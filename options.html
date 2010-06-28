@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Simple Profanity Filter Options</title>
+</head>
+<script type="text/javascript">
+// Saves options to localStorage.
+function save_options() {
+	var listbox = document.getElementById("wordList");
+	var wordList = listbox.value;
+	localStorage["wordList"] = wordList;
+}
+
+// Restores select box states to saved values from localStorage.
+function restore_options() {
+	var listFavorite = localStorage["wordList"];
+	if (!listFavorite) {
+		return;
+	}
+	var listbox = document.getElementById("wordList");
+	listbox.value = listFavorite;
+}
+
+</script>
+
+<body onload="restore_options()">
+<table border=0>
+<tr>
+<td>
+<img src="icon_small.png">
+</td>
+<td>
+<h2>Simple Profanity Filter</h2>
+</td>
+</tr>
+</table>
+<table border="0">
+<tr>
+<td align="top">
+Filtered Words (comma separated): 
+</td>
+<td align="top">
+<textarea id="wordList" cols="40" rows="10"></textarea>
+</td>
+</tr>
+</table>
+<br>
+<button onclick="save_options()">Save</button>
+</body>
+</html>

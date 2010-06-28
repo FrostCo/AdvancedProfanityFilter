@@ -1,0 +1,22 @@
+<html>
+<head>
+<script>
+function begin() {
+	if (!localStorage.wordList) {
+		// Default profanity word list
+		localStorage.wordList = "fuck, shit, bitch";
+	}
+
+	chrome.extension.onRequest.addListener(
+		function(request, sender, sendResponse) {
+		if (request.localstorage == "wordList")
+			sendResponse({wordList: localStorage.wordList});
+		else
+			sendResponse({});
+	});
+}
+</script>
+</head>
+<body onload="begin()">
+</body>
+</html>
