@@ -1,6 +1,6 @@
 {
 	"name": "Simple Profanity Filter",
-	"version": "1.01",
+	"version": "1.2",
 	"description": "A simple and configurable profanity filter.",
 	"icons": { "128": "icon.png" },
 	"background_page": "background.html",
