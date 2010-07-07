@@ -1,23 +1,58 @@
 var wordList;
+var preserveFirst;
+var filterSubstring;
+var readyWordList = false;
+var readyPreserveFirst = false;
+var readyFilterSubstring = false;
 
-chrome.extension.sendRequest({localstorage: "wordList"}, function(response) {
-	wordList = parseWordList(response.wordList);
-	removeProfanity();
-	document.addEventListener('DOMSubtreeModified', removeProfanity, false);
+// Retrieve the localStorage from background page
+var port = chrome.extension.connect({name: "getLocalStorage"});
+port.postMessage({localStorage: "wordList"});
+port.postMessage({localStorage: "preserveFirst"});
+port.postMessage({localStorage: "filterSubstring"});
+port.onMessage.addListener(function(msg) {
+  if (msg.wordList) {
+	wordList = msg.wordList.split(",");
+	if (readyPreserveFirst && readyFilterSubstring) {
+		// When all local storage retrieved, begin removing profanity
+		removeProfanity();
+	}
+	readyWordList = true;
+  }
+  if (msg.preserveFirst) {
+	preserveFirst = (msg.preserveFirst == "true");
+	if (readyWordList && readyFilterSubstring) {
+		// When all local storage retrieved, begin removing profanity
+		removeProfanity();
+	}
+	readyPreserveFirst = true;
+  }
+  if (msg.filterSubstring) {
+	filterSubstring = (msg.filterSubstring == "true");
+	if (readyWordList && readyPreserveFirst) {
+		// When all local storage retrieved, begin removing profanity
+		removeProfanity();
+	}
+	readyFilterSubstring = true;
+  }
 });
 
+// When DOM it modified, remove profanity again
+document.addEventListener('DOMSubtreeModified', removeProfanity, false);
+
+// Remove the profanity from the document
 function removeProfanity() {
 	var regExList = [];
-	var starList = [];
-	for (var x = 0; x < wordList.length; x++) {
-		regExList.push(new RegExp("\\b" + wordList[x] + "\\b", "gi" ));
-		var starString = "";
-		for (var y = 0; y < wordList[x].length; y++) {
-			starString = starString + "*";
+	if (filterSubstring) {
+		for (var x = 0; x < wordList.length; x++) {
+			regExList.push(new RegExp("(" + wordList[x][0] + ")" + wordList[x].substring(1), "gi" ));
 		}
-		starList.push(starString);
+	} else {
+		for (var x = 0; x < wordList.length; x++) {
+			regExList.push(new RegExp("\\b(" + wordList[x][0] + ")" + wordList[x].substring(1) + "\\b", "gi" ));
+		}
 	}
-	var xPathResult = document.evaluate(
+	var evalResult = document.evaluate(
 		'.//text()[normalize-space(.) != ""]',
 		document,
 		null,
@@ -25,56 +60,27 @@ function removeProfanity() {
 		null
 	);
 	
-	for (var i = 0; i < xPathResult.snapshotLength; i++) {
-		var textNode = xPathResult.snapshotItem(i);
+	for (var i = 0; i < evalResult.snapshotLength; i++) {
+		var textNode = evalResult.snapshotItem(i);
 		for (var z = 0; z < regExList.length; z++) {
-			textNode.data = textNode.data.replace(regExList[z], starList[z]);
+			textNode.data = textNode.data.replace(regExList[z], starReplace);
 		}
 	}
 }
 
-function parseWordList(wordListString) {
-	wordListString = wordListString.toLowerCase();
-	
-	var parsedWordList = [];
-	var startIndex = 0;
-	var endIndex = 0;
-	var wordStarted = false;
-	for (var i = 0; i < wordListString.length; i++) {
-		if (wordListString[i] == ",") {
-			endIndex = findPrevChar(wordListString, i);
-			if (startIndex < endIndex) {
-				parsedWordList.push(wordListString.substring(startIndex, endIndex));
-			}
-			wordStarted = false;
-			startIndex = i + 1;
-			endIndex = startIndex;
-		} else if (wordListString[i] == " ") {
-			if (!wordStarted) {
-				startIndex = i + 1;
-				endIndex = startIndex;
-			}
-		} else {
-			if (!wordStarted) {
-				wordStarted = true;
-			}
+// Replace the profanity with a string of asterisks
+function starReplace(strMatchingString, strFirstLetter) {
+	var starString = "";
+	if (!preserveFirst) {
+		for (var i = 0; i < strMatchingString.length; i++) {
+			starString = starString + "*";
+		}
+	} else {
+		starString = strFirstLetter;
+		for (var i = 1; i < strMatchingString.length; i++) {
+			starString = starString + "*";
 		}
 	}
-	endIndex = findPrevChar(wordListString, i);
-	if (startIndex < endIndex) {
-		parsedWordList.push(wordListString.substring(startIndex, endIndex));
-	}
 	
-	return parsedWordList;
-}
-
-function findPrevChar(wordListString, i) {
-	while (i > 0) {
-		if (i != " ") {
-			return i;
-		}
-		i--;
-	}
-	
-	return i;
+	return starString;
 }
