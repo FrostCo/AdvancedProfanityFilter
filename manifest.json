@@ -9,7 +9,8 @@
     {
       "matches": ["http://*/*"],
       "js": ["filter.js"],
-	  "run_at": "document_end"
+	  "run_at": "document_end",
+	  "all_frames": true
     }
   ],
   "permissions": [

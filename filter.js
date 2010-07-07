@@ -1,41 +1,36 @@
+var wordList;
+
 chrome.extension.sendRequest({localstorage: "wordList"}, function(response) {
-	// Parse profanity word list
-	var wordList = parseWordList(response.wordList);
-	
-	var html = document.body.innerHTML;
-	for (var i = 0; i < html.length; i++) {
-		for (var x = 0; x < wordList.length; x++) {
-			if (html[i].toLowerCase() == wordList[x].substring(wordList[x].length - 1)) {
-				if (checkProfanity(html, i, wordList[x])) {
-					html = replaceWithStars(html, i, wordList[x].length);
-				}
-			}
-		}
-	}
+	wordList = parseWordList(response.wordList);
+	removeProfanity();
+	document.addEventListener('DOMSubtreeModified', removeProfanity, false);
 });
 
-function checkProfanity(html, i, word) {
-	if (html.length < word.length) {
-		return false;
-	} else {
-		for (var x = 0; x < word.length; x++) {
-			if (word.charAt(word.length - 1 - x) != html.charAt(i - x)) {
-				return false;
-			}
+function removeProfanity() {
+	var regExList = [];
+	var starList = [];
+	for (var x = 0; x < wordList.length; x++) {
+		regExList.push(new RegExp("\\b" + wordList[x] + "\\b", "gi" ));
+		var starString = "";
+		for (var y = 0; y < wordList[x].length; y++) {
+			starString = starString + "*";
+		}
+		starList.push(starString);
+	}
+	var xPathResult = document.evaluate(
+		'.//text()[normalize-space(.) != ""]',
+		document,
+		null,
+		XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
+		null
+	);
+	
+	for (var i = 0; i < xPathResult.snapshotLength; i++) {
+		var textNode = xPathResult.snapshotItem(i);
+		for (var z = 0; z < regExList.length; z++) {
+			textNode.data = textNode.data.replace(regExList[z], starList[z]);
 		}
 	}
-	
-	return true;
-}
-
-function replaceWithStars(html, i, numStars) {
-	var stars = "";
-	for (var x = 0; x < numStars; x++) {
-		stars = stars + "*";
-	}
-	html = html.substring(0, i-numStars) + stars + html.substring(i);
-	
-	return html;
 }
 
 function parseWordList(wordListString) {
