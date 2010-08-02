@@ -1,6 +1,6 @@
 {
 	"name": "Simple Profanity Filter",
-	"version": "1.2",
+	"version": "1.2.1",
 	"description": "A simple and configurable profanity filter.",
 	"icons": { "128": "icon.png" },
 	"background_page": "background.html",
@@ -9,7 +9,7 @@
 		{
 		"matches": ["http://*/*"],
 		"js": ["filter.js"],
-		"run_at": "document_start",
+		"run_at": "document_end",
 		"all_frames": true
 		}
 	],

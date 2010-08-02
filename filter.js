@@ -4,6 +4,7 @@ var filterSubstring;
 var readyWordList = false;
 var readyPreserveFirst = false;
 var readyFilterSubstring = false;
+var profanityList = [];
 
 // Retrieve the localStorage from background page
 var port = chrome.extension.connect({name: "getLocalStorage"});
@@ -15,6 +16,7 @@ port.onMessage.addListener(function(msg) {
 	wordList = msg.wordList.split(",");
 	if (readyPreserveFirst && readyFilterSubstring) {
 		// When all local storage retrieved, begin removing profanity
+		generateProfanityList();
 		removeProfanity();
 	}
 	readyWordList = true;
@@ -23,6 +25,7 @@ port.onMessage.addListener(function(msg) {
 	preserveFirst = (msg.preserveFirst == "true");
 	if (readyWordList && readyFilterSubstring) {
 		// When all local storage retrieved, begin removing profanity
+		generateProfanityList();
 		removeProfanity();
 	}
 	readyPreserveFirst = true;
@@ -31,27 +34,31 @@ port.onMessage.addListener(function(msg) {
 	filterSubstring = (msg.filterSubstring == "true");
 	if (readyWordList && readyPreserveFirst) {
 		// When all local storage retrieved, begin removing profanity
+		generateProfanityList();
 		removeProfanity();
 	}
 	readyFilterSubstring = true;
   }
 });
 
-// When DOM it modified, remove profanity again
-document.addEventListener('DOMSubtreeModified', removeProfanity, false);
+// When DOM is modified, remove profanity from inserted node
+document.addEventListener('DOMNodeInserted', removeProfanityFromNode, false);
 
-// Remove the profanity from the document
-function removeProfanity() {
-	var regExList = [];
+// Parse the profanity list
+function generateProfanityList() {
 	if (filterSubstring) {
 		for (var x = 0; x < wordList.length; x++) {
-			regExList.push(new RegExp("(" + wordList[x][0] + ")" + wordList[x].substring(1), "gi" ));
+			profanityList.push(new RegExp("(" + wordList[x][0] + ")" + wordList[x].substring(1), "gi" ));
 		}
 	} else {
 		for (var x = 0; x < wordList.length; x++) {
-			regExList.push(new RegExp("\\b(" + wordList[x][0] + ")" + wordList[x].substring(1) + "\\b", "gi" ));
+			profanityList.push(new RegExp("\\b(" + wordList[x][0] + ")" + wordList[x].substring(1) + "\\b", "gi" ));
 		}
 	}
+}
+
+// Remove the profanity from the document
+function removeProfanity() {
 	var evalResult = document.evaluate(
 		'.//text()[normalize-space(.) != ""]',
 		document,
@@ -62,8 +69,28 @@ function removeProfanity() {
 	
 	for (var i = 0; i < evalResult.snapshotLength; i++) {
 		var textNode = evalResult.snapshotItem(i);
-		for (var z = 0; z < regExList.length; z++) {
-			textNode.data = textNode.data.replace(regExList[z], starReplace);
+		for (var z = 0; z < profanityList.length; z++) {
+			textNode.data = textNode.data.replace(profanityList[z], starReplace);
+		}
+	}
+}
+
+// Remove the profanity from the node
+function removeProfanityFromNode(event) {
+	var node = event.target;
+	
+	var evalResult = document.evaluate(
+		'.//text()[normalize-space(.) != ""]',
+		node,
+		null,
+		XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
+		null
+	);
+	
+	for (var i = 0; i < evalResult.snapshotLength; i++) {
+		var textNode = evalResult.snapshotItem(i);
+		for (var z = 0; z < profanityList.length; z++) {
+			textNode.data = textNode.data.replace(profanityList[z], starReplace);
 		}
 	}
 }
