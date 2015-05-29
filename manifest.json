@@ -1,19 +1,25 @@
 {
-	"name": "Simple Profanity Filter",
-	"version": "1.2.1",
-	"description": "A simple and configurable profanity filter.",
-	"icons": { "128": "icon.png" },
-	"background_page": "background.html",
-	"options_page": "options.html",
-	"content_scripts": [
-		{
-		"matches": ["http://*/*"],
-		"js": ["filter.js"],
-		"run_at": "document_end",
-		"all_frames": true
-		}
-	],
-	"permissions": [
-		"tabs"
-	]
+  "name": "Simple Profanity Filter 2",
+  "short_name": "Profanity Filter",
+  "author": "phr0styr",
+  "manifest_version": 2,
+  "version": "1.2.1",
+  "description": "A simple and configurable profanity filter.",
+  "icons": { "128": "icon.png" },
+  "permissions": [
+    "tabs"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["filter.js"],
+      "run_at": "document_end",
+      "all_frames": true
+    }
+  ]
 }

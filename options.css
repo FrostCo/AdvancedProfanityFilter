@@ -1,50 +1,57 @@
 body {
-	background-color: #b00101;
+  background-color: #b00101;
 }
 
 a:link { 
-	color: gray;
-	font-size: 10px;
+  color: gray;
+  font-size: 10px;
 }
 
 a:visited { 
-	color: gray;
-	font-size: 10px;
+  color: gray;
+  font-size: 10px;
 }
 
 a:hover { 
-	color: #393939;
-	font-size: 10px;
+  color: #393939;
+  font-size: 10px;
 }
 
 a:active { 
-	color: #393939;
-	font-size: 10px;
+  color: #393939;
+  font-size: 10px;
 }
 
 textarea
 {
-    width:100%;
+  width:100%;
 }
 
 #ext-options-header { 
-	color: #b00101;
-	font-size: 22px;
-	font-weight:bold;
+  color: #b00101;
+  font-size: 22px;
+  font-weight:bold;
 }
 
 #ext-options {
-	border:2px solid #ccc;
-	margin:10px auto;
-	padding:10px;
-	width:400px;
-	background-color:white;
-	font-family: arial, sans-serif;
-	color: black;
-	font-size: 14px;
+  border:2px solid #ccc;
+  margin:10px auto;
+  padding:10px;
+  width:400px;
+  background-color:white;
+  font-family: arial, sans-serif;
+  color: black;
+  font-size: 14px;
 }
 
 #ext-options-notes {
-	color: gray;
-	font-size: 10px;
+  color: gray;
+  font-size: 10px;
+}
+
+.contributors {
+  font-style: italic;
+  font-size: 10px;
+  color: gray;
+  line-height: 14px;
 }

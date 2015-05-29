@@ -1,78 +1,76 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-<title>Simple Profanity Filter</title>
-<script type="text/javascript" src="options.js"></script>
-<link rel="stylesheet" type="text/css" href="options.css" />
+  <title>Simple Profanity Filter</title>
+  <link rel="stylesheet" type="text/css" href="options.css" />
 </head>
+<body>
+  <div id="ext-options">
+    <table>
+      <tr>
+        <td>
+          <table border="0">
+            <tr>
+              <td>
+                <img src="icon_small.png" />
+              </td>
+              <td>
+                <div id="ext-options-header">Simple Profanity Filter</div>
+                <a href="https://chrome.google.com/extensions/detail/ackkocjhcalcpgpfjcoinogdejibgbho" target="_blank">Visit the Official Website</a>
+              </td>
+            </tr>
+          </table>
+          <br />
 
-<body onload="restore_options()">
-<div id="ext-options">
-<table>
-<tr>
-<td>
+          <div ID="profanityButton" style="display:block;">
+            <br />
+            <button id="toggleProfanity">Modify Profanity List</button>
+            <div id="ext-options-notes">Warning: Offensive Language</div>
+            <br />
+          </div>
 
-<table border="0">
-<tr>
-<td>
-<img src="icon_small.png" />
-</td>
-<td>
-<div id="ext-options-header">Simple Profanity Filter</div>
-<a href="javascript:openWebsite()">Visit the Official Website</a>
-</td>
-</tr>
-</table>
-<br />
+          <div ID="profanityList" style="display:none;">
+            Filtered Words:<br />
+            <div id="ext-options-notes">Comma separated values with no spaces</div>
+            <textarea id="wordList" cols="40" rows="10"></textarea>
+          </div>
 
-<div ID="profanityButton" style="display:block;">
-<br />
-<button onclick="toggleProfanity()">Modify Profanity List</button>
-<div id="ext-options-notes">Warning: Offensive Language</div>
-<br />
-</div>
+          <form name="myForm">
+            <table border="0" cellpadding="5">
+              <tr>
+                <td>
+                  <input type="checkbox" name="preserveFirst" value="value0">
+                </td>
+                <td>
+                  Preserve the first letter<br />
+                  <div id="ext-options-notes">Example: If "Dog" is filtered, then it is displayed as "D**"</div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" name="filterSubstring" value="value0">
+                </td>
+                <td>
+                  Filter parts of words<br />
+                  <div id="ext-options-notes">Example: If "Dog" is filtered, then "Doghouse" is displayed as "***house"</div>
+                </td>
+              </tr>
+            </table>
+          </form>
+          <br />
 
-<div ID="profanityList" style="display:none;">
-Filtered Words:<br />
-<div id="ext-options-notes">Comma separated values with no spaces</div>
-<textarea id="wordList" cols="40" rows="10"></textarea>
-</div>
-
-<form name="myForm">
-<table border="0" cellpadding="5">
-<tr>
-<td>
-<input type="checkbox" name="preserveFirst" value="value0">
-</td>
-<td>
-Preserve the first letter<br />
-<div id="ext-options-notes">
-Example: If "Dog" is filtered, then it is displayed as "D**"
-</div>
-</td>
-</tr>
-<tr>
-<td>
-<input type="checkbox" name="filterSubstring" value="value0">
-</td>
-<td>
-Filter parts of words<br />
-<div id="ext-options-notes">
-Example: If "Dog" is filtered, then "Doghouse" is displayed as "***house"
-</div>
-</td>
-</tr>
-</table>
-</form>
-<br />
-
-<button onclick="save_options()">Save</button>
-<button onclick="window.close()">Cancel</button>
-
-</td>
-</tr>
-</table>
-</div>
+          <button id="save">Save</button>
+          <button id="close">Close</button>
+        </td>
+      </tr>
+    </table>
+    <div class="contributors">
+      <p>
+        Originally developed by markyd13<br />
+        Additional functionality added by Ricahrd Frost
+      </p>
+    </div>
+  </div>
+  <script type="text/javascript" src="options.js"></script>
 </body>
 </html>
