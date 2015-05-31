@@ -1,58 +1,31 @@
 var wordList;
+var profanityList = [];
 var preserveFirst;
 var filterSubstring;
-var readyWordList = false;
-var readyPreserveFirst = false;
-var readyFilterSubstring = false;
-var profanityList = [];
+var defaults = {'wordList' : 'asshole,bastard,bitch,cock,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst' : false, 'filterSubstring' : true};
 
-// Retrieve the localStorage from background page
-var port = chrome.extension.connect({name: "getLocalStorage"});
-port.postMessage({localStorage: "wordList"});
-port.postMessage({localStorage: "preserveFirst"});
-port.postMessage({localStorage: "filterSubstring"});
-port.onMessage.addListener(function(msg) {
-  if (msg.wordList) {
-  wordList = msg.wordList.split(",");
-  if (readyPreserveFirst && readyFilterSubstring) {
-    // When all local storage retrieved, begin removing profanity
-    generateProfanityList();
-    removeProfanity();
-  }
-  readyWordList = true;
-  }
-  if (msg.preserveFirst) {
-  preserveFirst = (msg.preserveFirst == "true");
-  if (readyWordList && readyFilterSubstring) {
-    // When all local storage retrieved, begin removing profanity
-    generateProfanityList();
-    removeProfanity();
-  }
-  readyPreserveFirst = true;
-  }
-  if (msg.filterSubstring) {
-  filterSubstring = (msg.filterSubstring == "true");
-  if (readyWordList && readyPreserveFirst) {
-    // When all local storage retrieved, begin removing profanity
-    generateProfanityList();
-    removeProfanity();
-  }
-  readyFilterSubstring = true;
-  }
+chrome.storage.sync.get(defaults, function(settings) {
+  console.log('filter');
+  wordList = settings.wordList.split(',');
+  filterSubstring = settings.filterSubstring;
+  preserveFirst = settings.preserveFirst;
+  generateProfanityList();
+  removeProfanity();
 });
 
+// TODO: Is this still needed? Works without it on Twitter and Facebook
 // When DOM is modified, remove profanity from inserted node
-document.addEventListener('DOMNodeInserted', removeProfanityFromNode, false);
+// document.addEventListener('DOMNodeInserted', removeProfanityFromNode, false);
 
 // Parse the profanity list
 function generateProfanityList() {
   if (filterSubstring) {
     for (var x = 0; x < wordList.length; x++) {
-      profanityList.push(new RegExp("(" + wordList[x][0] + ")" + wordList[x].substring(1), "gi" ));
+      profanityList.push(new RegExp('(' + wordList[x][0] + ')' + wordList[x].substring(1), 'gi' ));
     }
   } else {
     for (var x = 0; x < wordList.length; x++) {
-      profanityList.push(new RegExp("\\b(" + wordList[x][0] + ")" + wordList[x].substring(1) + "\\b", "gi" ));
+      profanityList.push(new RegExp('\\b(' + wordList[x][0] + ')' + wordList[x].substring(1) + '\\b', 'gi' ));
     }
   }
 }
@@ -97,15 +70,15 @@ function removeProfanityFromNode(event) {
 
 // Replace the profanity with a string of asterisks
 function starReplace(strMatchingString, strFirstLetter) {
-  var starString = "";
+  var starString = '';
   if (!preserveFirst) {
     for (var i = 0; i < strMatchingString.length; i++) {
-      starString = starString + "*";
+      starString = starString + '*';
     }
   } else {
     starString = strFirstLetter;
     for (var i = 1; i < strMatchingString.length; i++) {
-      starString = starString + "*";
+      starString = starString + '*';
     }
   }
   
