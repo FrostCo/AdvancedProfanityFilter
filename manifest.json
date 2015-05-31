@@ -3,7 +3,7 @@
   "short_name": "Profanity Filter",
   "author": "phr0styr",
   "manifest_version": 2,
-  "version": "1.2.1",
+  "version": "1.9.0",
   "description": "A simple and configurable profanity filter.",
   "icons": { "128": "icon.png" },
   "permissions": [
