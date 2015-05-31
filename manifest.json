@@ -7,12 +7,9 @@
   "description": "A simple and configurable profanity filter.",
   "icons": { "128": "icon.png" },
   "permissions": [
-    "tabs"
+    "tabs",
+    "storage"
   ],
-  "background": {
-    "scripts": ["background.js"],
-    "persistent": false
-  },
   "options_page": "options.html",
   "content_scripts": [
     {
