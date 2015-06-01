@@ -13,9 +13,8 @@ chrome.storage.sync.get(defaults, function(settings) {
   removeProfanity();
 });
 
-// TODO: Is this still needed? Works without it on Twitter and Facebook
 // When DOM is modified, remove profanity from inserted node
-// document.addEventListener('DOMNodeInserted', removeProfanityFromNode, false);
+document.addEventListener('DOMNodeInserted', removeProfanityFromNode, false);
 
 // Parse the profanity list
 function generateProfanityList() {
