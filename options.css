@@ -45,6 +45,7 @@ textarea
 }
 
 #ext-options-notes {
+  padding-top: 5px;
   color: gray;
   font-size: 10px;
 }
