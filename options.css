@@ -50,6 +50,15 @@ textarea
   font-size: 10px;
 }
 
+#status {
+  height: 18px;
+  color: green;
+}
+
+#status.error {
+  color: red;
+}
+
 .contributors {
   font-style: italic;
   font-size: 10px;
