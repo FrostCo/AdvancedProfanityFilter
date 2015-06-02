@@ -3,34 +3,19 @@ var profanityList = [];
 var preserveFirst;
 var filterSubstring;
 var defaults = {'wordList' : 'asshole,bastard,bitch,cock,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst' : false, 'filterSubstring' : true};
-var localDefaults = {'chromeSync' : true};
 
 // Get settings
-chrome.storage.local.get(localDefaults, function(local){
- if (local.chromeSync) {
-  chrome.storage.sync.get(defaults, function(settings) {
-    console.log('filter (sync storage)');
-    filter(settings);
-  });
-  } else {
-    chrome.storage.local.get(defaults, function(settings){
-      console.log('filter (local storage)');
-      filter(settings);
-    });
-  }
-});
-
-// When DOM is modified, remove profanity from inserted node
-document.addEventListener('DOMNodeInserted', removeProfanityFromNode, false);
-
-// Use retrieved settings and clean the document
-function filter(settings) {
+chrome.storage.sync.get(defaults, function(settings) {
+  console.log('filter');
   wordList = settings.wordList.split(',');
   filterSubstring = settings.filterSubstring;
   preserveFirst = settings.preserveFirst;
   generateProfanityList();
   removeProfanity();
-}
+});
+
+// When DOM is modified, remove profanity from inserted node
+document.addEventListener('DOMNodeInserted', removeProfanityFromNode, false);
 
 // Parse the profanity list
 function generateProfanityList() {
