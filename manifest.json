@@ -3,14 +3,27 @@
   "short_name": "Profanity Filter",
   "author": "phr0styr",
   "manifest_version": 2,
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "An advanced profanity filter.",
   "icons": { "128": "icon.png" },
   "permissions": [
     "tabs",
     "storage"
   ],
-  "options_page": "options.html",
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
+  "background": {
+    "scripts": ["eventPage.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_icon": {
+      "38": "icon_small.png"
+    },
+    "default_title": "Advanced Profanity Filter"
+  },
   "content_scripts": [
     {
       "matches": ["*://*/*"],

@@ -51,9 +51,11 @@ function toggleProfanity() {
     profanityList.style.display = 'block';
     document.getElementById('listWarning').style.display = 'none';
     document.getElementById('wordList').focus();
+    document.getElementById('toggleProfanity').textContent = "Hide Profanity List"
   } else {
     profanityList.style.display = 'none';
     document.getElementById('listWarning').style.display = 'block';
+    document.getElementById('toggleProfanity').textContent = "Modify Profanity List"
   }
 }
 
