@@ -1,57 +1,49 @@
-body {
-  background-color: #b00101;
-}
-
-a:link { 
+a:link, a:visited {
   color: gray;
   font-size: 10px;
 }
 
-a:visited { 
-  color: gray;
-  font-size: 10px;
-}
-
-a:hover { 
+a:hover, a:active {
   color: #393939;
   font-size: 10px;
 }
 
-a:active { 
-  color: #393939;
-  font-size: 10px;
-}
-
-textarea
-{
+textarea {
   width:100%;
 }
 
-#ext-options-header { 
-  color: #b00101;
-  font-size: 22px;
-  font-weight:bold;
+label input[type=checkbox]{
+  position: relative;
+  vertical-align: middle;
+  bottom: 1px;
 }
 
-#ext-options {
-  border:2px solid #ccc;
-  margin:10px auto;
-  padding:10px;
-  width:400px;
-  background-color:white;
-  font-family: arial, sans-serif;
-  color: black;
-  font-size: 14px;
+#save {
+  float: right;
+  margin-right: 0;
 }
 
-#ext-options-notes {
+.notes {
   padding-top: 5px;
-  color: gray;
   font-size: 10px;
+  color: gray;
+}
+
+.examples {
+  padding-bottom: 5px;
+  padding-left: 20px;
+  font-size: 10px;
+  color: gray; 
+}
+
+#options {
+  padding: 20px 0;
 }
 
 #status {
-  height: 18px;
+  height: 40px;
+  padding-top: 11px;
+  padding-bottom: 11px;
   color: green;
 }
 
@@ -59,9 +51,15 @@ textarea
   color: red;
 }
 
-.contributors {
+#default {
+  margin: 6px 0 0 0;
+  float: right;
+}
+
+#contributors {
   font-style: italic;
   font-size: 10px;
-  color: gray;
   line-height: 14px;
+  display: inline;
+  color: gray;
 }

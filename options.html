@@ -4,74 +4,42 @@
   <title>Advanced Profanity Filter</title>
   <link rel="stylesheet" type="text/css" href="options.css" />
 </head>
+
 <body>
-  <div id="ext-options">
-    <table>
-      <tr>
-        <td>
-          <table border="0">
-            <tr>
-              <td>
-                <img src="icon_small.png" />
-              </td>
-              <td>
-                <div id="ext-options-header">Advanced Profanity Filter</div>
-              </td>
-            </tr>
-          </table>
-          <br />
-
-          <div ID="profanityButton" style="display:block;">
-            <br />
-            <button id="toggleProfanity">Modify Profanity List</button>
-            <div id="ext-options-notes">Warning: Offensive Language</div>
-            <br />
-          </div>
-
-          <div ID="profanityList" style="display:none;">
-            Filtered Words:<br />
-            <div id="ext-options-notes">Comma separated values with no spaces</div>
-            <textarea id="wordList" cols="40" rows="10"></textarea>
-          </div>
-
-          <form name="myForm">
-            <table border="0" cellpadding="5">
-              <tr>
-                <td>
-                  <input type="checkbox" name="preserveFirst" value="value0">
-                </td>
-                <td>
-                  Preserve the first letter<br />
-                  <div id="ext-options-notes">Example: If "Dog" is filtered, then it is displayed as "D**"</div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <input type="checkbox" name="filterSubstring" value="value0">
-                </td>
-                <td>
-                  Filter parts of words<br />
-                  <div id="ext-options-notes">Example: If "Dog" is filtered, then "Doghouse" is displayed as "***house"</div>
-                </td>
-              </tr>
-            </table>
-          </form>
-          <br />
-
-          <button id="save">Save</button>
-          <button id="close">Close</button>
-          <button id="default">Default</button>
-        </td>
-      </tr>
-    </table>
-    <div id="status"></div>
-    <div class="contributors">
-      <p>
-        Created By <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Richard Frost</a><br />
-        Based off of markyd13's Simple Profanity Filter
-      </p>
-    </div>
+  <div id="profanityButton">
+    <button id="toggleProfanity">Modify Profanity List</button>
+    <div id="listWarning" class="notes">Warning: Offensive Language</div>
   </div>
-  <script type="text/javascript" src="options.js"></script>
+
+  <div id="profanityList" style="display: none;">
+    <div class="notes">Comma separated values with no spaces</div>
+    <textarea id="wordList" cols="40" rows="10"></textarea>
+    <button id="save">Save</button>
+  </div>
+
+  <div id="options">
+    <label>
+      <input type="checkbox" id="preserveFirst">
+      Preserve the first letter
+    </label>
+    <div class="examples">Example: If "Dog" is filtered, then it is displayed as "D**"</div>
+
+    <label>
+      <input type="checkbox" id="filterSubstring">
+      Filter parts of words
+    </label>
+    <div class="examples">Example: If "Dog" is filtered, then "Doghouse" is displayed as "***house"</div>
+  </div>
+
+  <div id="status"></div>
+  
+  <button id="default">Restore Defaults</button>
+  <span id="contributors">
+    Created By <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Richard Frost</a>
+    <br>
+    Based off of markyd13's Simple Profanity Filter
+  </span>
+
+  <script src="options.js"></script>
 </body>
 </html>

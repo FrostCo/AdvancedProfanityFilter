@@ -71,6 +71,7 @@ function removeProfanityFromNode(event) {
 // Replace the profanity with a string of asterisks
 function starReplace(strMatchingString, strFirstLetter) {
   var starString = '';
+
   if (!preserveFirst) {
     for (var i = 0; i < strMatchingString.length; i++) {
       starString = starString + '*';
