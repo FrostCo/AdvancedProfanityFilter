@@ -3,12 +3,11 @@ var profanityList = [];
 var preserveFirst;
 var filterSubstring;
 var defaults = {'wordList' : 'asshole,bastard,bitch,cock,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst' : false, 'filterSubstring' : true};
-var localSyncEnabled = {'syncEnabled' : false};
+var localDefaults = {'chromeSync' : true};
 
 // Get settings
-chrome.storage.local.get(localSyncEnabled, function(sync){
- console.log(sync);
- if (sync.syncEnabled) {
+chrome.storage.local.get(localDefaults, function(local){
+ if (local.chromeSync) {
   chrome.storage.sync.get(defaults, function(settings) {
     console.log('filter (sync storage)');
     filter(settings);
