@@ -1,6 +1,5 @@
 // Saves options to sync storage
 function save_options() {
-  console.log('save_options');
   // Gather current settings
   var settings = {};
   settings.wordList = document.getElementById('wordList').value;
@@ -20,9 +19,7 @@ function save_options() {
 
 // Restores form state to saved values from Chroem Sync
 function restore_options() {
-  console.log('restore_options');
   var defaults = {'wordList': 'asshole,bastard,bitch,cock,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true};
-
   chrome.storage.sync.get(defaults, function(settings) {
     // Display saved settings
     document.getElementById('wordList').value = settings.wordList;
@@ -33,7 +30,6 @@ function restore_options() {
 
 // Restore default settings
 function restore_defaults() {
-  console.log('restore defaults');
   chrome.storage.sync.clear(function(){
     if (chrome.runtime.lastError) {
       update_status('Error restoring defaults! Please try again.', true, 5000);
