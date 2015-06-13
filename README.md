@@ -17,3 +17,5 @@ The best way to install this Chrome extension is to get it from the [Chrome Web 
 
 You can download the original extension by markyd13 [here](https://chrome.google.com/webstore/detail/simple-profanity-filter/ackkocjhcalcpgpfjcoinogdejibgbho).
 
+##### License
+This project is licensed under the terms of the GPL v3.0 license.
