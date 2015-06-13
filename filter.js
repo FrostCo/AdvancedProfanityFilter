@@ -1,17 +1,17 @@
-var wordList;
+var wordList, preserveFirst, filterSubstring, showCounter;
 var profanityList = [];
-var preserveFirst;
-var filterSubstring;
-var defaults = {'wordList' : 'asshole,bastard,bitch,cock,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst' : false, 'filterSubstring' : true};
+var defaults = {'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true, 'showCounter': true};
+var counter = 0;
 
-// Get settings
+// Get settings and run filter
 chrome.storage.sync.get(defaults, function(settings) {
-  console.log('filter');
   wordList = settings.wordList.split(',');
   filterSubstring = settings.filterSubstring;
   preserveFirst = settings.preserveFirst;
+  showCounter = settings.showCounter;
   generateProfanityList();
   removeProfanity();
+  if (counter > 0 && showCounter){chrome.runtime.sendMessage({counter: counter.toString()});}
 });
 
 // When DOM is modified, remove profanity from inserted node
@@ -66,11 +66,13 @@ function removeProfanityFromNode(event) {
       textNode.data = textNode.data.replace(profanityList[z], starReplace);
     }
   }
+  if (counter > 0 && showCounter){chrome.runtime.sendMessage({counter: counter.toString()});}
 }
 
 // Replace the profanity with a string of asterisks
 function starReplace(strMatchingString, strFirstLetter) {
   var starString = '';
+  counter++;
 
   if (!preserveFirst) {
     for (var i = 0; i < strMatchingString.length; i++) {
@@ -82,6 +84,6 @@ function starReplace(strMatchingString, strFirstLetter) {
       starString = starString + '*';
     }
   }
-  
+
   return starString;
 }

@@ -5,6 +5,7 @@ function save_options() {
   settings.wordList = document.getElementById('wordList').value;
   settings.preserveFirst = document.getElementById('preserveFirst').checked;
   settings.filterSubstring = document.getElementById('filterSubstring').checked;
+  settings.showCounter = document.getElementById('showCounter').checked
 
   // Save settings
   chrome.storage.sync.set(settings, function() {
@@ -12,19 +13,20 @@ function save_options() {
       update_status('Settings not saved! Please try again.', true, 5000);
     } else {
       update_status('Settings saved successfully!', false, 3000);
-      if (document.getElementById('profanityList').style.display == 'block') {toggleProfanity();} // Close wordList
+      if (document.getElementById('profanityList').style.display === 'block') {toggleProfanity();} // Close wordList
     }
   });
 }
 
 // Restores form state to saved values from Chroem Sync
 function restore_options() {
-  var defaults = {'wordList': 'asshole,bastard,bitch,cock,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true};
+  var defaults = {'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true, 'showCounter': true};
   chrome.storage.sync.get(defaults, function(settings) {
     // Display saved settings
     document.getElementById('wordList').value = settings.wordList;
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('filterSubstring').checked = settings.filterSubstring;
+    document.getElementById('showCounter').checked = settings.showCounter;
   });
 }
 
@@ -43,7 +45,7 @@ function restore_defaults() {
 // Displays the profanity list and hides the profanity button
 function toggleProfanity() {
   var profanityList = document.getElementById('profanityList');
-  if (profanityList.style.display == 'none') {
+  if (profanityList.style.display === 'none') {
     profanityList.style.display = 'block';
     document.getElementById('listWarning').style.display = 'none';
     document.getElementById('wordList').focus();
@@ -69,4 +71,5 @@ document.getElementById('toggleProfanity').addEventListener('click', toggleProfa
 document.getElementById('save').addEventListener('click', save_options);
 document.getElementById('preserveFirst').addEventListener('click', save_options);
 document.getElementById('filterSubstring').addEventListener('click', save_options);
+document.getElementById('showCounter').addEventListener('click', save_options);
 document.getElementById('default').addEventListener('click', restore_defaults);
