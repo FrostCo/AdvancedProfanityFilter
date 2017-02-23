@@ -5,7 +5,7 @@ function save_options() {
   settings.wordList = document.getElementById('wordList').value;
   settings.preserveFirst = document.getElementById('preserveFirst').checked;
   settings.filterSubstring = document.getElementById('filterSubstring').checked;
-  settings.showCounter = document.getElementById('showCounter').checked
+  settings.showCounter = document.getElementById('showCounter').checked;
 
   // Save settings
   chrome.storage.sync.set(settings, function() {
@@ -49,11 +49,11 @@ function toggleProfanity() {
     profanityList.style.display = 'block';
     document.getElementById('listWarning').style.display = 'none';
     document.getElementById('wordList').focus();
-    document.getElementById('toggleProfanity').textContent = "Hide Profanity List"
+    document.getElementById('toggleProfanity').textContent = "Hide Profanity List";
   } else {
     profanityList.style.display = 'none';
     document.getElementById('listWarning').style.display = 'block';
-    document.getElementById('toggleProfanity').textContent = "Modify Profanity List"
+    document.getElementById('toggleProfanity').textContent = "Modify Profanity List";
   }
 }
 
