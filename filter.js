@@ -33,13 +33,13 @@ function generateProfanityList() {
 // Remove the profanity from the document
 function removeProfanity() {
   var evalResult = document.evaluate(
-    './/text()[normalize-space(.) != ""]',
+    '//body//text()[normalize-space(.) != ""]',
     document,
     null,
     XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
     null
   );
-  
+
   for (var i = 0; i < evalResult.snapshotLength; i++) {
     var textNode = evalResult.snapshotItem(i);
     for (var z = 0; z < profanityList.length; z++) {
@@ -51,7 +51,7 @@ function removeProfanity() {
 // Remove the profanity from the node
 function removeProfanityFromNode(event) {
   var node = event.target;
-  
+
   var evalResult = document.evaluate(
     './/text()[normalize-space(.) != ""]',
     node,
@@ -59,7 +59,7 @@ function removeProfanityFromNode(event) {
     XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
     null
   );
-  
+
   for (var i = 0; i < evalResult.snapshotLength; i++) {
     var textNode = evalResult.snapshotItem(i);
     for (var z = 0; z < profanityList.length; z++) {
