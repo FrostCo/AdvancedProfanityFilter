@@ -15,7 +15,27 @@ chrome.storage.sync.get(defaults, function(settings) {
 });
 
 // When DOM is modified, remove profanity from inserted node
-document.addEventListener('DOMNodeInserted', removeProfanityFromNode, false);
+var observer = new MutationObserver(function(mutations) {
+  mutations.forEach(function(mutation) {
+    checkForProfanity(mutation);
+  });
+});
+
+var observerConfig = {
+  childList: true,
+  subtree: true
+};
+
+var targetNode = document;
+observer.observe(targetNode, observerConfig);
+
+function checkForProfanity(mutation) {
+  mutation.addedNodes.forEach(function(node) {
+    if (node.tagName != "SCRIPT" || node.tagName != "STYLE") {
+      removeProfanityFromNode(node);
+    }
+  });
+}
 
 // Parse the profanity list
 function generateProfanityList() {
@@ -33,7 +53,7 @@ function generateProfanityList() {
 // Remove the profanity from the document
 function removeProfanity() {
   var evalResult = document.evaluate(
-    '//body//text()[normalize-space(.) != ""]',
+    '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]',
     document,
     null,
     XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
@@ -49,11 +69,9 @@ function removeProfanity() {
 }
 
 // Remove the profanity from the node
-function removeProfanityFromNode(event) {
-  var node = event.target;
-
+function removeProfanityFromNode(node) {
   var evalResult = document.evaluate(
-    './/text()[normalize-space(.) != ""]',
+    './/*[not(self::script or self::style)]/text()[normalize-space(.) != ""]',
     node,
     null,
     XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
