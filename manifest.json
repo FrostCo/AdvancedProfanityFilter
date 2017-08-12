@@ -11,10 +11,10 @@
     "128": "icons/icon128.png"
   },
   "permissions": [
-    "file://*/*",
     "tabs",
     "storage"
   ],
+  "optional_permissions": ["file://*/*"],
   "options_ui": {
     "page": "options.html",
     "chrome_style": true
