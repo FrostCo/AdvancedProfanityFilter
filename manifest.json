@@ -3,7 +3,7 @@
   "short_name": "Profanity Filter",
   "author": "phermium",
   "manifest_version": 2,
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "An advanced profanity filter.",
   "icons": {
     "16": "icons/icon16.png",
@@ -14,6 +14,7 @@
     "tabs",
     "storage"
   ],
+  "optional_permissions": ["file://*/*"],
   "options_ui": {
     "page": "options.html",
     "chrome_style": true
@@ -31,7 +32,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*/*"],
+      "matches": ["<all_urls>"],
       "js": ["filter.js"],
       "run_at": "document_end",
       "all_frames": true
