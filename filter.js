@@ -3,50 +3,31 @@ var profanityList = [];
 var defaults = {'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true, 'showCounter': true};
 var counter = 0;
 
-// Get settings and run filter
-chrome.storage.sync.get(defaults, function(settings) {
-  wordList = settings.wordList.split(',');
-  filterSubstring = settings.filterSubstring;
-  preserveFirst = settings.preserveFirst;
-  showCounter = settings.showCounter;
-  generateProfanityList();
-  removeProfanity();
-  if (counter > 0 && showCounter){chrome.runtime.sendMessage({counter: counter.toString()});}
-});
-
-// Returns true if a node should *not* be altered in any way
-// Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
-function isForbiddenNode(node) {
-  return node.isContentEditable || // DraftJS and many others
-  (node.parentNode && node.parentNode.isContentEditable) || // Special case for Gmail
-  (node.tagName && (node.tagName.toLowerCase() == "textarea" || // Some catch-alls
-                    node.tagName.toLowerCase() == "input" ||
-                    node.tagName.toLowerCase() == "script" ||
-                    node.tagName.toLowerCase() == "style")
-  );
-}
-
-// When DOM is modified, remove profanity from inserted node
-var observer = new MutationObserver(function(mutations) {
-  mutations.forEach(function(mutation) {
-    checkForProfanity(mutation);
-  });
-});
-
-var observerConfig = {
-  childList: true,
-  subtree: true
-};
-
-var targetNode = document;
-observer.observe(targetNode, observerConfig);
-
 function checkForProfanity(mutation) {
   mutation.addedNodes.forEach(function(node) {
     if (!isForbiddenNode(node)) {
       removeProfanityFromNode(node);
     }
   });
+}
+
+function cleanPage() {
+  loadSettings();
+
+  var observerConfig = {
+    childList: true,
+    subtree: true
+  };
+
+  // When DOM is modified, remove profanity from inserted node
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      checkForProfanity(mutation);
+    });
+  });
+
+  var targetNode = document;
+  observer.observe(targetNode, observerConfig);
 }
 
 // Parse the profanity list
@@ -60,6 +41,31 @@ function generateProfanityList() {
       profanityList.push(new RegExp('\\b(' + wordList[x][0] + ')' + wordList[x].substring(1) + '\\b', 'gi' ));
     }
   }
+}
+
+// Returns true if a node should *not* be altered in any way
+// Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
+function isForbiddenNode(node) {
+  return node.isContentEditable || // DraftJS and many others
+  (node.parentNode && node.parentNode.isContentEditable) || // Special case for Gmail
+  (node.tagName && (node.tagName.toLowerCase() == "textarea" || // Some catch-alls
+                    node.tagName.toLowerCase() == "input" ||
+                    node.tagName.toLowerCase() == "script" ||
+                    node.tagName.toLowerCase() == "style")
+  );
+}
+
+// Get settings and run filter
+function loadSettings() {
+  chrome.storage.sync.get(defaults, function(settings) {
+    wordList = settings.wordList.split(',');
+    filterSubstring = settings.filterSubstring;
+    preserveFirst = settings.preserveFirst;
+    showCounter = settings.showCounter;
+    generateProfanityList();
+    removeProfanity();
+    if (counter > 0 && showCounter){chrome.runtime.sendMessage({counter: counter.toString()});}
+  });
 }
 
 // Remove the profanity from the document
@@ -117,3 +123,5 @@ function starReplace(strMatchingString, strFirstLetter) {
 
   return starString;
 }
+
+cleanPage();
