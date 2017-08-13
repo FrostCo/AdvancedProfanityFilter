@@ -11,7 +11,7 @@ The best way to install this Chrome extension is to get it from the [Chrome Web 
 * HTTPS Support
 * Counter for filtered words
 
-### Issues, Suggestions or feedback?
+### Issues, Suggestions or Feedback?
 * Found a bug? Please open an [issue](https://github.com/richardfrost/AdvancedProfanityFilter/issues/new).
 * Have a great idea to improve the project? Want to share some feedback? Head over [here](https://goo.gl/forms/LTqFpJ0mCTsrgGgf2).
 
