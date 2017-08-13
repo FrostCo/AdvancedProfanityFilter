@@ -14,6 +14,18 @@ chrome.storage.sync.get(defaults, function(settings) {
   if (counter > 0 && showCounter){chrome.runtime.sendMessage({counter: counter.toString()});}
 });
 
+// Returns true if a node should *not* be altered in any way
+// Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
+function isForbiddenNode(node) {
+  return node.isContentEditable || // DraftJS and many others
+  (node.parentNode && node.parentNode.isContentEditable) || // Special case for Gmail
+  (node.tagName && (node.tagName.toLowerCase() == "textarea" || // Some catch-alls
+                    node.tagName.toLowerCase() == "input" ||
+                    node.tagName.toLowerCase() == "script" ||
+                    node.tagName.toLowerCase() == "style")
+  );
+}
+
 // When DOM is modified, remove profanity from inserted node
 var observer = new MutationObserver(function(mutations) {
   mutations.forEach(function(mutation) {
@@ -31,7 +43,7 @@ observer.observe(targetNode, observerConfig);
 
 function checkForProfanity(mutation) {
   mutation.addedNodes.forEach(function(node) {
-    if (node.tagName != "SCRIPT" || node.tagName != "STYLE") {
+    if (!isForbiddenNode(node)) {
       removeProfanityFromNode(node);
     }
   });
