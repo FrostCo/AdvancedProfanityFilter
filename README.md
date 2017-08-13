@@ -1,4 +1,4 @@
-# AdvancedProfanityFilter
+# Advanced Profanity Filter
 A chrome extension to filter profanity from webpages.
 
 ### Introduction
@@ -11,10 +11,14 @@ The best way to install this Chrome extension is to get it from the [Chrome Web 
 * HTTPS Support
 * Counter for filtered words
 
+### Issues, Suggestions or feedback?
+* Found a bug? Please open an [issue](https://github.com/richardfrost/AdvancedProfanityFilter/issues/new).
+* Have a great idea to improve the project? Want to share some feedback? Head over [here](https://goo.gl/forms/LTqFpJ0mCTsrgGgf2).
 
+### Beta Testing
+If you would like to help with development, but don't have experience coding, its very helpful to have users test a release candidate before actually publishing it to everyone. If you are interested in testing new versions see [the wiki](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Beta-Testing) for more information.
 
 #### Original
-
 You can download the original extension by markyd13 [here](https://chrome.google.com/webstore/detail/simple-profanity-filter/ackkocjhcalcpgpfjcoinogdejibgbho).
 
 ##### License
