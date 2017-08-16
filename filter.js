@@ -49,9 +49,7 @@ function isForbiddenNode(node) {
   return node.isContentEditable || // DraftJS and many others
   (node.parentNode && node.parentNode.isContentEditable) || // Special case for Gmail
   (node.tagName && (node.tagName.toLowerCase() == "textarea" || // Some catch-alls
-                    node.tagName.toLowerCase() == "input" ||
-                    node.tagName.toLowerCase() == "script" ||
-                    node.tagName.toLowerCase() == "style")
+                    node.tagName.toLowerCase() == "input")
   );
 }
 
