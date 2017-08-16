@@ -24,6 +24,7 @@ function cleanPage() {
 
     // Remove profanity from the main document and watch for new nodes
     removeProfanity(xpathDocText);
+    updateCounterBadge();
   });
   observeNewNodes();
 }
@@ -65,13 +66,15 @@ function observeNewNodes() {
     mutations.forEach(function(mutation) {
       checkNodeForProfanity(mutation);
     });
+    updateCounterBadge();
   });
 
   // Remove profanity from new objects
   observer.observe(document, observerConfig);
 }
 
-function removeProfanity(xpathExpression, node = document) {
+function removeProfanity(xpathExpression, node) {
+  node = (typeof node !== 'undefined') ?  node : document;
   var evalResult = document.evaluate(
     xpathExpression,
     node,
@@ -110,14 +113,13 @@ function starReplace(strMatchingString, strFirstLetter) {
     }
   }
 
-  updateCounter();
+  counter++;
   return starString;
 }
 
 // Updates the counter and displays it if enabled
-function updateCounter() {
+function updateCounterBadge() {
   if (showCounter) {
-    counter++;
     chrome.runtime.sendMessage({counter: counter.toString()});
   }
 }

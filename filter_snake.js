@@ -10,7 +10,7 @@ function cleanPage() {
     settings.showCounter = storage.showCounter;
     settings.counter = 0;
     settings.wordRegExps = [];
-    generateRegexpList()
+    generateRegexpList();
 
     // Start cleaning the page
     walkAndObserve(document);
@@ -66,6 +66,8 @@ function observerCallback(mutations) {
       }
     }
   });
+
+  updateCounterBadge();
 }
 
 function replaceText(str) {
@@ -92,14 +94,13 @@ function starReplace(strMatchingString, strFirstLetter) {
     }
   }
 
-  updateCounter();
+  settings.counter++;
   return starString;
 }
 
 // Updates the counter and displays it if enabled
-function updateCounter() {
+function updateCounterBadge() {
   if (settings.showCounter) {
-    settings.counter++;
     chrome.runtime.sendMessage({counter: settings.counter.toString()});
   }
 }
@@ -133,6 +134,7 @@ function walkAndObserve(doc) {
   // Do the initial text replacements in the document body and title
   walk(doc.body);
   doc.title = replaceText(doc.title);
+  updateCounterBadge();
 
   // Observe the body so that we replace text in any added/modified nodes
   bodyObserver = new MutationObserver(observerCallback);
