@@ -100,7 +100,7 @@ function starReplace(strMatchingString, strFirstLetter) {
 
 // Updates the counter and displays it if enabled
 function updateCounterBadge() {
-  if (settings.showCounter) {
+  if (settings.showCounter && settings.counter > 0) {
     chrome.runtime.sendMessage({counter: settings.counter.toString()});
   }
 }
