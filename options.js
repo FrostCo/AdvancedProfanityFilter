@@ -6,6 +6,7 @@ function save_options() {
   settings.preserveFirst = document.getElementById('preserveFirst').checked;
   settings.filterSubstring = document.getElementById('filterSubstring').checked;
   settings.showCounter = document.getElementById('showCounter').checked;
+  settings.disabledDomains = document.getElementById('disabledDomains').value;
 
   // Save settings
   chrome.storage.sync.set(settings, function() {
@@ -18,15 +19,16 @@ function save_options() {
   });
 }
 
-// Restores form state to saved values from Chroem Sync
+// Restores form state to saved values from Chrome Sync
 function restore_options() {
-  var defaults = {'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true, 'showCounter': true};
+  var defaults = {'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true, 'showCounter': true, 'disabledDomains': []};
   chrome.storage.sync.get(defaults, function(settings) {
     // Display saved settings
     document.getElementById('wordList').value = settings.wordList;
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('filterSubstring').checked = settings.filterSubstring;
     document.getElementById('showCounter').checked = settings.showCounter;
+    document.getElementById('disabledDomains').value = settings.disabledDomains;
   });
 }
 
@@ -68,7 +70,7 @@ function update_status(message, error, timeout) {
 // Add event listeners to DOM
 window.addEventListener('load', restore_options);
 document.getElementById('toggleProfanity').addEventListener('click', toggleProfanity);
-document.getElementById('save').addEventListener('click', save_options);
+document.getElementById('saveWordList').addEventListener('click', save_options);
 document.getElementById('preserveFirst').addEventListener('click', save_options);
 document.getElementById('filterSubstring').addEventListener('click', save_options);
 document.getElementById('showCounter').addEventListener('click', save_options);
