@@ -36,12 +36,10 @@ function cleanPage() {
 function disabledPage() {
   disabled = false;
   domain = window.location.hostname;
-  console.log("Domain: ", domain);
-  console.log("href: ", window.location.href);
 
   for (var x = 0; x < disabledDomains.length; x++) {
-    myTest.push(disabledDomains[x]);
-    if (domain == disabledDomains[x]) {
+    domainRegex = new RegExp("(^|\.)" + disabledDomains[x]);
+    if (domainRegex.test(domain)) {
       disabled = true;
       break;
     }

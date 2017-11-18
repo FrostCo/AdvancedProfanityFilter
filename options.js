@@ -71,6 +71,7 @@ function update_status(message, error, timeout) {
 window.addEventListener('load', restore_options);
 document.getElementById('toggleProfanity').addEventListener('click', toggleProfanity);
 document.getElementById('saveWordList').addEventListener('click', save_options);
+document.getElementById('saveDisabledDomains').addEventListener('click', save_options);
 document.getElementById('preserveFirst').addEventListener('click', save_options);
 document.getElementById('filterSubstring').addEventListener('click', save_options);
 document.getElementById('showCounter').addEventListener('click', save_options);
