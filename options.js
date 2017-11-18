@@ -21,7 +21,7 @@ function save_options() {
 
 // Restores form state to saved values from Chrome Sync
 function restore_options() {
-  var defaults = {'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true, 'showCounter': true, 'disabledDomains': []};
+  var defaults = {'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true, 'showCounter': true, 'disabledDomains': ''};
   chrome.storage.sync.get(defaults, function(settings) {
     // Display saved settings
     document.getElementById('wordList').value = settings.wordList;
