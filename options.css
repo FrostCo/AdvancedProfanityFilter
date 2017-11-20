@@ -74,13 +74,13 @@ label input[type=checkbox]{
 #save-list {
   position: relative;
   right: 135px;
-  top: 187px;
+  top: 307px;
   margin: 6px 0 0 0;
   float: right;
   padding: 5px 20px 5px 20px; 
   border: 1px solid #aaa; 
   border-radius: 5px;
-}
+  }
 
 #contributors {
   font-style: italic;
