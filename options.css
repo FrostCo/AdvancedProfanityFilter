@@ -1,3 +1,14 @@
+body {font-family: Arial;}
+
+h3 {
+  margin: 5px 0 15px 0;
+  padding: 0px;
+}
+
+.tabcontent p {
+  margin: 0;
+}
+
 a:link, a:visited {
   color: gray;
   font-size: 10px;
@@ -31,13 +42,14 @@ label input[type=checkbox]{
 
 .examples {
   padding-bottom: 5px;
-  padding-left: 20px;
+  padding-left: 30px;
   font-size: 10px;
-  color: gray; 
+  color: gray;
+  margin-bottom: 10px;
 }
 
 #options {
-  padding: 20px 0;
+  padding: 0px;
 }
 
 #status {
@@ -54,7 +66,21 @@ label input[type=checkbox]{
 #default {
   margin: 6px 0 0 0;
   float: right;
+  padding: 5px 20px 5px 20px; 
+  border: 1px solid #aaa; 
+  border-radius: 5px;
 }
+
+#save-list {
+  position: relative;
+  right: 135px;
+  top: 307px;
+  margin: 6px 0 0 0;
+  float: right;
+  padding: 5px 20px 5px 20px; 
+  border: 1px solid #aaa; 
+  border-radius: 5px;
+  }
 
 #contributors {
   font-style: italic;
@@ -62,4 +88,62 @@ label input[type=checkbox]{
   line-height: 14px;
   display: inline;
   color: gray;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 50px;
+  max-height: 232px;
+  border-radius: 5px;
+}
+
+#toggleProfanity {
+  padding: 5px 20px 5px 20px; 
+  border: 1px solid #aaa; 
+  border-radius: 5px;
+}
+
+.options {
+  margin: 0px;
+}
+
+::placeholder {
+  color: #bbb;
+}
+
+
+/* Tab Styling */
+div.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+div.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+div.tab button:hover {
+  background-color: #ddd;
+}
+
+div.tab button.active {
+  background-color: #ccc;
+}
+
+.tabcontent {
+  height: 300px;
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top: none;
 }
