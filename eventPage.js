@@ -14,6 +14,10 @@ chrome.runtime.onInstalled.addListener(function(details){
 // Show badge with number of words filtered
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
+    if (request.counter) {
+      chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
+    } else if (request.disabled) {
+      chrome.browserAction.setIcon({path: "icons/icon19-disabled.png", tabId: sender.tab.id});
+    }
   }
 );

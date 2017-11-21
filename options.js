@@ -18,12 +18,13 @@ function openTab(evt) {
   newTabContent.className = newTabContent.className.replace(" hidden", " visible");
 }
 
-// Restores form state to saved values from Chroem Sync
+// Restores form state to saved values from Chrome Sync
 function restoreOptions() {
-  var defaults = {'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true, 'showCounter': true};
+  var defaults = {'disabledDomains': '', 'filterSubstring': true, 'preserveFirst': false, 'showCounter': true, 'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore'};
   chrome.storage.sync.get(defaults, function(settings) {
     // Display saved settings
     document.getElementById('wordList').value = settings.wordList;
+    document.getElementById('disabledDomainsList').value = settings.disabledDomains;
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('filterSubstring').checked = settings.filterSubstring;
     document.getElementById('showCounter').checked = settings.showCounter;
@@ -48,10 +49,11 @@ function restoreDefaults() {
 function saveOptions() {
   // Gather current settings
   var settings = {};
-  settings.wordList = document.getElementById('wordList').value;
-  settings.preserveFirst = document.getElementById('preserveFirst').checked;
+  settings.disabledDomains = document.getElementById('disabledDomainsList').value;
   settings.filterSubstring = document.getElementById('filterSubstring').checked;
+  settings.preserveFirst = document.getElementById('preserveFirst').checked;
   settings.showCounter = document.getElementById('showCounter').checked;
+  settings.wordList = document.getElementById('wordList').value;
 
   // Save settings
   chrome.storage.sync.set(settings, function() {
@@ -88,16 +90,15 @@ function updateStatus(message, error, timeout) {
 }
 
 // Add event listeners to DOM
-window.addEventListener('load', restoreOptions);
-document.getElementById('toggleProfanity').addEventListener('click', toggleProfanity);
-document.getElementById('saveDisabledDomains').addEventListener('click', saveOptions);
-document.getElementById('save').addEventListener('click', saveOptions);
-document.getElementById('preserveFirst').addEventListener('click', saveOptions);
-document.getElementById('filterSubstring').addEventListener('click', saveOptions);
-document.getElementById('showCounter').addEventListener('click', saveOptions);
-document.getElementById('default').addEventListener('click', restoreDefaults);
-
 tabs = document.getElementsByClassName("tablinks");
 for (i = 0; i < tabs.length; i++) {
   tabs[i].addEventListener('click', function(e) { openTab(e); });
 }
+window.addEventListener('load', restoreOptions);
+document.getElementById('toggleProfanity').addEventListener('click', toggleProfanity);
+document.getElementById('saveDisabledDomains').addEventListener('click', saveOptions);
+document.getElementById('saveWords').addEventListener('click', saveOptions);
+document.getElementById('default').addEventListener('click', restoreDefaults);
+document.getElementById('filterSubstring').addEventListener('click', saveOptions);
+document.getElementById('preserveFirst').addEventListener('click', saveOptions);
+document.getElementById('showCounter').addEventListener('click', saveOptions);
