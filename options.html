@@ -6,65 +6,65 @@
 </head>
 
 <body>
-    
 <!-- Tabs -->
 <div class="tab">
-  <button class="tablinks active" onclick="openTab(event, 'Settings')">Settings</button>
-  <button class="tablinks" onclick="openTab(event, 'Domains')">Domains</button>
-  <button class="tablinks" onclick="openTab(event, 'Profanity List')">Profanity List</button>
+  <button class="tablinks active">Settings</button>
+  <button class="tablinks">Domains</button>
+  <button class="tablinks"">Words</button>
 </div>
-        
+
 <!-- Settings Tab -->
-<div id="Settings" class="tabcontent" style="display: block;">
+<div id="Settings" class="tabcontent visible">
   <h3>Settings</h3>
-    <div id="options">
+  <div id="options">
     <label>
-        <input type="checkbox" id="preserveFirst">
-        Preserve the first letter
+      <input type="checkbox" id="preserveFirst">
+      Preserve the first letter
     </label>
     <div class="examples">Example: If "Dog" is filtered, then it is displayed as "D**"</div>
-
     <label>
-        <input type="checkbox" id="filterSubstring">
-        Filter parts of words
+      <input type="checkbox" id="filterSubstring">
+      Filter parts of words
     </label>
     <div class="examples">Example: If "Dog" is filtered, then "Doghouse" is displayed as "***house"</div>
-
     <label>
-        <input type="checkbox" id="showCounter">
-        Show number of filtered words
+      <input type="checkbox" id="showCounter">
+      Show number of filtered words
     </label>
     <div class="examples">Number of filtered words will be shown over the extension icon</div>
   </div>
 </div>
-        
-    <!-- Domains Tab -->
-    <div id="Domains" class="tabcontent" style="display: none;">
-        <button id="save-list">Save List</button>
-        <h3>Disabled Domains</h3>
-        <p>Comma seperated values with no spaces</p>
-        <textarea name="comments" placeholder="Example: google.com,github.com,asdf.com" required="" maxlength="1000" class="disabled_domains"></textarea>
-    </div>
-    
-<!-- Profanity List -->
-  <div id="Profanity List" class="tabcontent" style="display: none;">
-    <h3>Profanity List</h3>
-    <div id="profanityButton">
-      <button id="toggleProfanity">Modify Profanity List</button>
-      <div id="listWarning" class="notes">Warning: Offensive Language</div>
-    </div>
+
+<!-- Domains Tab -->
+<div id="Domains" class="tabcontent hidden">
+  <h3>Disabled Domains</h3>
+  <div class="notes">Comma separated values with no spaces</div>
+  <textarea id="disabledDomainsList" cols="40" rows="10"></textarea>
+</div>
+
+<!-- Words -->
+<div id="Words" class="tabcontent hidden">
+  <h3>Profanity List</h3>
+  <button id="toggleProfanity">Modify Profanity List</button>
+  <div id="listWarning" class="notes">Warning: Offensive Language</div>
+  <div id="profanityList" style="display: none;">
+    <div class="notes">Comma separated values with no spaces</div>
+    <textarea id="wordList" cols="40" rows="10"></textarea>
   </div>
+</div>
 
 <!-- Footer -->
-<button id="default">Restore Defaults</button>
-  <span id="contributors">
-    <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
-      - <a href="https://github.com/richardfrost/AdvancedProfanityFilter/issues" target="_blank">Support</a>
-    <br>
-    Created by <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Richard Frost</a><br>
-    Based off of markyd13's Simple Profanity Filter
-  </span>
-
-  <script src="options.js"></script>
+<div id="footer">
+  <button id="save">Save</button>
+  <button id="default">Defaults</button>
+    <span id="contributors">
+      <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
+        - <a href="https://github.com/richardfrost/AdvancedProfanityFilter/issues" target="_blank">Support</a>
+      <br>
+      Created by <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Richard Frost</a><br>
+    </span>
+    <span id="status"></span>
+    <script src="options.js"></script>
+</div>
 </body>
 </html>
