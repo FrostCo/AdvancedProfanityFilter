@@ -5,10 +5,6 @@ h3 {
   padding: 0px;
 }
 
-.tabcontent p {
-  margin: 0;
-}
-
 a:link, a:visited {
   color: gray;
   font-size: 10px;
@@ -19,98 +15,12 @@ a:hover, a:active {
   font-size: 10px;
 }
 
-textarea {
-  width:100%;
-}
-
-label input[type=checkbox]{
-  position: relative;
-  vertical-align: middle;
-  bottom: 1px;
-}
-
-#save {
-  float: right;
-  margin-right: 0;
-}
-
-.notes {
-  padding-top: 5px;
-  font-size: 10px;
-  color: gray;
-}
-
-.examples {
-  padding-bottom: 5px;
-  padding-left: 30px;
-  font-size: 10px;
-  color: gray;
-  margin-bottom: 10px;
-}
-
-#options {
-  padding: 0px;
-}
-
-#status {
-  height: 40px;
-  padding-top: 11px;
-  padding-bottom: 11px;
-  color: green;
-}
-
-#status.error {
-  color: red;
-}
-
-#default {
-  margin: 6px 0 0 0;
-  float: right;
-  padding: 5px 20px 5px 20px; 
-  border: 1px solid #aaa; 
+button {
+  /*margin: 6px 0 0 0;*/
+  padding: 5px 20px 5px 20px;
+  border: 1px solid #aaa;
   border-radius: 5px;
 }
-
-#save-list {
-  position: relative;
-  right: 135px;
-  top: 307px;
-  margin: 6px 0 0 0;
-  float: right;
-  padding: 5px 20px 5px 20px; 
-  border: 1px solid #aaa; 
-  border-radius: 5px;
-  }
-
-#contributors {
-  font-style: italic;
-  font-size: 10px;
-  line-height: 14px;
-  display: inline;
-  color: gray;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 50px;
-  max-height: 232px;
-  border-radius: 5px;
-}
-
-#toggleProfanity {
-  padding: 5px 20px 5px 20px; 
-  border: 1px solid #aaa; 
-  border-radius: 5px;
-}
-
-.options {
-  margin: 0px;
-}
-
-::placeholder {
-  color: #bbb;
-}
-
 
 /* Tab Styling */
 div.tab {
@@ -135,7 +45,76 @@ div.tab button:hover {
 }
 
 div.tab button.active {
-  background-color: #ccc;
+  background-color: green;
+  font-style: bold;
+}
+
+button.active {
+  background-color: yellow;
+}
+
+label input[type=checkbox]{
+  position: relative;
+  vertical-align: middle;
+  bottom: 1px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 50px;
+  max-height: 232px;
+  border-radius: 5px;
+  width:100%;
+}
+
+#contributors {
+  font-style: italic;
+  font-size: 10px;
+  line-height: 14px;
+  display: inline;
+  color: gray;
+}
+
+#default {
+  float: right;
+}
+
+#options {
+  padding: 0px;
+}
+
+#save {
+  float: right;
+}
+
+#status {
+  color: green;
+}
+
+#status.error {
+  color: red;
+}
+
+.examples {
+  padding-bottom: 5px;
+  padding-left: 30px;
+  font-size: 10px;
+  color: gray;
+  margin-bottom: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.notes {
+  padding-top: 5px;
+  font-size: 10px;
+  color: gray;
+}
+
+.options {
+  margin: 0px;
 }
 
 .tabcontent {
@@ -146,4 +125,16 @@ div.tab button.active {
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   border-top: none;
+}
+
+.tabcontent p {
+  margin: 0;
+}
+
+.visible {
+  display: block;
+}
+
+::placeholder {
+  color: #bbb;
 }
