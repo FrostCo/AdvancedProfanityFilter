@@ -6,25 +6,16 @@
 </head>
 
 <body>
-  <div id="profanityButton">
-    <button id="toggleProfanity">Modify Profanity List</button>
-    <div id="listWarning" class="notes">Warning: Offensive Language</div>
-  </div>
+<!-- Tabs -->
+<div class="tab">
+  <button class="tablinks active">Settings</button>
+  <button class="tablinks">Domains</button>
+  <button class="tablinks"">Words</button>
+</div>
 
-  <div id="profanityList" style="display: none;">
-    <div class="notes">Comma separated values with no spaces</div>
-    <textarea id="wordList" cols="40" rows="10"></textarea>
-    <button id="saveWordList">Save List</button>
-  </div>
-
-  <div id="disabledDomainsList">
-    <hr/>
-    <h4>Diabled Domains</h4>
-    <div class="notes">Comma separated values with no spaces</div>
-    <textarea id="disabledDomains" cols="40" rows="2"></textarea>
-    <button id="saveDisabledDomains">Save List</button>
-  </div>
-
+<!-- Settings Tab -->
+<div id="Settings" class="tabcontent visible">
+  <h3>Settings</h3>
   <div id="options">
     <hr/>
     <h4>Settings</h4>
@@ -33,31 +24,49 @@
       Preserve the first letter
     </label>
     <div class="examples">Example: If "Dog" is filtered, then it is displayed as "D**"</div>
-
     <label>
       <input type="checkbox" id="filterSubstring">
       Filter parts of words
     </label>
     <div class="examples">Example: If "Dog" is filtered, then "Doghouse" is displayed as "***house"</div>
-
     <label>
       <input type="checkbox" id="showCounter">
       Show number of filtered words
     </label>
     <div class="examples">Number of filtered words will be shown over the extension icon</div>
   </div>
+</div>
 
-  <div id="status"></div>
+<!-- Domains Tab -->
+<div id="Domains" class="tabcontent hidden">
+  <h3>Disabled Domains</h3>
+  <div class="notes">Comma separated values with no spaces</div>
+  <textarea id="disabledDomainsList" cols="40" rows="10"></textarea>
+</div>
 
-  <button id="default">Restore Defaults</button>
-  <span id="contributors">
-    <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
-     - <a href="https://github.com/richardfrost/AdvancedProfanityFilter/issues" target="_blank">Support</a>
-    <br>
-    Created by <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Richard Frost</a><br>
-    Based off of markyd13's Simple Profanity Filter
-  </span>
+<!-- Words -->
+<div id="Words" class="tabcontent hidden">
+  <h3>Profanity List</h3>
+  <button id="toggleProfanity">Modify Profanity List</button>
+  <div id="listWarning" class="notes">Warning: Offensive Language</div>
+  <div id="profanityList" style="display: none;">
+    <div class="notes">Comma separated values with no spaces</div>
+    <textarea id="wordList" cols="40" rows="10"></textarea>
+  </div>
+</div>
 
-  <script src="options.js"></script>
+<!-- Footer -->
+<div id="footer">
+  <button id="save">Save</button>
+  <button id="default">Defaults</button>
+    <span id="contributors">
+      <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
+        - <a href="https://github.com/richardfrost/AdvancedProfanityFilter/issues" target="_blank">Support</a>
+      <br>
+      Created by <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Richard Frost</a><br>
+    </span>
+    <span id="status"></span>
+    <script src="options.js"></script>
+</div>
 </body>
 </html>
