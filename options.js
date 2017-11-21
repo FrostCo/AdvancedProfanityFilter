@@ -1,23 +1,3 @@
-// Saves options to sync storage
-function save_options() {
-  // Gather current settings
-  var settings = {};
-  settings.wordList = document.getElementById('wordList').value;
-  settings.preserveFirst = document.getElementById('preserveFirst').checked;
-  settings.filterSubstring = document.getElementById('filterSubstring').checked;
-  settings.showCounter = document.getElementById('showCounter').checked;
-
-  // Save settings
-  chrome.storage.sync.set(settings, function() {
-    if (chrome.runtime.lastError) {
-      update_status('Settings not saved! Please try again.', true, 5000);
-    } else {
-      update_status('Settings saved successfully!', false, 3000);
-      if (document.getElementById('profanityList').style.display === 'block') {toggleProfanity();} // Close wordList
-    }
-  });
-}
-
 // Switching Tabs
 function openTab(evt) {
   // Don't run on current tab
@@ -39,7 +19,7 @@ function openTab(evt) {
 }
 
 // Restores form state to saved values from Chroem Sync
-function restore_options() {
+function restoreOptions() {
   var defaults = {'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true, 'showCounter': true};
   chrome.storage.sync.get(defaults, function(settings) {
     // Display saved settings
@@ -51,14 +31,34 @@ function restore_options() {
 }
 
 // Restore default settings
-function restore_defaults() {
+function restoreDefaults() {
   // TODO: Prompt for confirmation
   chrome.storage.sync.clear(function(){
     if (chrome.runtime.lastError) {
-      update_status('Error restoring defaults! Please try again.', true, 5000);
+      updateStatus('Error restoring defaults! Please try again.', true, 5000);
     } else {
-      restore_options();
-      update_status('Default settings restored!', false, 3000);
+      restoreOptions();
+      updateStatus('Default settings restored!', false, 3000);
+    }
+  });
+}
+
+// Saves options to sync storage
+function saveOptions() {
+  // Gather current settings
+  var settings = {};
+  settings.wordList = document.getElementById('wordList').value;
+  settings.preserveFirst = document.getElementById('preserveFirst').checked;
+  settings.filterSubstring = document.getElementById('filterSubstring').checked;
+  settings.showCounter = document.getElementById('showCounter').checked;
+
+  // Save settings
+  chrome.storage.sync.set(settings, function() {
+    if (chrome.runtime.lastError) {
+      updateStatus('Settings not saved! Please try again.', true, 5000);
+    } else {
+      updateStatus('Settings saved successfully!', false, 3000);
+      if (document.getElementById('profanityList').style.display === 'block') {toggleProfanity();} // Close wordList
     }
   });
 }
@@ -79,7 +79,7 @@ function toggleProfanity() {
 }
 
 // Display status update to user
-function update_status(message, error, timeout) {
+function updateStatus(message, error, timeout) {
   var status = document.getElementById('status');
   if (error) {status.className = 'error';}
   status.textContent = message;
@@ -87,13 +87,13 @@ function update_status(message, error, timeout) {
 }
 
 // Add event listeners to DOM
-window.addEventListener('load', restore_options);
+window.addEventListener('load', restoreOptions);
 document.getElementById('toggleProfanity').addEventListener('click', toggleProfanity);
-document.getElementById('save').addEventListener('click', save_options);
-document.getElementById('preserveFirst').addEventListener('click', save_options);
-document.getElementById('filterSubstring').addEventListener('click', save_options);
-document.getElementById('showCounter').addEventListener('click', save_options);
-document.getElementById('default').addEventListener('click', restore_defaults);
+document.getElementById('save').addEventListener('click', saveOptions);
+document.getElementById('preserveFirst').addEventListener('click', saveOptions);
+document.getElementById('filterSubstring').addEventListener('click', saveOptions);
+document.getElementById('showCounter').addEventListener('click', saveOptions);
+document.getElementById('default').addEventListener('click', restoreDefaults);
 
 tabs = document.getElementsByClassName("tablinks");
 for (i = 0; i < tabs.length; i++) {
