@@ -1,3 +1,10 @@
+body {font-family: Arial;}
+
+h3 {
+  margin: 5px 0 15px 0;
+  padding: 0px;
+}
+
 a:link, a:visited {
   color: gray;
   font-size: 10px;
@@ -8,8 +15,42 @@ a:hover, a:active {
   font-size: 10px;
 }
 
-textarea {
-  width:100%;
+button {
+  /*margin: 6px 0 0 0;*/
+  padding: 5px 20px 5px 20px;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+}
+
+/* Tab Styling */
+div.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+div.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+div.tab button:hover {
+  background-color: #ddd;
+}
+
+div.tab button.active {
+  background-color: green;
+  font-style: bold;
+}
+
+button.active {
+  background-color: yellow;
 }
 
 label input[type=checkbox]{
@@ -18,42 +59,12 @@ label input[type=checkbox]{
   bottom: 1px;
 }
 
-#save {
-  float: right;
-  margin-right: 0;
-}
-
-.notes {
-  padding-top: 5px;
-  font-size: 10px;
-  color: gray;
-}
-
-.examples {
-  padding-bottom: 5px;
-  padding-left: 20px;
-  font-size: 10px;
-  color: gray; 
-}
-
-#options {
-  padding: 20px 0;
-}
-
-#status {
-  height: 40px;
-  padding-top: 11px;
-  padding-bottom: 11px;
-  color: green;
-}
-
-#status.error {
-  color: red;
-}
-
-#default {
-  margin: 6px 0 0 0;
-  float: right;
+textarea {
+  resize: vertical;
+  min-height: 50px;
+  max-height: 232px;
+  border-radius: 5px;
+  width:100%;
 }
 
 #contributors {
@@ -62,4 +73,68 @@ label input[type=checkbox]{
   line-height: 14px;
   display: inline;
   color: gray;
+}
+
+#default {
+  float: right;
+}
+
+#options {
+  padding: 0px;
+}
+
+#save {
+  float: right;
+}
+
+#status {
+  color: green;
+}
+
+#status.error {
+  color: red;
+}
+
+.examples {
+  padding-bottom: 5px;
+  padding-left: 30px;
+  font-size: 10px;
+  color: gray;
+  margin-bottom: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.notes {
+  padding-top: 5px;
+  font-size: 10px;
+  color: gray;
+}
+
+.options {
+  margin: 0px;
+}
+
+.tabcontent {
+  height: 300px;
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top: none;
+}
+
+.tabcontent p {
+  margin: 0;
+}
+
+.visible {
+  display: block;
+}
+
+::placeholder {
+  color: #bbb;
 }
