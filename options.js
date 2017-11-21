@@ -1,21 +1,5 @@
 // Saves options to sync storage
 function save_options() {
-
-// Switching Tabs
-function openTab(evt, tabName) {
-  var i, tabcontent, tablinks;
-  tabcontent = document.getElementsByClassName("tabcontent");
-  for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none";
-  }
-  tablinks = document.getElementsByClassName("tablinks");
-  for (i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" active", "");
-  }
-  document.getElementById(tabName).style.display = "block";
-  evt.currentTarget.className += " active";
-}
-
   // Gather current settings
   var settings = {};
   settings.wordList = document.getElementById('wordList').value;
@@ -34,6 +18,26 @@ function openTab(evt, tabName) {
   });
 }
 
+// Switching Tabs
+function openTab(evt) {
+  // Don't run on current tab
+  if ( evt.currentTarget.className.indexOf('active') >= 0) {
+    return false
+  }
+
+  // Set active tab
+  oldTab = document.getElementsByClassName("tablinks active")[0];
+  oldTab.className = oldTab.className.replace(" active", "");
+  evt.currentTarget.className += " active";
+
+  // Show active tab content
+  oldTabContent = document.getElementsByClassName("tabcontent visible")[0];
+  oldTabContent.className = oldTabContent.className.replace(" visible", " hidden");
+  newTabName = evt.currentTarget.innerText;
+  newTabContent = document.getElementById(newTabName);
+  newTabContent.className = newTabContent.className.replace(" hidden", " visible");
+}
+
 // Restores form state to saved values from Chroem Sync
 function restore_options() {
   var defaults = {'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true, 'showCounter': true};
@@ -48,6 +52,7 @@ function restore_options() {
 
 // Restore default settings
 function restore_defaults() {
+  // TODO: Prompt for confirmation
   chrome.storage.sync.clear(function(){
     if (chrome.runtime.lastError) {
       update_status('Error restoring defaults! Please try again.', true, 5000);
@@ -89,3 +94,8 @@ document.getElementById('preserveFirst').addEventListener('click', save_options)
 document.getElementById('filterSubstring').addEventListener('click', save_options);
 document.getElementById('showCounter').addEventListener('click', save_options);
 document.getElementById('default').addEventListener('click', restore_defaults);
+
+tabs = document.getElementsByClassName("tablinks");
+for (i = 0; i < tabs.length; i++) {
+  tabs[i].addEventListener('click', function(e) { openTab(e); });
+}
