@@ -1,9 +1,11 @@
 var wordList, preserveFirst, filterSubstring, showCounter;
 var wordRegExps = [];
-var defaults = {'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore', 'preserveFirst': false, 'filterSubstring': true, 'showCounter': true};
+var defaults = {'disabledDomains': '', 'filterSubstring': true, 'preserveFirst': false, 'showCounter': true, 'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore'};
 var counter = 0;
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
+var disabledDomains = [];
+var myTest = [];
 
 function checkNodeForProfanity(mutation) {
   mutation.addedNodes.forEach(function(node) {
@@ -20,13 +22,38 @@ function cleanPage() {
     filterSubstring = storage.filterSubstring;
     preserveFirst = storage.preserveFirst;
     showCounter = storage.showCounter;
-    generateRegexpList();
+    disabledDomains = storage.disabledDomains.split(',');
 
     // Remove profanity from the main document and watch for new nodes
+    if (disabledPage()) {
+      chrome.runtime.sendMessage({disabled: true});
+      return false;
+    }
+    generateRegexpList();
     removeProfanity(xpathDocText);
     updateCounterBadge();
+    observeNewNodes();
   });
-  observeNewNodes();
+}
+
+function disabledPage() {
+  disabled = false;
+  domain = window.location.hostname;
+
+  for (var x = 0; x < disabledDomains.length; x++) {
+    if (disabledDomains[x]) {
+      console.log(disabledDomains);
+      console.log("Checking domain: ", disabledDomains[x]);
+      domainRegex = new RegExp("(^|\.)" + disabledDomains[x]);
+      if (domainRegex.test(domain)) {
+        console.log("Blocked domain!");
+        disabled = true;
+        break;
+      }
+    }
+  }
+
+  return disabled;
 }
 
 // Parse the profanity list
