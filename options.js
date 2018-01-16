@@ -1,3 +1,20 @@
+var defaults = {'disabledDomains': '', 'filterSubstring': true, 'preserveFirst': false, 'showCounter': true, 'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore'};
+
+function exportConfig() {
+  chrome.storage.sync.get(null, function(settings) {
+    document.getElementById('configText').value = JSON.stringify(settings);
+  });
+}
+
+function importConfig(event) {
+  try {
+    var config = JSON.parse(document.getElementById('configText').value);
+    saveOptions(event, config);
+  } catch (e) {
+    updateStatus('Settings not saved! Please try again.', true, 5000);
+  }
+}
+
 // Switching Tabs
 function openTab(evt) {
   // Don't run on current tab
@@ -18,9 +35,8 @@ function openTab(evt) {
   newTabContent.className = newTabContent.className.replace(" hidden", " visible");
 }
 
-// Restores form state to saved values from Chrome Sync
-function restoreOptions() {
-  var defaults = {'disabledDomains': '', 'filterSubstring': true, 'preserveFirst': false, 'showCounter': true, 'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore'};
+// Restores form state to saved values from Chrome Storage
+function populateOptions() {
   chrome.storage.sync.get(defaults, function(settings) {
     // Display saved settings
     document.getElementById('wordList').value = settings.wordList;
@@ -28,7 +44,6 @@ function restoreOptions() {
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('filterSubstring').checked = settings.filterSubstring;
     document.getElementById('showCounter').checked = settings.showCounter;
-    document.getElementById('disabledDomains').value = settings.disabledDomains;
   });
 }
 
@@ -39,21 +54,23 @@ function restoreDefaults() {
     if (chrome.runtime.lastError) {
       updateStatus('Error restoring defaults! Please try again.', true, 5000);
     } else {
-      restoreOptions();
-      updateStatus('Default settings restored!', false, 3000);
+      populateOptions;
+      updateStatus('Settings restored!', false, 3000);
     }
   });
 }
 
 // Saves options to sync storage
-function saveOptions() {
+function saveOptions(event, settings) {
   // Gather current settings
-  var settings = {};
-  settings.disabledDomains = document.getElementById('disabledDomainsList').value;
-  settings.filterSubstring = document.getElementById('filterSubstring').checked;
-  settings.preserveFirst = document.getElementById('preserveFirst').checked;
-  settings.showCounter = document.getElementById('showCounter').checked;
-  settings.wordList = document.getElementById('wordList').value;
+  if (settings === undefined){
+    settings = {};
+    settings.disabledDomains = document.getElementById('disabledDomainsList').value;
+    settings.filterSubstring = document.getElementById('filterSubstring').checked;
+    settings.preserveFirst = document.getElementById('preserveFirst').checked;
+    settings.showCounter = document.getElementById('showCounter').checked;
+    settings.wordList = document.getElementById('wordList').value;
+  }
 
   // Save settings
   chrome.storage.sync.set(settings, function() {
@@ -94,7 +111,7 @@ tabs = document.getElementsByClassName("tablinks");
 for (i = 0; i < tabs.length; i++) {
   tabs[i].addEventListener('click', function(e) { openTab(e); });
 }
-window.addEventListener('load', restoreOptions);
+window.addEventListener('load', populateOptions);
 document.getElementById('toggleProfanity').addEventListener('click', toggleProfanity);
 document.getElementById('saveDisabledDomains').addEventListener('click', saveOptions);
 document.getElementById('saveWords').addEventListener('click', saveOptions);
@@ -102,3 +119,5 @@ document.getElementById('default').addEventListener('click', restoreDefaults);
 document.getElementById('filterSubstring').addEventListener('click', saveOptions);
 document.getElementById('preserveFirst').addEventListener('click', saveOptions);
 document.getElementById('showCounter').addEventListener('click', saveOptions);
+document.getElementById('import').addEventListener('click', importConfig);
+document.getElementById('export').addEventListener('click', exportConfig);
