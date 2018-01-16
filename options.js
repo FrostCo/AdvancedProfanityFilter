@@ -12,7 +12,7 @@ function confirm(action) {
   })
   document.getElementById('confirmYes').addEventListener("click", function() {
     this.removeEventListener('click', arguments.callee, false);
-    if (action == 'ImportConfig') {
+    if (action == 'importConfig') {
       importConfig();
     } else if (action == 'restoreDefaults') {
       restoreDefaults();
@@ -76,7 +76,7 @@ function restoreDefaults() {
     if (chrome.runtime.lastError) {
       updateStatus('Error restoring defaults! Please try again.', true, 5000);
     } else {
-      populateOptions;
+      populateOptions();
       updateStatus('Settings restored!', false, 3000);
     }
   });
@@ -100,6 +100,7 @@ function saveOptions(event, settings) {
       updateStatus('Settings not saved! Please try again.', true, 5000);
     } else {
       updateStatus('Settings saved successfully!', false, 3000);
+      populateOptions();
       if (document.getElementById('profanityList').style.display === 'block') {toggleProfanity();} // Close wordList
     }
   });
