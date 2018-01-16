@@ -23,6 +23,14 @@ function confirm(action) {
   dialog.showModal();
 }
 
+function dynamicWordList(words) {
+  var options = '<option value="" disabled selected>Warning - Language</option>';
+  for(var i = 0; i < words.length; i++) {
+    options += '<option value="'+words[i]+'">'+words[i]+'</option>';
+  }
+  document.getElementById('wordSelect').innerHTML = options;
+}
+
 function exportConfig() {
   chrome.storage.sync.get(null, function(settings) {
     document.getElementById('configText').value = JSON.stringify(settings);
@@ -67,6 +75,7 @@ function populateOptions() {
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('filterSubstring').checked = settings.filterSubstring;
     document.getElementById('showCounter').checked = settings.showCounter;
+    dynamicWordList(settings.wordList.split(','));
   });
 }
 
