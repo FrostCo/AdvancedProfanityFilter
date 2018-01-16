@@ -1,5 +1,28 @@
 var defaults = {'disabledDomains': '', 'filterSubstring': true, 'preserveFirst': false, 'showCounter': true, 'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore'};
 
+// Prompt for confirmation
+function confirm(action) {
+  var dialogContainer = document.getElementById('dialogContainer');
+  dialogContainer.innerHTML = '<dialog id="promptDialog">Are you sure?<br><button id="confirmYes">Yes</button><button id="confirmNo">No</button></dialog>';
+  var dialog = document.querySelector("dialog");
+
+  document.getElementById('confirmNo').addEventListener("click", function() {
+    this.removeEventListener('click', arguments.callee, false);
+    dialog.close();
+  })
+  document.getElementById('confirmYes').addEventListener("click", function() {
+    this.removeEventListener('click', arguments.callee, false);
+    if (action == 'ImportConfig') {
+      importConfig();
+    } else if (action == 'restoreDefaults') {
+      restoreDefaults();
+    }
+    dialog.close();
+  })
+
+  dialog.showModal();
+}
+
 function exportConfig() {
   chrome.storage.sync.get(null, function(settings) {
     document.getElementById('configText').value = JSON.stringify(settings);
@@ -49,7 +72,6 @@ function populateOptions() {
 
 // Restore default settings
 function restoreDefaults() {
-  // TODO: Prompt for confirmation
   chrome.storage.sync.clear(function(){
     if (chrome.runtime.lastError) {
       updateStatus('Error restoring defaults! Please try again.', true, 5000);
@@ -115,9 +137,9 @@ window.addEventListener('load', populateOptions);
 document.getElementById('toggleProfanity').addEventListener('click', toggleProfanity);
 document.getElementById('saveDisabledDomains').addEventListener('click', saveOptions);
 document.getElementById('saveWords').addEventListener('click', saveOptions);
-document.getElementById('default').addEventListener('click', restoreDefaults);
+document.getElementById('default').addEventListener('click', function() {confirm('restoreDefaults')} );
 document.getElementById('filterSubstring').addEventListener('click', saveOptions);
 document.getElementById('preserveFirst').addEventListener('click', saveOptions);
 document.getElementById('showCounter').addEventListener('click', saveOptions);
-document.getElementById('import').addEventListener('click', importConfig);
+document.getElementById('import').addEventListener('click', function() {confirm('importConfig')} );
 document.getElementById('export').addEventListener('click', exportConfig);
