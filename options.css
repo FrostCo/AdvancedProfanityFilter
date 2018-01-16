@@ -1,6 +1,8 @@
 body {font-family: Arial;}
 
 h3 {
+  color: teal;
+  font-weight: bold;
   margin: 5px 0 15px 0;
   padding: 0px;
 }
@@ -88,6 +90,9 @@ textarea {
 }
 
 #status {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  height: 14px;
   color: green;
 }
 
