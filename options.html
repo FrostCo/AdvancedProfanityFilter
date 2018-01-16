@@ -58,22 +58,23 @@
 
 <!-- Export/Import -->
 <div id="Config" class="tabcontent hidden">
-  <h3>Backup</h3>
+  <h3>Import/Export/Restore Defaults</h3>
+  <button id="default">Restore Defaults</button>
   <button id="import">Import</button>
   <button id="export">Export</button>
+  <div id="configNote" class="notes">Import/Export Config:</div>
   <textarea id="configText" cols="40" rows="10"></textarea>
 </div>
 
 <!-- Footer -->
 <div id="footer">
-  <button id="default">Defaults</button>
+  <div id="status"></div>
   <span id="contributors">
     <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
       - <a href="https://github.com/richardfrost/AdvancedProfanityFilter/issues" target="_blank">Support</a>
     <br>
     Created by <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Richard Frost</a><br>
   </span>
-  <span id="status"></span>
   <script src="options.js"></script>
 </div>
 </body>
