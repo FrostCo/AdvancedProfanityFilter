@@ -7,28 +7,37 @@ function arrayContains(array, string) {
 
 // Prompt for confirmation
 function confirm(action) {
-  var dialogContainer = document.getElementById('dialogContainer');
-  dialogContainer.innerHTML = '<dialog id="promptDialog">Are you sure?<br><button id="confirmYes">Yes</button><button id="confirmNo">No</button></dialog>';
-  var dialog = document.querySelector("dialog");
+  // TODO: Don't confirm if Firefox
+  if (/Chrome/.exec(navigator.userAgent)) {
+    var dialogContainer = document.getElementById('dialogContainer');
+    dialogContainer.innerHTML = '<dialog id="promptDialog">Are you sure?<br><button id="confirmYes">Yes</button><button id="confirmNo">No</button></dialog>';
+    var dialog = document.getElementById("promptDialog");
 
-  document.getElementById('confirmNo').addEventListener("click", function() {
-    this.removeEventListener('click', arguments.callee, false);
-    dialog.close();
-  })
-  document.getElementById('confirmYes').addEventListener("click", function() {
-    this.removeEventListener('click', arguments.callee, false);
+    document.getElementById('confirmNo').addEventListener("click", function() {
+      this.removeEventListener('click', arguments.callee, false);
+      dialog.close();
+    })
+    document.getElementById('confirmYes').addEventListener("click", function() {
+      this.removeEventListener('click', arguments.callee, false);
+      if (action == 'importConfig') {
+        importConfig();
+      } else if (action == 'restoreDefaults') {
+        restoreDefaults();
+      }
+      dialog.close();
+    })
+
+    dialog.showModal();
+  } else {
     if (action == 'importConfig') {
       importConfig();
     } else if (action == 'restoreDefaults') {
       restoreDefaults();
     }
-    dialog.close();
-  })
-
-  dialog.showModal();
+  }
 }
 
-function domainAdd() {
+function domainAdd(event) {
   var domain = document.getElementById('domainText').value;
   if (domain != "") {
     if (!arrayContains(config.disabledDomains, domain)) {
@@ -43,7 +52,7 @@ function domainAdd() {
   }
 }
 
-function domainRemove() {
+function domainRemove(event) {
   var domain = document.getElementById('domainSelect').value;
   if (domain != "") {
     config.disabledDomains = removeFromArray(config.disabledDomains, domain);
@@ -76,21 +85,21 @@ function importConfig(event) {
 }
 
 // Switching Tabs
-function openTab(evt) {
+function openTab(event) {
   // Don't run on current tab
-  if ( evt.currentTarget.className.indexOf('active') >= 0) {
-    return false
+  if ( event.currentTarget.className.indexOf('active') >= 0) {
+    return false;
   }
 
   // Set active tab
   oldTab = document.getElementsByClassName("tablinks active")[0];
   oldTab.className = oldTab.className.replace(" active", "");
-  evt.currentTarget.className += " active";
+  event.currentTarget.className += " active";
 
   // Show active tab content
   oldTabContent = document.getElementsByClassName("tabcontent visible")[0];
   oldTabContent.className = oldTabContent.className.replace(" visible", " hidden");
-  newTabName = evt.currentTarget.innerText;
+  newTabName = event.currentTarget.innerText;
   newTabContent = document.getElementById(newTabName);
   newTabContent.className = newTabContent.className.replace(" hidden", " visible");
 }
@@ -98,7 +107,7 @@ function openTab(evt) {
 // Restores form state to saved values from Chrome Storage
 function populateOptions() {
   chrome.storage.sync.get(defaults, function(settings) {
-    config = settings // Make config globally available
+    config = settings; // Make config globally available
     document.getElementById('wordList').value = settings.wordList;
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('filterSubstring').checked = settings.filterSubstring;
@@ -176,13 +185,17 @@ for (i = 0; i < tabs.length; i++) {
   tabs[i].addEventListener('click', function(e) { openTab(e); });
 }
 window.addEventListener('load', populateOptions);
-document.getElementById('toggleProfanity').addEventListener('click', toggleProfanity);
-document.getElementById('saveWords').addEventListener('click', saveOptions);
-document.getElementById('default').addEventListener('click', function() {confirm('restoreDefaults')} );
+// Filter
 document.getElementById('filterSubstring').addEventListener('click', saveOptions);
 document.getElementById('preserveFirst').addEventListener('click', saveOptions);
 document.getElementById('showCounter').addEventListener('click', saveOptions);
-document.getElementById('import').addEventListener('click', function() {confirm('importConfig')} );
-document.getElementById('export').addEventListener('click', exportConfig);
+// Words
+document.getElementById('toggleProfanity').addEventListener('click', toggleProfanity);
+document.getElementById('saveWords').addEventListener('click', saveOptions);
+// Domains
 document.getElementById('domainAdd').addEventListener('click', domainAdd);
 document.getElementById('domainRemove').addEventListener('click', domainRemove);
+// Config
+document.getElementById('default').addEventListener('click', function() {confirm('restoreDefaults')} );
+document.getElementById('import').addEventListener('click', function() {confirm('importConfig')} );
+document.getElementById('export').addEventListener('click', exportConfig);
