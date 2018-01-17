@@ -41,9 +41,12 @@
 <!-- Domains Tab -->
 <div id="Domains" class="tabcontent hidden">
   <h3>Disabled Domains</h3>
-  <div class="notes">Comma separated values with no spaces</div>
-  <textarea id="disabledDomainsList" cols="40" rows="10"></textarea>
-  <button id="saveDisabledDomains">Save</button>
+  <input type="text" id="domainText" name="domainText">
+  <button id="domainAdd">Add</button>
+  <div class="moveDown">
+    <select id="domainSelect"></select>
+    <button id="domainRemove">Remove</button>
+  </div>
 </div>
 
 <!-- Words -->
