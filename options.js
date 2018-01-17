@@ -1,4 +1,9 @@
-var defaults = {'disabledDomains': '', 'filterSubstring': true, 'preserveFirst': false, 'showCounter': true, 'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore'};
+var defaults = {'disabledDomains': [], 'filterSubstring': true, 'preserveFirst': false, 'showCounter': true, 'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore'};
+var config = {};
+
+function arrayContains(array, string) {
+  return (array.indexOf(string) > -1);
+}
 
 // Prompt for confirmation
 function confirm(action) {
@@ -23,12 +28,44 @@ function confirm(action) {
   dialog.showModal();
 }
 
-function dynamicWordList(words) {
+function domainAdd() {
+  var domain = document.getElementById('domainText').value;
+  if (domain != "") {
+    if (!arrayContains(config.disabledDomains, domain)) {
+      config.disabledDomains.push(domain);
+      config.disabledDomains = config.disabledDomains.sort();
+      saveOptions(event, config);
+      dynamicDomains(config.disabledDomains, 'domainSelect');
+      document.getElementById('domainText').value = "";
+    } else {
+      updateStatus('Domain already in list.', true, 3000);
+    }
+  }
+}
+
+function domainRemove() {
+  var domain = document.getElementById('domainSelect').value;
+  if (domain != "") {
+    config.disabledDomains = removeFromArray(config.disabledDomains, domain);
+    saveOptions(event, config);
+    dynamicDomains(config.disabledDomains, 'domainSelect');
+  }
+}
+
+function dynamicList(words) {
   var options = '<option value="" disabled selected>Warning - Language</option>';
   for(var i = 0; i < words.length; i++) {
     options += '<option value="'+words[i]+'">'+words[i]+'</option>';
   }
   document.getElementById('wordSelect').innerHTML = options;
+}
+
+function dynamicDomains(list, selectEm) {
+  var options = '<option value="" disabled selected>Disabled Domains</option>';
+  for(var i = 0; i < list.length; i++) {
+    options += '<option value="'+list[i]+'">'+list[i]+'</option>';
+  }
+  document.getElementById(selectEm).innerHTML = options;
 }
 
 function exportConfig() {
@@ -39,8 +76,8 @@ function exportConfig() {
 
 function importConfig(event) {
   try {
-    var config = JSON.parse(document.getElementById('configText').value);
-    saveOptions(event, config);
+    var settings = JSON.parse(document.getElementById('configText').value);
+    saveOptions(event, settings);
   } catch (e) {
     updateStatus('Settings not saved! Please try again.', true, 5000);
   }
@@ -69,14 +106,18 @@ function openTab(evt) {
 // Restores form state to saved values from Chrome Storage
 function populateOptions() {
   chrome.storage.sync.get(defaults, function(settings) {
-    // Display saved settings
+    config = settings // Make config globally available
     document.getElementById('wordList').value = settings.wordList;
-    document.getElementById('disabledDomainsList').value = settings.disabledDomains;
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('filterSubstring').checked = settings.filterSubstring;
     document.getElementById('showCounter').checked = settings.showCounter;
-    dynamicWordList(settings.wordList.split(','));
+    dynamicList(settings.wordList.split(','));
+    dynamicDomains(settings.disabledDomains, 'domainSelect');
   });
+}
+
+function removeFromArray(array, element) {
+  return array.filter(e => e !== element);
 }
 
 // Restore default settings
@@ -96,7 +137,6 @@ function saveOptions(event, settings) {
   // Gather current settings
   if (settings === undefined){
     settings = {};
-    settings.disabledDomains = document.getElementById('disabledDomainsList').value;
     settings.filterSubstring = document.getElementById('filterSubstring').checked;
     settings.preserveFirst = document.getElementById('preserveFirst').checked;
     settings.showCounter = document.getElementById('showCounter').checked;
@@ -138,6 +178,7 @@ function updateStatus(message, error, timeout) {
   setTimeout(function() {status.textContent = ''; status.className = '';}, timeout);
 }
 
+////
 // Add event listeners to DOM
 tabs = document.getElementsByClassName("tablinks");
 for (i = 0; i < tabs.length; i++) {
@@ -145,7 +186,6 @@ for (i = 0; i < tabs.length; i++) {
 }
 window.addEventListener('load', populateOptions);
 document.getElementById('toggleProfanity').addEventListener('click', toggleProfanity);
-document.getElementById('saveDisabledDomains').addEventListener('click', saveOptions);
 document.getElementById('saveWords').addEventListener('click', saveOptions);
 document.getElementById('default').addEventListener('click', function() {confirm('restoreDefaults')} );
 document.getElementById('filterSubstring').addEventListener('click', saveOptions);
@@ -153,3 +193,5 @@ document.getElementById('preserveFirst').addEventListener('click', saveOptions);
 document.getElementById('showCounter').addEventListener('click', saveOptions);
 document.getElementById('import').addEventListener('click', function() {confirm('importConfig')} );
 document.getElementById('export').addEventListener('click', exportConfig);
+document.getElementById('domainAdd').addEventListener('click', domainAdd);
+document.getElementById('domainRemove').addEventListener('click', domainRemove);
