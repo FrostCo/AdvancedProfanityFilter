@@ -52,14 +52,6 @@ function domainRemove() {
   }
 }
 
-function dynamicList(words) {
-  var options = '<option value="" disabled selected>Warning - Language</option>';
-  for(var i = 0; i < words.length; i++) {
-    options += '<option value="'+words[i]+'">'+words[i]+'</option>';
-  }
-  document.getElementById('wordSelect').innerHTML = options;
-}
-
 function dynamicDomains(list, selectEm) {
   var options = '<option value="" disabled selected>Disabled Domains</option>';
   for(var i = 0; i < list.length; i++) {
@@ -111,7 +103,6 @@ function populateOptions() {
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('filterSubstring').checked = settings.filterSubstring;
     document.getElementById('showCounter').checked = settings.showCounter;
-    dynamicList(settings.wordList.split(','));
     dynamicDomains(settings.disabledDomains, 'domainSelect');
   });
 }
