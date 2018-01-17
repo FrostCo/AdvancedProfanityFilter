@@ -1,6 +1,6 @@
 var wordList, preserveFirst, filterSubstring, showCounter;
 var wordRegExps = [];
-var defaults = {'disabledDomains': '', 'filterSubstring': true, 'preserveFirst': false, 'showCounter': true, 'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore'};
+var defaults = {'disabledDomains': [], 'filterSubstring': true, 'preserveFirst': false, 'showCounter': true, 'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore'};
 var counter = 0;
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
@@ -22,7 +22,7 @@ function cleanPage() {
     filterSubstring = storage.filterSubstring;
     preserveFirst = storage.preserveFirst;
     showCounter = storage.showCounter;
-    disabledDomains = storage.disabledDomains.split(',');
+    disabledDomains = storage.disabledDomains;
 
     // Remove profanity from the main document and watch for new nodes
     if (disabledPage()) {
