@@ -56,12 +56,13 @@ div.tab button.active {
   font-style: bold;
 }
 
-input {
+input[type=select],
+input[type=text] {
   height: 26px;
   width: 250px;
 }
 
-label input[type=checkbox]{
+label input[type=checkbox] {
   position: relative;
   vertical-align: middle;
   bottom: 1px;
