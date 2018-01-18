@@ -31,29 +31,33 @@ button.active {
 
 /* Tab Styling */
 div.tab {
-  overflow: hidden;
+  height: 40px;
   border: 1px solid #ccc;
   background-color: #f1f1f1;
+  text-align: center;
 }
 
-div.tab button {
-  background-color: inherit;
-  float: left;
-  border: none;
-  outline: none;
+span.tablinks {
+  display: inline-block;
   cursor: pointer;
-  padding: 14px 16px;
+  padding: 10px 8px 10px 8px;
   transition: 0.3s;
-  font-size: 17px;
+  font-size: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(215, 215, 215);
+  border-image: initial;
+  border-radius: 2px;
+  width: 70px;
+  text-align: center;
 }
 
-div.tab button:hover {
-  background-color: #ddd;
+div.tab span:hover {
+  background-color: rgb(195, 195, 195);
 }
 
-div.tab button.active {
-  background-color: green;
-  font-style: bold;
+div.tab span.active {
+  background-color: rgb(179, 179, 179);
 }
 
 input[type=select],
