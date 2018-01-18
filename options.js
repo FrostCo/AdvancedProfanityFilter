@@ -6,17 +6,17 @@ var defaults = {
   'showCounter': true,
   'words': {
     "asshole": ["butthole", "jerk"],
-    "bastard": [],
+    "bastard": ["imperfect", "impure"],
     "bitch": ["jerk"],
-    "cunt": [],
+    "cunt": ["explative"],
     "damn": ["dang", "darn"],
     "fuck": ["freak", "fudge"],
     "piss": ["pee"],
     "pissed": ["ticked"],
-    "slut": [],
+    "slut": ["imperfect", "impure"],
     "shit": ["crap", "crud", "poop"],
-    "tits": [],
-    "whore": []
+    "tits": ["explative"],
+    "whore": ["harlot", "tramp"]
   },
   'wordList': '' // TODO: Remove
 };
