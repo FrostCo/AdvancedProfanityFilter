@@ -1,5 +1,25 @@
-var defaults = {'disabledDomains': [], 'filterSubstring': true, 'preserveFirst': false, 'showCounter': true, 'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore'};
 var config = {};
+var defaults = {
+  'disabledDomains': [],
+  'filterSubstring': true,
+  'preserveFirst': false,
+  'showCounter': true,
+  'words': {
+    "asshole": ["butthole", "jerk"],
+    "bastard": [],
+    "bitch": ["jerk"],
+    "cunt": [],
+    "damn": ["dang", "darn"],
+    "fuck": ["freak", "fudge"],
+    "piss": ["pee"],
+    "pissed": ["ticked"],
+    "slut": [],
+    "shit": ["crap", "crud", "poop"],
+    "tits": [],
+    "whore": []
+  },
+  'wordList': '' // TODO: Remove
+};
 
 function arrayContains(array, string) {
   return (array.indexOf(string) > -1);
@@ -44,7 +64,7 @@ function domainAdd(event) {
       config.disabledDomains.push(domain);
       config.disabledDomains = config.disabledDomains.sort();
       saveOptions(event, config);
-      dynamicDomains(config.disabledDomains, 'domainSelect');
+      dynamicList(config.disabledDomains, 'domainSelect', 'Disabled Domains');
       document.getElementById('domainText').value = "";
     } else {
       updateStatus('Domain already in list.', true, 3000);
@@ -57,12 +77,12 @@ function domainRemove(event) {
   if (domain != "") {
     config.disabledDomains = removeFromArray(config.disabledDomains, domain);
     saveOptions(event, config);
-    dynamicDomains(config.disabledDomains, 'domainSelect');
+    dynamicList(config.disabledDomains, 'domainSelect', 'Disabled Domains');
   }
 }
 
-function dynamicDomains(list, selectEm) {
-  var options = '<option value="" disabled selected>Disabled Domains</option>';
+function dynamicList(list, selectEm, title) {
+  var options = '<option value="" disabled selected>' + title + '</option>';
   for(var i = 0; i < list.length; i++) {
     options += '<option value="'+list[i]+'">'+list[i]+'</option>';
   }
@@ -108,11 +128,12 @@ function openTab(event) {
 function populateOptions() {
   chrome.storage.sync.get(defaults, function(settings) {
     config = settings; // Make config globally available
-    document.getElementById('wordList').value = settings.wordList;
+
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('filterSubstring').checked = settings.filterSubstring;
     document.getElementById('showCounter').checked = settings.showCounter;
-    dynamicDomains(settings.disabledDomains, 'domainSelect');
+    dynamicList(settings.disabledDomains, 'domainSelect', 'Disabled Domains');
+    dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
   });
 }
 
@@ -140,7 +161,6 @@ function saveOptions(event, settings) {
     settings.filterSubstring = document.getElementById('filterSubstring').checked;
     settings.preserveFirst = document.getElementById('preserveFirst').checked;
     settings.showCounter = document.getElementById('showCounter').checked;
-    settings.wordList = document.getElementById('wordList').value;
   }
 
   // Save settings
@@ -150,24 +170,8 @@ function saveOptions(event, settings) {
     } else {
       updateStatus('Settings saved successfully!', false, 3000);
       populateOptions();
-      if (document.getElementById('profanityList').style.display === 'block') {toggleProfanity();} // Close wordList
     }
   });
-}
-
-// Displays the profanity list and hides the profanity button
-function toggleProfanity() {
-  var profanityList = document.getElementById('profanityList');
-  if (profanityList.style.display === 'none') {
-    profanityList.style.display = 'block';
-    document.getElementById('listWarning').style.display = 'none';
-    document.getElementById('wordList').focus();
-    document.getElementById('toggleProfanity').textContent = "Hide Profanity List";
-  } else {
-    profanityList.style.display = 'none';
-    document.getElementById('listWarning').style.display = 'block';
-    document.getElementById('toggleProfanity').textContent = "Modify Profanity List";
-  }
 }
 
 // Display status update to user
@@ -176,6 +180,29 @@ function updateStatus(message, error, timeout) {
   if (error) {status.className = 'error';}
   status.textContent = message;
   setTimeout(function() {status.textContent = ''; status.className = '';}, timeout);
+}
+
+function wordAdd(event) {
+  var word = document.getElementById('wordText').value;
+  if (word != "") {
+    if (!arrayContains(Object.keys(config.words), word)) {
+      config.words[word] = [];
+      saveOptions(event, config);
+      dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
+      document.getElementById('wordText').value = "";
+    } else {
+      updateStatus('Word already in list.', true, 3000);
+    }
+  }
+}
+
+function wordRemove(event) {
+  var word = document.getElementById('wordSelect').value;
+  if (word != "") {
+    delete config.words[word];
+    saveOptions(event, config);
+    dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
+  }
 }
 
 ////
@@ -190,8 +217,8 @@ document.getElementById('filterSubstring').addEventListener('click', saveOptions
 document.getElementById('preserveFirst').addEventListener('click', saveOptions);
 document.getElementById('showCounter').addEventListener('click', saveOptions);
 // Words
-document.getElementById('toggleProfanity').addEventListener('click', toggleProfanity);
-document.getElementById('saveWords').addEventListener('click', saveOptions);
+document.getElementById('wordAdd').addEventListener('click', wordAdd);
+document.getElementById('wordRemove').addEventListener('click', wordRemove);
 // Domains
 document.getElementById('domainAdd').addEventListener('click', domainAdd);
 document.getElementById('domainRemove').addEventListener('click', domainRemove);
