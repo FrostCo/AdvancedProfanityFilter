@@ -1,11 +1,30 @@
-var wordList, preserveFirst, filterSubstring, showCounter;
-var wordRegExps = [];
-var defaults = {'disabledDomains': [], 'filterSubstring': true, 'preserveFirst': false, 'showCounter': true, 'wordList': 'asshole,bastard,bitch,cunt,damn,fuck,piss,slut,shit,tits,whore'};
 var counter = 0;
+var defaults = {
+  'disabledDomains': [],
+  'filterSubstring': true,
+  'preserveFirst': false,
+  'showCounter': true,
+  'words': {
+    "asshole": ["butthole", "jerk"],
+    "bastard": [],
+    "bitch": ["jerk"],
+    "cunt": [],
+    "damn": ["dang", "darn"],
+    "fuck": ["freak", "fudge"],
+    "piss": ["pee"],
+    "pissed": ["ticked"],
+    "slut": [],
+    "shit": ["crap", "crud", "poop"],
+    "tits": [],
+    "whore": []
+  },
+  'wordList': '' // TODO: Remove
+};
+var disabledDomains = [];
+var words, preserveFirst, filterSubstring, showCounter;
+var wordRegExps = [];
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
-var disabledDomains = [];
-var myTest = [];
 
 function checkNodeForProfanity(mutation) {
   mutation.addedNodes.forEach(function(node) {
@@ -18,7 +37,7 @@ function checkNodeForProfanity(mutation) {
 function cleanPage() {
   chrome.storage.sync.get(defaults, function(storage) {
     // Load settings and setup environment
-    wordList = storage.wordList.split(',');
+    words = Object.keys(storage.words);
     filterSubstring = storage.filterSubstring;
     preserveFirst = storage.preserveFirst;
     showCounter = storage.showCounter;
@@ -56,12 +75,12 @@ function disabledPage() {
 // Parse the profanity list
 function generateRegexpList() {
   if (filterSubstring) {
-    for (var x = 0; x < wordList.length; x++) {
-      wordRegExps.push(new RegExp('(' + wordList[x][0] + ')' + wordList[x].substring(1), 'gi' ));
+    for (var x = 0; x < words.length; x++) {
+      wordRegExps.push(new RegExp('(' + words[x][0] + ')' + words[x].substring(1), 'gi' ));
     }
   } else {
-    for (var x = 0; x < wordList.length; x++) {
-      wordRegExps.push(new RegExp('\\b(' + wordList[x][0] + ')' + wordList[x].substring(1) + '\\b', 'gi' ));
+    for (var x = 0; x < words.length; x++) {
+      wordRegExps.push(new RegExp('\\b(' + words[x][0] + ')' + words[x].substring(1) + '\\b', 'gi' ));
     }
   }
 }
@@ -114,7 +133,7 @@ function removeProfanity(xpathExpression, node) {
 }
 
 function replaceText(str) {
-  for (var z = 0; z < wordList.length; z++) {
+  for (var z = 0; z < words.length; z++) {
     str = str.replace(wordRegExps[z], starReplace);
   }
 

@@ -53,12 +53,11 @@
 <!-- Words -->
 <div id="Words" class="tabcontent hidden">
   <h3>Profanity List</h3>
-  <button id="toggleProfanity">Modify Profanity List</button>
-  <div id="listWarning" class="notes">Warning: Offensive Language</div>
-  <div id="profanityList" style="display: none;">
-    <div class="notes">Comma separated values with no spaces</div>
-    <textarea id="wordList" cols="40" rows="10"></textarea>
-    <button id="saveWords">Save</button>
+  <input type="text" id="wordText" name="wordText">
+  <button id="wordAdd">Add</button>
+  <div class="moveDown">
+    <select id="wordSelect"></select>
+    <button id="wordRemove">Remove</button>
   </div>
 </div>
 
