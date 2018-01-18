@@ -71,7 +71,7 @@ function dynamicDomains(list, selectEm) {
 
 function exportConfig() {
   chrome.storage.sync.get(defaults, function(settings) {
-    document.getElementById('configText').value = JSON.stringify(settings);
+    document.getElementById('configText').value = JSON.stringify(settings, null, 2);
   });
 }
 
