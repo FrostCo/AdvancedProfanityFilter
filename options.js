@@ -131,10 +131,18 @@ function populateOptions() {
 
     // Migrate from old wordList to words ojbect
     // TODO: Remove me in next version
-    if (config.wordlist != "") {
+    // config.wordList = 'test-word';
+    // chrome.storage.sync.set(config, function() {
+    //   if (chrome.runtime.lastError) {
+    //     console.log('Migration not saved! Please try again.');
+    //   } else {
+    //     console.log('Migration saved successfully!');
+    //   }
+    // })
+    if (config.wordlist != '') {
       config.wordList.split(',').forEach(function(word) {
         if (!arrayContains(Object.keys(config.words), word)) {
-          config.words[word] = [];
+          if (word != '') { config.words[word] = []; }
         }
       })
 
@@ -142,9 +150,9 @@ function populateOptions() {
 
       chrome.storage.sync.set(config, function() {
         if (chrome.runtime.lastError) {
-          console.log('Settings not saved! Please try again.');
+          console.log('Migration not saved! Please try again.');
         } else {
-          console.log('Settings saved successfully!');
+          console.log('Migration saved successfully!');
         }
       })
     }
