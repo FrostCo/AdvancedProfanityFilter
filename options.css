@@ -18,7 +18,6 @@ a:hover, a:active {
 }
 
 button {
-  /*margin: 6px 0 0 0;*/
   margin: 4px 4px;
   padding: 5px 20px 5px 20px;
   border: 1px solid #aaa;
@@ -31,29 +30,32 @@ button.active {
 
 /* Tab Styling */
 div.tab {
-  overflow: hidden;
   border: 1px solid #ccc;
   background-color: #f1f1f1;
+  text-align: center;
 }
 
-div.tab button {
-  background-color: inherit;
-  float: left;
-  border: none;
-  outline: none;
+span.tablinks {
+  display: inline-block;
   cursor: pointer;
-  padding: 14px 16px;
+  padding: 10px 8px 10px 8px;
   transition: 0.3s;
-  font-size: 17px;
+  font-size: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(215, 215, 215);
+  border-image: initial;
+  border-radius: 2px;
+  min-width: 70px;
+  text-align: center;
 }
 
-div.tab button:hover {
-  background-color: #ddd;
+div.tab span:hover {
+  background-color: rgb(195, 195, 195);
 }
 
-div.tab button.active {
-  background-color: green;
-  font-style: bold;
+div.tab span.active {
+  background-color: rgb(179, 179, 179);
 }
 
 input[type=select],
@@ -73,11 +75,13 @@ select {
 }
 
 textarea {
-  resize: vertical;
-  min-height: 50px;
-  max-height: 232px;
+  resize: none;
   border-radius: 5px;
-  width:100%;
+}
+
+textarea#configText {
+  width: 340px;
+  height: 260px;
 }
 
 #contributors {
@@ -138,7 +142,7 @@ textarea {
 }
 
 .tabcontent {
-  height: 300px;
+  height: 370px;
   display: none;
   padding: 6px 12px;
   border: 1px solid #ccc;
