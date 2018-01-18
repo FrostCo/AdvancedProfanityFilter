@@ -42,11 +42,8 @@ function disabledPage() {
 
   for (var x = 0; x < disabledDomains.length; x++) {
     if (disabledDomains[x]) {
-      console.log(disabledDomains);
-      console.log("Checking domain: ", disabledDomains[x]);
       domainRegex = new RegExp("(^|\.)" + disabledDomains[x]);
       if (domainRegex.test(domain)) {
-        console.log("Blocked domain!");
         disabled = true;
         break;
       }
