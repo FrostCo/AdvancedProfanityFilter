@@ -44,22 +44,31 @@
 <div id="Domains" class="tabcontent hidden">
   <h3>Disabled Domains</h3>
   <div id="domainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
-  <input type="text" id="domainText" name="domainText">
-  <button id="domainAdd">Add</button>
+  <select id="domainSelect"></select>
+  <button id="domainRemove">Remove</button>
   <div class="moveDown">
-    <select id="domainSelect"></select>
-    <button id="domainRemove">Remove</button>
+    <input type="text" id="domainText" name="domainText">
+    <button id="domainAdd">Add</button>
   </div>
 </div>
 
 <!-- Words -->
 <div id="Words" class="tabcontent hidden">
   <h3>Profanity List</h3>
-  <input type="text" id="wordText" name="wordText">
-  <button id="wordAdd">Add</button>
+  <select id="wordSelect"></select>
+  <button id="wordRemove">Remove</button>
   <div class="moveDown">
-    <select id="wordSelect"></select>
-    <button id="wordRemove">Remove</button>
+    <input type="text" id="wordText" name="wordText">
+    <button id="wordAdd">Add</button>
+  </div>
+  <div class="moveDown">
+    <h4>Substitutions</h4>
+    <select id="substitutionSelect"></select>
+    <button id="substitutionRemove">Remove</button>
+  </div>
+  <div class="moveDown">
+    <input type="text" id="substitutionText" name="substitutionText">
+    <button id="substitutionAdd">Add</button>
   </div>
 </div>
 

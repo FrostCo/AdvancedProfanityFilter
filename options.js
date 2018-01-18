@@ -162,6 +162,7 @@ function populateOptions() {
     document.getElementById('showCounter').checked = settings.showCounter;
     dynamicList(settings.disabledDomains, 'domainSelect', 'Disabled Domains');
     dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
+    dynamicList([], 'substitutionSelect', 'Substitutions');
   });
 }
 
@@ -233,6 +234,37 @@ function wordRemove(event) {
   }
 }
 
+function substitutionAdd(event) {
+  var word = document.getElementById('wordSelect').value;
+  var sub = document.getElementById('substitutionText').value;
+  if (word != "" && sub != "") {
+    if (!arrayContains(config.words[word], sub)) {
+      config.words[word].push(sub);
+      config.words[word] = config.words[word].sort();
+      saveOptions(event, config);
+      dynamicList(config.words[word], 'substitutionSelect', 'Substitutions');
+      document.getElementById('substitutionText').value = "";
+    } else {
+      updateStatus('Substitution already in list.', true, 3000);
+    }
+  }
+}
+
+function substitutionLoad() {
+  var selectedOption = this[this.selectedIndex];
+  var selectedText = selectedOption.text;
+  dynamicList(config.words[selectedText], 'substitutionSelect', 'Substitutions');
+}
+
+function substitutionRemove(event) {
+  var word = document.getElementById('wordSelect').value;
+  var sub = document.getElementById('substitutionSelect').value;
+  if (word != "" && sub != "") {
+    config.words[word] = removeFromArray(config.words[word], sub);
+    saveOptions(event, config);
+  }
+}
+
 ////
 // Add event listeners to DOM
 tabs = document.getElementsByClassName("tablinks");
@@ -247,6 +279,10 @@ document.getElementById('showCounter').addEventListener('click', saveOptions);
 // Words
 document.getElementById('wordAdd').addEventListener('click', wordAdd);
 document.getElementById('wordRemove').addEventListener('click', wordRemove);
+document.getElementById('wordSelect').addEventListener('change', substitutionLoad);
+document.getElementById('substitutionAdd').addEventListener('click', substitutionAdd);
+document.getElementById('substitutionRemove').addEventListener('click', substitutionRemove);
+
 // Domains
 document.getElementById('domainAdd').addEventListener('click', domainAdd);
 document.getElementById('domainRemove').addEventListener('click', domainRemove);
