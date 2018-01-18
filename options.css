@@ -31,7 +31,6 @@ button.active {
 
 /* Tab Styling */
 div.tab {
-  height: 40px;
   border: 1px solid #ccc;
   background-color: #f1f1f1;
   text-align: center;
@@ -48,7 +47,7 @@ span.tablinks {
   border-color: rgb(215, 215, 215);
   border-image: initial;
   border-radius: 2px;
-  width: 70px;
+  min-width: 70px;
   text-align: center;
 }
 
