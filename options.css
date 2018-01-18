@@ -24,10 +24,6 @@ button {
   border-radius: 5px;
 }
 
-button.active {
-  background-color: green;
-}
-
 /* Tab Styling */
 div.tab {
   border: 1px solid #ccc;
@@ -35,7 +31,7 @@ div.tab {
   text-align: center;
 }
 
-span.tablinks {
+div.tab span.tablinks {
   display: inline-block;
   cursor: pointer;
   padding: 10px 8px 10px 8px;
@@ -58,12 +54,14 @@ div.tab span.active {
   background-color: rgb(179, 179, 179);
 }
 
-input[type=select],
 input[type=text] {
+  padding: 4px;
+  border-radius: 2px;
   height: 26px;
   width: 250px;
 }
 
+/* Form elements */
 label input[type=checkbox] {
   position: relative;
   vertical-align: middle;
@@ -71,6 +69,10 @@ label input[type=checkbox] {
 }
 
 select {
+  padding: 4px;
+  border-size: 1px;
+  border-radius: 2px;
+  height: 26px;
   width: 250px;
 }
 
