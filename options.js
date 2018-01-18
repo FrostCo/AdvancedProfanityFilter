@@ -129,6 +129,26 @@ function populateOptions() {
   chrome.storage.sync.get(defaults, function(settings) {
     config = settings; // Make config globally available
 
+    // Migrate from old wordList to words ojbect
+    // TODO: Remove me in next version
+    if (config.wordlist != "") {
+      config.wordList.split(',').forEach(function(word) {
+        if (!arrayContains(Object.keys(config.words), word)) {
+          config.words[word] = [];
+        }
+      })
+
+      delete config.wordList;
+
+      chrome.storage.sync.set(config, function() {
+        if (chrome.runtime.lastError) {
+          console.log('Settings not saved! Please try again.');
+        } else {
+          console.log('Settings saved successfully!');
+        }
+      })
+    }
+
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('filterSubstring').checked = settings.filterSubstring;
     document.getElementById('showCounter').checked = settings.showCounter;
