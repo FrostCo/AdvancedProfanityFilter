@@ -17,8 +17,7 @@ var defaults = {
     "shit": ["crap", "crud", "poop"],
     "tits": ["explative"],
     "whore": ["harlot", "tramp"]
-  },
-  'wordList': '' // TODO: Remove
+  }
 };
 
 function arrayContains(array, string) {
@@ -90,7 +89,11 @@ function dynamicList(list, selectEm, title) {
 }
 
 function exportConfig() {
-  chrome.storage.sync.get(defaults, function(settings) {
+  // TODO: To let people migrate from wordList to words, return all keys (null)
+  chrome.storage.sync.get(null, function(settings) {
+    if (Object.keys(settings).length === 0 && settings.constructor === Object) {
+      settings = defaults;
+    }
     document.getElementById('configText').value = JSON.stringify(settings, null, 2);
   });
 }
@@ -129,34 +132,6 @@ function populateOptions() {
   chrome.storage.sync.get(defaults, function(settings) {
     config = settings; // Make config globally available
 
-    // Migrate from old wordList to words ojbect
-    // TODO: Remove me in next version
-    // config.wordList = 'test-word';
-    // chrome.storage.sync.set(config, function() {
-    //   if (chrome.runtime.lastError) {
-    //     console.log('Migration not saved! Please try again.');
-    //   } else {
-    //     console.log('Migration saved successfully!');
-    //   }
-    // })
-    if (config.wordlist != '') {
-      config.wordList.split(',').forEach(function(word) {
-        if (!arrayContains(Object.keys(config.words), word)) {
-          if (word != '') { config.words[word] = []; }
-        }
-      })
-
-      delete config.wordList;
-
-      chrome.storage.sync.set(config, function() {
-        if (chrome.runtime.lastError) {
-          console.log('Migration not saved! Please try again.');
-        } else {
-          console.log('Migration saved successfully!');
-        }
-      })
-    }
-
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('filterSubstring').checked = settings.filterSubstring;
     document.getElementById('showCounter').checked = settings.showCounter;
@@ -185,7 +160,7 @@ function restoreDefaults() {
 // Saves options to sync storage
 function saveOptions(event, settings) {
   // Gather current settings
-  if (settings === undefined){
+  if (settings === undefined) {
     settings = {};
     settings.filterSubstring = document.getElementById('filterSubstring').checked;
     settings.preserveFirst = document.getElementById('preserveFirst').checked;
@@ -282,7 +257,6 @@ document.getElementById('wordRemove').addEventListener('click', wordRemove);
 document.getElementById('wordSelect').addEventListener('change', substitutionLoad);
 document.getElementById('substitutionAdd').addEventListener('click', substitutionAdd);
 document.getElementById('substitutionRemove').addEventListener('click', substitutionRemove);
-
 // Domains
 document.getElementById('domainAdd').addEventListener('click', domainAdd);
 document.getElementById('domainRemove').addEventListener('click', domainRemove);

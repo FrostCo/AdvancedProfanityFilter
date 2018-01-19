@@ -17,8 +17,7 @@ var defaults = {
     "shit": ["crap", "crud", "poop"],
     "tits": ["explative"],
     "whore": ["harlot", "tramp"]
-  },
-  'wordList': '' // TODO: Remove
+  }
 };
 var disabledDomains = [];
 var words, preserveFirst, filterSubstring, showCounter;
