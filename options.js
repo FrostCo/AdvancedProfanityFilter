@@ -1,10 +1,11 @@
 var config = {};
 var defaults = {
-  'disabledDomains': [],
-  'filterSubstring': true,
-  'preserveFirst': false,
-  'showCounter': true,
-  'words': {
+  "disabledDomains": [],
+  "filterMethod": 0, // ["censor", "substitute"];
+  "filterSubstring": true,
+  "preserveFirst": false,
+  "showCounter": true,
+  "words": {
     "asshole": ["butthole", "jerk"],
     "bastard": ["imperfect", "impure"],
     "bitch": ["jerk"],
@@ -107,6 +108,11 @@ function importConfig(event) {
   }
 }
 
+function methodSelected() {
+  config.filterMethod = document.getElementById('methodSelect').selectedIndex;
+  saveOptions(event, config);
+}
+
 // Switching Tabs
 function openTab(event) {
   // Don't run on current tab
@@ -131,7 +137,17 @@ function openTab(event) {
 function populateOptions() {
   chrome.storage.sync.get(defaults, function(settings) {
     config = settings; // Make config globally available
-
+    document.getElementById('methodSelect').selectedIndex = settings.filterMethod;
+    switch (settings.filterMethod) {
+      case 0:
+        document.getElementById('optionsCensor').classList.remove('hidden');
+        document.getElementById('wordSubstitutions').classList.add('hidden');
+        break;
+      case 1:
+        document.getElementById('optionsCensor').classList.add('hidden');
+        document.getElementById('wordSubstitutions').classList.remove('hidden');
+        break;
+    }
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('filterSubstring').checked = settings.filterSubstring;
     document.getElementById('showCounter').checked = settings.showCounter;
@@ -248,6 +264,7 @@ for (i = 0; i < tabs.length; i++) {
 }
 window.addEventListener('load', populateOptions);
 // Filter
+document.getElementById('methodSelect').addEventListener('change', methodSelected);
 document.getElementById('filterSubstring').addEventListener('click', saveOptions);
 document.getElementById('preserveFirst').addEventListener('click', saveOptions);
 document.getElementById('showCounter').addEventListener('click', saveOptions);

@@ -1,10 +1,11 @@
 var counter = 0;
 var defaults = {
-  'disabledDomains': [],
-  'filterSubstring': true,
-  'preserveFirst': false,
-  'showCounter': true,
-  'words': {
+  "disabledDomains": [],
+  "filterMethod": 0, // ["censor", "substitute"];
+  "filterSubstring": true,
+  "preserveFirst": false,
+  "showCounter": true,
+  "words": {
     "asshole": ["butthole", "jerk"],
     "bastard": ["imperfect", "impure"],
     "bitch": ["jerk"],
@@ -20,7 +21,7 @@ var defaults = {
   }
 };
 var disabledDomains = [];
-var words, preserveFirst, filterSubstring, showCounter;
+var filterMethod, filterSubstring, preserveFirst, showCounter, substitutionWords, words;
 var wordRegExps = [];
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
@@ -36,17 +37,21 @@ function checkNodeForProfanity(mutation) {
 function cleanPage() {
   chrome.storage.sync.get(defaults, function(storage) {
     // Load settings and setup environment
-    words = Object.keys(storage.words);
+    disabledDomains = storage.disabledDomains;
+    filterMethod = storage.filterMethod;
     filterSubstring = storage.filterSubstring;
     preserveFirst = storage.preserveFirst;
     showCounter = storage.showCounter;
-    disabledDomains = storage.disabledDomains;
+    substitutionWords = storage.words;
+    words = Object.keys(storage.words);
 
-    // Remove profanity from the main document and watch for new nodes
+    // Don't run if this is a disabled domain
     if (disabledPage()) {
       chrome.runtime.sendMessage({disabled: true});
       return false;
     }
+
+    // Remove profanity from the main document and watch for new nodes
     generateRegexpList();
     removeProfanity(xpathDocText);
     updateCounterBadge();
@@ -115,6 +120,10 @@ function observeNewNodes() {
   observer.observe(document, observerConfig);
 }
 
+function randomElement(array) {
+  return array[Math.floor((Math.random()*array.length))];
+}
+
 function removeProfanity(xpathExpression, node) {
   node = (typeof node !== 'undefined') ?  node : document;
   var evalResult = document.evaluate(
@@ -132,10 +141,21 @@ function removeProfanity(xpathExpression, node) {
 }
 
 function replaceText(str) {
-  for (var z = 0; z < words.length; z++) {
-    str = str.replace(wordRegExps[z], starReplace);
+  switch(filterMethod) {
+    case 0: // Censor
+      for (var z = 0; z < words.length; z++) {
+        str = str.replace(wordRegExps[z], starReplace);
+      }
+      break;
+    case 1: // Substitute
+      for (var z = 0; z < words.length; z++) {
+        str = str.replace(wordRegExps[z], function(match) {
+          counter++;
+          return randomElement(substitutionWords[words[z]]);
+        });
+      }
+      break;
   }
-
   return str;
 }
 

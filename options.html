@@ -21,22 +21,34 @@
 <!-- Settings Tab -->
 <div id="Settings" class="tabcontent visible">
   <h3>Filter Settings</h3>
-  <div id="options">
+
+  <h4>Method</h4>
+  <select id="methodSelect">
+    <option value="0">Censor</option>
+    <option value="1">Substitute</option>
+  </select>
+
+  <div id="optionsCensor" class="moveDown hidden">
+    <h4>Censor Settings</h4>
     <label>
       <input type="checkbox" id="preserveFirst">
       Preserve the first letter
     </label>
-    <div class="examples">Example: If "Dog" is filtered, then it is displayed as "D**"</div>
+    <div class="examples">If "Dog" is filtered, then "Dog" becomes "D**"</div>
+  </div>
+
+  <div id="options" class="moveDown">
+    <h4>General</h4>
     <label>
       <input type="checkbox" id="filterSubstring">
       Filter parts of words
+      <div class="examples">If "Dog" is filtered, then "Doghouse" becomes "***house"</div>
     </label>
-    <div class="examples">Example: If "Dog" is filtered, then "Doghouse" is displayed as "***house"</div>
     <label>
       <input type="checkbox" id="showCounter">
       Show number of filtered words
+      <div class="examples">Number of filtered words will be shown over the extension icon</div>
     </label>
-    <div class="examples">Number of filtered words will be shown over the extension icon</div>
   </div>
 </div>
 
@@ -61,14 +73,16 @@
     <input type="text" id="wordText" name="wordText">
     <button id="wordAdd">Add</button>
   </div>
-  <div class="moveDown hidden">
-    <h4>Substitutions</h4>
-    <select id="substitutionSelect"></select>
-    <button id="substitutionRemove">Remove</button>
-  </div>
-  <div class="moveDown hidden">
-    <input type="text" id="substitutionText" name="substitutionText">
-    <button id="substitutionAdd">Add</button>
+  <div id="wordSubstitutions" class="hidden">
+    <div class="moveDown">
+      <h4>Substitutions</h4>
+      <select id="substitutionSelect"></select>
+      <button id="substitutionRemove">Remove</button>
+    </div>
+    <div class="moveDown">
+      <input type="text" id="substitutionText" name="substitutionText">
+      <button id="substitutionAdd">Add</button>
+    </div>
   </div>
 </div>
 

@@ -1,4 +1,7 @@
-body {font-family: Arial;}
+body {
+  font-family: Arial;
+  overflow: hidden;
+}
 
 h3 {
   color: teal;
