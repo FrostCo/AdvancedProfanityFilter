@@ -43,7 +43,11 @@ function cleanPage() {
     preserveFirst = storage.preserveFirst;
     showCounter = storage.showCounter;
     substitutionWords = storage.words;
-    words = Object.keys(storage.words);
+    // Sort the words array by longest (most-specific) first
+    words = Object.keys(storage.words).sort(function(a, b) {
+      return b.length - a.length;
+    });
+    console.log(words);
 
     // Don't run if this is a disabled domain
     if (disabledPage()) {
