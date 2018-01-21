@@ -29,15 +29,15 @@
   <div id="optionsCensor" class="moveDown hidden">
     <h4>Censor Settings</h4>
     <label>
-      <input type="checkbox" id="preserveFirst">
-      Preserve the first letter
-      <span class="notes">(Dog: dog = d**)</span>
-    </label>
-    <br />
-    <label>
       <input type="checkbox" id="censorRemoveWord">
       Remove word
       <span class="notes">(Dog: dog = "")</span>
+    </label>
+    <br />
+    <label>
+      <input type="checkbox" id="preserveFirst">
+      Preserve the first letter
+      <span class="notes">(Dog: dog = d**)</span>
     </label>
     <br />
     <label>
@@ -50,6 +50,7 @@
         <option value="@">@</option>
         <option value="^">^</option>
         <option value="-">-</option>
+        <option value="_">_</option>
       </select>
     </label>
     <br />
@@ -73,17 +74,17 @@
   <div id="options" class="moveDown">
     <h4>Matching Method</h4>
     <label>
-      <input type="radio" name="matchMethod" id="matchMethodExact" value="0"></input>
+      <input type="radio" name="matchMethodRadio" id="matchMethodExact" value="0"></input>
       Exact Match <span class="notes">(Dog: dog = ***)</span>
     </label>
     <br />
     <label>
-      <input type="radio" name="matchMethod" id="matchMethodPart" value="1"></input>
+      <input type="radio" name="matchMethodRadio" id="matchMethodPart" value="1"></input>
       Partial Match <span class="notes">(Dog: doghouse = ***house)</span>
     </label>
     <br />
     <label>
-      <input type="radio" name="matchMethod" id="matchMethodGreedy" value="2"></input>
+      <input type="radio" name="matchMethodRadio" id="matchMethodGreedy" value="2"></input>
       Greedy Match <span class="notes">(Dog: doghouse = ********)</span>
     </label>
     <br />

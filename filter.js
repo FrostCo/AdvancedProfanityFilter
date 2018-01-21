@@ -54,7 +54,7 @@ function censorReplace(strMatchingString, strFirstLetter) {
     }
   } else {
     if (!preserveFirst) {
-      censoredString = censorCharacter(strMatchingString.length);
+      censoredString = censorCharacter.repeat(strMatchingString.length);
     } else {
       censoredString = strFirstLetter + censorCharacter.repeat((strMatchingString.length - 1));
     }
@@ -67,15 +67,15 @@ function censorReplace(strMatchingString, strFirstLetter) {
 function cleanPage() {
   chrome.storage.sync.get(defaults, function(storage) {
     // Load settings and setup environment
+    censorCharacter = storage.censorCharacter;
+    censorFixedLength = storage.censorFixedLength;
+    censorRemoveWord = storage.censorRemoveWord
     disabledDomains = storage.disabledDomains;
     filterMethod = storage.filterMethod;
+    matchMethod = storage.matchMethod;
     preserveFirst = storage.preserveFirst;
     showCounter = storage.showCounter;
-    censorFixedLength = storage.censorFixedLength;
-    censorCharacter = storage.censorCharacter;
-    censorRemoveWord = storage.censorRemoveWord
     substitutionWords = storage.words;
-    matchMethod = storage.matchMethod;
     // Sort the words array by longest (most-specific) first
     words = Object.keys(storage.words).sort(function(a, b) {
       return b.length - a.length;
