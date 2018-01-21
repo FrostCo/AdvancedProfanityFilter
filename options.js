@@ -121,6 +121,11 @@ function importConfig(event) {
   }
 }
 
+function matchMethodRadio() {
+  config.matchMethod = parseInt(document.querySelector('input[name="matchMethodRadio"]:checked').value);
+  saveOptions(event, config);
+}
+
 function methodSelected() {
   config.filterMethod = document.getElementById('methodSelect').selectedIndex;
   saveOptions(event, config);
@@ -161,11 +166,15 @@ function populateOptions() {
         document.getElementById('wordSubstitutions').classList.remove('hidden');
         break;
     }
+    // Settings
     document.getElementById('censorFixedLengthSelect').selectedIndex = settings.censorFixedLength;
     document.getElementById('censorCharacterSelect').value = settings.censorCharacter;
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
+    document.querySelector('input[name="matchMethodRadio"][value="' + settings.matchMethod + '"]').checked = true;
     document.getElementById('showCounter').checked = settings.showCounter;
+    // Domains
     dynamicList(settings.disabledDomains, 'domainSelect', 'Disabled Domains');
+    // Words
     dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
     dynamicList([], 'substitutionSelect', 'Substitutions');
   });
@@ -283,6 +292,10 @@ document.getElementById('preserveFirst').addEventListener('click', saveOptions);
 document.getElementById('censorRemoveWord').addEventListener('click', saveOptions);
 document.getElementById('censorCharacterSelect').addEventListener('change', censorCharacter);
 document.getElementById('censorFixedLengthSelect').addEventListener('change', censorFixedLength);
+matchMethodRadios = document.getElementsByName('matchMethodRadio');
+for (i = 0; i < matchMethodRadios.length; i++) {
+  matchMethodRadios[i].addEventListener('click', function(e) { matchMethodRadio(); });
+}
 // General
 document.getElementById('showCounter').addEventListener('click', saveOptions);
 // Words
