@@ -1,9 +1,8 @@
 body {
   font-family: Arial;
-  overflow: hidden;
 }
 
-h3 {
+h4 {
   color: teal;
   font-weight: bold;
   margin: 5px 0 15px 0;
@@ -57,6 +56,11 @@ div.tab span.active {
   background-color: rgb(179, 179, 179);
 }
 
+/* Form elements */
+input[type=radio] {
+  margin-bottom: 4px;
+}
+
 input[type=text] {
   padding: 4px;
   border-radius: 2px;
@@ -64,11 +68,18 @@ input[type=text] {
   width: 250px;
 }
 
-/* Form elements */
+input[type=text].small {
+  padding: 4px;
+  border-radius: 2px;
+  height: 26px;
+  width: 100px;
+}
+
 label input[type=checkbox] {
   position: relative;
   vertical-align: middle;
   bottom: 1px;
+  margin-bottom: 4px;
 }
 
 select {
@@ -77,6 +88,10 @@ select {
   border-radius: 2px;
   height: 26px;
   width: 250px;
+}
+
+select.small {
+  width: 100px;
 }
 
 textarea {
@@ -121,7 +136,7 @@ textarea#configText {
 }
 
 .moveDown {
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 .examples {
@@ -147,7 +162,7 @@ textarea#configText {
 }
 
 .tabcontent {
-  height: 370px;
+  min-height: 370px;
   display: none;
   padding: 6px 12px;
   border: 1px solid #ccc;

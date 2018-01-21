@@ -1,8 +1,11 @@
 var config = {};
 var defaults = {
+  "censorCharacter": "*",
+  "censorFixedLength": 0,
+  "censorRemoveWord": false,
   "disabledDomains": [],
   "filterMethod": 0, // ["censor", "substitute"];
-  "filterSubstring": true,
+  "matchMethod": 1, // ["exact", "partial", "greedy"]
   "preserveFirst": false,
   "showCounter": true,
   "words": {
@@ -23,6 +26,16 @@ var defaults = {
 
 function arrayContains(array, string) {
   return (array.indexOf(string) > -1);
+}
+
+function censorCharacter() {
+  config.censorCharacter = document.getElementById('censorCharacterSelect').value;
+  saveOptions(event, config);
+}
+
+function censorFixedLength() {
+  config.censorFixedLength = document.getElementById('censorFixedLengthSelect').selectedIndex;
+  saveOptions(event, config);
 }
 
 // Prompt for confirmation
@@ -148,8 +161,9 @@ function populateOptions() {
         document.getElementById('wordSubstitutions').classList.remove('hidden');
         break;
     }
+    document.getElementById('censorFixedLengthSelect').selectedIndex = settings.censorFixedLength;
+    document.getElementById('censorCharacterSelect').value = settings.censorCharacter;
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
-    document.getElementById('filterSubstring').checked = settings.filterSubstring;
     document.getElementById('showCounter').checked = settings.showCounter;
     dynamicList(settings.disabledDomains, 'domainSelect', 'Disabled Domains');
     dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
@@ -178,7 +192,7 @@ function saveOptions(event, settings) {
   // Gather current settings
   if (settings === undefined) {
     settings = {};
-    settings.filterSubstring = document.getElementById('filterSubstring').checked;
+    settings.censorRemoveWord = document.getElementById('censorRemoveWord').checked;
     settings.preserveFirst = document.getElementById('preserveFirst').checked;
     settings.showCounter = document.getElementById('showCounter').checked;
   }
@@ -265,8 +279,11 @@ for (i = 0; i < tabs.length; i++) {
 window.addEventListener('load', populateOptions);
 // Filter
 document.getElementById('methodSelect').addEventListener('change', methodSelected);
-document.getElementById('filterSubstring').addEventListener('click', saveOptions);
 document.getElementById('preserveFirst').addEventListener('click', saveOptions);
+document.getElementById('censorRemoveWord').addEventListener('click', saveOptions);
+document.getElementById('censorCharacterSelect').addEventListener('change', censorCharacter);
+document.getElementById('censorFixedLengthSelect').addEventListener('change', censorFixedLength);
+// General
 document.getElementById('showCounter').addEventListener('click', saveOptions);
 // Words
 document.getElementById('wordAdd').addEventListener('click', wordAdd);

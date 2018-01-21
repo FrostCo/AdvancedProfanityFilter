@@ -1,8 +1,11 @@
 var counter = 0;
 var defaults = {
+  "censorCharacter": "*",
+  "censorFixedLength": 0,
+  "censorRemoveWord": false,
   "disabledDomains": [],
   "filterMethod": 0, // ["censor", "substitute"];
-  "filterSubstring": true,
+  "matchMethod": 1, // ["exact", "partial", "greedy"]
   "preserveFirst": false,
   "showCounter": true,
   "words": {
@@ -20,8 +23,7 @@ var defaults = {
     "whore": ["harlot", "tramp"]
   }
 };
-var disabledDomains = [];
-var filterMethod, filterSubstring, preserveFirst, showCounter, substitutionWords, words;
+var censorCharacter, censorFixedLength, censorRemoveWord, disabledDomains, filterMethod, matchMethod, preserveFirst, showCounter, substitutionWords, words;
 var wordRegExps = [];
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
@@ -34,20 +36,50 @@ function checkNodeForProfanity(mutation) {
   });
 }
 
+// Censor the profanity
+// Only gets run when there is a match in replaceText()
+function censorReplace(strMatchingString, strFirstLetter) {
+  var censoredString = '';
+
+  // Compatible Combinations
+  // removeWord: None
+  // preserveFirst: censorCharacter, censorFixedLength
+  if (censorRemoveWord) {
+    censoredString = '';
+  } else if (censorFixedLength > 0) {
+    if (preserveFirst) {
+      censoredString = strFirstLetter + censorCharacter.repeat((censorFixedLength - 1));
+    } else {
+      censoredString = censorCharacter.repeat(censorFixedLength);
+    }
+  } else {
+    if (!preserveFirst) {
+      censoredString = censorCharacter(strMatchingString.length);
+    } else {
+      censoredString = strFirstLetter + censorCharacter.repeat((strMatchingString.length - 1));
+    }
+  }
+
+  counter++;
+  return censoredString;
+}
+
 function cleanPage() {
   chrome.storage.sync.get(defaults, function(storage) {
     // Load settings and setup environment
     disabledDomains = storage.disabledDomains;
     filterMethod = storage.filterMethod;
-    filterSubstring = storage.filterSubstring;
     preserveFirst = storage.preserveFirst;
     showCounter = storage.showCounter;
+    censorFixedLength = storage.censorFixedLength;
+    censorCharacter = storage.censorCharacter;
+    censorRemoveWord = storage.censorRemoveWord
     substitutionWords = storage.words;
+    matchMethod = storage.matchMethod;
     // Sort the words array by longest (most-specific) first
     words = Object.keys(storage.words).sort(function(a, b) {
       return b.length - a.length;
     });
-    console.log(words);
 
     // Don't run if this is a disabled domain
     if (disabledPage()) {
@@ -82,14 +114,28 @@ function disabledPage() {
 
 // Parse the profanity list
 function generateRegexpList() {
-  if (filterSubstring) {
-    for (var x = 0; x < words.length; x++) {
-      wordRegExps.push(new RegExp('(' + words[x][0] + ')' + words[x].substring(1), 'gi' ));
-    }
-  } else {
-    for (var x = 0; x < words.length; x++) {
-      wordRegExps.push(new RegExp('\\b(' + words[x][0] + ')' + words[x].substring(1) + '\\b', 'gi' ));
-    }
+  switch(matchMethod) {
+    case 0:
+      // Word must match exactly (not sub-string)
+      // /\b(w)ord\b/gi
+      for (var x = 0; x < words.length; x++) {
+        wordRegExps.push(new RegExp('\\b(' + words[x][0] + ')' + words[x].substring(1) + '\\b', 'gi' ));
+      }
+      break;
+    case 1:
+      // Match any part of a word (sub-string)
+      // /(w)ord/gi
+      for (var x = 0; x < words.length; x++) {
+        wordRegExps.push(new RegExp('(' + words[x][0] + ')' + words[x].substring(1), 'gi' ));
+      }
+      break;
+    case 2:
+      // Match entire word that contains sub-string
+      // /\b[\w-]*(w)ord[\w-]*\b/gi
+      for (var x = 0; x < words.length; x++) {
+        wordRegExps.push(new RegExp('\\b[\\w-]*(' + words[x][0] + ')' + words[x].substring(1) + '[\\w-]*\\b', 'gi' ));
+      }
+      break;
   }
 }
 
@@ -148,7 +194,7 @@ function replaceText(str) {
   switch(filterMethod) {
     case 0: // Censor
       for (var z = 0; z < words.length; z++) {
-        str = str.replace(wordRegExps[z], starReplace);
+        str = str.replace(wordRegExps[z], censorReplace);
       }
       break;
     case 1: // Substitute
@@ -161,26 +207,6 @@ function replaceText(str) {
       break;
   }
   return str;
-}
-
-// Replace the profanity with a string of asterisks
-// Only gets run when there is a match in replaceText()
-function starReplace(strMatchingString, strFirstLetter) {
-  var starString = '';
-
-  if (!preserveFirst) {
-    for (var i = 0; i < strMatchingString.length; i++) {
-      starString = starString + '*';
-    }
-  } else {
-    starString = strFirstLetter;
-    for (var i = 1; i < strMatchingString.length; i++) {
-      starString = starString + '*';
-    }
-  }
-
-  counter++;
-  return starString;
 }
 
 function updateCounterBadge() {

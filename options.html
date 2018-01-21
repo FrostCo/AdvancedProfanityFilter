@@ -20,9 +20,7 @@
 
 <!-- Settings Tab -->
 <div id="Settings" class="tabcontent visible">
-  <h3>Filter Settings</h3>
-
-  <h4>Method</h4>
+  <h4>Filter Method</h4>
   <select id="methodSelect">
     <option value="0">Censor</option>
     <option value="1">Substitute</option>
@@ -33,17 +31,64 @@
     <label>
       <input type="checkbox" id="preserveFirst">
       Preserve the first letter
+      <span class="notes">(Dog: dog = d**)</span>
     </label>
-    <div class="examples">If "Dog" is filtered, then "Dog" becomes "D**"</div>
+    <br />
+    <label>
+      <input type="checkbox" id="censorRemoveWord">
+      Remove word
+      <span class="notes">(Dog: dog = "")</span>
+    </label>
+    <br />
+    <label>
+      Censor character:
+      <select id="censorCharacterSelect" class="small">
+        <option value="*">*</option>
+        <option value="&">&amp;</option>
+        <option value="$">$</option>
+        <option value="#">#</option>
+        <option value="@">@</option>
+        <option value="^">^</option>
+        <option value="-">-</option>
+      </select>
+    </label>
+    <br />
+    <label>
+      Fixed length:
+      <select id="censorFixedLengthSelect" class="small">
+        <option value="0">No limit</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+      </select>
+    </label>
   </div>
 
   <div id="options" class="moveDown">
-    <h4>General</h4>
+    <h4>Matching Method</h4>
     <label>
-      <input type="checkbox" id="filterSubstring">
-      Filter parts of words
-      <div class="examples">If "Dog" is filtered, then "Doghouse" becomes "***house"</div>
+      <input type="radio" name="matchMethod" id="matchMethodExact" value="0"></input>
+      Exact Match <span class="notes">(Dog: dog = ***)</span>
     </label>
+    <br />
+    <label>
+      <input type="radio" name="matchMethod" id="matchMethodPart" value="1"></input>
+      Partial Match <span class="notes">(Dog: doghouse = ***house)</span>
+    </label>
+    <br />
+    <label>
+      <input type="radio" name="matchMethod" id="matchMethodGreedy" value="2"></input>
+      Greedy Match <span class="notes">(Dog: doghouse = ********)</span>
+    </label>
+    <br />
+
+    <h4>General Settings</h4>
     <label>
       <input type="checkbox" id="showCounter">
       Show number of filtered words
@@ -54,7 +99,7 @@
 
 <!-- Domains Tab -->
 <div id="Domains" class="tabcontent hidden">
-  <h3>Disabled Domains</h3>
+  <h4>Disabled Domains</h4>
   <div id="domainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
   <select id="domainSelect"></select>
   <button id="domainRemove">Remove</button>
@@ -66,7 +111,7 @@
 
 <!-- Words -->
 <div id="Words" class="tabcontent hidden">
-  <h3>Profanity List</h3>
+  <h4>Profanity List</h4>
   <select id="wordSelect"></select>
   <button id="wordRemove">Remove</button>
   <div class="moveDown">
@@ -88,7 +133,7 @@
 
 <!-- Export/Import -->
 <div id="Config" class="tabcontent hidden">
-  <h3>Import/Export/Restore Defaults</h3>
+  <h4>Import/Export/Restore Defaults</h4>
   <button id="default">Restore Defaults</button>
   <button id="import">Import</button>
   <button id="export">Export</button>
