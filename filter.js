@@ -48,15 +48,15 @@ function censorReplace(strMatchingString, strFirstLetter) {
     censoredString = '';
   } else if (censorFixedLength > 0) {
     if (preserveFirst) {
-      censoredString = strFirstLetter + censorCharacter.repeat((censorFixedLength - 1));
+      censoredString = strFirstLetter[0] + censorCharacter.repeat((censorFixedLength - 1));
     } else {
       censoredString = censorCharacter.repeat(censorFixedLength);
     }
   } else {
-    if (!preserveFirst) {
-      censoredString = censorCharacter.repeat(strMatchingString.length);
+    if (preserveFirst) {
+      censoredString = strFirstLetter[0] + censorCharacter.repeat((strMatchingString.length - 1));
     } else {
-      censoredString = strFirstLetter + censorCharacter.repeat((strMatchingString.length - 1));
+      censoredString = censorCharacter.repeat(strMatchingString.length);
     }
   }
 
@@ -133,7 +133,7 @@ function generateRegexpList() {
       // Match entire word that contains sub-string
       // /\b[\w-]*(w)ord[\w-]*\b/gi
       for (var x = 0; x < words.length; x++) {
-        wordRegExps.push(new RegExp('\\b[\\w-]*(' + words[x][0] + ')' + words[x].substring(1) + '[\\w-]*\\b', 'gi' ));
+        wordRegExps.push(new RegExp('\\b([\\w-]*' + words[x][0] + ')' + words[x].substring(1) + '[\\w-]*\\b', 'gi' ));
       }
       break;
   }
