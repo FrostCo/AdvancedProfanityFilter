@@ -5,7 +5,7 @@ var defaults = {
   "censorRemoveWord": false,
   "disabledDomains": [],
   "filterMethod": 0, // ["censor", "substitute"];
-  "matchMethod": 1, // ["exact", "partial", "greedy"]
+  "matchMethod": 1, // ["exact", "partial", "whole"]
   "preserveFirst": false,
   "showCounter": true,
   "words": {
