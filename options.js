@@ -134,8 +134,8 @@ function importConfig(event) {
   }
 }
 
-function methodSelected() {
-  config.filterMethod = document.getElementById('methodSelect').selectedIndex;
+function filterMethodSelect() {
+  config.filterMethod = document.getElementById('filterMethodSelect').selectedIndex;
   saveOptions(event, config);
 }
 
@@ -163,7 +163,7 @@ function openTab(event) {
 function populateOptions() {
   chrome.storage.sync.get(defaults, function(settings) {
     config = settings; // Make config globally available
-    document.getElementById('methodSelect').selectedIndex = settings.filterMethod;
+    document.getElementById('filterMethodSelect').selectedIndex = settings.filterMethod;
     switch (settings.filterMethod) {
       case 0:
         document.getElementById('optionsCensor').classList.remove('hidden');
@@ -227,37 +227,6 @@ function saveOptions(event, settings) {
   });
 }
 
-// Display status update to user
-function updateStatus(message, error, timeout) {
-  var status = document.getElementById('status');
-  if (error) {status.className = 'error';}
-  status.textContent = message;
-  setTimeout(function() {status.textContent = ''; status.className = '';}, timeout);
-}
-
-function wordAdd(event) {
-  var word = document.getElementById('wordText').value;
-  if (word != "") {
-    if (!arrayContains(Object.keys(config.words), word)) {
-      config.words[word] = {"method": 1, "words": []};
-      saveOptions(event, config);
-      dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
-      document.getElementById('wordText').value = "";
-    } else {
-      updateStatus('Word already in list.', true, 3000);
-    }
-  }
-}
-
-function wordRemove(event) {
-  var word = document.getElementById('wordSelect').value;
-  if (word != "") {
-    delete config.words[word];
-    saveOptions(event, config);
-    dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
-  }
-}
-
 function substitutionAdd(event) {
   var word = document.getElementById('wordSelect').value;
   var sub = document.getElementById('substitutionText').value;
@@ -282,6 +251,37 @@ function substitutionLoad() {
   }
 }
 
+function substitutionRemove(event) {
+  var word = document.getElementById('wordSelect').value;
+  var sub = document.getElementById('substitutionSelect').value;
+  if (word != "" && sub != "") {
+    config.words[word] = removeFromArray(config.words[word], sub);
+    saveOptions(event, config);
+  }
+}
+
+// Display status update to user
+function updateStatus(message, error, timeout) {
+  var status = document.getElementById('status');
+  if (error) {status.className = 'error';}
+  status.textContent = message;
+  setTimeout(function() {status.textContent = ''; status.className = '';}, timeout);
+}
+
+function wordAdd(event) {
+  var word = document.getElementById('wordText').value;
+  if (word != "") {
+    if (!arrayContains(Object.keys(config.words), word)) {
+      config.words[word] = {"method": 1, "words": []};
+      saveOptions(event, config);
+      dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
+      document.getElementById('wordText').value = "";
+    } else {
+      updateStatus('Word already in list.', true, 3000);
+    }
+  }
+}
+
 function wordMatchMethodLoad() {
   var selectedOption = this[this.selectedIndex];
   var selectedText = selectedOption.text;
@@ -297,12 +297,12 @@ function wordMatchMethodSet() {
   saveOptions(event, config);
 }
 
-function substitutionRemove(event) {
+function wordRemove(event) {
   var word = document.getElementById('wordSelect').value;
-  var sub = document.getElementById('substitutionSelect').value;
-  if (word != "" && sub != "") {
-    config.words[word] = removeFromArray(config.words[word], sub);
+  if (word != "") {
+    delete config.words[word];
     saveOptions(event, config);
+    dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
   }
 }
 
@@ -314,7 +314,7 @@ for (i = 0; i < tabs.length; i++) {
 }
 window.addEventListener('load', populateOptions);
 // Filter
-document.getElementById('methodSelect').addEventListener('change', methodSelected);
+document.getElementById('filterMethodSelect').addEventListener('change', filterMethodSelect);
 document.getElementById('preserveFirst').addEventListener('click', saveOptions);
 document.getElementById('censorRemoveWord').addEventListener('click', saveOptions);
 document.getElementById('censorCharacterSelect').addEventListener('change', censorCharacter);
