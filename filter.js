@@ -1,12 +1,11 @@
 var counter = 0;
-// matchMethod = ["exact", "partial", "whole"]
 var defaults = {
   "censorCharacter": "*",
   "censorFixedLength": 0,
   "defaultSubstitutions": ["censored", "expletive", "filtered"],
   "disabledDomains": [],
-  "filterMethod": 0, // ["censor", "substitute"];
-  "globalMatchMethod": 3, // ["exact", "partial", "whole", "disabled"]
+  "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
+  "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word"]
   "preserveFirst": false,
   "showCounter": true,
   "words": {
@@ -27,25 +26,32 @@ var defaults = {
 };
 var censorCharacter, censorFixedLength, defaultSubstitutions, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, showCounter, words, wordList;
 var wordRegExps = [];
+var whitespaceRegExp = new RegExp('\\s');
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 
 // Word must match exactly (not sub-string)
 // /\b(w)ord\b/gi
-function build_exact_regexp(word) {
+function buildExactRegexp(word) {
   wordRegExps.push(new RegExp('\\b(' + word[0] + ')' + word.substring(1) + '\\b', 'gi' ));
 }
 
 // Match any part of a word (sub-string)
 // /(w)ord/gi
-function build_part_regexp(word) {
+function buildPartRegexp(word) {
   wordRegExps.push(new RegExp('(' + word[0] + ')' + word.substring(1), 'gi' ));
 }
 
 // Match entire word that contains sub-string
 // /\b[\w-]*(w)ord[\w-]*\b/gi
-function build_whole_regexp(word) {
+function buildWholeRegexp(word) {
   wordRegExps.push(new RegExp('\\b([\\w-]*' + word[0] + ')' + word.substring(1) + '[\\w-]*\\b', 'gi' ));
+}
+
+// Match entire word that contains sub-string and surrounding whitespace
+// /\s?\b[\w-]*(w)ord[\w-]*\b\s?/gi
+function buildWholeRegexpForRemove(word) {
+  wordRegExps.push(new RegExp('\\s?\\b([\\w-]*' + word[0] + ')' + word.substring(1) + '[\\w-]*\\b\\s?', 'gi' ));
 }
 
 function checkNodeForProfanity(mutation) {
@@ -81,11 +87,18 @@ function censorReplace(strMatchingString, strFirstLetter) {
 
 function cleanPage() {
   chrome.storage.sync.get(defaults, function(storage) {
+    disabledDomains = storage.disabledDomains;
+
+    // Don't run if this is a disabled domain
+    if (disabledPage()) {
+      chrome.runtime.sendMessage({disabled: true});
+      return false;
+    }
+
     // Load settings and setup environment
     censorCharacter = storage.censorCharacter;
     censorFixedLength = storage.censorFixedLength;
     defaultSubstitutions = storage.defaultSubstitutions;
-    disabledDomains = storage.disabledDomains;
     filterMethod = storage.filterMethod;
     globalMatchMethod = storage.globalMatchMethod;
     matchMethod = storage.matchMethod;
@@ -96,12 +109,6 @@ function cleanPage() {
     wordList = Object.keys(words).sort(function(a, b) {
       return b.length - a.length;
     });
-
-    // Don't run if this is a disabled domain
-    if (disabledPage()) {
-      chrome.runtime.sendMessage({disabled: true});
-      return false;
-    }
 
     // Remove profanity from the main document and watch for new nodes
     generateRegexpList();
@@ -131,37 +138,43 @@ function disabledPage() {
 // Parse the profanity list
 // ["exact", "partial", "whole", "disabled"]
 function generateRegexpList() {
-  switch(globalMatchMethod) {
-    case 0: // Global: Exact match
-      for (var x = 0; x < wordList.length; x++) {
-        build_exact_regexp(wordList[x]);
-      }
-      break;
-    case 2: // Global: Whole word match
-      for (var x = 0; x < wordList.length; x++) {
-        build_whole_regexp(wordList[x]);
-      }
-      break;
-    case 3: // Per-word matching
-      for (var x = 0; x < wordList.length; x++) {
-        switch(words[wordList[x]].matchMethod) {
-          case 0: // Exact match
-            build_exact_regexp(wordList[x]);
-            break;
-          case 2: // Whole word match
-            build_whole_regexp(wordList[x]);
-            break;
-          default: // case 1 - Partial word match (Default)
-            build_part_regexp(wordList[x]);
-            break;
+  if (filterMethod == 2) { // If removing, ignore match method
+    for (var x = 0; x < wordList.length; x++) {
+      buildWholeRegexpForRemove(wordList[x]);
+    }
+  } else {
+    switch(globalMatchMethod) {
+      case 0: // Global: Exact match
+        for (var x = 0; x < wordList.length; x++) {
+          buildExactRegexp(wordList[x]);
         }
-      }
-      break;
-    default: // case 1 - Global: Partial word match (Default)
-      for (var x = 0; x < wordList.length; x++) {
-        build_part_regexp(wordList[x]);
-      }
-      break;
+        break;
+      case 2: // Global: Whole word match
+        for (var x = 0; x < wordList.length; x++) {
+          buildWholeRegexp(wordList[x]);
+        }
+        break;
+      case 3: // Per-word matching
+        for (var x = 0; x < wordList.length; x++) {
+          switch(words[wordList[x]].matchMethod) {
+            case 0: // Exact match
+              buildExactRegexp(wordList[x]);
+              break;
+            case 2: // Whole word match
+              buildWholeRegexp(wordList[x]);
+              break;
+            default: // case 1 - Partial word match (Default)
+              buildPartRegexp(wordList[x]);
+              break;
+          }
+        }
+        break;
+      default: // case 1 - Global: Partial word match (Default)
+        for (var x = 0; x < wordList.length; x++) {
+          buildPartRegexp(wordList[x]);
+        }
+        break;
+    }
   }
 }
 
@@ -238,7 +251,12 @@ function replaceText(str) {
       for (var z = 0; z < wordList.length; z++) {
         str = str.replace(wordRegExps[z], function(match) {
           counter++;
-          return '';
+          // Don't remove both leading and trailing whitespace
+          if (whitespaceRegExp.test(match[0]) && whitespaceRegExp.test(match[match.length - 1])) {
+            return match[0];
+          } else {
+            return "";
+          }
         });
       }
       break;

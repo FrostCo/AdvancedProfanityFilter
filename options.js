@@ -4,7 +4,7 @@ var defaults = {
   "censorFixedLength": 0,
   "defaultSubstitutions": ["censored", "expletive", "filtered"],
   "disabledDomains": [],
-  "filterMethod": 0, // ["censor", "substitute"];
+  "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
   "globalMatchMethod": 3, // ["exact", "partial", "whole", "disabled"]
   "preserveFirst": false,
   "showCounter": true,
@@ -136,7 +136,6 @@ function importConfig(event) {
 
 function filterMethodSelect() {
   config.filterMethod = document.getElementById('filterMethodSelect').selectedIndex;
-  if (config.filterMethod === 2) { config.globalMatchMethod = 2; }
   saveOptions(event, config);
 }
 
