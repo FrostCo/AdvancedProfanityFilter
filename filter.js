@@ -3,8 +3,7 @@ var counter = 0;
 var defaults = {
   "censorCharacter": "*",
   "censorFixedLength": 0,
-  "censorRemoveWord": false,
-  "defaultSubstitutions": ["censored", "explative", "filtered"],
+  "defaultSubstitutions": ["censored", "expletive", "filtered"],
   "disabledDomains": [],
   "filterMethod": 0, // ["censor", "substitute"];
   "globalMatchMethod": 3, // ["exact", "partial", "whole", "disabled"]
@@ -26,7 +25,7 @@ var defaults = {
     "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
   }
 };
-var censorCharacter, censorFixedLength, censorRemoveWord, defaultSubstitutions, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, showCounter, words, wordList;
+var censorCharacter, censorFixedLength, defaultSubstitutions, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, showCounter, words, wordList;
 var wordRegExps = [];
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
@@ -62,12 +61,7 @@ function checkNodeForProfanity(mutation) {
 function censorReplace(strMatchingString, strFirstLetter) {
   var censoredString = '';
 
-  // Compatible Combinations
-  // removeWord: None
-  // preserveFirst: censorCharacter, censorFixedLength
-  if (censorRemoveWord) {
-    censoredString = '';
-  } else if (censorFixedLength > 0) {
+  if (censorFixedLength > 0) {
     if (preserveFirst) {
       censoredString = strFirstLetter[0] + censorCharacter.repeat((censorFixedLength - 1));
     } else {
@@ -90,7 +84,6 @@ function cleanPage() {
     // Load settings and setup environment
     censorCharacter = storage.censorCharacter;
     censorFixedLength = storage.censorFixedLength;
-    censorRemoveWord = storage.censorRemoveWord;
     defaultSubstitutions = storage.defaultSubstitutions;
     disabledDomains = storage.disabledDomains;
     filterMethod = storage.filterMethod;
@@ -238,6 +231,14 @@ function replaceText(str) {
         str = str.replace(wordRegExps[z], function(match) {
           counter++;
           return randomElement(words[wordList[z]].words);
+        });
+      }
+      break;
+    case 2: // Remove
+      for (var z = 0; z < wordList.length; z++) {
+        str = str.replace(wordRegExps[z], function(match) {
+          counter++;
+          return '';
         });
       }
       break;
