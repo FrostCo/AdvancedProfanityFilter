@@ -3,24 +3,26 @@ var defaults = {
   "censorCharacter": "*",
   "censorFixedLength": 0,
   "censorRemoveWord": false,
+  "defaultSubstitutions": ["censored", "explative", "filtered"],
   "disabledDomains": [],
   "filterMethod": 0, // ["censor", "substitute"];
-  "matchMethod": 1, // ["exact", "partial", "whole"]
+  "globalMatchMethod": 3, // ["exact", "partial", "whole", "disabled"]
   "preserveFirst": false,
   "showCounter": true,
   "words": {
-    "asshole": ["butthole", "jerk"],
-    "bastard": ["imperfect", "impure"],
-    "bitch": ["jerk"],
-    "cunt": ["explative"],
-    "damn": ["dang", "darn"],
-    "fuck": ["freak", "fudge"],
-    "piss": ["pee"],
-    "pissed": ["ticked"],
-    "slut": ["imperfect", "impure"],
-    "shit": ["crap", "crud", "poop"],
-    "tits": ["explative"],
-    "whore": ["harlot", "tramp"]
+    "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
+    "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
+    "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
+    "bitch": {"matchMethod": 1, "words": ["jerk"] },
+    "cunt": {"matchMethod": 1, "words": ["explative"] },
+    "damn": {"matchMethod": 1, "words": ["dang", "darn"] },
+    "fuck": {"matchMethod": 1, "words": ["freak", "fudge"] },
+    "piss": {"matchMethod": 1, "words": ["pee"] },
+    "pissed": {"matchMethod": 0, "words": ["ticked"] },
+    "slut": {"matchMethod": 1, "words": ["imperfect", "impure"] },
+    "shit": {"matchMethod": 1, "words": ["crap", "crud", "poop"] },
+    "tits": {"matchMethod": 1, "words": ["explative"] },
+    "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
   }
 };
 
