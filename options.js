@@ -163,6 +163,8 @@ function openTab(event) {
 function populateOptions() {
   chrome.storage.sync.get(defaults, function(settings) {
     config = settings; // Make config globally available
+
+    // Show/hide censor options and word substitutions based on filter method
     document.getElementById('filterMethodSelect').selectedIndex = settings.filterMethod;
     switch (settings.filterMethod) {
       case 0:
@@ -174,6 +176,14 @@ function populateOptions() {
         document.getElementById('wordSubstitutions').classList.remove('hidden');
         break;
     }
+
+    // Hide per-word matching options if not selected globally
+    if (settings.globalMatchMethod === 3) {
+      document.getElementById('wordMatchMethodContainer').classList.remove('hidden');
+    } else {
+      document.getElementById('wordMatchMethodContainer').classList.add('hidden');
+    }
+
     // Settings
     document.getElementById('censorFixedLengthSelect').selectedIndex = settings.censorFixedLength;
     document.getElementById('censorCharacterSelect').value = settings.censorCharacter;
