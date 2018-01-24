@@ -25,7 +25,7 @@ var defaults = {
     "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
   }
 };
-var censorCharacter, censorFixedLength, censorRemoveWord, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, showCounter, substitutionWords, words;
+var censorCharacter, censorFixedLength, censorRemoveWord, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, showCounter, words, wordList;
 var wordRegExps = [];
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
@@ -89,16 +89,16 @@ function cleanPage() {
     // Load settings and setup environment
     censorCharacter = storage.censorCharacter;
     censorFixedLength = storage.censorFixedLength;
-    censorRemoveWord = storage.censorRemoveWord
+    censorRemoveWord = storage.censorRemoveWord;
     disabledDomains = storage.disabledDomains;
     filterMethod = storage.filterMethod;
     globalMatchMethod = storage.globalMatchMethod;
     matchMethod = storage.matchMethod;
     preserveFirst = storage.preserveFirst;
     showCounter = storage.showCounter;
-    substitutionWords = storage.words;
+    words = storage.words;
     // Sort the words array by longest (most-specific) first
-    words = Object.keys(storage.words).sort(function(a, b) {
+    wordList = Object.keys(words).sort(function(a, b) {
       return b.length - a.length;
     });
 
@@ -138,33 +138,33 @@ function disabledPage() {
 function generateRegexpList() {
   switch(globalMatchMethod) {
     case 0: // Global: Exact match
-      for (var x = 0; x < words.length; x++) {
-        build_exact_regexp(words[x]);
+      for (var x = 0; x < wordList.length; x++) {
+        build_exact_regexp(wordList[x]);
       }
       break;
     case 2: // Global: Whole word match
-      for (var x = 0; x < words.length; x++) {
-        build_whole_regexp(words[x]);
+      for (var x = 0; x < wordList.length; x++) {
+        build_whole_regexp(wordList[x]);
       }
       break;
     case 3: // Per-word matching
-      for (var x = 0; x < words.length; x++) {
-        switch(substitutionWords[words[x]].matchMethod) {
+      for (var x = 0; x < wordList.length; x++) {
+        switch(words[wordList[x]].matchMethod) {
           case 0: // Exact match
-            build_exact_regexp(words[x]);
+            build_exact_regexp(wordList[x]);
             break;
           case 2: // Whole word match
-            build_whole_regexp(words[x]);
+            build_whole_regexp(wordList[x]);
             break;
           default: // case 1 - Partial word match (Default)
-            build_part_regexp(words[x]);
+            build_part_regexp(wordList[x]);
             break;
         }
       }
       break;
     default: // case 1 - Global: Partial word match (Default)
-      for (var x = 0; x < words.length; x++) {
-        build_part_regexp(words[x]);
+      for (var x = 0; x < wordList.length; x++) {
+        build_part_regexp(wordList[x]);
       }
       break;
   }
@@ -224,15 +224,15 @@ function removeProfanity(xpathExpression, node) {
 function replaceText(str) {
   switch(filterMethod) {
     case 0: // Censor
-      for (var z = 0; z < words.length; z++) {
+      for (var z = 0; z < wordList.length; z++) {
         str = str.replace(wordRegExps[z], censorReplace);
       }
       break;
     case 1: // Substitute
-      for (var z = 0; z < words.length; z++) {
+      for (var z = 0; z < wordList.length; z++) {
         str = str.replace(wordRegExps[z], function(match) {
           counter++;
-          return randomElement(substitutionWords[words[z]]);
+          return randomElement(words[wordList[z]].words);
         });
       }
       break;
