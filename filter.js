@@ -4,6 +4,7 @@ var defaults = {
   "censorCharacter": "*",
   "censorFixedLength": 0,
   "censorRemoveWord": false,
+  "defaultSubstitutions": ["censored", "explative", "filtered"],
   "disabledDomains": [],
   "filterMethod": 0, // ["censor", "substitute"];
   "globalMatchMethod": 3, // ["exact", "partial", "whole", "disabled"]
@@ -25,7 +26,7 @@ var defaults = {
     "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
   }
 };
-var censorCharacter, censorFixedLength, censorRemoveWord, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, showCounter, words, wordList;
+var censorCharacter, censorFixedLength, censorRemoveWord, defaultSubstitutions, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, showCounter, words, wordList;
 var wordRegExps = [];
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
@@ -90,6 +91,7 @@ function cleanPage() {
     censorCharacter = storage.censorCharacter;
     censorFixedLength = storage.censorFixedLength;
     censorRemoveWord = storage.censorRemoveWord;
+    defaultSubstitutions = storage.defaultSubstitutions;
     disabledDomains = storage.disabledDomains;
     filterMethod = storage.filterMethod;
     globalMatchMethod = storage.globalMatchMethod;
@@ -202,6 +204,9 @@ function observeNewNodes() {
 }
 
 function randomElement(array) {
+  if (array.length === 0) {
+    array = defaultSubstitutions;
+  }
   return array[Math.floor((Math.random()*array.length))];
 }
 
