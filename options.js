@@ -119,6 +119,12 @@ function exportConfig() {
   });
 }
 
+function globalMatchMethod() {
+  var selectedIndex = document.getElementById('globalMatchMethodSelect').selectedIndex;
+  config.globalMatchMethod = selectedIndex;
+  saveOptions(event, config);
+}
+
 function importConfig(event) {
   try {
     var settings = JSON.parse(document.getElementById('configText').value);
@@ -173,6 +179,8 @@ function populateOptions() {
     document.getElementById('censorCharacterSelect').value = settings.censorCharacter;
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('showCounter').checked = settings.showCounter;
+    dynamicList(matchMethods, 'globalMatchMethodSelect');
+    document.getElementById('globalMatchMethodSelect').selectedIndex = settings.globalMatchMethod;
     // Words
     dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
     dynamicList([], 'substitutionSelect', 'Substitutions');
@@ -284,7 +292,6 @@ function wordMatchMethodLoad() {
 
 function wordMatchMethodSet() {
   var selectedWord = document.getElementById('wordSelect').value;
-  console.log(selectedWord);
   var matchMethod = document.getElementById('wordMatchMethodSelect').selectedIndex;
   config.words[selectedWord].matchMethod = matchMethod;
   saveOptions(event, config);
@@ -312,6 +319,8 @@ document.getElementById('preserveFirst').addEventListener('click', saveOptions);
 document.getElementById('censorRemoveWord').addEventListener('click', saveOptions);
 document.getElementById('censorCharacterSelect').addEventListener('change', censorCharacter);
 document.getElementById('censorFixedLengthSelect').addEventListener('change', censorFixedLength);
+// Global Matching Method
+document.getElementById('globalMatchMethodSelect').addEventListener('change', globalMatchMethod);
 // General
 document.getElementById('showCounter').addEventListener('click', saveOptions);
 // Words
