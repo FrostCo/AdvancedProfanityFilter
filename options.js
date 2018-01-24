@@ -2,8 +2,7 @@ var config = {};
 var defaults = {
   "censorCharacter": "*",
   "censorFixedLength": 0,
-  "censorRemoveWord": false,
-  "defaultSubstitutions": ["censored", "explative", "filtered"],
+  "defaultSubstitutions": ["censored", "expletive", "filtered"],
   "disabledDomains": [],
   "filterMethod": 0, // ["censor", "substitute"];
   "globalMatchMethod": 3, // ["exact", "partial", "whole", "disabled"]
@@ -25,6 +24,7 @@ var defaults = {
     "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
   }
 };
+var filterMethods = ["Censor", "Substitute", "Remove"];
 var matchMethods = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match"];
 
 function arrayContains(array, string) {
@@ -136,6 +136,7 @@ function importConfig(event) {
 
 function filterMethodSelect() {
   config.filterMethod = document.getElementById('filterMethodSelect').selectedIndex;
+  if (config.filterMethod === 2) { config.globalMatchMethod = 2; }
   saveOptions(event, config);
 }
 
@@ -165,20 +166,28 @@ function populateOptions() {
     config = settings; // Make config globally available
 
     // Show/hide censor options and word substitutions based on filter method
+    dynamicList(filterMethods, 'filterMethodSelect');
     document.getElementById('filterMethodSelect').selectedIndex = settings.filterMethod;
     switch (settings.filterMethod) {
       case 0:
         document.getElementById('optionsCensor').classList.remove('hidden');
+        document.getElementById('globalMatchMethod').classList.remove('hidden');
         document.getElementById('wordSubstitutions').classList.add('hidden');
         break;
       case 1:
         document.getElementById('optionsCensor').classList.add('hidden');
+        document.getElementById('globalMatchMethod').classList.remove('hidden');
         document.getElementById('wordSubstitutions').classList.remove('hidden');
+        break;
+      case 2:
+        document.getElementById('optionsCensor').classList.add('hidden');
+        document.getElementById('globalMatchMethod').classList.add('hidden');
+        document.getElementById('wordSubstitutions').classList.add('hidden');
         break;
     }
 
     // Hide per-word matching options if not selected globally
-    if (settings.globalMatchMethod === 3) {
+    if (settings.globalMatchMethod === 3 && settings.filterMethod != 2) {
       document.getElementById('wordMatchMethodContainer').classList.remove('hidden');
     } else {
       document.getElementById('wordMatchMethodContainer').classList.add('hidden');
@@ -221,7 +230,6 @@ function saveOptions(event, settings) {
   // Gather current settings
   if (settings === undefined) {
     settings = {};
-    settings.censorRemoveWord = document.getElementById('censorRemoveWord').checked;
     settings.preserveFirst = document.getElementById('preserveFirst').checked;
     settings.showCounter = document.getElementById('showCounter').checked;
   }
@@ -326,7 +334,6 @@ window.addEventListener('load', populateOptions);
 // Filter
 document.getElementById('filterMethodSelect').addEventListener('change', filterMethodSelect);
 document.getElementById('preserveFirst').addEventListener('click', saveOptions);
-document.getElementById('censorRemoveWord').addEventListener('click', saveOptions);
 document.getElementById('censorCharacterSelect').addEventListener('change', censorCharacter);
 document.getElementById('censorFixedLengthSelect').addEventListener('change', censorFixedLength);
 // Global Matching Method
