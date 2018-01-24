@@ -71,9 +71,19 @@
     </label>
   </div>
 
-  <div id="options" class="moveDown">
-    <h4>Matching Method</h4>
+  <div id="globalMatchMethod" class="moveDown">
+    <h4>Global Matching Method</h4>
+    <label>
+      <select id="globalMatchMethod">
+        <option value="0">Exact Match</option>
+        <option value="1">Partial Match</option>
+        <option value="2">Whole Match</option>
+        <option value="3">Per-Word Match</option>
+      </select>
+    </label>
+  </div>
 
+  <div id="generalOptions" class="moveDown">
     <h4>General Settings</h4>
     <label>
       <input type="checkbox" id="showCounter">
@@ -89,7 +99,20 @@
   <span class="notes">Warning: Offensive language</span>
   <select id="wordSelect"></select>
   <button id="wordRemove">Remove</button>
+
+  <div id="wordMatchMethodContainer" class="moveDown">
+    <label>
+      Matching Method:
+      <br />
+      <select id="wordMatchMethodSelect">
+        <option value="" disabled selected>Select a Word</option>
+      </select>
+      <button id="wordMatchMethodSet">Set</button>
+    </label>
+  </div>
+
   <div class="moveDown">
+    New Word/Phrase:
     <input type="text" id="wordText" name="wordText">
     <button id="wordAdd">Add</button>
   </div>

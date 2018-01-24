@@ -25,6 +25,7 @@ var defaults = {
     "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
   }
 };
+var matchMethods = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match"];
 
 function arrayContains(array, string) {
   return (array.indexOf(string) > -1);
@@ -97,7 +98,11 @@ function domainRemove(event) {
 }
 
 function dynamicList(list, selectEm, title) {
-  var options = '<option value="" disabled selected>' + title + '</option>';
+  var options = '';
+  if (title !== undefined) {
+    options = '<option value="" disabled selected>' + title + '</option>';
+  }
+
   for(var i = 0; i < list.length; i++) {
     options += '<option value="'+list[i]+'">'+list[i]+'</option>';
   }
@@ -168,11 +173,12 @@ function populateOptions() {
     document.getElementById('censorCharacterSelect').value = settings.censorCharacter;
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
     document.getElementById('showCounter').checked = settings.showCounter;
-    // Domains
-    dynamicList(settings.disabledDomains, 'domainSelect', 'Disabled Domains');
     // Words
     dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
     dynamicList([], 'substitutionSelect', 'Substitutions');
+    dynamicList([], 'wordMatchMethodSelect', 'Select a Word');
+    // Domains
+    dynamicList(settings.disabledDomains, 'domainSelect', 'Disabled Domains');
   });
 }
 
@@ -225,7 +231,7 @@ function wordAdd(event) {
   var word = document.getElementById('wordText').value;
   if (word != "") {
     if (!arrayContains(Object.keys(config.words), word)) {
-      config.words[word] = [];
+      config.words[word] = {"method": 1, "words": []};
       saveOptions(event, config);
       dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
       document.getElementById('wordText').value = "";
@@ -248,11 +254,11 @@ function substitutionAdd(event) {
   var word = document.getElementById('wordSelect').value;
   var sub = document.getElementById('substitutionText').value;
   if (word != "" && sub != "") {
-    if (!arrayContains(config.words[word], sub)) {
-      config.words[word].push(sub);
-      config.words[word] = config.words[word].sort();
+    if (!arrayContains(config.words[word].words, sub)) {
+      config.words[word].words.push(sub);
+      config.words[word].words = config.words[word].words.sort();
       saveOptions(event, config);
-      dynamicList(config.words[word], 'substitutionSelect', 'Substitutions');
+      dynamicList(config.words[word].words, 'substitutionSelect', 'Substitutions');
       document.getElementById('substitutionText').value = "";
     } else {
       updateStatus('Substitution already in list.', true, 3000);
@@ -261,9 +267,27 @@ function substitutionAdd(event) {
 }
 
 function substitutionLoad() {
+  if (config.filterMethod === 1) {
+    var selectedOption = this[this.selectedIndex];
+    var selectedText = selectedOption.text;
+    dynamicList(config.words[selectedText].words, 'substitutionSelect', 'Substitutions');
+  }
+}
+
+function wordMatchMethodLoad() {
   var selectedOption = this[this.selectedIndex];
   var selectedText = selectedOption.text;
-  dynamicList(config.words[selectedText], 'substitutionSelect', 'Substitutions');
+  var list = 'wordMatchMethodSelect';
+  dynamicList(matchMethods.slice(0,-1), 'wordMatchMethodSelect');
+  document.getElementById('wordMatchMethodSelect').selectedIndex = config.words[selectedText].matchMethod;
+}
+
+function wordMatchMethodSet() {
+  var selectedWord = document.getElementById('wordSelect').value;
+  console.log(selectedWord);
+  var matchMethod = document.getElementById('wordMatchMethodSelect').selectedIndex;
+  config.words[selectedWord].matchMethod = matchMethod;
+  saveOptions(event, config);
 }
 
 function substitutionRemove(event) {
@@ -294,6 +318,8 @@ document.getElementById('showCounter').addEventListener('click', saveOptions);
 document.getElementById('wordAdd').addEventListener('click', wordAdd);
 document.getElementById('wordRemove').addEventListener('click', wordRemove);
 document.getElementById('wordSelect').addEventListener('change', substitutionLoad);
+document.getElementById('wordSelect').addEventListener('change', wordMatchMethodLoad);
+document.getElementById('wordMatchMethodSet').addEventListener('click', wordMatchMethodSet);
 document.getElementById('substitutionAdd').addEventListener('click', substitutionAdd);
 document.getElementById('substitutionRemove').addEventListener('click', substitutionRemove);
 // Domains
