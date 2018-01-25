@@ -31,12 +31,12 @@ function arrayContains(array, string) {
   return (array.indexOf(string) > -1);
 }
 
-function censorCharacter() {
+function censorCharacter(event) {
   config.censorCharacter = document.getElementById('censorCharacterSelect').value;
   saveOptions(event, config);
 }
 
-function censorFixedLength() {
+function censorFixedLength(event) {
   config.censorFixedLength = document.getElementById('censorFixedLengthSelect').selectedIndex;
   saveOptions(event, config);
 }
@@ -119,7 +119,7 @@ function exportConfig() {
   });
 }
 
-function globalMatchMethod() {
+function globalMatchMethod(event) {
   var selectedIndex = document.getElementById('globalMatchMethodSelect').selectedIndex;
   config.globalMatchMethod = selectedIndex;
   saveOptions(event, config);
@@ -134,7 +134,7 @@ function importConfig(event) {
   }
 }
 
-function filterMethodSelect() {
+function filterMethodSelect(event) {
   config.filterMethod = document.getElementById('filterMethodSelect').selectedIndex;
   saveOptions(event, config);
 }
@@ -272,7 +272,7 @@ function substitutionRemove(event) {
   var word = document.getElementById('wordSelect').value;
   var sub = document.getElementById('substitutionSelect').value;
   if (word != "" && sub != "") {
-    config.words[word] = removeFromArray(config.words[word], sub);
+    config.words[word] = removeFromArray(config.words[word].words, sub);
     saveOptions(event, config);
   }
 }
@@ -307,7 +307,7 @@ function wordMatchMethodLoad() {
   document.getElementById('wordMatchMethodSelect').selectedIndex = config.words[selectedText].matchMethod;
 }
 
-function wordMatchMethodSet() {
+function wordMatchMethodSet(event) {
   var selectedWord = document.getElementById('wordSelect').value;
   var matchMethod = document.getElementById('wordMatchMethodSelect').selectedIndex;
   config.words[selectedWord].matchMethod = matchMethod;
