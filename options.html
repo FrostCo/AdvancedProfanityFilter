@@ -10,8 +10,8 @@
 <div class="tab">
   <nav>
     <span class="tablinks active">Settings</span>
-    <span class="tablinks">Domains</span>
     <span class="tablinks">Words</span>
+    <span class="tablinks">Domains</span>
     <span class="tablinks">Config</span>
   </nav>
 </div>
@@ -20,53 +20,116 @@
 
 <!-- Settings Tab -->
 <div id="Settings" class="tabcontent visible">
-  <h3>Filter Settings</h3>
-  <div id="options">
+  <h4>Filter Method</h4>
+  <select id="filterMethodSelect"></select>
+
+  <div id="optionsCensor" class="moveDown hidden">
+    <h4>Censor Settings</h4>
     <label>
       <input type="checkbox" id="preserveFirst">
       Preserve the first letter
+      <span class="notes">(Dog: dog = d**)</span>
     </label>
-    <div class="examples">Example: If "Dog" is filtered, then it is displayed as "D**"</div>
+    <br />
     <label>
-      <input type="checkbox" id="filterSubstring">
-      Filter parts of words
+      Censor character:
+      <select id="censorCharacterSelect" class="small">
+        <option value="*">*</option>
+        <option value="&">&amp;</option>
+        <option value="$">$</option>
+        <option value="#">#</option>
+        <option value="@">@</option>
+        <option value="^">^</option>
+        <option value="-">-</option>
+        <option value="_">_</option>
+      </select>
     </label>
-    <div class="examples">Example: If "Dog" is filtered, then "Doghouse" is displayed as "***house"</div>
+    <br />
+    <label>
+      Fixed length:
+      <select id="censorFixedLengthSelect" class="small">
+        <option value="0">Original</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+      </select>
+    </label>
+  </div>
+
+  <div id="globalMatchMethod" class="moveDown hidden">
+    <h4>Global Matching Method</h4>
+    <label>
+      <select id="globalMatchMethodSelect"></select>
+    </label>
+  </div>
+
+  <div id="generalOptions" class="moveDown">
+    <h4>General Settings</h4>
     <label>
       <input type="checkbox" id="showCounter">
       Show number of filtered words
+      <div class="examples">Number of filtered words will be shown over the extension icon</div>
     </label>
-    <div class="examples">Number of filtered words will be shown over the extension icon</div>
-  </div>
-</div>
-
-<!-- Domains Tab -->
-<div id="Domains" class="tabcontent hidden">
-  <h3>Disabled Domains</h3>
-  <div id="domainNote" class="notes">Domains to not run on. Example: "google.com" </div>
-  <input type="text" id="domainText" name="domainText">
-  <button id="domainAdd">Add</button>
-  <div class="moveDown">
-    <select id="domainSelect"></select>
-    <button id="domainRemove">Remove</button>
   </div>
 </div>
 
 <!-- Words -->
 <div id="Words" class="tabcontent hidden">
-  <h3>Profanity List</h3>
-  <button id="toggleProfanity">Modify Profanity List</button>
-  <div id="listWarning" class="notes">Warning: Offensive Language</div>
-  <div id="profanityList" style="display: none;">
-    <div class="notes">Comma separated values with no spaces</div>
-    <textarea id="wordList" cols="40" rows="10"></textarea>
-    <button id="saveWords">Save</button>
+  <h4>Profanity List</h4>
+  <span class="notes">Warning: Offensive language</span>
+  <select id="wordSelect"></select>
+  <button id="wordRemove">Remove</button>
+
+  <div id="wordMatchMethodContainer" class="moveDown hidden">
+    <label>
+      Matching Method:
+      <br />
+      <select id="wordMatchMethodSelect">
+        <option value="" disabled selected>Select a Word</option>
+      </select>
+      <button id="wordMatchMethodSet">Set</button>
+    </label>
+  </div>
+
+  <div class="moveDown">
+    New Word/Phrase:
+    <input type="text" id="wordText" name="wordText">
+    <button id="wordAdd">Add</button>
+  </div>
+  <div id="wordSubstitutions" class="hidden">
+    <div class="moveDown">
+      <h4>Substitutions</h4>
+      <select id="substitutionSelect"></select>
+      <button id="substitutionRemove">Remove</button>
+    </div>
+    <div class="moveDown">
+      <input type="text" id="substitutionText" name="substitutionText">
+      <button id="substitutionAdd">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Domains Tab -->
+<div id="Domains" class="tabcontent hidden">
+  <h4>Disabled Domains</h4>
+  <div id="domainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
+  <select id="domainSelect"></select>
+  <button id="domainRemove">Remove</button>
+  <div class="moveDown">
+    <input type="text" id="domainText" name="domainText">
+    <button id="domainAdd">Add</button>
   </div>
 </div>
 
 <!-- Export/Import -->
 <div id="Config" class="tabcontent hidden">
-  <h3>Import/Export/Restore Defaults</h3>
+  <h4>Import/Export/Restore Defaults</h4>
   <button id="default">Restore Defaults</button>
   <button id="import">Import</button>
   <button id="export">Export</button>
