@@ -80,7 +80,6 @@ function domainAdd(event) {
       config.disabledDomains.push(domain);
       config.disabledDomains = config.disabledDomains.sort();
       saveOptions(event, config);
-      dynamicList(config.disabledDomains, 'domainSelect', 'Disabled Domains');
       document.getElementById('domainText').value = "";
     } else {
       updateStatus('Domain already in list.', true, 3000);
@@ -93,7 +92,6 @@ function domainRemove(event) {
   if (domain != "") {
     config.disabledDomains = removeFromArray(config.disabledDomains, domain);
     saveOptions(event, config);
-    dynamicList(config.disabledDomains, 'domainSelect', 'Disabled Domains');
   }
 }
 
@@ -200,7 +198,7 @@ function populateOptions() {
     dynamicList(matchMethods, 'globalMatchMethodSelect');
     document.getElementById('globalMatchMethodSelect').selectedIndex = settings.globalMatchMethod;
     // Words
-    dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
+    dynamicList(Object.keys(config.words).sort(), 'wordSelect', 'Words to Filter');
     dynamicList([], 'substitutionSelect', 'Substitutions');
     dynamicList([], 'wordMatchMethodSelect', 'Select a Word');
     // Domains
@@ -214,6 +212,7 @@ function removeFromArray(array, element) {
 
 // Restore default settings
 function restoreDefaults() {
+  exportConfig();
   chrome.storage.sync.clear(function(){
     if (chrome.runtime.lastError) {
       updateStatus('Error restoring defaults! Please try again.', true, 5000);
@@ -272,7 +271,7 @@ function substitutionRemove(event) {
   var word = document.getElementById('wordSelect').value;
   var sub = document.getElementById('substitutionSelect').value;
   if (word != "" && sub != "") {
-    config.words[word] = removeFromArray(config.words[word].words, sub);
+    config.words[word].words = removeFromArray(config.words[word].words, sub);
     saveOptions(event, config);
   }
 }
@@ -289,7 +288,7 @@ function wordAdd(event) {
   var word = document.getElementById('wordText').value;
   if (word != "") {
     if (!arrayContains(Object.keys(config.words), word)) {
-      config.words[word] = {"method": 1, "words": []};
+      config.words[word] = {"matchMethod": 1, "words": []};
       saveOptions(event, config);
       dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
       document.getElementById('wordText').value = "";
