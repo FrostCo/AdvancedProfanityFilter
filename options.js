@@ -8,6 +8,7 @@ var defaults = {
   "globalMatchMethod": 3, // ["exact", "partial", "whole", "disabled"]
   "preserveFirst": false,
   "showCounter": true,
+  "substitutionMark": true,
   "words": {
     "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
     "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
@@ -168,16 +169,19 @@ function populateOptions() {
     switch (settings.filterMethod) {
       case 0:
         document.getElementById('optionsCensor').classList.remove('hidden');
+        document.getElementById('optionsSubstitution').classList.add('hidden');
         document.getElementById('globalMatchMethod').classList.remove('hidden');
         document.getElementById('wordSubstitutions').classList.add('hidden');
         break;
       case 1:
         document.getElementById('optionsCensor').classList.add('hidden');
+        document.getElementById('optionsSubstitution').classList.remove('hidden');
         document.getElementById('globalMatchMethod').classList.remove('hidden');
         document.getElementById('wordSubstitutions').classList.remove('hidden');
         break;
       case 2:
         document.getElementById('optionsCensor').classList.add('hidden');
+        document.getElementById('optionsSubstitution').classList.add('hidden');
         document.getElementById('globalMatchMethod').classList.add('hidden');
         document.getElementById('wordSubstitutions').classList.add('hidden');
         break;
@@ -194,6 +198,7 @@ function populateOptions() {
     document.getElementById('censorFixedLengthSelect').selectedIndex = settings.censorFixedLength;
     document.getElementById('censorCharacterSelect').value = settings.censorCharacter;
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
+    document.getElementById('substitutionMark').checked = settings.substitutionMark;
     document.getElementById('showCounter').checked = settings.showCounter;
     dynamicList(matchMethods, 'globalMatchMethodSelect');
     document.getElementById('globalMatchMethodSelect').selectedIndex = settings.globalMatchMethod;
@@ -230,6 +235,7 @@ function saveOptions(event, settings) {
     settings = {};
     settings.preserveFirst = document.getElementById('preserveFirst').checked;
     settings.showCounter = document.getElementById('showCounter').checked;
+    settings.substitutionMark = document.getElementById('substitutionMark').checked;
   }
 
   // Save settings
@@ -331,9 +337,12 @@ for (i = 0; i < tabs.length; i++) {
 window.addEventListener('load', populateOptions);
 // Filter
 document.getElementById('filterMethodSelect').addEventListener('change', filterMethodSelect);
+// Filter - Censor
 document.getElementById('preserveFirst').addEventListener('click', saveOptions);
 document.getElementById('censorCharacterSelect').addEventListener('change', censorCharacter);
 document.getElementById('censorFixedLengthSelect').addEventListener('change', censorFixedLength);
+// Filter - Substitute
+document.getElementById('substitutionMark').addEventListener('click', saveOptions);
 // Global Matching Method
 document.getElementById('globalMatchMethodSelect').addEventListener('change', globalMatchMethod);
 // General

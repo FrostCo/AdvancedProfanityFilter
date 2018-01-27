@@ -8,6 +8,7 @@ var defaults = {
   "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word"]
   "preserveFirst": false,
   "showCounter": true,
+  "substitutionMark": true,
   "words": {
     "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
     "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
@@ -24,7 +25,7 @@ var defaults = {
     "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
   }
 };
-var censorCharacter, censorFixedLength, defaultSubstitutions, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, showCounter, words, wordList;
+var censorCharacter, censorFixedLength, defaultSubstitutions, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, showCounter, substitutionMark, words, wordList;
 var wordRegExps = [];
 var whitespaceRegExp = new RegExp('\\s');
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
@@ -104,6 +105,7 @@ function cleanPage() {
     matchMethod = storage.matchMethod;
     preserveFirst = storage.preserveFirst;
     showCounter = storage.showCounter;
+    substitutionMark = storage.substitutionMark;
     words = storage.words;
     // Sort the words array by longest (most-specific) first
     wordList = Object.keys(words).sort(function(a, b) {
@@ -243,7 +245,11 @@ function replaceText(str) {
       for (var z = 0; z < wordList.length; z++) {
         str = str.replace(wordRegExps[z], function(match) {
           counter++;
-          return randomElement(words[wordList[z]].words);
+          if (substitutionMark) {
+            return '[' + randomElement(words[wordList[z]].words) + ']';
+          } else {
+            return randomElement(words[wordList[z]].words);
+          }
         });
       }
       break;
