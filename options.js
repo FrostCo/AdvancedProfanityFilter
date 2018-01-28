@@ -5,7 +5,7 @@ var defaults = {
   "defaultSubstitutions": ["censored", "expletive", "filtered"],
   "disabledDomains": [],
   "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
-  "globalMatchMethod": 3, // ["exact", "partial", "whole", "disabled"]
+  "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word"]
   "preserveFirst": false,
   "showCounter": true,
   "substitutionMark": true,
