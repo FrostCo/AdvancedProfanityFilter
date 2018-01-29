@@ -138,6 +138,41 @@ function importConfig(event) {
   }
 }
 
+// TODO: Migrate wordList to new words object
+function migrateWordList() {
+  chrome.storage.sync.get('wordList', function(storage) {
+    var wordListStr = storage.wordList;
+
+    if (wordListStr != undefined && wordListStr != '') {
+      var word = '';
+      var wordList = wordListStr.split(',');
+
+      try {
+        // Migrate to new words object
+        for (i = 0; i < wordList.length; i++) {
+          word = wordList[i];
+          if (word != "") {
+            if (!arrayContains(Object.keys(config.words), word)) {
+              console.log('Migrating word: ' + word);
+              config.words[word] = {"matchMethod": 1, "words": []};
+            } else {
+              console.log('Word already in list: ' + word);
+            }
+          }
+        }
+
+        // Remove wordList if successful
+        console.log(wordListStr, wordList);
+        saveOptions(undefined, config);
+        chrome.storage.sync.remove('wordList');
+      }
+      catch(error) {
+        console.log('Error: Aborting wordList migration!', error);
+      }
+    }
+  });
+}
+
 // Switching Tabs
 function openTab(event) {
   // Don't run on current tab
@@ -162,6 +197,7 @@ function openTab(event) {
 function populateOptions() {
   chrome.storage.sync.get(defaults, function(settings) {
     config = settings; // Make config globally available
+    migrateWordList(); // TODO: Migrate wordList
 
     // Show/hide censor options and word substitutions based on filter method
     dynamicList(filterMethods, 'filterMethodSelect');
