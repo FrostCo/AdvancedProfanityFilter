@@ -1,0 +1,25 @@
+Advanced Profanity Filter replaces profanity seen on websites.
+
+Features:
+• Multiple Filter Types
+    • Censor - Hide offending words
+    • Substitute - Replace offensive words
+    • Remove - Remove offensive words
+• Customizable word and substitution list
+• Disable filter for specific domains
+• Import/Export settings to share with others
+• Sync settings across browsers
+• Counter showing number of filtered words
+• HTTPS Support
+• Supports social media sites such as:
+    • Facebook
+    • Twitter
+    • YouTube
+    • Pinterest
+    • Reddit
+
+For a detailed overview of the features and settings, please see the Wiki here:
+
+https://github.com/richardfrost/AdvancedProfanityFilter/wiki
+
+Artwork by: Kevin Frost ( https://www.facebook.com/KevinGeorgeFrost )
