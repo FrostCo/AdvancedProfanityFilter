@@ -118,6 +118,11 @@ function exportConfig() {
   });
 }
 
+function filterMethodSelect(event) {
+  config.filterMethod = document.getElementById('filterMethodSelect').selectedIndex;
+  saveOptions(event, config);
+}
+
 function globalMatchMethod(event) {
   var selectedIndex = document.getElementById('globalMatchMethodSelect').selectedIndex;
   config.globalMatchMethod = selectedIndex;
@@ -131,11 +136,6 @@ function importConfig(event) {
   } catch (e) {
     updateStatus('Settings not saved! Please try again.', true, 5000);
   }
-}
-
-function filterMethodSelect(event) {
-  config.filterMethod = document.getElementById('filterMethodSelect').selectedIndex;
-  saveOptions(event, config);
 }
 
 // Switching Tabs
