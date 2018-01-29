@@ -8,6 +8,9 @@ chrome.runtime.onInstalled.addListener(function(details){
   } else if (details.reason == "update") {
     // var thisVersion = chrome.runtime.getManifest().version;
     // console.log("Updated from " + details.previousVersion + " to " + thisVersion + "!");
+
+    // TODO: Migrate wordList - Open options page to show new features
+    chrome.runtime.openOptionsPage();
   }
 });
 
