@@ -9,21 +9,22 @@ var defaults = {
   "preserveFirst": false,
   "showCounter": true,
   "substitutionMark": true,
-  "words": {
-    "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
-    "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
-    "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
-    "bitch": {"matchMethod": 1, "words": ["jerk"] },
-    "cunt": {"matchMethod": 1, "words": ["explative"] },
-    "damn": {"matchMethod": 1, "words": ["dang", "darn"] },
-    "fuck": {"matchMethod": 1, "words": ["freak", "fudge"] },
-    "piss": {"matchMethod": 1, "words": ["pee"] },
-    "pissed": {"matchMethod": 0, "words": ["ticked"] },
-    "slut": {"matchMethod": 1, "words": ["imperfect", "impure"] },
-    "shit": {"matchMethod": 1, "words": ["crap", "crud", "poop"] },
-    "tits": {"matchMethod": 1, "words": ["explative"] },
-    "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
-  }
+  "words": {}
+};
+var defaultWords = {
+  "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
+  "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
+  "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
+  "bitch": {"matchMethod": 1, "words": ["jerk"] },
+  "cunt": {"matchMethod": 1, "words": ["explative"] },
+  "damn": {"matchMethod": 1, "words": ["dang", "darn"] },
+  "fuck": {"matchMethod": 1, "words": ["freak", "fudge"] },
+  "piss": {"matchMethod": 1, "words": ["pee"] },
+  "pissed": {"matchMethod": 0, "words": ["ticked"] },
+  "slut": {"matchMethod": 1, "words": ["imperfect", "impure"] },
+  "shit": {"matchMethod": 1, "words": ["crap", "crud", "poop"] },
+  "tits": {"matchMethod": 1, "words": ["explative"] },
+  "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
 };
 var filterMethods = ["Censor", "Substitute", "Remove"];
 var matchMethods = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match"];
@@ -154,7 +155,7 @@ function migrateWordList() {
           if (word != "") {
             if (!arrayContains(Object.keys(config.words), word)) {
               console.log('Migrating word: ' + word);
-              config.words[word] = {"matchMethod": 1, "words": []};
+              config.words[word] = {"matchMethod": 0, "words": []};
             } else {
               console.log('Word already in list: ' + word);
             }
@@ -198,6 +199,11 @@ function populateOptions() {
   chrome.storage.sync.get(defaults, function(settings) {
     config = settings; // Make config globally available
     migrateWordList(); // TODO: Migrate wordList
+    if (Object.keys(config.words).length === 0 && config.words.constructor === Object) {
+      config.words = defaultWords;
+      saveOptions(null, config);
+      return false;
+    }
 
     // Show/hide censor options and word substitutions based on filter method
     dynamicList(filterMethods, 'filterMethodSelect');
@@ -332,7 +338,6 @@ function wordAdd(event) {
     if (!arrayContains(Object.keys(config.words), word)) {
       config.words[word] = {"matchMethod": 1, "words": []};
       saveOptions(event, config);
-      dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
       document.getElementById('wordText').value = "";
     } else {
       updateStatus('Word already in list.', true, 3000);
@@ -360,7 +365,6 @@ function wordRemove(event) {
   if (word != "") {
     delete config.words[word];
     saveOptions(event, config);
-    dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
   }
 }
 

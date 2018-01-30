@@ -9,22 +9,23 @@ var defaults = {
   "preserveFirst": false,
   "showCounter": true,
   "substitutionMark": true,
-  "words": {
-    "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
-    "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
-    "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
-    "bitch": {"matchMethod": 1, "words": ["jerk"] },
-    "cunt": {"matchMethod": 1, "words": ["explative"] },
-    "damn": {"matchMethod": 1, "words": ["dang", "darn"] },
-    "fuck": {"matchMethod": 1, "words": ["freak", "fudge"] },
-    "piss": {"matchMethod": 1, "words": ["pee"] },
-    "pissed": {"matchMethod": 0, "words": ["ticked"] },
-    "slut": {"matchMethod": 1, "words": ["imperfect", "impure"] },
-    "shit": {"matchMethod": 1, "words": ["crap", "crud", "poop"] },
-    "tits": {"matchMethod": 1, "words": ["explative"] },
-    "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
-  }
+  "words": {}
 };
+var defaultWords = {
+  "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
+  "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
+  "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
+  "bitch": {"matchMethod": 1, "words": ["jerk"] },
+  "cunt": {"matchMethod": 1, "words": ["explative"] },
+  "damn": {"matchMethod": 1, "words": ["dang", "darn"] },
+  "fuck": {"matchMethod": 1, "words": ["freak", "fudge"] },
+  "piss": {"matchMethod": 1, "words": ["pee"] },
+  "pissed": {"matchMethod": 0, "words": ["ticked"] },
+  "slut": {"matchMethod": 1, "words": ["imperfect", "impure"] },
+  "shit": {"matchMethod": 1, "words": ["crap", "crud", "poop"] },
+  "tits": {"matchMethod": 1, "words": ["explative"] },
+  "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
+}
 var censorCharacter, censorFixedLength, defaultSubstitutions, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, showCounter, substitutionMark, words, wordList;
 var wordRegExps = [];
 var whitespaceRegExp = new RegExp('\\s');
@@ -94,6 +95,11 @@ function cleanPage() {
     if (disabledPage()) {
       chrome.runtime.sendMessage({disabled: true});
       return false;
+    }
+
+    // If no words are specified use defaultWords
+    if (Object.keys(storage.words).length === 0 && storage.words.constructor === Object) {
+      storage.words = defaultWords;
     }
 
     // Load settings and setup environment
