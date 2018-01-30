@@ -338,7 +338,6 @@ function wordAdd(event) {
     if (!arrayContains(Object.keys(config.words), word)) {
       config.words[word] = {"matchMethod": 1, "words": []};
       saveOptions(event, config);
-      dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
       document.getElementById('wordText').value = "";
     } else {
       updateStatus('Word already in list.', true, 3000);
@@ -366,7 +365,6 @@ function wordRemove(event) {
   if (word != "") {
     delete config.words[word];
     saveOptions(event, config);
-    dynamicList(Object.keys(config.words), 'wordSelect', 'Words to Filter');
   }
 }
 
