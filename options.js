@@ -9,21 +9,22 @@ var defaults = {
   "preserveFirst": false,
   "showCounter": true,
   "substitutionMark": true,
-  "words": {
-    "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
-    "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
-    "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
-    "bitch": {"matchMethod": 1, "words": ["jerk"] },
-    "cunt": {"matchMethod": 1, "words": ["explative"] },
-    "damn": {"matchMethod": 1, "words": ["dang", "darn"] },
-    "fuck": {"matchMethod": 1, "words": ["freak", "fudge"] },
-    "piss": {"matchMethod": 1, "words": ["pee"] },
-    "pissed": {"matchMethod": 0, "words": ["ticked"] },
-    "slut": {"matchMethod": 1, "words": ["imperfect", "impure"] },
-    "shit": {"matchMethod": 1, "words": ["crap", "crud", "poop"] },
-    "tits": {"matchMethod": 1, "words": ["explative"] },
-    "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
-  }
+  "words": {}
+};
+var defaultWords = {
+  "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
+  "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
+  "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
+  "bitch": {"matchMethod": 1, "words": ["jerk"] },
+  "cunt": {"matchMethod": 1, "words": ["explative"] },
+  "damn": {"matchMethod": 1, "words": ["dang", "darn"] },
+  "fuck": {"matchMethod": 1, "words": ["freak", "fudge"] },
+  "piss": {"matchMethod": 1, "words": ["pee"] },
+  "pissed": {"matchMethod": 0, "words": ["ticked"] },
+  "slut": {"matchMethod": 1, "words": ["imperfect", "impure"] },
+  "shit": {"matchMethod": 1, "words": ["crap", "crud", "poop"] },
+  "tits": {"matchMethod": 1, "words": ["explative"] },
+  "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
 };
 var filterMethods = ["Censor", "Substitute", "Remove"];
 var matchMethods = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match"];
@@ -198,6 +199,11 @@ function populateOptions() {
   chrome.storage.sync.get(defaults, function(settings) {
     config = settings; // Make config globally available
     migrateWordList(); // TODO: Migrate wordList
+    if (Object.keys(config.words).length === 0 && config.words.constructor === Object) {
+      config.words = defaultWords;
+      saveOptions(null, config);
+      return false;
+    }
 
     // Show/hide censor options and word substitutions based on filter method
     dynamicList(filterMethods, 'filterMethodSelect');
