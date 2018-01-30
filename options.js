@@ -155,7 +155,7 @@ function migrateWordList() {
           if (word != "") {
             if (!arrayContains(Object.keys(config.words), word)) {
               console.log('Migrating word: ' + word);
-              config.words[word] = {"matchMethod": 1, "words": []};
+              config.words[word] = {"matchMethod": 0, "words": []};
             } else {
               console.log('Word already in list: ' + word);
             }
