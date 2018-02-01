@@ -25,7 +25,7 @@ var defaultWords = {
   "shit": {"matchMethod": 1, "words": ["crap", "crud", "poop"] },
   "tits": {"matchMethod": 1, "words": ["explative"] },
   "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
-}
+};
 var censorCharacter, censorFixedLength, defaultSubstitutions, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, showCounter, substitutionMark, words, wordList;
 var wordRegExps = [];
 var whitespaceRegExp = new RegExp('\\s');
