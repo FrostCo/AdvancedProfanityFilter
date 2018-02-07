@@ -72,9 +72,9 @@ function censorReplace(strMatchingString, strFirstLetter) {
 
   if (censorFixedLength > 0) {
     if (preserveFirst && preserveLast) {
-      censoredString = strFirstLetter[0] + censorCharacter.repeat((censorFixedLength - 2)) + strMatchingString.slice(-1);
+      censoredString = strFirstLetter + censorCharacter.repeat((censorFixedLength - 2)) + strMatchingString.slice(-1);
     } else if (preserveFirst) {
-      censoredString = strFirstLetter[0] + censorCharacter.repeat((censorFixedLength - 1));
+      censoredString = strFirstLetter + censorCharacter.repeat((censorFixedLength - 1));
     } else if (preserveLast) {
       censoredString = censorCharacter.repeat((censorFixedLength - 1)) + strMatchingString.slice(-1);
     } else {
@@ -82,9 +82,9 @@ function censorReplace(strMatchingString, strFirstLetter) {
     }
   } else {
     if (preserveFirst && preserveLast) {
-      censoredString = strFirstLetter[0] + censorCharacter.repeat((strMatchingString.length - 2)) + strMatchingString.slice(-1); // done
+      censoredString = strFirstLetter + censorCharacter.repeat((strMatchingString.length - 2)) + strMatchingString.slice(-1); // done
     } else if (preserveFirst) {
-      censoredString = strFirstLetter[0] + censorCharacter.repeat((strMatchingString.length - 1)); // done
+      censoredString = strFirstLetter + censorCharacter.repeat((strMatchingString.length - 1)); // done
     } else if (preserveLast) {
       censoredString = censorCharacter.repeat((strMatchingString.length - 1)) + strMatchingString.slice(-1);
     } else {
