@@ -7,6 +7,7 @@ var defaults = {
   "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
   "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word"]
   "preserveFirst": false,
+  "preserveLast": false,
   "showCounter": true,
   "substitutionMark": true,
   "words": {}
@@ -26,7 +27,7 @@ var defaultWords = {
   "tits": {"matchMethod": 1, "words": ["explative"] },
   "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
 };
-var censorCharacter, censorFixedLength, defaultSubstitutions, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, showCounter, substitutionMark, words, wordList;
+var censorCharacter, censorFixedLength, defaultSubstitutions, disabledDomains, filterMethod, globalMatchMethod, matchMethod, preserveFirst, preserveLast, showCounter, substitutionMark, words, wordList;
 var wordRegExps = [];
 var whitespaceRegExp = new RegExp('\\s');
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
@@ -35,7 +36,7 @@ var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-spa
 // Word must match exactly (not sub-string)
 // /\b(w)ord\b/gi
 function buildExactRegexp(word) {
-  wordRegExps.push(new RegExp('\\b(' + word[0] + ')' + word.substring(1) + '\\b', 'gi' ));
+  wordRegExps.push(new RegExp('\\b(' + word[0] + ')' + word.substring(1)+ '\\b', 'gi' ));
 }
 
 // Match any part of a word (sub-string)
@@ -70,16 +71,24 @@ function censorReplace(strMatchingString, strFirstLetter) {
   var censoredString = '';
 
   if (censorFixedLength > 0) {
-    if (preserveFirst) {
+    if (preserveFirst && preserveLast) {
+      censoredString = strFirstLetter[0] + censorCharacter.repeat((censorFixedLength - 2)) + strMatchingString.slice(-1);
+    } else if (preserveFirst) {
       censoredString = strFirstLetter[0] + censorCharacter.repeat((censorFixedLength - 1));
+    } else if (preserveLast) {
+      censoredString = censorCharacter.repeat((censorFixedLength - 1)) + strMatchingString.slice(-1);
     } else {
       censoredString = censorCharacter.repeat(censorFixedLength);
     }
   } else {
-    if (preserveFirst) {
-      censoredString = strFirstLetter[0] + censorCharacter.repeat((strMatchingString.length - 1));
+    if (preserveFirst && preserveLast) {
+      censoredString = strFirstLetter[0] + censorCharacter.repeat((strMatchingString.length - 2)) + strMatchingString.slice(-1); // done
+    } else if (preserveFirst) {
+      censoredString = strFirstLetter[0] + censorCharacter.repeat((strMatchingString.length - 1)); // done
+    } else if (preserveLast) {
+      censoredString = censorCharacter.repeat((strMatchingString.length - 1)) + strMatchingString.slice(-1);
     } else {
-      censoredString = censorCharacter.repeat(strMatchingString.length);
+      censoredString = censorCharacter.repeat(strMatchingString.length); // done
     }
   }
 
@@ -110,6 +119,7 @@ function cleanPage() {
     globalMatchMethod = storage.globalMatchMethod;
     matchMethod = storage.matchMethod;
     preserveFirst = storage.preserveFirst;
+    preserveLast = storage.preserveLast;
     showCounter = storage.showCounter;
     substitutionMark = storage.substitutionMark;
     words = storage.words;
