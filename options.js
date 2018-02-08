@@ -264,10 +264,10 @@ function restoreDefaults() {
   exportConfig();
   chrome.storage.sync.clear(function(){
     if (chrome.runtime.lastError) {
-      updateStatus('Error restoring defaults! Please try again.', true, 5000);
+      updateStatus('Error restoring defaults!', true, 5000);
     } else {
       populateOptions();
-      updateStatus('Settings restored!', false, 3000);
+      updateStatus('Default settings restored!', false, 3000);
     }
   });
 }
@@ -288,7 +288,6 @@ function saveOptions(event, settings) {
     if (chrome.runtime.lastError) {
       updateStatus('Settings not saved! Please try again.', true, 5000);
     } else {
-      updateStatus('Settings saved successfully!', false, 3000);
       populateOptions();
     }
   });
