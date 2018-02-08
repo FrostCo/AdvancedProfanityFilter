@@ -88,7 +88,7 @@ function censorReplace(strMatchingString, strFirstLetter) {
     } else if (preserveLast) {
       censoredString = censorCharacter.repeat((strMatchingString.length - 1)) + strMatchingString.slice(-1);
     } else {
-      censoredString = censorCharacter.repeat(strMatchingString.length); // done
+      censoredString = censorCharacter.repeat(strMatchingString.length);
     }
   }
 
