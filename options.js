@@ -7,6 +7,7 @@ var defaults = {
   "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
   "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word"]
   "preserveFirst": false,
+  "preserveLast": false,
   "showCounter": true,
   "substitutionMark": true,
   "words": {}
@@ -240,6 +241,7 @@ function populateOptions() {
     document.getElementById('censorFixedLengthSelect').selectedIndex = settings.censorFixedLength;
     document.getElementById('censorCharacterSelect').value = settings.censorCharacter;
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
+    document.getElementById('preserveLast').checked = settings.preserveLast;
     document.getElementById('substitutionMark').checked = settings.substitutionMark;
     document.getElementById('showCounter').checked = settings.showCounter;
     dynamicList(matchMethods, 'globalMatchMethodSelect');
@@ -262,10 +264,10 @@ function restoreDefaults() {
   exportConfig();
   chrome.storage.sync.clear(function(){
     if (chrome.runtime.lastError) {
-      updateStatus('Error restoring defaults! Please try again.', true, 5000);
+      updateStatus('Error restoring defaults!', true, 5000);
     } else {
       populateOptions();
-      updateStatus('Settings restored!', false, 3000);
+      updateStatus('Default settings restored!', false, 3000);
     }
   });
 }
@@ -276,6 +278,7 @@ function saveOptions(event, settings) {
   if (settings === undefined) {
     settings = {};
     settings.preserveFirst = document.getElementById('preserveFirst').checked;
+    settings.preserveLast = document.getElementById('preserveLast').checked;
     settings.showCounter = document.getElementById('showCounter').checked;
     settings.substitutionMark = document.getElementById('substitutionMark').checked;
   }
@@ -285,7 +288,6 @@ function saveOptions(event, settings) {
     if (chrome.runtime.lastError) {
       updateStatus('Settings not saved! Please try again.', true, 5000);
     } else {
-      updateStatus('Settings saved successfully!', false, 3000);
       populateOptions();
     }
   });
@@ -336,7 +338,7 @@ function wordAdd(event) {
   var word = document.getElementById('wordText').value;
   if (word != "") {
     if (!arrayContains(Object.keys(config.words), word)) {
-      config.words[word] = {"matchMethod": 1, "words": []};
+      config.words[word] = {"matchMethod": 0, "words": []};
       saveOptions(event, config);
       document.getElementById('wordText').value = "";
     } else {
@@ -379,6 +381,7 @@ window.addEventListener('load', populateOptions);
 document.getElementById('filterMethodSelect').addEventListener('change', filterMethodSelect);
 // Filter - Censor
 document.getElementById('preserveFirst').addEventListener('click', saveOptions);
+document.getElementById('preserveLast').addEventListener('click', saveOptions);
 document.getElementById('censorCharacterSelect').addEventListener('change', censorCharacter);
 document.getElementById('censorFixedLengthSelect').addEventListener('change', censorFixedLength);
 // Filter - Substitute
