@@ -339,7 +339,7 @@ function wordAdd(event) {
   var word = document.getElementById('wordText').value;
   if (word != "") {
     if (!arrayContains(Object.keys(config.words), word)) {
-      config.words[word] = {"matchMethod": 1, "words": []};
+      config.words[word] = {"matchMethod": 0, "words": []};
       saveOptions(event, config);
       document.getElementById('wordText').value = "";
     } else {
