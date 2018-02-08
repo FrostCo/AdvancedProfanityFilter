@@ -7,6 +7,7 @@ var defaults = {
   "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
   "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word"]
   "preserveFirst": false,
+  "preserveLast": false,
   "showCounter": true,
   "substitutionMark": true,
   "words": {}
@@ -240,6 +241,7 @@ function populateOptions() {
     document.getElementById('censorFixedLengthSelect').selectedIndex = settings.censorFixedLength;
     document.getElementById('censorCharacterSelect').value = settings.censorCharacter;
     document.getElementById('preserveFirst').checked = settings.preserveFirst;
+    document.getElementById('preserveLast').checked = settings.preserveLast;
     document.getElementById('substitutionMark').checked = settings.substitutionMark;
     document.getElementById('showCounter').checked = settings.showCounter;
     dynamicList(matchMethods, 'globalMatchMethodSelect');
@@ -276,6 +278,7 @@ function saveOptions(event, settings) {
   if (settings === undefined) {
     settings = {};
     settings.preserveFirst = document.getElementById('preserveFirst').checked;
+    settings.preserveLast = document.getElementById('preserveLast').checked;
     settings.showCounter = document.getElementById('showCounter').checked;
     settings.substitutionMark = document.getElementById('substitutionMark').checked;
   }
@@ -379,6 +382,7 @@ window.addEventListener('load', populateOptions);
 document.getElementById('filterMethodSelect').addEventListener('change', filterMethodSelect);
 // Filter - Censor
 document.getElementById('preserveFirst').addEventListener('click', saveOptions);
+document.getElementById('preserveLast').addEventListener('click', saveOptions);
 document.getElementById('censorCharacterSelect').addEventListener('change', censorCharacter);
 document.getElementById('censorFixedLengthSelect').addEventListener('change', censorFixedLength);
 // Filter - Substitute
