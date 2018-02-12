@@ -134,11 +134,11 @@
 <!-- Domains Tab -->
 <div id="Domains" class="tabcontent hidden">
   <h4>Disabled Domains</h4>
-  <div id="domainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
   <select id="domainSelect"></select>
   <button id="domainRemove">Remove</button>
   <div class="moveDown">
-    <input type="text" id="domainText" name="domainText">
+    <div id="domainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
+    <input type="text" id="domainText" name="domainText" pattern="^[a-zA-Z0-9\.\-]+$">
     <button id="domainAdd">Add</button>
   </div>
 </div>

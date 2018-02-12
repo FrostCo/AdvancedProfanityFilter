@@ -77,15 +77,19 @@ function confirm(action) {
 }
 
 function domainAdd(event) {
-  var domain = document.getElementById('domainText').value;
-  if (domain != "") {
-    if (!arrayContains(config.disabledDomains, domain)) {
-      config.disabledDomains.push(domain);
-      config.disabledDomains = config.disabledDomains.sort();
-      saveOptions(event, config);
-      document.getElementById('domainText').value = "";
+  var domain = document.getElementById('domainText');
+  if (domain.value != "") {
+    if (domain.checkValidity()) {
+      if (!arrayContains(config.disabledDomains, domain.value)) {
+        config.disabledDomains.push(domain.value);
+        config.disabledDomains = config.disabledDomains.sort();
+        saveOptions(event, config);
+        document.getElementById('domainText').value = "";
+      } else {
+        updateStatus('Domain already in list.', true, 3000);
+      }
     } else {
-      updateStatus('Domain already in list.', true, 3000);
+      updateStatus("Invalid domain, please only provide the domain name.", true, 5000);
     }
   }
 }
