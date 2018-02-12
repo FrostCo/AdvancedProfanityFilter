@@ -24,3 +24,61 @@ chrome.runtime.onMessage.addListener(
     }
   }
 );
+
+////
+// Context menu
+//
+function arrayContains(array, string) {
+  return (array.indexOf(string) > -1);
+}
+
+function addSelection(selection) {
+  chrome.storage.sync.get({'words': {}}, function(storage) {
+    selection = (selection.trim()).toLowerCase();
+    if (!arrayContains(Object.keys(storage.words), selection)) {
+      storage.words[selection] = {"matchMethod": 0, "words": []};
+      chrome.storage.sync.set({'words': storage.words}, function() {
+        if (!chrome.runtime.lastError) {
+          chrome.tabs.reload();
+        }
+      });
+    };
+  });
+}
+
+function disableDomain(domain) {
+  chrome.storage.sync.get({'disabledDomains': []}, function(storage) {
+    if (!arrayContains(storage.disabledDomains, domain)) {
+      storage.disabledDomains.push(domain);
+      chrome.storage.sync.set({'disabledDomains': storage.disabledDomains}, function() {
+        if (!chrome.runtime.lastError) {
+          chrome.tabs.reload();
+        }
+      });
+    };
+  });
+}
+
+chrome.contextMenus.create({
+  "id": "addSelection",
+  "title": "Add selection to filter",
+  "contexts": ["selection"]
+});
+chrome.contextMenus.onClicked.addListener(function(info, tab) {
+  if (info.menuItemId == "addSelection") {
+    addSelection(info.selectionText);
+  }
+});
+
+chrome.contextMenus.create({
+  "id": "disableDomain",
+  "title": "Disable filter for domain",
+  "contexts": ["all"]
+});
+chrome.contextMenus.onClicked.addListener(function(info, tab) {
+  if (info.menuItemId == "disableDomain") {
+    var url = new URL(tab.url);
+    var domain = url.hostname;
+    disableDomain(domain);
+  }
+});
