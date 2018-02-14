@@ -82,3 +82,16 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
     disableDomain(domain);
   }
 });
+
+chrome.contextMenus.create({type: "separator"});
+
+chrome.contextMenus.create({
+  "id": "options",
+  "title": "Options...",
+  "contexts": ["all"]
+});
+chrome.contextMenus.onClicked.addListener(function(info, tab) {
+  if (info.menuItemId == "options") {
+    chrome.runtime.openOptionsPage();
+  }
+});
