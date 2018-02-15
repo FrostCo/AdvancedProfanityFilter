@@ -23,7 +23,7 @@ chrome.runtime.onInstalled.addListener(function(details){
     // console.log("Updated from " + details.previousVersion + " to " + thisVersion + "!");
 
     // TODO: Migrate wordList - Open options page to show new features
-    // chrome.runtime.openOptionsPage();
+    chrome.runtime.openOptionsPage();
   }
 });
 
