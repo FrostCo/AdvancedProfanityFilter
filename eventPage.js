@@ -109,8 +109,6 @@ chrome.contextMenus.create({
   "contexts": ["selection"]
 });
 
-chrome.contextMenus.create({id: "separator1", type: "separator"});
-
 chrome.contextMenus.create({
   "id": "disableDomain",
   "title": "Disable filter for domain",
@@ -127,7 +125,7 @@ chrome.contextMenus.create({
   "contexts": ["all"]
 });
 
-chrome.contextMenus.create({id: "separator2", type: "separator"});
+chrome.contextMenus.create({id: "separator1", type: "separator"});
 
 chrome.contextMenus.create({
   "id": "options",
