@@ -101,8 +101,9 @@ function cleanPage() {
     disabledDomains = storage.disabledDomains;
 
     // Don't run if this is a disabled domain
-    if (disabledPage()) {
-      chrome.runtime.sendMessage({disabled: true});
+    message = disabledPage();
+    chrome.runtime.sendMessage(message);
+    if (message.disabled) {
       return false;
     }
 
@@ -137,20 +138,21 @@ function cleanPage() {
 }
 
 function disabledPage() {
-  disabled = false;
+  result = { "disabled": false };
   domain = window.location.hostname;
 
   for (var x = 0; x < disabledDomains.length; x++) {
     if (disabledDomains[x]) {
       domainRegex = new RegExp("(^|\.)" + disabledDomains[x]);
       if (domainRegex.test(domain)) {
-        disabled = true;
+        result.disabled = true;
+        result.domain = disabledDomains[x];
         break;
       }
     }
   }
 
-  return disabled;
+  return result;
 }
 
 // Parse the profanity list
