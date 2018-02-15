@@ -1,16 +1,29 @@
+////
+// Helper functions
+function arrayContains(array, string) {
+  return (array.indexOf(string) > -1);
+}
+
+function removeFromArray(array, element) {
+  return array.filter(e => e !== element);
+}
+
+////
+// Actions and messaging
+
 // Open options page if extension icon is clicked
 chrome.browserAction.onClicked.addListener(function() {chrome.runtime.openOptionsPage();});
 
 // Actions for extension install or upgrade
 chrome.runtime.onInstalled.addListener(function(details){
-  if (details.reason == "install"){
+  if (details.reason == 'install'){
     chrome.runtime.openOptionsPage();
-  } else if (details.reason == "update") {
+  } else if (details.reason == 'update') {
     // var thisVersion = chrome.runtime.getManifest().version;
     // console.log("Updated from " + details.previousVersion + " to " + thisVersion + "!");
 
     // TODO: Migrate wordList - Open options page to show new features
-    chrome.runtime.openOptionsPage();
+    // chrome.runtime.openOptionsPage();
   }
 });
 
@@ -20,7 +33,10 @@ chrome.runtime.onMessage.addListener(
     if (request.counter) {
       chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
     } else if (request.disabled) {
-      chrome.browserAction.setIcon({path: "icons/icon19-disabled.png", tabId: sender.tab.id});
+      chrome.browserAction.setIcon({path: 'icons/icon19-disabled.png', tabId: sender.tab.id});
+      showEnableDomainMenuItem(request.domain);
+    } else if (request.disabled === false) {
+      hideEnableDomainMenuItem(request.domain);
     }
   }
 );
@@ -28,16 +44,12 @@ chrome.runtime.onMessage.addListener(
 ////
 // Context menu
 //
-function arrayContains(array, string) {
-  return (array.indexOf(string) > -1);
-}
-
 function addSelection(selection) {
-  chrome.storage.sync.get({'words': {}}, function(storage) {
+  chrome.storage.sync.get({"words": {}}, function(storage) {
     selection = (selection.trim()).toLowerCase();
     if (!arrayContains(Object.keys(storage.words), selection)) {
       storage.words[selection] = {"matchMethod": 0, "words": []};
-      chrome.storage.sync.set({'words': storage.words}, function() {
+      chrome.storage.sync.set({"words": storage.words}, function() {
         if (!chrome.runtime.lastError) {
           chrome.tabs.reload();
         }
@@ -47,10 +59,10 @@ function addSelection(selection) {
 }
 
 function disableDomain(domain) {
-  chrome.storage.sync.get({'disabledDomains': []}, function(storage) {
+  chrome.storage.sync.get({"disabledDomains": []}, function(storage) {
     if (!arrayContains(storage.disabledDomains, domain)) {
       storage.disabledDomains.push(domain);
-      chrome.storage.sync.set({'disabledDomains': storage.disabledDomains}, function() {
+      chrome.storage.sync.set({"disabledDomains": storage.disabledDomains}, function() {
         if (!chrome.runtime.lastError) {
           chrome.tabs.reload();
         }
@@ -59,39 +71,80 @@ function disableDomain(domain) {
   });
 }
 
+// Remove all entries that disable the filter for domain
+function enableDomain(domain) {
+  chrome.storage.sync.get({"disabledDomains": []}, function(storage) {
+    var newDisabledDomains = storage.disabledDomains;
+
+    for (var x = 0; x < storage.disabledDomains.length; x++) {
+      domainRegex = new RegExp('(^|\.)' + storage.disabledDomains[x]);
+      if (domainRegex.test(domain)) {
+        newDisabledDomains = removeFromArray(newDisabledDomains, storage.disabledDomains[x]);
+      }
+    }
+
+    chrome.storage.sync.set({"disabledDomains": newDisabledDomains}, function() {
+      if (!chrome.runtime.lastError) {
+        chrome.tabs.reload();
+      }
+    });
+  });
+}
+
+function hideEnableDomainMenuItem(domain) {
+  chrome.contextMenus.update('disableDomain', { "visible": true });
+  chrome.contextMenus.update('enableDomain', { "visible": false });
+}
+
+function showEnableDomainMenuItem(domain) {
+  chrome.contextMenus.update('disableDomain', { "visible": false });
+  chrome.contextMenus.update('enableDomain', { "visible": true });
+}
+
+////
+// Menu Items
 chrome.contextMenus.create({
   "id": "addSelection",
   "title": "Add selection to filter",
   "contexts": ["selection"]
 });
-chrome.contextMenus.onClicked.addListener(function(info, tab) {
-  if (info.menuItemId == "addSelection") {
-    addSelection(info.selectionText);
-  }
-});
 
 chrome.contextMenus.create({
   "id": "disableDomain",
   "title": "Disable filter for domain",
+  "visible": true,
   "contexts": ["all"]
 });
-chrome.contextMenus.onClicked.addListener(function(info, tab) {
-  if (info.menuItemId == "disableDomain") {
-    var url = new URL(tab.url);
-    var domain = url.hostname;
-    disableDomain(domain);
-  }
+
+chrome.contextMenus.create({
+  "id": "enableDomain",
+  "title": "Enable filter for domain",
+  "visible": false,
+  "contexts": ["all"]
 });
 
-chrome.contextMenus.create({type: "separator"});
+chrome.contextMenus.create({id: "separator1", type: "separator"});
 
 chrome.contextMenus.create({
   "id": "options",
   "title": "Options...",
   "contexts": ["all"]
 });
+
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
-  if (info.menuItemId == "options") {
-    chrome.runtime.openOptionsPage();
+  switch(info.menuItemId) {
+    case "addSelection":
+      addSelection(info.selectionText); break;
+    case "disableDomain":
+      var url = new URL(tab.url);
+      var domain = url.hostname;
+      disableDomain(domain); break;
+    case "enableDomain":
+      var url = new URL(tab.url);
+      var domain = url.hostname;
+      enableDomain(domain); break;
+      break;
+    case "options":
+      chrome.runtime.openOptionsPage(); break;
   }
 });
