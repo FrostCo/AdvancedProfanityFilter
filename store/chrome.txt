@@ -8,6 +8,7 @@ Features:
 • Customizable word and substitution list
 • Disable filter for specific domains
 • Import/Export settings to share with others
+• Context menu for easily adding words and disabling the filter
 • Sync settings across browsers
 • Counter showing number of filtered words
 • HTTPS Support

@@ -34,9 +34,9 @@ chrome.runtime.onMessage.addListener(
       chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
     } else if (request.disabled) {
       chrome.browserAction.setIcon({path: 'icons/icon19-disabled.png', tabId: sender.tab.id});
-      showEnableDomainMenuItem(request.domain);
+      selectDisableDomainMenuItem();
     } else if (request.disabled === false) {
-      hideEnableDomainMenuItem(request.domain);
+      selectEnableDomainMenuItem();
     }
   }
 );
@@ -91,14 +91,14 @@ function enableDomain(domain) {
   });
 }
 
-function hideEnableDomainMenuItem(domain) {
-  chrome.contextMenus.update('disableDomain', { "visible": true });
-  chrome.contextMenus.update('enableDomain', { "visible": false });
+function selectDisableDomainMenuItem() {
+  chrome.contextMenus.update('enableDomain', { "checked": false });
+  chrome.contextMenus.update('disableDomain', { "checked": true });
 }
 
-function showEnableDomainMenuItem(domain) {
-  chrome.contextMenus.update('disableDomain', { "visible": false });
-  chrome.contextMenus.update('enableDomain', { "visible": true });
+function selectEnableDomainMenuItem() {
+  chrome.contextMenus.update('disableDomain', { "checked": false });
+  chrome.contextMenus.update('enableDomain', { "checked": true });
 }
 
 ////
@@ -109,21 +109,25 @@ chrome.contextMenus.create({
   "contexts": ["selection"]
 });
 
+chrome.contextMenus.create({id: "separator1", type: "separator"});
+
 chrome.contextMenus.create({
   "id": "disableDomain",
   "title": "Disable filter for domain",
-  "visible": true,
+  "type": "radio",
+  "checked": false,
   "contexts": ["all"]
 });
 
 chrome.contextMenus.create({
   "id": "enableDomain",
   "title": "Enable filter for domain",
-  "visible": false,
+  "type": "radio",
+  "checked": true,
   "contexts": ["all"]
 });
 
-chrome.contextMenus.create({id: "separator1", type: "separator"});
+chrome.contextMenus.create({id: "separator2", type: "separator"});
 
 chrome.contextMenus.create({
   "id": "options",
@@ -136,14 +140,17 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
     case "addSelection":
       addSelection(info.selectionText); break;
     case "disableDomain":
-      var url = new URL(tab.url);
-      var domain = url.hostname;
-      disableDomain(domain); break;
+      if (!info.wasChecked) {
+        var url = new URL(tab.url);
+        var domain = url.hostname;
+        disableDomain(domain);
+      } break;
     case "enableDomain":
-      var url = new URL(tab.url);
-      var domain = url.hostname;
-      enableDomain(domain); break;
-      break;
+      if (!info.wasChecked) {
+        var url = new URL(tab.url);
+        var domain = url.hostname;
+        enableDomain(domain);
+      } break;
     case "options":
       chrome.runtime.openOptionsPage(); break;
   }
