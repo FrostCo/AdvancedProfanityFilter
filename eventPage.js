@@ -11,9 +11,6 @@ function removeFromArray(array, element) {
 ////
 // Actions and messaging
 
-// Open options page if extension icon is clicked
-chrome.browserAction.onClicked.addListener(function() {chrome.runtime.openOptionsPage();});
-
 // Actions for extension install or upgrade
 chrome.runtime.onInstalled.addListener(function(details){
   if (details.reason == 'install'){
