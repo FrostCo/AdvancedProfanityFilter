@@ -34,9 +34,6 @@ chrome.runtime.onMessage.addListener(
       chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
     } else if (request.disabled) {
       chrome.browserAction.setIcon({path: 'icons/icon19-disabled.png', tabId: sender.tab.id});
-      selectDisableDomainMenuItem();
-    } else if (request.disabled === false) {
-      selectEnableDomainMenuItem();
     }
   }
 );
@@ -95,62 +92,55 @@ function enableDomain(domain) {
   });
 }
 
-function selectDisableDomainMenuItem() {
-  chrome.contextMenus.update('enableDomain', { "checked": false });
-  chrome.contextMenus.update('disableDomain', { "checked": true });
-}
+function toggleFilter(domain) {
+  var disabled = false;
+  chrome.storage.sync.get({"disabledDomains": []}, function(storage) {
+    for (var x = 0; x < storage.disabledDomains.length; x++) {
+      if (storage.disabledDomains[x]) {
+        domainRegex = new RegExp("(^|\.)" + storage.disabledDomains[x]);
+        if (domainRegex.test(domain)) {
+          disabled = true;
+          break;
+        }
+      }
+    }
 
-function selectEnableDomainMenuItem() {
-  chrome.contextMenus.update('disableDomain', { "checked": false });
-  chrome.contextMenus.update('enableDomain', { "checked": true });
+    disabled ? enableDomain(domain) : disableDomain(domain);
+  });
 }
 
 ////
 // Menu Items
-chrome.contextMenus.create({
-  "id": "addSelection",
-  "title": "Add selection to filter",
-  "contexts": ["selection"]
-});
+chrome.contextMenus.removeAll(function() {
+  chrome.contextMenus.create({
+    "id": "addSelection",
+    "title": "Add selection to filter",
+    "contexts": ["selection"]
+  });
 
-chrome.contextMenus.create({
-  "id": "disableDomain",
-  "title": "Disable filter for domain",
-  "type": "radio",
-  "checked": false,
-  "contexts": ["all"]
-});
+  chrome.contextMenus.create({
+    "id": "toggleFilterForDomain",
+    "title": "Toggle filter for domain",
+    "contexts": ["all"]
+  });
 
-chrome.contextMenus.create({
-  "id": "enableDomain",
-  "title": "Enable filter for domain",
-  "type": "radio",
-  "checked": true,
-  "contexts": ["all"]
-});
+  chrome.contextMenus.create({id: "separator1", type: "separator"});
 
-chrome.contextMenus.create({id: "separator1", type: "separator"});
-
-chrome.contextMenus.create({
-  "id": "options",
-  "title": "Options...",
-  "contexts": ["all"]
+  chrome.contextMenus.create({
+    "id": "options",
+    "title": "Options...",
+    "contexts": ["all"]
+  });
 });
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
   switch(info.menuItemId) {
     case "addSelection":
       addSelection(info.selectionText); break;
-    case "disableDomain":
+    case "toggleFilterForDomain":
       var url = new URL(tab.url);
       var domain = url.hostname;
-      disableDomain(domain);
-      break;
-    case "enableDomain":
-      var url = new URL(tab.url);
-      var domain = url.hostname;
-      enableDomain(domain);
-      break;
+      toggleFilter(domain); break;
     case "options":
       chrome.runtime.openOptionsPage(); break;
   }
