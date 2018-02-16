@@ -75,19 +75,23 @@ function disableDomain(domain) {
 function enableDomain(domain) {
   chrome.storage.sync.get({"disabledDomains": []}, function(storage) {
     var newDisabledDomains = storage.disabledDomains;
+    var foundMatch;
 
     for (var x = 0; x < storage.disabledDomains.length; x++) {
       domainRegex = new RegExp('(^|\.)' + storage.disabledDomains[x]);
       if (domainRegex.test(domain)) {
+        foundMatch = true;
         newDisabledDomains = removeFromArray(newDisabledDomains, storage.disabledDomains[x]);
       }
     }
 
-    chrome.storage.sync.set({"disabledDomains": newDisabledDomains}, function() {
-      if (!chrome.runtime.lastError) {
-        chrome.tabs.reload();
-      }
-    });
+    if (foundMatch) {
+      chrome.storage.sync.set({"disabledDomains": newDisabledDomains}, function() {
+        if (!chrome.runtime.lastError) {
+          chrome.tabs.reload();
+        }
+      });
+    }
   });
 }
 
@@ -138,17 +142,15 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
     case "addSelection":
       addSelection(info.selectionText); break;
     case "disableDomain":
-      if (!info.wasChecked) {
-        var url = new URL(tab.url);
-        var domain = url.hostname;
-        disableDomain(domain);
-      } break;
+      var url = new URL(tab.url);
+      var domain = url.hostname;
+      disableDomain(domain);
+      break;
     case "enableDomain":
-      if (!info.wasChecked) {
-        var url = new URL(tab.url);
-        var domain = url.hostname;
-        enableDomain(domain);
-      } break;
+      var url = new URL(tab.url);
+      var domain = url.hostname;
+      enableDomain(domain);
+      break;
     case "options":
       chrome.runtime.openOptionsPage(); break;
   }
