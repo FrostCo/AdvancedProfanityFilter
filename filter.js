@@ -101,10 +101,13 @@ function cleanPage() {
     disabledDomains = storage.disabledDomains;
 
     // Don't run if this is a disabled domain
-    message = disabledPage();
-    chrome.runtime.sendMessage(message);
-    if (message.disabled) {
-      return false;
+    // Only run on main page (no frames)
+    if (window == window.top) {
+      message = disabledPage();
+      chrome.runtime.sendMessage(message);
+      if (message.disabled) {
+        return false;
+      }
     }
 
     // If no words are specified use defaultWords
