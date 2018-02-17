@@ -20,7 +20,16 @@ chrome.runtime.onInstalled.addListener(function(details){
     // console.log("Updated from " + details.previousVersion + " to " + thisVersion + "!");
 
     // TODO: Migrate wordList - Open options page to show new features
-    chrome.runtime.openOptionsPage();
+    // chrome.runtime.openOptionsPage();
+
+    // Display update notification
+    chrome.notifications.create("extensionUpdate", {
+      "type": "basic",
+      "title": "Advanced Profanity Filter",
+      "message": "Update installed, click for changelog.",
+      "iconUrl": "icons/icon64.png",
+      "isClickable": true,
+    });
   }
 });
 
@@ -130,6 +139,8 @@ chrome.contextMenus.removeAll(function() {
   });
 });
 
+////
+// Listeners
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
   switch(info.menuItemId) {
     case "addSelection":
@@ -140,5 +151,14 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
       toggleFilter(domain); break;
     case "options":
       chrome.runtime.openOptionsPage(); break;
+  }
+});
+
+chrome.notifications.onClicked.addListener(function(notificationId) {
+  switch(notificationId) {
+    case "extensionUpdate":
+      chrome.tabs.create({url: "https://github.com/richardfrost/AdvancedProfanityFilter/releases"});
+      chrome.notifications.clear("extensionUpdate");
+      break;
   }
 });
