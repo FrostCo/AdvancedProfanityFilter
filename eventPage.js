@@ -130,12 +130,10 @@ chrome.contextMenus.removeAll(function() {
     "contexts": ["all"]
   });
 
-  chrome.contextMenus.create({id: "separator1", type: "separator"});
-
   chrome.contextMenus.create({
     "id": "options",
     "title": "Options",
-    "contexts": ["page"]
+    "contexts": ["page", "selection"]
   });
 });
 
@@ -157,8 +155,8 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
 chrome.notifications.onClicked.addListener(function(notificationId) {
   switch(notificationId) {
     case "extensionUpdate":
-      chrome.tabs.create({url: "https://github.com/richardfrost/AdvancedProfanityFilter/releases"});
       chrome.notifications.clear("extensionUpdate");
+      chrome.tabs.create({url: "https://github.com/richardfrost/AdvancedProfanityFilter/releases"});
       break;
   }
 });
