@@ -1,4 +1,4 @@
-var domain, disabledDomains, filterMethod;
+var domain, disabledDomains;
 var filterMethods = ["Censor", "Substitute", "Remove"];
 
 ////
@@ -60,7 +60,7 @@ function enableDomain(domain) {
 }
 
 function filterMethodSelect(event) {
-  filterMethod = document.getElementById('filterMethodSelect').selectedIndex;
+  var filterMethod = document.getElementById('filterMethodSelect').selectedIndex;
   chrome.storage.sync.set({"filterMethod": filterMethod}, function() {
     if (!chrome.runtime.lastError) {
       chrome.tabs.reload();
@@ -73,7 +73,7 @@ function populateOptions() {
   chrome.storage.sync.get({"disabledDomains": [], "filterMethod": 0}, function(storage) {
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       disabledDomains = storage.disabledDomains;
-      filterMethod = storage.filterMethod;
+      document.getElementById('filterMethodSelect').selectedIndex = storage.filterMethod;
       var tab = tabs[0];
       var checked = document.getElementById('domainFilter').value;
       var url = new URL(tab.url);
@@ -90,8 +90,6 @@ function populateOptions() {
           }
         }
       }
-
-      document.getElementById('filterMethodSelect').selectedIndex = filterMethod;
     });
   });
 }
@@ -108,5 +106,5 @@ function toggleFilter() {
 // Listeners
 window.addEventListener('load', populateOptions);
 document.getElementById('domainFilter').addEventListener('change', toggleFilter);
-document.getElementById('options').addEventListener('click', function() {chrome.runtime.openOptionsPage(); });
 document.getElementById('filterMethodSelect').addEventListener('change', filterMethodSelect);
+document.getElementById('options').addEventListener('click', function() {chrome.runtime.openOptionsPage(); });
