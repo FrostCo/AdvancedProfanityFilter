@@ -11,9 +11,6 @@ function removeFromArray(array, element) {
 ////
 // Actions and messaging
 
-// Open options page if extension icon is clicked
-chrome.browserAction.onClicked.addListener(function() {chrome.runtime.openOptionsPage();});
-
 // Actions for extension install or upgrade
 chrome.runtime.onInstalled.addListener(function(details){
   if (details.reason == 'install'){
@@ -23,7 +20,16 @@ chrome.runtime.onInstalled.addListener(function(details){
     // console.log("Updated from " + details.previousVersion + " to " + thisVersion + "!");
 
     // TODO: Migrate wordList - Open options page to show new features
-    chrome.runtime.openOptionsPage();
+    // chrome.runtime.openOptionsPage();
+
+    // Display update notification
+    chrome.notifications.create("extensionUpdate", {
+      "type": "basic",
+      "title": "Advanced Profanity Filter",
+      "message": "Update installed, click for changelog.",
+      "iconUrl": "icons/icon64.png",
+      "isClickable": true,
+    });
   }
 });
 
@@ -34,9 +40,6 @@ chrome.runtime.onMessage.addListener(
       chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
     } else if (request.disabled) {
       chrome.browserAction.setIcon({path: 'icons/icon19-disabled.png', tabId: sender.tab.id});
-      selectDisableDomainMenuItem();
-    } else if (request.disabled === false) {
-      selectEnableDomainMenuItem();
     }
   }
 );
@@ -75,81 +78,87 @@ function disableDomain(domain) {
 function enableDomain(domain) {
   chrome.storage.sync.get({"disabledDomains": []}, function(storage) {
     var newDisabledDomains = storage.disabledDomains;
+    var foundMatch;
 
     for (var x = 0; x < storage.disabledDomains.length; x++) {
       domainRegex = new RegExp('(^|\.)' + storage.disabledDomains[x]);
       if (domainRegex.test(domain)) {
+        foundMatch = true;
         newDisabledDomains = removeFromArray(newDisabledDomains, storage.disabledDomains[x]);
       }
     }
 
-    chrome.storage.sync.set({"disabledDomains": newDisabledDomains}, function() {
-      if (!chrome.runtime.lastError) {
-        chrome.tabs.reload();
-      }
-    });
+    if (foundMatch) {
+      chrome.storage.sync.set({"disabledDomains": newDisabledDomains}, function() {
+        if (!chrome.runtime.lastError) {
+          chrome.tabs.reload();
+        }
+      });
+    }
   });
 }
 
-function selectDisableDomainMenuItem() {
-  chrome.contextMenus.update('enableDomain', { "checked": false });
-  chrome.contextMenus.update('disableDomain', { "checked": true });
-}
+function toggleFilter(domain) {
+  var disabled = false;
+  chrome.storage.sync.get({"disabledDomains": []}, function(storage) {
+    for (var x = 0; x < storage.disabledDomains.length; x++) {
+      if (storage.disabledDomains[x]) {
+        domainRegex = new RegExp("(^|\.)" + storage.disabledDomains[x]);
+        if (domainRegex.test(domain)) {
+          disabled = true;
+          break;
+        }
+      }
+    }
 
-function selectEnableDomainMenuItem() {
-  chrome.contextMenus.update('disableDomain', { "checked": false });
-  chrome.contextMenus.update('enableDomain', { "checked": true });
+    disabled ? enableDomain(domain) : disableDomain(domain);
+  });
 }
 
 ////
 // Menu Items
-chrome.contextMenus.create({
-  "id": "addSelection",
-  "title": "Add selection to filter",
-  "contexts": ["selection"]
+chrome.contextMenus.removeAll(function() {
+  chrome.contextMenus.create({
+    "id": "addSelection",
+    "title": "Add selection to filter",
+    "contexts": ["selection"]
+  });
+
+  chrome.contextMenus.create({
+    "id": "toggleFilterForDomain",
+    "title": "Toggle filter for domain",
+    "contexts": ["all"]
+  });
+
+  chrome.contextMenus.create({id: "separator1", type: "separator"});
+
+  chrome.contextMenus.create({
+    "id": "options",
+    "title": "Options...",
+    "contexts": ["all"]
+  });
 });
 
-chrome.contextMenus.create({
-  "id": "disableDomain",
-  "title": "Disable filter for domain",
-  "type": "radio",
-  "checked": false,
-  "contexts": ["all"]
-});
-
-chrome.contextMenus.create({
-  "id": "enableDomain",
-  "title": "Enable filter for domain",
-  "type": "radio",
-  "checked": true,
-  "contexts": ["all"]
-});
-
-chrome.contextMenus.create({id: "separator1", type: "separator"});
-
-chrome.contextMenus.create({
-  "id": "options",
-  "title": "Options...",
-  "contexts": ["all"]
-});
-
+////
+// Listeners
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
   switch(info.menuItemId) {
     case "addSelection":
       addSelection(info.selectionText); break;
-    case "disableDomain":
-      if (!info.wasChecked) {
-        var url = new URL(tab.url);
-        var domain = url.hostname;
-        disableDomain(domain);
-      } break;
-    case "enableDomain":
-      if (!info.wasChecked) {
-        var url = new URL(tab.url);
-        var domain = url.hostname;
-        enableDomain(domain);
-      } break;
+    case "toggleFilterForDomain":
+      var url = new URL(tab.url);
+      var domain = url.hostname;
+      toggleFilter(domain); break;
     case "options":
       chrome.runtime.openOptionsPage(); break;
+  }
+});
+
+chrome.notifications.onClicked.addListener(function(notificationId) {
+  switch(notificationId) {
+    case "extensionUpdate":
+      chrome.tabs.create({url: "https://github.com/richardfrost/AdvancedProfanityFilter/releases"});
+      chrome.notifications.clear("extensionUpdate");
+      break;
   }
 });
