@@ -134,8 +134,8 @@ chrome.contextMenus.removeAll(function() {
 
   chrome.contextMenus.create({
     "id": "options",
-    "title": "Options...",
-    "contexts": ["all"]
+    "title": "Options",
+    "contexts": ["page"]
   });
 });
 
