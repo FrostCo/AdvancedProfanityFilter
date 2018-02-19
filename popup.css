@@ -1,10 +1,44 @@
 body {
   font-family: Arial;
   width: 250px;
-  height: 100%; /*300px;*/
+  height: 100%;
   background-color: #eee;
   padding: 0;
   margin: 0;
+}
+
+a:link, a:visited {
+  color: #333;
+  font-size: 10px;
+}
+
+a:hover, a:active {
+  color: #222;
+  font-size: 10px;
+}
+
+p {
+  margin-right: 35px;
+  margin-top: 40px;
+  float: right;
+}
+
+h4 {
+  margin-bottom: 5px;
+}
+
+input:checked + .slider {
+  background-color: teal;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px teal;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
 }
 
 #banner {
@@ -17,6 +51,22 @@ body {
   color: #DA291C;
 }
 
+#filterMethodSelect {
+  width: 200px;
+}
+
+#footer {
+  width: 100%;
+  padding: 15px 0;
+  background: #ccc;
+  text-align: center;
+}
+
+#gettingStarted {
+  color: teal;
+  font-weight: bold;
+}
+
 #logo {
   text-align: center;
   width: 64px;
@@ -24,32 +74,8 @@ body {
   margin: 1rem;
   margin-left: 45px;
   text-align: center;
-  /*display: block;*/
 }
 
-#footer {
-   width:100%;
-   padding: 15px 0;
-   background:#ccc;
-   text-align: center;
-}
-
-.divider {
-  border-bottom: solid #ccc 1px;
-  width: 200px;
-  margin: auto;
-}
-
-p {
-  margin-right: 35px;
-  margin-top: 40px;
-  float: right;
-}
-
-.options {
-  width: 200px;
-  margin-left: 25px;
-}
 #options {
   padding: 1rem;
   margin: 0;
@@ -63,6 +89,22 @@ p {
   background-color: #ddd;
 }
 
+.divider {
+  border-bottom: solid #ccc 1px;
+  width: 200px;
+  margin: auto;
+}
+
+.filter {
+  margin-left: 25px;
+  margin-bottom: 1rem;
+}
+
+.options {
+  width: 200px;
+  margin-left: 25px;
+}
+
 .unselectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -72,36 +114,7 @@ p {
   user-select: none;
 }
 
-.filter {
-  margin-left: 25px;
-  margin-bottom: 1rem;
-}
-
-h4 {
-  margin-bottom: 5px;
-}
-
-#filterMethodSelect {
-  width: 200px;
-}
-
-a:link, a:visited {
-  color: #333;
-  font-size: 10px;
-}
-
-a:hover, a:active {
-  color: #222;
-  font-size: 10px;
-}
-
-#gettingStarted {
-  color: teal;
-  font-weight: bold;
-}
-
 /* --------------The Switch------------- */
-
 /* The switch - the box around the slider */
 .switch {
   position: relative;
@@ -114,7 +127,7 @@ a:hover, a:active {
 }
 
 /* Hide default HTML checkbox */
-.switch input {display:none;}
+.switch input {display: none;}
 
 /* The slider */
 .slider {
@@ -135,20 +148,6 @@ a:hover, a:active {
   left: 4px;
   bottom: 4px;
   background-color: white;
-}
-
-input:checked + .slider {
-  background-color: teal;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px teal;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
 }
 
 /* Rounded sliders */
