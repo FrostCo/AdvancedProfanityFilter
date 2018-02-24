@@ -234,8 +234,8 @@ function populateOptions() {
         break;
     }
 
-    // Hide per-word matching options if not selected globally
-    if (settings.globalMatchMethod === 3 && settings.filterMethod != 2) {
+    // Hide per-word matching options if not selected globally (always show for Remove filter method)
+    if (settings.globalMatchMethod == 3 || settings.filterMethod == 2) {
       document.getElementById('wordMatchMethodContainer').classList.remove('hidden');
     } else {
       document.getElementById('wordMatchMethodContainer').classList.add('hidden');
