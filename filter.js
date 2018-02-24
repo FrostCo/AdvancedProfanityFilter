@@ -45,16 +45,22 @@ function buildPartRegexp(word) {
   wordRegExps.push(new RegExp('(' + word[0] + ')' + word.slice(1), 'gi' ));
 }
 
-// Match entire word that contains sub-string
-// /\b[\w-]*(w)ord[\w-]*\b/gi
-function buildWholeRegexp(word) {
-  wordRegExps.push(new RegExp('\\b([\\w-]*' + word[0] + ')' + word.slice(1) + '[\\w-]*\\b', 'gi' ))
+// Match entire word that contains sub-string and surrounding whitespace
+// /\s?\b(w)ord\b\s?/gi
+function buildRegexpForRemoveExact(word) {
+  wordRegExps.push(new RegExp('\\s?\\b(' + word[0] + ')' + word.slice(1) + '\\b\\s?', 'gi' ));
 }
 
 // Match entire word that contains sub-string and surrounding whitespace
 // /\s?\b[\w-]*(w)ord[\w-]*\b\s?/gi
-function buildWholeRegexpForRemove(word) {
+function buildRegexpForRemovePart(word) {
   wordRegExps.push(new RegExp('\\s?\\b([\\w-]*' + word[0] + ')' + word.slice(1) + '[\\w-]*\\b\\s?', 'gi' ));
+}
+
+// Match entire word that contains sub-string
+// /\b[\w-]*(w)ord[\w-]*\b/gi
+function buildWholeRegexp(word) {
+  wordRegExps.push(new RegExp('\\b([\\w-]*' + word[0] + ')' + word.slice(1) + '[\\w-]*\\b', 'gi' ))
 }
 
 function checkNodeForProfanity(mutation) {
@@ -161,9 +167,13 @@ function disabledPage() {
 // Parse the profanity list
 // ["exact", "partial", "whole", "disabled"]
 function generateRegexpList() {
-  if (filterMethod == 2) { // If removing, ignore match method
+  if (filterMethod == 2) { // Special regexp for "Remove" filter
     for (var x = 0; x < wordList.length; x++) {
-      buildWholeRegexpForRemove(wordList[x]);
+      if (words[wordList[x]].matchMethod == 0) { // If word matchMethod is exact
+        buildRegexpForRemoveExact(wordList[x]);
+      } else {
+        buildRegexpForRemovePart(wordList[x]);
+      }
     }
   } else {
     switch(globalMatchMethod) {
