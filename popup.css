@@ -100,6 +100,10 @@ input:checked + .slider:before {
   margin-bottom: 1rem;
 }
 
+.hidden {
+  display: none;
+}
+
 .options {
   width: 200px;
   margin-left: 25px;
