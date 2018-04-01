@@ -5,7 +5,7 @@ var defaults = {
   "defaultSubstitutions": ["censored", "expletive", "filtered"],
   "disabledDomains": [],
   "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
-  "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word"]
+  "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word", "RegExp"]
   "preserveFirst": false,
   "preserveLast": false,
   "showCounter": true,
@@ -36,31 +36,31 @@ var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-spa
 // Word must match exactly (not sub-string)
 // /\b(w)ord\b/gi
 function buildExactRegexp(word) {
-  wordRegExps.push(new RegExp('\\b(' + word[0] + ')' + word.slice(1)+ '\\b', 'gi' ));
+  wordRegExps.push(new RegExp('\\b(' + word[0] + ')' + escapeRegExp(word.slice(1)) + '\\b', 'gi' ));
 }
 
 // Match any part of a word (sub-string)
 // /(w)ord/gi
 function buildPartRegexp(word) {
-  wordRegExps.push(new RegExp('(' + word[0] + ')' + word.slice(1), 'gi' ));
+  wordRegExps.push(new RegExp('(' + word[0] + ')' + escapeRegExp(word.slice(1)), 'gi' ));
 }
 
 // Match entire word that contains sub-string and surrounding whitespace
 // /\s?\b(w)ord\b\s?/gi
 function buildRegexpForRemoveExact(word) {
-  wordRegExps.push(new RegExp('\\s?\\b(' + word[0] + ')' + word.slice(1) + '\\b\\s?', 'gi' ));
+  wordRegExps.push(new RegExp('\\s?\\b(' + word[0] + ')' + escapeRegExp(word.slice(1)) + '\\b\\s?', 'gi' ));
 }
 
 // Match entire word that contains sub-string and surrounding whitespace
 // /\s?\b[\w-]*(w)ord[\w-]*\b\s?/gi
 function buildRegexpForRemovePart(word) {
-  wordRegExps.push(new RegExp('\\s?\\b([\\w-]*' + word[0] + ')' + word.slice(1) + '[\\w-]*\\b\\s?', 'gi' ));
+  wordRegExps.push(new RegExp('\\s?\\b([\\w-]*' + word[0] + ')' + escapeRegExp(word.slice(1)) + '[\\w-]*\\b\\s?', 'gi' ));
 }
 
 // Match entire word that contains sub-string
 // /\b[\w-]*(w)ord[\w-]*\b/gi
 function buildWholeRegexp(word) {
-  wordRegExps.push(new RegExp('\\b([\\w-]*' + word[0] + ')' + word.slice(1) + '[\\w-]*\\b', 'gi' ))
+  wordRegExps.push(new RegExp('\\b([\\w-]*' + word[0] + ')' + escapeRegExp(word.slice(1)) + '[\\w-]*\\b', 'gi' ))
 }
 
 function checkNodeForProfanity(mutation) {
@@ -164,6 +164,10 @@ function disabledPage() {
   return result;
 }
 
+function escapeRegExp(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
 // Parse the profanity list
 // ["exact", "partial", "whole", "disabled"]
 function generateRegexpList() {
@@ -195,6 +199,9 @@ function generateRegexpList() {
               break;
             case 2: // Whole word match
               buildWholeRegexp(wordList[x]);
+              break;
+            case 4: // Regular Expression (Advanced)
+              wordRegExps.push(new RegExp(wordList[x], 'gi'));
               break;
             default: // case 1 - Partial word match (Default)
               buildPartRegexp(wordList[x]);
