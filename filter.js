@@ -65,7 +65,6 @@ function buildWholeRegexp(word) {
 
 function checkNodeForProfanity(mutation) {
   mutation.addedNodes.forEach(function(node) {
-    // console.log("forbidden? ", isForbiddenNode(node), node);
     if (!isForbiddenNode(node)) {
       removeProfanity(xpathNodeText, node);
     }
@@ -141,7 +140,7 @@ function cleanPage() {
 
     // Remove profanity from the main document and watch for new nodes
     generateRegexpList();
-    removeProfanity(xpathDocText);
+    removeProfanity(xpathDocText, document);
     updateCounterBadge();
     observeNewNodes();
   });
@@ -224,13 +223,13 @@ function generateRegexpList() {
 function isForbiddenNode(node) {
   return Boolean(node.isContentEditable || // DraftJS and many others
   (node.parentNode && node.parentNode.isContentEditable) || // Special case for Gmail
-  (node.parentNode && (node.parentNode.tagName == "IFRAME" ||
-                       node.parentNode.tagName == "SCRIPT" ||
+  (node.parentNode && (node.parentNode.tagName == "SCRIPT" ||
                        node.parentNode.tagName == "STYLE"
                       )
-  ) ||
-  (node.tagName && (node.tagName == "TEXTAREA" || // Some catch-alls
+  ) || // Some catch-alls
+  (node.tagName && (node.tagName == "IFRAME" ||
                     node.tagName == "INPUT" ||
+                    node.tagName == "TEXTAREA" ||
                     node.tagName == "SCRIPT" ||
                     node.tagName == "STYLE"
                    )
@@ -264,7 +263,6 @@ function randomElement(array) {
 }
 
 function removeProfanity(xpathExpression, node) {
-  node = (typeof node !== 'undefined') ?  node : document; // Todo: What is this for?
   var evalResult = document.evaluate(
     xpathExpression,
     node,
@@ -273,15 +271,17 @@ function removeProfanity(xpathExpression, node) {
     null
   );
 
-  // TODO: Soundcloud uses plain text for waveform comments
-  // This can also get scripts and styles too
-  if (evalResult.snapshotLength == 0 && node.data) {
-    console.log('Warning: evalResult.snapshotLength was 0 - ', node.data);
-    node.data = replaceText(node.data);
-  } else {
+  if (evalResult.snapshotLength == 0 && node.data) { // If plaintext node
+    if (/^\s*(<[a-z]|{)/.test(node.data)) { // Don't touch tags
+      // console.log('Skipping:', node.data); // DEBUG
+    } else {
+      // console.log('Plaintext:', node.data, replaceText(node.data)); // DEBUG
+      node.data = replaceText(node.data);
+    }
+  } else { // If evalResult matches
     for (var i = 0; i < evalResult.snapshotLength; i++) {
       var textNode = evalResult.snapshotItem(i);
-      console.log('normal cleaning:', replaceText(textNode.data));
+      // console.log('Normal cleaning:', replaceText(textNode.data)); // DEBUG
       textNode.data = replaceText(textNode.data);
     }
   }
