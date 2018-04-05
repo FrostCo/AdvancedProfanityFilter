@@ -66,6 +66,7 @@ function buildWholeRegexp(word) {
 function checkNodeForProfanity(mutation) {
   mutation.addedNodes.forEach(function(node) {
     if (!isForbiddenNode(node)) {
+      // console.log('Node to removeProfanity', node); // DEBUG
       removeProfanity(xpathNodeText, node);
     }
   });
@@ -99,6 +100,7 @@ function censorReplace(strMatchingString, strFirstLetter) {
   }
 
   counter++;
+  // console.log('Censor match:', strMatchingString, censoredString); // DEBUG
   return censoredString;
 }
 
@@ -275,13 +277,13 @@ function removeProfanity(xpathExpression, node) {
     if (/^\s*(<[a-z]|{)/.test(node.data)) { // Don't touch tags
       // console.log('Skipping:', node.data); // DEBUG
     } else {
-      // console.log('Plaintext:', node.data, replaceText(node.data)); // DEBUG
+      // console.log('Plaintext:', node.data); // DEBUG
       node.data = replaceText(node.data);
     }
   } else { // If evalResult matches
     for (var i = 0; i < evalResult.snapshotLength; i++) {
       var textNode = evalResult.snapshotItem(i);
-      // console.log('Normal cleaning:', replaceText(textNode.data)); // DEBUG
+      // console.log('Normal cleaning:', textNode.data); // DEBUG
       textNode.data = replaceText(textNode.data);
     }
   }
@@ -298,6 +300,7 @@ function replaceText(str) {
       for (var z = 0; z < wordList.length; z++) {
         str = str.replace(wordRegExps[z], function(match) {
           counter++;
+          // console.log('Substitute match:', match, words[wordList[z]].words); // DEBUG
           if (substitutionMark) {
             return '[' + randomElement(words[wordList[z]].words) + ']';
           } else {
@@ -311,6 +314,7 @@ function replaceText(str) {
         str = str.replace(wordRegExps[z], function(match) {
           counter++;
           // Don't remove both leading and trailing whitespace
+          // console.log('Remove match:', match); // DEBUG
           if (whitespaceRegExp.test(match[0]) && whitespaceRegExp.test(match[match.length - 1])) {
             return match[0];
           } else {
