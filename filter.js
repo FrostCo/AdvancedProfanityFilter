@@ -65,6 +65,7 @@ function buildWholeRegexp(word) {
 
 function checkNodeForProfanity(mutation) {
   mutation.addedNodes.forEach(function(node) {
+    // console.log("forbidden? ", isForbiddenNode(node), node);
     if (!isForbiddenNode(node)) {
       removeProfanity(xpathNodeText, node);
     }
@@ -221,13 +222,19 @@ function generateRegexpList() {
 // Returns true if a node should *not* be altered in any way
 // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
 function isForbiddenNode(node) {
-  return node.isContentEditable || // DraftJS and many others
+  return Boolean(node.isContentEditable || // DraftJS and many others
   (node.parentNode && node.parentNode.isContentEditable) || // Special case for Gmail
-  (node.tagName && (node.tagName.toLowerCase() == "textarea" || // Some catch-alls
-                    node.tagName.toLowerCase() == "input" ||
-                    node.tagName.toLowerCase() == "script" ||
-                    node.tagName.toLowerCase() == "style")
-  );
+  (node.parentNode && (node.parentNode.tagName == "IFRAME" ||
+                       node.parentNode.tagName == "SCRIPT" ||
+                       node.parentNode.tagName == "STYLE"
+                      )
+  ) ||
+  (node.tagName && (node.tagName == "TEXTAREA" || // Some catch-alls
+                    node.tagName == "INPUT" ||
+                    node.tagName == "SCRIPT" ||
+                    node.tagName == "STYLE"
+                   )
+  ));
 }
 
 // Watch for new text nodes and clean them as they are added
@@ -257,7 +264,7 @@ function randomElement(array) {
 }
 
 function removeProfanity(xpathExpression, node) {
-  node = (typeof node !== 'undefined') ?  node : document;
+  node = (typeof node !== 'undefined') ?  node : document; // Todo: What is this for?
   var evalResult = document.evaluate(
     xpathExpression,
     node,
@@ -266,9 +273,17 @@ function removeProfanity(xpathExpression, node) {
     null
   );
 
-  for (var i = 0; i < evalResult.snapshotLength; i++) {
-    var textNode = evalResult.snapshotItem(i);
-    textNode.data = replaceText(textNode.data);
+  // TODO: Soundcloud uses plain text for waveform comments
+  // This can also get scripts and styles too
+  if (evalResult.snapshotLength == 0 && node.data) {
+    console.log('Warning: evalResult.snapshotLength was 0 - ', node.data);
+    node.data = replaceText(node.data);
+  } else {
+    for (var i = 0; i < evalResult.snapshotLength; i++) {
+      var textNode = evalResult.snapshotItem(i);
+      console.log('normal cleaning:', replaceText(textNode.data));
+      textNode.data = replaceText(textNode.data);
+    }
   }
 }
 
