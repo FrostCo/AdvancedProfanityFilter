@@ -7,6 +7,13 @@
 
 <body>
 <!-- Tabs -->
+<div id="passwordContainer">
+  <label for="password">Password: </label>
+  <input type="password" id="password">
+  <input type="button" value="Submit" id="submitPassword"/>
+</div>
+
+<div id="main" class="visible">
 <div class="tab">
   <nav>
     <span class="tablinks active">Settings</span>
@@ -19,7 +26,7 @@
 <div id="dialogContainer"></div>
 
 <!-- Settings Tab -->
-<div id="Settings" class="tabcontent visible">
+<div id="settings" class="tabcontent visible">
   <h4>Filter Method</h4>
   <select id="filterMethodSelect"></select>
 
@@ -152,6 +159,7 @@
   <div id="configNote" class="notes">Import/Export Config:</div>
   <textarea id="configText"></textarea>
 </div>
+</div> <!-- #main -->
 
 <!-- Footer -->
 <div id="footer">

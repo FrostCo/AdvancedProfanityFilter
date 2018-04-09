@@ -6,6 +6,7 @@ var defaults = {
   "disabledDomains": [],
   "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
   "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word", "RegExp"]
+  "password": "blank",
   "preserveFirst": false,
   "preserveLast": false,
   "showCounter": true,
@@ -27,6 +28,8 @@ var defaultWords = {
   "tits": {"matchMethod": 1, "words": ["explative"] },
   "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
 };
+// var password = 'blank';
+var authenticated = false;
 var filterMethods = ["Censor", "Substitute", "Remove"];
 var matchMethods = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match", "Regular Expression"];
 
@@ -210,6 +213,12 @@ function populateOptions() {
       return false;
     }
 
+    if (config.password && !authenticated) {
+      console.log('login foo!');
+      document.getElementById('main').classList.remove('visible');
+      document.getElementById('main').classList.add('hidden');
+    }
+
     // Show/hide censor options and word substitutions based on filter method
     dynamicList(filterMethods, 'filterMethodSelect');
     document.getElementById('filterMethodSelect').selectedIndex = settings.filterMethod;
@@ -257,6 +266,16 @@ function populateOptions() {
     // Domains
     dynamicList(settings.disabledDomains, 'domainSelect', 'Disabled Domains');
   });
+}
+
+function authenticate() {
+  if (document.getElementById('password').value == config.password) {
+    document.getElementById('main').classList.remove('visible');
+    document.getElementById('main').classList.add('hidden');
+    return true;
+  } else {
+    return false;
+  }
 }
 
 function removeFromArray(array, element) {
@@ -413,3 +432,5 @@ document.getElementById('domainRemove').addEventListener('click', domainRemove);
 document.getElementById('default').addEventListener('click', function() {confirm('restoreDefaults')} );
 document.getElementById('import').addEventListener('click', function() {confirm('importConfig')} );
 document.getElementById('export').addEventListener('click', exportConfig);
+
+document.getElementById('submitPassword').addEventListener('click', authenticate);
