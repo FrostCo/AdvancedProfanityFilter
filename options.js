@@ -14,6 +14,7 @@ var defaults = {
 };
 var defaultWords = {
   "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
+  "asses": {"matchMethod": 0, "words": ["butts"] },
   "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
   "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
   "bitch": {"matchMethod": 1, "words": ["jerk"] },
