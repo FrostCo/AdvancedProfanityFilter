@@ -14,6 +14,7 @@ var defaults = {
 };
 var defaultWords = {
   "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
+  "asses": {"matchMethod": 0, "words": ["butts"] },
   "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
   "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
   "bitch": {"matchMethod": 1, "words": ["jerk"] },
@@ -66,6 +67,7 @@ function buildWholeRegexp(word) {
 function checkNodeForProfanity(mutation) {
   mutation.addedNodes.forEach(function(node) {
     if (!isForbiddenNode(node)) {
+      // console.log('Node to removeProfanity', node); // DEBUG
       removeProfanity(xpathNodeText, node);
     }
   });
@@ -99,6 +101,7 @@ function censorReplace(strMatchingString, strFirstLetter) {
   }
 
   counter++;
+  // console.log('Censor match:', strMatchingString, censoredString); // DEBUG
   return censoredString;
 }
 
@@ -140,7 +143,7 @@ function cleanPage() {
 
     // Remove profanity from the main document and watch for new nodes
     generateRegexpList();
-    removeProfanity(xpathDocText);
+    removeProfanity(xpathDocText, document);
     updateCounterBadge();
     observeNewNodes();
   });
@@ -221,12 +224,25 @@ function generateRegexpList() {
 // Returns true if a node should *not* be altered in any way
 // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
 function isForbiddenNode(node) {
-  return node.isContentEditable || // DraftJS and many others
-  (node.parentNode && node.parentNode.isContentEditable) || // Special case for Gmail
-  (node.tagName && (node.tagName.toLowerCase() == "textarea" || // Some catch-alls
-                    node.tagName.toLowerCase() == "input" ||
-                    node.tagName.toLowerCase() == "script" ||
-                    node.tagName.toLowerCase() == "style")
+  return Boolean(
+    node.isContentEditable || // DraftJS and many others
+    (node.parentNode && (
+                          node.parentNode.isContentEditable || // Special case for Gmail
+                          node.parentNode.tagName == "SCRIPT" ||
+                          node.parentNode.tagName == "STYLE" ||
+                          node.parentNode.tagName == "INPUT" ||
+                          node.parentNode.tagName == "TEXTAREA" ||
+                          node.parentNode.tagName == "IFRAME"
+                        )
+    ) || // Some catch-alls
+    (node.tagName &&  (
+                        node.tagName == "SCRIPT" ||
+                        node.tagName == "STYLE" ||
+                        node.tagName == "INPUT" ||
+                        node.tagName == "TEXTAREA" ||
+                        node.tagName == "IFRAME"
+                      )
+    )
   );
 }
 
@@ -257,7 +273,6 @@ function randomElement(array) {
 }
 
 function removeProfanity(xpathExpression, node) {
-  node = (typeof node !== 'undefined') ?  node : document;
   var evalResult = document.evaluate(
     xpathExpression,
     node,
@@ -266,9 +281,20 @@ function removeProfanity(xpathExpression, node) {
     null
   );
 
-  for (var i = 0; i < evalResult.snapshotLength; i++) {
-    var textNode = evalResult.snapshotItem(i);
-    textNode.data = replaceText(textNode.data);
+  if (evalResult.snapshotLength == 0 && node.data) { // If plaintext node
+    // Don't mess with tags, styles, or URIs
+    if (!/^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/.test(node.data)) {
+      // console.log('Plaintext:', node.data); // DEBUG
+      node.data = replaceText(node.data);
+    } else {
+      // console.log('Skipping:', node.data); // DEBUG
+    }
+  } else { // If evalResult matches
+    for (var i = 0; i < evalResult.snapshotLength; i++) {
+      var textNode = evalResult.snapshotItem(i);
+      // console.log('Normal cleaning:', textNode.data); // DEBUG
+      textNode.data = replaceText(textNode.data);
+    }
   }
 }
 
@@ -283,6 +309,7 @@ function replaceText(str) {
       for (var z = 0; z < wordList.length; z++) {
         str = str.replace(wordRegExps[z], function(match) {
           counter++;
+          // console.log('Substitute match:', match, words[wordList[z]].words); // DEBUG
           if (substitutionMark) {
             return '[' + randomElement(words[wordList[z]].words) + ']';
           } else {
@@ -296,6 +323,7 @@ function replaceText(str) {
         str = str.replace(wordRegExps[z], function(match) {
           counter++;
           // Don't remove both leading and trailing whitespace
+          // console.log('Remove match:', match); // DEBUG
           if (whitespaceRegExp.test(match[0]) && whitespaceRegExp.test(match[match.length - 1])) {
             return match[0];
           } else {
