@@ -14,6 +14,7 @@ var defaults = {
 };
 var defaultWords = {
   "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
+  "asses": {"matchMethod": 0, "words": ["butts"] },
   "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
   "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
   "bitch": {"matchMethod": 1, "words": ["jerk"] },
@@ -281,11 +282,12 @@ function removeProfanity(xpathExpression, node) {
   );
 
   if (evalResult.snapshotLength == 0 && node.data) { // If plaintext node
-    if (/^\s*(<[a-z]|{)/.test(node.data)) { // Don't touch tags
-      // console.log('Skipping:', node.data); // DEBUG
-    } else {
+    // Don't mess with tags, styles, or URIs
+    if (!/^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/.test(node.data)) {
       // console.log('Plaintext:', node.data); // DEBUG
       node.data = replaceText(node.data);
+    } else {
+      // console.log('Skipping:', node.data); // DEBUG
     }
   } else { // If evalResult matches
     for (var i = 0; i < evalResult.snapshotLength; i++) {
