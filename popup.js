@@ -1,5 +1,6 @@
 var domain, disabledDomains;
 var filterMethods = ["Censor", "Substitute", "Remove"];
+var filterMethodContainer = document.getElementById('filterMethodContainer');
 
 ////
 // Helper functions
@@ -40,6 +41,7 @@ function disableDomain(domain) {
     disabledDomains.push(domain);
     chrome.storage.sync.set({"disabledDomains": disabledDomains}, function() {
       if (!chrome.runtime.lastError) {
+        filterMethodContainer.className = filterMethodContainer.className + " hidden";
         chrome.tabs.reload();
       }
     });
@@ -63,6 +65,7 @@ function enableDomain(domain) {
     chrome.storage.sync.set({"disabledDomains": newDisabledDomains}, function() {
       if (!chrome.runtime.lastError) {
         disabledDomains = newDisabledDomains;
+        filterMethodContainer.className = filterMethodContainer.className.replace(" hidden", "");
         chrome.tabs.reload();
       }
     });
@@ -96,6 +99,7 @@ function populateOptions() {
           domainRegex = new RegExp("(^|\.)" + disabledDomains[x]);
           if (domainRegex.test(domain)) {
             document.getElementById('domainFilter').checked = false;
+            filterMethodContainer.className = filterMethodContainer.className + " hidden";
             break;
           }
         }
