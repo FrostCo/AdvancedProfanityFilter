@@ -183,6 +183,26 @@ function migrateWordList() {
   });
 }
 
+
+function hide(element) {
+  element.classList.remove('visible');
+  element.classList.add('hidden');
+}
+
+function show(element) {
+  element.classList.remove('hidden');
+  element.classList.add('visible');
+}
+
+function activate(element) {
+  element.classList.add('active');
+}
+
+function deactivate(element) {
+  element.classList.remove('active');
+}
+
+
 // Switching Tabs
 function openTab(event) {
   // Don't run on current tab
@@ -192,15 +212,14 @@ function openTab(event) {
 
   // Set active tab
   oldTab = document.getElementsByClassName("tablinks active")[0];
-  oldTab.className = oldTab.className.replace(" active", "");
-  event.currentTarget.className += " active";
+  deactivate(oldTab);
+  activate(event.currentTarget);
 
   // Show active tab content
   oldTabContent = document.getElementsByClassName("tabcontent visible")[0];
-  oldTabContent.className = oldTabContent.className.replace(" visible", " hidden");
+  hide(oldTabContent);
   newTabName = event.currentTarget.innerText;
-  newTabContent = document.getElementById(newTabName);
-  newTabContent.className = newTabContent.className.replace(" hidden", " visible");
+  show(document.getElementById(newTabName));
 }
 
 // Restores form state to saved values from Chrome Storage
@@ -216,9 +235,7 @@ function populateOptions() {
 
     console.log(config.password, authenticated);
     if (config.password && !authenticated) {
-      console.log('login foo!');
-      document.getElementById('main').classList.remove('visible');
-      document.getElementById('main').classList.add('hidden');
+      hide(document.getElementById('main'));
     }
 
     // Show/hide censor options and word substitutions based on filter method
@@ -226,10 +243,14 @@ function populateOptions() {
     document.getElementById('filterMethodSelect').selectedIndex = settings.filterMethod;
     switch (settings.filterMethod) {
       case 0:
-        document.getElementById('optionsCensor').classList.remove('hidden');
-        document.getElementById('optionsSubstitution').classList.add('hidden');
-        document.getElementById('globalMatchMethod').classList.remove('hidden');
-        document.getElementById('wordSubstitutions').classList.add('hidden');
+        show(document.getElementById('optionsCensor'));
+        hide(document.getElementById('optionsSubstitution'));
+        show(document.getElementById('globalMatchMethod'));
+        hide(document.getElementById('wordSubstitutions'));
+        // document.getElementById('optionsCensor').classList.remove('hidden');
+        // document.getElementById('optionsSubstitution').classList.add('hidden');
+        // document.getElementById('globalMatchMethod').classList.remove('hidden');
+        // document.getElementById('wordSubstitutions').classList.add('hidden');
         break;
       case 1:
         document.getElementById('optionsCensor').classList.add('hidden');
@@ -271,16 +292,10 @@ function populateOptions() {
 }
 
 function authenticate() {
-  console.log('logging in...', document.getElementById('password').value, config.password);
   if (document.getElementById('password').value == config.password) {
-    console.log('success');
-    document.getElementById('passwordContainer').classList.add('hidden');
-    document.getElementById('main').classList.remove('hidden');
-    document.getElementById('main').classList.add('visible');
+    hide(document.getElementById('passwordContainer'));
+    show(document.getElementById('main'));
     authenticated = true;
-    // return true;
-  // } else {
-    // return false;
   }
 }
 
