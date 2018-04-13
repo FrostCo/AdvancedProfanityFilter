@@ -214,6 +214,7 @@ function populateOptions() {
       return false;
     }
 
+    console.log(config.password, authenticated);
     if (config.password && !authenticated) {
       console.log('login foo!');
       document.getElementById('main').classList.remove('visible');
@@ -270,12 +271,16 @@ function populateOptions() {
 }
 
 function authenticate() {
+  console.log('logging in...', document.getElementById('password').value, config.password);
   if (document.getElementById('password').value == config.password) {
-    document.getElementById('main').classList.remove('visible');
-    document.getElementById('main').classList.add('hidden');
-    return true;
-  } else {
-    return false;
+    console.log('success');
+    document.getElementById('passwordContainer').classList.add('hidden');
+    document.getElementById('main').classList.remove('hidden');
+    document.getElementById('main').classList.add('visible');
+    authenticated = true;
+    // return true;
+  // } else {
+    // return false;
   }
 }
 
