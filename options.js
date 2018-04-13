@@ -6,7 +6,7 @@ var defaults = {
   "disabledDomains": [],
   "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
   "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word", "RegExp"]
-  "password": "blank",
+  "password": null,
   "preserveFirst": false,
   "preserveLast": false,
   "showCounter": true,
@@ -29,7 +29,6 @@ var defaultWords = {
   "tits": {"matchMethod": 1, "words": ["explative"] },
   "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
 };
-// var password = 'blank';
 var authenticated = false;
 var filterMethods = ["Censor", "Substitute", "Remove"];
 var matchMethods = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match", "Regular Expression"];
@@ -234,9 +233,11 @@ function populateOptions() {
       return false;
     }
 
+    // console.log('Password:', config.password, 'Authenticated', !authenticated); // DEBUG
     if (config.password && !authenticated) {
-      show(document.getElementById('passwordContainer'));
+      // console.log('Prompt for password'); // DEBUG
       hide(document.getElementById('main'));
+      show(document.getElementById('passwordContainer'));
     }
 
     // Show/hide censor options and word substitutions based on filter method
@@ -327,11 +328,12 @@ function saveOptions(event, settings) {
 }
 
 function setPassword() {
-  var password = document.getElementById('setPassword').value;
-  if (password == '') {
-    chrome.storage.sync.set({password: ''});
+  var password = document.getElementById('setPassword');
+  if (password.value == '') {
+    chrome.storage.sync.remove('password');
   } else {
-    chrome.storage.sync.set({password: password});
+    chrome.storage.sync.set({password: password.value});
+    password.value = '';
   }
 }
 

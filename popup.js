@@ -19,8 +19,18 @@ function dynamicList(list, selectEm, title) {
   document.getElementById(selectEm).innerHTML = options;
 }
 
+function hide(element) {
+  element.classList.remove('visible');
+  element.classList.add('hidden');
+}
+
 function removeFromArray(array, element) {
   return array.filter(e => e !== element);
+}
+
+function show(element) {
+  element.classList.remove('hidden');
+  element.classList.add('visible');
 }
 
 ////
@@ -70,7 +80,7 @@ function filterMethodSelect(event) {
 
 function populateOptions() {
   dynamicList(filterMethods, 'filterMethodSelect');
-  chrome.storage.sync.get({"disabledDomains": [], "filterMethod": 0}, function(storage) {
+  chrome.storage.sync.get({"disabledDomains": [], "filterMethod": 0, "password": null}, function(storage) {
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       disabledDomains = storage.disabledDomains;
       document.getElementById('filterMethodSelect').selectedIndex = storage.filterMethod;
