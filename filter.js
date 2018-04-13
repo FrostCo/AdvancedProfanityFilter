@@ -5,7 +5,7 @@ var defaults = {
   "defaultSubstitutions": ["censored", "expletive", "filtered"],
   "disabledDomains": [],
   "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
-  "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word"]
+  "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word", "RegExp"]
   "preserveFirst": false,
   "preserveLast": false,
   "showCounter": true,
@@ -14,6 +14,7 @@ var defaults = {
 };
 var defaultWords = {
   "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
+  "asses": {"matchMethod": 0, "words": ["butts"] },
   "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
   "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
   "bitch": {"matchMethod": 1, "words": ["jerk"] },
@@ -36,30 +37,37 @@ var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-spa
 // Word must match exactly (not sub-string)
 // /\b(w)ord\b/gi
 function buildExactRegexp(word) {
-  wordRegExps.push(new RegExp('\\b(' + word[0] + ')' + word.slice(1)+ '\\b', 'gi' ));
+  wordRegExps.push(new RegExp('\\b(' + word[0] + ')' + escapeRegExp(word.slice(1)) + '\\b', 'gi' ));
 }
 
 // Match any part of a word (sub-string)
 // /(w)ord/gi
 function buildPartRegexp(word) {
-  wordRegExps.push(new RegExp('(' + word[0] + ')' + word.slice(1), 'gi' ));
+  wordRegExps.push(new RegExp('(' + word[0] + ')' + escapeRegExp(word.slice(1)), 'gi' ));
+}
+
+// Match entire word that contains sub-string and surrounding whitespace
+// /\s?\b(w)ord\b\s?/gi
+function buildRegexpForRemoveExact(word) {
+  wordRegExps.push(new RegExp('\\s?\\b(' + word[0] + ')' + escapeRegExp(word.slice(1)) + '\\b\\s?', 'gi' ));
+}
+
+// Match entire word that contains sub-string and surrounding whitespace
+// /\s?\b[\w-]*(w)ord[\w-]*\b\s?/gi
+function buildRegexpForRemovePart(word) {
+  wordRegExps.push(new RegExp('\\s?\\b([\\w-]*' + word[0] + ')' + escapeRegExp(word.slice(1)) + '[\\w-]*\\b\\s?', 'gi' ));
 }
 
 // Match entire word that contains sub-string
 // /\b[\w-]*(w)ord[\w-]*\b/gi
 function buildWholeRegexp(word) {
-  wordRegExps.push(new RegExp('\\b([\\w-]*' + word[0] + ')' + word.slice(1) + '[\\w-]*\\b', 'gi' ))
-}
-
-// Match entire word that contains sub-string and surrounding whitespace
-// /\s?\b[\w-]*(w)ord[\w-]*\b\s?/gi
-function buildWholeRegexpForRemove(word) {
-  wordRegExps.push(new RegExp('\\s?\\b([\\w-]*' + word[0] + ')' + word.slice(1) + '[\\w-]*\\b\\s?', 'gi' ));
+  wordRegExps.push(new RegExp('\\b([\\w-]*' + word[0] + ')' + escapeRegExp(word.slice(1)) + '[\\w-]*\\b', 'gi' ))
 }
 
 function checkNodeForProfanity(mutation) {
   mutation.addedNodes.forEach(function(node) {
     if (!isForbiddenNode(node)) {
+      // console.log('Node to removeProfanity', node); // DEBUG
       removeProfanity(xpathNodeText, node);
     }
   });
@@ -93,6 +101,7 @@ function censorReplace(strMatchingString, strFirstLetter) {
   }
 
   counter++;
+  // console.log('Censor match:', strMatchingString, censoredString); // DEBUG
   return censoredString;
 }
 
@@ -134,7 +143,7 @@ function cleanPage() {
 
     // Remove profanity from the main document and watch for new nodes
     generateRegexpList();
-    removeProfanity(xpathDocText);
+    removeProfanity(xpathDocText, document);
     updateCounterBadge();
     observeNewNodes();
   });
@@ -158,12 +167,20 @@ function disabledPage() {
   return result;
 }
 
+function escapeRegExp(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
 // Parse the profanity list
 // ["exact", "partial", "whole", "disabled"]
 function generateRegexpList() {
-  if (filterMethod == 2) { // If removing, ignore match method
+  if (filterMethod == 2) { // Special regexp for "Remove" filter
     for (var x = 0; x < wordList.length; x++) {
-      buildWholeRegexpForRemove(wordList[x]);
+      if (words[wordList[x]].matchMethod == 0) { // If word matchMethod is exact
+        buildRegexpForRemoveExact(wordList[x]);
+      } else {
+        buildRegexpForRemovePart(wordList[x]);
+      }
     }
   } else {
     switch(globalMatchMethod) {
@@ -186,6 +203,9 @@ function generateRegexpList() {
             case 2: // Whole word match
               buildWholeRegexp(wordList[x]);
               break;
+            case 4: // Regular Expression (Advanced)
+              wordRegExps.push(new RegExp(wordList[x], 'gi'));
+              break;
             default: // case 1 - Partial word match (Default)
               buildPartRegexp(wordList[x]);
               break;
@@ -204,12 +224,25 @@ function generateRegexpList() {
 // Returns true if a node should *not* be altered in any way
 // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
 function isForbiddenNode(node) {
-  return node.isContentEditable || // DraftJS and many others
-  (node.parentNode && node.parentNode.isContentEditable) || // Special case for Gmail
-  (node.tagName && (node.tagName.toLowerCase() == "textarea" || // Some catch-alls
-                    node.tagName.toLowerCase() == "input" ||
-                    node.tagName.toLowerCase() == "script" ||
-                    node.tagName.toLowerCase() == "style")
+  return Boolean(
+    node.isContentEditable || // DraftJS and many others
+    (node.parentNode && (
+                          node.parentNode.isContentEditable || // Special case for Gmail
+                          node.parentNode.tagName == "SCRIPT" ||
+                          node.parentNode.tagName == "STYLE" ||
+                          node.parentNode.tagName == "INPUT" ||
+                          node.parentNode.tagName == "TEXTAREA" ||
+                          node.parentNode.tagName == "IFRAME"
+                        )
+    ) || // Some catch-alls
+    (node.tagName &&  (
+                        node.tagName == "SCRIPT" ||
+                        node.tagName == "STYLE" ||
+                        node.tagName == "INPUT" ||
+                        node.tagName == "TEXTAREA" ||
+                        node.tagName == "IFRAME"
+                      )
+    )
   );
 }
 
@@ -240,7 +273,6 @@ function randomElement(array) {
 }
 
 function removeProfanity(xpathExpression, node) {
-  node = (typeof node !== 'undefined') ?  node : document;
   var evalResult = document.evaluate(
     xpathExpression,
     node,
@@ -249,9 +281,20 @@ function removeProfanity(xpathExpression, node) {
     null
   );
 
-  for (var i = 0; i < evalResult.snapshotLength; i++) {
-    var textNode = evalResult.snapshotItem(i);
-    textNode.data = replaceText(textNode.data);
+  if (evalResult.snapshotLength == 0 && node.data) { // If plaintext node
+    // Don't mess with tags, styles, or URIs
+    if (!/^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/.test(node.data)) {
+      // console.log('Plaintext:', node.data); // DEBUG
+      node.data = replaceText(node.data);
+    } else {
+      // console.log('Skipping:', node.data); // DEBUG
+    }
+  } else { // If evalResult matches
+    for (var i = 0; i < evalResult.snapshotLength; i++) {
+      var textNode = evalResult.snapshotItem(i);
+      // console.log('Normal cleaning:', textNode.data); // DEBUG
+      textNode.data = replaceText(textNode.data);
+    }
   }
 }
 
@@ -266,6 +309,7 @@ function replaceText(str) {
       for (var z = 0; z < wordList.length; z++) {
         str = str.replace(wordRegExps[z], function(match) {
           counter++;
+          // console.log('Substitute match:', match, words[wordList[z]].words); // DEBUG
           if (substitutionMark) {
             return '[' + randomElement(words[wordList[z]].words) + ']';
           } else {
@@ -279,6 +323,7 @@ function replaceText(str) {
         str = str.replace(wordRegExps[z], function(match) {
           counter++;
           // Don't remove both leading and trailing whitespace
+          // console.log('Remove match:', match); // DEBUG
           if (whitespaceRegExp.test(match[0]) && whitespaceRegExp.test(match[match.length - 1])) {
             return match[0];
           } else {

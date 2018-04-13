@@ -5,7 +5,7 @@ var defaults = {
   "defaultSubstitutions": ["censored", "expletive", "filtered"],
   "disabledDomains": [],
   "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
-  "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word"]
+  "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word", "RegExp"]
   "preserveFirst": false,
   "preserveLast": false,
   "showCounter": true,
@@ -14,6 +14,7 @@ var defaults = {
 };
 var defaultWords = {
   "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
+  "asses": {"matchMethod": 0, "words": ["butts"] },
   "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
   "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
   "bitch": {"matchMethod": 1, "words": ["jerk"] },
@@ -28,7 +29,7 @@ var defaultWords = {
   "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
 };
 var filterMethods = ["Censor", "Substitute", "Remove"];
-var matchMethods = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match"];
+var matchMethods = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match", "Regular Expression"];
 
 function arrayContains(array, string) {
   return (array.indexOf(string) > -1);
@@ -234,8 +235,8 @@ function populateOptions() {
         break;
     }
 
-    // Hide per-word matching options if not selected globally
-    if (settings.globalMatchMethod === 3 && settings.filterMethod != 2) {
+    // Hide per-word matching options if not selected globally (always show for Remove filter method)
+    if (settings.globalMatchMethod == 3 || settings.filterMethod == 2) {
       document.getElementById('wordMatchMethodContainer').classList.remove('hidden');
     } else {
       document.getElementById('wordMatchMethodContainer').classList.add('hidden');
@@ -248,7 +249,7 @@ function populateOptions() {
     document.getElementById('preserveLast').checked = settings.preserveLast;
     document.getElementById('substitutionMark').checked = settings.substitutionMark;
     document.getElementById('showCounter').checked = settings.showCounter;
-    dynamicList(matchMethods, 'globalMatchMethodSelect');
+    dynamicList(matchMethods.slice(0, -1), 'globalMatchMethodSelect');
     document.getElementById('globalMatchMethodSelect').selectedIndex = settings.globalMatchMethod;
     // Words
     dynamicList(Object.keys(config.words).sort(), 'wordSelect', 'Words to Filter');
@@ -342,7 +343,11 @@ function wordAdd(event) {
   var word = document.getElementById('wordText').value;
   if (word != "") {
     if (!arrayContains(Object.keys(config.words), word)) {
-      config.words[word] = {"matchMethod": 0, "words": []};
+      if (/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/.test(word)) {
+        config.words[word] = {"matchMethod": 1, "words": []};
+      } else {
+        config.words[word] = {"matchMethod": 0, "words": []};
+      }
       saveOptions(event, config);
       document.getElementById('wordText').value = "";
     } else {
@@ -355,13 +360,13 @@ function wordMatchMethodLoad() {
   var selectedOption = this[this.selectedIndex];
   var selectedText = selectedOption.text;
   var list = 'wordMatchMethodSelect';
-  dynamicList(matchMethods.slice(0,-1), 'wordMatchMethodSelect');
-  document.getElementById('wordMatchMethodSelect').selectedIndex = config.words[selectedText].matchMethod;
+  dynamicList(matchMethods.slice(0,-2).concat(matchMethods.slice(-1)), 'wordMatchMethodSelect');
+  document.getElementById('wordMatchMethodSelect').value = matchMethods[config.words[selectedText].matchMethod];
 }
 
 function wordMatchMethodSet(event) {
   var selectedWord = document.getElementById('wordSelect').value;
-  var matchMethod = document.getElementById('wordMatchMethodSelect').selectedIndex;
+  var matchMethod = matchMethods.indexOf(document.getElementById('wordMatchMethodSelect').value);
   config.words[selectedWord].matchMethod = matchMethod;
   saveOptions(event, config);
 }
