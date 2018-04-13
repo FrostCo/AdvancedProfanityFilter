@@ -34,8 +34,20 @@ var authenticated = false;
 var filterMethods = ["Censor", "Substitute", "Remove"];
 var matchMethods = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match", "Regular Expression"];
 
+function activate(element) {
+  element.classList.add('active');
+}
+
 function arrayContains(array, string) {
   return (array.indexOf(string) > -1);
+}
+
+function authenticate() {
+  if (document.getElementById('password').value == config.password) {
+    hide(document.getElementById('passwordContainer'));
+    show(document.getElementById('main'));
+    authenticated = true;
+  }
 }
 
 function censorCharacter(event) {
@@ -78,6 +90,10 @@ function confirm(action) {
       restoreDefaults();
     }
   }
+}
+
+function deactivate(element) {
+  element.classList.remove('active');
 }
 
 function domainAdd(event) {
@@ -139,6 +155,11 @@ function globalMatchMethod(event) {
   saveOptions(event, config);
 }
 
+function hide(element) {
+  element.classList.remove('visible');
+  element.classList.add('hidden');
+}
+
 function importConfig(event) {
   try {
     var settings = JSON.parse(document.getElementById('configText').value);
@@ -183,26 +204,6 @@ function migrateWordList() {
   });
 }
 
-
-function hide(element) {
-  element.classList.remove('visible');
-  element.classList.add('hidden');
-}
-
-function show(element) {
-  element.classList.remove('hidden');
-  element.classList.add('visible');
-}
-
-function activate(element) {
-  element.classList.add('active');
-}
-
-function deactivate(element) {
-  element.classList.remove('active');
-}
-
-
 // Switching Tabs
 function openTab(event) {
   // Don't run on current tab
@@ -233,8 +234,8 @@ function populateOptions() {
       return false;
     }
 
-    console.log(config.password, authenticated);
     if (config.password && !authenticated) {
+      show(document.getElementById('passwordContainer'));
       hide(document.getElementById('main'));
     }
 
@@ -247,30 +248,26 @@ function populateOptions() {
         hide(document.getElementById('optionsSubstitution'));
         show(document.getElementById('globalMatchMethod'));
         hide(document.getElementById('wordSubstitutions'));
-        // document.getElementById('optionsCensor').classList.remove('hidden');
-        // document.getElementById('optionsSubstitution').classList.add('hidden');
-        // document.getElementById('globalMatchMethod').classList.remove('hidden');
-        // document.getElementById('wordSubstitutions').classList.add('hidden');
         break;
       case 1:
-        document.getElementById('optionsCensor').classList.add('hidden');
-        document.getElementById('optionsSubstitution').classList.remove('hidden');
-        document.getElementById('globalMatchMethod').classList.remove('hidden');
-        document.getElementById('wordSubstitutions').classList.remove('hidden');
+        hide(document.getElementById('optionsCensor'));
+        show(document.getElementById('optionsSubstitution'));
+        show(document.getElementById('globalMatchMethod'));
+        show(document.getElementById('wordSubstitutions'));
         break;
       case 2:
-        document.getElementById('optionsCensor').classList.add('hidden');
-        document.getElementById('optionsSubstitution').classList.add('hidden');
-        document.getElementById('globalMatchMethod').classList.add('hidden');
-        document.getElementById('wordSubstitutions').classList.add('hidden');
+        hide(document.getElementById('optionsCensor'));
+        hide(document.getElementById('optionsSubstitution'));
+        hide(document.getElementById('globalMatchMethod'));
+        hide(document.getElementById('wordSubstitutions'));
         break;
     }
 
     // Hide per-word matching options if not selected globally (always show for Remove filter method)
     if (settings.globalMatchMethod == 3 || settings.filterMethod == 2) {
-      document.getElementById('wordMatchMethodContainer').classList.remove('hidden');
+      show(document.getElementById('wordMatchMethodContainer'));
     } else {
-      document.getElementById('wordMatchMethodContainer').classList.add('hidden');
+      hide(document.getElementById('wordMatchMethodContainer'));
     }
 
     // Settings
@@ -289,14 +286,6 @@ function populateOptions() {
     // Domains
     dynamicList(settings.disabledDomains, 'domainSelect', 'Disabled Domains');
   });
-}
-
-function authenticate() {
-  if (document.getElementById('password').value == config.password) {
-    hide(document.getElementById('passwordContainer'));
-    show(document.getElementById('main'));
-    authenticated = true;
-  }
 }
 
 function removeFromArray(array, element) {
@@ -335,6 +324,20 @@ function saveOptions(event, settings) {
       populateOptions();
     }
   });
+}
+
+function setPassword() {
+  var password = document.getElementById('setPassword').value;
+  if (password == '') {
+    chrome.storage.sync.set({password: ''});
+  } else {
+    chrome.storage.sync.set({password: password});
+  }
+}
+
+function show(element) {
+  element.classList.remove('hidden');
+  element.classList.add('visible');
 }
 
 function substitutionAdd(event) {
@@ -455,3 +458,4 @@ document.getElementById('import').addEventListener('click', function() {confirm(
 document.getElementById('export').addEventListener('click', exportConfig);
 
 document.getElementById('submitPassword').addEventListener('click', authenticate);
+document.getElementById('setPasswordBtn').addEventListener('click', setPassword);
