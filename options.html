@@ -7,7 +7,7 @@
 
 <body>
 <!-- Tabs -->
-<div id="passwordContainer">
+<div id="passwordContainer" class="hidden">
   <label for="password">Password: </label>
   <input type="password" id="password">
   <input type="button" value="Submit" id="submitPassword"/>
@@ -158,7 +158,12 @@
   <button id="export">Export</button>
   <div id="configNote" class="notes">Import/Export Config:</div>
   <textarea id="configText"></textarea>
-  <
+
+  <div id="setPasswordContainer">
+    <label for="password">Password: </label>
+    <input type="password" id="setPassword">
+    <input type="button" value="Set" id="setPasswordBtn"/>
+  </div>
 </div>
 </div> <!-- #main -->
 
