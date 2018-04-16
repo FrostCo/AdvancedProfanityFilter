@@ -1,6 +1,7 @@
 var domain, disabledDomains;
 var filterMethods = ["Censor", "Substitute", "Remove"];
 var filterMethodContainer = document.getElementById('filterMethodContainer');
+var protected = false;
 
 ////
 // Helper functions
@@ -20,32 +21,32 @@ function dynamicList(list, selectEm, title) {
   document.getElementById(selectEm).innerHTML = options;
 }
 
-function hide(element) {
-  element.classList.remove('visible');
-  element.classList.add('hidden');
-}
-
 function removeFromArray(array, element) {
   return array.filter(e => e !== element);
 }
 
-function show(element) {
-  element.classList.remove('hidden');
-  element.classList.add('visible');
-}
-
 ////
 // Functions for Popup
+function disable(element) {
+  element.disabled = true;
+  element.classList.add('disabled');
+}
+
 function disableDomain(domain) {
   if (!arrayContains(disabledDomains, domain)) {
     disabledDomains.push(domain);
     chrome.storage.sync.set({"disabledDomains": disabledDomains}, function() {
       if (!chrome.runtime.lastError) {
-        filterMethodContainer.className = filterMethodContainer.className + " hidden";
+        disable(document.getElementById('filterMethodSelect'));
         chrome.tabs.reload();
       }
     });
   };
+}
+
+function enable(element) {
+  element.disabled = false;
+  element.classList.remove('disabled');
 }
 
 // Remove all entries that disable the filter for domain
@@ -65,7 +66,7 @@ function enableDomain(domain) {
     chrome.storage.sync.set({"disabledDomains": newDisabledDomains}, function() {
       if (!chrome.runtime.lastError) {
         disabledDomains = newDisabledDomains;
-        filterMethodContainer.className = filterMethodContainer.className.replace(" hidden", "");
+        enable(document.getElementById('filterMethodSelect'));
         chrome.tabs.reload();
       }
     });
@@ -84,6 +85,13 @@ function filterMethodSelect(event) {
 function populateOptions() {
   dynamicList(filterMethods, 'filterMethodSelect');
   chrome.storage.sync.get({"disabledDomains": [], "filterMethod": 0, "password": null}, function(storage) {
+    if (storage.password && storage.password != '') {
+      protected = true;
+      disable(document.getElementById('domainFilter'));
+      disable(document.getElementById('domainToggle'));
+      disable(document.getElementById('filterMethodSelect'));
+    }
+
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       disabledDomains = storage.disabledDomains;
       document.getElementById('filterMethodSelect').selectedIndex = storage.filterMethod;
@@ -99,7 +107,7 @@ function populateOptions() {
           domainRegex = new RegExp("(^|\.)" + disabledDomains[x]);
           if (domainRegex.test(domain)) {
             document.getElementById('domainFilter').checked = false;
-            filterMethodContainer.className = filterMethodContainer.className + " hidden";
+            disable(document.getElementById('filterMethodSelect'));
             break;
           }
         }
@@ -108,11 +116,13 @@ function populateOptions() {
   });
 }
 
-function toggleFilter() {
-  if (document.getElementById('domainFilter').checked) {
-    enableDomain(domain);
-  } else {
-    disableDomain(domain);
+function toggleFilter(event) {
+  if (!protected) {
+    if (document.getElementById('domainFilter').checked) {
+      enableDomain(domain);
+    } else {
+      disableDomain(domain);
+    }
   }
 }
 

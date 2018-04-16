@@ -1,3 +1,4 @@
+var authenticated = false;
 var config = {};
 var defaults = {
   "censorCharacter": "*",
@@ -29,7 +30,6 @@ var defaultWords = {
   "tits": {"matchMethod": 1, "words": ["explative"] },
   "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
 };
-var authenticated = false;
 var filterMethods = ["Censor", "Substitute", "Remove"];
 var matchMethods = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match", "Regular Expression"];
 
@@ -43,9 +43,9 @@ function arrayContains(array, string) {
 
 function authenticate() {
   if (document.getElementById('password').value == config.password) {
+    authenticated = true;
     hide(document.getElementById('passwordContainer'));
     show(document.getElementById('main'));
-    authenticated = true;
   }
 }
 
@@ -233,9 +233,9 @@ function populateOptions() {
       return false;
     }
 
-    // console.log('Password:', config.password, 'Authenticated', !authenticated); // DEBUG
+    // console.log('Password:', config.password, 'Authenticated:', authenticated); // DEBUG Password
     if (config.password && !authenticated) {
-      // console.log('Prompt for password'); // DEBUG
+      // console.log('Prompt for password'); // DEBUG Password
       hide(document.getElementById('main'));
       show(document.getElementById('passwordContainer'));
     }
@@ -458,6 +458,6 @@ document.getElementById('domainRemove').addEventListener('click', domainRemove);
 document.getElementById('default').addEventListener('click', function() {confirm('restoreDefaults')} );
 document.getElementById('import').addEventListener('click', function() {confirm('importConfig')} );
 document.getElementById('export').addEventListener('click', exportConfig);
-
+// Password
 document.getElementById('submitPassword').addEventListener('click', authenticate);
 document.getElementById('setPasswordBtn').addEventListener('click', setPassword);
