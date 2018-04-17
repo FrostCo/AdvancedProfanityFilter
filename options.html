@@ -7,6 +7,13 @@
 
 <body>
 <!-- Tabs -->
+<div id="passwordContainer" class="hidden">
+  <label for="password">Password: </label>
+  <input type="password" id="password">
+  <input type="button" value="Submit" id="submitPassword"/>
+</div>
+
+<div id="main" class="visible">
 <div class="tab">
   <nav>
     <span class="tablinks active">Settings</span>
@@ -151,7 +158,14 @@
   <button id="export">Export</button>
   <div id="configNote" class="notes">Import/Export Config:</div>
   <textarea id="configText"></textarea>
+
+  <div id="setPasswordContainer">
+    <label for="setPassword">Password: </label>
+    <input type="password" id="setPassword">
+    <input type="button" value="Set" id="setPasswordBtn"/>
+  </div>
 </div>
+</div> <!-- #main -->
 
 <!-- Footer -->
 <div id="footer">

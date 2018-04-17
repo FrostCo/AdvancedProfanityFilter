@@ -1,3 +1,4 @@
+var authenticated = false;
 var config = {};
 var defaults = {
   "censorCharacter": "*",
@@ -6,6 +7,7 @@ var defaults = {
   "disabledDomains": [],
   "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
   "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word", "RegExp"]
+  "password": null,
   "preserveFirst": false,
   "preserveLast": false,
   "showCounter": true,
@@ -31,8 +33,20 @@ var defaultWords = {
 var filterMethods = ["Censor", "Substitute", "Remove"];
 var matchMethods = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match", "Regular Expression"];
 
+function activate(element) {
+  element.classList.add('active');
+}
+
 function arrayContains(array, string) {
   return (array.indexOf(string) > -1);
+}
+
+function authenticate() {
+  if (document.getElementById('password').value == config.password) {
+    authenticated = true;
+    hide(document.getElementById('passwordContainer'));
+    show(document.getElementById('main'));
+  }
 }
 
 function censorCharacter(event) {
@@ -75,6 +89,10 @@ function confirm(action) {
       restoreDefaults();
     }
   }
+}
+
+function deactivate(element) {
+  element.classList.remove('active');
 }
 
 function domainAdd(event) {
@@ -136,6 +154,11 @@ function globalMatchMethod(event) {
   saveOptions(event, config);
 }
 
+function hide(element) {
+  element.classList.remove('visible');
+  element.classList.add('hidden');
+}
+
 function importConfig(event) {
   try {
     var settings = JSON.parse(document.getElementById('configText').value);
@@ -189,15 +212,14 @@ function openTab(event) {
 
   // Set active tab
   oldTab = document.getElementsByClassName("tablinks active")[0];
-  oldTab.className = oldTab.className.replace(" active", "");
-  event.currentTarget.className += " active";
+  deactivate(oldTab);
+  activate(event.currentTarget);
 
   // Show active tab content
   oldTabContent = document.getElementsByClassName("tabcontent visible")[0];
-  oldTabContent.className = oldTabContent.className.replace(" visible", " hidden");
+  hide(oldTabContent);
   newTabName = event.currentTarget.innerText;
-  newTabContent = document.getElementById(newTabName);
-  newTabContent.className = newTabContent.className.replace(" hidden", " visible");
+  show(document.getElementById(newTabName));
 }
 
 // Restores form state to saved values from Chrome Storage
@@ -211,35 +233,42 @@ function populateOptions() {
       return false;
     }
 
+    // console.log('Password:', config.password, 'Authenticated:', authenticated); // DEBUG Password
+    if (config.password && !authenticated) {
+      // console.log('Prompt for password'); // DEBUG Password
+      hide(document.getElementById('main'));
+      show(document.getElementById('passwordContainer'));
+    }
+
     // Show/hide censor options and word substitutions based on filter method
     dynamicList(filterMethods, 'filterMethodSelect');
     document.getElementById('filterMethodSelect').selectedIndex = settings.filterMethod;
     switch (settings.filterMethod) {
       case 0:
-        document.getElementById('optionsCensor').classList.remove('hidden');
-        document.getElementById('optionsSubstitution').classList.add('hidden');
-        document.getElementById('globalMatchMethod').classList.remove('hidden');
-        document.getElementById('wordSubstitutions').classList.add('hidden');
+        show(document.getElementById('optionsCensor'));
+        hide(document.getElementById('optionsSubstitution'));
+        show(document.getElementById('globalMatchMethod'));
+        hide(document.getElementById('wordSubstitutions'));
         break;
       case 1:
-        document.getElementById('optionsCensor').classList.add('hidden');
-        document.getElementById('optionsSubstitution').classList.remove('hidden');
-        document.getElementById('globalMatchMethod').classList.remove('hidden');
-        document.getElementById('wordSubstitutions').classList.remove('hidden');
+        hide(document.getElementById('optionsCensor'));
+        show(document.getElementById('optionsSubstitution'));
+        show(document.getElementById('globalMatchMethod'));
+        show(document.getElementById('wordSubstitutions'));
         break;
       case 2:
-        document.getElementById('optionsCensor').classList.add('hidden');
-        document.getElementById('optionsSubstitution').classList.add('hidden');
-        document.getElementById('globalMatchMethod').classList.add('hidden');
-        document.getElementById('wordSubstitutions').classList.add('hidden');
+        hide(document.getElementById('optionsCensor'));
+        hide(document.getElementById('optionsSubstitution'));
+        hide(document.getElementById('globalMatchMethod'));
+        hide(document.getElementById('wordSubstitutions'));
         break;
     }
 
     // Hide per-word matching options if not selected globally (always show for Remove filter method)
     if (settings.globalMatchMethod == 3 || settings.filterMethod == 2) {
-      document.getElementById('wordMatchMethodContainer').classList.remove('hidden');
+      show(document.getElementById('wordMatchMethodContainer'));
     } else {
-      document.getElementById('wordMatchMethodContainer').classList.add('hidden');
+      hide(document.getElementById('wordMatchMethodContainer'));
     }
 
     // Settings
@@ -296,6 +325,21 @@ function saveOptions(event, settings) {
       populateOptions();
     }
   });
+}
+
+function setPassword() {
+  var password = document.getElementById('setPassword');
+  if (password.value == '') {
+    chrome.storage.sync.remove('password');
+  } else {
+    chrome.storage.sync.set({password: password.value});
+    password.value = '';
+  }
+}
+
+function show(element) {
+  element.classList.remove('hidden');
+  element.classList.add('visible');
 }
 
 function substitutionAdd(event) {
@@ -414,3 +458,6 @@ document.getElementById('domainRemove').addEventListener('click', domainRemove);
 document.getElementById('default').addEventListener('click', function() {confirm('restoreDefaults')} );
 document.getElementById('import').addEventListener('click', function() {confirm('importConfig')} );
 document.getElementById('export').addEventListener('click', exportConfig);
+// Password
+document.getElementById('submitPassword').addEventListener('click', authenticate);
+document.getElementById('setPasswordBtn').addEventListener('click', setPassword);

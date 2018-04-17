@@ -89,6 +89,10 @@ input:checked + .slider:before {
   background-color: #ddd;
 }
 
+.disabled {
+  cursor: not-allowed !important;
+}
+
 .divider {
   border-bottom: solid #ccc 1px;
   width: 200px;
