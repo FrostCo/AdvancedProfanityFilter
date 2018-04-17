@@ -33,6 +33,7 @@ function disable(element) {
 }
 
 function disableDomain(domain) {
+
   if (!arrayContains(disabledDomains, domain)) {
     disabledDomains.push(domain);
     chrome.storage.sync.set({"disabledDomains": disabledDomains}, function() {
@@ -99,6 +100,15 @@ function populateOptions() {
       var checked = document.getElementById('domainFilter').value;
       var url = new URL(tab.url);
       domain = url.hostname;
+
+      // Restricted pages
+      if (url.protocol == 'chrome:' || url.protocol == 'about:' || domain == 'chrome.google.com') {
+        document.getElementById('domainFilter').checked = false;
+        disable(document.getElementById('domainFilter'));
+        disable(document.getElementById('domainToggle'));
+        disable(document.getElementById('filterMethodSelect'));
+        return false;
+      }
 
       // Set initial value for domain filter
       var domainRegex;
