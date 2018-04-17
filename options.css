@@ -25,6 +25,7 @@ button {
   border: 1px solid #aaa;
   border-radius: 5px;
   height: 26px;
+  padding-bottom: 1px;
 }
 
 /* Tab Styling */
