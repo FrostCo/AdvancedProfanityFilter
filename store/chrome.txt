@@ -11,6 +11,7 @@ Features:
 • Context menu for easily adding words and disabling the filter
 • Sync settings across browsers
 • Counter showing number of filtered words
+• Basic password protection for options page
 • HTTPS Support
 • Supports social media sites such as:
     • Facebook
