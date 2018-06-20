@@ -1,13 +1,5 @@
-////
-// Helper functions
-function arrayContains(array, string) {
-  return (array.indexOf(string) > -1);
-}
-
-function removeFromArray(array, element) {
-  return array.filter(e => e !== element);
-}
-
+/// <reference path="helpers.ts" />
+let Helper = Helpers;
 ////
 // Actions and messaging
 
@@ -50,7 +42,7 @@ chrome.runtime.onMessage.addListener(
 function addSelection(selection) {
   chrome.storage.sync.get({"words": {}}, function(storage) {
     selection = (selection.trim()).toLowerCase();
-    if (!arrayContains(Object.keys(storage.words), selection)) {
+    if (!Helper.arrayContains(Object.keys(storage.words), selection)) {
       storage.words[selection] = {"matchMethod": 0, "words": []};
       chrome.storage.sync.set({"words": storage.words}, function() {
         if (!chrome.runtime.lastError) {
@@ -61,9 +53,9 @@ function addSelection(selection) {
   });
 }
 
-function disableDomain(domain) {
+function disableDomainEventPage(domain) {
   chrome.storage.sync.get({"disabledDomains": []}, function(storage) {
-    if (!arrayContains(storage.disabledDomains, domain)) {
+    if (!Helper.arrayContains(storage.disabledDomains, domain)) {
       storage.disabledDomains.push(domain);
       chrome.storage.sync.set({"disabledDomains": storage.disabledDomains}, function() {
         if (!chrome.runtime.lastError) {
@@ -75,16 +67,16 @@ function disableDomain(domain) {
 }
 
 // Remove all entries that disable the filter for domain
-function enableDomain(domain) {
+function enableDomainEventPage(domain) {
   chrome.storage.sync.get({"disabledDomains": []}, function(storage) {
+    var domainRegex, foundMatch;
     var newDisabledDomains = storage.disabledDomains;
-    var foundMatch;
 
     for (var x = 0; x < storage.disabledDomains.length; x++) {
       domainRegex = new RegExp('(^|\.)' + storage.disabledDomains[x]);
       if (domainRegex.test(domain)) {
         foundMatch = true;
-        newDisabledDomains = removeFromArray(newDisabledDomains, storage.disabledDomains[x]);
+        newDisabledDomains = Helper.removeFromArray(newDisabledDomains, storage.disabledDomains[x]);
       }
     }
 
@@ -98,7 +90,8 @@ function enableDomain(domain) {
   });
 }
 
-function toggleFilter(domain) {
+function toggleFilterEventPage(domain) {
+  var domainRegex;
   var disabled = false;
   chrome.storage.sync.get({"disabledDomains": []}, function(storage) {
     for (var x = 0; x < storage.disabledDomains.length; x++) {
@@ -111,7 +104,7 @@ function toggleFilter(domain) {
       }
     }
 
-    disabled ? enableDomain(domain) : disableDomain(domain);
+    disabled ? enableDomainEventPage(domain) : disableDomainEventPage(domain);
   });
 }
 
@@ -146,7 +139,7 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
     case "toggleFilterForDomain":
       var url = new URL(tab.url);
       var domain = url.hostname;
-      toggleFilter(domain); break;
+      toggleFilterEventPage(domain); break;
     case "options":
       chrome.runtime.openOptionsPage(); break;
   }

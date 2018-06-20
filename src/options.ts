@@ -1,35 +1,60 @@
+namespace options {
+/// <reference path="defaults.ts" />
+/// <reference path="helpers.ts" />
+let Helper = Helpers;
+let Default = Defaults;
+
+interface Config {
+  censorCharacter: String,
+  censorFixedLength: Number,
+  defaultSubstitutions: String[],
+  disabledDomains: String[],
+  filterMethod: Number,
+  globalMatchMethod: Number,
+  password: String,
+  preserveFirst: Boolean,
+  preserveLast: Boolean,
+  showCounter: Boolean,
+  substitutionMark: Boolean,
+  words: {
+      matchMethod: Number,
+      words: String[]
+  }
+}
+
 var authenticated = false;
-var config = {};
-var defaults = {
-  "censorCharacter": "*",
-  "censorFixedLength": 0,
-  "defaultSubstitutions": ["censored", "expletive", "filtered"],
-  "disabledDomains": [],
-  "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
-  "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word", "RegExp"]
-  "password": null,
-  "preserveFirst": false,
-  "preserveLast": false,
-  "showCounter": true,
-  "substitutionMark": true,
-  "words": {}
-};
-var defaultWords = {
-  "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
-  "asses": {"matchMethod": 0, "words": ["butts"] },
-  "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
-  "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
-  "bitch": {"matchMethod": 1, "words": ["jerk"] },
-  "cunt": {"matchMethod": 1, "words": ["explative"] },
-  "damn": {"matchMethod": 1, "words": ["dang", "darn"] },
-  "fuck": {"matchMethod": 1, "words": ["freak", "fudge"] },
-  "piss": {"matchMethod": 1, "words": ["pee"] },
-  "pissed": {"matchMethod": 0, "words": ["ticked"] },
-  "slut": {"matchMethod": 1, "words": ["imperfect", "impure"] },
-  "shit": {"matchMethod": 1, "words": ["crap", "crud", "poop"] },
-  "tits": {"matchMethod": 1, "words": ["explative"] },
-  "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
-};
+let config: Config = Defaults.defaults;
+
+// var defaults = {
+//   "censorCharacter": "*",
+//   "censorFixedLength": 0,
+//   "defaultSubstitutions": ["censored", "expletive", "filtered"],
+//   "disabledDomains": [],
+//   "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
+//   "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word", "RegExp"]
+//   "password": null,
+//   "preserveFirst": false,
+//   "preserveLast": false,
+//   "showCounter": true,
+//   "substitutionMark": true,
+//   "words": {}
+// };
+// var defaultWords = {
+//   "ass": {"matchMethod": 0, "words": ["butt", "tail"] },
+//   "asses": {"matchMethod": 0, "words": ["butts"] },
+//   "asshole": {"matchMethod": 1, "words": ["butthole", "jerk"] },
+//   "bastard": {"matchMethod": 1, "words": ["imperfect", "impure"] },
+//   "bitch": {"matchMethod": 1, "words": ["jerk"] },
+//   "cunt": {"matchMethod": 1, "words": ["explative"] },
+//   "damn": {"matchMethod": 1, "words": ["dang", "darn"] },
+//   "fuck": {"matchMethod": 1, "words": ["freak", "fudge"] },
+//   "piss": {"matchMethod": 1, "words": ["pee"] },
+//   "pissed": {"matchMethod": 0, "words": ["ticked"] },
+//   "slut": {"matchMethod": 1, "words": ["imperfect", "impure"] },
+//   "shit": {"matchMethod": 1, "words": ["crap", "crud", "poop"] },
+//   "tits": {"matchMethod": 1, "words": ["explative"] },
+//   "whore": {"matchMethod": 1, "words": ["harlot", "tramp"] }
+// };
 var filterMethods = ["Censor", "Substitute", "Remove"];
 var matchMethods = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match", "Regular Expression"];
 
@@ -42,7 +67,8 @@ function arrayContains(array, string) {
 }
 
 function authenticate() {
-  if (document.getElementById('password').value == config.password) {
+  let passwordInput = document.getElementById('password') as HTMLInputElement;
+  if (passwordInput.value == config.password) {
     authenticated = true;
     hide(document.getElementById('passwordContainer'));
     show(document.getElementById('main'));
@@ -50,22 +76,24 @@ function authenticate() {
 }
 
 function censorCharacter(event) {
-  config.censorCharacter = document.getElementById('censorCharacterSelect').value;
+  let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
+  config.censorCharacter = censorCharacterSelect.value;
   saveOptions(event, config);
 }
 
 function censorFixedLength(event) {
-  config.censorFixedLength = document.getElementById('censorFixedLengthSelect').selectedIndex;
+  let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
+  config.censorFixedLength = censorFixedLengthSelect.selectedIndex;
   saveOptions(event, config);
 }
 
 // Prompt for confirmation
-function confirm(action) {
+function confirm(event, action) {
   // TODO: Don't confirm if Firefox
   if (/Chrome/.exec(navigator.userAgent)) {
     var dialogContainer = document.getElementById('dialogContainer');
     dialogContainer.innerHTML = '<dialog id="promptDialog">Are you sure?<br><button id="confirmYes">Yes</button><button id="confirmNo">No</button></dialog>';
-    var dialog = document.getElementById("promptDialog");
+    var dialog = document.getElementById("promptDialog") as HTMLDialogElement;
 
     document.getElementById('confirmNo').addEventListener("click", function() {
       this.removeEventListener('click', arguments.callee, false);
@@ -74,7 +102,7 @@ function confirm(action) {
     document.getElementById('confirmYes').addEventListener("click", function() {
       this.removeEventListener('click', arguments.callee, false);
       if (action == 'importConfig') {
-        importConfig();
+        importConfig(event);
       } else if (action == 'restoreDefaults') {
         restoreDefaults();
       }
@@ -84,7 +112,7 @@ function confirm(action) {
     dialog.showModal();
   } else {
     if (action == 'importConfig') {
-      importConfig();
+      importConfig(event);
     } else if (action == 'restoreDefaults') {
       restoreDefaults();
     }
@@ -96,14 +124,14 @@ function deactivate(element) {
 }
 
 function domainAdd(event) {
-  var domain = document.getElementById('domainText');
-  if (domain.value != "") {
-    if (domain.checkValidity()) {
-      if (!arrayContains(config.disabledDomains, domain.value)) {
-        config.disabledDomains.push(domain.value);
+  let domainInput = document.getElementById('domainText') as HTMLInputElement;
+  if (domainInput.value != "") {
+    if (domainInput.checkValidity()) {
+      if (!arrayContains(config.disabledDomains, domainInput.value)) {
+        config.disabledDomains.push(domainInput.value);
         config.disabledDomains = config.disabledDomains.sort();
         saveOptions(event, config);
-        document.getElementById('domainText').value = "";
+        domainInput.value = "";
       } else {
         updateStatus('Domain already in list.', true, 3000);
       }
@@ -114,23 +142,11 @@ function domainAdd(event) {
 }
 
 function domainRemove(event) {
-  var domain = document.getElementById('domainSelect').value;
-  if (domain != "") {
-    config.disabledDomains = removeFromArray(config.disabledDomains, domain);
+  let domainSelect = document.getElementById('domainSelect') as HTMLSelectElement;
+  if (domainSelect.value != "") {
+    config.disabledDomains = removeFromArray(config.disabledDomains, domainSelect.value);
     saveOptions(event, config);
   }
-}
-
-function dynamicList(list, selectEm, title) {
-  var options = '';
-  if (title !== undefined) {
-    options = '<option value="" disabled selected>' + title + '</option>';
-  }
-
-  for(var i = 0; i < list.length; i++) {
-    options += '<option value="'+list[i]+'">'+list[i]+'</option>';
-  }
-  document.getElementById(selectEm).innerHTML = options;
 }
 
 function exportConfig() {
@@ -139,18 +155,20 @@ function exportConfig() {
     if (Object.keys(settings).length === 0 && settings.constructor === Object) {
       settings = defaults;
     }
-    document.getElementById('configText').value = JSON.stringify(settings, null, 2);
+    let configText = document.getElementById('configText') as HTMLTextAreaElement;
+    configText.value = JSON.stringify(settings, null, 2);
   });
 }
 
 function filterMethodSelect(event) {
-  config.filterMethod = document.getElementById('filterMethodSelect').selectedIndex;
+  let filterMethodSelectEm = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+  config.filterMethod = filterMethodSelectEm.selectedIndex;
   saveOptions(event, config);
 }
 
 function globalMatchMethod(event) {
-  var selectedIndex = document.getElementById('globalMatchMethodSelect').selectedIndex;
-  config.globalMatchMethod = selectedIndex;
+  let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
+  config.globalMatchMethod = globalMatchMethodSelect.selectedIndex;
   saveOptions(event, config);
 }
 
@@ -161,7 +179,8 @@ function hide(element) {
 
 function importConfig(event) {
   try {
-    var settings = JSON.parse(document.getElementById('configText').value);
+    let configText = document.getElementById('configText') as HTMLTextAreaElement;
+    let settings = JSON.parse(configText.value);
     saveOptions(event, settings);
   } catch (e) {
     updateStatus('Settings not saved! Please try again.', true, 5000);
@@ -179,7 +198,7 @@ function migrateWordList() {
 
       try {
         // Migrate to new words object
-        for (i = 0; i < wordList.length; i++) {
+        for (let i = 0; i < wordList.length; i++) {
           word = wordList[i];
           if (word != "") {
             if (!arrayContains(Object.keys(config.words), word)) {
@@ -211,14 +230,14 @@ function openTab(event) {
   }
 
   // Set active tab
-  oldTab = document.getElementsByClassName("tablinks active")[0];
+  let oldTab = document.getElementsByClassName("tablinks active")[0];
   deactivate(oldTab);
   activate(event.currentTarget);
 
   // Show active tab content
-  oldTabContent = document.getElementsByClassName("tabcontent visible")[0];
+  let oldTabContent = document.getElementsByClassName("tabcontent visible")[0];
   hide(oldTabContent);
-  newTabName = event.currentTarget.innerText;
+  let newTabName = event.currentTarget.innerText;
   show(document.getElementById(newTabName));
 }
 
@@ -228,7 +247,7 @@ function populateOptions() {
     config = settings; // Make config globally available
     migrateWordList(); // TODO: Migrate wordList
     if (Object.keys(config.words).length === 0 && config.words.constructor === Object) {
-      config.words = defaultWords;
+      config.words = Default.words; // defaultWords;
       saveOptions(null, config);
       return false;
     }
@@ -241,8 +260,9 @@ function populateOptions() {
     }
 
     // Show/hide censor options and word substitutions based on filter method
-    dynamicList(filterMethods, 'filterMethodSelect');
-    document.getElementById('filterMethodSelect').selectedIndex = settings.filterMethod;
+    Helper.dynamicList(filterMethods, 'filterMethodSelect');
+    let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    filterMethodSelect.selectedIndex = settings.filterMethod;
     switch (settings.filterMethod) {
       case 0:
         show(document.getElementById('optionsCensor'));
@@ -272,20 +292,28 @@ function populateOptions() {
     }
 
     // Settings
-    document.getElementById('censorFixedLengthSelect').selectedIndex = settings.censorFixedLength;
-    document.getElementById('censorCharacterSelect').value = settings.censorCharacter;
-    document.getElementById('preserveFirst').checked = settings.preserveFirst;
-    document.getElementById('preserveLast').checked = settings.preserveLast;
-    document.getElementById('substitutionMark').checked = settings.substitutionMark;
-    document.getElementById('showCounter').checked = settings.showCounter;
-    dynamicList(matchMethods.slice(0, -1), 'globalMatchMethodSelect');
-    document.getElementById('globalMatchMethodSelect').selectedIndex = settings.globalMatchMethod;
+    let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
+    let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
+    let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
+    let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
+    let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
+    let showCounter = document.getElementById('showCounter') as HTMLInputElement;
+    let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
+
+    censorFixedLengthSelect.selectedIndex = settings.censorFixedLength;
+    censorCharacterSelect.value = settings.censorCharacter;
+    preserveFirst.checked = settings.preserveFirst;
+    preserveLast.checked = settings.preserveLast;
+    substitutionMark.checked = settings.substitutionMark;
+    showCounter.checked = settings.showCounter;
+    Helper.dynamicList(matchMethods.slice(0, -1), 'globalMatchMethodSelect');
+    globalMatchMethodSelect.selectedIndex = settings.globalMatchMethod;
     // Words
-    dynamicList(Object.keys(config.words).sort(), 'wordSelect', 'Words to Filter');
-    dynamicList([], 'substitutionSelect', 'Substitutions');
-    dynamicList([], 'wordMatchMethodSelect', 'Select a Word');
+    Helper.dynamicList(Object.keys(config.words).sort(), 'wordSelect', 'Words to Filter');
+    Helper.dynamicList([], 'substitutionSelect', 'Substitutions');
+    Helper.dynamicList([], 'wordMatchMethodSelect', 'Select a Word');
     // Domains
-    dynamicList(settings.disabledDomains, 'domainSelect', 'Disabled Domains');
+    Helper.dynamicList(settings.disabledDomains, 'domainSelect', 'Disabled Domains');
   });
 }
 
@@ -307,14 +335,19 @@ function restoreDefaults() {
 }
 
 // Saves options to sync storage
-function saveOptions(event, settings) {
+function saveOptions(event, settings?) {
   // Gather current settings
+  let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
+  let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
+  let showCounter = document.getElementById('showCounter') as HTMLInputElement;
+  let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
+
   if (settings === undefined) {
     settings = {};
-    settings.preserveFirst = document.getElementById('preserveFirst').checked;
-    settings.preserveLast = document.getElementById('preserveLast').checked;
-    settings.showCounter = document.getElementById('showCounter').checked;
-    settings.substitutionMark = document.getElementById('substitutionMark').checked;
+    settings.preserveFirst = preserveFirst.checked;
+    settings.preserveLast = preserveLast.checked;
+    settings.showCounter = showCounter.checked;
+    settings.substitutionMark = substitutionMark.checked;
   }
 
   // Save settings
@@ -328,7 +361,7 @@ function saveOptions(event, settings) {
 }
 
 function setPassword() {
-  var password = document.getElementById('setPassword');
+  var password = document.getElementById('setPassword') as HTMLInputElement;
   if (password.value == '') {
     chrome.storage.sync.remove('password');
   } else {
@@ -343,15 +376,18 @@ function show(element) {
 }
 
 function substitutionAdd(event) {
-  var word = document.getElementById('wordSelect').value;
-  var sub = document.getElementById('substitutionText').value;
+  let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
+  let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
+
+  let word = wordSelect.value;
+  let sub = substitutionText.value;
   if (word != "" && sub != "") {
     if (!arrayContains(config.words[word].words, sub)) {
       config.words[word].words.push(sub);
       config.words[word].words = config.words[word].words.sort();
       saveOptions(event, config);
-      dynamicList(config.words[word].words, 'substitutionSelect', 'Substitutions');
-      document.getElementById('substitutionText').value = "";
+      Helper.dynamicList(config.words[word].words, 'substitutionSelect', 'Substitutions');
+      substitutionText.value = "";
     } else {
       updateStatus('Substitution already in list.', true, 3000);
     }
@@ -362,13 +398,16 @@ function substitutionLoad() {
   if (config.filterMethod === 1) {
     var selectedOption = this[this.selectedIndex];
     var selectedText = selectedOption.text;
-    dynamicList(config.words[selectedText].words, 'substitutionSelect', 'Substitutions');
+    Helper.dynamicList(config.words[selectedText].words, 'substitutionSelect', 'Substitutions');
   }
 }
 
 function substitutionRemove(event) {
-  var word = document.getElementById('wordSelect').value;
-  var sub = document.getElementById('substitutionSelect').value;
+  let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
+  let substitutionSelect = document.getElementById('substitutionSelect') as HTMLSelectElement;
+
+  let word = wordSelect.value;
+  let sub = substitutionSelect.value;
   if (word != "" && sub != "") {
     config.words[word].words = removeFromArray(config.words[word].words, sub);
     saveOptions(event, config);
@@ -384,7 +423,8 @@ function updateStatus(message, error, timeout) {
 }
 
 function wordAdd(event) {
-  var word = document.getElementById('wordText').value;
+  let wordText = document.getElementById('wordText') as HTMLInputElement;
+  let word = wordText.value;
   if (word != "") {
     if (!arrayContains(Object.keys(config.words), word)) {
       if (/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/.test(word)) {
@@ -393,30 +433,31 @@ function wordAdd(event) {
         config.words[word] = {"matchMethod": 0, "words": []};
       }
       saveOptions(event, config);
-      document.getElementById('wordText').value = "";
+      wordText.value = "";
     } else {
       updateStatus('Word already in list.', true, 3000);
     }
   }
 }
 
-function wordMatchMethodLoad() {
+function wordMatchMethodLoad(event) {
   var selectedOption = this[this.selectedIndex];
   var selectedText = selectedOption.text;
-  var list = 'wordMatchMethodSelect';
-  dynamicList(matchMethods.slice(0,-2).concat(matchMethods.slice(-1)), 'wordMatchMethodSelect');
-  document.getElementById('wordMatchMethodSelect').value = matchMethods[config.words[selectedText].matchMethod];
+  Helper.dynamicList(matchMethods.slice(0,-2).concat(matchMethods.slice(-1)), 'wordMatchMethodSelect');
+  let wordMatchMethodSelect = document.getElementById('wordMatchMethodSelect') as HTMLSelectElement;
+  wordMatchMethodSelect.value = matchMethods[config.words[selectedText].matchMethod];
 }
 
 function wordMatchMethodSet(event) {
-  var selectedWord = document.getElementById('wordSelect').value;
-  var matchMethod = matchMethods.indexOf(document.getElementById('wordMatchMethodSelect').value);
-  config.words[selectedWord].matchMethod = matchMethod;
+  let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
+  let matchMethodSelect = document.getElementById('wordMatchMethodSelect') as HTMLSelectElement;
+  config.words[wordSelect.value].matchMethod = matchMethods.indexOf(matchMethodSelect.value);
   saveOptions(event, config);
 }
 
 function wordRemove(event) {
-  var word = document.getElementById('wordSelect').value;
+  let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
+  let word = wordSelect.value;
   if (word != "") {
     delete config.words[word];
     saveOptions(event, config);
@@ -425,8 +466,8 @@ function wordRemove(event) {
 
 ////
 // Add event listeners to DOM
-tabs = document.getElementsByClassName("tablinks");
-for (i = 0; i < tabs.length; i++) {
+let tabs = document.getElementsByClassName("tablinks");
+for (let i = 0; i < tabs.length; i++) {
   tabs[i].addEventListener('click', function(e) { openTab(e); });
 }
 window.addEventListener('load', populateOptions);
@@ -455,9 +496,10 @@ document.getElementById('substitutionRemove').addEventListener('click', substitu
 document.getElementById('domainAdd').addEventListener('click', domainAdd);
 document.getElementById('domainRemove').addEventListener('click', domainRemove);
 // Config
-document.getElementById('default').addEventListener('click', function() {confirm('restoreDefaults')} );
-document.getElementById('import').addEventListener('click', function() {confirm('importConfig')} );
+document.getElementById('default').addEventListener('click', function(event) {confirm(event, 'restoreDefaults')} );
+document.getElementById('import').addEventListener('click', function(event) {confirm(event, 'importConfig')} );
 document.getElementById('export').addEventListener('click', exportConfig);
 // Password
 document.getElementById('submitPassword').addEventListener('click', authenticate);
 document.getElementById('setPasswordBtn').addEventListener('click', setPassword);
+}
