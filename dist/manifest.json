@@ -36,7 +36,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["filter.js"],
+      "js": ["modules.js", "config.js", "filter.js" ],
       "run_at": "document_end",
       "all_frames": true
     }
