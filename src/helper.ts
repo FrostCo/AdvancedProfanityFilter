@@ -1,21 +1,21 @@
-namespace Helpers {
-    export function arrayContains(array: String[], element: String) {
+class Helper {
+    static arrayContains(array: String[], element: String) {
         return (array.indexOf(element) > -1);
     }
 
-    export function dynamicList(list, selectEm, title?: String) {
-        var options = '';
+    static dynamicList(list, selectEm, title?: String) {
+        let options = '';
         if (title !== undefined) {
             options = '<option value="" disabled selected>' + title + '</option>';
         }
 
-        for(var i = 0; i < list.length; i++) {
+        for(let i = 0; i < list.length; i++) {
             options += '<option value="'+list[i]+'">'+list[i]+'</option>';
         }
         document.getElementById(selectEm).innerHTML = options;
     }
 
-    export function removeFromArray(array: String[], element: String) {
+    static removeFromArray(array: String[], element: String) {
         return array.filter(e => e !== element);
     }
 
