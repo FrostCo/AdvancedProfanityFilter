@@ -50,23 +50,7 @@ rename .js .ts *.js
 
 npm install -g typescript
 
-// // Promise
-// function newGets() {
-//     return new Promise(function(resolve, reject) {
-//         chrome.storage.sync.get(defaults, function(items) {
-//             // console.log(items);
-//             resolve(items);
-//         })
-//     });
-// };
-
-// newGets().then(function(aaaa) {
-//     console.log(aaaa);
-//     window.aaa = aaaa;
-// });
-
-// Overwrite defaults
-// for(var k in items) self[k] = items[k];
+./build.sh
 ```
 
 ##### License
