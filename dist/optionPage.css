@@ -1,0 +1,191 @@
+body {
+  font-family: Arial;
+  min-width: 370px;
+}
+
+h4 {
+  color: teal;
+  font-weight: bold;
+  margin: 5px 0 15px 0;
+  padding: 0px;
+}
+
+a:link, a:visited {
+  color: gray;
+  font-size: 10px;
+}
+
+a:hover, a:active {
+  color: #393939;
+  font-size: 10px;
+}
+
+button {
+  margin: 4px 4px;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  height: 26px;
+  padding-bottom: 1px;
+}
+
+/* Tab Styling */
+div.tab {
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  text-align: center;
+}
+
+div.tab span.tablinks {
+  display: inline-block;
+  cursor: pointer;
+  padding: 10px 8px 10px 8px;
+  transition: 0.3s;
+  font-size: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(215, 215, 215);
+  border-image: initial;
+  border-radius: 2px;
+  min-width: 65px;
+  text-align: center;
+}
+
+div.tab span:hover {
+  background-color: rgb(195, 195, 195);
+}
+
+div.tab span.active {
+  background-color: rgb(179, 179, 179);
+}
+
+/* Form elements */
+input[type=radio] {
+  margin-bottom: 4px;
+}
+
+input[type=text] {
+  padding: 4px;
+  border-radius: 2px;
+  height: 26px;
+  width: 250px;
+}
+
+input[type=text].small {
+  padding: 4px;
+  border-radius: 2px;
+  height: 26px;
+  width: 100px;
+}
+
+label input[type=checkbox] {
+  position: relative;
+  vertical-align: middle;
+  bottom: 1px;
+  margin-bottom: 4px;
+}
+
+select {
+  padding: 4px;
+  border-size: 1px;
+  border-radius: 2px;
+  height: 26px;
+  width: 250px;
+}
+
+select.small {
+  width: 100px;
+}
+
+textarea {
+  resize: none;
+  border-radius: 5px;
+}
+
+textarea#configText {
+  width: 340px;
+  height: 260px;
+}
+
+#contributors {
+  font-style: italic;
+  font-size: 10px;
+  line-height: 14px;
+  display: inline;
+  color: gray;
+}
+
+#default {
+  float: right;
+}
+
+#gettingStarted {
+  color: teal;
+  font-weight: bold;
+}
+
+#options {
+  padding: 0px;
+}
+
+#save {
+  float: right;
+}
+
+#status {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  height: 14px;
+  color: green;
+}
+
+#status.error {
+  color: red;
+}
+
+.moveDown {
+  margin-top: 20px;
+}
+
+.examples {
+  padding-bottom: 5px;
+  padding-left: 30px;
+  font-size: 10px;
+  color: gray;
+  margin-bottom: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.notes {
+  padding-top: 5px;
+  font-size: 10px;
+  color: gray;
+}
+
+.options {
+  margin: 0px;
+}
+
+.tabcontent {
+  min-height: 370px;
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top: none;
+}
+
+.tabcontent p {
+  margin: 0;
+}
+
+.visible {
+  display: block;
+}
+
+::placeholder {
+  color: #bbb;
+}
