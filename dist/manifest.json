@@ -16,13 +16,13 @@
     "storage",
     "tabs"
   ],
-  "optional_permissions": ["file://*/*"],
+  "optional_permissions": [ "file://*/*" ],
   "options_ui": {
-    "page": "options.html",
+    "page": "optionPage.html",
     "chrome_style": true
   },
   "background": {
-    "scripts": ["eventPage.js"],
+    "scripts": [ "eventPage.js" ],
     "persistent": false
   },
   "browser_action": {
@@ -35,8 +35,8 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["filter.js"],
+      "matches": [ "<all_urls>" ],
+      "js": [ "filter.js" ],
       "run_at": "document_end",
       "all_frames": true
     }

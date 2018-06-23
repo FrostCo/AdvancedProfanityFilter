@@ -1,12 +1,4 @@
-////
-// Helper functions
-function arrayContains(array, string) {
-  return (array.indexOf(string) > -1);
-}
-
-function removeFromArray(array, element) {
-  return array.filter(e => e !== element);
-}
+// tsc --outfile ./dist/eventPage.js ./src/helper.ts ./src/config.ts ./src/eventPage.ts --target es6
 
 ////
 // Actions and messaging
@@ -47,72 +39,66 @@ chrome.runtime.onMessage.addListener(
 ////
 // Context menu
 //
-function addSelection(selection) {
-  chrome.storage.sync.get({"words": {}}, function(storage) {
-    selection = (selection.trim()).toLowerCase();
-    if (!arrayContains(Object.keys(storage.words), selection)) {
-      storage.words[selection] = {"matchMethod": 0, "words": []};
-      chrome.storage.sync.set({"words": storage.words}, function() {
-        if (!chrome.runtime.lastError) {
-          chrome.tabs.reload();
-        }
-      });
-    };
-  });
+// Add selected word/phrase and reload page (unless already present)
+async function addSelection(selection: string) {
+  selection = (selection.trim()).toLowerCase();
+  let cfg = await Config.build(['words']);
+
+  if (!arrayContains(Object.keys(cfg.words), selection)) {
+    cfg.words[selection] = {"matchMethod": 0, "words": []};
+    let result = await cfg.save();
+    if (!result) { chrome.tabs.reload(); }
+  }
 }
 
-function disableDomain(domain) {
-  chrome.storage.sync.get({"disabledDomains": []}, function(storage) {
-    if (!arrayContains(storage.disabledDomains, domain)) {
-      storage.disabledDomains.push(domain);
-      chrome.storage.sync.set({"disabledDomains": storage.disabledDomains}, function() {
-        if (!chrome.runtime.lastError) {
-          chrome.tabs.reload();
-        }
-      });
-    };
-  });
+// Disable domain and reload page (unless already disabled)
+async function disableDomainEventPage(domain: string) {
+  let cfg = await Config.build(['disabledDomains']);
+
+  if (!arrayContains(cfg.disabledDomains, domain)) {
+    cfg.disabledDomains.push(domain);
+    let result = await cfg.save();
+    if (!result) { chrome.tabs.reload(); }
+  }
 }
 
 // Remove all entries that disable the filter for domain
-function enableDomain(domain) {
-  chrome.storage.sync.get({"disabledDomains": []}, function(storage) {
-    var newDisabledDomains = storage.disabledDomains;
-    var foundMatch;
+async function enableDomainEventPage(domain: string) {
+  let cfg = await Config.build(['disabledDomains']);
+  let domainRegex, foundMatch;
+  let newDisabledDomains = cfg.disabledDomains;
 
-    for (var x = 0; x < storage.disabledDomains.length; x++) {
-      domainRegex = new RegExp('(^|\.)' + storage.disabledDomains[x]);
-      if (domainRegex.test(domain)) {
-        foundMatch = true;
-        newDisabledDomains = removeFromArray(newDisabledDomains, storage.disabledDomains[x]);
-      }
+  for (let x = 0; x < cfg.disabledDomains.length; x++) {
+    domainRegex = new RegExp('(^|\.)' + cfg.disabledDomains[x]);
+    if (domainRegex.test(domain)) {
+      foundMatch = true;
+      newDisabledDomains = removeFromArray(newDisabledDomains, cfg.disabledDomains[x]);
     }
+  }
 
-    if (foundMatch) {
-      chrome.storage.sync.set({"disabledDomains": newDisabledDomains}, function() {
-        if (!chrome.runtime.lastError) {
-          chrome.tabs.reload();
-        }
-      });
-    }
-  });
+  if (foundMatch) {
+    cfg.disabledDomains = newDisabledDomains;
+    let result = await cfg.save();
+    if (!result) { chrome.tabs.reload(); }
+  }
 }
 
-function toggleFilter(domain) {
-  var disabled = false;
-  chrome.storage.sync.get({"disabledDomains": []}, function(storage) {
-    for (var x = 0; x < storage.disabledDomains.length; x++) {
-      if (storage.disabledDomains[x]) {
-        domainRegex = new RegExp("(^|\.)" + storage.disabledDomains[x]);
-        if (domainRegex.test(domain)) {
-          disabled = true;
-          break;
-        }
+async function toggleFilterEventPage(domain: string) {
+  let cfg = await Config.build(['disabledDomains']);
+  let domainRegex;
+  let disabled = false;
+
+  for (let x = 0; x < cfg.disabledDomains.length; x++) {
+    if (cfg.disabledDomains[x]) {
+      domainRegex = new RegExp("(^|\.)" + cfg.disabledDomains[x]);
+      if (domainRegex.test(domain)) {
+        disabled = true;
+        break;
       }
     }
+  }
 
-    disabled ? enableDomain(domain) : disableDomain(domain);
-  });
+  disabled ? enableDomainEventPage(domain) : disableDomainEventPage(domain);
 }
 
 ////
@@ -144,9 +130,9 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
     case "addSelection":
       addSelection(info.selectionText); break;
     case "toggleFilterForDomain":
-      var url = new URL(tab.url);
-      var domain = url.hostname;
-      toggleFilter(domain); break;
+      let url = new URL(tab.url);
+      let domain = url.hostname;
+      toggleFilterEventPage(domain); break;
     case "options":
       chrome.runtime.openOptionsPage(); break;
   }

@@ -1,0 +1,28 @@
+{
+  "name": "advancedprofanityfilter",
+  "version": "1.0.11",
+  "description": "Profanity filter",
+  "main": "filter.js",
+  "scripts": {
+    "compile": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/richardfrost/AdvancedProfanityFilter.git"
+  },
+  "keywords": [
+    "Profanity",
+    "Filter"
+  ],
+  "author": "Richard Frost",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/richardfrost/AdvancedProfanityFilter/issues"
+  },
+  "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
+  "devDependencies": {
+    "@types/chrome": "latest",
+    "typescript": "latest"
+  }
+}
