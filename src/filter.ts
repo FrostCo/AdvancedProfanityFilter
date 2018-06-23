@@ -199,12 +199,22 @@ class Filter {
         for (let z = 0; z < self.cfg.wordList.length; z++) {
           str = str.replace(self.wordRegExps[z], function(match) {
             self.counter++;
+            let sub = Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words);
             // console.log('Substitute match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
 
+            let preserveCase = true;
+            if (preserveCase) {
+              if (Word.allUpperCase(match)) {
+                sub = sub.toUpperCase();
+              } else if (Word.capitalized(match)) {
+                sub = Word.capitalize(sub);
+              }
+            }
+
             if (self.cfg.substitutionMark) {
-              return '[' + Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words) + ']';
+              return '[' + sub + ']';
             } else {
-              return Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words);
+              return sub;
             }
           });
         }

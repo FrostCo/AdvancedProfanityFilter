@@ -1,4 +1,12 @@
 class Word {
+  static allLowerCase(string: string): boolean {
+    return string.toLowerCase() === string;
+  }
+
+  static allUpperCase(string: string): boolean {
+    return string.toUpperCase() === string;
+  }
+
   // Word must match exactly (not sub-string)
   // /\b(w)ord\b/gi
   static buildExactRegexp(word: string) {
@@ -27,6 +35,14 @@ class Word {
   // /\b[\w-]*(w)ord[\w-]*\b/gi
   static buildWholeRegexp(word: string) {
     return new RegExp('\\b([\\w-]*' + word[0] + ')' + Word.escapeRegExp(word.slice(1)) + '[\\w-]*\\b', 'gi' )
+  }
+
+  static capitalize(string: string): string {
+    return string.charAt(0).toUpperCase() + string.substr(1);
+  }
+
+  static capitalized(string: string): boolean {
+    return string.charAt(0).toUpperCase() === string.charAt(0);
   }
 
   static escapeRegExp(str: string): string {
