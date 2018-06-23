@@ -1,97 +1,65 @@
+// tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
 // /// <reference path="./config.ts" />
-namespace Filter {
-  // Globals - TODO
-  var cfg: Config;
-  var counter: number;
-  var whitespaceRegExp: RegExp;
-  var wordRegExps: RegExp[];
-  var xpathDocText: string;
-  var xpathNodeText: string;
-  eval("var cfg;");
-  eval("var counter = 0;");
-  eval("var whitespaceRegExp = new RegExp('\\s');");
-  eval("var wordRegExps = [];");
-  eval("var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';");
-  eval("var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';");
 
-  // Word must match exactly (not sub-string)
-  // /\b(w)ord\b/gi
-  function buildExactRegexp(word: string) {
-    wordRegExps.push(new RegExp('\\b(' + word[0] + ')' + escapeRegExp(word.slice(1)) + '\\b', 'gi' ));
+class Filter {
+  cfg: Config;
+  counter: number;
+  wordRegExps: RegExp[];
+
+  constructor() {
+    this.counter = 0;
+    this.wordRegExps = [];
   }
 
-  // Match any part of a word (sub-string)
-  // /(w)ord/gi
-  function buildPartRegexp(word: string) {
-    wordRegExps.push(new RegExp('(' + word[0] + ')' + escapeRegExp(word.slice(1)), 'gi' ));
-  }
-
-  // Match entire word that contains sub-string and surrounding whitespace
-  // /\s?\b(w)ord\b\s?/gi
-  function buildRegexpForRemoveExact(word: string) {
-    wordRegExps.push(new RegExp('\\s?\\b(' + word[0] + ')' + escapeRegExp(word.slice(1)) + '\\b\\s?', 'gi' ));
-  }
-
-  // Match entire word that contains sub-string and surrounding whitespace
-  // /\s?\b[\w-]*(w)ord[\w-]*\b\s?/gi
-  function buildRegexpForRemovePart(word: string) {
-    wordRegExps.push(new RegExp('\\s?\\b([\\w-]*' + word[0] + ')' + escapeRegExp(word.slice(1)) + '[\\w-]*\\b\\s?', 'gi' ));
-  }
-
-  // Match entire word that contains sub-string
-  // /\b[\w-]*(w)ord[\w-]*\b/gi
-  function buildWholeRegexp(word: string) {
-    wordRegExps.push(new RegExp('\\b([\\w-]*' + word[0] + ')' + escapeRegExp(word.slice(1)) + '[\\w-]*\\b', 'gi' ))
-  }
-
-  function checkNodeForProfanity(mutation: any) {
+  checkNodeForProfanity(mutation: any) {
+    let self = this;
     mutation.addedNodes.forEach(function(node) {
-      if (!isForbiddenNode(node)) {
+      if (!Page.isForbiddenNode(node)) {
         // console.log('Node to removeProfanity', node); // DEBUG
-        removeProfanity(xpathNodeText, node);
+        self.removeProfanity(Page.xpathNodeText, node);
       }
     });
   }
 
   // Censor the profanity
   // Only gets run when there is a match in replaceText()
-  function censorReplace(strMatchingString: string, strFirstLetter: string) {
+  censorReplace(strMatchingString: string, strFirstLetter: string): string {
     let censoredString = '';
 
-    if (cfg.censorFixedLength > 0) {
-      if (cfg.preserveFirst && cfg.preserveLast) {
-        censoredString = strFirstLetter + cfg.censorCharacter.repeat((cfg.censorFixedLength - 2)) + strMatchingString.slice(-1);
-      } else if (cfg.preserveFirst) {
-        censoredString = strFirstLetter + cfg.censorCharacter.repeat((cfg.censorFixedLength - 1));
-      } else if (cfg.preserveLast) {
-        censoredString = cfg.censorCharacter.repeat((cfg.censorFixedLength - 1)) + strMatchingString.slice(-1);
+    if (filter.cfg.censorFixedLength > 0) {
+      if (filter.cfg.preserveFirst && filter.cfg.preserveLast) {
+        censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 2)) + strMatchingString.slice(-1);
+      } else if (filter.cfg.preserveFirst) {
+        censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 1));
+      } else if (filter.cfg.preserveLast) {
+        censoredString = filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 1)) + strMatchingString.slice(-1);
       } else {
-        censoredString = cfg.censorCharacter.repeat(cfg.censorFixedLength);
+        censoredString = filter.cfg.censorCharacter.repeat(filter.cfg.censorFixedLength);
       }
     } else {
-      if (cfg.preserveFirst && cfg.preserveLast) {
-        censoredString = strFirstLetter + cfg.censorCharacter.repeat((strMatchingString.length - 2)) + strMatchingString.slice(-1);
-      } else if (cfg.preserveFirst) {
-        censoredString = strFirstLetter + cfg.censorCharacter.repeat((strMatchingString.length - 1));
-      } else if (cfg.preserveLast) {
-        censoredString = cfg.censorCharacter.repeat((strMatchingString.length - 1)) + strMatchingString.slice(-1);
+      if (filter.cfg.preserveFirst && filter.cfg.preserveLast) {
+        censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((strMatchingString.length - 2)) + strMatchingString.slice(-1);
+      } else if (filter.cfg.preserveFirst) {
+        censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((strMatchingString.length - 1));
+      } else if (filter.cfg.preserveLast) {
+        censoredString = filter.cfg.censorCharacter.repeat((strMatchingString.length - 1)) + strMatchingString.slice(-1);
       } else {
-        censoredString = cfg.censorCharacter.repeat(strMatchingString.length);
+        censoredString = filter.cfg.censorCharacter.repeat(strMatchingString.length);
       }
     }
 
-    counter++;
+    filter.counter++;
     // console.log('Censor match:', strMatchingString, censoredString); // DEBUG
     return censoredString;
   }
 
-  async function cleanPage() {
-    cfg = await Config.build();
+  async cleanPage() {
+    this.cfg = await Config.build();
 
     // Don't run if this is a disabled domain
     // Only run on main page (no frames)
     if (window == window.top) {
-      let message = disabledPage();
+      let message = this.disabledPage();
       chrome.runtime.sendMessage(message);
       if (message.disabled) {
         return false;
@@ -99,22 +67,22 @@ namespace Filter {
     }
 
     // Remove profanity from the main document and watch for new nodes
-    generateRegexpList();
-    removeProfanity(xpathDocText, document);
-    updateCounterBadge();
-    observeNewNodes();
+    this.generateRegexpList();
+    this.removeProfanity(Page.xpathDocText, document);
+    this.updateCounterBadge();
+    this.observeNewNodes();
   }
 
-  function disabledPage() {
+  disabledPage() {
     let result = { "disabled": false, "domain": "" };
     let domain = window.location.hostname;
 
-    for (let x = 0; x < cfg.disabledDomains.length; x++) {
-      if (cfg.disabledDomains[x]) {
-        let domainRegex = new RegExp("(^|\.)" + cfg.disabledDomains[x]);
+    for (let x = 0; x < this.cfg.disabledDomains.length; x++) {
+      if (this.cfg.disabledDomains[x]) {
+        let domainRegex = new RegExp("(^|\.)" + this.cfg.disabledDomains[x]);
         if (domainRegex.test(domain)) {
           result.disabled = true;
-          result.domain = cfg.disabledDomains[x];
+          result.domain = this.cfg.disabledDomains[x];
           break;
         }
       }
@@ -123,87 +91,59 @@ namespace Filter {
     return result;
   }
 
-  function escapeRegExp(str: string) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-  }
-
   // Parse the profanity list
   // ["exact", "partial", "whole", "disabled"]
-  function generateRegexpList() {
-    if (cfg.filterMethod == 2) { // Special regexp for "Remove" filter
-      for (let x = 0; x < cfg.wordList.length; x++) {
-        if (cfg.words[cfg.wordList[x]].matchMethod == 0) { // If word matchMethod is exact
-          buildRegexpForRemoveExact(cfg.wordList[x]);
+  generateRegexpList() {
+    if (this.cfg.filterMethod == 2) { // Special regexp for "Remove" filter
+      for (let x = 0; x < this.cfg.wordList.length; x++) {
+        if (this.cfg.words[this.cfg.wordList[x]].matchMethod == 0) { // If word matchMethod is exact
+          this.wordRegExps.push(Word.buildRegexpForRemoveExact(this.cfg.wordList[x]));
         } else {
-          buildRegexpForRemovePart(cfg.wordList[x]);
+          this.wordRegExps.push(Word.buildRegexpForRemovePart(this.cfg.wordList[x]));
         }
       }
     } else {
-      switch(cfg.globalMatchMethod) {
+      switch(this.cfg.globalMatchMethod) {
         case 0: // Global: Exact match
-          for (let x = 0; x < cfg.wordList.length; x++) {
-            buildExactRegexp(cfg.wordList[x]);
+          for (let x = 0; x < this.cfg.wordList.length; x++) {
+            this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x]));
           }
           break;
         case 2: // Global: Whole word match
-          for (let x = 0; x < cfg.wordList.length; x++) {
-            buildWholeRegexp(cfg.wordList[x]);
+          for (let x = 0; x < this.cfg.wordList.length; x++) {
+            this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x]));
           }
           break;
         case 3: // Per-word matching
-          for (let x = 0; x < cfg.wordList.length; x++) {
-            switch(cfg.words[cfg.wordList[x]].matchMethod) {
+          for (let x = 0; x < this.cfg.wordList.length; x++) {
+            switch(this.cfg.words[this.cfg.wordList[x]].matchMethod) {
               case 0: // Exact match
-                buildExactRegexp(cfg.wordList[x]);
+                this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x]));
                 break;
               case 2: // Whole word match
-                buildWholeRegexp(cfg.wordList[x]);
+                this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x]));
                 break;
               case 4: // Regular Expression (Advanced)
-                wordRegExps.push(new RegExp(cfg.wordList[x], 'gi'));
+                this.wordRegExps.push(new RegExp(this.cfg.wordList[x], 'gi'));
                 break;
               default: // case 1 - Partial word match (Default)
-                buildPartRegexp(cfg.wordList[x]);
+              this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x]));
                 break;
             }
           }
           break;
         default: // case 1 - Global: Partial word match (Default)
-          for (let x = 0; x < cfg.wordList.length; x++) {
-            buildPartRegexp(cfg.wordList[x]);
+          for (let x = 0; x < this.cfg.wordList.length; x++) {
+            this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x]));
           }
           break;
       }
     }
   }
 
-  // Returns true if a node should *not* be altered in any way
-  // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
-  function isForbiddenNode(node: any) {
-    return Boolean(
-      node.isContentEditable || // DraftJS and many others
-      (node.parentNode && (
-                            node.parentNode.isContentEditable || // Special case for Gmail
-                            node.parentNode.tagName == "SCRIPT" ||
-                            node.parentNode.tagName == "STYLE" ||
-                            node.parentNode.tagName == "INPUT" ||
-                            node.parentNode.tagName == "TEXTAREA" ||
-                            node.parentNode.tagName == "IFRAME"
-                          )
-      ) || // Some catch-alls
-      (node.tagName &&  (
-                          node.tagName == "SCRIPT" ||
-                          node.tagName == "STYLE" ||
-                          node.tagName == "INPUT" ||
-                          node.tagName == "TEXTAREA" ||
-                          node.tagName == "IFRAME"
-                        )
-      )
-    );
-  }
-
   // Watch for new text nodes and clean them as they are added
-  function observeNewNodes() {
+  observeNewNodes() {
+    let self = this;
     let observerConfig = {
       childList: true,
       subtree: true
@@ -212,23 +152,16 @@ namespace Filter {
     // When DOM is modified, remove profanity from inserted node
     let observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
-        checkNodeForProfanity(mutation);
+        self.checkNodeForProfanity(mutation);
       });
-      updateCounterBadge();
+      self.updateCounterBadge();
     });
 
     // Remove profanity from new objects
     observer.observe(document, observerConfig);
   }
 
-  function randomElement(array: any[]) {
-    if (array.length === 0) {
-      array = cfg.defaultSubstitutions;
-    }
-    return array[Math.floor((Math.random()*array.length))];
-  }
-
-  function removeProfanity(xpathExpression: string, node: any) {
+  removeProfanity(xpathExpression: string, node: any) {
     let evalResult = document.evaluate(
       xpathExpression,
       node,
@@ -241,7 +174,7 @@ namespace Filter {
       // Don't mess with tags, styles, or URIs
       if (!/^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/.test(node.data)) {
         // console.log('Plaintext:', node.data); // DEBUG
-        node.data = replaceText(node.data);
+        node.data = this.replaceText(node.data);
       } else {
         // console.log('Skipping:', node.data); // DEBUG
       }
@@ -249,38 +182,40 @@ namespace Filter {
       for (let i = 0; i < evalResult.snapshotLength; i++) {
         let textNode = evalResult.snapshotItem(i) as any; // TODO
         // console.log('Normal cleaning:', textNode.data); // DEBUG
-        textNode.data = replaceText(textNode.data);
+        textNode.data = this.replaceText(textNode.data);
       }
     }
   }
 
-  function replaceText(str: string) {
-    switch(cfg.filterMethod) {
+  replaceText(str: string) {
+    let self = this;
+    switch(self.cfg.filterMethod) {
       case 0: // Censor
-        for (let z = 0; z < cfg.wordList.length; z++) {
-          str = str.replace(wordRegExps[z], censorReplace);
+        for (let z = 0; z < self.cfg.wordList.length; z++) {
+          str = str.replace(self.wordRegExps[z], self.censorReplace);
         }
         break;
       case 1: // Substitute
-        for (let z = 0; z < cfg.wordList.length; z++) {
-          str = str.replace(wordRegExps[z], function(match) {
-            counter++;
-            // console.log('Substitute match:', match, cfg.words[cfg.wordList[z]].words); // DEBUG
-            if (cfg.substitutionMark) {
-              return '[' + randomElement(cfg.words[cfg.wordList[z]].words) + ']';
+        for (let z = 0; z < self.cfg.wordList.length; z++) {
+          str = str.replace(self.wordRegExps[z], function(match) {
+            self.counter++;
+            // console.log('Substitute match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
+
+            if (self.cfg.substitutionMark) {
+              return '[' + Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words) + ']';
             } else {
-              return randomElement(cfg.words[cfg.wordList[z]].words);
+              return Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words);
             }
           });
         }
         break;
       case 2: // Remove
-        for (let z = 0; z < cfg.wordList.length; z++) {
-          str = str.replace(wordRegExps[z], function(match) {
-            counter++;
+        for (let z = 0; z < self.cfg.wordList.length; z++) {
+          str = str.replace(self.wordRegExps[z], function(match) {
+            self.counter++;
             // Don't remove both leading and trailing whitespace
             // console.log('Remove match:', match); // DEBUG
-            if (whitespaceRegExp.test(match[0]) && whitespaceRegExp.test(match[match.length - 1])) {
+            if (Page.whitespaceRegExp.test(match[0]) && Page.whitespaceRegExp.test(match[match.length - 1])) {
               return match[0];
             } else {
               return "";
@@ -292,11 +227,13 @@ namespace Filter {
     return str;
   }
 
-  function updateCounterBadge() {
-    if (cfg.showCounter && counter > 0) {
-      chrome.runtime.sendMessage({counter: counter.toString()});
+  updateCounterBadge() {
+    if (this.cfg.showCounter && this.counter > 0) {
+      chrome.runtime.sendMessage({counter: this.counter.toString()});
     }
   }
-
-  cleanPage();
 }
+
+// Global
+var filter = new Filter
+filter.cleanPage();
