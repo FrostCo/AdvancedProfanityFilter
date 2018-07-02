@@ -169,18 +169,21 @@ class OptionPage {
       case 0:
         OptionPage.show(document.getElementById('optionsCensor'));
         OptionPage.hide(document.getElementById('optionsSubstitution'));
+        OptionPage.show(document.getElementById('preserveCaseContainer'));
         OptionPage.show(document.getElementById('globalMatchMethod'));
         OptionPage.hide(document.getElementById('wordSubstitutions'));
         break;
       case 1:
         OptionPage.hide(document.getElementById('optionsCensor'));
         OptionPage.show(document.getElementById('optionsSubstitution'));
+        OptionPage.show(document.getElementById('preserveCaseContainer'));
         OptionPage.show(document.getElementById('globalMatchMethod'));
         OptionPage.show(document.getElementById('wordSubstitutions'));
         break;
       case 2:
         OptionPage.hide(document.getElementById('optionsCensor'));
         OptionPage.hide(document.getElementById('optionsSubstitution'));
+        OptionPage.hide(document.getElementById('preserveCaseContainer'));
         OptionPage.hide(document.getElementById('globalMatchMethod'));
         OptionPage.hide(document.getElementById('wordSubstitutions'));
         break;
@@ -196,6 +199,7 @@ class OptionPage {
     // Settings
     let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
     let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
+    let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
@@ -204,6 +208,7 @@ class OptionPage {
 
     censorFixedLengthSelect.selectedIndex = self.cfg.censorFixedLength;
     censorCharacterSelect.value = self.cfg.censorCharacter;
+    preserveCase.checked = self.cfg.preserveCase;
     preserveFirst.checked = self.cfg.preserveFirst;
     preserveLast.checked = self.cfg.preserveLast;
     substitutionMark.checked = self.cfg.substitutionMark;
@@ -235,10 +240,12 @@ class OptionPage {
   async saveOptions(event) {
     let self = this;
     // Gather current settings
+    let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
+    self.cfg.preserveCase = preserveCase.checked;
     self.cfg.preserveFirst = preserveFirst.checked;
     self.cfg.preserveLast = preserveLast.checked;
     self.cfg.showCounter = showCounter.checked;
@@ -358,6 +365,7 @@ document.getElementById('substitutionMark').addEventListener('click', function(e
 // Global Matching Method
 document.getElementById('globalMatchMethodSelect').addEventListener('change', function(e) { option.globalMatchMethod(e); });
 // General
+document.getElementById('preserveCase').addEventListener('click', function(e) { option.saveOptions(e); });
 document.getElementById('showCounter').addEventListener('click', function(e) { option.saveOptions(e); });
 // Words
 document.getElementById('wordAdd').addEventListener('click', function(e) { option.wordAdd(e); });
