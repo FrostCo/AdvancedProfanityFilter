@@ -202,8 +202,7 @@ class Filter {
             let sub = Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words);
             // console.log('Substitute match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
 
-            let preserveCase = true;
-            if (preserveCase) {
+            if (self.cfg.preserveCase) {
               if (Word.allUpperCase(match)) {
                 sub = sub.toUpperCase();
               } else if (Word.capitalized(match)) {

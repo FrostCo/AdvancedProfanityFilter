@@ -7,6 +7,7 @@ class Config {
   filterMethod: number;
   globalMatchMethod: number;
   password: string;
+  preserveCase: boolean;
   preserveFirst: boolean;
   preserveLast: boolean;
   showCounter: boolean;
@@ -27,6 +28,7 @@ class Config {
     "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
     "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word", "RegExp"]
     "password": null,
+    "preserveCase": true,
     "preserveFirst": true,
     "preserveLast": false,
     "showCounter": true,
