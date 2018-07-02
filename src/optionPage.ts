@@ -349,31 +349,31 @@ for (let i = 0; i < tabs.length; i++) {
 // Filter
 document.getElementById('filterMethodSelect').addEventListener('change', function(e) { option.filterMethodSelect(e); });
 // Filter - Censor
-document.getElementById('preserveFirst').addEventListener('click', function(e) { option.saveOptions(e); } );
-document.getElementById('preserveLast').addEventListener('click', function(e) { option.saveOptions(e); } );
+document.getElementById('preserveFirst').addEventListener('click', function(e) { option.saveOptions(e); });
+document.getElementById('preserveLast').addEventListener('click', function(e) { option.saveOptions(e); });
 document.getElementById('censorCharacterSelect').addEventListener('change', function(e) { option.censorCharacter(e); });
 document.getElementById('censorFixedLengthSelect').addEventListener('change', function(e) { option.censorFixedLength(e); });
 // Filter - Substitute
-document.getElementById('substitutionMark').addEventListener('click', function(e) { option.saveOptions(e); } );
+document.getElementById('substitutionMark').addEventListener('click', function(e) { option.saveOptions(e); });
 // Global Matching Method
 document.getElementById('globalMatchMethodSelect').addEventListener('change', function(e) { option.globalMatchMethod(e); });
 // General
-document.getElementById('showCounter').addEventListener('click', function(e) { option.saveOptions(e); } );
+document.getElementById('showCounter').addEventListener('click', function(e) { option.saveOptions(e); });
 // Words
-document.getElementById('wordAdd').addEventListener('click', function(e) { option.wordAdd(e); } );
-document.getElementById('wordRemove').addEventListener('click', function(e) { option.wordRemove(e); } );
+document.getElementById('wordAdd').addEventListener('click', function(e) { option.wordAdd(e); });
+document.getElementById('wordRemove').addEventListener('click', function(e) { option.wordRemove(e); });
 document.getElementById('wordSelect').addEventListener('change', function(e) { option.substitutionLoad(); });
 document.getElementById('wordSelect').addEventListener('change', function(e) { option.wordMatchMethodLoad(e); });
-document.getElementById('wordMatchMethodSet').addEventListener('click', function(e) { option.wordMatchMethodSet(e); } );
-document.getElementById('substitutionAdd').addEventListener('click', function(e) { option.substitutionAdd(e); } );
-document.getElementById('substitutionRemove').addEventListener('click', function(e) { option.substitutionRemove(e); } );
+document.getElementById('wordMatchMethodSet').addEventListener('click', function(e) { option.wordMatchMethodSet(e); });
+document.getElementById('substitutionAdd').addEventListener('click', function(e) { option.substitutionAdd(e); });
+document.getElementById('substitutionRemove').addEventListener('click', function(e) { option.substitutionRemove(e); });
 // Domains
-document.getElementById('domainAdd').addEventListener('click', function(e) { option.domainAdd(e); } );
-document.getElementById('domainRemove').addEventListener('click', function(e) { option.domainRemove(e); } );
+document.getElementById('domainAdd').addEventListener('click', function(e) { option.domainAdd(e); });
+document.getElementById('domainRemove').addEventListener('click', function(e) { option.domainRemove(e); });
 // Config
-document.getElementById('default').addEventListener('click', function(e) { option.confirm(e, 'restoreDefaults'); } );
-document.getElementById('import').addEventListener('click', function(e) { option.confirm(e, 'importConfig'); } );
-document.getElementById('export').addEventListener('click', function(e) { option.exportConfig(); } );
+document.getElementById('default').addEventListener('click', function(e) { option.confirm(e, 'restoreDefaults'); });
+document.getElementById('import').addEventListener('click', function(e) { option.confirm(e, 'importConfig'); });
+document.getElementById('export').addEventListener('click', function(e) { option.exportConfig(); });
 // Password
-document.getElementById('submitPassword').addEventListener('click', function(e) { option.auth.authenticate(e); } );
-document.getElementById('setPasswordBtn').addEventListener('click', function(e) { option.auth.setPassword(); } );
+document.getElementById('submitPassword').addEventListener('click', function(e) { option.auth.authenticate(e); });
+document.getElementById('setPasswordBtn').addEventListener('click', function(e) { option.auth.setPassword(); });
