@@ -62,10 +62,6 @@ class Config {
                     if (Object.keys(items.words).length === 0 && items.words.constructor === Object) {
                         items.words = Config._defaultWords;
                     }
-                    // Sort the words array by longest (most-specific) first
-                    items.wordList = Object.keys(items.words).sort(function (a, b) {
-                        return b.length - a.length;
-                    });
                 }
                 resolve(items);
             });
@@ -83,8 +79,6 @@ class Config {
         });
     }
     save() {
-        // let clone = Object.assign({}, this, {"wordList": undefined});
-        // console.log(clone);
         let self = this;
         return new Promise(function (resolve, reject) {
             chrome.storage.sync.set(self, function () {
@@ -113,6 +107,7 @@ Config._defaults = {
     "filterMethod": 0,
     "globalMatchMethod": 3,
     "password": null,
+    "preserveCase": true,
     "preserveFirst": true,
     "preserveLast": false,
     "showCounter": true,
@@ -361,6 +356,7 @@ class OptionPage {
             // Settings
             let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect');
             let censorCharacterSelect = document.getElementById('censorCharacterSelect');
+            let preserveCase = document.getElementById('preserveCase');
             let preserveFirst = document.getElementById('preserveFirst');
             let preserveLast = document.getElementById('preserveLast');
             let substitutionMark = document.getElementById('substitutionMark');
@@ -368,6 +364,7 @@ class OptionPage {
             let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect');
             censorFixedLengthSelect.selectedIndex = self.cfg.censorFixedLength;
             censorCharacterSelect.value = self.cfg.censorCharacter;
+            preserveCase.checked = self.cfg.preserveCase;
             preserveFirst.checked = self.cfg.preserveFirst;
             preserveLast.checked = self.cfg.preserveLast;
             substitutionMark.checked = self.cfg.substitutionMark;
@@ -402,10 +399,12 @@ class OptionPage {
         return __awaiter(this, void 0, void 0, function* () {
             let self = this;
             // Gather current settings
+            let preserveCase = document.getElementById('preserveCase');
             let preserveFirst = document.getElementById('preserveFirst');
             let preserveLast = document.getElementById('preserveLast');
             let showCounter = document.getElementById('showCounter');
             let substitutionMark = document.getElementById('substitutionMark');
+            self.cfg.preserveCase = preserveCase.checked;
             self.cfg.preserveFirst = preserveFirst.checked;
             self.cfg.preserveLast = preserveLast.checked;
             self.cfg.showCounter = showCounter.checked;
@@ -513,6 +512,7 @@ document.getElementById('preserveLast').addEventListener('click', function (e) {
 document.getElementById('censorCharacterSelect').addEventListener('change', function (e) { option.censorCharacter(e); });
 document.getElementById('censorFixedLengthSelect').addEventListener('change', function (e) { option.censorFixedLength(e); });
 // Filter - Substitute
+document.getElementById('preserveCase').addEventListener('click', function (e) { option.saveOptions(e); });
 document.getElementById('substitutionMark').addEventListener('click', function (e) { option.saveOptions(e); });
 // Global Matching Method
 document.getElementById('globalMatchMethodSelect').addEventListener('change', function (e) { option.globalMatchMethod(e); });

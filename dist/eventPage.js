@@ -62,10 +62,6 @@ class Config {
                     if (Object.keys(items.words).length === 0 && items.words.constructor === Object) {
                         items.words = Config._defaultWords;
                     }
-                    // Sort the words array by longest (most-specific) first
-                    items.wordList = Object.keys(items.words).sort(function (a, b) {
-                        return b.length - a.length;
-                    });
                 }
                 resolve(items);
             });
@@ -83,8 +79,6 @@ class Config {
         });
     }
     save() {
-        // let clone = Object.assign({}, this, {"wordList": undefined});
-        // console.log(clone);
         let self = this;
         return new Promise(function (resolve, reject) {
             chrome.storage.sync.set(self, function () {
@@ -113,6 +107,7 @@ Config._defaults = {
     "filterMethod": 0,
     "globalMatchMethod": 3,
     "password": null,
+    "preserveCase": true,
     "preserveFirst": true,
     "preserveLast": false,
     "showCounter": true,
