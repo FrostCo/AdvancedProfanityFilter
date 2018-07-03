@@ -169,21 +169,18 @@ class OptionPage {
       case 0:
         OptionPage.show(document.getElementById('optionsCensor'));
         OptionPage.hide(document.getElementById('optionsSubstitution'));
-        OptionPage.show(document.getElementById('preserveCaseContainer'));
         OptionPage.show(document.getElementById('globalMatchMethod'));
         OptionPage.hide(document.getElementById('wordSubstitutions'));
         break;
       case 1:
         OptionPage.hide(document.getElementById('optionsCensor'));
         OptionPage.show(document.getElementById('optionsSubstitution'));
-        OptionPage.show(document.getElementById('preserveCaseContainer'));
         OptionPage.show(document.getElementById('globalMatchMethod'));
         OptionPage.show(document.getElementById('wordSubstitutions'));
         break;
       case 2:
         OptionPage.hide(document.getElementById('optionsCensor'));
         OptionPage.hide(document.getElementById('optionsSubstitution'));
-        OptionPage.hide(document.getElementById('preserveCaseContainer'));
         OptionPage.hide(document.getElementById('globalMatchMethod'));
         OptionPage.hide(document.getElementById('wordSubstitutions'));
         break;
@@ -361,11 +358,11 @@ document.getElementById('preserveLast').addEventListener('click', function(e) { 
 document.getElementById('censorCharacterSelect').addEventListener('change', function(e) { option.censorCharacter(e); });
 document.getElementById('censorFixedLengthSelect').addEventListener('change', function(e) { option.censorFixedLength(e); });
 // Filter - Substitute
+document.getElementById('preserveCase').addEventListener('click', function(e) { option.saveOptions(e); });
 document.getElementById('substitutionMark').addEventListener('click', function(e) { option.saveOptions(e); });
 // Global Matching Method
 document.getElementById('globalMatchMethodSelect').addEventListener('change', function(e) { option.globalMatchMethod(e); });
 // General
-document.getElementById('preserveCase').addEventListener('click', function(e) { option.saveOptions(e); });
 document.getElementById('showCounter').addEventListener('click', function(e) { option.saveOptions(e); });
 // Words
 document.getElementById('wordAdd').addEventListener('click', function(e) { option.wordAdd(e); });
