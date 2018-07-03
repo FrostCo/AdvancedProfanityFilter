@@ -47,34 +47,12 @@ class OptionPage {
 
   // Prompt for confirmation
   confirm(event, action) {
-    // TODO: Don't confirm if Firefox
-    // if (/Chrome/.exec(navigator.userAgent)) {
-    //   var dialogContainer = document.getElementById('dialogContainer');
-    //   dialogContainer.innerHTML = '<dialog id="promptDialog">Are you sure?<br><button id="confirmYes">Yes</button><button id="confirmNo">No</button></dialog>';
-    //   var dialog = document.getElementById("promptDialog") as HTMLDialogElement;
-
-    //   document.getElementById('confirmNo').addEventListener("click", function() {
-    //     this.removeEventListener('click', arguments.callee, false);
-    //     dialog.close();
-    //   })
-    //   document.getElementById('confirmYes').addEventListener("click", function() {
-    //     this.removeEventListener('click', arguments.callee, false);
-    //     if (action == 'importConfig') {
-    //       importConfig(event);
-    //     } else if (action == 'restoreDefaults') {
-    //       restoreDefaults();
-    //     }
-    //     dialog.close();
-    //   })
-
-    //   dialog.showModal();
-    // } else {
-      if (action == 'importConfig') {
-        this.importConfig(event);
-      } else if (action == 'restoreDefaults') {
-        this.restoreDefaults();
-      }
-    // }
+    // TODO: Add confirmation prompt
+    if (action == 'importConfig') {
+      this.importConfig(event);
+    } else if (action == 'restoreDefaults') {
+      this.restoreDefaults();
+    }
   }
 
   domainAdd(event) {
