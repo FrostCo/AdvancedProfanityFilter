@@ -78,6 +78,11 @@
   <div id="optionsSubstitution" class="moveDown hidden">
     <h4>Substitution Settings</h4>
     <label>
+      <input type="checkbox" id="preserveCase">
+      Preserve case of filtered words
+    </label>
+    <br />
+    <label>
       <input type="checkbox" id="substitutionMark">
       Mark substitution words with [ ]
       <span class="notes">(Dog: dog = [cat])</span>
@@ -93,13 +98,6 @@
 
   <div id="generalOptions" class="moveDown">
     <h4>General Settings</h4>
-    <div id="preserveCaseContainer" class="hidden">
-      <label>
-        <input type="checkbox" id="preserveCase">
-        Preserve case of filtered words
-      </label>
-      <br />
-    </div>
     <label>
       <input type="checkbox" id="showCounter">
       Show number of filtered words
