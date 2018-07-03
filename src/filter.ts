@@ -66,6 +66,11 @@ class Filter {
       }
     }
 
+    // Sort the words array by longest (most-specific) first
+    this.cfg.wordList = Object.keys(this.cfg.words).sort(function(a, b) {
+      return b.length - a.length;
+    });
+
     // Remove profanity from the main document and watch for new nodes
     this.generateRegexpList();
     this.removeProfanity(Page.xpathDocText, document);
