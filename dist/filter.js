@@ -183,22 +183,30 @@ class Word {
 }
 class Page {
     static isForbiddenNode(node) {
+        // TODO: Hack for new Reddit: <script id="data">
+        if (node.parentNode && node.parentNode.tagName == "SCRIPT" && Page.redditHack.test(node.data)) {
+            filter.counter = 0; // Reset counter because we have to re-process the page
+            return false;
+        }
         return Boolean(node.isContentEditable || // DraftJS and many others
-            (node.parentNode && (node.parentNode.isContentEditable || // Special case for Gmail
-                node.parentNode.tagName == "SCRIPT" ||
-                node.parentNode.tagName == "STYLE" ||
-                node.parentNode.tagName == "INPUT" ||
-                node.parentNode.tagName == "TEXTAREA" ||
-                node.parentNode.tagName == "IFRAME")) || // Some catch-alls
-            (node.tagName && (node.tagName == "SCRIPT" ||
-                node.tagName == "STYLE" ||
-                node.tagName == "INPUT" ||
-                node.tagName == "TEXTAREA" ||
-                node.tagName == "IFRAME")));
+            (node.parentNode &&
+                (node.parentNode.isContentEditable || // Special case for Gmail
+                    node.parentNode.tagName == "SCRIPT" ||
+                    node.parentNode.tagName == "STYLE" ||
+                    node.parentNode.tagName == "INPUT" ||
+                    node.parentNode.tagName == "TEXTAREA" ||
+                    node.parentNode.tagName == "IFRAME")) || // Some catch-alls
+            (node.tagName &&
+                (node.tagName == "SCRIPT" ||
+                    node.tagName == "STYLE" ||
+                    node.tagName == "INPUT" ||
+                    node.tagName == "TEXTAREA" ||
+                    node.tagName == "IFRAME")));
     }
 }
 // Returns true if a node should *not* be altered in any way
 // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
+Page.redditHack = RegExp('^window.___r'); // TODO: Hack for new Reddit
 Page.whitespaceRegExp = new RegExp('\\s');
 Page.xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
 Page.xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
@@ -210,12 +218,14 @@ class Filter {
         this.wordRegExps = [];
     }
     checkNodeForProfanity(mutation) {
-        let self = this;
+        // console.log('Mutation observed:', mutation); // DEBUG
         mutation.addedNodes.forEach(function (node) {
+            // console.log('Added node(s):', node); // DEBUG
             if (!Page.isForbiddenNode(node)) {
                 // console.log('Node to removeProfanity', node); // DEBUG
-                self.removeProfanity(Page.xpathNodeText, node);
+                filter.removeProfanity(Page.xpathNodeText, node);
             }
+            // else { console.log('Forbidden node:', node); } // DEBUG
         });
     }
     // Censor the profanity
@@ -347,6 +357,7 @@ class Filter {
     observeNewNodes() {
         let self = this;
         let observerConfig = {
+            characterData: true,
             childList: true,
             subtree: true
         };
