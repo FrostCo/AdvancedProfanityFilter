@@ -62,10 +62,6 @@ class Config {
                     if (Object.keys(items.words).length === 0 && items.words.constructor === Object) {
                         items.words = Config._defaultWords;
                     }
-                    // Sort the words array by longest (most-specific) first
-                    items.wordList = Object.keys(items.words).sort(function (a, b) {
-                        return b.length - a.length;
-                    });
                 }
                 resolve(items);
             });
@@ -83,8 +79,6 @@ class Config {
         });
     }
     save() {
-        // let clone = Object.assign({}, this, {"wordList": undefined});
-        // console.log(clone);
         let self = this;
         return new Promise(function (resolve, reject) {
             chrome.storage.sync.set(self, function () {
@@ -113,6 +107,7 @@ Config._defaults = {
     "filterMethod": 0,
     "globalMatchMethod": 3,
     "password": null,
+    "preserveCase": true,
     "preserveFirst": true,
     "preserveLast": false,
     "showCounter": true,
@@ -138,6 +133,12 @@ Config._defaultWords = {
 Config._filterMethodNames = ["Censor", "Substitute", "Remove"];
 Config._matchMethodNames = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match", "Regular Expression"];
 class Word {
+    static allLowerCase(string) {
+        return string.toLowerCase() === string;
+    }
+    static allUpperCase(string) {
+        return string.toUpperCase() === string;
+    }
     // Word must match exactly (not sub-string)
     // /\b(w)ord\b/gi
     static buildExactRegexp(word) {
@@ -162,6 +163,12 @@ class Word {
     // /\b[\w-]*(w)ord[\w-]*\b/gi
     static buildWholeRegexp(word) {
         return new RegExp('\\b([\\w-]*' + word[0] + ')' + Word.escapeRegExp(word.slice(1)) + '[\\w-]*\\b', 'gi');
+    }
+    static capitalize(string) {
+        return string.charAt(0).toUpperCase() + string.substr(1);
+    }
+    static capitalized(string) {
+        return string.charAt(0).toUpperCase() === string.charAt(0);
     }
     static escapeRegExp(str) {
         return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -214,6 +221,7 @@ class Filter {
     // Censor the profanity
     // Only gets run when there is a match in replaceText()
     censorReplace(strMatchingString, strFirstLetter) {
+        filter.counter++;
         let censoredString = '';
         if (filter.cfg.censorFixedLength > 0) {
             if (filter.cfg.preserveFirst && filter.cfg.preserveLast) {
@@ -243,7 +251,6 @@ class Filter {
                 censoredString = filter.cfg.censorCharacter.repeat(strMatchingString.length);
             }
         }
-        filter.counter++;
         // console.log('Censor match:', strMatchingString, censoredString); // DEBUG
         return censoredString;
     }
@@ -259,6 +266,10 @@ class Filter {
                     return false;
                 }
             }
+            // Sort the words array by longest (most-specific) first
+            this.cfg.wordList = Object.keys(this.cfg.words).sort(function (a, b) {
+                return b.length - a.length;
+            });
             // Remove profanity from the main document and watch for new nodes
             this.generateRegexpList();
             this.removeProfanity(Page.xpathDocText, document);
@@ -370,31 +381,40 @@ class Filter {
         }
     }
     replaceText(str) {
-        let self = this;
-        switch (self.cfg.filterMethod) {
+        switch (filter.cfg.filterMethod) {
             case 0: // Censor
-                for (let z = 0; z < self.cfg.wordList.length; z++) {
-                    str = str.replace(self.wordRegExps[z], self.censorReplace);
+                for (let z = 0; z < filter.cfg.wordList.length; z++) {
+                    str = str.replace(filter.wordRegExps[z], filter.censorReplace);
                 }
                 break;
             case 1: // Substitute
-                for (let z = 0; z < self.cfg.wordList.length; z++) {
-                    str = str.replace(self.wordRegExps[z], function (match) {
-                        self.counter++;
-                        // console.log('Substitute match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
-                        if (self.cfg.substitutionMark) {
-                            return '[' + Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words) + ']';
+                for (let z = 0; z < filter.cfg.wordList.length; z++) {
+                    str = str.replace(filter.wordRegExps[z], function (match) {
+                        filter.counter++;
+                        let sub = Word.randomElement(filter.cfg.words[filter.cfg.wordList[z]].words);
+                        // console.log('Substitute match:', match, filter.cfg.words[filter.cfg.wordList[z]].words); // DEBUG
+                        // Make substitution match case of original match
+                        if (filter.cfg.preserveCase) {
+                            if (Word.allUpperCase(match)) {
+                                sub = sub.toUpperCase();
+                            }
+                            else if (Word.capitalized(match)) {
+                                sub = Word.capitalize(sub);
+                            }
+                        }
+                        if (filter.cfg.substitutionMark) {
+                            return '[' + sub + ']';
                         }
                         else {
-                            return Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words);
+                            return sub;
                         }
                     });
                 }
                 break;
             case 2: // Remove
-                for (let z = 0; z < self.cfg.wordList.length; z++) {
-                    str = str.replace(self.wordRegExps[z], function (match) {
-                        self.counter++;
+                for (let z = 0; z < filter.cfg.wordList.length; z++) {
+                    str = str.replace(filter.wordRegExps[z], function (match) {
+                        filter.counter++;
                         // Don't remove both leading and trailing whitespace
                         // console.log('Remove match:', match); // DEBUG
                         if (Page.whitespaceRegExp.test(match[0]) && Page.whitespaceRegExp.test(match[match.length - 1])) {

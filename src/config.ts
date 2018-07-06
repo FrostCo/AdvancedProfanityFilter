@@ -7,6 +7,7 @@ class Config {
   filterMethod: number;
   globalMatchMethod: number;
   password: string;
+  preserveCase: boolean;
   preserveFirst: boolean;
   preserveLast: boolean;
   showCounter: boolean;
@@ -27,6 +28,7 @@ class Config {
     "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
     "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word", "RegExp"]
     "password": null,
+    "preserveCase": true,
     "preserveFirst": true,
     "preserveLast": false,
     "showCounter": true,
@@ -88,11 +90,6 @@ class Config {
           if (Object.keys(items.words).length === 0 && items.words.constructor === Object) {
             items.words = Config._defaultWords;
           }
-
-          // Sort the words array by longest (most-specific) first
-          items.wordList = Object.keys(items.words).sort(function(a, b) {
-            return b.length - a.length;
-          });
         }
         resolve(items);
       });
@@ -113,8 +110,6 @@ class Config {
   }
 
   save() {
-    // let clone = Object.assign({}, this, {"wordList": undefined});
-    // console.log(clone);
     let self = this;
     return new Promise(function(resolve, reject) {
       chrome.storage.sync.set(self, function() {
