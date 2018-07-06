@@ -24,6 +24,7 @@ class Filter {
   // Censor the profanity
   // Only gets run when there is a match in replaceText()
   censorReplace(strMatchingString: string, strFirstLetter: string): string {
+    filter.counter++;
     let censoredString = '';
 
     if (filter.cfg.censorFixedLength > 0) {
@@ -48,7 +49,6 @@ class Filter {
       }
     }
 
-    filter.counter++;
     // console.log('Censor match:', strMatchingString, censoredString); // DEBUG
     return censoredString;
   }
@@ -65,6 +65,11 @@ class Filter {
         return false;
       }
     }
+
+    // Sort the words array by longest (most-specific) first
+    this.cfg.wordList = Object.keys(this.cfg.words).sort(function(a, b) {
+      return b.length - a.length;
+    });
 
     // Remove profanity from the main document and watch for new nodes
     this.generateRegexpList();
@@ -188,31 +193,40 @@ class Filter {
   }
 
   replaceText(str: string) {
-    let self = this;
-    switch(self.cfg.filterMethod) {
+    switch(filter.cfg.filterMethod) {
       case 0: // Censor
-        for (let z = 0; z < self.cfg.wordList.length; z++) {
-          str = str.replace(self.wordRegExps[z], self.censorReplace);
+        for (let z = 0; z < filter.cfg.wordList.length; z++) {
+          str = str.replace(filter.wordRegExps[z], filter.censorReplace);
         }
         break;
       case 1: // Substitute
-        for (let z = 0; z < self.cfg.wordList.length; z++) {
-          str = str.replace(self.wordRegExps[z], function(match) {
-            self.counter++;
-            // console.log('Substitute match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
+        for (let z = 0; z < filter.cfg.wordList.length; z++) {
+          str = str.replace(filter.wordRegExps[z], function(match) {
+            filter.counter++;
+            let sub = Word.randomElement(filter.cfg.words[filter.cfg.wordList[z]].words);
+            // console.log('Substitute match:', match, filter.cfg.words[filter.cfg.wordList[z]].words); // DEBUG
 
-            if (self.cfg.substitutionMark) {
-              return '[' + Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words) + ']';
+            // Make substitution match case of original match
+            if (filter.cfg.preserveCase) {
+              if (Word.allUpperCase(match)) {
+                sub = sub.toUpperCase();
+              } else if (Word.capitalized(match)) {
+                sub = Word.capitalize(sub);
+              }
+            }
+
+            if (filter.cfg.substitutionMark) {
+              return '[' + sub + ']';
             } else {
-              return Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words);
+              return sub;
             }
           });
         }
         break;
       case 2: // Remove
-        for (let z = 0; z < self.cfg.wordList.length; z++) {
-          str = str.replace(self.wordRegExps[z], function(match) {
-            self.counter++;
+        for (let z = 0; z < filter.cfg.wordList.length; z++) {
+          str = str.replace(filter.wordRegExps[z], function(match) {
+            filter.counter++;
             // Don't remove both leading and trailing whitespace
             // console.log('Remove match:', match); // DEBUG
             if (Page.whitespaceRegExp.test(match[0]) && Page.whitespaceRegExp.test(match[match.length - 1])) {

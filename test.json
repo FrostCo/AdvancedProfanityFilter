@@ -1,0 +1,45 @@
+{
+  "censorCharacter": "*",
+  "censorFixedLength": 0,
+  "defaultSubstitutions": [
+    "censored",
+    "expletive",
+    "filtered"
+  ],
+  "filterMethod": 1,
+  "globalMatchMethod": 3,
+  "preserveCase": true,
+  "preserveFirst": true,
+  "preserveLast": true,
+  "showCounter": true,
+  "substitutionMark": true,
+  "words": {
+    "force": {
+      "matchMethod": 0,
+      "words": [
+        "magic",
+        "power"
+      ]
+    },
+    "parrot": {
+      "matchMethod": 0,
+      "words": [
+        "bird",
+        "repeat"
+      ]
+    },
+    "rospe": {
+      "matchMethod": 2,
+      "words": [
+        "benefit",
+        "do well",
+        "succeed",
+        "thrive"
+      ]
+    },
+    "theEnterprise": {
+      "matchMethod": 2,
+      "words": []
+    }
+  }
+}

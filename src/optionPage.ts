@@ -47,34 +47,12 @@ class OptionPage {
 
   // Prompt for confirmation
   confirm(event, action) {
-    // TODO: Don't confirm if Firefox
-    // if (/Chrome/.exec(navigator.userAgent)) {
-    //   var dialogContainer = document.getElementById('dialogContainer');
-    //   dialogContainer.innerHTML = '<dialog id="promptDialog">Are you sure?<br><button id="confirmYes">Yes</button><button id="confirmNo">No</button></dialog>';
-    //   var dialog = document.getElementById("promptDialog") as HTMLDialogElement;
-
-    //   document.getElementById('confirmNo').addEventListener("click", function() {
-    //     this.removeEventListener('click', arguments.callee, false);
-    //     dialog.close();
-    //   })
-    //   document.getElementById('confirmYes').addEventListener("click", function() {
-    //     this.removeEventListener('click', arguments.callee, false);
-    //     if (action == 'importConfig') {
-    //       importConfig(event);
-    //     } else if (action == 'restoreDefaults') {
-    //       restoreDefaults();
-    //     }
-    //     dialog.close();
-    //   })
-
-    //   dialog.showModal();
-    // } else {
-      if (action == 'importConfig') {
-        this.importConfig(event);
-      } else if (action == 'restoreDefaults') {
-        this.restoreDefaults();
-      }
-    // }
+    // TODO: Add confirmation prompt
+    if (action == 'importConfig') {
+      this.importConfig(event);
+    } else if (action == 'restoreDefaults') {
+      this.restoreDefaults();
+    }
   }
 
   domainAdd(event) {
@@ -196,6 +174,7 @@ class OptionPage {
     // Settings
     let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
     let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
+    let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
@@ -204,6 +183,7 @@ class OptionPage {
 
     censorFixedLengthSelect.selectedIndex = self.cfg.censorFixedLength;
     censorCharacterSelect.value = self.cfg.censorCharacter;
+    preserveCase.checked = self.cfg.preserveCase;
     preserveFirst.checked = self.cfg.preserveFirst;
     preserveLast.checked = self.cfg.preserveLast;
     substitutionMark.checked = self.cfg.substitutionMark;
@@ -235,10 +215,12 @@ class OptionPage {
   async saveOptions(event) {
     let self = this;
     // Gather current settings
+    let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
+    self.cfg.preserveCase = preserveCase.checked;
     self.cfg.preserveFirst = preserveFirst.checked;
     self.cfg.preserveLast = preserveLast.checked;
     self.cfg.showCounter = showCounter.checked;
@@ -349,31 +331,32 @@ for (let i = 0; i < tabs.length; i++) {
 // Filter
 document.getElementById('filterMethodSelect').addEventListener('change', function(e) { option.filterMethodSelect(e); });
 // Filter - Censor
-document.getElementById('preserveFirst').addEventListener('click', function(e) { option.saveOptions(e); } );
-document.getElementById('preserveLast').addEventListener('click', function(e) { option.saveOptions(e); } );
+document.getElementById('preserveFirst').addEventListener('click', function(e) { option.saveOptions(e); });
+document.getElementById('preserveLast').addEventListener('click', function(e) { option.saveOptions(e); });
 document.getElementById('censorCharacterSelect').addEventListener('change', function(e) { option.censorCharacter(e); });
 document.getElementById('censorFixedLengthSelect').addEventListener('change', function(e) { option.censorFixedLength(e); });
 // Filter - Substitute
-document.getElementById('substitutionMark').addEventListener('click', function(e) { option.saveOptions(e); } );
+document.getElementById('preserveCase').addEventListener('click', function(e) { option.saveOptions(e); });
+document.getElementById('substitutionMark').addEventListener('click', function(e) { option.saveOptions(e); });
 // Global Matching Method
 document.getElementById('globalMatchMethodSelect').addEventListener('change', function(e) { option.globalMatchMethod(e); });
 // General
-document.getElementById('showCounter').addEventListener('click', function(e) { option.saveOptions(e); } );
+document.getElementById('showCounter').addEventListener('click', function(e) { option.saveOptions(e); });
 // Words
-document.getElementById('wordAdd').addEventListener('click', function(e) { option.wordAdd(e); } );
-document.getElementById('wordRemove').addEventListener('click', function(e) { option.wordRemove(e); } );
+document.getElementById('wordAdd').addEventListener('click', function(e) { option.wordAdd(e); });
+document.getElementById('wordRemove').addEventListener('click', function(e) { option.wordRemove(e); });
 document.getElementById('wordSelect').addEventListener('change', function(e) { option.substitutionLoad(); });
 document.getElementById('wordSelect').addEventListener('change', function(e) { option.wordMatchMethodLoad(e); });
-document.getElementById('wordMatchMethodSet').addEventListener('click', function(e) { option.wordMatchMethodSet(e); } );
-document.getElementById('substitutionAdd').addEventListener('click', function(e) { option.substitutionAdd(e); } );
-document.getElementById('substitutionRemove').addEventListener('click', function(e) { option.substitutionRemove(e); } );
+document.getElementById('wordMatchMethodSet').addEventListener('click', function(e) { option.wordMatchMethodSet(e); });
+document.getElementById('substitutionAdd').addEventListener('click', function(e) { option.substitutionAdd(e); });
+document.getElementById('substitutionRemove').addEventListener('click', function(e) { option.substitutionRemove(e); });
 // Domains
-document.getElementById('domainAdd').addEventListener('click', function(e) { option.domainAdd(e); } );
-document.getElementById('domainRemove').addEventListener('click', function(e) { option.domainRemove(e); } );
+document.getElementById('domainAdd').addEventListener('click', function(e) { option.domainAdd(e); });
+document.getElementById('domainRemove').addEventListener('click', function(e) { option.domainRemove(e); });
 // Config
-document.getElementById('default').addEventListener('click', function(e) { option.confirm(e, 'restoreDefaults'); } );
-document.getElementById('import').addEventListener('click', function(e) { option.confirm(e, 'importConfig'); } );
-document.getElementById('export').addEventListener('click', function(e) { option.exportConfig(); } );
+document.getElementById('default').addEventListener('click', function(e) { option.confirm(e, 'restoreDefaults'); });
+document.getElementById('import').addEventListener('click', function(e) { option.confirm(e, 'importConfig'); });
+document.getElementById('export').addEventListener('click', function(e) { option.exportConfig(); });
 // Password
-document.getElementById('submitPassword').addEventListener('click', function(e) { option.auth.authenticate(e); } );
-document.getElementById('setPasswordBtn').addEventListener('click', function(e) { option.auth.setPassword(); } );
+document.getElementById('submitPassword').addEventListener('click', function(e) { option.auth.authenticate(e); });
+document.getElementById('setPasswordBtn').addEventListener('click', function(e) { option.auth.setPassword(); });
