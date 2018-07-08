@@ -11,13 +11,15 @@ class Filter {
     this.wordRegExps = [];
   }
 
-  checkNodeForProfanity(mutation: any) {
-    let self = this;
+  checkNodeForProfanity(mutation: MutationRecord) {
+    // console.log('Mutation observed:', mutation); // DEBUG
     mutation.addedNodes.forEach(function(node) {
+      // console.log('Added node(s):', node); // DEBUG
       if (!Page.isForbiddenNode(node)) {
         // console.log('Node to removeProfanity', node); // DEBUG
-        self.removeProfanity(Page.xpathNodeText, node);
+        filter.removeProfanity(Page.xpathNodeText, node);
       }
+      // else { console.log('Forbidden node:', node); } // DEBUG
     });
   }
 
@@ -150,6 +152,7 @@ class Filter {
   observeNewNodes() {
     let self = this;
     let observerConfig = {
+      characterData: true,
       childList: true,
       subtree: true
     };
