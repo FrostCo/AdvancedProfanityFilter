@@ -277,10 +277,10 @@ class OptionPage {
 
   wordAdd(event) {
     let wordText = document.getElementById('wordText') as HTMLInputElement;
-    let word = wordText.value;
+    let word = wordText.value.trim().toLowerCase();
     if (word != "") {
       if (!arrayContains(Object.keys(this.cfg.words), word)) {
-      if (/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/.test(word)) {
+        if (/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/.test(word)) {
           this.cfg.words[word] = {"matchMethod": 1, "words": []};
         } else {
           this.cfg.words[word] = {"matchMethod": 0, "words": []};
