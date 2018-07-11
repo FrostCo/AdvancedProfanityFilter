@@ -138,11 +138,10 @@ class Config {
           }
         });
 
-        // Add words if requested, and provide defaults if needed
+        // Add words if requested, and provide _defaultWords if needed
         if (keys === undefined || arrayContains(keys, 'words')) {
           // Use default words if none were provided
-          // TODO
-          if (items._words0 && Object.keys(items._words0).length === 0 ) { // && items.words.constructor === Object) {
+          if (items._words0 === undefined || Object.keys(items._words0).length == 0) {
             items._words0 = Config._defaultWords;
           }
           Config.combineWords(items);
