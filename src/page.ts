@@ -5,18 +5,11 @@ class Page {
 
   // Returns true if a node should *not* be altered in any way
   // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
-  static readonly redditHack = RegExp('^window.___r'); // TODO: Hack for new Reddit
   static readonly whitespaceRegExp = new RegExp('\\s');
   static readonly xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
   static readonly xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
 
   static isForbiddenNode(node: any): boolean {
-    // TODO: Hack for new Reddit: <script id="data">
-    if (node.parentNode && node.parentNode.tagName == "SCRIPT" && Page.redditHack.test(node.data)) {
-      filter.counter = 0; // Reset counter because we have to re-process the page
-      return false;
-    }
-
     return Boolean(
       node.isContentEditable || // DraftJS and many others
       (node.parentNode &&
