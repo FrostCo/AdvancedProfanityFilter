@@ -131,6 +131,7 @@ class Config {
       }
 
       chrome.storage.sync.get(request, function(items) {
+        // TODO: probably not needed?
         // Ensure defaults for undefined settings
         Object.keys(Config._defaults).forEach(function(defaultKey){
           if (items[defaultKey] === undefined) {
