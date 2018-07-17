@@ -64,23 +64,28 @@ class Config {
         let data = {};
         // Save all settings using keys from _defaults
         Object.keys(Config._defaults).forEach(function (key) {
-            data[key] = self[key];
+            if (self[key] !== undefined) {
+                data[key] = self[key];
+            }
         });
-        // Split words back into _words* for storage
-        let splitWords = self.splitWords();
-        Object.keys(splitWords).forEach(function (key) {
-            data[key] = splitWords[key];
-        });
-        let wordKeys = Object.keys(self).filter(function (key) {
-            return Config._wordsPattern.test(key);
-        });
-        wordKeys.forEach(function (key) {
-            data[key] = self[key];
-        });
-        // console.log('dataToPersist', data); // DEBUG
+        if (self.words) {
+            // Split words back into _words* for storage
+            let splitWords = self.splitWords();
+            Object.keys(splitWords).forEach(function (key) {
+                data[key] = splitWords[key];
+            });
+            let wordKeys = Object.keys(self).filter(function (key) {
+                return Config._wordsPattern.test(key);
+            });
+            wordKeys.forEach(function (key) {
+                data[key] = self[key];
+            });
+        }
+        // console.log('dataToPersist', data); // DEBUG - Config
         return data;
     }
     // Async call to get provided keys (or default keys) from chrome storage
+    // TODO: Keys: Doesn't support getting words
     static getConfig(keys) {
         return new Promise(function (resolve, reject) {
             // Generate a request to use with chrome.storage
@@ -92,11 +97,12 @@ class Config {
                 }
             }
             chrome.storage.sync.get(request, function (items) {
-                // TODO: probably not needed?
                 // Ensure defaults for undefined settings
                 Object.keys(Config._defaults).forEach(function (defaultKey) {
-                    if (items[defaultKey] === undefined) {
-                        items[defaultKey] = Config._defaults[defaultKey];
+                    if (request == null || arrayContains(Object.keys(request), defaultKey)) {
+                        if (items[defaultKey] === undefined) {
+                            items[defaultKey] = Config._defaults[defaultKey];
+                        }
                     }
                 });
                 // Add words if requested, and provide _defaultWords if needed
@@ -154,6 +160,7 @@ class Config {
 Config._defaults = {
     "censorCharacter": "*",
     "censorFixedLength": 0,
+    "comprehensiveDomains": [],
     "defaultSubstitutions": ["censored", "expletive", "filtered"],
     "disabledDomains": [],
     "filterMethod": 0,
@@ -172,6 +179,7 @@ Config._defaultWords = {
     "bastard": { "matchMethod": 1, "words": ["imperfect", "impure"] },
     "bitch": { "matchMethod": 1, "words": ["jerk"] },
     "cunt": { "matchMethod": 1, "words": ["explative"] },
+    "dammit": { "matchMethod": 1, "words": ["dangit"] },
     "damn": { "matchMethod": 1, "words": ["dang", "darn"] },
     "fuck": { "matchMethod": 1, "words": ["freak", "fudge"] },
     "piss": { "matchMethod": 1, "words": ["pee"] },
@@ -186,6 +194,35 @@ Config._matchMethodNames = ["Exact Match", "Partial Match", "Whole Match", "Per-
 Config._maxBytes = 6500;
 Config._maxWords = 100;
 Config._wordsPattern = /^_words\d+/;
+class Domain {
+    static domainMatch(domain, domains) {
+        let result = false;
+        for (let x = 0; x < domains.length; x++) {
+            if (domains[x]) {
+                let domainRegex = new RegExp("(^|\.)" + domains[x]);
+                if (domainRegex.test(domain)) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+    static getCurrentTab() {
+        return new Promise(function (resolve, reject) {
+            chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+                resolve(tabs[0]);
+            });
+        });
+    }
+    load() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.tab = yield Domain.getCurrentTab();
+            this.url = new URL(this.tab.url);
+            this.hostname = this.url.hostname;
+        });
+    }
+}
 class Word {
     static allLowerCase(string) {
         return string.toLowerCase() === string;
@@ -258,10 +295,11 @@ class Page {
 Page.whitespaceRegExp = new RegExp('\\s');
 Page.xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
 Page.xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
-// tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
+// tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/domain.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
 // /// <reference path="./config.ts" />
 class Filter {
     constructor() {
+        this.comprehensive = false;
         this.counter = 0;
         this.wordRegExps = [];
     }
@@ -340,6 +378,8 @@ class Filter {
                     return false;
                 }
             }
+            // Turn on comprehensive filter (NOTE: Can break things)
+            this.comprehensive = Domain.domainMatch(window.location.hostname, this.cfg.comprehensiveDomains);
             // Sort the words array by longest (most-specific) first
             this.cfg.wordList = Object.keys(this.cfg.words).sort(function (a, b) {
                 return b.length - a.length;
@@ -352,18 +392,9 @@ class Filter {
         });
     }
     disabledPage() {
-        let result = { "disabled": false, "domain": "" };
+        let result = { "disabled": false };
         let domain = window.location.hostname;
-        for (let x = 0; x < this.cfg.disabledDomains.length; x++) {
-            if (this.cfg.disabledDomains[x]) {
-                let domainRegex = new RegExp("(^|\.)" + this.cfg.disabledDomains[x]);
-                if (domainRegex.test(domain)) {
-                    result.disabled = true;
-                    result.domain = this.cfg.disabledDomains[x];
-                    break;
-                }
-            }
-        }
+        result.disabled = Domain.domainMatch(domain, this.cfg.disabledDomains);
         return result;
     }
     // Parse the profanity list
@@ -446,7 +477,19 @@ class Filter {
                 }
                 // else { console.log('Skipping plaintext (protected pattern):', node.data); } // DEBUG
             }
-            // else { console.log('No evalResults and no node.data:', evalResult, node.innerText); } // DEBUG
+            else { // No matches, no node.data
+                if (filter.comprehensive) {
+                    console.log('Comprehensive mode:', evalResult, node.textContent); // DEBUG - Comprehensive
+                    var replacement;
+                    if (node.textContent) {
+                        replacement = filter.replaceText(node.textContent);
+                        if (replacement != node.textContent) {
+                            console.log('Comprehensive replacement with no data:', replacement); // DEBUG - Comprehensive
+                            node.textContent = replacement;
+                        }
+                    }
+                }
+            }
         }
         else { // If evalResult matches
             for (let i = 0; i < evalResult.snapshotLength; i++) {
