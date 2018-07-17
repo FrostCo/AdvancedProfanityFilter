@@ -42,26 +42,76 @@ class Config {
             return instance;
         });
     }
+    // Compile words
+    static combineWords(items) {
+        items.words = {};
+        if (items._words0 !== undefined) {
+            // Find all _words* to combine
+            let wordKeys = Object.keys(items).filter(function (key) {
+                return Config._wordsPattern.test(key);
+            });
+            // Add all _words* to words and remove _words*
+            wordKeys.forEach(function (key) {
+                Object.assign(items.words, items[key]);
+                delete items[key];
+            });
+        }
+        // console.log('combineWords', items); // DEBUG
+    }
+    // Persist all configs from defaults and split _words*
+    dataToPersist() {
+        let self = this;
+        let data = {};
+        // Save all settings using keys from _defaults
+        Object.keys(Config._defaults).forEach(function (key) {
+            if (self[key] !== undefined) {
+                data[key] = self[key];
+            }
+        });
+        if (self.words) {
+            // Split words back into _words* for storage
+            let splitWords = self.splitWords();
+            Object.keys(splitWords).forEach(function (key) {
+                data[key] = splitWords[key];
+            });
+            let wordKeys = Object.keys(self).filter(function (key) {
+                return Config._wordsPattern.test(key);
+            });
+            wordKeys.forEach(function (key) {
+                data[key] = self[key];
+            });
+        }
+        // console.log('dataToPersist', data); // DEBUG - Config
+        return data;
+    }
     // Async call to get provided keys (or default keys) from chrome storage
+    // TODO: Keys: Doesn't support getting words
     static getConfig(keys) {
         return new Promise(function (resolve, reject) {
             // Generate a request to use with chrome.storage
-            let request = {};
-            if (keys === undefined) {
-                request = Config._defaults;
-            }
-            else {
+            let request = null;
+            if (keys !== undefined) {
+                request = {};
                 for (let k of keys) {
                     request[k] = Config._defaults[k];
                 }
             }
             chrome.storage.sync.get(request, function (items) {
-                // Only include words if requested
+                // Ensure defaults for undefined settings
+                Object.keys(Config._defaults).forEach(function (defaultKey) {
+                    if (request == null || arrayContains(Object.keys(request), defaultKey)) {
+                        if (items[defaultKey] === undefined) {
+                            items[defaultKey] = Config._defaults[defaultKey];
+                        }
+                    }
+                });
+                // Add words if requested, and provide _defaultWords if needed
                 if (keys === undefined || arrayContains(keys, 'words')) {
                     // Use default words if none were provided
-                    if (Object.keys(items.words).length === 0 && items.words.constructor === Object) {
-                        items.words = Config._defaultWords;
+                    if (items._words0 === undefined || Object.keys(items._words0).length == 0) {
+                        items._words0 = Config._defaultWords;
                     }
+                    Config.combineWords(items);
                 }
                 resolve(items);
             });
@@ -79,29 +129,38 @@ class Config {
         });
     }
     save() {
-        let self = this;
+        var self = this;
         return new Promise(function (resolve, reject) {
-            chrome.storage.sync.set(self, function () {
+            chrome.storage.sync.set(self.dataToPersist(), function () {
                 resolve(chrome.runtime.lastError ? 1 : 0);
             });
         });
     }
-    saveProp({ prop: string, val: any }) {
-        // let cfg = this;
-        // cfg[prop] = val;
-        // return new Promise(function(resolve, reject) {
-        //     chrome.storage.sync.set(cfg, function() {
-        //         resolve(chrome.runtime.lastError ? 1 : 0);
-        //     });
-        // });
-    }
-    setProp(event, prop, value) {
-        this[prop] = value;
+    splitWords() {
+        let self = this;
+        let currentContainerNum = 0;
+        let currentWordNum = 0;
+        // let wordsLength = JSON.stringify(self.words).length;
+        // let wordContainers = Math.ceil(wordsLength/Config._maxBytes);
+        // let wordsNum = Object.keys(self.words).length;
+        let words = {};
+        words[`_words${currentContainerNum}`] = {};
+        Object.keys(self.words).sort().forEach(function (word) {
+            if (currentWordNum == Config._maxWords) {
+                currentContainerNum++;
+                currentWordNum = 0;
+                words[`_words${currentContainerNum}`] = {};
+            }
+            words[`_words${currentContainerNum}`][word] = self.words[word];
+            currentWordNum++;
+        });
+        return words;
     }
 }
 Config._defaults = {
     "censorCharacter": "*",
     "censorFixedLength": 0,
+    "comprehensiveDomains": [],
     "defaultSubstitutions": ["censored", "expletive", "filtered"],
     "disabledDomains": [],
     "filterMethod": 0,
@@ -111,8 +170,7 @@ Config._defaults = {
     "preserveFirst": true,
     "preserveLast": false,
     "showCounter": true,
-    "substitutionMark": true,
-    "words": {}
+    "substitutionMark": true
 };
 Config._defaultWords = {
     "ass": { "matchMethod": 0, "words": ["butt", "tail"] },
@@ -121,6 +179,7 @@ Config._defaultWords = {
     "bastard": { "matchMethod": 1, "words": ["imperfect", "impure"] },
     "bitch": { "matchMethod": 1, "words": ["jerk"] },
     "cunt": { "matchMethod": 1, "words": ["explative"] },
+    "dammit": { "matchMethod": 1, "words": ["dangit"] },
     "damn": { "matchMethod": 1, "words": ["dang", "darn"] },
     "fuck": { "matchMethod": 1, "words": ["freak", "fudge"] },
     "piss": { "matchMethod": 1, "words": ["pee"] },
@@ -132,6 +191,9 @@ Config._defaultWords = {
 };
 Config._filterMethodNames = ["Censor", "Substitute", "Remove"];
 Config._matchMethodNames = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match", "Regular Expression"];
+Config._maxBytes = 6500;
+Config._maxWords = 100;
+Config._wordsPattern = /^_words\d+/;
 // tsc --outfile ./dist/eventPage.js ./src/helper.ts ./src/config.ts ./src/eventPage.ts --target es6
 ////
 // Actions and messaging
@@ -145,6 +207,8 @@ chrome.runtime.onInstalled.addListener(function (details) {
         // console.log("Updated from " + details.previousVersion + " to " + thisVersion + "!");
         // TODO: Migrate wordList - Open options page to show new features
         // chrome.runtime.openOptionsPage();
+        // TODO: Move words to _words*
+        updateRemoveWordsFromStorage();
         // Display update notification
         chrome.notifications.create("extensionUpdate", {
             "type": "basic",
@@ -231,6 +295,28 @@ function toggleFilterEventPage(domain) {
             }
         }
         disabled ? enableDomainEventPage(domain) : disableDomainEventPage(domain);
+    });
+}
+// TODO: Remove after update: transition from previous words structure under the hood
+function updateRemoveWordsFromStorage() {
+    chrome.storage.sync.get({ "words": null }, function (oldWords) {
+        console.log('Old words for migration:', oldWords.words);
+        if (oldWords.words) {
+            chrome.storage.sync.set({ "_words0": oldWords.words }, function () {
+                if (!chrome.runtime.lastError) {
+                    chrome.storage.sync.remove("words", function () {
+                        // Split words if necessary
+                        var wordsPromise = new Promise(function (resolve, reject) {
+                            resolve(Config.build());
+                        });
+                        wordsPromise
+                            .then(function (response) {
+                            response.save();
+                        });
+                    });
+                }
+            });
+        }
     });
 }
 ////

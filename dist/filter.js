@@ -42,26 +42,76 @@ class Config {
             return instance;
         });
     }
+    // Compile words
+    static combineWords(items) {
+        items.words = {};
+        if (items._words0 !== undefined) {
+            // Find all _words* to combine
+            let wordKeys = Object.keys(items).filter(function (key) {
+                return Config._wordsPattern.test(key);
+            });
+            // Add all _words* to words and remove _words*
+            wordKeys.forEach(function (key) {
+                Object.assign(items.words, items[key]);
+                delete items[key];
+            });
+        }
+        // console.log('combineWords', items); // DEBUG
+    }
+    // Persist all configs from defaults and split _words*
+    dataToPersist() {
+        let self = this;
+        let data = {};
+        // Save all settings using keys from _defaults
+        Object.keys(Config._defaults).forEach(function (key) {
+            if (self[key] !== undefined) {
+                data[key] = self[key];
+            }
+        });
+        if (self.words) {
+            // Split words back into _words* for storage
+            let splitWords = self.splitWords();
+            Object.keys(splitWords).forEach(function (key) {
+                data[key] = splitWords[key];
+            });
+            let wordKeys = Object.keys(self).filter(function (key) {
+                return Config._wordsPattern.test(key);
+            });
+            wordKeys.forEach(function (key) {
+                data[key] = self[key];
+            });
+        }
+        // console.log('dataToPersist', data); // DEBUG - Config
+        return data;
+    }
     // Async call to get provided keys (or default keys) from chrome storage
+    // TODO: Keys: Doesn't support getting words
     static getConfig(keys) {
         return new Promise(function (resolve, reject) {
             // Generate a request to use with chrome.storage
-            let request = {};
-            if (keys === undefined) {
-                request = Config._defaults;
-            }
-            else {
+            let request = null;
+            if (keys !== undefined) {
+                request = {};
                 for (let k of keys) {
                     request[k] = Config._defaults[k];
                 }
             }
             chrome.storage.sync.get(request, function (items) {
-                // Only include words if requested
+                // Ensure defaults for undefined settings
+                Object.keys(Config._defaults).forEach(function (defaultKey) {
+                    if (request == null || arrayContains(Object.keys(request), defaultKey)) {
+                        if (items[defaultKey] === undefined) {
+                            items[defaultKey] = Config._defaults[defaultKey];
+                        }
+                    }
+                });
+                // Add words if requested, and provide _defaultWords if needed
                 if (keys === undefined || arrayContains(keys, 'words')) {
                     // Use default words if none were provided
-                    if (Object.keys(items.words).length === 0 && items.words.constructor === Object) {
-                        items.words = Config._defaultWords;
+                    if (items._words0 === undefined || Object.keys(items._words0).length == 0) {
+                        items._words0 = Config._defaultWords;
                     }
+                    Config.combineWords(items);
                 }
                 resolve(items);
             });
@@ -79,29 +129,38 @@ class Config {
         });
     }
     save() {
-        let self = this;
+        var self = this;
         return new Promise(function (resolve, reject) {
-            chrome.storage.sync.set(self, function () {
+            chrome.storage.sync.set(self.dataToPersist(), function () {
                 resolve(chrome.runtime.lastError ? 1 : 0);
             });
         });
     }
-    saveProp({ prop: string, val: any }) {
-        // let cfg = this;
-        // cfg[prop] = val;
-        // return new Promise(function(resolve, reject) {
-        //     chrome.storage.sync.set(cfg, function() {
-        //         resolve(chrome.runtime.lastError ? 1 : 0);
-        //     });
-        // });
-    }
-    setProp(event, prop, value) {
-        this[prop] = value;
+    splitWords() {
+        let self = this;
+        let currentContainerNum = 0;
+        let currentWordNum = 0;
+        // let wordsLength = JSON.stringify(self.words).length;
+        // let wordContainers = Math.ceil(wordsLength/Config._maxBytes);
+        // let wordsNum = Object.keys(self.words).length;
+        let words = {};
+        words[`_words${currentContainerNum}`] = {};
+        Object.keys(self.words).sort().forEach(function (word) {
+            if (currentWordNum == Config._maxWords) {
+                currentContainerNum++;
+                currentWordNum = 0;
+                words[`_words${currentContainerNum}`] = {};
+            }
+            words[`_words${currentContainerNum}`][word] = self.words[word];
+            currentWordNum++;
+        });
+        return words;
     }
 }
 Config._defaults = {
     "censorCharacter": "*",
     "censorFixedLength": 0,
+    "comprehensiveDomains": [],
     "defaultSubstitutions": ["censored", "expletive", "filtered"],
     "disabledDomains": [],
     "filterMethod": 0,
@@ -111,8 +170,7 @@ Config._defaults = {
     "preserveFirst": true,
     "preserveLast": false,
     "showCounter": true,
-    "substitutionMark": true,
-    "words": {}
+    "substitutionMark": true
 };
 Config._defaultWords = {
     "ass": { "matchMethod": 0, "words": ["butt", "tail"] },
@@ -121,6 +179,7 @@ Config._defaultWords = {
     "bastard": { "matchMethod": 1, "words": ["imperfect", "impure"] },
     "bitch": { "matchMethod": 1, "words": ["jerk"] },
     "cunt": { "matchMethod": 1, "words": ["explative"] },
+    "dammit": { "matchMethod": 1, "words": ["dangit"] },
     "damn": { "matchMethod": 1, "words": ["dang", "darn"] },
     "fuck": { "matchMethod": 1, "words": ["freak", "fudge"] },
     "piss": { "matchMethod": 1, "words": ["pee"] },
@@ -132,6 +191,38 @@ Config._defaultWords = {
 };
 Config._filterMethodNames = ["Censor", "Substitute", "Remove"];
 Config._matchMethodNames = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match", "Regular Expression"];
+Config._maxBytes = 6500;
+Config._maxWords = 100;
+Config._wordsPattern = /^_words\d+/;
+class Domain {
+    static domainMatch(domain, domains) {
+        let result = false;
+        for (let x = 0; x < domains.length; x++) {
+            if (domains[x]) {
+                let domainRegex = new RegExp("(^|\.)" + domains[x]);
+                if (domainRegex.test(domain)) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+    static getCurrentTab() {
+        return new Promise(function (resolve, reject) {
+            chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+                resolve(tabs[0]);
+            });
+        });
+    }
+    load() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.tab = yield Domain.getCurrentTab();
+            this.url = new URL(this.tab.url);
+            this.hostname = this.url.hostname;
+        });
+    }
+}
 class Word {
     static allLowerCase(string) {
         return string.toLowerCase() === string;
@@ -183,11 +274,6 @@ class Word {
 }
 class Page {
     static isForbiddenNode(node) {
-        // TODO: Hack for new Reddit: <script id="data">
-        if (node.parentNode && node.parentNode.tagName == "SCRIPT" && Page.redditHack.test(node.data)) {
-            filter.counter = 0; // Reset counter because we have to re-process the page
-            return false;
-        }
         return Boolean(node.isContentEditable || // DraftJS and many others
             (node.parentNode &&
                 (node.parentNode.isContentEditable || // Special case for Gmail
@@ -206,27 +292,43 @@ class Page {
 }
 // Returns true if a node should *not* be altered in any way
 // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
-Page.redditHack = RegExp('^window.___r'); // TODO: Hack for new Reddit
 Page.whitespaceRegExp = new RegExp('\\s');
 Page.xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
 Page.xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
-// tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
+// tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/domain.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
 // /// <reference path="./config.ts" />
 class Filter {
     constructor() {
+        this.comprehensive = false;
         this.counter = 0;
         this.wordRegExps = [];
     }
+    checkMutationTargetTextForProfanity(mutation) {
+        // console.log('Process mutation.target:', mutation.target, mutation.target.data); // DEBUG - Mutation target text
+        var replacement;
+        if (!Page.isForbiddenNode(mutation.target)) {
+            replacement = filter.replaceText(mutation.target.data);
+            if (replacement != mutation.target.data) {
+                // console.log("Mutation target text changed:", mutation.target.data, replacement); // DEBUG - Mutation target text
+                mutation.target.data = replacement;
+            }
+        }
+        // else { console.log('Forbidden mutation.target node:', mutation.target); } // DEBUG - Mutation target text
+    }
     checkNodeForProfanity(mutation) {
-        // console.log('Mutation observed:', mutation); // DEBUG
+        // console.log('Mutation observed:', mutation); // DEBUG - Mutation addedNodes
         mutation.addedNodes.forEach(function (node) {
-            // console.log('Added node(s):', node); // DEBUG
+            // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
             if (!Page.isForbiddenNode(node)) {
-                // console.log('Node to removeProfanity', node); // DEBUG
+                // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
                 filter.removeProfanity(Page.xpathNodeText, node);
             }
-            // else { console.log('Forbidden node:', node); } // DEBUG
+            // else { console.log('Forbidden node:', node); } // DEBUG - Mutation addedNodes
         });
+        // Only process mutation change if target is text
+        if (mutation.target && mutation.target.nodeName == '#text') {
+            filter.checkMutationTargetTextForProfanity(mutation);
+        }
     }
     // Censor the profanity
     // Only gets run when there is a match in replaceText()
@@ -276,6 +378,8 @@ class Filter {
                     return false;
                 }
             }
+            // Turn on comprehensive filter (NOTE: Can break things)
+            this.comprehensive = Domain.domainMatch(window.location.hostname, this.cfg.comprehensiveDomains);
             // Sort the words array by longest (most-specific) first
             this.cfg.wordList = Object.keys(this.cfg.words).sort(function (a, b) {
                 return b.length - a.length;
@@ -288,18 +392,9 @@ class Filter {
         });
     }
     disabledPage() {
-        let result = { "disabled": false, "domain": "" };
+        let result = { "disabled": false };
         let domain = window.location.hostname;
-        for (let x = 0; x < this.cfg.disabledDomains.length; x++) {
-            if (this.cfg.disabledDomains[x]) {
-                let domainRegex = new RegExp("(^|\.)" + this.cfg.disabledDomains[x]);
-                if (domainRegex.test(domain)) {
-                    result.disabled = true;
-                    result.domain = this.cfg.disabledDomains[x];
-                    break;
-                }
-            }
-        }
+        result.disabled = Domain.domainMatch(domain, this.cfg.disabledDomains);
         return result;
     }
     // Parse the profanity list
@@ -373,21 +468,34 @@ class Filter {
     }
     removeProfanity(xpathExpression, node) {
         let evalResult = document.evaluate(xpathExpression, node, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-        if (evalResult.snapshotLength == 0 && node.data) { // If plaintext node
-            // Don't mess with tags, styles, or URIs
-            if (!/^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/.test(node.data)) {
-                // console.log('Plaintext:', node.data); // DEBUG
-                node.data = this.replaceText(node.data);
+        if (evalResult.snapshotLength == 0) { // If plaintext node
+            if (node.data) {
+                // Don't mess with tags, styles, or URIs
+                if (!/^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/.test(node.data)) {
+                    // console.log('Plaintext:', node.data); // DEBUG
+                    node.data = this.replaceText(node.data);
+                }
+                // else { console.log('Skipping plaintext (protected pattern):', node.data); } // DEBUG
             }
-            else {
-                // console.log('Skipping:', node.data); // DEBUG
+            else { // No matches, no node.data
+                if (filter.comprehensive) {
+                    console.log('Comprehensive mode:', evalResult, node.textContent); // DEBUG - Comprehensive
+                    var replacement;
+                    if (node.textContent) {
+                        replacement = filter.replaceText(node.textContent);
+                        if (replacement != node.textContent) {
+                            console.log('Comprehensive replacement with no data:', replacement); // DEBUG - Comprehensive
+                            node.textContent = replacement;
+                        }
+                    }
+                }
             }
         }
         else { // If evalResult matches
             for (let i = 0; i < evalResult.snapshotLength; i++) {
-                let textNode = evalResult.snapshotItem(i); // TODO
-                // console.log('Normal cleaning:', textNode.data); // DEBUG
-                textNode.data = this.replaceText(textNode.data);
+                var item = evalResult.snapshotItem(i);
+                // console.log('Normal cleaning:', item.data); // DEBUG
+                item.data = this.replaceText(item.data);
             }
         }
     }
