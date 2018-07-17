@@ -1,12 +1,14 @@
-// tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
+// tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/domain.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
 // /// <reference path="./config.ts" />
 
 class Filter {
   cfg: Config;
+  comprehensive: boolean;
   counter: number;
   wordRegExps: RegExp[];
 
   constructor() {
+    this.comprehensive = false;
     this.counter = 0;
     this.wordRegExps = [];
   }
@@ -86,6 +88,9 @@ class Filter {
       }
     }
 
+    // Turn on comprehensive filter (NOTE: Can break things)
+    this.comprehensive = Domain.domainMatch(window.location.hostname, this.cfg.comprehensiveDomains);
+
     // Sort the words array by longest (most-specific) first
     this.cfg.wordList = Object.keys(this.cfg.words).sort(function(a, b) {
       return b.length - a.length;
@@ -99,20 +104,9 @@ class Filter {
   }
 
   disabledPage() {
-    let result = { "disabled": false, "domain": "" };
+    let result = { "disabled": false };
     let domain = window.location.hostname;
-
-    for (let x = 0; x < this.cfg.disabledDomains.length; x++) {
-      if (this.cfg.disabledDomains[x]) {
-        let domainRegex = new RegExp("(^|\.)" + this.cfg.disabledDomains[x]);
-        if (domainRegex.test(domain)) {
-          result.disabled = true;
-          result.domain = this.cfg.disabledDomains[x];
-          break;
-        }
-      }
-    }
-
+    result.disabled = Domain.domainMatch(domain, this.cfg.disabledDomains);
     return result;
   }
 
@@ -204,8 +198,19 @@ class Filter {
           node.data = this.replaceText(node.data);
         }
         // else { console.log('Skipping plaintext (protected pattern):', node.data); } // DEBUG
+      } else { // No matches, no node.data
+        if (filter.comprehensive) {
+          console.log('Comprehensive mode:', evalResult, node.textContent); // DEBUG - Comprehensive
+          var replacement;
+          if (node.textContent) {
+            replacement = filter.replaceText(node.textContent);
+            if (replacement != node.textContent) {
+              console.log('Comprehensive replacement with no data:', replacement); // DEBUG - Comprehensive
+              node.textContent = replacement;
+            }
+          }
+        }
       }
-      // else { console.log('No evalResults and no node.data:', evalResult, node.innerText); } // DEBUG
     } else { // If evalResult matches
       for (let i = 0; i < evalResult.snapshotLength; i++) {
         var item = evalResult.snapshotItem(i) as any;
