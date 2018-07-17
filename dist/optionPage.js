@@ -64,23 +64,28 @@ class Config {
         let data = {};
         // Save all settings using keys from _defaults
         Object.keys(Config._defaults).forEach(function (key) {
-            data[key] = self[key];
+            if (self[key] !== undefined) {
+                data[key] = self[key];
+            }
         });
-        // Split words back into _words* for storage
-        let splitWords = self.splitWords();
-        Object.keys(splitWords).forEach(function (key) {
-            data[key] = splitWords[key];
-        });
-        let wordKeys = Object.keys(self).filter(function (key) {
-            return Config._wordsPattern.test(key);
-        });
-        wordKeys.forEach(function (key) {
-            data[key] = self[key];
-        });
-        // console.log('dataToPersist', data); // DEBUG
+        if (self.words) {
+            // Split words back into _words* for storage
+            let splitWords = self.splitWords();
+            Object.keys(splitWords).forEach(function (key) {
+                data[key] = splitWords[key];
+            });
+            let wordKeys = Object.keys(self).filter(function (key) {
+                return Config._wordsPattern.test(key);
+            });
+            wordKeys.forEach(function (key) {
+                data[key] = self[key];
+            });
+        }
+        // console.log('dataToPersist', data); // DEBUG - Config
         return data;
     }
     // Async call to get provided keys (or default keys) from chrome storage
+    // TODO: Keys: Doesn't support getting words
     static getConfig(keys) {
         return new Promise(function (resolve, reject) {
             // Generate a request to use with chrome.storage
@@ -92,11 +97,12 @@ class Config {
                 }
             }
             chrome.storage.sync.get(request, function (items) {
-                // TODO: probably not needed?
                 // Ensure defaults for undefined settings
                 Object.keys(Config._defaults).forEach(function (defaultKey) {
-                    if (items[defaultKey] === undefined) {
-                        items[defaultKey] = Config._defaults[defaultKey];
+                    if (request == null || arrayContains(Object.keys(request), defaultKey)) {
+                        if (items[defaultKey] === undefined) {
+                            items[defaultKey] = Config._defaults[defaultKey];
+                        }
                     }
                 });
                 // Add words if requested, and provide _defaultWords if needed
@@ -154,6 +160,7 @@ class Config {
 Config._defaults = {
     "censorCharacter": "*",
     "censorFixedLength": 0,
+    "comprehensiveDomains": [],
     "defaultSubstitutions": ["censored", "expletive", "filtered"],
     "disabledDomains": [],
     "filterMethod": 0,
@@ -172,6 +179,7 @@ Config._defaultWords = {
     "bastard": { "matchMethod": 1, "words": ["imperfect", "impure"] },
     "bitch": { "matchMethod": 1, "words": ["jerk"] },
     "cunt": { "matchMethod": 1, "words": ["explative"] },
+    "dammit": { "matchMethod": 1, "words": ["dangit"] },
     "damn": { "matchMethod": 1, "words": ["dang", "darn"] },
     "fuck": { "matchMethod": 1, "words": ["freak", "fudge"] },
     "piss": { "matchMethod": 1, "words": ["pee"] },
