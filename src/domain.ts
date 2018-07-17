@@ -1,8 +1,23 @@
-// TODO:  Update async pattern
 class Domain {
-  tab: any; // TODO
+  tab: any;
   url: URL;
   hostname: string;
+
+  static domainMatch(domain: string, domains: string[]): boolean {
+    let result = false;
+
+    for (let x = 0; x < domains.length; x++) {
+      if (domains[x]) {
+        let domainRegex = new RegExp("(^|\.)" + domains[x]);
+        if (domainRegex.test(domain)) {
+          result = true;
+          break;
+        }
+      }
+    }
+
+    return result;
+  }
 
   static getCurrentTab() {
     return new Promise(function(resolve, reject) {
