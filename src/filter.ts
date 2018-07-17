@@ -1,26 +1,46 @@
-// tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
+// tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/domain.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
 // /// <reference path="./config.ts" />
 
 class Filter {
   cfg: Config;
+  comprehensive: boolean;
   counter: number;
   wordRegExps: RegExp[];
 
   constructor() {
+    this.comprehensive = false;
     this.counter = 0;
     this.wordRegExps = [];
   }
 
-  checkNodeForProfanity(mutation: MutationRecord) {
-    // console.log('Mutation observed:', mutation); // DEBUG
+  checkMutationTargetTextForProfanity(mutation) {
+    // console.log('Process mutation.target:', mutation.target, mutation.target.data); // DEBUG - Mutation target text
+    var replacement;
+    if (!Page.isForbiddenNode(mutation.target)) {
+      replacement = filter.replaceText(mutation.target.data);
+      if (replacement != mutation.target.data) {
+        // console.log("Mutation target text changed:", mutation.target.data, replacement); // DEBUG - Mutation target text
+        mutation.target.data = replacement;
+      }
+    }
+    // else { console.log('Forbidden mutation.target node:', mutation.target); } // DEBUG - Mutation target text
+  }
+
+  checkNodeForProfanity(mutation) {
+    // console.log('Mutation observed:', mutation); // DEBUG - Mutation addedNodes
     mutation.addedNodes.forEach(function(node) {
-      // console.log('Added node(s):', node); // DEBUG
+      // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
       if (!Page.isForbiddenNode(node)) {
-        // console.log('Node to removeProfanity', node); // DEBUG
+        // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
         filter.removeProfanity(Page.xpathNodeText, node);
       }
-      // else { console.log('Forbidden node:', node); } // DEBUG
+      // else { console.log('Forbidden node:', node); } // DEBUG - Mutation addedNodes
     });
+
+    // Only process mutation change if target is text
+    if (mutation.target && mutation.target.nodeName == '#text') {
+      filter.checkMutationTargetTextForProfanity(mutation);
+    }
   }
 
   // Censor the profanity
@@ -68,6 +88,9 @@ class Filter {
       }
     }
 
+    // Turn on comprehensive filter (NOTE: Can break things)
+    this.comprehensive = Domain.domainMatch(window.location.hostname, this.cfg.comprehensiveDomains);
+
     // Sort the words array by longest (most-specific) first
     this.cfg.wordList = Object.keys(this.cfg.words).sort(function(a, b) {
       return b.length - a.length;
@@ -81,20 +104,9 @@ class Filter {
   }
 
   disabledPage() {
-    let result = { "disabled": false, "domain": "" };
+    let result = { "disabled": false };
     let domain = window.location.hostname;
-
-    for (let x = 0; x < this.cfg.disabledDomains.length; x++) {
-      if (this.cfg.disabledDomains[x]) {
-        let domainRegex = new RegExp("(^|\.)" + this.cfg.disabledDomains[x]);
-        if (domainRegex.test(domain)) {
-          result.disabled = true;
-          result.domain = this.cfg.disabledDomains[x];
-          break;
-        }
-      }
-    }
-
+    result.disabled = Domain.domainMatch(domain, this.cfg.disabledDomains);
     return result;
   }
 
@@ -178,24 +190,37 @@ class Filter {
       null
     );
 
-    if (evalResult.snapshotLength == 0 && node.data) { // If plaintext node
-      // Don't mess with tags, styles, or URIs
-      if (!/^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/.test(node.data)) {
-        // console.log('Plaintext:', node.data); // DEBUG
-        node.data = this.replaceText(node.data);
-      } else {
-        // console.log('Skipping:', node.data); // DEBUG
+    if (evalResult.snapshotLength == 0) { // If plaintext node
+      if (node.data) {
+        // Don't mess with tags, styles, or URIs
+        if (!/^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/.test(node.data)) {
+          // console.log('Plaintext:', node.data); // DEBUG
+          node.data = this.replaceText(node.data);
+        }
+        // else { console.log('Skipping plaintext (protected pattern):', node.data); } // DEBUG
+      } else { // No matches, no node.data
+        if (filter.comprehensive) {
+          console.log('Comprehensive mode:', evalResult, node.textContent); // DEBUG - Comprehensive
+          var replacement;
+          if (node.textContent) {
+            replacement = filter.replaceText(node.textContent);
+            if (replacement != node.textContent) {
+              console.log('Comprehensive replacement with no data:', replacement); // DEBUG - Comprehensive
+              node.textContent = replacement;
+            }
+          }
+        }
       }
     } else { // If evalResult matches
       for (let i = 0; i < evalResult.snapshotLength; i++) {
-        let textNode = evalResult.snapshotItem(i) as any; // TODO
-        // console.log('Normal cleaning:', textNode.data); // DEBUG
-        textNode.data = this.replaceText(textNode.data);
+        var item = evalResult.snapshotItem(i) as any;
+        // console.log('Normal cleaning:', item.data); // DEBUG
+        item.data = this.replaceText(item.data);
       }
     }
   }
 
-  replaceText(str: string) {
+  replaceText(str: string): string {
     switch(filter.cfg.filterMethod) {
       case 0: // Censor
         for (let z = 0; z < filter.cfg.wordList.length; z++) {
