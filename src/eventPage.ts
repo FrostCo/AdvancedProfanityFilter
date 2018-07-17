@@ -5,7 +5,7 @@
 
 // Actions for extension install or upgrade
 chrome.runtime.onInstalled.addListener(function(details){
-  if (details.reason == 'install'){
+  if (details.reason == 'install') {
     chrome.runtime.openOptionsPage();
   } else if (details.reason == 'update') {
     // var thisVersion = chrome.runtime.getManifest().version;
@@ -13,6 +13,9 @@ chrome.runtime.onInstalled.addListener(function(details){
 
     // TODO: Migrate wordList - Open options page to show new features
     // chrome.runtime.openOptionsPage();
+
+    // TODO: Move words to _words*
+    updateRemoveWordsFromStorage();
 
     // Display update notification
     chrome.notifications.create("extensionUpdate", {
@@ -99,6 +102,13 @@ async function toggleFilterEventPage(domain: string) {
   }
 
   disabled ? enableDomainEventPage(domain) : disableDomainEventPage(domain);
+}
+
+// TODO: Transition from previous words structure under the hood
+async function updateRemoveWordsFromStorage() {
+  let cfg = await Config.build();
+  cfg.save();
+  chrome.storage.sync.remove('words');
 }
 
 ////
