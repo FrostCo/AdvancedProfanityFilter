@@ -104,11 +104,27 @@ async function toggleFilterEventPage(domain: string) {
   disabled ? enableDomainEventPage(domain) : disableDomainEventPage(domain);
 }
 
-// TODO: Transition from previous words structure under the hood
-async function updateRemoveWordsFromStorage() {
-  let cfg = await Config.build();
-  cfg.save();
-  chrome.storage.sync.remove('words');
+// TODO: Remove after update: transition from previous words structure under the hood
+function updateRemoveWordsFromStorage() {
+  chrome.storage.sync.get({"words": null}, function(oldWords) {
+    console.log('Old words for migration:', oldWords.words);
+    if (oldWords.words) {
+      chrome.storage.sync.set({"_words0": oldWords.words}, function() {
+        if (!chrome.runtime.lastError) {
+          chrome.storage.sync.remove("words", function() {
+            // Split words if necessary
+            var wordsPromise = new Promise(function(resolve, reject) {
+              resolve(Config.build());
+            });
+            wordsPromise
+              .then(function(response: Config) {
+                response.save();
+              });
+          });
+        }
+      });
+    }
+  });
 }
 
 ////
