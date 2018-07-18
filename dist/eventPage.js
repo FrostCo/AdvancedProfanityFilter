@@ -235,7 +235,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 function addSelection(selection) {
     return __awaiter(this, void 0, void 0, function* () {
         selection = (selection.trim()).toLowerCase();
-        let cfg = yield Config.build(['words']);
+        let cfg = yield Config.build(); // TODO: Only need words here
         if (!arrayContains(Object.keys(cfg.words), selection)) {
             cfg.words[selection] = { "matchMethod": 0, "words": [] };
             let result = yield cfg.save();

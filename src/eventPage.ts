@@ -45,7 +45,7 @@ chrome.runtime.onMessage.addListener(
 // Add selected word/phrase and reload page (unless already present)
 async function addSelection(selection: string) {
   selection = (selection.trim()).toLowerCase();
-  let cfg = await Config.build(['words']);
+  let cfg = await Config.build(); // TODO: Only need words here
 
   if (!arrayContains(Object.keys(cfg.words), selection)) {
     cfg.words[selection] = {"matchMethod": 0, "words": []};
