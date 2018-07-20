@@ -371,7 +371,6 @@ class OptionPage {
         return __awaiter(this, void 0, void 0, function* () {
             let self = this;
             yield OptionPage.load(self);
-            // migrateWordList(); // TODO: Migrate wordList
             // console.log('Password:', cfg.password, 'Authenticated:', authenticated); // DEBUG Password
             if (self.cfg.password && !self.auth.authenticated) {
                 // console.log('Prompt for password'); // DEBUG Password
