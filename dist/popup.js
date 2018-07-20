@@ -160,7 +160,7 @@ class Config {
 Config._defaults = {
     "censorCharacter": "*",
     "censorFixedLength": 0,
-    "comprehensiveDomains": [],
+    "advancedDomains": [],
     "defaultSubstitutions": ["censored", "expletive", "filtered"],
     "disabledDomains": [],
     "filterMethod": 0,
