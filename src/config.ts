@@ -2,7 +2,7 @@
 class Config {
   censorCharacter: string;
   censorFixedLength: number;
-  comprehensiveDomains: string[];
+  advancedDomains: string[];
   defaultSubstitutions: string[];
   disabledDomains: string[];
   filterMethod: number;
@@ -24,7 +24,7 @@ class Config {
   static readonly _defaults = {
     "censorCharacter": "*",
     "censorFixedLength": 0,
-    "comprehensiveDomains": [],
+    "advancedDomains": [],
     "defaultSubstitutions": ["censored", "expletive", "filtered"],
     "disabledDomains": [],
     "filterMethod": 0, // ["Censor", "Substitute", "Remove"];

@@ -160,7 +160,7 @@ class Config {
 Config._defaults = {
     "censorCharacter": "*",
     "censorFixedLength": 0,
-    "comprehensiveDomains": [],
+    "advancedDomains": [],
     "defaultSubstitutions": ["censored", "expletive", "filtered"],
     "disabledDomains": [],
     "filterMethod": 0,
@@ -223,6 +223,8 @@ chrome.runtime.onInstalled.addListener(function (details) {
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.counter) {
         chrome.browserAction.setBadgeText({ text: request.counter, tabId: sender.tab.id });
+        // chrome.browserAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255] }); // Red - Advanced
+        // chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255] }); // Blue - Normal
     }
     else if (request.disabled) {
         chrome.browserAction.setIcon({ path: 'icons/icon19-disabled.png', tabId: sender.tab.id });

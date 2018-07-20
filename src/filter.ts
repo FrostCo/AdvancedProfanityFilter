@@ -3,12 +3,12 @@
 
 class Filter {
   cfg: Config;
-  comprehensive: boolean;
+  advanced: boolean;
   counter: number;
   wordRegExps: RegExp[];
 
   constructor() {
-    this.comprehensive = false;
+    this.advanced = false;
     this.counter = 0;
     this.wordRegExps = [];
   }
@@ -88,8 +88,8 @@ class Filter {
       }
     }
 
-    // Turn on comprehensive filter (NOTE: Can break things)
-    this.comprehensive = Domain.domainMatch(window.location.hostname, this.cfg.comprehensiveDomains);
+    // Turn on advanced filter (NOTE: Can break things)
+    this.advanced = Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
 
     // Sort the words array by longest (most-specific) first
     this.cfg.wordList = Object.keys(this.cfg.words).sort(function(a, b) {
@@ -199,13 +199,13 @@ class Filter {
         }
         // else { console.log('Skipping plaintext (protected pattern):', node.data); } // DEBUG
       } else { // No matches, no node.data
-        if (filter.comprehensive) {
-          console.log('Comprehensive mode:', evalResult, node.textContent); // DEBUG - Comprehensive
+        if (filter.advanced) {
+          console.log('Advanced mode:', evalResult, node.textContent); // DEBUG - Advanced
           var replacement;
           if (node.textContent) {
             replacement = filter.replaceText(node.textContent);
             if (replacement != node.textContent) {
-              console.log('Comprehensive replacement with no data:', replacement); // DEBUG - Comprehensive
+              console.log('Advanced replacement with no data:', replacement); // DEBUG - Advanced
               node.textContent = replacement;
             }
           }
