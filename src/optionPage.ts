@@ -33,6 +33,36 @@ class OptionPage {
     setTimeout(function() {status.textContent = ''; status.className = '';}, timeout);
   }
 
+  addNewItem(event, input, attr) {
+    if (input.value != "") {
+      if (input.checkValidity()) {
+        if (!arrayContains(option.cfg[attr], input.value)) {
+          option.cfg[attr].push(input.value);
+          option.cfg[attr] = option.cfg[attr].sort();
+          option.saveOptions(event);
+          input.value = "";
+        } else {
+          OptionPage.updateStatus('Error: Already in list.', true, 3000);
+        }
+      } else {
+        OptionPage.updateStatus("Error: Invalid entry.", true, 5000);
+      }
+    }
+  }
+
+  advancedDomainAdd(event) {
+    let input = document.getElementById('advancedDomainText') as HTMLInputElement;
+    option.addNewItem(event, input, 'advancedDomains');
+  }
+
+  advancedDomainRemove(event) {
+    let input = document.getElementById('advancedDomainSelect') as HTMLInputElement;
+    if (input.value != "") {
+      option.cfg.advancedDomains = removeFromArray(option.cfg.advancedDomains, input.value);
+      option.saveOptions(event);
+    }
+  }
+
   censorCharacter(event) {
     let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
     this.cfg.censorCharacter = censorCharacterSelect.value;
@@ -56,28 +86,15 @@ class OptionPage {
   }
 
   domainAdd(event) {
-    let domainInput = document.getElementById('domainText') as HTMLInputElement;
-    if (domainInput.value != "") {
-      if (domainInput.checkValidity()) {
-        if (!arrayContains(this.cfg.disabledDomains, domainInput.value)) {
-          this.cfg.disabledDomains.push(domainInput.value);
-          this.cfg.disabledDomains = this.cfg.disabledDomains.sort();
-          this.saveOptions(event);
-          domainInput.value = "";
-        } else {
-          OptionPage.updateStatus('Domain already in list.', true, 3000);
-        }
-      } else {
-        OptionPage.updateStatus("Invalid domain, please only provide the domain name.", true, 5000);
-      }
-    }
+    let input = document.getElementById('domainText') as HTMLInputElement;
+    option.addNewItem(event, input, 'disabledDomains');
   }
 
   domainRemove(event) {
     let domainSelect = document.getElementById('domainSelect') as HTMLSelectElement;
     if (domainSelect.value != "") {
-      this.cfg.disabledDomains = removeFromArray(this.cfg.disabledDomains, domainSelect.value);
-      this.saveOptions(event);
+      option.cfg.disabledDomains = removeFromArray(option.cfg.disabledDomains, domainSelect.value);
+      option.saveOptions(event);
     }
   }
 
@@ -195,6 +212,7 @@ class OptionPage {
     dynamicList([], 'substitutionSelect', 'Substitutions');
     dynamicList([], 'wordMatchMethodSelect', 'Select a Word');
     // Domains
+    dynamicList(self.cfg.advancedDomains, 'advancedDomainSelect', 'Advanced Domains');
     dynamicList(self.cfg.disabledDomains, 'domainSelect', 'Disabled Domains');
   }
 
@@ -351,6 +369,8 @@ document.getElementById('wordMatchMethodSet').addEventListener('click', function
 document.getElementById('substitutionAdd').addEventListener('click', function(e) { option.substitutionAdd(e); });
 document.getElementById('substitutionRemove').addEventListener('click', function(e) { option.substitutionRemove(e); });
 // Domains
+document.getElementById('advancedDomainAdd').addEventListener('click', function(e) { option.advancedDomainAdd(e); });
+document.getElementById('advancedDomainRemove').addEventListener('click', function(e) { option.advancedDomainRemove(e); });
 document.getElementById('domainAdd').addEventListener('click', function(e) { option.domainAdd(e); });
 document.getElementById('domainRemove').addEventListener('click', function(e) { option.domainRemove(e); });
 // Config
