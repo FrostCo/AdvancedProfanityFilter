@@ -146,6 +146,20 @@
 
 <!-- Domains Tab -->
 <div id="Domains" class="tabcontent hidden">
+  <h4>Advanced Domains</h4>
+  <div class="notes">
+    Only use when the filter isn't working for a page<br />
+    Warning: This option can have negative results
+  </div>
+  <select id="advancedDomainSelect"></select>
+  <button id="advancedDomainRemove">Remove</button>
+  <div class="moveDown">
+    <div id="advancedDomainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
+    <input type="text" id="advancedDomainText" name="advancedDomainText" pattern="^[a-zA-Z0-9\.\-]+$">
+    <button id="advancedDomainAdd">Add</button>
+  </div>
+
+  <div class="moveDown"></div>
   <h4>Disabled Domains</h4>
   <select id="domainSelect"></select>
   <button id="domainRemove">Remove</button>
