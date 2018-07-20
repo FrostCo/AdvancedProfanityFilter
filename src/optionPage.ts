@@ -147,8 +147,6 @@ class OptionPage {
     let self = this;
     await OptionPage.load(self);
 
-    // migrateWordList(); // TODO: Migrate wordList
-
     // console.log('Password:', cfg.password, 'Authenticated:', authenticated); // DEBUG Password
     if (self.cfg.password && !self.auth.authenticated) {
       // console.log('Prompt for password'); // DEBUG Password
