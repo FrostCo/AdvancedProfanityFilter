@@ -1,4 +1,6 @@
 // tsc --outfile ./dist/eventPage.js ./src/helper.ts ./src/config.ts ./src/eventPage.ts --target es6
+import { arrayContains, removeFromArray } from "./helper.js";
+import Config from './config.js';
 
 ////
 // Actions and messaging

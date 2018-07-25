@@ -1,4 +1,4 @@
-class Word {
+export default class Word {
   static allLowerCase(string: string): boolean {
     return string.toLowerCase() === string;
   }
@@ -50,7 +50,7 @@ class Word {
   }
 
   // TODO: Dependent on filter
-  static randomElement(array: any[]) {
+  static randomElement(array: any[], filter) {
     if (array.length === 0) {
       array = filter.cfg.defaultSubstitutions;
     }

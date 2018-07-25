@@ -1,9 +1,11 @@
 // tsc --outfile ./dist/optionPage.js ./src/helper.ts ./src/config.ts ./src/optionAuth.ts ./src/optionTab.ts ./src/optionPage.ts --target es6
-// TODO: Magic Numbers
-/// <reference path="config.ts" />
-/// <reference path="helper.ts" />
+import { arrayContains, dynamicList, removeFromArray } from "./helper";
+import Config from './config';
+import OptionTab from './optionTab';
+import OptionAuth from './optionAuth';
 
-class OptionPage {
+// TODO: Magic Numbers
+export default class OptionPage {
   cfg: Config;
   auth: OptionAuth;
 

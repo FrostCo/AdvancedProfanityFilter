@@ -1,4 +1,4 @@
-class Domain {
+export default class Domain {
   tab: any;
   url: URL;
   hostname: string;
