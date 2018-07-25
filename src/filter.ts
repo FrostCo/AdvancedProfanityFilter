@@ -1,5 +1,8 @@
 // tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/domain.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
-// /// <reference path="./config.ts" />
+import Config from './config';
+import Domain from './domain';
+import Page from './page';
+import Word from './word';
 
 class Filter {
   cfg: Config;
@@ -231,7 +234,7 @@ class Filter {
         for (let z = 0; z < filter.cfg.wordList.length; z++) {
           str = str.replace(filter.wordRegExps[z], function(match) {
             filter.counter++;
-            let sub = Word.randomElement(filter.cfg.words[filter.cfg.wordList[z]].words);
+            let sub = Word.randomElement(filter.cfg.words[filter.cfg.wordList[z]].words, filter);
             // console.log('Substitute match:', match, filter.cfg.words[filter.cfg.wordList[z]].words); // DEBUG
 
             // Make substitution match case of original match
