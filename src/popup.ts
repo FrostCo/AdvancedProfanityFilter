@@ -1,7 +1,7 @@
 // tsc --outfile ./dist/popup.js ./src/helper.ts ./src/config.ts ./src/domain.ts ./src/popup.ts --target es6
-import { arrayContains, dynamicList, removeFromArray } from "./helper";
-import Config from './config';
-import Domain from './domain';
+import { arrayContains, dynamicList, removeFromArray } from './helper.js';
+import Config from './config.js';
+import Domain from './domain.js';
 
 class Popup {
   cfg: Config;
