@@ -22,7 +22,7 @@
     "chrome_style": true
   },
   "background": {
-    "scripts": [ "eventPage.js" ],
+    "scripts": [ "eventPage.html" ],
     "persistent": false
   },
   "browser_action": {
