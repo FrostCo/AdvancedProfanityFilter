@@ -2,7 +2,8 @@
     "compilerOptions": {
         "outDir": "./dist",
         "allowJs": true,
-        "target": "es6",
+        "target": "es2015",
+        "module": "commonjs",
         "noEmitOnError": true
     },
     "include": [

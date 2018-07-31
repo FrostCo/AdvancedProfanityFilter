@@ -4,7 +4,10 @@
   "description": "Profanity filter",
   "main": "filter.js",
   "scripts": {
-    "compile": "tsc",
+    "build": "./build.sh",
+    "package-all": "npm run package-chrome && npm run package-firefox && git checkout master",
+    "package-chrome": "./package.sh",
+    "package-firefox": "git checkout firefox && git merge master && ./package.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,6 +26,11 @@
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
   "devDependencies": {
     "@types/chrome": "latest",
-    "typescript": "latest"
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "ts-loader": "^4.4.2",
+    "typescript": "latest",
+    "webpack": "^4.16.3",
+    "webpack-cli": "^3.1.0"
   }
 }
