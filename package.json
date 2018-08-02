@@ -4,8 +4,12 @@
   "description": "Profanity filter",
   "main": "filter.js",
   "scripts": {
-    "compile": "./build.sh",
+    "build": "./build.sh",
+    "compile": "npm run build",
     "lint": "npx eslint ./src/*.ts",
+    "package-all": "npm run package-chrome && npm run package-firefox && git checkout master",
+    "package-chrome": "./package.sh",
+    "package-firefox": "git checkout firefox && git merge master && ./package.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
