@@ -187,22 +187,24 @@ class OptionPage {
     }
 
     // Settings
-    let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
     let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
+    let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
+    let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
+    let matchRepeated = document.getElementById('matchRepeated') as HTMLInputElement;
     let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
-    let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
-    let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
+    let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
 
-    censorFixedLengthSelect.selectedIndex = self.cfg.censorFixedLength;
     censorCharacterSelect.value = self.cfg.censorCharacter;
+    censorFixedLengthSelect.selectedIndex = self.cfg.censorFixedLength;
+    matchRepeated.checked = self.cfg.matchRepeated;
     preserveCase.checked = self.cfg.preserveCase;
     preserveFirst.checked = self.cfg.preserveFirst;
     preserveLast.checked = self.cfg.preserveLast;
-    substitutionMark.checked = self.cfg.substitutionMark;
     showCounter.checked = self.cfg.showCounter;
+    substitutionMark.checked = self.cfg.substitutionMark;
     dynamicList(Config._matchMethodNames.slice(0, -1), 'globalMatchMethodSelect');
     globalMatchMethodSelect.selectedIndex = self.cfg.globalMatchMethod;
     // Words
@@ -231,11 +233,13 @@ class OptionPage {
   async saveOptions(event) {
     let self = this;
     // Gather current settings
+    let matchRepeated = document.getElementById('matchRepeated') as HTMLInputElement;
     let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
+    self.cfg.matchRepeated = matchRepeated.checked;
     self.cfg.preserveCase = preserveCase.checked;
     self.cfg.preserveFirst = preserveFirst.checked;
     self.cfg.preserveLast = preserveLast.checked;
@@ -358,6 +362,7 @@ document.getElementById('substitutionMark').addEventListener('click', function(e
 document.getElementById('globalMatchMethodSelect').addEventListener('change', function(e) { option.globalMatchMethod(e); });
 // General
 document.getElementById('showCounter').addEventListener('click', function(e) { option.saveOptions(e); });
+document.getElementById('matchRepeated').addEventListener('click', function(e) { option.saveOptions(e); });
 // Words
 document.getElementById('wordAdd').addEventListener('click', function(e) { option.wordAdd(e); });
 document.getElementById('wordRemove').addEventListener('click', function(e) { option.wordRemove(e); });

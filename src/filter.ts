@@ -231,7 +231,7 @@ class Filter {
         for (let z = 0; z < filter.cfg.wordList.length; z++) {
           str = str.replace(filter.wordRegExps[z], function(match) {
             filter.counter++;
-            let sub = Word.randomElement(filter.cfg.words[filter.cfg.wordList[z]].words);
+            let sub = Word.randomElement(filter.cfg.words[filter.cfg.wordList[z]].words, filter.cfg.defaultSubstitutions);
             // console.log('Substitute match:', match, filter.cfg.words[filter.cfg.wordList[z]].words); // DEBUG
 
             // Make substitution match case of original match
