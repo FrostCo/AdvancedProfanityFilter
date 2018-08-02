@@ -22,41 +22,41 @@ class Config {
   };
 
   static readonly _defaults = {
-    "censorCharacter": "*",
-    "censorFixedLength": 0,
-    "advancedDomains": [],
-    "defaultSubstitutions": ["censored", "expletive", "filtered"],
-    "disabledDomains": [],
-    "filterMethod": 0, // ["Censor", "Substitute", "Remove"];
-    "globalMatchMethod": 3, // ["Exact", "Partial", "Whole", "Per-Word", "RegExp"]
-    "password": null,
-    "preserveCase": true,
-    "preserveFirst": true,
-    "preserveLast": false,
-    "showCounter": true,
-    "substitutionMark": true
+    censorCharacter: '*',
+    censorFixedLength: 0,
+    advancedDomains: [],
+    defaultSubstitutions: ['censored', 'expletive', 'filtered'],
+    disabledDomains: [],
+    filterMethod: 0, // ['Censor', 'Substitute', 'Remove'];
+    globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
+    password: null,
+    preserveCase: true,
+    preserveFirst: true,
+    preserveLast: false,
+    showCounter: true,
+    substitutionMark: true
   };
 
   private static readonly _defaultWords = {
-    "ass": { "matchMethod": 0, "words": ["butt", "tail"] },
-    "asses": { "matchMethod": 0, "words": ["butts"] },
-    "asshole": { "matchMethod": 1, "words": ["butthole", "jerk"] },
-    "bastard": { "matchMethod": 1, "words": ["imperfect", "impure"] },
-    "bitch": { "matchMethod": 1, "words": ["jerk"] },
-    "cunt": { "matchMethod": 1, "words": ["explative"] },
-    "dammit": { "matchMethod": 1, "words": ["dangit"] },
-    "damn": { "matchMethod": 1, "words": ["dang", "darn"] },
-    "fuck": { "matchMethod": 1, "words": ["freak", "fudge"] },
-    "piss": { "matchMethod": 1, "words": ["pee"] },
-    "pissed": { "matchMethod": 0, "words": ["ticked"] },
-    "slut": { "matchMethod": 1, "words": ["imperfect", "impure"] },
-    "shit": { "matchMethod": 1, "words": ["crap", "crud", "poop"] },
-    "tits": { "matchMethod": 1, "words": ["explative"] },
-    "whore": { "matchMethod": 1, "words": ["harlot", "tramp"] }
+    'ass': { 'matchMethod': 0, 'words': ['butt', 'tail'] },
+    'asses': { 'matchMethod': 0, 'words': ['butts'] },
+    'asshole': { 'matchMethod': 1, 'words': ['butthole', 'jerk'] },
+    'bastard': { 'matchMethod': 1, 'words': ['imperfect', 'impure'] },
+    'bitch': { 'matchMethod': 1, 'words': ['jerk'] },
+    'cunt': { 'matchMethod': 1, 'words': ['explative'] },
+    'dammit': { 'matchMethod': 1, 'words': ['dangit'] },
+    'damn': { 'matchMethod': 1, 'words': ['dang', 'darn'] },
+    'fuck': { 'matchMethod': 1, 'words': ['freak', 'fudge'] },
+    'piss': { 'matchMethod': 1, 'words': ['pee'] },
+    'pissed': { 'matchMethod': 0, 'words': ['ticked'] },
+    'slut': { 'matchMethod': 1, 'words': ['imperfect', 'impure'] },
+    'shit': { 'matchMethod': 1, 'words': ['crap', 'crud', 'poop'] },
+    'tits': { 'matchMethod': 1, 'words': ['explative'] },
+    'whore': { 'matchMethod': 1, 'words': ['harlot', 'tramp'] }
   };
 
-  static readonly _filterMethodNames = ["Censor", "Substitute", "Remove"];
-  static readonly _matchMethodNames = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match", "Regular Expression"];
+  static readonly _filterMethodNames = ['Censor', 'Substitute', 'Remove'];
+  static readonly _matchMethodNames = ['Exact Match', 'Partial Match', 'Whole Match', 'Per-Word Match', 'Regular Expression'];
   static readonly _maxBytes = 6500;
   static readonly _maxWords = 100;
   static readonly _wordsPattern = /^_words\d+/;
@@ -120,7 +120,7 @@ class Config {
 
       wordKeys.forEach(function(key){
         data[key] = self[key];
-      })
+      });
     }
 
     // console.log('dataToPersist', data); // DEBUG - Config
