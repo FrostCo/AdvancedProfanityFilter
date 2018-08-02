@@ -15,20 +15,20 @@ export default class Page {
       (node.parentNode &&
         (
           node.parentNode.isContentEditable || // Special case for Gmail
-          node.parentNode.tagName == "SCRIPT" ||
-          node.parentNode.tagName == "STYLE" ||
-          node.parentNode.tagName == "INPUT" ||
-          node.parentNode.tagName == "TEXTAREA" ||
-          node.parentNode.tagName == "IFRAME"
+          node.parentNode.tagName == 'SCRIPT' ||
+          node.parentNode.tagName == 'STYLE' ||
+          node.parentNode.tagName == 'INPUT' ||
+          node.parentNode.tagName == 'TEXTAREA' ||
+          node.parentNode.tagName == 'IFRAME'
         )
       ) || // Some catch-alls
       (node.tagName &&
         (
-          node.tagName == "SCRIPT" ||
-          node.tagName == "STYLE" ||
-          node.tagName == "INPUT" ||
-          node.tagName == "TEXTAREA" ||
-          node.tagName == "IFRAME"
+          node.tagName == 'SCRIPT' ||
+          node.tagName == 'STYLE' ||
+          node.tagName == 'INPUT' ||
+          node.tagName == 'TEXTAREA' ||
+          node.tagName == 'IFRAME'
         )
       )
     );
