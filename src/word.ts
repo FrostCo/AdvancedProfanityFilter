@@ -34,7 +34,7 @@ class Word {
   // Match entire word that contains sub-string
   // /\b[\w-]*(w)ord[\w-]*\b/gi
   static buildWholeRegexp(word: string) {
-    return new RegExp('\\b([\\w-]*' + word[0] + ')' + Word.escapeRegExp(word.slice(1)) + '[\\w-]*\\b', 'gi' )
+    return new RegExp('\\b([\\w-]*' + word[0] + ')' + Word.escapeRegExp(word.slice(1)) + '[\\w-]*\\b', 'gi' );
   }
 
   static capitalize(string: string): string {
@@ -46,7 +46,7 @@ class Word {
   }
 
   static escapeRegExp(str: string): string {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
   }
 
   // TODO: Dependent on filter

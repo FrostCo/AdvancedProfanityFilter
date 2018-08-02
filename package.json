@@ -4,7 +4,8 @@
   "description": "Profanity filter",
   "main": "filter.js",
   "scripts": {
-    "compile": "tsc",
+    "compile": "./build.sh",
+    "lint": "npx eslint ./src/*.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,6 +24,9 @@
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
   "devDependencies": {
     "@types/chrome": "latest",
-    "typescript": "latest"
+    "eslint": "^5.2.0",
+    "eslint-plugin-typescript": "^0.12.0",
+    "typescript": "latest",
+    "typescript-eslint-parser": "^17.0.1"
   }
 }

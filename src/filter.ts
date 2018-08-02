@@ -104,7 +104,7 @@ class Filter {
   }
 
   disabledPage() {
-    let result = { "disabled": false };
+    let result = { disabled: false };
     let domain = window.location.hostname;
     result.disabled = Domain.domainMatch(domain, this.cfg.disabledDomains);
     return result;
@@ -200,12 +200,12 @@ class Filter {
         // else { console.log('Skipping plaintext (protected pattern):', node.data); } // DEBUG
       } else { // No matches, no node.data
         if (filter.advanced) {
-          console.log('Advanced mode:', evalResult, node.textContent); // DEBUG - Advanced
+          // console.log('Advanced mode:', evalResult, node.textContent); // DEBUG - Advanced
           var replacement;
           if (node.textContent) {
             replacement = filter.replaceText(node.textContent);
             if (replacement != node.textContent) {
-              console.log('Advanced replacement with no data:', replacement); // DEBUG - Advanced
+              // console.log('Advanced replacement with no data:', replacement); // DEBUG - Advanced
               node.textContent = replacement;
             }
           }
@@ -260,7 +260,7 @@ class Filter {
             if (Page.whitespaceRegExp.test(match[0]) && Page.whitespaceRegExp.test(match[match.length - 1])) {
               return match[0];
             } else {
-              return "";
+              return '';
             }
           });
         }
@@ -277,5 +277,5 @@ class Filter {
 }
 
 // Global
-var filter = new Filter
+var filter = new Filter;
 filter.cleanPage();
