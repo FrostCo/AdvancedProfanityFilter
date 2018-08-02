@@ -7,6 +7,7 @@ class Config {
   disabledDomains: string[];
   filterMethod: number;
   globalMatchMethod: number;
+  matchRepeated: boolean;
   password: string;
   preserveCase: boolean;
   preserveFirst: boolean;
@@ -29,6 +30,7 @@ class Config {
     disabledDomains: [],
     filterMethod: 0, // ['Censor', 'Substitute', 'Remove'];
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
+    matchRepeated: true,
     password: null,
     preserveCase: true,
     preserveFirst: true,
