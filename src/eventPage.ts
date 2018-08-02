@@ -20,12 +20,12 @@ chrome.runtime.onInstalled.addListener(function(details){
     updateRemoveWordsFromStorage();
 
     // Display update notification
-    chrome.notifications.create("extensionUpdate", {
-      "type": "basic",
-      "title": "Advanced Profanity Filter",
-      "message": "Update installed, click for changelog.",
-      "iconUrl": "icons/icon64.png",
-      "isClickable": true,
+    chrome.notifications.create('extensionUpdate', {
+      'type': 'basic',
+      'title': 'Advanced Profanity Filter',
+      'message': 'Update installed, click for changelog.',
+      'iconUrl': 'icons/icon64.png',
+      'isClickable': true,
     });
   }
 });
@@ -52,7 +52,7 @@ async function addSelection(selection: string) {
   let cfg = await Config.build(); // TODO: Only need words here
 
   if (!arrayContains(Object.keys(cfg.words), selection)) {
-    cfg.words[selection] = {"matchMethod": 0, "words": []};
+    cfg.words[selection] = {matchMethod: 0, words: []};
     let result = await cfg.save();
     if (!result) { chrome.tabs.reload(); }
   }
@@ -97,7 +97,7 @@ async function toggleFilterEventPage(domain: string) {
 
   for (let x = 0; x < cfg.disabledDomains.length; x++) {
     if (cfg.disabledDomains[x]) {
-      domainRegex = new RegExp("(^|\.)" + cfg.disabledDomains[x]);
+      domainRegex = new RegExp('(^|\.)' + cfg.disabledDomains[x]);
       if (domainRegex.test(domain)) {
         disabled = true;
         break;
@@ -108,14 +108,14 @@ async function toggleFilterEventPage(domain: string) {
   disabled ? enableDomainEventPage(domain) : disableDomainEventPage(domain);
 }
 
-// TODO: Remove after update: transition from previous words structure under the hood
+// TODO - RELEASE: Remove after update: transition from previous words structure under the hood
 function updateRemoveWordsFromStorage() {
-  chrome.storage.sync.get({"words": null}, function(oldWords) {
-    console.log('Old words for migration:', oldWords.words);
+  chrome.storage.sync.get({'words': null}, function(oldWords) {
+    // console.log('Old words for migration:', oldWords.words);
     if (oldWords.words) {
-      chrome.storage.sync.set({"_words0": oldWords.words}, function() {
+      chrome.storage.sync.set({'_words0': oldWords.words}, function() {
         if (!chrome.runtime.lastError) {
-          chrome.storage.sync.remove("words", function() {
+          chrome.storage.sync.remove('words', function() {
             // Split words if necessary
             var wordsPromise = new Promise(function(resolve, reject) {
               resolve(Config.build());
@@ -135,21 +135,21 @@ function updateRemoveWordsFromStorage() {
 // Menu Items
 chrome.contextMenus.removeAll(function() {
   chrome.contextMenus.create({
-    "id": "addSelection",
-    "title": "Add selection to filter",
-    "contexts": ["selection"]
+    id: 'addSelection',
+    title: 'Add selection to filter',
+    contexts: ['selection']
   });
 
   chrome.contextMenus.create({
-    "id": "toggleFilterForDomain",
-    "title": "Toggle filter for domain",
-    "contexts": ["all"]
+    id: 'toggleFilterForDomain',
+    title: 'Toggle filter for domain',
+    contexts: ['all']
   });
 
   chrome.contextMenus.create({
-    "id": "options",
-    "title": "Options",
-    "contexts": ["page", "selection"]
+    id: 'options',
+    title: 'Options',
+    contexts: ['page', 'selection']
   });
 });
 
@@ -157,22 +157,23 @@ chrome.contextMenus.removeAll(function() {
 // Listeners
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
   switch(info.menuItemId) {
-    case "addSelection":
+    case 'addSelection':
       addSelection(info.selectionText); break;
-    case "toggleFilterForDomain":
+    case 'toggleFilterForDomain': {
       let url = new URL(tab.url);
       let domain = url.hostname;
       toggleFilterEventPage(domain); break;
-    case "options":
+    }
+    case 'options':
       chrome.runtime.openOptionsPage(); break;
   }
 });
 
 chrome.notifications.onClicked.addListener(function(notificationId) {
   switch(notificationId) {
-    case "extensionUpdate":
-      chrome.notifications.clear("extensionUpdate");
-      chrome.tabs.create({url: "https://github.com/richardfrost/AdvancedProfanityFilter/releases"});
+    case 'extensionUpdate':
+      chrome.notifications.clear('extensionUpdate');
+      chrome.tabs.create({url: 'https://github.com/richardfrost/AdvancedProfanityFilter/releases'});
       break;
   }
 });

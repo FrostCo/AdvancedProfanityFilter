@@ -9,12 +9,12 @@ export default class OptionTab {
     }
 
     // Set active tab
-    let oldTab = document.getElementsByClassName("tablinks active")[0];
+    let oldTab = document.getElementsByClassName('tablinks active')[0];
     OptionPage.deactivate(oldTab);
     OptionPage.activate(event.currentTarget);
 
     // Show active tab content
-    let oldTabContent = document.getElementsByClassName("tabcontent visible")[0];
+    let oldTabContent = document.getElementsByClassName('tabcontent visible')[0];
     OptionPage.hide(oldTabContent);
     let newTabName = event.currentTarget.innerText;
     OptionPage.show(document.getElementById(newTabName));

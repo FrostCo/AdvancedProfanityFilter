@@ -12,7 +12,7 @@ class Popup {
   static async load(instance: Popup) {
     instance.cfg = await Config.build(['disabledDomains', 'filterMethod', 'password']);
     instance.domain = new Domain();
-    await instance.domain.load()
+    await instance.domain.load();
     return instance;
   }
 
@@ -42,7 +42,7 @@ class Popup {
         Popup.disable(document.getElementById('filterMethodSelect'));
         chrome.tabs.reload();
       }
-    };
+    }
   }
 
   // Remove all entries that disable the filter for domain
@@ -71,7 +71,7 @@ class Popup {
 
   filterMethodSelect() {
     let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
-    chrome.storage.sync.set({"filterMethod": filterMethodSelect.selectedIndex}, function() {
+    chrome.storage.sync.set({filterMethod: filterMethodSelect.selectedIndex}, function() {
       if (!chrome.runtime.lastError) {
         chrome.tabs.reload();
       }
@@ -108,7 +108,7 @@ class Popup {
     let domainRegex;
     for (let x = 0; x < popup.cfg.disabledDomains.length; x++) {
       if (popup.cfg.disabledDomains[x]) {
-        domainRegex = new RegExp("(^|\.)" + popup.cfg.disabledDomains[x]);
+        domainRegex = new RegExp('(^|\.)' + popup.cfg.disabledDomains[x]);
         if (domainRegex.test(popup.domain.hostname)) {
           domainFilter.checked = false;
           Popup.disable(filterMethodSelect);

@@ -5,6 +5,8 @@
   "main": "filter.js",
   "scripts": {
     "build": "./build.sh",
+    "compile": "npm run build",
+    "lint": "npx eslint ./src/*.ts",
     "package-all": "npm run package-chrome && npm run package-firefox && git checkout master",
     "package-chrome": "./package.sh",
     "package-firefox": "git checkout firefox && git merge master && ./package.sh",
@@ -26,11 +28,9 @@
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
   "devDependencies": {
     "@types/chrome": "latest",
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "ts-loader": "^4.4.2",
+    "eslint": "^5.2.0",
+    "eslint-plugin-typescript": "^0.12.0",
     "typescript": "latest",
-    "webpack": "^4.16.3",
-    "webpack-cli": "^3.1.0"
+    "typescript-eslint-parser": "^17.0.1"
   }
 }
