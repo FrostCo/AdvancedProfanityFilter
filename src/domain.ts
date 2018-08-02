@@ -8,7 +8,7 @@ class Domain {
 
     for (let x = 0; x < domains.length; x++) {
       if (domains[x]) {
-        let domainRegex = new RegExp("(^|\.)" + domains[x]);
+        let domainRegex = new RegExp('(^|\.)' + domains[x]);
         if (domainRegex.test(domain)) {
           result = true;
           break;
