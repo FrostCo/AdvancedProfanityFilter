@@ -48,6 +48,7 @@ class Config {
     'cunt': { 'matchMethod': 1, 'words': ['explative'] },
     'dammit': { 'matchMethod': 1, 'words': ['dangit'] },
     'damn': { 'matchMethod': 1, 'words': ['dang', 'darn'] },
+    'dumbass': { 'matchMethod': 0, 'words': ['idiot'] },
     'fuck': { 'matchMethod': 1, 'words': ['freak', 'fudge'] },
     'piss': { 'matchMethod': 1, 'words': ['pee'] },
     'pissed': { 'matchMethod': 0, 'words': ['ticked'] },
