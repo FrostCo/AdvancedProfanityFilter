@@ -1,4 +1,4 @@
-import { arrayContains } from "./helper.js";
+import { arrayContains } from './helper.js';
 
 export default class Config {
   censorCharacter: string;

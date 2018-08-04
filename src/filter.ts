@@ -1,4 +1,3 @@
-// tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/domain.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
 import Config from './config.js';
 import Domain from './domain.js';
 import Page from './page.js';
