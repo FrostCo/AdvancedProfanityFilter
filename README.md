@@ -14,6 +14,7 @@ For an overview of features and options, please head to the [wiki](https://githu
   * Censor - Hide offending words
   * Substitute - Replace offensive words
   * Remove - Remove offensive words
+* Optional Advanced Mode for troublesome pages
 * Customizable word and substitution list
 * Disable filter for specific domains
 * Import/Export settings to share with others
@@ -38,19 +39,12 @@ If you would like to help with development, but don't have experience coding, it
 After years of using Simple Profanity Filter, I decided that it was time to give back to the community. Thanks markyd13 for all your work on this great extension! You can download the original extension by markyd13 [here](https://chrome.google.com/webstore/detail/simple-profanity-filter/ackkocjhcalcpgpfjcoinogdejibgbho).
 
 ### Development
-I am moving the project over to Typescript to make it more pleasant to develop in.
+This project is written in TypeScript, and during the build/package process it will be converted to JS. Please see `package.json`'s scripts for more info on the process.
 
+Getting started
 ```
 sudo npm install typescript --global
-```
-
-```js
-npm init
-rename .js .ts *.js
-
-npm install -g typescript
-
-./build.sh
+npm install
 ```
 
 ##### License

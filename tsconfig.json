@@ -2,11 +2,13 @@
     "compilerOptions": {
         "outDir": "./dist",
         "allowJs": true,
-        "target": "es2015",
-        "module": "commonjs",
+        "target": "es6",
         "noEmitOnError": true
     },
     "include": [
-        "./src/**/*"
+        "./src/**/*.ts"
+    ],
+    "exclude": [
+        "./src/filter.ts"
     ]
 }
