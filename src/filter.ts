@@ -1,5 +1,7 @@
-// tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/domain.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
-// /// <reference path="./config.ts" />
+import Config from './config.js';
+import Domain from './domain.js';
+import Page from './page.js';
+import Word from './word.js';
 
 class Filter {
   cfg: Config;

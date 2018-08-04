@@ -1,0 +1,181 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+import { arrayContains } from './helper.js';
+export default class Config {
+    // Call build() to create a new instance
+    constructor(async_param) {
+        if (typeof async_param === 'undefined') {
+            throw new Error('Cannot be called directly. call build()');
+        }
+        // TODO: Not supported yet
+        // Object.assign(async_param, this);
+        for (let k in async_param)
+            this[k] = async_param[k];
+    }
+    static build(keys) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let async_result = yield Config.getConfig(keys);
+            let instance = new Config(async_result);
+            return instance;
+        });
+    }
+    // Compile words
+    static combineWords(items) {
+        items.words = {};
+        if (items._words0 !== undefined) {
+            // Find all _words* to combine
+            let wordKeys = Object.keys(items).filter(function (key) {
+                return Config._wordsPattern.test(key);
+            });
+            // Add all _words* to words and remove _words*
+            wordKeys.forEach(function (key) {
+                Object.assign(items.words, items[key]);
+                delete items[key];
+            });
+        }
+        // console.log('combineWords', items); // DEBUG
+    }
+    // Persist all configs from defaults and split _words*
+    dataToPersist() {
+        let self = this;
+        let data = {};
+        // Save all settings using keys from _defaults
+        Object.keys(Config._defaults).forEach(function (key) {
+            if (self[key] !== undefined) {
+                data[key] = self[key];
+            }
+        });
+        if (self.words) {
+            // Split words back into _words* for storage
+            let splitWords = self.splitWords();
+            Object.keys(splitWords).forEach(function (key) {
+                data[key] = splitWords[key];
+            });
+            let wordKeys = Object.keys(self).filter(function (key) {
+                return Config._wordsPattern.test(key);
+            });
+            wordKeys.forEach(function (key) {
+                data[key] = self[key];
+            });
+        }
+        // console.log('dataToPersist', data); // DEBUG - Config
+        return data;
+    }
+    // Async call to get provided keys (or default keys) from chrome storage
+    // TODO: Keys: Doesn't support getting words
+    static getConfig(keys) {
+        return new Promise(function (resolve, reject) {
+            // Generate a request to use with chrome.storage
+            let request = null;
+            if (keys !== undefined) {
+                request = {};
+                for (let k of keys) {
+                    request[k] = Config._defaults[k];
+                }
+            }
+            chrome.storage.sync.get(request, function (items) {
+                // Ensure defaults for undefined settings
+                Object.keys(Config._defaults).forEach(function (defaultKey) {
+                    if (request == null || arrayContains(Object.keys(request), defaultKey)) {
+                        if (items[defaultKey] === undefined) {
+                            items[defaultKey] = Config._defaults[defaultKey];
+                        }
+                    }
+                });
+                // Add words if requested, and provide _defaultWords if needed
+                if (keys === undefined || arrayContains(keys, 'words')) {
+                    // Use default words if none were provided
+                    if (items._words0 === undefined || Object.keys(items._words0).length == 0) {
+                        items._words0 = Config._defaultWords;
+                    }
+                    Config.combineWords(items);
+                }
+                resolve(items);
+            });
+        });
+    }
+    removeProp(prop) {
+        chrome.storage.sync.remove(prop);
+        delete this[prop];
+    }
+    reset() {
+        return new Promise(function (resolve, reject) {
+            chrome.storage.sync.clear(function () {
+                resolve(chrome.runtime.lastError ? 1 : 0);
+            });
+        });
+    }
+    save() {
+        var self = this;
+        return new Promise(function (resolve, reject) {
+            chrome.storage.sync.set(self.dataToPersist(), function () {
+                resolve(chrome.runtime.lastError ? 1 : 0);
+            });
+        });
+    }
+    splitWords() {
+        let self = this;
+        let currentContainerNum = 0;
+        let currentWordNum = 0;
+        // let wordsLength = JSON.stringify(self.words).length;
+        // let wordContainers = Math.ceil(wordsLength/Config._maxBytes);
+        // let wordsNum = Object.keys(self.words).length;
+        let words = {};
+        words[`_words${currentContainerNum}`] = {};
+        Object.keys(self.words).sort().forEach(function (word) {
+            if (currentWordNum == Config._maxWords) {
+                currentContainerNum++;
+                currentWordNum = 0;
+                words[`_words${currentContainerNum}`] = {};
+            }
+            words[`_words${currentContainerNum}`][word] = self.words[word];
+            currentWordNum++;
+        });
+        return words;
+    }
+}
+Config._defaults = {
+    censorCharacter: '*',
+    censorFixedLength: 0,
+    advancedDomains: [],
+    defaultSubstitutions: ['censored', 'expletive', 'filtered'],
+    disabledDomains: [],
+    filterMethod: 0,
+    globalMatchMethod: 3,
+    matchRepeated: true,
+    password: null,
+    preserveCase: true,
+    preserveFirst: true,
+    preserveLast: false,
+    showCounter: true,
+    substitutionMark: true
+};
+Config._defaultWords = {
+    'ass': { 'matchMethod': 0, 'words': ['butt', 'tail'] },
+    'asses': { 'matchMethod': 0, 'words': ['butts'] },
+    'asshole': { 'matchMethod': 1, 'words': ['butthole', 'jerk'] },
+    'bastard': { 'matchMethod': 1, 'words': ['imperfect', 'impure'] },
+    'bitch': { 'matchMethod': 1, 'words': ['jerk'] },
+    'cunt': { 'matchMethod': 1, 'words': ['explative'] },
+    'dammit': { 'matchMethod': 1, 'words': ['dangit'] },
+    'damn': { 'matchMethod': 1, 'words': ['dang', 'darn'] },
+    'dumbass': { 'matchMethod': 0, 'words': ['idiot'] },
+    'fuck': { 'matchMethod': 1, 'words': ['freak', 'fudge'] },
+    'piss': { 'matchMethod': 1, 'words': ['pee'] },
+    'pissed': { 'matchMethod': 0, 'words': ['ticked'] },
+    'slut': { 'matchMethod': 1, 'words': ['imperfect', 'impure'] },
+    'shit': { 'matchMethod': 1, 'words': ['crap', 'crud', 'poop'] },
+    'tits': { 'matchMethod': 1, 'words': ['explative'] },
+    'whore': { 'matchMethod': 1, 'words': ['harlot', 'tramp'] }
+};
+Config._filterMethodNames = ['Censor', 'Substitute', 'Remove'];
+Config._matchMethodNames = ['Exact Match', 'Partial Match', 'Whole Match', 'Per-Word Match', 'Regular Expression'];
+Config._maxBytes = 6500;
+Config._maxWords = 100;
+Config._wordsPattern = /^_words\d+/;

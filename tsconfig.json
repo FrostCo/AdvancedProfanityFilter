@@ -6,6 +6,9 @@
         "noEmitOnError": true
     },
     "include": [
-        "./src/**/*"
+        "./src/**/*.ts"
+    ],
+    "exclude": [
+        "./src/filter.ts"
     ]
 }

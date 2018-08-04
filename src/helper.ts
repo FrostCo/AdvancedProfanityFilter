@@ -1,9 +1,8 @@
-// export class Helper {
-function arrayContains(array: string[], element: string) {
+export function arrayContains(array: string[], element: string) {
   return (array.indexOf(element) > -1);
 }
 
-function dynamicList(list, selectEm, title?: string) {
+export function dynamicList(list, selectEm, title?: string) {
   let options = '';
   if (title !== undefined) {
     options = '<option value="" disabled selected>' + title + '</option>';
@@ -15,6 +14,6 @@ function dynamicList(list, selectEm, title?: string) {
   document.getElementById(selectEm).innerHTML = options;
 }
 
-function removeFromArray(array: string[], element: string) {
+export function removeFromArray(array: string[], element: string) {
   return array.filter(e => e !== element);
 }

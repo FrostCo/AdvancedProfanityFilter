@@ -1,5 +1,6 @@
-/// <reference path="helper.ts" />
-class Config {
+import { arrayContains } from './helper.js';
+
+export default class Config {
   censorCharacter: string;
   censorFixedLength: number;
   advancedDomains: string[];

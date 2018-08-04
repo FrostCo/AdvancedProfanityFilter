@@ -1,4 +1,4 @@
-class Page {
+export default class Page {
   whitespaceRegExp: RegExp;
   xpathDocText: string;
   xpathNodeText: string;

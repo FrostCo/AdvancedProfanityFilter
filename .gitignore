@@ -1,2 +1,5 @@
 *.zip
 node_modules/*
+
+# Combined file (prebuild.js)
+src/filter.bundle.ts

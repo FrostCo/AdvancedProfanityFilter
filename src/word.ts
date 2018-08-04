@@ -1,4 +1,4 @@
-class Word {
+export default class Word {
   // /[-\/\\^$*+?.()|[\]{}]/g
   // /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
   private static readonly _escapeRegExp = /[-\/\\^$*+?.()|[\]{}]/g;

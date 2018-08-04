@@ -6,7 +6,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-// export class Helper {
+////
+//src/helper.ts
+//
 function arrayContains(array, element) {
     return (array.indexOf(element) > -1);
 }
@@ -23,7 +25,9 @@ function dynamicList(list, selectEm, title) {
 function removeFromArray(array, element) {
     return array.filter(e => e !== element);
 }
-/// <reference path="helper.ts" />
+////
+//src/config.ts
+//
 class Config {
     // Call build() to create a new instance
     constructor(async_param) {
@@ -158,48 +162,53 @@ class Config {
     }
 }
 Config._defaults = {
-    "censorCharacter": "*",
-    "censorFixedLength": 0,
-    "advancedDomains": [],
-    "defaultSubstitutions": ["censored", "expletive", "filtered"],
-    "disabledDomains": [],
-    "filterMethod": 0,
-    "globalMatchMethod": 3,
-    "password": null,
-    "preserveCase": true,
-    "preserveFirst": true,
-    "preserveLast": false,
-    "showCounter": true,
-    "substitutionMark": true
+    censorCharacter: '*',
+    censorFixedLength: 0,
+    advancedDomains: [],
+    defaultSubstitutions: ['censored', 'expletive', 'filtered'],
+    disabledDomains: [],
+    filterMethod: 0,
+    globalMatchMethod: 3,
+    matchRepeated: true,
+    password: null,
+    preserveCase: true,
+    preserveFirst: true,
+    preserveLast: false,
+    showCounter: true,
+    substitutionMark: true
 };
 Config._defaultWords = {
-    "ass": { "matchMethod": 0, "words": ["butt", "tail"] },
-    "asses": { "matchMethod": 0, "words": ["butts"] },
-    "asshole": { "matchMethod": 1, "words": ["butthole", "jerk"] },
-    "bastard": { "matchMethod": 1, "words": ["imperfect", "impure"] },
-    "bitch": { "matchMethod": 1, "words": ["jerk"] },
-    "cunt": { "matchMethod": 1, "words": ["explative"] },
-    "dammit": { "matchMethod": 1, "words": ["dangit"] },
-    "damn": { "matchMethod": 1, "words": ["dang", "darn"] },
-    "fuck": { "matchMethod": 1, "words": ["freak", "fudge"] },
-    "piss": { "matchMethod": 1, "words": ["pee"] },
-    "pissed": { "matchMethod": 0, "words": ["ticked"] },
-    "slut": { "matchMethod": 1, "words": ["imperfect", "impure"] },
-    "shit": { "matchMethod": 1, "words": ["crap", "crud", "poop"] },
-    "tits": { "matchMethod": 1, "words": ["explative"] },
-    "whore": { "matchMethod": 1, "words": ["harlot", "tramp"] }
+    'ass': { 'matchMethod': 0, 'words': ['butt', 'tail'] },
+    'asses': { 'matchMethod': 0, 'words': ['butts'] },
+    'asshole': { 'matchMethod': 1, 'words': ['butthole', 'jerk'] },
+    'bastard': { 'matchMethod': 1, 'words': ['imperfect', 'impure'] },
+    'bitch': { 'matchMethod': 1, 'words': ['jerk'] },
+    'cunt': { 'matchMethod': 1, 'words': ['explative'] },
+    'dammit': { 'matchMethod': 1, 'words': ['dangit'] },
+    'damn': { 'matchMethod': 1, 'words': ['dang', 'darn'] },
+    'dumbass': { 'matchMethod': 0, 'words': ['idiot'] },
+    'fuck': { 'matchMethod': 1, 'words': ['freak', 'fudge'] },
+    'piss': { 'matchMethod': 1, 'words': ['pee'] },
+    'pissed': { 'matchMethod': 0, 'words': ['ticked'] },
+    'slut': { 'matchMethod': 1, 'words': ['imperfect', 'impure'] },
+    'shit': { 'matchMethod': 1, 'words': ['crap', 'crud', 'poop'] },
+    'tits': { 'matchMethod': 1, 'words': ['explative'] },
+    'whore': { 'matchMethod': 1, 'words': ['harlot', 'tramp'] }
 };
-Config._filterMethodNames = ["Censor", "Substitute", "Remove"];
-Config._matchMethodNames = ["Exact Match", "Partial Match", "Whole Match", "Per-Word Match", "Regular Expression"];
+Config._filterMethodNames = ['Censor', 'Substitute', 'Remove'];
+Config._matchMethodNames = ['Exact Match', 'Partial Match', 'Whole Match', 'Per-Word Match', 'Regular Expression'];
 Config._maxBytes = 6500;
 Config._maxWords = 100;
 Config._wordsPattern = /^_words\d+/;
+////
+//src/domain.ts
+//
 class Domain {
     static domainMatch(domain, domains) {
         let result = false;
         for (let x = 0; x < domains.length; x++) {
             if (domains[x]) {
-                let domainRegex = new RegExp("(^|\.)" + domains[x]);
+                let domainRegex = new RegExp('(^|\.)' + domains[x]);
                 if (domainRegex.test(domain)) {
                     result = true;
                     break;
@@ -223,6 +232,9 @@ class Domain {
         });
     }
 }
+////
+//src/word.ts
+//
 class Word {
     static allLowerCase(string) {
         return string.toLowerCase() === string;
@@ -233,27 +245,27 @@ class Word {
     // Word must match exactly (not sub-string)
     // /\b(w)ord\b/gi
     static buildExactRegexp(word) {
-        return new RegExp('\\b(' + word[0] + ')' + Word.escapeRegExp(word.slice(1)) + '\\b', 'gi');
+        return new RegExp('\\b(' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)) + '\\b', 'gi');
     }
     // Match any part of a word (sub-string)
     // /(w)ord/gi
     static buildPartRegexp(word) {
-        return new RegExp('(' + word[0] + ')' + Word.escapeRegExp(word.slice(1)), 'gi');
+        return new RegExp('(' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)), 'gi');
     }
     // Match entire word that contains sub-string and surrounding whitespace
     // /\s?\b(w)ord\b\s?/gi
     static buildRegexpForRemoveExact(word) {
-        return new RegExp('\\s?\\b(' + word[0] + ')' + Word.escapeRegExp(word.slice(1)) + '\\b\\s?', 'gi');
+        return new RegExp('\\s?\\b(' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)) + '\\b\\s?', 'gi');
     }
     // Match entire word that contains sub-string and surrounding whitespace
     // /\s?\b[\w-]*(w)ord[\w-]*\b\s?/gi
     static buildRegexpForRemovePart(word) {
-        return new RegExp('\\s?\\b([\\w-]*' + word[0] + ')' + Word.escapeRegExp(word.slice(1)) + '[\\w-]*\\b\\s?', 'gi');
+        return new RegExp('\\s?\\b([\\w-]*' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)) + '[\\w-]*\\b\\s?', 'gi');
     }
     // Match entire word that contains sub-string
     // /\b[\w-]*(w)ord[\w-]*\b/gi
     static buildWholeRegexp(word) {
-        return new RegExp('\\b([\\w-]*' + word[0] + ')' + Word.escapeRegExp(word.slice(1)) + '[\\w-]*\\b', 'gi');
+        return new RegExp('\\b([\\w-]*' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)) + '[\\w-]*\\b', 'gi');
     }
     static capitalize(string) {
         return string.charAt(0).toUpperCase() + string.substr(1);
@@ -262,32 +274,67 @@ class Word {
         return string.charAt(0).toUpperCase() === string.charAt(0);
     }
     static escapeRegExp(str) {
-        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        return str.replace(Word._escapeRegExp, '\\$&');
     }
-    // TODO: Dependent on filter
-    static randomElement(array) {
+    // Process the rest of the word (word excluding first character)
+    // This will escape the word and optionally include repeating characters
+    static processRestOfWord(str) {
+        var escaped = Word.escapeRegExp(str);
+        if (filter && filter.cfg.matchRepeated) {
+            return Word.repeatingCharacterRegexp(escaped);
+        }
+        return escaped;
+    }
+    static randomElement(array, defaults) {
         if (array.length === 0) {
-            array = filter.cfg.defaultSubstitutions;
+            array = defaults;
         }
         return array[Math.floor((Math.random() * array.length))];
     }
+    // Regexp to match repeating characters
+    // Note: Skip first letter of word (used for preserveFirst)
+    // Word: /(w)+o+r+d+/gi
+    static repeatingCharacterRegexp(str) {
+        if (str.includes('\\')) {
+            var repeat = '+';
+            for (var i = 0; i < str.length; i++) {
+                if (str[i] === '\\') {
+                    repeat += (str[i] + str[i + 1] + '+');
+                    i++;
+                }
+                else {
+                    repeat += str[i] + '+';
+                }
+            }
+            return repeat;
+        }
+        else {
+            return '+' + str.split('').map(letter => letter + '+').join('');
+        }
+    }
 }
+// /[-\/\\^$*+?.()|[\]{}]/g
+// /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
+Word._escapeRegExp = /[-\/\\^$*+?.()|[\]{}]/g;
+////
+//src/page.ts
+//
 class Page {
     static isForbiddenNode(node) {
         return Boolean(node.isContentEditable || // DraftJS and many others
             (node.parentNode &&
                 (node.parentNode.isContentEditable || // Special case for Gmail
-                    node.parentNode.tagName == "SCRIPT" ||
-                    node.parentNode.tagName == "STYLE" ||
-                    node.parentNode.tagName == "INPUT" ||
-                    node.parentNode.tagName == "TEXTAREA" ||
-                    node.parentNode.tagName == "IFRAME")) || // Some catch-alls
+                    node.parentNode.tagName == 'SCRIPT' ||
+                    node.parentNode.tagName == 'STYLE' ||
+                    node.parentNode.tagName == 'INPUT' ||
+                    node.parentNode.tagName == 'TEXTAREA' ||
+                    node.parentNode.tagName == 'IFRAME')) || // Some catch-alls
             (node.tagName &&
-                (node.tagName == "SCRIPT" ||
-                    node.tagName == "STYLE" ||
-                    node.tagName == "INPUT" ||
-                    node.tagName == "TEXTAREA" ||
-                    node.tagName == "IFRAME")));
+                (node.tagName == 'SCRIPT' ||
+                    node.tagName == 'STYLE' ||
+                    node.tagName == 'INPUT' ||
+                    node.tagName == 'TEXTAREA' ||
+                    node.tagName == 'IFRAME')));
     }
 }
 // Returns true if a node should *not* be altered in any way
@@ -295,8 +342,9 @@ class Page {
 Page.whitespaceRegExp = new RegExp('\\s');
 Page.xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
 Page.xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
-// tsc --outfile ./dist/filter.js ./src/helper.ts ./src/config.ts ./src/domain.ts ./src/word.ts ./src/page.ts ./src/filter.ts --target es6
-// /// <reference path="./config.ts" />
+////
+//src/filter.ts
+//
 class Filter {
     constructor() {
         this.advanced = false;
@@ -392,7 +440,7 @@ class Filter {
         });
     }
     disabledPage() {
-        let result = { "disabled": false };
+        let result = { disabled: false };
         let domain = window.location.hostname;
         result.disabled = Domain.domainMatch(domain, this.cfg.disabledDomains);
         return result;
@@ -479,12 +527,12 @@ class Filter {
             }
             else { // No matches, no node.data
                 if (filter.advanced) {
-                    console.log('Advanced mode:', evalResult, node.textContent); // DEBUG - Advanced
+                    // console.log('Advanced mode:', evalResult, node.textContent); // DEBUG - Advanced
                     var replacement;
                     if (node.textContent) {
                         replacement = filter.replaceText(node.textContent);
                         if (replacement != node.textContent) {
-                            console.log('Advanced replacement with no data:', replacement); // DEBUG - Advanced
+                            // console.log('Advanced replacement with no data:', replacement); // DEBUG - Advanced
                             node.textContent = replacement;
                         }
                     }
@@ -510,7 +558,7 @@ class Filter {
                 for (let z = 0; z < filter.cfg.wordList.length; z++) {
                     str = str.replace(filter.wordRegExps[z], function (match) {
                         filter.counter++;
-                        let sub = Word.randomElement(filter.cfg.words[filter.cfg.wordList[z]].words);
+                        let sub = Word.randomElement(filter.cfg.words[filter.cfg.wordList[z]].words, filter.cfg.defaultSubstitutions);
                         // console.log('Substitute match:', match, filter.cfg.words[filter.cfg.wordList[z]].words); // DEBUG
                         // Make substitution match case of original match
                         if (filter.cfg.preserveCase) {
@@ -540,7 +588,7 @@ class Filter {
                             return match[0];
                         }
                         else {
-                            return "";
+                            return '';
                         }
                     });
                 }

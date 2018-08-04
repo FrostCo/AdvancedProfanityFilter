@@ -1,4 +1,6 @@
-class OptionTab {
+import OptionPage from './optionPage.js';
+
+export default class OptionTab {
   // Switching Tabs
   static openTab(event) {
     // Don't run on current tab
