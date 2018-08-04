@@ -1,7 +1,7 @@
 {
   "name": "Advanced Profanity Filter",
   "short_name": "Profanity Filter",
-  "author": "phermium",
+  "author": "Richard Frost",
   "manifest_version": 2,
   "version": "1.0.15",
   "description": "Hide offensive words on the webpages you visit",
@@ -36,7 +36,7 @@
   "content_scripts": [
     {
       "matches": [ "<all_urls>" ],
-      "js": [ "filter.js" ],
+      "js": [ "filter.bundle.js" ],
       "run_at": "document_start",
       "all_frames": true
     }

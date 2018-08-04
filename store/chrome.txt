@@ -5,6 +5,7 @@ Features:
     • Censor - Hide offending words
     • Substitute - Replace offensive words
     • Remove - Remove offensive words
+• Optional Advanced Mode for troublesome pages
 • Customizable word and substitution list
 • Disable filter for specific domains
 • Import/Export settings to share with others
