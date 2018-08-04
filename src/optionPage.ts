@@ -1,4 +1,3 @@
-// tsc --outfile ./dist/optionPage.js ./src/helper.ts ./src/config.ts ./src/optionAuth.ts ./src/optionTab.ts ./src/optionPage.ts --target es6
 import { arrayContains, dynamicList, removeFromArray } from './helper.js';
 import Config from './config.js';
 import OptionTab from './optionTab.js';
