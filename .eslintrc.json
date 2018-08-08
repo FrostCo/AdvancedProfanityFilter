@@ -10,11 +10,16 @@
     "typescript"
   ],
   "rules": {
+    "no-console": "warn",
     "no-undef": ["off"],
     "no-unused-vars": ["off"],
     "no-useless-escape": ["off"],
     "quotes": ["error", "single"],
     "semi": ["error", "always"],
-    "typescript/class-name-casing": "error"
+    "typescript/class-name-casing": "error",
+    "typescript/explicit-function-return-type": "off",
+    "typescript/no-unused-vars": "error",
+    "typescript/no-use-before-define": "off",
+    "typescript/type-annotation-spacing": "error"
   }
 }
