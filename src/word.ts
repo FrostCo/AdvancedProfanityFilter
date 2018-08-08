@@ -10,33 +10,33 @@ export default class Word {
   }
 
   // Word must match exactly (not sub-string)
-  // /\b(w)ord\b/gi
-  static buildExactRegexp(word: string, matchRepeated: boolean = false) {
-    return new RegExp('\\b(' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1), matchRepeated) + '\\b', 'gi' );
+  // /\bword\b/gi
+  static buildExactRegexp(str: string, matchRepeated: boolean = false) {
+    return new RegExp('\\b' + Word.processPhrase(str, matchRepeated) + '\\b', 'gi' );
   }
 
   // Match any part of a word (sub-string)
-  // /(w)ord/gi
-  static buildPartRegexp(word: string, matchRepeated: boolean = false) {
-    return new RegExp('(' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1), matchRepeated), 'gi' );
+  // /word/gi
+  static buildPartRegexp(str: string, matchRepeated: boolean = false) {
+    return new RegExp(Word.processPhrase(str, matchRepeated), 'gi' );
   }
 
   // Match entire word that contains sub-string and surrounding whitespace
-  // /\s?\b(w)ord\b\s?/gi
-  static buildRegexpForRemoveExact(word: string, matchRepeated: boolean = false) {
-    return new RegExp('\\s?\\b(' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1), matchRepeated) + '\\b\\s?', 'gi' );
+  // /\s?\bword\b\s?/gi
+  static buildRegexpForRemoveExact(str: string, matchRepeated: boolean = false) {
+    return new RegExp('\\s?\\b' + Word.processPhrase(str, matchRepeated) + '\\b\\s?', 'gi' );
   }
 
   // Match entire word that contains sub-string and surrounding whitespace
-  // /\s?\b[\w-]*(w)ord[\w-]*\b\s?/gi
-  static buildRegexpForRemovePart(word: string, matchRepeated: boolean = false) {
-    return new RegExp('\\s?\\b([\\w-]*' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1), matchRepeated) + '[\\w-]*\\b\\s?', 'gi' );
+  // /\s?\b[\w-]*word[\w-]*\b\s?/gi
+  static buildRegexpForRemovePart(str: string, matchRepeated: boolean = false) {
+    return new RegExp('\\s?\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b\\s?', 'gi' );
   }
 
   // Match entire word that contains sub-string
-  // /\b[\w-]*(w)ord[\w-]*\b/gi
-  static buildWholeRegexp(word: string, matchRepeated: boolean = false) {
-    return new RegExp('\\b([\\w-]*' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1), matchRepeated) + '[\\w-]*\\b', 'gi' );
+  // /\b[\w-]*word[\w-]*\b/gi
+  static buildWholeRegexp(str: string, matchRepeated: boolean = false) {
+    return new RegExp('\\b([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi' );
   }
 
   static capitalize(string: string): string {
@@ -55,7 +55,7 @@ export default class Word {
 
   // Process the rest of the word (word excluding first character)
   // This will escape the word and optionally include repeating characters
-  static processRestOfWord(str: string, matchRepeated: boolean): string {
+  static processPhrase(str: string, matchRepeated: boolean): string {
     var escaped = Word.escapeRegExp(str);
     if (matchRepeated) {
       return Word.repeatingCharacterRegexp(escaped);
@@ -73,7 +73,7 @@ export default class Word {
 
   // Regexp to match repeating characters
   // Note: Skip first letter of word (used for preserveFirst)
-  // Word: /(w)+o+r+d+/gi
+  // Word: /w+o+r+d+/gi
   static repeatingCharacterRegexp(str: string): string {
     if (str.includes('\\')) {
       var repeat = '+';

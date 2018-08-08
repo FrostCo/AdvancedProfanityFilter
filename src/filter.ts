@@ -47,15 +47,15 @@ class Filter {
 
   // Censor the profanity
   // Only gets run when there is a match in replaceText()
-  censorReplace(strMatchingString: string, strFirstLetter: string): string {
+  censorReplace(strMatchingString: string): string {
     filter.counter++;
     let censoredString = '';
 
     if (filter.cfg.censorFixedLength > 0) {
       if (filter.cfg.preserveFirst && filter.cfg.preserveLast) {
-        censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 2)) + strMatchingString.slice(-1);
+        censoredString = strMatchingString[0] + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 2)) + strMatchingString.slice(-1);
       } else if (filter.cfg.preserveFirst) {
-        censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 1));
+        censoredString = strMatchingString[0] + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 1));
       } else if (filter.cfg.preserveLast) {
         censoredString = filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 1)) + strMatchingString.slice(-1);
       } else {
@@ -63,9 +63,9 @@ class Filter {
       }
     } else {
       if (filter.cfg.preserveFirst && filter.cfg.preserveLast) {
-        censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((strMatchingString.length - 2)) + strMatchingString.slice(-1);
+        censoredString = strMatchingString[0] + filter.cfg.censorCharacter.repeat((strMatchingString.length - 2)) + strMatchingString.slice(-1);
       } else if (filter.cfg.preserveFirst) {
-        censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((strMatchingString.length - 1));
+        censoredString = strMatchingString[0] + filter.cfg.censorCharacter.repeat((strMatchingString.length - 1));
       } else if (filter.cfg.preserveLast) {
         censoredString = filter.cfg.censorCharacter.repeat((strMatchingString.length - 1)) + strMatchingString.slice(-1);
       } else {
