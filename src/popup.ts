@@ -45,22 +45,12 @@ class Popup {
   }
 
   // Remove all entries that disable the filter for domain
-  async enableDomain() {
-    let popup = this;
-    let domainRegex, foundMatch;
-    let newDisabledDomains = popup.cfg.disabledDomains;
+  async enableDomain(cfg: Config, domain: string, key: string) {
+    let newDomainList = Domain.removeFromList(domain, cfg[key]);
 
-    for (let x = 0; x < popup.cfg.disabledDomains.length; x++) {
-      domainRegex = new RegExp('(^|\.)' + popup.cfg.disabledDomains[x]);
-      if (domainRegex.test(popup.domain.hostname)) {
-        foundMatch = true;
-        newDisabledDomains = removeFromArray(newDisabledDomains, popup.cfg.disabledDomains[x]);
-      }
-    }
-
-    if (foundMatch) {
-      popup.cfg.disabledDomains = newDisabledDomains;
-      let result = await popup.cfg.save();
+    if (newDomainList.length < cfg[key].length) {
+      cfg[key] = newDomainList;
+      let result = await cfg.save();
       if (!result) {
         Popup.enable(document.getElementById('filterMethodSelect'));
         chrome.tabs.reload();
@@ -104,16 +94,9 @@ class Popup {
     }
 
     // Set initial value for domain filter
-    let domainRegex;
-    for (let x = 0; x < popup.cfg.disabledDomains.length; x++) {
-      if (popup.cfg.disabledDomains[x]) {
-        domainRegex = new RegExp('(^|\.)' + popup.cfg.disabledDomains[x]);
-        if (domainRegex.test(popup.domain.hostname)) {
-          domainFilter.checked = false;
-          Popup.disable(filterMethodSelect);
-          break;
-        }
-      }
+    if (Domain.domainMatch(popup.domain.hostname, popup.cfg['disabledDomains'])) {
+      domainFilter.checked = false;
+      Popup.disable(filterMethodSelect);
     }
   }
 
@@ -122,7 +105,7 @@ class Popup {
     if (!popup.protected) {
       let domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
       if (domainFilter.checked) {
-        popup.enableDomain();
+        popup.enableDomain(popup.cfg, popup.domain.hostname, 'disabledDomains');
       } else {
         popup.disableDomain();
       }
