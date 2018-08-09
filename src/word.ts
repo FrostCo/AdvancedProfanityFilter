@@ -12,31 +12,41 @@ export default class Word {
   // Word must match exactly (not sub-string)
   // /\bword\b/gi
   static buildExactRegexp(str: string, matchRepeated: boolean = false) {
-    return new RegExp('\\b' + Word.processPhrase(str, matchRepeated) + '\\b', 'gi' );
+    try {
+      return new RegExp('\\b' + Word.processPhrase(str, matchRepeated) + '\\b', 'gi');
+    } catch(e) { console.log('Error: Failed to filter: ' + str); }
   }
 
   // Match any part of a word (sub-string)
   // /word/gi
   static buildPartRegexp(str: string, matchRepeated: boolean = false) {
-    return new RegExp(Word.processPhrase(str, matchRepeated), 'gi' );
+    try {
+      return new RegExp(Word.processPhrase(str, matchRepeated), 'gi');
+    } catch(e) { console.log('Error: Failed to filter: ' + str); }
   }
 
   // Match entire word that contains sub-string and surrounding whitespace
   // /\s?\bword\b\s?/gi
   static buildRegexpForRemoveExact(str: string, matchRepeated: boolean = false) {
-    return new RegExp('\\s?\\b' + Word.processPhrase(str, matchRepeated) + '\\b\\s?', 'gi' );
+    try {
+      return new RegExp('\\s?\\b' + Word.processPhrase(str, matchRepeated) + '\\b\\s?', 'gi');
+    } catch(e) { console.log('Error: Failed to filter: ' + str); }
   }
 
   // Match entire word that contains sub-string and surrounding whitespace
   // /\s?\b[\w-]*word[\w-]*\b\s?/gi
   static buildRegexpForRemovePart(str: string, matchRepeated: boolean = false) {
-    return new RegExp('\\s?\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b\\s?', 'gi' );
+    try {
+      return new RegExp('\\s?\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b\\s?', 'gi');
+    } catch(e) { console.log('Error: Failed to filter: ' + str); }
   }
 
   // Match entire word that contains sub-string
   // /\b[\w-]*word[\w-]*\b/gi
   static buildWholeRegexp(str: string, matchRepeated: boolean = false) {
-    return new RegExp('\\b([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi' );
+    try {
+      return new RegExp('\\b([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi');
+    } catch(e) { console.log('Error: Failed to filter: ' + str); }
   }
 
   static capitalize(string: string): string {
@@ -72,11 +82,10 @@ export default class Word {
   }
 
   // Regexp to match repeating characters
-  // Note: Skip first letter of word (used for preserveFirst)
-  // Word: /w+o+r+d+/gi
+    // Word: /w+o+r+d+/gi
   static repeatingCharacterRegexp(str: string): string {
     if (str.includes('\\')) {
-      var repeat = '+';
+      var repeat = '';
       for (var i= 0; i < str.length; i++) {
         if (str[i] === '\\') {
           repeat += (str[i] + str[i + 1] + '+');
@@ -87,7 +96,7 @@ export default class Word {
       }
       return repeat;
     } else {
-      return '+' + str.split('').map(letter => letter + '+').join('');
+      return str.split('').map(letter => letter + '+').join('');
     }
   }
 }
