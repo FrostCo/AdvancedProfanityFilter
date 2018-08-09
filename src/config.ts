@@ -1,10 +1,11 @@
 import { arrayContains } from './helper.js';
 
 export default class Config {
+  advancedDomains: string[];
   censorCharacter: string;
   censorFixedLength: number;
-  advancedDomains: string[];
   defaultSubstitutions: string[];
+  defaultWordMatchMethod: number;
   disabledDomains: string[];
   filterMethod: number;
   globalMatchMethod: number;
@@ -24,10 +25,11 @@ export default class Config {
   };
 
   static readonly _defaults = {
+    advancedDomains: [],
     censorCharacter: '*',
     censorFixedLength: 0,
-    advancedDomains: [],
     defaultSubstitutions: ['censored', 'expletive', 'filtered'],
+    defaultWordMatchMethod: 0,
     disabledDomains: [],
     filterMethod: 0, // ['Censor', 'Substitute', 'Remove'];
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
@@ -64,6 +66,14 @@ export default class Config {
   static readonly _maxBytes = 6500;
   static readonly _maxWords = 100;
   static readonly _wordsPattern = /^_words\d+/;
+
+  addWord(str: string) {
+    if (!arrayContains(Object.keys(this.words), str)) {
+      this.words[str] = {matchMethod: this.defaultWordMatchMethod, words: []};
+      return true;
+    }
+    return false;
+  }
 
   static async build(keys?: string[]) {
     let async_result = await Config.getConfig(keys);
