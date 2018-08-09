@@ -3,6 +3,7 @@ export default class Page {
   xpathDocText: string;
   xpathNodeText: string;
 
+  static readonly forbiddenNodeRegExp = new RegExp('^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)');
   static readonly whitespaceRegExp = new RegExp('\\s');
   static readonly xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
   static readonly xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';

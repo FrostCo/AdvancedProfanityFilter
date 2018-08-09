@@ -1,3 +1,4 @@
+// import * as Helper from './helper.js';
 import Config from './config.js';
 import Domain from './domain.js';
 import Page from './page.js';
@@ -16,6 +17,7 @@ class Filter {
   }
 
   checkMutationTargetTextForProfanity(mutation) {
+    // console.count('checkMutationTargetTextForProfanity'); // Benchmarking - Executaion Count
     // console.log('Process mutation.target:', mutation.target, mutation.target.data); // DEBUG - Mutation target text
     var replacement;
     if (!Page.isForbiddenNode(mutation.target)) {
@@ -29,6 +31,7 @@ class Filter {
   }
 
   checkNodeForProfanity(mutation) {
+    // console.count('checkNodeForProfanity'); // Benchmarking - Executaion Count
     // console.log('Mutation observed:', mutation); // DEBUG - Mutation addedNodes
     mutation.addedNodes.forEach(function(node) {
       // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
@@ -48,6 +51,7 @@ class Filter {
   // Censor the profanity
   // Only gets run when there is a match in replaceText()
   censorReplace(strMatchingString: string): string {
+    // console.count('censorReplace'); // Benchmarking - Executaion Count
     filter.counter++;
     let censoredString = '';
 
@@ -106,6 +110,7 @@ class Filter {
   }
 
   disabledPage() {
+    // console.count('disabledPage'); // Benchmarking - Executaion Count
     let result = { disabled: false };
     let domain = window.location.hostname;
     result.disabled = Domain.domainMatch(domain, this.cfg.disabledDomains);
@@ -115,6 +120,8 @@ class Filter {
   // Parse the profanity list
   // ["exact", "partial", "whole", "disabled"]
   generateRegexpList() {
+    console.time('generateRegexpList'); // Benchmark - Call Time
+    // console.count('generateRegexpList: words to filter'); // Benchmarking - Executaion Count
     let matchRepeated = this.cfg.matchRepeated;
     if (this.cfg.filterMethod == 2) { // Special regexp for "Remove" filter
       for (let x = 0; x < this.cfg.wordList.length; x++) {
@@ -161,6 +168,7 @@ class Filter {
           break;
       }
     }
+    console.timeEnd('generateRegexpList'); // Benchmark - Call Time
   }
 
   // Watch for new text nodes and clean them as they are added
@@ -185,6 +193,7 @@ class Filter {
   }
 
   removeProfanity(xpathExpression: string, node: any) {
+    // console.count('removeProfanity'); // Benchmarking - Executaion Count
     let evalResult = document.evaluate(
       xpathExpression,
       node,
@@ -196,7 +205,7 @@ class Filter {
     if (evalResult.snapshotLength == 0) { // If plaintext node
       if (node.data) {
         // Don't mess with tags, styles, or URIs
-        if (!/^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/.test(node.data)) {
+        if (!Page.forbiddenNodeRegExp.test(node.data)) {
           // console.log('Plaintext:', node.data); // DEBUG
           node.data = this.replaceText(node.data);
         }
@@ -224,6 +233,7 @@ class Filter {
   }
 
   replaceText(str: string): string {
+    // console.count('replaceText'); // Benchmarking - Executaion Count
     switch(filter.cfg.filterMethod) {
       case 0: // Censor
         for (let z = 0; z < filter.cfg.wordList.length; z++) {
@@ -273,6 +283,7 @@ class Filter {
   }
 
   updateCounterBadge() {
+    // console.count('updateCounterBadge'); // Benchmarking - Executaion Count
     if (this.cfg.showCounter && this.counter > 0) {
       chrome.runtime.sendMessage({counter: this.counter.toString()});
     }
