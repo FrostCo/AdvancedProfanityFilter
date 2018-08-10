@@ -1,8 +1,13 @@
-// import * as Helper from './helper.js';
 import Config from './config.js';
 import Domain from './domain.js';
 import Page from './page.js';
 import Word from './word.js';
+
+interface Message {
+  advanced?: boolean,
+  counter?: number,
+  disabled?: boolean
+}
 
 class Filter {
   cfg: Config;
@@ -87,15 +92,23 @@ class Filter {
     // Don't run if this is a disabled domain
     // Only run on main page (no frames)
     if (window == window.top) {
-      let message = this.disabledPage();
-      chrome.runtime.sendMessage(message);
+      let disabled = this.disabledPage();
+      let message = { disabled: disabled } as Message;
+
       if (message.disabled) {
+        chrome.runtime.sendMessage(message);
         return false;
       }
-    }
 
-    // Turn on advanced filter (NOTE: Can break things)
-    this.advanced = Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
+      // Check for advanced mode on current domain
+      this.advanced = Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
+      message.advanced = this.advanced;
+      if (this.advanced) {
+        message.advanced = true;
+      }
+
+      chrome.runtime.sendMessage(message);
+    }
 
     // Sort the words array by longest (most-specific) first
     this.cfg.wordList = Object.keys(this.cfg.words).sort(function(a, b) {
@@ -109,12 +122,10 @@ class Filter {
     this.observeNewNodes();
   }
 
-  disabledPage() {
+  disabledPage(): boolean {
     // console.count('disabledPage'); // Benchmarking - Executaion Count
-    let result = { disabled: false };
     let domain = window.location.hostname;
-    result.disabled = Domain.domainMatch(domain, this.cfg.disabledDomains);
-    return result;
+    return Domain.domainMatch(domain, this.cfg.disabledDomains);
   }
 
   // Parse the profanity list

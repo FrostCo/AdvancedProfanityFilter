@@ -33,12 +33,18 @@ chrome.runtime.onInstalled.addListener(function(details){
 // Show badge with number of words filtered
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    if (request.counter) {
-      chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
-      // chrome.browserAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255] }); // Red - Advanced
-      // chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255] }); // Blue - Normal
-    } else if (request.disabled) {
+    if (request.disabled === true) {
       chrome.browserAction.setIcon({path: 'icons/icon19-disabled.png', tabId: sender.tab.id});
+    } else {
+      if (request.counter) {
+        chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
+      }
+
+      if (request.advanced === true) {
+        chrome.browserAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255] }); // Red - Advanced
+      } else if (request.advanced === false) {
+        chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255] }); // Blue - Normal
+      }
     }
   }
 );
