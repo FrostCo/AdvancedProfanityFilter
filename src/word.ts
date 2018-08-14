@@ -14,7 +14,9 @@ export default class Word {
   static buildExactRegexp(str: string, matchRepeated: boolean = false) {
     try {
       return new RegExp('\\b' + Word.processPhrase(str, matchRepeated) + '\\b', 'gi');
-    } catch(e) { console.log('Error: Failed to filter: ' + str); }
+    } catch(e) {
+      // console.log('Error: Failed to filter: ' + str);
+    }
   }
 
   // Match any part of a word (sub-string)
@@ -22,7 +24,9 @@ export default class Word {
   static buildPartRegexp(str: string, matchRepeated: boolean = false) {
     try {
       return new RegExp(Word.processPhrase(str, matchRepeated), 'gi');
-    } catch(e) { console.log('Error: Failed to filter: ' + str); }
+    } catch(e) {
+      // console.log('Error: Failed to filter: ' + str);
+    }
   }
 
   // Match entire word that contains sub-string and surrounding whitespace
@@ -30,7 +34,9 @@ export default class Word {
   static buildRegexpForRemoveExact(str: string, matchRepeated: boolean = false) {
     try {
       return new RegExp('\\s?\\b' + Word.processPhrase(str, matchRepeated) + '\\b\\s?', 'gi');
-    } catch(e) { console.log('Error: Failed to filter: ' + str); }
+    } catch(e) {
+      // console.log('Error: Failed to filter: ' + str);
+    }
   }
 
   // Match entire word that contains sub-string and surrounding whitespace
@@ -38,7 +44,9 @@ export default class Word {
   static buildRegexpForRemovePart(str: string, matchRepeated: boolean = false) {
     try {
       return new RegExp('\\s?\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b\\s?', 'gi');
-    } catch(e) { console.log('Error: Failed to filter: ' + str); }
+    } catch(e) {
+      // console.log('Error: Failed to filter: ' + str);
+    }
   }
 
   // Match entire word that contains sub-string
@@ -46,7 +54,9 @@ export default class Word {
   static buildWholeRegexp(str: string, matchRepeated: boolean = false) {
     try {
       return new RegExp('\\b([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi');
-    } catch(e) { console.log('Error: Failed to filter: ' + str); }
+    } catch(e) {
+      // console.log('Error: Failed to filter: ' + str);
+    }
   }
 
   static capitalize(string: string): string {
