@@ -3,7 +3,6 @@ import Config from './config.js';
 import OptionTab from './optionTab.js';
 import OptionAuth from './optionAuth.js';
 
-// TODO: Magic Numbers
 export default class OptionPage {
   cfg: Config;
   auth: OptionAuth;
@@ -100,7 +99,6 @@ export default class OptionPage {
   }
 
   exportConfig() {
-    // TODO: To let people migrate from wordList to words, return all keys (null)
     let configText = document.getElementById('configText') as HTMLTextAreaElement;
     configText.value = JSON.stringify(this.cfg, null, 2);
   }
@@ -122,6 +120,7 @@ export default class OptionPage {
     try {
       let configText = document.getElementById('configText') as HTMLTextAreaElement;
       self.cfg = new Config(JSON.parse(configText.value));
+      self.cfg.sanitizeWords();
 
       let resetError = await self.cfg.reset();
       if (resetError) {
@@ -191,7 +190,9 @@ export default class OptionPage {
     let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
     let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
     let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
-    let matchRepeated = document.getElementById('matchRepeated') as HTMLInputElement;
+    let defaultWordMatchRepeated = document.getElementById('defaultWordMatchRepeated') as HTMLInputElement;
+    let defaultMatchMethodSelect = document.getElementById('defaultMatchMethodSelect') as HTMLSelectElement;
+    let matchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
     let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
@@ -200,7 +201,6 @@ export default class OptionPage {
 
     censorCharacterSelect.value = self.cfg.censorCharacter;
     censorFixedLengthSelect.selectedIndex = self.cfg.censorFixedLength;
-    matchRepeated.checked = self.cfg.matchRepeated;
     preserveCase.checked = self.cfg.preserveCase;
     preserveFirst.checked = self.cfg.preserveFirst;
     preserveLast.checked = self.cfg.preserveLast;
@@ -208,8 +208,12 @@ export default class OptionPage {
     substitutionMark.checked = self.cfg.substitutionMark;
     dynamicList(Config._matchMethodNames.slice(0, -1), 'globalMatchMethodSelect');
     globalMatchMethodSelect.selectedIndex = self.cfg.globalMatchMethod;
+    defaultWordMatchRepeated.checked = self.cfg.defaultWordRepeat;
+    dynamicList(Config._matchMethodNames.slice(0,-2), 'defaultMatchMethodSelect');
+    defaultMatchMethodSelect.selectedIndex = self.cfg.defaultWordMatchMethod; // TODO: Working Here
     // Words
     dynamicList(Object.keys(self.cfg.words).sort(), 'wordSelect', 'Words to Filter');
+    matchRepeated.disabled = true;
     dynamicList([], 'substitutionSelect', 'Substitutions');
     dynamicList([], 'wordMatchMethodSelect', 'Select a Word');
     // Domains
@@ -230,22 +234,28 @@ export default class OptionPage {
     }
   }
 
+  saveDefaultMatchMethod(event) {
+    let defaultMatchMethodSelect = document.getElementById('defaultMatchMethodSelect') as HTMLSelectElement;
+    this.cfg.defaultWordMatchMethod = defaultMatchMethodSelect.selectedIndex;
+    this.saveOptions(event);
+  }
+
   // Saves options to sync storage
   async saveOptions(event) {
     let self = this;
     // Gather current settings
-    let matchRepeated = document.getElementById('matchRepeated') as HTMLInputElement;
     let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
-    self.cfg.matchRepeated = matchRepeated.checked;
+    let defaultWordMatchRepeated = document.getElementById('defaultWordMatchRepeated') as HTMLInputElement;
     self.cfg.preserveCase = preserveCase.checked;
     self.cfg.preserveFirst = preserveFirst.checked;
     self.cfg.preserveLast = preserveLast.checked;
     self.cfg.showCounter = showCounter.checked;
     self.cfg.substitutionMark = substitutionMark.checked;
+    self.cfg.defaultWordRepeat = defaultWordMatchRepeated.checked;
 
     // Save settings
     let error = await self.cfg.save();
@@ -299,13 +309,10 @@ export default class OptionPage {
   wordAdd(event) {
     let wordText = document.getElementById('wordText') as HTMLInputElement;
     let word = wordText.value.trim().toLowerCase();
+    let result = filter.cfg.addWord(word);
+
     if (word != '') {
-      if (!arrayContains(Object.keys(this.cfg.words), word)) {
-        if (/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/.test(word)) {
-          this.cfg.words[word] = {'matchMethod': 1, 'words': []};
-        } else {
-          this.cfg.words[word] = {'matchMethod': 0, 'words': []};
-        }
+      if (result) {
         this.saveOptions(event);
         wordText.value = '';
       } else {
@@ -314,12 +321,15 @@ export default class OptionPage {
     }
   }
 
-  wordMatchMethodLoad(event) {
+  WordLoadOptions(event) {
     let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
     let word = wordSelect.value;
     dynamicList(Config._matchMethodNames.slice(0,-2).concat(Config._matchMethodNames.slice(-1)), 'wordMatchMethodSelect');
     let wordMatchMethodSelect = document.getElementById('wordMatchMethodSelect') as HTMLSelectElement;
     wordMatchMethodSelect.value = Config._matchMethodNames[this.cfg.words[word].matchMethod];
+
+    this.wordRepeatLoad(word);
+    this.substitutionLoad();
   }
 
   wordMatchMethodSet(event) {
@@ -329,6 +339,18 @@ export default class OptionPage {
     this.saveOptions(event);
   }
 
+  wordMatcRepeatedSet(event) {
+    let self = this;
+    let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
+    let matchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
+    let word = wordSelect.value;
+
+    if (word != '') {
+      self.cfg.words[word].repeat = matchRepeated.checked;
+      self.saveOptions(event);
+    }
+  }
+
   wordRemove(event) {
     let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
     let word = wordSelect.value;
@@ -336,6 +358,13 @@ export default class OptionPage {
       delete this.cfg.words[word];
       this.saveOptions(event);
     }
+  }
+
+  wordRepeatLoad(word: string) {
+    let matchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
+    let result = this.cfg.words[word].repeat || this.cfg.defaultWordRepeat;
+    matchRepeated.disabled = false;
+    matchRepeated.checked = result;
   }
 }
 
@@ -363,13 +392,15 @@ document.getElementById('substitutionMark').addEventListener('click', function(e
 document.getElementById('globalMatchMethodSelect').addEventListener('change', function(e) { option.globalMatchMethod(e); });
 // General
 document.getElementById('showCounter').addEventListener('click', function(e) { option.saveOptions(e); });
-document.getElementById('matchRepeated').addEventListener('click', function(e) { option.saveOptions(e); });
+// Defaults
+document.getElementById('defaultWordMatchRepeated').addEventListener('click', function(e) { option.saveOptions(e); });
+document.getElementById('defaultMatchMethodSelect').addEventListener('click', function(e) { option.saveDefaultMatchMethod(e); });
 // Words
 document.getElementById('wordAdd').addEventListener('click', function(e) { option.wordAdd(e); });
 document.getElementById('wordRemove').addEventListener('click', function(e) { option.wordRemove(e); });
-document.getElementById('wordSelect').addEventListener('change', function(e) { option.substitutionLoad(); });
-document.getElementById('wordSelect').addEventListener('change', function(e) { option.wordMatchMethodLoad(e); });
+document.getElementById('wordSelect').addEventListener('change', function(e) { option.WordLoadOptions(e); });
 document.getElementById('wordMatchMethodSet').addEventListener('click', function(e) { option.wordMatchMethodSet(e); });
+document.getElementById('wordMatchRepeated').addEventListener('click', function(e) { option.wordMatcRepeatedSet(e); });
 document.getElementById('substitutionAdd').addEventListener('click', function(e) { option.substitutionAdd(e); });
 document.getElementById('substitutionRemove').addEventListener('click', function(e) { option.substitutionRemove(e); });
 // Domains

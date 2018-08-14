@@ -131,55 +131,59 @@ class Filter {
   // Parse the profanity list
   // ["exact", "partial", "whole", "disabled"]
   generateRegexpList() {
-    console.time('generateRegexpList'); // Benchmark - Call Time
+    // console.time('generateRegexpList'); // Benchmark - Call Time
     // console.count('generateRegexpList: words to filter'); // Benchmarking - Executaion Count
-    let matchRepeated = this.cfg.matchRepeated;
     if (this.cfg.filterMethod == 2) { // Special regexp for "Remove" filter
       for (let x = 0; x < this.cfg.wordList.length; x++) {
+        let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
         if (this.cfg.words[this.cfg.wordList[x]].matchMethod == 0) { // If word matchMethod is exact
-          this.wordRegExps.push(Word.buildRegexpForRemoveExact(this.cfg.wordList[x], matchRepeated));
+          this.wordRegExps.push(Word.buildRegexpForRemoveExact(this.cfg.wordList[x], repeat));
         } else {
-          this.wordRegExps.push(Word.buildRegexpForRemovePart(this.cfg.wordList[x], matchRepeated));
+          this.wordRegExps.push(Word.buildRegexpForRemovePart(this.cfg.wordList[x], repeat));
         }
       }
     } else {
       switch(this.cfg.globalMatchMethod) {
         case 0: // Global: Exact match
           for (let x = 0; x < this.cfg.wordList.length; x++) {
-            this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x], matchRepeated));
+            let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+            this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x], repeat));
           }
           break;
         case 2: // Global: Whole word match
           for (let x = 0; x < this.cfg.wordList.length; x++) {
-            this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x], matchRepeated));
+            let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+            this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x], repeat));
           }
           break;
         case 3: // Per-word matching
           for (let x = 0; x < this.cfg.wordList.length; x++) {
+            let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
             switch(this.cfg.words[this.cfg.wordList[x]].matchMethod) {
               case 0: // Exact match
-                this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x], matchRepeated));
+                this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x], repeat));
                 break;
               case 2: // Whole word match
-                this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x], matchRepeated));
+                this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x], repeat));
                 break;
               case 4: // Regular Expression (Advanced)
                 this.wordRegExps.push(new RegExp(this.cfg.wordList[x], 'gi'));
                 break;
               default: // case 1 - Partial word match (Default)
-              this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x], matchRepeated));
+              this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x], repeat));
                 break;
             }
           }
           break;
         default: // case 1 - Global: Partial word match (Default)
           for (let x = 0; x < this.cfg.wordList.length; x++) {
-            this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x]));
+            let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+            this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x], repeat));
           }
           break;
       }
     }
-    console.timeEnd('generateRegexpList'); // Benchmark - Call Time
+    // console.timeEnd('generateRegexpList'); // Benchmark - Call Time
   }
 
   // Watch for new text nodes and clean them as they are added
