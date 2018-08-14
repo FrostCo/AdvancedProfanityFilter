@@ -90,18 +90,10 @@ async function toggleDomain(domain: string, key: string) {
 }
 
 async function updateMigrations() {
+  // [1.0.16] - Downcase and Trip each word in the list (NOTE: This MAY result in losing some words)
   let cfg = await Config.build();
-
-  let output = Object.keys(cfg.words)
-  .reduce((destination, key) => {
-    destination[key.trim().toLowerCase()] = cfg.words[key];
-    return destination;
-  }, {});
-  console.log(output);
-
-  // for (var i = 0; i < Object.keys(cfg.words).length ; i++) {
-  //   cfg.words[i]
-  // }
+  cfg.sanitizeWords();
+  cfg.save();
 
   // // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
   // Note: Not async function
