@@ -104,21 +104,37 @@
       Show number of filtered words
       <span class="notes">(Shown over the extension icon)</span>
     </label>
-    <br />
+  </div>
+
+  <div id="defaultOptions" class="moveDown">
+    <h4>Default Settings (For new words/phrases)</h4>
     <label>
-      <input type="checkbox" id="matchRepeated">
+      <input type="checkbox" id="defaultWordMatchRepeated">
       Match repeated characters in words
       <span class="notes">(Dog: dddoooggg)</span>
     </label>
+    <br />
+    <div id="defaultMatchMethod">
+      <label>
+        Word Match Method:
+        <select id="defaultMatchMethodSelect" class="small"></select>
+      </label>
+    </div>
   </div>
 </div>
 
 <!-- Words -->
 <div id="Words" class="tabcontent hidden">
-  <h4>Profanity List</h4>
-  <div class="notes">Warning: Offensive language</div>
-  <select id="wordSelect"></select>
-  <button id="wordRemove">Remove</button>
+  <h4>Add New Word/Phrase</h4>
+  <input type="text" id="wordText" name="wordText">
+  <button id="wordAdd">Add</button>
+
+  <div class="moveDown">
+    <h4>Configure Words/Phrases</h4>
+    <div class="notes">Warning: Offensive language</div>
+    <select id="wordSelect"></select>
+    <button id="wordRemove">Remove</button>
+  </div>
 
   <div id="wordMatchMethodContainer" class="moveDown hidden">
     <label>
@@ -131,12 +147,13 @@
     </label>
   </div>
 
-  <div class="moveDown">
-    New Word/Phrase:
-    <br />
-    <input type="text" id="wordText" name="wordText">
-    <button id="wordAdd">Add</button>
-  </div>
+  <br />
+  <label>
+    <input type="checkbox" id="wordMatchRepeated" disabled>
+    Match repeated characters in words
+    <span class="notes">(Dog: dddoooggg)</span>
+  </label>
+
   <div id="wordSubstitutions" class="hidden">
     <div class="moveDown">
       <h4>Substitutions</h4>
