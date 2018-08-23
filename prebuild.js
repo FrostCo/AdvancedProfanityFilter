@@ -7,73 +7,90 @@
 const fs = require('fs');
 const path = require('path');
 
-var src = './src/';
-var filterFiles = ['helper.ts', 'config.ts', 'domain.ts', 'word.ts', 'page.ts', 'filter.ts'];
-var fileContents = [];
+////
+// Functions
+function cleanFile(file) {
+  let clean;
+  let cleanLines = [];
+  let content = fs.readFileSync(file, 'utf8');
+  let lines = content.split('\n');
 
-function writeCombinedFile(destination) {
-  console.log('Writing combined file: ' + destination);
-  fs.writeFile(destination, fileContents.join('\n'), function(err) {
+  // Ouptut header for file
+  cleanLines.push('////\n//' + file + '\n//');
+
+  // Clean lines
+  lines.forEach(line => {
+    clean = line.replace(/^\s*export(\sdefault|)\s*/gi, '').replace(/^\s*import.*$/gi, '');
+    if (clean != '') { cleanLines.push(clean); } // Remove empty lines
+  });
+
+  return cleanLines.join('\n');
+}
+
+function findDependencies(file) {
+  let imports = [];
+  let content = fs.readFileSync(file, 'utf8');
+  let lines = content.split('\n');
+
+  lines.forEach(line => {
+    if (/^\s*import\b/.test(line)) {
+      let result = line.match(/'.+';?$/);
+      let importFile;
+      if (result) {
+        importFile = result[0];
+        // Remove semicolon & quotes, Remove relative path identifier, Change .js to .ts
+        importFile = importFile.replace(/[;'"]/g, '').replace(/^\.\//, '').replace(/\.js/, '.ts');
+
+        // Check for sub dependencies and include them as well
+        let subDependencies = findDependencies(path.join(src, importFile));
+        subDependencies.forEach(subDep => {
+          console.log(' - Including subdepencies for ' + importFile + ': ' + subDependencies.join(', '));
+          if (!imports.includes(subDep)) { imports.push(subDep); }
+        });
+
+        // Add dependency
+        if (!imports.includes(importFile)) { imports.push(importFile); }
+      } else { console.log('Problem with import line: ' + line); }
+    }
+  });
+
+  return imports;
+}
+
+function writeBundleFile(destination, output) {
+  let bundle = destination.replace('.ts', '.bundle.ts')
+  console.log('Writing bundle: ' + bundle);
+  fs.writeFile(bundle, output.join('\n'), function(err) {
     if (err) {
       console.log('ERROR: Failed to write file');
     }
   });
 }
 
-filterFiles.forEach(file => {
-  console.log('Reading file: ' + file);
-  var content;
-  var cleanFile = [];
-  var clean;
-  var lines;
-  content = fs.readFileSync(path.join(src,file), 'utf8');
+////
+// Main task
+function prebuild(files) {
+  compileFiles.forEach(file => {
+    console.log('Inspecting file: ' + file);
+    let output = [];
+    let dependencies = findDependencies(path.join(src,file));
+    console.log('Dependencies for ' + file + ': ' + dependencies.join(', '));
 
-  lines = content.split('\n');
-  cleanFile.push('////\n//' + path.join(src, file) + '\n//');
-  lines.forEach(line => {
-    clean = line.replace(/^\s*export(\sdefault|)\s*/gi, '').replace(/^\s*import.*$/gi, '');
-    if (clean != '') { cleanFile.push(clean); } // Remove empty lines
+    // Gather dependency file content
+    dependencies.forEach(dependency => {
+      output.push(cleanFile(path.join(src, dependency)));
+    });
+
+    // Append main file after all dependencies
+    output.push(cleanFile(path.join(src, file)));
+
+    writeBundleFile(path.join(src, file), output);
   });
+}
 
-  fileContents.push(cleanFile.join('\n'));
-});
+////
+// User variables
+const src = './src/';
+const compileFiles = ['filter.ts'];
 
-writeCombinedFile(path.join(src, 'filter.bundle.ts'));
-
-// const { exec } = require('child_process');
-// TODO: Async
-// filterFiles.forEach(file => {
-//   console.log('Reading file: ' + file);
-//   fs.readFile(src + file, 'utf8', function(err, data){
-//     var cleanFile = [];
-//     var clean;
-//     var lines;
-
-//     lines = data.split('\n');
-//     lines.forEach(line => {
-//       clean = line.replace(/^\s*export(\sdefault|)\s*/gi, '').replace(/^\s*import.*$/gi, '');
-//       if (clean != '') { cleanFile.push(clean); } // Remove empty lines
-//     });
-
-//     console.log('cleanFile: ' + cleanFile);
-//     fileContents.push(cleanFile.join('\n'));
-//   });
-// });
-
-// var out = './dist/filter.js'
-// var params = '--target es6 --outFile ' + out + ' ' + filterFiles.map(file => src + 'tmp.' + file).join(' ') + ' ' + src + 'filter.ts';
-
-// console.log('Executing: ', 'tsc', params);
-// exec('tsc ' + params, (err, stdout, stderr) => {
-//   if (err) {
-//     // node couldn't execute the command
-//     console.log(err);
-//     return;
-//   }
-
-//   // the *entire* stdout and stderr (buffered)
-//   console.log(`stdout: ${stdout}`);
-//   console.log(`stderr: ${stderr}`);
-// });
-
-// filterFiles.forEach(file => fs.unlinkSync(src + 'tmp.' + file));
+prebuild(compileFiles);

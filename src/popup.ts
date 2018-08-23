@@ -1,4 +1,4 @@
-import { arrayContains, dynamicList, removeFromArray } from './helper.js';
+import { arrayContains, dynamicList } from './helper.js';
 import Config from './config.js';
 import Domain from './domain.js';
 
@@ -9,7 +9,7 @@ class Popup {
   filterMethodContainer: Element;
 
   static async load(instance: Popup) {
-    instance.cfg = await Config.build(['disabledDomains', 'filterMethod', 'password']);
+    instance.cfg = await Config.build(['advancedDomains', 'disabledDomains', 'filterMethod', 'password']);
     instance.domain = new Domain();
     await instance.domain.load();
     return instance;
@@ -32,36 +32,50 @@ class Popup {
     element.classList.remove('disabled');
   }
 
+  async disableAdvancedMode(cfg: Config, domain: string, key: string) {
+    let newDomainList = Domain.removeFromList(domain, cfg[key]);
+
+    if (newDomainList.length < cfg[key].length) {
+      cfg[key] = newDomainList;
+      let result = await cfg.save();
+      if (!result) {
+        chrome.tabs.reload();
+      }
+    }
+  }
+
   async disableDomain() {
     let popup = this;
     if (!arrayContains(popup.cfg.disabledDomains, popup.domain.hostname)) {
       popup.cfg.disabledDomains.push(popup.domain.hostname);
       let result = await popup.cfg.save();
       if (!result) {
+        Popup.disable(document.getElementById('advancedMode'));
         Popup.disable(document.getElementById('filterMethodSelect'));
         chrome.tabs.reload();
       }
     }
   }
 
-  // Remove all entries that disable the filter for domain
-  async enableDomain() {
-    let popup = this;
-    let domainRegex, foundMatch;
-    let newDisabledDomains = popup.cfg.disabledDomains;
-
-    for (let x = 0; x < popup.cfg.disabledDomains.length; x++) {
-      domainRegex = new RegExp('(^|\.)' + popup.cfg.disabledDomains[x]);
-      if (domainRegex.test(popup.domain.hostname)) {
-        foundMatch = true;
-        newDisabledDomains = removeFromArray(newDisabledDomains, popup.cfg.disabledDomains[x]);
+  async enableAdvancedMode(cfg: Config, domain: string, key: string) {
+    if (!arrayContains(cfg[key], domain)) {
+      cfg[key].push(domain);
+      let result = await cfg.save();
+      if (!result) {
+        chrome.tabs.reload();
       }
     }
+  }
 
-    if (foundMatch) {
-      popup.cfg.disabledDomains = newDisabledDomains;
-      let result = await popup.cfg.save();
+  // Remove all entries that disable the filter for domain
+  async enableDomain(cfg: Config, domain: string, key: string) {
+    let newDomainList = Domain.removeFromList(domain, cfg[key]);
+
+    if (newDomainList.length < cfg[key].length) {
+      cfg[key] = newDomainList;
+      let result = await cfg.save();
       if (!result) {
+        Popup.enable(document.getElementById('advancedMode'));
         Popup.enable(document.getElementById('filterMethodSelect'));
         chrome.tabs.reload();
       }
@@ -81,38 +95,52 @@ class Popup {
     let popup = this;
     await Popup.load(popup);
 
-    dynamicList(Config._filterMethodNames, 'filterMethodSelect');
     let domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
     let domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
+    let advancedMode = document.getElementById('advancedMode') as HTMLInputElement;
     let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    dynamicList(Config._filterMethodNames, 'filterMethodSelect');
+    filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
 
     if (popup.cfg.password && popup.cfg.password != '') {
       popup.protected = true;
       Popup.disable(domainFilter);
       Popup.disable(domainToggle);
+      Popup.disable(advancedMode);
       Popup.disable(filterMethodSelect);
     }
-    filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
 
     // Restricted pages
     if (popup.domain.url.protocol == 'chrome:' || popup.domain.url.protocol == 'about:' || popup.domain.hostname == 'chrome.google.com') {
       domainFilter.checked = false;
       Popup.disable(domainFilter);
       Popup.disable(domainToggle);
+      Popup.disable(advancedMode);
       Popup.disable(filterMethodSelect);
       return false;
     }
 
-    // Set initial value for domain filter
-    let domainRegex;
-    for (let x = 0; x < popup.cfg.disabledDomains.length; x++) {
-      if (popup.cfg.disabledDomains[x]) {
-        domainRegex = new RegExp('(^|\.)' + popup.cfg.disabledDomains[x]);
-        if (domainRegex.test(popup.domain.hostname)) {
-          domainFilter.checked = false;
-          Popup.disable(filterMethodSelect);
-          break;
-        }
+    // Set initial value for domain filter and disable options if they are not applicable
+    if (Domain.domainMatch(popup.domain.hostname, popup.cfg['disabledDomains'])) {
+      domainFilter.checked = false;
+      Popup.disable(advancedMode);
+      Popup.disable(filterMethodSelect);
+    }
+
+    // Set initial value for advanced mode
+    if (Domain.domainMatch(popup.domain.hostname, popup.cfg['advancedDomains'])) {
+      advancedMode.checked = true;
+    }
+  }
+
+  toggleAdvancedMode() {
+    let popup = this;
+    if (!popup.protected) {
+      let advancedMode = document.getElementById('advancedMode') as HTMLInputElement;
+      if (advancedMode.checked) {
+        popup.enableAdvancedMode(popup.cfg, popup.domain.hostname, 'advancedDomains');
+      } else {
+        popup.disableAdvancedMode(popup.cfg, popup.domain.hostname, 'advancedDomains');
       }
     }
   }
@@ -122,7 +150,7 @@ class Popup {
     if (!popup.protected) {
       let domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
       if (domainFilter.checked) {
-        popup.enableDomain();
+        popup.enableDomain(popup.cfg, popup.domain.hostname, 'disabledDomains');
       } else {
         popup.disableDomain();
       }
@@ -136,5 +164,6 @@ let popup = new Popup;
 // Listeners
 window.addEventListener('load', function(event) { popup.populateOptions(); });
 document.getElementById('domainFilter').addEventListener('change', function(event) { popup.toggleFilter(); });
+document.getElementById('advancedMode').addEventListener('change', function(event) { popup.toggleAdvancedMode(); });
 document.getElementById('filterMethodSelect').addEventListener('change', function(event) { popup.filterMethodSelect(); });
 document.getElementById('options').addEventListener('click', function() { chrome.runtime.openOptionsPage(); });

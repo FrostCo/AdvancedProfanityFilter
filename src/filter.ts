@@ -3,6 +3,12 @@ import Domain from './domain.js';
 import Page from './page.js';
 import Word from './word.js';
 
+interface Message {
+  advanced?: boolean,
+  counter?: number,
+  disabled?: boolean
+}
+
 class Filter {
   cfg: Config;
   advanced: boolean;
@@ -16,6 +22,7 @@ class Filter {
   }
 
   checkMutationTargetTextForProfanity(mutation) {
+    // console.count('checkMutationTargetTextForProfanity'); // Benchmarking - Executaion Count
     // console.log('Process mutation.target:', mutation.target, mutation.target.data); // DEBUG - Mutation target text
     var replacement;
     if (!Page.isForbiddenNode(mutation.target)) {
@@ -29,6 +36,7 @@ class Filter {
   }
 
   checkNodeForProfanity(mutation) {
+    // console.count('checkNodeForProfanity'); // Benchmarking - Executaion Count
     // console.log('Mutation observed:', mutation); // DEBUG - Mutation addedNodes
     mutation.addedNodes.forEach(function(node) {
       // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
@@ -47,15 +55,16 @@ class Filter {
 
   // Censor the profanity
   // Only gets run when there is a match in replaceText()
-  censorReplace(strMatchingString: string, strFirstLetter: string): string {
+  censorReplace(strMatchingString: string): string {
+    // console.count('censorReplace'); // Benchmarking - Executaion Count
     filter.counter++;
     let censoredString = '';
 
     if (filter.cfg.censorFixedLength > 0) {
       if (filter.cfg.preserveFirst && filter.cfg.preserveLast) {
-        censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 2)) + strMatchingString.slice(-1);
+        censoredString = strMatchingString[0] + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 2)) + strMatchingString.slice(-1);
       } else if (filter.cfg.preserveFirst) {
-        censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 1));
+        censoredString = strMatchingString[0] + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 1));
       } else if (filter.cfg.preserveLast) {
         censoredString = filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 1)) + strMatchingString.slice(-1);
       } else {
@@ -63,9 +72,9 @@ class Filter {
       }
     } else {
       if (filter.cfg.preserveFirst && filter.cfg.preserveLast) {
-        censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((strMatchingString.length - 2)) + strMatchingString.slice(-1);
+        censoredString = strMatchingString[0] + filter.cfg.censorCharacter.repeat((strMatchingString.length - 2)) + strMatchingString.slice(-1);
       } else if (filter.cfg.preserveFirst) {
-        censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((strMatchingString.length - 1));
+        censoredString = strMatchingString[0] + filter.cfg.censorCharacter.repeat((strMatchingString.length - 1));
       } else if (filter.cfg.preserveLast) {
         censoredString = filter.cfg.censorCharacter.repeat((strMatchingString.length - 1)) + strMatchingString.slice(-1);
       } else {
@@ -83,15 +92,23 @@ class Filter {
     // Don't run if this is a disabled domain
     // Only run on main page (no frames)
     if (window == window.top) {
-      let message = this.disabledPage();
-      chrome.runtime.sendMessage(message);
+      let disabled = this.disabledPage();
+      let message = { disabled: disabled } as Message;
+
       if (message.disabled) {
+        chrome.runtime.sendMessage(message);
         return false;
       }
-    }
 
-    // Turn on advanced filter (NOTE: Can break things)
-    this.advanced = Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
+      // Check for advanced mode on current domain
+      this.advanced = Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
+      message.advanced = this.advanced;
+      if (this.advanced) {
+        message.advanced = true;
+      }
+
+      chrome.runtime.sendMessage(message);
+    }
 
     // Sort the words array by longest (most-specific) first
     this.cfg.wordList = Object.keys(this.cfg.words).sort(function(a, b) {
@@ -105,61 +122,68 @@ class Filter {
     this.observeNewNodes();
   }
 
-  disabledPage() {
-    let result = { disabled: false };
+  disabledPage(): boolean {
+    // console.count('disabledPage'); // Benchmarking - Executaion Count
     let domain = window.location.hostname;
-    result.disabled = Domain.domainMatch(domain, this.cfg.disabledDomains);
-    return result;
+    return Domain.domainMatch(domain, this.cfg.disabledDomains);
   }
 
   // Parse the profanity list
   // ["exact", "partial", "whole", "disabled"]
   generateRegexpList() {
+    // console.time('generateRegexpList'); // Benchmark - Call Time
+    // console.count('generateRegexpList: words to filter'); // Benchmarking - Executaion Count
     if (this.cfg.filterMethod == 2) { // Special regexp for "Remove" filter
       for (let x = 0; x < this.cfg.wordList.length; x++) {
+        let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
         if (this.cfg.words[this.cfg.wordList[x]].matchMethod == 0) { // If word matchMethod is exact
-          this.wordRegExps.push(Word.buildRegexpForRemoveExact(this.cfg.wordList[x]));
+          this.wordRegExps.push(Word.buildRegexpForRemoveExact(this.cfg.wordList[x], repeat));
         } else {
-          this.wordRegExps.push(Word.buildRegexpForRemovePart(this.cfg.wordList[x]));
+          this.wordRegExps.push(Word.buildRegexpForRemovePart(this.cfg.wordList[x], repeat));
         }
       }
     } else {
       switch(this.cfg.globalMatchMethod) {
         case 0: // Global: Exact match
           for (let x = 0; x < this.cfg.wordList.length; x++) {
-            this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x]));
+            let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+            this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x], repeat));
           }
           break;
         case 2: // Global: Whole word match
           for (let x = 0; x < this.cfg.wordList.length; x++) {
-            this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x]));
+            let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+            this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x], repeat));
           }
           break;
         case 3: // Per-word matching
           for (let x = 0; x < this.cfg.wordList.length; x++) {
+            let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
             switch(this.cfg.words[this.cfg.wordList[x]].matchMethod) {
               case 0: // Exact match
-                this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x]));
+                this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x], repeat));
                 break;
               case 2: // Whole word match
-                this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x]));
+                this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x], repeat));
                 break;
               case 4: // Regular Expression (Advanced)
                 this.wordRegExps.push(new RegExp(this.cfg.wordList[x], 'gi'));
                 break;
               default: // case 1 - Partial word match (Default)
-              this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x]));
+              this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x], repeat));
                 break;
             }
           }
           break;
         default: // case 1 - Global: Partial word match (Default)
           for (let x = 0; x < this.cfg.wordList.length; x++) {
-            this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x]));
+            let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+            this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x], repeat));
           }
           break;
       }
     }
+    // console.timeEnd('generateRegexpList'); // Benchmark - Call Time
   }
 
   // Watch for new text nodes and clean them as they are added
@@ -184,6 +208,7 @@ class Filter {
   }
 
   removeProfanity(xpathExpression: string, node: any) {
+    // console.count('removeProfanity'); // Benchmarking - Executaion Count
     let evalResult = document.evaluate(
       xpathExpression,
       node,
@@ -195,7 +220,7 @@ class Filter {
     if (evalResult.snapshotLength == 0) { // If plaintext node
       if (node.data) {
         // Don't mess with tags, styles, or URIs
-        if (!/^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/.test(node.data)) {
+        if (!Page.forbiddenNodeRegExp.test(node.data)) {
           // console.log('Plaintext:', node.data); // DEBUG
           node.data = this.replaceText(node.data);
         }
@@ -223,6 +248,7 @@ class Filter {
   }
 
   replaceText(str: string): string {
+    // console.count('replaceText'); // Benchmarking - Executaion Count
     switch(filter.cfg.filterMethod) {
       case 0: // Censor
         for (let z = 0; z < filter.cfg.wordList.length; z++) {
@@ -272,6 +298,7 @@ class Filter {
   }
 
   updateCounterBadge() {
+    // console.count('updateCounterBadge'); // Benchmarking - Executaion Count
     if (this.cfg.showCounter && this.counter > 0) {
       chrome.runtime.sendMessage({counter: this.counter.toString()});
     }

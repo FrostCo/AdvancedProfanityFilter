@@ -1,5 +1,6 @@
-import { arrayContains, removeFromArray } from './helper.js';
+import { arrayContains } from './helper.js';
 import Config from './config.js';
+import Domain from './domain.js';
 
 ////
 // Actions and messaging
@@ -16,7 +17,7 @@ chrome.runtime.onInstalled.addListener(function(details){
     // chrome.runtime.openOptionsPage();
 
     // TODO: Move words to _words*
-    updateRemoveWordsFromStorage();
+    updateMigrations();
 
     // Display update notification
     chrome.notifications.create('extensionUpdate', {
@@ -32,12 +33,18 @@ chrome.runtime.onInstalled.addListener(function(details){
 // Show badge with number of words filtered
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    if (request.counter) {
-      chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
-      // chrome.browserAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255] }); // Red - Advanced
-      // chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255] }); // Blue - Normal
-    } else if (request.disabled) {
+    if (request.disabled === true) {
       chrome.browserAction.setIcon({path: 'icons/icon19-disabled.png', tabId: sender.tab.id});
+    } else {
+      if (request.counter) {
+        chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
+      }
+
+      if (request.advanced === true) {
+        chrome.browserAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255] }); // Red - Advanced
+      } else if (request.advanced === false) {
+        chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255] }); // Blue - Normal
+      }
     }
   }
 );
@@ -49,85 +56,66 @@ chrome.runtime.onMessage.addListener(
 async function addSelection(selection: string) {
   selection = (selection.trim()).toLowerCase();
   let cfg = await Config.build(); // TODO: Only need words here
+  let result = cfg.addWord(selection);
 
-  if (!arrayContains(Object.keys(cfg.words), selection)) {
-    cfg.words[selection] = {matchMethod: 0, words: []};
-    let result = await cfg.save();
-    if (!result) { chrome.tabs.reload(); }
+  if (result) {
+    let saved = await cfg.save();
+    if (!saved) { chrome.tabs.reload(); }
   }
 }
 
 // Disable domain and reload page (unless already disabled)
-async function disableDomainEventPage(domain: string) {
-  let cfg = await Config.build(['disabledDomains']);
-
-  if (!arrayContains(cfg.disabledDomains, domain)) {
-    cfg.disabledDomains.push(domain);
+async function disableDomain(cfg: Config, domain: string, key: string) {
+  if (!arrayContains(cfg[key], domain)) {
+    cfg[key].push(domain);
     let result = await cfg.save();
     if (!result) { chrome.tabs.reload(); }
   }
 }
 
 // Remove all entries that disable the filter for domain
-async function enableDomainEventPage(domain: string) {
-  let cfg = await Config.build(['disabledDomains']);
-  let domainRegex, foundMatch;
-  let newDisabledDomains = cfg.disabledDomains;
+async function enableDomain(cfg: Config, domain: string, key: string) {
+  let newDomainList = Domain.removeFromList(domain, cfg[key]);
 
-  for (let x = 0; x < cfg.disabledDomains.length; x++) {
-    domainRegex = new RegExp('(^|\.)' + cfg.disabledDomains[x]);
-    if (domainRegex.test(domain)) {
-      foundMatch = true;
-      newDisabledDomains = removeFromArray(newDisabledDomains, cfg.disabledDomains[x]);
-    }
-  }
-
-  if (foundMatch) {
-    cfg.disabledDomains = newDisabledDomains;
+  if (newDomainList.length < cfg[key].length) {
+    cfg[key] = newDomainList;
     let result = await cfg.save();
     if (!result) { chrome.tabs.reload(); }
   }
 }
 
-async function toggleFilterEventPage(domain: string) {
-  let cfg = await Config.build(['disabledDomains']);
-  let domainRegex;
-  let disabled = false;
-
-  for (let x = 0; x < cfg.disabledDomains.length; x++) {
-    if (cfg.disabledDomains[x]) {
-      domainRegex = new RegExp('(^|\.)' + cfg.disabledDomains[x]);
-      if (domainRegex.test(domain)) {
-        disabled = true;
-        break;
-      }
-    }
-  }
-
-  disabled ? enableDomainEventPage(domain) : disableDomainEventPage(domain);
+async function toggleDomain(domain: string, key: string) {
+  let cfg = await Config.build([key]);
+  Domain.domainMatch(domain, cfg[key]) ? enableDomain(cfg, domain, key) : disableDomain(cfg, domain, key);
 }
 
-// TODO - RELEASE: Remove after update: transition from previous words structure under the hood
-function updateRemoveWordsFromStorage() {
-  chrome.storage.sync.get({'words': null}, function(oldWords) {
-    // console.log('Old words for migration:', oldWords.words);
-    if (oldWords.words) {
-      chrome.storage.sync.set({'_words0': oldWords.words}, function() {
-        if (!chrome.runtime.lastError) {
-          chrome.storage.sync.remove('words', function() {
-            // Split words if necessary
-            var wordsPromise = new Promise(function(resolve, reject) {
-              resolve(Config.build());
-            });
-            wordsPromise
-              .then(function(response: Config) {
-                response.save();
-              });
-          });
-        }
-      });
-    }
-  });
+async function updateMigrations() {
+  // [1.0.16] - Downcase and Trip each word in the list (NOTE: This MAY result in losing some words)
+  let cfg = await Config.build();
+  cfg.sanitizeWords();
+  cfg.save();
+
+  // // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
+  // Note: Not async function
+  // chrome.storage.sync.get({'words': null}, function(oldWords) {
+  //   // console.log('Old words for migration:', oldWords.words);
+  //   if (oldWords.words) {
+  //     chrome.storage.sync.set({'_words0': oldWords.words}, function() {
+  //       if (!chrome.runtime.lastError) {
+  //         chrome.storage.sync.remove('words', function() {
+  //           // Split words if necessary
+  //           var wordsPromise = new Promise(function(resolve, reject) {
+  //             resolve(Config.build());
+  //           });
+  //           wordsPromise
+  //             .then(function(response: Config) {
+  //               response.save();
+  //             });
+  //         });
+  //       }
+  //     });
+  //   }
+  // });
 }
 
 ////
@@ -146,6 +134,12 @@ chrome.contextMenus.removeAll(function() {
   });
 
   chrome.contextMenus.create({
+    id: 'toggleAdvancedModeForDomain',
+    title: 'Toggle advanced mode for domain',
+    contexts: ['all']
+  });
+
+  chrome.contextMenus.create({
     id: 'options',
     title: 'Options',
     contexts: ['page', 'selection']
@@ -160,8 +154,11 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
       addSelection(info.selectionText); break;
     case 'toggleFilterForDomain': {
       let url = new URL(tab.url);
-      let domain = url.hostname;
-      toggleFilterEventPage(domain); break;
+      toggleDomain(url.hostname, 'disabledDomains'); break;
+    }
+    case 'toggleAdvancedModeForDomain': {
+      let url = new URL(tab.url);
+      toggleDomain(url.hostname, 'advancedDomains'); break;
     }
     case 'options':
       chrome.runtime.openOptionsPage(); break;

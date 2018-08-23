@@ -1,3 +1,5 @@
+import { arrayContains, removeFromArray } from './helper.js';
+
 export default class Domain {
   tab: any;
   url: URL;
@@ -8,7 +10,7 @@ export default class Domain {
 
     for (let x = 0; x < domains.length; x++) {
       if (domains[x]) {
-        let domainRegex = new RegExp('(^|\.)' + domains[x]);
+        let domainRegex = new RegExp('(^|\.)' + domains[x], 'i');
         if (domainRegex.test(domain)) {
           result = true;
           break;
@@ -17,6 +19,20 @@ export default class Domain {
     }
 
     return result;
+  }
+
+  static removeFromList(domain: string, domains: string[]): string[] {
+    let domainRegex;
+    let newDomainsList = domains;
+
+    for (let x = 0; x < domains.length; x++) {
+      domainRegex = new RegExp('(^|\.)' + domains[x], 'i');
+      if (domainRegex.test(domain)) {
+        newDomainsList = removeFromArray(newDomainsList, domains[x]);
+      }
+    }
+
+    return newDomainsList;
   }
 
   static getCurrentTab() {

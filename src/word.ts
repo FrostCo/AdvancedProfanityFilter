@@ -1,6 +1,4 @@
 export default class Word {
-  // /[-\/\\^$*+?.()|[\]{}]/g
-  // /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
   private static readonly _escapeRegExp = /[-\/\\^$*+?.()|[\]{}]/g;
 
   static allLowerCase(string: string): boolean {
@@ -12,33 +10,53 @@ export default class Word {
   }
 
   // Word must match exactly (not sub-string)
-  // /\b(w)ord\b/gi
-  static buildExactRegexp(word: string) {
-    return new RegExp('\\b(' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)) + '\\b', 'gi' );
+  // /\bword\b/gi
+  static buildExactRegexp(str: string, matchRepeated: boolean = false) {
+    try {
+      return new RegExp('\\b' + Word.processPhrase(str, matchRepeated) + '\\b', 'gi');
+    } catch(e) {
+      // console.log('Error: Failed to filter: ' + str);
+    }
   }
 
   // Match any part of a word (sub-string)
-  // /(w)ord/gi
-  static buildPartRegexp(word: string) {
-    return new RegExp('(' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)), 'gi' );
+  // /word/gi
+  static buildPartRegexp(str: string, matchRepeated: boolean = false) {
+    try {
+      return new RegExp(Word.processPhrase(str, matchRepeated), 'gi');
+    } catch(e) {
+      // console.log('Error: Failed to filter: ' + str);
+    }
   }
 
   // Match entire word that contains sub-string and surrounding whitespace
-  // /\s?\b(w)ord\b\s?/gi
-  static buildRegexpForRemoveExact(word: string) {
-    return new RegExp('\\s?\\b(' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)) + '\\b\\s?', 'gi' );
+  // /\s?\bword\b\s?/gi
+  static buildRegexpForRemoveExact(str: string, matchRepeated: boolean = false) {
+    try {
+      return new RegExp('\\s?\\b' + Word.processPhrase(str, matchRepeated) + '\\b\\s?', 'gi');
+    } catch(e) {
+      // console.log('Error: Failed to filter: ' + str);
+    }
   }
 
   // Match entire word that contains sub-string and surrounding whitespace
-  // /\s?\b[\w-]*(w)ord[\w-]*\b\s?/gi
-  static buildRegexpForRemovePart(word: string) {
-    return new RegExp('\\s?\\b([\\w-]*' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)) + '[\\w-]*\\b\\s?', 'gi' );
+  // /\s?\b[\w-]*word[\w-]*\b\s?/gi
+  static buildRegexpForRemovePart(str: string, matchRepeated: boolean = false) {
+    try {
+      return new RegExp('\\s?\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b\\s?', 'gi');
+    } catch(e) {
+      // console.log('Error: Failed to filter: ' + str);
+    }
   }
 
   // Match entire word that contains sub-string
-  // /\b[\w-]*(w)ord[\w-]*\b/gi
-  static buildWholeRegexp(word: string) {
-    return new RegExp('\\b([\\w-]*' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)) + '[\\w-]*\\b', 'gi' );
+  // /\b[\w-]*word[\w-]*\b/gi
+  static buildWholeRegexp(str: string, matchRepeated: boolean = false) {
+    try {
+      return new RegExp('\\b([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi');
+    } catch(e) {
+      // console.log('Error: Failed to filter: ' + str);
+    }
   }
 
   static capitalize(string: string): string {
@@ -49,15 +67,17 @@ export default class Word {
     return string.charAt(0).toUpperCase() === string.charAt(0);
   }
 
+  // /[-\/\\^$*+?.()|[\]{}]/g
+  // /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
   static escapeRegExp(str: string): string {
     return str.replace(Word._escapeRegExp, '\\$&');
   }
 
   // Process the rest of the word (word excluding first character)
   // This will escape the word and optionally include repeating characters
-  static processRestOfWord(str: string): string {
+  static processPhrase(str: string, matchRepeated: boolean): string {
     var escaped = Word.escapeRegExp(str);
-    if (filter && filter.cfg.matchRepeated) {
+    if (matchRepeated) {
       return Word.repeatingCharacterRegexp(escaped);
     }
 
@@ -72,11 +92,10 @@ export default class Word {
   }
 
   // Regexp to match repeating characters
-  // Note: Skip first letter of word (used for preserveFirst)
-  // Word: /(w)+o+r+d+/gi
+    // Word: /w+o+r+d+/gi
   static repeatingCharacterRegexp(str: string): string {
     if (str.includes('\\')) {
-      var repeat = '+';
+      var repeat = '';
       for (var i= 0; i < str.length; i++) {
         if (str[i] === '\\') {
           repeat += (str[i] + str[i + 1] + '+');
@@ -87,7 +106,7 @@ export default class Word {
       }
       return repeat;
     } else {
-      return '+' + str.split('').map(letter => letter + '+').join('');
+      return str.split('').map(letter => letter + '+').join('');
     }
   }
 }
