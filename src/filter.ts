@@ -55,8 +55,9 @@ class Filter {
 
   // Censor the profanity
   // Only gets run when there is a match in replaceText()
-  censorReplace(strMatchingString: string): string {
+  censorReplace(strMatchingString: string, p1, p2, p3): string {
     // console.count('censorReplace'); // Benchmarking - Executaion Count
+    if (p2 != undefined) { strMatchingString = p2; } // Workaround for unicode word boundaries
     filter.counter++;
     let censoredString = '';
 
@@ -83,6 +84,7 @@ class Filter {
     }
 
     // console.log('Censor match:', strMatchingString, censoredString); // DEBUG
+    if (p2 != undefined) { censoredString = p1 + censoredString + p3; } // Workaround for unicode word boundaries
     return censoredString;
   }
 
@@ -257,8 +259,9 @@ class Filter {
         break;
       case 1: // Substitute
         for (let z = 0; z < filter.cfg.wordList.length; z++) {
-          str = str.replace(filter.wordRegExps[z], function(match) {
+          str = str.replace(filter.wordRegExps[z], function(match, p1, p2, p3) {
             filter.counter++;
+            if (p2 != undefined) { match = p2; } // Workaround for unicode word boundaries
             let sub = Word.randomElement(filter.cfg.words[filter.cfg.wordList[z]].words, filter.cfg.defaultSubstitutions);
             // console.log('Substitute match:', match, filter.cfg.words[filter.cfg.wordList[z]].words); // DEBUG
 
@@ -272,23 +275,33 @@ class Filter {
             }
 
             if (filter.cfg.substitutionMark) {
-              return '[' + sub + ']';
-            } else {
-              return sub;
+              sub = '[' + sub + ']';
             }
+
+            if (p2 != undefined) { sub = p1 + sub + p3; } // Workaround for unicode word boundaries
+            return sub;
           });
         }
         break;
       case 2: // Remove
         for (let z = 0; z < filter.cfg.wordList.length; z++) {
-          str = str.replace(filter.wordRegExps[z], function(match) {
+          str = str.replace(filter.wordRegExps[z], function(match, p1, p2, p3) {
             filter.counter++;
-            // Don't remove both leading and trailing whitespace
-            // console.log('Remove match:', match); // DEBUG
-            if (Page.whitespaceRegExp.test(match[0]) && Page.whitespaceRegExp.test(match[match.length - 1])) {
-              return match[0];
+            if (p2 != undefined) {
+              // Workaround for unicode word boundaries TODO: Working - how to ensure consistent surrounding whitespace
+              if (Page.whitespaceRegExp.test(p1) && Page.whitespaceRegExp.test(p3)) {
+                return p1;
+              } else {
+                return '';
+              }
             } else {
-              return '';
+              // Don't remove both leading and trailing whitespace
+              // console.log('Remove match:', match); // DEBUG
+              if (Page.whitespaceRegExp.test(match[0]) && Page.whitespaceRegExp.test(match[match.length - 1])) {
+                return match[0];
+              } else {
+                return '';
+              }
             }
           });
         }

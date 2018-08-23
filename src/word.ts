@@ -1,5 +1,7 @@
 export default class Word {
   private static readonly _escapeRegExp = /[-\/\\^$*+?.()|[\]{}]/g;
+  private static readonly _unicodeRegex = /[^\u0000-\u00ff]/;
+  private static readonly _unicodeWordBoundary = '[\\s.,\'"+!?|-]';
 
   static allLowerCase(string: string): boolean {
     return string.toLowerCase() === string;
@@ -13,7 +15,13 @@ export default class Word {
   // /\bword\b/gi
   static buildExactRegexp(str: string, matchRepeated: boolean = false) {
     try {
-      return new RegExp('\\b' + Word.processPhrase(str, matchRepeated) + '\\b', 'gi');
+      if (Word.containsDoubleByte(str)) {
+        // Work around for lack of word boundary support for unicode strings
+        // /(^|[\s.,'"+!?-|]+)(word)([\s.,'"+!?-|]+|$)/giu
+        return new RegExp('(^|' + Word._unicodeWordBoundary + '+)(' + Word.processPhrase(str, matchRepeated) + ')(' + Word._unicodeWordBoundary + '+|$)', 'giu');
+      } else {
+        return new RegExp('\\b' + Word.processPhrase(str, matchRepeated) + '\\b', 'gi');
+      }
     } catch(e) {
       // console.log('Error: Failed to filter: ' + str);
     }
@@ -33,7 +41,13 @@ export default class Word {
   // /\s?\bword\b\s?/gi
   static buildRegexpForRemoveExact(str: string, matchRepeated: boolean = false) {
     try {
-      return new RegExp('\\s?\\b' + Word.processPhrase(str, matchRepeated) + '\\b\\s?', 'gi');
+      if (Word.containsDoubleByte(str)) {
+        // Work around for lack of word boundary support for unicode strings
+        // /(^|[\s.,'"+!?-|]+)(word)([\s.,'"+!?-|]+|$)/giu
+        return new RegExp('(^|' + Word._unicodeWordBoundary + '+)(' + Word.processPhrase(str, matchRepeated) + ')(' + Word._unicodeWordBoundary + '+|$)', 'giu');
+      } else {
+        return new RegExp('\\s?\\b' + Word.processPhrase(str, matchRepeated) + '\\b\\s?', 'gi');
+      }
     } catch(e) {
       // console.log('Error: Failed to filter: ' + str);
     }
@@ -43,7 +57,12 @@ export default class Word {
   // /\s?\b[\w-]*word[\w-]*\b\s?/gi
   static buildRegexpForRemovePart(str: string, matchRepeated: boolean = false) {
     try {
-      return new RegExp('\\s?\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b\\s?', 'gi');
+      if (Word.containsDoubleByte(str)) {
+        // Work around for lack of word boundary support for unicode strings
+        return new RegExp('(^|' + Word._unicodeWordBoundary + '*)[\\w-]*(' + Word.processPhrase(str, matchRepeated) + ')[\\w-]*(' + Word._unicodeWordBoundary + '*|$)', 'giu');
+      } else {
+        return new RegExp('\\s?\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b\\s?', 'gi');
+      }
     } catch(e) {
       // console.log('Error: Failed to filter: ' + str);
     }
@@ -53,7 +72,12 @@ export default class Word {
   // /\b[\w-]*word[\w-]*\b/gi
   static buildWholeRegexp(str: string, matchRepeated: boolean = false) {
     try {
-      return new RegExp('\\b([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi');
+      if (Word.containsDoubleByte(str)) {
+        // Work around for lack of word boundary support for unicode strings
+        return new RegExp('(^|' + Word._unicodeWordBoundary + '*)[\\w-]*(' + Word.processPhrase(str, matchRepeated) + ')[\\w-]*(' + Word._unicodeWordBoundary + '*|$)', 'giu');
+      } else {
+        return new RegExp('\\b([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi');
+      }
     } catch(e) {
       // console.log('Error: Failed to filter: ' + str);
     }
@@ -65,6 +89,12 @@ export default class Word {
 
   static capitalized(string: string): boolean {
     return string.charAt(0).toUpperCase() === string.charAt(0);
+  }
+
+  static containsDoubleByte(str) {
+    if (!str.length) return false;
+    if (str.charCodeAt(0) > 255) return true;
+    return Word._unicodeRegex.test(str);
   }
 
   // /[-\/\\^$*+?.()|[\]{}]/g
@@ -92,7 +122,7 @@ export default class Word {
   }
 
   // Regexp to match repeating characters
-    // Word: /w+o+r+d+/gi
+  // Word: /w+o+r+d+/gi
   static repeatingCharacterRegexp(str: string): string {
     if (str.includes('\\')) {
       var repeat = '';
