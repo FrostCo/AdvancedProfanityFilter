@@ -9,7 +9,7 @@
     "lint": "npx eslint ./src/*.ts",
     "package": "npm run build && node ./package.js",
     "package-no-build": "node ./package.js",
-    "test": "npx mocha --require babel-core/register test/**/*.js"
+    "test": "npx mocha --require babel-core/register test/**/*.spec.js"
   },
   "repository": {
     "type": "git",

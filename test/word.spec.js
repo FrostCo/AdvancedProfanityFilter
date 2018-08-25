@@ -11,6 +11,25 @@ describe('Word', function() {
       it('should build the proper RegExp with matchRepeated', function() {
         expect(Word.buildExactRegexp('word', true)).to.eql(/\bw+o+r+d+\b/gi);
       });
+
+      it('should throw exception for invalid RegExp', function() {
+        expect(() => { Word.buildExactRegexp(5, true)}).to.throw();
+      });
+
+      // Work around for lack of word boundary support for unicode characters
+      describe('Unicode/UTF', function() {
+        it('should use workaround for UTF word boundaries for exact match', function() {
+          expect(Word.buildExactRegexp('врата', true)).to.eql(
+            new RegExp('(^|[\\s.,\'"+!?|-]+)(в+р+а+т+а+)([\\s.,\'"+!?|-]+|$)', 'giu')
+          );
+        });
+
+        it('should use workaround for UTF word boundaries for whole match', function() {
+          expect(Word.buildWholeRegexp('куче', true)).to.eql(
+            new RegExp('(^|[\\s.,\'"+!?|-]+)([\\w-]*к+у+ч+е+[\\w-]*)([\\s.,\'"+!?|-]+|$)', 'giu')
+          );
+        });
+      });
     });
 
     describe('buildPartRegexp()', function() {
@@ -46,8 +65,6 @@ describe('Word', function() {
 
     describe('buildWholeRegexp()', function() {
       it('should build the proper RegExp for whole match', function() {
-        console.log(Word.buildRegexpForRemovePart('word'));
-        console.log(Word.buildWholeRegexp('word'));
         expect(Word.buildWholeRegexp('word')).to.eql(/\b[\w-]*word[\w-]*\b/gi);
       });
 
