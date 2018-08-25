@@ -16,14 +16,14 @@ export default class Word {
   static buildExactRegexp(str: string, matchRepeated: boolean = false) {
     try {
       if (Word.containsDoubleByte(str)) {
-        // Work around for lack of word boundary support for unicode strings
-        // /(^|[\s.,'"+!?-|]+)(word)([\s.,'"+!?-|]+|$)/giu
+        // Work around for lack of word boundary support for unicode characters
+        // /(^|[\s.,'"+!?|-]+)(word)([\s.,'"+!?|-]+|$)/giu
         return new RegExp('(^|' + Word._unicodeWordBoundary + '+)(' + Word.processPhrase(str, matchRepeated) + ')(' + Word._unicodeWordBoundary + '+|$)', 'giu');
       } else {
         return new RegExp('\\b' + Word.processPhrase(str, matchRepeated) + '\\b', 'gi');
       }
     } catch(e) {
-      // console.log('Error: Failed to filter: ' + str);
+      throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
     }
   }
 
@@ -33,7 +33,7 @@ export default class Word {
     try {
       return new RegExp(Word.processPhrase(str, matchRepeated), 'gi');
     } catch(e) {
-      // console.log('Error: Failed to filter: ' + str);
+      throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
     }
   }
 
@@ -42,14 +42,14 @@ export default class Word {
   static buildRegexpForRemoveExact(str: string, matchRepeated: boolean = false) {
     try {
       if (Word.containsDoubleByte(str)) {
-        // Work around for lack of word boundary support for unicode strings
-        // /(^|[\s.,'"+!?-|]+)(word)([\s.,'"+!?-|]+|$)/giu
+        // Work around for lack of word boundary support for unicode characters
+        // /(^|[\s.,'"+!?|-]+)(word)([\s.,'"+!?|-]+|$)/giu
         return new RegExp('(^|' + Word._unicodeWordBoundary + '+)(' + Word.processPhrase(str, matchRepeated) + ')(' + Word._unicodeWordBoundary + '+|$)', 'giu');
       } else {
         return new RegExp('\\s?\\b' + Word.processPhrase(str, matchRepeated) + '\\b\\s?', 'gi');
       }
     } catch(e) {
-      // console.log('Error: Failed to filter: ' + str);
+      throw e; //new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
     }
   }
 
@@ -58,13 +58,13 @@ export default class Word {
   static buildRegexpForRemovePart(str: string, matchRepeated: boolean = false) {
     try {
       if (Word.containsDoubleByte(str)) {
-        // Work around for lack of word boundary support for unicode strings
+        // Work around for lack of word boundary support for unicode characters
         return new RegExp('(^|' + Word._unicodeWordBoundary + '*)[\\w-]*(' + Word.processPhrase(str, matchRepeated) + ')[\\w-]*(' + Word._unicodeWordBoundary + '*|$)', 'giu');
       } else {
         return new RegExp('\\s?\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b\\s?', 'gi');
       }
     } catch(e) {
-      // console.log('Error: Failed to filter: ' + str);
+      throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
     }
   }
 
@@ -73,13 +73,14 @@ export default class Word {
   static buildWholeRegexp(str: string, matchRepeated: boolean = false) {
     try {
       if (Word.containsDoubleByte(str)) {
-        // Work around for lack of word boundary support for unicode strings
-        return new RegExp('(^|' + Word._unicodeWordBoundary + '*)[\\w-]*(' + Word.processPhrase(str, matchRepeated) + ')[\\w-]*(' + Word._unicodeWordBoundary + '*|$)', 'giu');
+        // Work around for lack of word boundary support for unicode characters
+        // (^|[\s.,'"+!?|-]*)([\w-]*куче[\w-]*)([\s.,'"+!?|-]*|$)/giu
+        return new RegExp('(^|' + Word._unicodeWordBoundary + '+)([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*)(' + Word._unicodeWordBoundary + '+|$)', 'giu');
       } else {
-        return new RegExp('\\b([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi');
+        return new RegExp('\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi');
       }
     } catch(e) {
-      // console.log('Error: Failed to filter: ' + str);
+      throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
     }
   }
 

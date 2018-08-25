@@ -9,7 +9,7 @@ interface Message {
   disabled?: boolean
 }
 
-class Filter {
+export class Filter {
   cfg: Config;
   advanced: boolean;
   counter: number;
@@ -53,41 +53,6 @@ class Filter {
     }
   }
 
-  // Censor the profanity
-  // Only gets run when there is a match in replaceText()
-  censorReplace(strMatchingString: string, p1, p2, p3): string {
-    // console.count('censorReplace'); // Benchmarking - Executaion Count
-    if (p2 != undefined) { strMatchingString = p2; } // Workaround for unicode word boundaries
-    filter.counter++;
-    let censoredString = '';
-
-    if (filter.cfg.censorFixedLength > 0) {
-      if (filter.cfg.preserveFirst && filter.cfg.preserveLast) {
-        censoredString = strMatchingString[0] + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 2)) + strMatchingString.slice(-1);
-      } else if (filter.cfg.preserveFirst) {
-        censoredString = strMatchingString[0] + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 1));
-      } else if (filter.cfg.preserveLast) {
-        censoredString = filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 1)) + strMatchingString.slice(-1);
-      } else {
-        censoredString = filter.cfg.censorCharacter.repeat(filter.cfg.censorFixedLength);
-      }
-    } else {
-      if (filter.cfg.preserveFirst && filter.cfg.preserveLast) {
-        censoredString = strMatchingString[0] + filter.cfg.censorCharacter.repeat((strMatchingString.length - 2)) + strMatchingString.slice(-1);
-      } else if (filter.cfg.preserveFirst) {
-        censoredString = strMatchingString[0] + filter.cfg.censorCharacter.repeat((strMatchingString.length - 1));
-      } else if (filter.cfg.preserveLast) {
-        censoredString = filter.cfg.censorCharacter.repeat((strMatchingString.length - 1)) + strMatchingString.slice(-1);
-      } else {
-        censoredString = filter.cfg.censorCharacter.repeat(strMatchingString.length);
-      }
-    }
-
-    // console.log('Censor match:', strMatchingString, censoredString); // DEBUG
-    if (p2 != undefined) { censoredString = p1 + censoredString + p3; } // Workaround for unicode word boundaries
-    return censoredString;
-  }
-
   async cleanPage() {
     this.cfg = await Config.build();
 
@@ -112,12 +77,8 @@ class Filter {
       chrome.runtime.sendMessage(message);
     }
 
-    // Sort the words array by longest (most-specific) first
-    this.cfg.wordList = Object.keys(this.cfg.words).sort(function(a, b) {
-      return b.length - a.length;
-    });
-
     // Remove profanity from the main document and watch for new nodes
+    this.generateWordList();
     this.generateRegexpList();
     this.removeProfanity(Page.xpathDocText, document);
     this.updateCounterBadge();
@@ -135,11 +96,13 @@ class Filter {
   generateRegexpList() {
     // console.time('generateRegexpList'); // Benchmark - Call Time
     // console.count('generateRegexpList: words to filter'); // Benchmarking - Executaion Count
-    if (this.cfg.filterMethod == 2) { // Special regexp for "Remove" filter
+    if (this.cfg.filterMethod == 2) { // Special regexp for "Remove" filter, uses per-word matchMethods
       for (let x = 0; x < this.cfg.wordList.length; x++) {
         let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
         if (this.cfg.words[this.cfg.wordList[x]].matchMethod == 0) { // If word matchMethod is exact
           this.wordRegExps.push(Word.buildRegexpForRemoveExact(this.cfg.wordList[x], repeat));
+        } else if (this.cfg.words[this.cfg.wordList[x]].matchMethod == 4) { // If word matchMethod is RegExp
+          this.wordRegExps.push(new RegExp(this.cfg.wordList[x], 'gi'));
         } else {
           this.wordRegExps.push(Word.buildRegexpForRemovePart(this.cfg.wordList[x], repeat));
         }
@@ -186,6 +149,13 @@ class Filter {
       }
     }
     // console.timeEnd('generateRegexpList'); // Benchmark - Call Time
+  }
+
+  // Sort the words array by longest (most-specific) first
+  generateWordList() {
+    this.cfg.wordList = Object.keys(this.cfg.words).sort(function(a, b) {
+      return b.length - a.length;
+    });
   }
 
   // Watch for new text nodes and clean them as they are added
@@ -251,22 +221,42 @@ class Filter {
 
   replaceText(str: string): string {
     // console.count('replaceText'); // Benchmarking - Executaion Count
-    switch(filter.cfg.filterMethod) {
+    let self = this;
+    switch(self.cfg.filterMethod) {
       case 0: // Censor
-        for (let z = 0; z < filter.cfg.wordList.length; z++) {
-          str = str.replace(filter.wordRegExps[z], filter.censorReplace);
+        for (let z = 0; z < self.cfg.wordList.length; z++) {
+          str = str.replace(self.wordRegExps[z], function(match, arg1, arg2, arg3, arg4, arg5): string {
+            self.counter++;
+            if (self.wordRegExps[z].unicode) { match = arg2; } // Workaround for unicode word boundaries
+            let censoredString = '';
+            let censorLength = self.cfg.censorFixedLength > 0 ? self.cfg.censorFixedLength : match.length;
+
+            if (self.cfg.preserveFirst && self.cfg.preserveLast) {
+              censoredString = match[0] + self.cfg.censorCharacter.repeat(censorLength - 2) + match.slice(-1);
+            } else if (self.cfg.preserveFirst) {
+              censoredString = match[0] + self.cfg.censorCharacter.repeat(censorLength - 1);
+            } else if (self.cfg.preserveLast) {
+              censoredString = self.cfg.censorCharacter.repeat(censorLength - 1) + match.slice(-1);
+            } else {
+              censoredString = self.cfg.censorCharacter.repeat(censorLength);
+            }
+
+            if (self.wordRegExps[z].unicode) { censoredString = arg1 + censoredString + arg3; } // Workaround for unicode word boundaries
+            // console.log('Censor match:', match, censoredString); // DEBUG
+            return censoredString;
+          });
         }
         break;
       case 1: // Substitute
-        for (let z = 0; z < filter.cfg.wordList.length; z++) {
-          str = str.replace(filter.wordRegExps[z], function(match, p1, p2, p3) {
-            filter.counter++;
-            if (p2 != undefined) { match = p2; } // Workaround for unicode word boundaries
-            let sub = Word.randomElement(filter.cfg.words[filter.cfg.wordList[z]].words, filter.cfg.defaultSubstitutions);
-            // console.log('Substitute match:', match, filter.cfg.words[filter.cfg.wordList[z]].words); // DEBUG
+        for (let z = 0; z < self.cfg.wordList.length; z++) {
+          str = str.replace(self.wordRegExps[z], function(match, arg1, arg2, arg3, arg4, arg5): string {
+            // console.log('Substitute match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
+            self.counter++;
+            if (self.wordRegExps[z].unicode) { match = arg2; } // Workaround for unicode word boundaries
+            let sub = Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words, self.cfg.defaultSubstitutions);
 
             // Make substitution match case of original match
-            if (filter.cfg.preserveCase) {
+            if (self.cfg.preserveCase) {
               if (Word.allUpperCase(match)) {
                 sub = sub.toUpperCase();
               } else if (Word.capitalized(match)) {
@@ -274,23 +264,24 @@ class Filter {
               }
             }
 
-            if (filter.cfg.substitutionMark) {
+            if (self.cfg.substitutionMark) {
               sub = '[' + sub + ']';
             }
 
-            if (p2 != undefined) { sub = p1 + sub + p3; } // Workaround for unicode word boundaries
+            if (self.wordRegExps[z].unicode) { sub = arg1 + sub + arg3; } // Workaround for unicode word boundaries
             return sub;
           });
         }
         break;
       case 2: // Remove
-        for (let z = 0; z < filter.cfg.wordList.length; z++) {
-          str = str.replace(filter.wordRegExps[z], function(match, p1, p2, p3) {
-            filter.counter++;
-            if (p2 != undefined) {
+        for (let z = 0; z < self.cfg.wordList.length; z++) {
+          str = str.replace(self.wordRegExps[z], function(match, arg1, arg2, arg3, arg4, arg5): string {
+            // console.log('Remove match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
+            self.counter++;
+            if (self.wordRegExps[z].unicode) {
               // Workaround for unicode word boundaries TODO: Working - how to ensure consistent surrounding whitespace
-              if (Page.whitespaceRegExp.test(p1) && Page.whitespaceRegExp.test(p3)) {
-                return p1;
+              if (Page.whitespaceRegExp.test(arg1) && Page.whitespaceRegExp.test(arg3)) {
+                return arg1;
               } else {
                 return '';
               }
@@ -320,4 +311,6 @@ class Filter {
 
 // Global
 var filter = new Filter;
-filter.cleanPage();
+if (typeof window !== 'undefined' && ({}).toString.call(window) === '[object Window]') {
+  filter.cleanPage();
+}
