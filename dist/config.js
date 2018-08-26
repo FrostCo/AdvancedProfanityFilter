@@ -18,6 +18,13 @@ export default class Config {
         for (let k in async_param)
             this[k] = async_param[k];
     }
+    addWord(str) {
+        if (!arrayContains(Object.keys(this.words), str)) {
+            this.words[str] = { matchMethod: this.defaultWordMatchMethod, repeat: this.defaultWordRepeat, words: [] };
+            return true;
+        }
+        return false;
+    }
     static build(keys) {
         return __awaiter(this, void 0, void 0, function* () {
             let async_result = yield Config.getConfig(keys);
@@ -111,6 +118,13 @@ export default class Config {
             });
         });
     }
+    sanitizeWords() {
+        let sanitizedWords = {};
+        Object.keys(this.words).sort().forEach((key) => {
+            sanitizedWords[key.trim().toLowerCase()] = this.words[key];
+        });
+        this.words = sanitizedWords;
+    }
     save() {
         var self = this;
         return new Promise(function (resolve, reject) {
@@ -141,14 +155,15 @@ export default class Config {
     }
 }
 Config._defaults = {
+    advancedDomains: [],
     censorCharacter: '*',
     censorFixedLength: 0,
-    advancedDomains: [],
     defaultSubstitutions: ['censored', 'expletive', 'filtered'],
+    defaultWordMatchMethod: 0,
+    defaultWordRepeat: false,
     disabledDomains: [],
     filterMethod: 0,
     globalMatchMethod: 3,
-    matchRepeated: true,
     password: null,
     preserveCase: true,
     preserveFirst: true,
@@ -157,22 +172,22 @@ Config._defaults = {
     substitutionMark: true
 };
 Config._defaultWords = {
-    'ass': { 'matchMethod': 0, 'words': ['butt', 'tail'] },
-    'asses': { 'matchMethod': 0, 'words': ['butts'] },
-    'asshole': { 'matchMethod': 1, 'words': ['butthole', 'jerk'] },
-    'bastard': { 'matchMethod': 1, 'words': ['imperfect', 'impure'] },
-    'bitch': { 'matchMethod': 1, 'words': ['jerk'] },
-    'cunt': { 'matchMethod': 1, 'words': ['explative'] },
-    'dammit': { 'matchMethod': 1, 'words': ['dangit'] },
-    'damn': { 'matchMethod': 1, 'words': ['dang', 'darn'] },
-    'dumbass': { 'matchMethod': 0, 'words': ['idiot'] },
-    'fuck': { 'matchMethod': 1, 'words': ['freak', 'fudge'] },
-    'piss': { 'matchMethod': 1, 'words': ['pee'] },
-    'pissed': { 'matchMethod': 0, 'words': ['ticked'] },
-    'slut': { 'matchMethod': 1, 'words': ['imperfect', 'impure'] },
-    'shit': { 'matchMethod': 1, 'words': ['crap', 'crud', 'poop'] },
-    'tits': { 'matchMethod': 1, 'words': ['explative'] },
-    'whore': { 'matchMethod': 1, 'words': ['harlot', 'tramp'] }
+    'ass': { matchMethod: 0, repeat: true, words: ['butt', 'tail'] },
+    'asses': { matchMethod: 0, repeat: true, words: ['butts'] },
+    'asshole': { matchMethod: 1, repeat: true, words: ['butthole', 'jerk'] },
+    'bastard': { matchMethod: 1, repeat: true, words: ['imperfect', 'impure'] },
+    'bitch': { matchMethod: 1, repeat: true, words: ['jerk'] },
+    'cunt': { matchMethod: 1, repeat: true, words: ['explative'] },
+    'dammit': { matchMethod: 1, repeat: true, words: ['dangit'] },
+    'damn': { matchMethod: 1, repeat: true, words: ['dang', 'darn'] },
+    'dumbass': { matchMethod: 0, repeat: true, words: ['idiot'] },
+    'fuck': { matchMethod: 1, repeat: true, words: ['freak', 'fudge'] },
+    'piss': { matchMethod: 1, repeat: true, words: ['pee'] },
+    'pissed': { matchMethod: 0, repeat: true, words: ['ticked'] },
+    'slut': { matchMethod: 1, repeat: true, words: ['imperfect', 'impure'] },
+    'shit': { matchMethod: 1, repeat: true, words: ['crap', 'crud', 'poop'] },
+    'tits': { matchMethod: 1, repeat: true, words: ['explative'] },
+    'whore': { matchMethod: 1, repeat: true, words: ['harlot', 'tramp'] }
 };
 Config._filterMethodNames = ['Censor', 'Substitute', 'Remove'];
 Config._matchMethodNames = ['Exact Match', 'Partial Match', 'Whole Match', 'Per-Word Match', 'Regular Expression'];

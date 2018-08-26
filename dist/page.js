@@ -1,4 +1,6 @@
 export default class Page {
+    // Returns true if a node should *not* be altered in any way
+    // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
     static isForbiddenNode(node) {
         return Boolean(node.isContentEditable || // DraftJS and many others
             (node.parentNode &&
@@ -16,8 +18,6 @@ export default class Page {
                     node.tagName == 'IFRAME')));
     }
 }
-// Returns true if a node should *not* be altered in any way
-// Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
-Page.whitespaceRegExp = new RegExp('\\s');
+Page.forbiddenNodeRegExp = new RegExp('^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)');
 Page.xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
 Page.xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';

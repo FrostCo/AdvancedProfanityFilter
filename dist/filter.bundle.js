@@ -39,6 +39,13 @@ class Config {
         for (let k in async_param)
             this[k] = async_param[k];
     }
+    addWord(str) {
+        if (!arrayContains(Object.keys(this.words), str)) {
+            this.words[str] = { matchMethod: this.defaultWordMatchMethod, repeat: this.defaultWordRepeat, words: [] };
+            return true;
+        }
+        return false;
+    }
     static build(keys) {
         return __awaiter(this, void 0, void 0, function* () {
             let async_result = yield Config.getConfig(keys);
@@ -132,6 +139,13 @@ class Config {
             });
         });
     }
+    sanitizeWords() {
+        let sanitizedWords = {};
+        Object.keys(this.words).sort().forEach((key) => {
+            sanitizedWords[key.trim().toLowerCase()] = this.words[key];
+        });
+        this.words = sanitizedWords;
+    }
     save() {
         var self = this;
         return new Promise(function (resolve, reject) {
@@ -162,14 +176,15 @@ class Config {
     }
 }
 Config._defaults = {
+    advancedDomains: [],
     censorCharacter: '*',
     censorFixedLength: 0,
-    advancedDomains: [],
     defaultSubstitutions: ['censored', 'expletive', 'filtered'],
+    defaultWordMatchMethod: 0,
+    defaultWordRepeat: false,
     disabledDomains: [],
     filterMethod: 0,
     globalMatchMethod: 3,
-    matchRepeated: true,
     password: null,
     preserveCase: true,
     preserveFirst: true,
@@ -178,22 +193,22 @@ Config._defaults = {
     substitutionMark: true
 };
 Config._defaultWords = {
-    'ass': { 'matchMethod': 0, 'words': ['butt', 'tail'] },
-    'asses': { 'matchMethod': 0, 'words': ['butts'] },
-    'asshole': { 'matchMethod': 1, 'words': ['butthole', 'jerk'] },
-    'bastard': { 'matchMethod': 1, 'words': ['imperfect', 'impure'] },
-    'bitch': { 'matchMethod': 1, 'words': ['jerk'] },
-    'cunt': { 'matchMethod': 1, 'words': ['explative'] },
-    'dammit': { 'matchMethod': 1, 'words': ['dangit'] },
-    'damn': { 'matchMethod': 1, 'words': ['dang', 'darn'] },
-    'dumbass': { 'matchMethod': 0, 'words': ['idiot'] },
-    'fuck': { 'matchMethod': 1, 'words': ['freak', 'fudge'] },
-    'piss': { 'matchMethod': 1, 'words': ['pee'] },
-    'pissed': { 'matchMethod': 0, 'words': ['ticked'] },
-    'slut': { 'matchMethod': 1, 'words': ['imperfect', 'impure'] },
-    'shit': { 'matchMethod': 1, 'words': ['crap', 'crud', 'poop'] },
-    'tits': { 'matchMethod': 1, 'words': ['explative'] },
-    'whore': { 'matchMethod': 1, 'words': ['harlot', 'tramp'] }
+    'ass': { matchMethod: 0, repeat: true, words: ['butt', 'tail'] },
+    'asses': { matchMethod: 0, repeat: true, words: ['butts'] },
+    'asshole': { matchMethod: 1, repeat: true, words: ['butthole', 'jerk'] },
+    'bastard': { matchMethod: 1, repeat: true, words: ['imperfect', 'impure'] },
+    'bitch': { matchMethod: 1, repeat: true, words: ['jerk'] },
+    'cunt': { matchMethod: 1, repeat: true, words: ['explative'] },
+    'dammit': { matchMethod: 1, repeat: true, words: ['dangit'] },
+    'damn': { matchMethod: 1, repeat: true, words: ['dang', 'darn'] },
+    'dumbass': { matchMethod: 0, repeat: true, words: ['idiot'] },
+    'fuck': { matchMethod: 1, repeat: true, words: ['freak', 'fudge'] },
+    'piss': { matchMethod: 1, repeat: true, words: ['pee'] },
+    'pissed': { matchMethod: 0, repeat: true, words: ['ticked'] },
+    'slut': { matchMethod: 1, repeat: true, words: ['imperfect', 'impure'] },
+    'shit': { matchMethod: 1, repeat: true, words: ['crap', 'crud', 'poop'] },
+    'tits': { matchMethod: 1, repeat: true, words: ['explative'] },
+    'whore': { matchMethod: 1, repeat: true, words: ['harlot', 'tramp'] }
 };
 Config._filterMethodNames = ['Censor', 'Substitute', 'Remove'];
 Config._matchMethodNames = ['Exact Match', 'Partial Match', 'Whole Match', 'Per-Word Match', 'Regular Expression'];
@@ -208,7 +223,7 @@ class Domain {
         let result = false;
         for (let x = 0; x < domains.length; x++) {
             if (domains[x]) {
-                let domainRegex = new RegExp('(^|\.)' + domains[x]);
+                let domainRegex = new RegExp('(^|\.)' + domains[x], 'i');
                 if (domainRegex.test(domain)) {
                     result = true;
                     break;
@@ -216,6 +231,19 @@ class Domain {
             }
         }
         return result;
+    }
+    // If a parent domain (example.com) is included, it will not +match all subdomains.
+    // If a subdomain is included, it will match itself and the parent, if present.
+    static removeFromList(domain, domains) {
+        let domainRegex;
+        let newDomainsList = domains;
+        for (let x = 0; x < domains.length; x++) {
+            domainRegex = new RegExp('(^|\.)' + domains[x], 'i');
+            if (domainRegex.test(domain)) {
+                newDomainsList = removeFromArray(newDomainsList, domains[x]);
+            }
+        }
+        return newDomainsList;
     }
     static getCurrentTab() {
         return new Promise(function (resolve, reject) {
@@ -233,93 +261,11 @@ class Domain {
     }
 }
 ////
-//src/word.ts
-//
-class Word {
-    static allLowerCase(string) {
-        return string.toLowerCase() === string;
-    }
-    static allUpperCase(string) {
-        return string.toUpperCase() === string;
-    }
-    // Word must match exactly (not sub-string)
-    // /\b(w)ord\b/gi
-    static buildExactRegexp(word) {
-        return new RegExp('\\b(' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)) + '\\b', 'gi');
-    }
-    // Match any part of a word (sub-string)
-    // /(w)ord/gi
-    static buildPartRegexp(word) {
-        return new RegExp('(' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)), 'gi');
-    }
-    // Match entire word that contains sub-string and surrounding whitespace
-    // /\s?\b(w)ord\b\s?/gi
-    static buildRegexpForRemoveExact(word) {
-        return new RegExp('\\s?\\b(' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)) + '\\b\\s?', 'gi');
-    }
-    // Match entire word that contains sub-string and surrounding whitespace
-    // /\s?\b[\w-]*(w)ord[\w-]*\b\s?/gi
-    static buildRegexpForRemovePart(word) {
-        return new RegExp('\\s?\\b([\\w-]*' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)) + '[\\w-]*\\b\\s?', 'gi');
-    }
-    // Match entire word that contains sub-string
-    // /\b[\w-]*(w)ord[\w-]*\b/gi
-    static buildWholeRegexp(word) {
-        return new RegExp('\\b([\\w-]*' + Word.escapeRegExp(word[0]) + ')' + Word.processRestOfWord(word.slice(1)) + '[\\w-]*\\b', 'gi');
-    }
-    static capitalize(string) {
-        return string.charAt(0).toUpperCase() + string.substr(1);
-    }
-    static capitalized(string) {
-        return string.charAt(0).toUpperCase() === string.charAt(0);
-    }
-    static escapeRegExp(str) {
-        return str.replace(Word._escapeRegExp, '\\$&');
-    }
-    // Process the rest of the word (word excluding first character)
-    // This will escape the word and optionally include repeating characters
-    static processRestOfWord(str) {
-        var escaped = Word.escapeRegExp(str);
-        if (filter && filter.cfg.matchRepeated) {
-            return Word.repeatingCharacterRegexp(escaped);
-        }
-        return escaped;
-    }
-    static randomElement(array, defaults) {
-        if (array.length === 0) {
-            array = defaults;
-        }
-        return array[Math.floor((Math.random() * array.length))];
-    }
-    // Regexp to match repeating characters
-    // Note: Skip first letter of word (used for preserveFirst)
-    // Word: /(w)+o+r+d+/gi
-    static repeatingCharacterRegexp(str) {
-        if (str.includes('\\')) {
-            var repeat = '+';
-            for (var i = 0; i < str.length; i++) {
-                if (str[i] === '\\') {
-                    repeat += (str[i] + str[i + 1] + '+');
-                    i++;
-                }
-                else {
-                    repeat += str[i] + '+';
-                }
-            }
-            return repeat;
-        }
-        else {
-            return '+' + str.split('').map(letter => letter + '+').join('');
-        }
-    }
-}
-// /[-\/\\^$*+?.()|[\]{}]/g
-// /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
-Word._escapeRegExp = /[-\/\\^$*+?.()|[\]{}]/g;
-////
 //src/page.ts
 //
 class Page {
+    // Returns true if a node should *not* be altered in any way
+    // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
     static isForbiddenNode(node) {
         return Boolean(node.isContentEditable || // DraftJS and many others
             (node.parentNode &&
@@ -337,14 +283,156 @@ class Page {
                     node.tagName == 'IFRAME')));
     }
 }
-// Returns true if a node should *not* be altered in any way
-// Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
-Page.whitespaceRegExp = new RegExp('\\s');
+Page.forbiddenNodeRegExp = new RegExp('^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)');
 Page.xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
 Page.xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
 ////
-//src/filter.ts
+//src/word.ts
 //
+class Word {
+    static allLowerCase(string) {
+        return string.toLowerCase() === string;
+    }
+    static allUpperCase(string) {
+        return string.toUpperCase() === string;
+    }
+    // Word must match exactly (not sub-string)
+    // /\bword\b/gi
+    static buildExactRegexp(str, matchRepeated = false) {
+        try {
+            if (Word.containsDoubleByte(str)) {
+                // Work around for lack of word boundary support for unicode characters
+                // /(^|[\s.,'"+!?|-]+)(word)([\s.,'"+!?|-]+|$)/giu
+                return new RegExp('(^|' + Word._unicodeWordBoundary + '+)(' + Word.processPhrase(str, matchRepeated) + ')(' + Word._unicodeWordBoundary + '+|$)', 'giu');
+            }
+            else {
+                return new RegExp('\\b' + Word.processPhrase(str, matchRepeated) + '\\b', 'gi');
+            }
+        }
+        catch (e) {
+            throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
+        }
+    }
+    // Match any part of a word (sub-string)
+    // /word/gi
+    static buildPartRegexp(str, matchRepeated = false) {
+        try {
+            return new RegExp(Word.processPhrase(str, matchRepeated), 'gi');
+        }
+        catch (e) {
+            throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
+        }
+    }
+    // Match entire word that contains sub-string and surrounding whitespace
+    // /\s?\bword\b\s?/gi
+    static buildRegexpForRemoveExact(str, matchRepeated = false) {
+        try {
+            if (Word.containsDoubleByte(str)) {
+                // Work around for lack of word boundary support for unicode characters
+                // /(^|[\s.,'"+!?|-]+)(word)([\s.,'"+!?|-]+|$)/giu
+                return new RegExp('(^|' + Word._unicodeWordBoundary + ')(' + Word.processPhrase(str, matchRepeated) + ')(' + Word._unicodeWordBoundary + '|$)', 'giu');
+            }
+            else {
+                return new RegExp('\\s?\\b' + Word.processPhrase(str, matchRepeated) + '\\b\\s?', 'gi');
+            }
+        }
+        catch (e) {
+            throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
+        }
+    }
+    // Match entire word that contains sub-string and surrounding whitespace
+    // /\s?\b[\w-]*word[\w-]*\b\s?/gi
+    static buildRegexpForRemovePart(str, matchRepeated = false) {
+        try {
+            if (Word.containsDoubleByte(str)) {
+                // Work around for lack of word boundary support for unicode characters
+                // /(^|[\s.,'"+!?|-]?)[\w-]*(word)[\w-]*([\s.,'"+!?|-]?|$)/giu
+                return new RegExp('(^|' + Word._unicodeWordBoundary + '?)([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*)(' + Word._unicodeWordBoundary + '?|$)', 'giu');
+            }
+            else {
+                return new RegExp('\\s?\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b\\s?', 'gi');
+            }
+        }
+        catch (e) {
+            throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
+        }
+    }
+    // Match entire word that contains sub-string
+    // /\b[\w-]*word[\w-]*\b/gi
+    static buildWholeRegexp(str, matchRepeated = false) {
+        try {
+            if (Word.containsDoubleByte(str)) {
+                // Work around for lack of word boundary support for unicode characters
+                // (^|[\s.,'"+!?|-]*)([\w-]*куче[\w-]*)([\s.,'"+!?|-]*|$)/giu
+                return new RegExp('(^|' + Word._unicodeWordBoundary + '+)([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*)(' + Word._unicodeWordBoundary + '+|$)', 'giu');
+            }
+            else {
+                return new RegExp('\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi');
+            }
+        }
+        catch (e) {
+            throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
+        }
+    }
+    static capitalize(string) {
+        return string.charAt(0).toUpperCase() + string.substr(1);
+    }
+    static capitalized(string) {
+        return string.charAt(0).toUpperCase() === string.charAt(0);
+    }
+    static containsDoubleByte(str) {
+        if (!str.length)
+            return false;
+        if (str.charCodeAt(0) > 255)
+            return true;
+        return Word._unicodeRegex.test(str);
+    }
+    // /[-\/\\^$*+?.()|[\]{}]/g
+    // /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
+    static escapeRegExp(str) {
+        return str.replace(Word._escapeRegExp, '\\$&');
+    }
+    // Process the rest of the word (word excluding first character)
+    // This will escape the word and optionally include repeating characters
+    static processPhrase(str, matchRepeated) {
+        var escaped = Word.escapeRegExp(str);
+        if (matchRepeated) {
+            return Word.repeatingCharacterRegexp(escaped);
+        }
+        return escaped;
+    }
+    static randomElement(array, defaults) {
+        if (array.length === 0) {
+            array = defaults;
+        }
+        return array[Math.floor((Math.random() * array.length))];
+    }
+    // Regexp to match repeating characters
+    // Word: /w+o+r+d+/gi
+    static repeatingCharacterRegexp(str) {
+        if (str.includes('\\')) {
+            var repeat = '';
+            for (var i = 0; i < str.length; i++) {
+                if (str[i] === '\\') {
+                    repeat += (str[i] + str[i + 1] + '+');
+                    i++;
+                }
+                else {
+                    repeat += str[i] + '+';
+                }
+            }
+            return repeat;
+        }
+        else {
+            return str.split('').map(letter => letter + '+').join('');
+        }
+    }
+}
+Word._escapeRegExp = /[-\/\\^$*+?.()|[\]{}]/g;
+Word._unicodeRegex = /[^\u0000-\u00ff]/;
+Word._unicodeWordBoundary = '[\\s.,\'"+!?|-]';
+Word.nonWordRegExp = new RegExp('^\\s*[^\\w]\\s*$', 'g');
+Word.whitespaceRegExp = new RegExp('^\\s*$');
 class Filter {
     constructor() {
         this.advanced = false;
@@ -352,6 +440,7 @@ class Filter {
         this.wordRegExps = [];
     }
     checkMutationTargetTextForProfanity(mutation) {
+        // console.count('checkMutationTargetTextForProfanity'); // Benchmarking - Executaion Count
         // console.log('Process mutation.target:', mutation.target, mutation.target.data); // DEBUG - Mutation target text
         var replacement;
         if (!Page.isForbiddenNode(mutation.target)) {
@@ -364,6 +453,7 @@ class Filter {
         // else { console.log('Forbidden mutation.target node:', mutation.target); } // DEBUG - Mutation target text
     }
     checkNodeForProfanity(mutation) {
+        // console.count('checkNodeForProfanity'); // Benchmarking - Executaion Count
         // console.log('Mutation observed:', mutation); // DEBUG - Mutation addedNodes
         mutation.addedNodes.forEach(function (node) {
             // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
@@ -378,61 +468,28 @@ class Filter {
             filter.checkMutationTargetTextForProfanity(mutation);
         }
     }
-    // Censor the profanity
-    // Only gets run when there is a match in replaceText()
-    censorReplace(strMatchingString, strFirstLetter) {
-        filter.counter++;
-        let censoredString = '';
-        if (filter.cfg.censorFixedLength > 0) {
-            if (filter.cfg.preserveFirst && filter.cfg.preserveLast) {
-                censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 2)) + strMatchingString.slice(-1);
-            }
-            else if (filter.cfg.preserveFirst) {
-                censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 1));
-            }
-            else if (filter.cfg.preserveLast) {
-                censoredString = filter.cfg.censorCharacter.repeat((filter.cfg.censorFixedLength - 1)) + strMatchingString.slice(-1);
-            }
-            else {
-                censoredString = filter.cfg.censorCharacter.repeat(filter.cfg.censorFixedLength);
-            }
-        }
-        else {
-            if (filter.cfg.preserveFirst && filter.cfg.preserveLast) {
-                censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((strMatchingString.length - 2)) + strMatchingString.slice(-1);
-            }
-            else if (filter.cfg.preserveFirst) {
-                censoredString = strFirstLetter + filter.cfg.censorCharacter.repeat((strMatchingString.length - 1));
-            }
-            else if (filter.cfg.preserveLast) {
-                censoredString = filter.cfg.censorCharacter.repeat((strMatchingString.length - 1)) + strMatchingString.slice(-1);
-            }
-            else {
-                censoredString = filter.cfg.censorCharacter.repeat(strMatchingString.length);
-            }
-        }
-        // console.log('Censor match:', strMatchingString, censoredString); // DEBUG
-        return censoredString;
-    }
     cleanPage() {
         return __awaiter(this, void 0, void 0, function* () {
             this.cfg = yield Config.build();
             // Don't run if this is a disabled domain
             // Only run on main page (no frames)
             if (window == window.top) {
-                let message = this.disabledPage();
-                chrome.runtime.sendMessage(message);
+                let disabled = this.disabledPage();
+                let message = { disabled: disabled };
                 if (message.disabled) {
+                    chrome.runtime.sendMessage(message);
                     return false;
                 }
+                // Check for advanced mode on current domain
+                this.advanced = Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
+                message.advanced = this.advanced;
+                if (this.advanced) {
+                    message.advanced = true;
+                }
+                chrome.runtime.sendMessage(message);
             }
-            // Turn on advanced filter (NOTE: Can break things)
-            this.advanced = Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
-            // Sort the words array by longest (most-specific) first
-            this.cfg.wordList = Object.keys(this.cfg.words).sort(function (a, b) {
-                return b.length - a.length;
-            });
             // Remove profanity from the main document and watch for new nodes
+            this.generateWordList();
             this.generateRegexpList();
             this.removeProfanity(Page.xpathDocText, document);
             this.updateCounterBadge();
@@ -440,21 +497,26 @@ class Filter {
         });
     }
     disabledPage() {
-        let result = { disabled: false };
+        // console.count('disabledPage'); // Benchmarking - Executaion Count
         let domain = window.location.hostname;
-        result.disabled = Domain.domainMatch(domain, this.cfg.disabledDomains);
-        return result;
+        return Domain.domainMatch(domain, this.cfg.disabledDomains);
     }
     // Parse the profanity list
     // ["exact", "partial", "whole", "disabled"]
     generateRegexpList() {
-        if (this.cfg.filterMethod == 2) { // Special regexp for "Remove" filter
+        // console.time('generateRegexpList'); // Benchmark - Call Time
+        // console.count('generateRegexpList: words to filter'); // Benchmarking - Executaion Count
+        if (this.cfg.filterMethod == 2) { // Special regexp for "Remove" filter, uses per-word matchMethods
             for (let x = 0; x < this.cfg.wordList.length; x++) {
+                let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
                 if (this.cfg.words[this.cfg.wordList[x]].matchMethod == 0) { // If word matchMethod is exact
-                    this.wordRegExps.push(Word.buildRegexpForRemoveExact(this.cfg.wordList[x]));
+                    this.wordRegExps.push(Word.buildRegexpForRemoveExact(this.cfg.wordList[x], repeat));
+                }
+                else if (this.cfg.words[this.cfg.wordList[x]].matchMethod == 4) { // If word matchMethod is RegExp
+                    this.wordRegExps.push(new RegExp(this.cfg.wordList[x], 'gi'));
                 }
                 else {
-                    this.wordRegExps.push(Word.buildRegexpForRemovePart(this.cfg.wordList[x]));
+                    this.wordRegExps.push(Word.buildRegexpForRemovePart(this.cfg.wordList[x], repeat));
                 }
             }
         }
@@ -462,39 +524,50 @@ class Filter {
             switch (this.cfg.globalMatchMethod) {
                 case 0: // Global: Exact match
                     for (let x = 0; x < this.cfg.wordList.length; x++) {
-                        this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x]));
+                        let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+                        this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x], repeat));
                     }
                     break;
                 case 2: // Global: Whole word match
                     for (let x = 0; x < this.cfg.wordList.length; x++) {
-                        this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x]));
+                        let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+                        this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x], repeat));
                     }
                     break;
                 case 3: // Per-word matching
                     for (let x = 0; x < this.cfg.wordList.length; x++) {
+                        let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
                         switch (this.cfg.words[this.cfg.wordList[x]].matchMethod) {
                             case 0: // Exact match
-                                this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x]));
+                                this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x], repeat));
                                 break;
                             case 2: // Whole word match
-                                this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x]));
+                                this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x], repeat));
                                 break;
                             case 4: // Regular Expression (Advanced)
                                 this.wordRegExps.push(new RegExp(this.cfg.wordList[x], 'gi'));
                                 break;
                             default: // case 1 - Partial word match (Default)
-                                this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x]));
+                                this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x], repeat));
                                 break;
                         }
                     }
                     break;
                 default: // case 1 - Global: Partial word match (Default)
                     for (let x = 0; x < this.cfg.wordList.length; x++) {
-                        this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x]));
+                        let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+                        this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x], repeat));
                     }
                     break;
             }
         }
+        // console.timeEnd('generateRegexpList'); // Benchmark - Call Time
+    }
+    // Sort the words array by longest (most-specific) first
+    generateWordList() {
+        this.cfg.wordList = Object.keys(this.cfg.words).sort(function (a, b) {
+            return b.length - a.length;
+        });
     }
     // Watch for new text nodes and clean them as they are added
     observeNewNodes() {
@@ -515,11 +588,12 @@ class Filter {
         observer.observe(document, observerConfig);
     }
     removeProfanity(xpathExpression, node) {
+        // console.count('removeProfanity'); // Benchmarking - Executaion Count
         let evalResult = document.evaluate(xpathExpression, node, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
         if (evalResult.snapshotLength == 0) { // If plaintext node
             if (node.data) {
                 // Don't mess with tags, styles, or URIs
-                if (!/^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/.test(node.data)) {
+                if (!Page.forbiddenNodeRegExp.test(node.data)) {
                     // console.log('Plaintext:', node.data); // DEBUG
                     node.data = this.replaceText(node.data);
                 }
@@ -548,20 +622,49 @@ class Filter {
         }
     }
     replaceText(str) {
-        switch (filter.cfg.filterMethod) {
+        // console.count('replaceText'); // Benchmarking - Executaion Count
+        let self = this;
+        switch (self.cfg.filterMethod) {
             case 0: // Censor
-                for (let z = 0; z < filter.cfg.wordList.length; z++) {
-                    str = str.replace(filter.wordRegExps[z], filter.censorReplace);
+                for (let z = 0; z < self.cfg.wordList.length; z++) {
+                    str = str.replace(self.wordRegExps[z], function (match, arg1, arg2, arg3, arg4, arg5) {
+                        self.counter++;
+                        if (self.wordRegExps[z].unicode) {
+                            match = arg2;
+                        } // Workaround for unicode word boundaries
+                        let censoredString = '';
+                        let censorLength = self.cfg.censorFixedLength > 0 ? self.cfg.censorFixedLength : match.length;
+                        if (self.cfg.preserveFirst && self.cfg.preserveLast) {
+                            censoredString = match[0] + self.cfg.censorCharacter.repeat(censorLength - 2) + match.slice(-1);
+                        }
+                        else if (self.cfg.preserveFirst) {
+                            censoredString = match[0] + self.cfg.censorCharacter.repeat(censorLength - 1);
+                        }
+                        else if (self.cfg.preserveLast) {
+                            censoredString = self.cfg.censorCharacter.repeat(censorLength - 1) + match.slice(-1);
+                        }
+                        else {
+                            censoredString = self.cfg.censorCharacter.repeat(censorLength);
+                        }
+                        if (self.wordRegExps[z].unicode) {
+                            censoredString = arg1 + censoredString + arg3;
+                        } // Workaround for unicode word boundaries
+                        // console.log('Censor match:', match, censoredString); // DEBUG
+                        return censoredString;
+                    });
                 }
                 break;
             case 1: // Substitute
-                for (let z = 0; z < filter.cfg.wordList.length; z++) {
-                    str = str.replace(filter.wordRegExps[z], function (match) {
-                        filter.counter++;
-                        let sub = Word.randomElement(filter.cfg.words[filter.cfg.wordList[z]].words, filter.cfg.defaultSubstitutions);
-                        // console.log('Substitute match:', match, filter.cfg.words[filter.cfg.wordList[z]].words); // DEBUG
+                for (let z = 0; z < self.cfg.wordList.length; z++) {
+                    str = str.replace(self.wordRegExps[z], function (match, arg1, arg2, arg3, arg4, arg5) {
+                        // console.log('Substitute match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
+                        self.counter++;
+                        if (self.wordRegExps[z].unicode) {
+                            match = arg2;
+                        } // Workaround for unicode word boundaries
+                        let sub = Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words, self.cfg.defaultSubstitutions);
                         // Make substitution match case of original match
-                        if (filter.cfg.preserveCase) {
+                        if (self.cfg.preserveCase) {
                             if (Word.allUpperCase(match)) {
                                 sub = sub.toUpperCase();
                             }
@@ -569,26 +672,43 @@ class Filter {
                                 sub = Word.capitalize(sub);
                             }
                         }
-                        if (filter.cfg.substitutionMark) {
-                            return '[' + sub + ']';
+                        if (self.cfg.substitutionMark) {
+                            sub = '[' + sub + ']';
                         }
-                        else {
-                            return sub;
-                        }
+                        if (self.wordRegExps[z].unicode) {
+                            sub = arg1 + sub + arg3;
+                        } // Workaround for unicode word boundaries
+                        return sub;
                     });
                 }
                 break;
             case 2: // Remove
-                for (let z = 0; z < filter.cfg.wordList.length; z++) {
-                    str = str.replace(filter.wordRegExps[z], function (match) {
-                        filter.counter++;
-                        // Don't remove both leading and trailing whitespace
-                        // console.log('Remove match:', match); // DEBUG
-                        if (Page.whitespaceRegExp.test(match[0]) && Page.whitespaceRegExp.test(match[match.length - 1])) {
-                            return match[0];
+                for (let z = 0; z < self.cfg.wordList.length; z++) {
+                    str = str.replace(self.wordRegExps[z], function (match, arg1, arg2, arg3, arg4, arg5) {
+                        // console.log('Remove match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
+                        // console.log('\nmatch: ', match, '\narg1: ', arg1, '\narg2: ', arg2, '\narg3: ', arg3, '\narg4: ', arg4, '\narg5: ', arg5); // DEBUG
+                        self.counter++;
+                        if (self.wordRegExps[z].unicode) {
+                            // Workaround for unicode word boundaries
+                            if (Word.whitespaceRegExp.test(arg1) && Word.whitespaceRegExp.test(arg3)) { // If both surrounds are whitespace
+                                return arg1;
+                            }
+                            else if (Word.nonWordRegExp.test(arg1) || Word.nonWordRegExp.test(arg3)) { // If there is more than just whitesapce (ex. ',')
+                                return (arg1 + arg3).trim();
+                            }
+                            else {
+                                return '';
+                            }
                         }
                         else {
-                            return '';
+                            // Don't remove both leading and trailing whitespace
+                            // console.log('Remove match:', match); // DEBUG
+                            if (Word.whitespaceRegExp.test(match[0]) && Word.whitespaceRegExp.test(match[match.length - 1])) {
+                                return match[0];
+                            }
+                            else {
+                                return '';
+                            }
                         }
                     });
                 }
@@ -597,6 +717,7 @@ class Filter {
         return str;
     }
     updateCounterBadge() {
+        // console.count('updateCounterBadge'); // Benchmarking - Executaion Count
         if (this.cfg.showCounter && this.counter > 0) {
             chrome.runtime.sendMessage({ counter: this.counter.toString() });
         }
@@ -604,4 +725,6 @@ class Filter {
 }
 // Global
 var filter = new Filter;
-filter.cleanPage();
+if (typeof window !== 'undefined' && ({}).toString.call(window) === '[object Window]') {
+    filter.cleanPage();
+}
