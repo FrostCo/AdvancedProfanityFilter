@@ -172,24 +172,24 @@
   <h4>Advanced Domains</h4>
   <div class="notes">
     Only use when the filter isn't working for a page<br />
-    Warning: This option can have negative results
+    Warning: This option can have negative results - Use with caution.
   </div>
-  <select id="advancedDomainSelect"></select>
-  <button id="advancedDomainRemove">Remove</button>
+  <div id="advancedDomainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
+  <input type="text" id="advancedDomainText" name="advancedDomainText" pattern="^[a-zA-Z0-9\.\-]+$">
+  <button id="advancedDomainAdd">Add</button>
   <div class="moveDown">
-    <div id="advancedDomainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
-    <input type="text" id="advancedDomainText" name="advancedDomainText" pattern="^[a-zA-Z0-9\.\-]+$">
-    <button id="advancedDomainAdd">Add</button>
+    <select id="advancedDomainSelect"></select>
+    <button id="advancedDomainRemove">Remove</button>
   </div>
 
   <div class="moveDown"></div>
   <h4>Disabled Domains</h4>
-  <select id="domainSelect"></select>
-  <button id="domainRemove">Remove</button>
+  <div id="domainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
+  <input type="text" id="domainText" name="domainText" pattern="^[a-zA-Z0-9\.\-]+$">
+  <button id="domainAdd">Add</button>
   <div class="moveDown">
-    <div id="domainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
-    <input type="text" id="domainText" name="domainText" pattern="^[a-zA-Z0-9\.\-]+$">
-    <button id="domainAdd">Add</button>
+    <select id="domainSelect"></select>
+    <button id="domainRemove">Remove</button>
   </div>
 </div>
 

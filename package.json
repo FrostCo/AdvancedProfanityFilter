@@ -1,13 +1,13 @@
 {
   "name": "advancedprofanityfilter",
-  "version": "1.0.15",
+  "version": "1.1.0",
   "description": "A browser extension to filter profanity from webpages.",
   "main": "filter.js",
   "scripts": {
     "build": "node ./prebuild.js && npm run lint && echo \"Running tsc...\" & tsc",
     "build-no-verify": "node ./prebuild.js && echo \"Running tsc...\" & tsc",
     "lint": "npx eslint ./src/*.ts",
-    "package": "npm run build && node ./package.js",
+    "package": "npm run build && npm test && node ./package.js",
     "package-no-build": "node ./package.js",
     "test": "npx mocha --require babel-core/register test/**/*.spec.js"
   },
