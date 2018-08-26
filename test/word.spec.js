@@ -17,16 +17,16 @@ describe('Word', function() {
       });
 
       // Work around for lack of word boundary support for unicode characters
-      describe('Unicode/UTF', function() {
+      describe('Unicode', function() {
         it('should use workaround for UTF word boundaries for exact match', function() {
-          expect(Word.buildExactRegexp('врата', true)).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-]+)(в+р+а+т+а+)([\\s.,\'"+!?|-]+|$)', 'giu')
+          expect(Word.buildExactRegexp('врата')).to.eql(
+            new RegExp('(^|[\\s.,\'"+!?|-]+)(врата)([\\s.,\'"+!?|-]+|$)', 'giu')
           );
         });
 
-        it('should use workaround for UTF word boundaries for whole match', function() {
-          expect(Word.buildWholeRegexp('куче', true)).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-]+)([\\w-]*к+у+ч+е+[\\w-]*)([\\s.,\'"+!?|-]+|$)', 'giu')
+        it('should use workaround for UTF word boundaries for exact match with matchRepeated', function() {
+          expect(Word.buildExactRegexp('врата', true)).to.eql(
+            new RegExp('(^|[\\s.,\'"+!?|-]+)(в+р+а+т+а+)([\\s.,\'"+!?|-]+|$)', 'giu')
           );
         });
       });
@@ -50,9 +50,23 @@ describe('Word', function() {
       it('should build the proper RegExp for remove exact with matchRepeated', function() {
         expect(Word.buildRegexpForRemoveExact('word', true)).to.eql(/\s?\bw+o+r+d+\b\s?/gi);
       });
+
+      // Work around for lack of word boundary support for unicode characters
+      describe('Unicode', function() {
+        it('should build the proper RegExp for remove exact', function() {
+          expect(Word.buildRegexpForRemoveExact('куче')).to.eql(
+            new RegExp('(^|[\\s.,\'"+!?|-])(куче)([\\s.,\'"+!?|-]|$)', 'giu')
+          );
+        });
+
+        it('should build the proper RegExp for remove exact with matchRepeated', function() {
+          expect(Word.buildRegexpForRemoveExact('куче', true)).to.eql(
+            new RegExp('(^|[\\s.,\'"+!?|-])(к+у+ч+е+)([\\s.,\'"+!?|-]|$)', 'giu')
+          );
+        });
+      });
     });
 
-    // TODO: Test if repeat makes sense?
     describe('buildRegexpForRemovePart()', function() {
       it('should build the proper RegExp for remove part', function() {
         expect(Word.buildRegexpForRemovePart('word')).to.eql(/\s?\b[\w-]*word[\w-]*\b\s?/gi);
@@ -60,6 +74,21 @@ describe('Word', function() {
 
       it('should build the proper RegExp for remove part with matchRepeated', function() {
         expect(Word.buildRegexpForRemovePart('word', true)).to.eql(/\s?\b[\w-]*w+o+r+d+[\w-]*\b\s?/gi);
+      });
+
+      // Work around for lack of word boundary support for unicode characters
+      describe('Unicode', function() {
+        it('should build the proper RegExp for remove part', function() {
+          expect(Word.buildRegexpForRemovePart('куче')).to.eql(
+            new RegExp('(^|[\\s.,\'"+!?|-]?)([\\w-]*куче[\\w-]*)([\\s.,\'"+!?|-]?|$)', 'giu')
+          );
+        });
+
+        it('should build the proper RegExp for remove part with matchRepeated', function() {
+          expect(Word.buildRegexpForRemovePart('куче', true)).to.eql(
+            new RegExp('(^|[\\s.,\'"+!?|-]?)([\\w-]*к+у+ч+е+[\\w-]*)([\\s.,\'"+!?|-]?|$)', 'giu')
+          );
+        });
       });
     });
 
@@ -70,6 +99,21 @@ describe('Word', function() {
 
       it('should build the proper RegExp for whole match with matchRepeated', function() {
         expect(Word.buildWholeRegexp('word', true)).to.eql(/\b[\w-]*w+o+r+d+[\w-]*\b/gi);
+      });
+
+      // Work around for lack of word boundary support for unicode characters
+      describe('Unicode', function() {
+        it('should build the proper RegExp for whole match', function() {
+          expect(Word.buildWholeRegexp('куче')).to.eql(
+            new RegExp('(^|[\\s.,\'"+!?|-]+)([\\w-]*куче[\\w-]*)([\\s.,\'"+!?|-]+|$)', 'giu')
+          );
+        });
+
+        it('should build the proper RegExp for whole match with matchRepeated', function() {
+          expect(Word.buildWholeRegexp('куче', true)).to.eql(
+            new RegExp('(^|[\\s.,\'"+!?|-]+)([\\w-]*к+у+ч+е+[\\w-]*)([\\s.,\'"+!?|-]+|$)', 'giu')
+          );
+        });
       });
     });
   });

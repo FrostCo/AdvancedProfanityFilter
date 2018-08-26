@@ -44,12 +44,12 @@ export default class Word {
       if (Word.containsDoubleByte(str)) {
         // Work around for lack of word boundary support for unicode characters
         // /(^|[\s.,'"+!?|-]+)(word)([\s.,'"+!?|-]+|$)/giu
-        return new RegExp('(^|' + Word._unicodeWordBoundary + '+)(' + Word.processPhrase(str, matchRepeated) + ')(' + Word._unicodeWordBoundary + '+|$)', 'giu');
+        return new RegExp('(^|' + Word._unicodeWordBoundary + ')(' + Word.processPhrase(str, matchRepeated) + ')(' + Word._unicodeWordBoundary + '|$)', 'giu');
       } else {
         return new RegExp('\\s?\\b' + Word.processPhrase(str, matchRepeated) + '\\b\\s?', 'gi');
       }
     } catch(e) {
-      throw e; //new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
+      throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
     }
   }
 
@@ -59,7 +59,8 @@ export default class Word {
     try {
       if (Word.containsDoubleByte(str)) {
         // Work around for lack of word boundary support for unicode characters
-        return new RegExp('(^|' + Word._unicodeWordBoundary + '*)[\\w-]*(' + Word.processPhrase(str, matchRepeated) + ')[\\w-]*(' + Word._unicodeWordBoundary + '*|$)', 'giu');
+        // /(^|[\s.,'"+!?|-]?)[\w-]*(word)[\w-]*([\s.,'"+!?|-]?|$)/giu
+        return new RegExp('(^|' + Word._unicodeWordBoundary + '?)([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*)(' + Word._unicodeWordBoundary + '?|$)', 'giu');
       } else {
         return new RegExp('\\s?\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b\\s?', 'gi');
       }
