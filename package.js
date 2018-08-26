@@ -13,10 +13,12 @@ function updateManifestFile(zip, obj) {
 }
 
 // Chrome Extension
+// try { fs.unlinkSync('./dist/filter.js'); } catch {};
 zip.addLocalFolder(dist, null)
 var manifest = JSON.parse(fs.readFileSync(path.join(dist, 'manifest.json')));
 manifest.version = process.env.npm_package_version || manifest.version;
 updateManifestFile(zip, manifest);
+zip.deleteFile('filter.js'); // Remove filter.js as its only used for testing. Use filter.bundle.js instead
 zip.writeZip('./extension-chrome.zip');
 
 // Firefox Extension
