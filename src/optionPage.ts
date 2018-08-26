@@ -210,7 +210,7 @@ export default class OptionPage {
     globalMatchMethodSelect.selectedIndex = self.cfg.globalMatchMethod;
     defaultWordMatchRepeated.checked = self.cfg.defaultWordRepeat;
     dynamicList(Config._matchMethodNames.slice(0,-2), 'defaultMatchMethodSelect');
-    defaultMatchMethodSelect.selectedIndex = self.cfg.defaultWordMatchMethod; // TODO: Working Here
+    defaultMatchMethodSelect.selectedIndex = self.cfg.defaultWordMatchMethod;
     // Words
     dynamicList(Object.keys(self.cfg.words).sort(), 'wordSelect', 'Words to Filter');
     matchRepeated.disabled = true;

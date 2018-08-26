@@ -277,18 +277,21 @@ export class Filter {
         for (let z = 0; z < self.cfg.wordList.length; z++) {
           str = str.replace(self.wordRegExps[z], function(match, arg1, arg2, arg3, arg4, arg5): string {
             // console.log('Remove match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
+            // console.log('\nmatch: ', match, '\narg1: ', arg1, '\narg2: ', arg2, '\narg3: ', arg3, '\narg4: ', arg4, '\narg5: ', arg5); // DEBUG
             self.counter++;
             if (self.wordRegExps[z].unicode) {
-              // Workaround for unicode word boundaries TODO: Working - how to ensure consistent surrounding whitespace
-              if (Page.whitespaceRegExp.test(arg1) && Page.whitespaceRegExp.test(arg3)) {
+              // Workaround for unicode word boundaries
+              if (Word.whitespaceRegExp.test(arg1) && Word.whitespaceRegExp.test(arg3)) { // If both surrounds are whitespace
                 return arg1;
+              } else if (Word.nonWordRegExp.test(arg1) || Word.nonWordRegExp.test(arg3)) { // If there is more than just whitesapce (ex. ',')
+                return (arg1 + arg3).trim();
               } else {
                 return '';
               }
             } else {
               // Don't remove both leading and trailing whitespace
               // console.log('Remove match:', match); // DEBUG
-              if (Page.whitespaceRegExp.test(match[0]) && Page.whitespaceRegExp.test(match[match.length - 1])) {
+              if (Word.whitespaceRegExp.test(match[0]) && Word.whitespaceRegExp.test(match[match.length - 1])) {
                 return match[0];
               } else {
                 return '';

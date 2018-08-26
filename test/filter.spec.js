@@ -2,8 +2,6 @@ const expect = require('chai').expect;
 // import * as bundle from '../dist/filter.bundle';
 import {Filter} from '../dist/filter'
 
-// TODO: remove filter
-
 const testWords = {
   'example': { matchMethod: 0, repeat: true, words: ['demo'] },
   'placeholder': { matchMethod: 0, repeat: false, words: ['variable'] },
@@ -220,7 +218,7 @@ describe('Filter', function() {
         filter.cfg = { words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 };
         filter.generateWordList();
         filter.generateRegexpList();
-        expect(filter.replaceText('A cool example sentence.')).to.equal('A cool sentence.');
+        expect(filter.replaceText('A cool, example sentence.')).to.equal('A cool, sentence.');
       });
 
       it('Should filter an partial word', function() {
@@ -238,6 +236,29 @@ describe('Filter', function() {
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.replaceText('Have you ever done this and everything after it?')).to.equal('Have you ever done ');
+      });
+
+      describe('Unicode characters', function() {
+        it('Should filter an exact word', function() {
+          let filter = new Filter;
+          filter.cfg = { words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 };
+          filter.cfg.words['врата'] = { matchMethod: 0, repeat: true, words: ['door'] };
+          filter.generateWordList();
+          filter.generateRegexpList();
+          expect(filter.replaceText('This even works on врата. cool huh?')).to.equal('This even works on. cool huh?');
+          expect(filter.replaceText('This even works on врата, cool huh?')).to.equal('This even works on, cool huh?');
+          expect(filter.replaceText('This even works on врата?')).to.equal('This even works on?');
+        });
+
+        it('Should filter an entire word with a partial match', function() {
+          let filter = new Filter;
+          filter.cfg = { words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 };
+          filter.cfg.words['врата'] = { matchMethod: 1, repeat: true, words: ['door'] };
+          filter.generateWordList();
+          filter.generateRegexpList();
+          expect(filter.replaceText('This even works on with-врата. Cool huh?')).to.equal('This even works on. Cool huh?');
+          expect(filter.replaceText('The вратаs in the hat')).to.equal('The in the hat');
+        });
       });
     });
   });
