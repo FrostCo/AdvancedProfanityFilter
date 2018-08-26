@@ -9,7 +9,7 @@
     "lint": "npx eslint ./src/*.ts",
     "package": "npm run build && node ./package.js",
     "package-no-build": "node ./package.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx mocha --require babel-core/register test/**/*.spec.js"
   },
   "repository": {
     "type": "git",
@@ -28,9 +28,19 @@
   "devDependencies": {
     "@types/chrome": "latest",
     "adm-zip": "^0.4.11",
-    "eslint": "^5.2.0",
+    "babel-core": "latest",
+    "babel-preset-env": "latest",
+    "babel-require": "latest",
+    "chai": "latest",
     "eslint-plugin-typescript": "^0.12.0",
-    "typescript": "^3.0.1",
-    "typescript-eslint-parser": "^17.0.1"
+    "eslint": "^5.2.0",
+    "mocha": "latest",
+    "typescript-eslint-parser": "^17.0.1",
+    "typescript": "^3.0.1"
+  },
+  "babel": {
+    "presets": [
+      "env"
+    ]
   }
 }

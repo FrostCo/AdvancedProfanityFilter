@@ -11,12 +11,12 @@ chrome.runtime.onInstalled.addListener(function(details){
     chrome.runtime.openOptionsPage();
   } else if (details.reason == 'update') {
     // var thisVersion = chrome.runtime.getManifest().version;
-    // console.log("Updated from " + details.previousVersion + " to " + thisVersion + "!");
+    // console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion);
 
-    // TODO: Migrate wordList - Open options page to show new features
+    // Open options page to show new features
     // chrome.runtime.openOptionsPage();
 
-    // TODO: Move words to _words*
+    // Run any data migrations on update
     updateMigrations();
 
     // Display update notification
@@ -90,7 +90,7 @@ async function toggleDomain(domain: string, key: string) {
 }
 
 async function updateMigrations() {
-  // [1.0.16] - Downcase and Trip each word in the list (NOTE: This MAY result in losing some words)
+  // [1.0.16] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
   let cfg = await Config.build();
   cfg.sanitizeWords();
   cfg.save();
