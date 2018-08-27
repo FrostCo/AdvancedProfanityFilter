@@ -362,9 +362,8 @@ export default class OptionPage {
 
   wordRepeatLoad(word: string) {
     let matchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
-    let result = this.cfg.words[word].repeat || this.cfg.defaultWordRepeat;
+    matchRepeated.checked = this.cfg.repeatForWord(word);
     matchRepeated.disabled = false;
-    matchRepeated.checked = result;
   }
 }
 

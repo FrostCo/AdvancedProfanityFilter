@@ -98,7 +98,7 @@ export class Filter {
     // console.count('generateRegexpList: words to filter'); // Benchmarking - Executaion Count
     if (this.cfg.filterMethod == 2) { // Special regexp for "Remove" filter, uses per-word matchMethods
       for (let x = 0; x < this.cfg.wordList.length; x++) {
-        let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+        let repeat = this.cfg.repeatForWord(this.cfg.wordList[x]);
         if (this.cfg.words[this.cfg.wordList[x]].matchMethod == 0) { // If word matchMethod is exact
           this.wordRegExps.push(Word.buildRegexpForRemoveExact(this.cfg.wordList[x], repeat));
         } else if (this.cfg.words[this.cfg.wordList[x]].matchMethod == 4) { // If word matchMethod is RegExp
@@ -111,19 +111,19 @@ export class Filter {
       switch(this.cfg.globalMatchMethod) {
         case 0: // Global: Exact match
           for (let x = 0; x < this.cfg.wordList.length; x++) {
-            let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+            let repeat = this.cfg.repeatForWord(this.cfg.wordList[x]);
             this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x], repeat));
           }
           break;
         case 2: // Global: Whole word match
           for (let x = 0; x < this.cfg.wordList.length; x++) {
-            let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+            let repeat = this.cfg.repeatForWord(this.cfg.wordList[x]);
             this.wordRegExps.push(Word.buildWholeRegexp(this.cfg.wordList[x], repeat));
           }
           break;
         case 3: // Per-word matching
           for (let x = 0; x < this.cfg.wordList.length; x++) {
-            let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+            let repeat = this.cfg.repeatForWord(this.cfg.wordList[x]);
             switch(this.cfg.words[this.cfg.wordList[x]].matchMethod) {
               case 0: // Exact match
                 this.wordRegExps.push(Word.buildExactRegexp(this.cfg.wordList[x], repeat));
@@ -142,7 +142,7 @@ export class Filter {
           break;
         default: // case 1 - Global: Partial word match (Default)
           for (let x = 0; x < this.cfg.wordList.length; x++) {
-            let repeat = this.cfg.words[this.cfg.wordList[x]].repeat || this.cfg.defaultWordRepeat;
+            let repeat = this.cfg.repeatForWord(this.cfg.wordList[x]);
             this.wordRegExps.push(Word.buildPartRegexp(this.cfg.wordList[x], repeat));
           }
           break;

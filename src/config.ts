@@ -182,6 +182,14 @@ export default class Config {
     delete this[prop];
   }
 
+  repeatForWord(word: string): boolean {
+    if (this.words[word].repeat === true || this.words[word].repeat === false) {
+      return this.words[word].repeat;
+    } else {
+      return this.defaultWordRepeat;
+    }
+  }
+
   reset() {
     return new Promise(function(resolve, reject) {
       chrome.storage.sync.clear(function() {
