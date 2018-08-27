@@ -344,9 +344,8 @@ export default class OptionPage {
     }
     wordRepeatLoad(word) {
         let matchRepeated = document.getElementById('wordMatchRepeated');
-        let result = this.cfg.words[word].repeat || this.cfg.defaultWordRepeat;
+        matchRepeated.checked = this.cfg.repeatForWord(word);
         matchRepeated.disabled = false;
-        matchRepeated.checked = result;
     }
 }
 let option = new OptionPage;

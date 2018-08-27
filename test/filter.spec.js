@@ -1,5 +1,6 @@
 const expect = require('chai').expect;
 // import * as bundle from '../dist/filter.bundle';
+import Config from '../dist/config'
 import {Filter} from '../dist/filter'
 
 const testWords = {
@@ -12,7 +13,7 @@ const testWords = {
 describe('Filter', function() {
   describe('disabledPage()', function() {
     let filter = new Filter;
-    filter.cfg = { disabledDomains: ['example.com', 'sub.sample.com'] };
+    filter.cfg = new Config({ disabledDomains: ['example.com', 'sub.sample.com'] });
     global.window = { location: { hostname: 'example.com' } };
 
     it('should return true when on a disabled domain', function() {
@@ -33,7 +34,7 @@ describe('Filter', function() {
   describe('generateWordList()', function() {
     it('should generate a sorted word list RegExp list', function() {
       let filter = new Filter;
-      filter.cfg = { words: Object.assign({}, testWords) };
+      filter.cfg = new Config({ words: Object.assign({}, testWords) });
       filter.generateWordList();
       expect(filter.cfg.wordList.length).to.equal(4);
       expect(filter.cfg.wordList).to.eql(['placeholder', 'example', 'sample', 'word']);
@@ -44,7 +45,7 @@ describe('Filter', function() {
     describe('Global matching', function() {
       it('should return RegExp list for global exact match', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 0 };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 0 });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.wordRegExps.length).to.equal(4);
@@ -53,7 +54,7 @@ describe('Filter', function() {
 
       it('should return RegExp list for global part match', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 1 };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 1 });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.wordRegExps.length).to.equal(4);
@@ -62,7 +63,7 @@ describe('Filter', function() {
 
       it('should return RegExp list for global part match (default)', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 0 };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0 });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.wordRegExps.length).to.equal(4);
@@ -71,7 +72,7 @@ describe('Filter', function() {
 
       it('should return RegExp list for global whole match (substitution filter)', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 2 };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 2 });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.wordRegExps.length).to.equal(4);
@@ -87,7 +88,7 @@ describe('Filter', function() {
     describe('Per-word matching', function() {
       it('should return RegExp list for per-word matching', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3 };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3 });
         filter.cfg.words['^regexp.*?$'] = { matchMethod: 4, repeat: false, words: ['substitute'] };
         filter.generateWordList();
         filter.generateRegexpList();
@@ -101,7 +102,7 @@ describe('Filter', function() {
     describe('Censor Filter', function() {
       it('Should filter an exact word and preserveFirst', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: false };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: false });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.replaceText('this is a placeholder placeholder.')).to.equal('this is a p********** p**********.');
@@ -109,7 +110,7 @@ describe('Filter', function() {
 
       it('Should filter an exact word with (-) characters and no preserveFirst or preserveLast', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '-', censorFixedLength: 0, preserveFirst: false, preserveLast: false };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '-', censorFixedLength: 0, preserveFirst: false, preserveLast: false });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.replaceText('A cool example sentence.')).to.equal('A cool ------- sentence.');
@@ -117,7 +118,7 @@ describe('Filter', function() {
 
       it('Should filter an partial word with preserveFirst and preserveLast', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.replaceText('this sample is a pretty good sampler to sample.')).to.equal('this s****e is a pretty good s****er to s****e.');
@@ -125,7 +126,7 @@ describe('Filter', function() {
 
       it('Should filter a whole word with (_) characters and fixed length (3)', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '_', censorFixedLength: 3, preserveFirst: false, preserveLast: false };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '_', censorFixedLength: 3, preserveFirst: false, preserveLast: false });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.replaceText('Words used to be okay, but now even a word is bad.')).to.equal('___ used to be okay, but now even a ___ is bad.');
@@ -133,7 +134,7 @@ describe('Filter', function() {
 
       it('Should filter an RegExp and fixed length (5) with preserveFirst', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '_', censorFixedLength: 5, preserveFirst: true, preserveLast: false };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '_', censorFixedLength: 5, preserveFirst: true, preserveLast: false });
         filter.cfg.words['^The'] = { matchMethod: 4, repeat: false, words: ['substitute'] };
         filter.generateWordList();
         filter.generateRegexpList();
@@ -143,7 +144,7 @@ describe('Filter', function() {
       describe('Unicode characters', function() {
         it('Should filter an exact word and preserveFirst', function() {
           let filter = new Filter;
-          filter.cfg = { words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: false };
+          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: false });
           filter.cfg.words['врата'] = { matchMethod: 0, repeat: true, words: ['door'] };
           filter.generateWordList();
           filter.generateRegexpList();
@@ -152,7 +153,7 @@ describe('Filter', function() {
 
         it('Should filter an partial word with preserveFirst and preserveLast', function() {
           let filter = new Filter;
-          filter.cfg = { words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true };
+          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
           filter.cfg.words['котка'] = { matchMethod: 1, repeat: true, words: ['cat'] };
           filter.generateWordList();
           filter.generateRegexpList();
@@ -161,7 +162,7 @@ describe('Filter', function() {
 
         it('Should filter a whole word with (_) characters and preserveFirst', function() {
           let filter = new Filter;
-          filter.cfg = { words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '_', censorFixedLength: 0, preserveFirst: true, preserveLast: false };
+          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '_', censorFixedLength: 0, preserveFirst: true, preserveLast: false });
           filter.cfg.words['куче'] = { matchMethod: 2, repeat: true, words: ['dog'] };
           filter.generateWordList();
           filter.generateRegexpList();
@@ -173,7 +174,7 @@ describe('Filter', function() {
     describe('Substitute Filter', function() {
       it('Should filter an exact word with substitions marked and preserveCase', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: true };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: true });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.replaceText('I love having good examples as an Example.')).to.equal('I love having good examples as an [Demo].');
@@ -181,7 +182,7 @@ describe('Filter', function() {
 
       it('Should filter an exact word with substitions marked and preserveCase with repeated characters', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: true };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: true });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.replaceText('I love having good examples as an Exxaammppllee.')).to.equal('I love having good examples as an [Demo].');
@@ -189,7 +190,7 @@ describe('Filter', function() {
 
       it('Should filter an partial word with substitions not marked and preserveCase', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: false, preserveCase: true };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: false, preserveCase: true });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('This Piece is a pretty good piecer to piece.');
@@ -197,7 +198,7 @@ describe('Filter', function() {
 
       it('Should filter an partial word with substitions not marked, not repeated, and preserveCase', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: false, preserveCase: true };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: false, preserveCase: true });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.replaceText('This Sample is a pretty good sampler to saammppllee.')).to.equal('This Piece is a pretty good piecer to saammppllee.');
@@ -205,7 +206,7 @@ describe('Filter', function() {
 
       it('Should filter an partial word with substitions marked and preserveCase', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: true };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: true });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('This [Piece] is a pretty good [piece]r to [piece].');
@@ -215,7 +216,7 @@ describe('Filter', function() {
     describe('Remove Filter', function() {
       it('Should filter an exact word', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.replaceText('A cool, example sentence.')).to.equal('A cool, sentence.');
@@ -223,7 +224,7 @@ describe('Filter', function() {
 
       it('Should filter an partial word', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 });
         filter.generateWordList();
         filter.generateRegexpList();
         expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('This is a pretty good to.');
@@ -231,7 +232,7 @@ describe('Filter', function() {
 
       it('Should filter a RegExp', function() {
         let filter = new Filter;
-        filter.cfg = { words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 };
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 });
         filter.cfg.words['this and everything after.*$'] = { matchMethod: 4, repeat: false, words: ['substitute'] };
         filter.generateWordList();
         filter.generateRegexpList();
@@ -241,7 +242,7 @@ describe('Filter', function() {
       describe('Unicode characters', function() {
         it('Should filter an exact word', function() {
           let filter = new Filter;
-          filter.cfg = { words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 };
+          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 });
           filter.cfg.words['врата'] = { matchMethod: 0, repeat: true, words: ['door'] };
           filter.generateWordList();
           filter.generateRegexpList();
@@ -252,7 +253,7 @@ describe('Filter', function() {
 
         it('Should filter an entire word with a partial match', function() {
           let filter = new Filter;
-          filter.cfg = { words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 };
+          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 });
           filter.cfg.words['врата'] = { matchMethod: 1, repeat: true, words: ['door'] };
           filter.generateWordList();
           filter.generateRegexpList();
