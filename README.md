@@ -43,8 +43,12 @@ This project is written in TypeScript, and during the build/package process it w
 
 Getting started
 ```
-sudo npm install typescript --global
 npm install
+```
+
+To Build the extension
+```
+npm run package
 ```
 
 ##### License
