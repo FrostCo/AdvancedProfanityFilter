@@ -1,6 +1,12 @@
-import { arrayContains } from './helper.js';
+import { arrayContains, getVersion, isVersionOlder } from './helper.js';
 import Config from './config.js';
 import Domain from './domain.js';
+
+interface Version {
+  major: number,
+  minor: number,
+  patch: number
+}
 
 ////
 // Actions and messaging
@@ -17,7 +23,7 @@ chrome.runtime.onInstalled.addListener(function(details){
     // chrome.runtime.openOptionsPage();
 
     // Run any data migrations on update
-    updateMigrations();
+    updateMigrations(details.previousVersion);
 
     // Display update notification
     chrome.notifications.create('extensionUpdate', {
@@ -89,33 +95,44 @@ async function toggleDomain(domain: string, key: string) {
   Domain.domainMatch(domain, cfg[key]) ? enableDomain(cfg, domain, key) : disableDomain(cfg, domain, key);
 }
 
-async function updateMigrations() {
-  // [1.0.16] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
-  let cfg = await Config.build();
-  cfg.sanitizeWords();
-  cfg.save();
+// This will look at the version (from before the update) and perform data migrations if necessary
+// Only append so the order stays the same (oldest first).
+async function updateMigrations(previousVersion) {
+  let old = getVersion(previousVersion) as Version;
+  // let current = chrome.runtime.getManifest().version
 
-  // // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
-  // Note: Not async function
-  // chrome.storage.sync.get({'words': null}, function(oldWords) {
-  //   // console.log('Old words for migration:', oldWords.words);
-  //   if (oldWords.words) {
-  //     chrome.storage.sync.set({'_words0': oldWords.words}, function() {
-  //       if (!chrome.runtime.lastError) {
-  //         chrome.storage.sync.remove('words', function() {
-  //           // Split words if necessary
-  //           var wordsPromise = new Promise(function(resolve, reject) {
-  //             resolve(Config.build());
-  //           });
-  //           wordsPromise
-  //             .then(function(response: Config) {
-  //               response.save();
-  //             });
-  //         });
-  //       }
-  //     });
-  //   }
-  // });
+  // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
+  if (isVersionOlder(getVersion('1.0.13'), old)) {
+    console.log('not in herer');
+    // Note: using promise instead of async/await
+    chrome.storage.sync.get({'words': null}, function(oldWords) {
+      // console.log('Old words for migration:', oldWords.words);
+      if (oldWords.words) {
+        chrome.storage.sync.set({'_words0': oldWords.words}, function() {
+          if (!chrome.runtime.lastError) {
+            chrome.storage.sync.remove('words', function() {
+              // Split words if necessary
+              var wordsPromise = new Promise(function(resolve, reject) {
+                resolve(Config.build());
+              });
+              wordsPromise
+                .then(function(response: Config) {
+                  response.save();
+                });
+            });
+          }
+        });
+      }
+    });
+  }
+
+  // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
+  if (isVersionOlder(getVersion('1.1.0'), old)) {
+    console.log('in version update');
+    let cfg = await Config.build();
+    cfg.sanitizeWords();
+    cfg.save();
+  }
 }
 
 ////

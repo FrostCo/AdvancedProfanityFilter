@@ -6,9 +6,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-////
-//src/helper.ts
-//
 function arrayContains(array, element) {
     return (array.indexOf(element) > -1);
 }
@@ -21,6 +18,28 @@ function dynamicList(list, selectEm, title) {
         options += '<option value="' + list[i] + '">' + list[i] + '</option>';
     }
     document.getElementById(selectEm).innerHTML = options;
+}
+// /^\d+\.\d+\.\d+$/
+function getVersion(version) {
+    let versionValues = version.split('.');
+    return {
+        major: parseInt(versionValues[0]),
+        minor: parseInt(versionValues[1]),
+        patch: parseInt(versionValues[2])
+    };
+}
+// Is the provided version lower than the minimum version?
+function isVersionOlder(minimum, version) {
+    if (version.major < minimum.major) {
+        return true;
+    }
+    else if (version.major == minimum.major && version.minor < minimum.minor) {
+        return true;
+    }
+    else if (version.major == minimum.major && version.minor == minimum.minor && version.patch < minimum.patch) {
+        return true;
+    }
+    return false;
 }
 function removeFromArray(array, element) {
     return array.filter(e => e !== element);

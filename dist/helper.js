@@ -11,6 +11,28 @@ export function dynamicList(list, selectEm, title) {
     }
     document.getElementById(selectEm).innerHTML = options;
 }
+// /^\d+\.\d+\.\d+$/
+export function getVersion(version) {
+    let versionValues = version.split('.');
+    return {
+        major: parseInt(versionValues[0]),
+        minor: parseInt(versionValues[1]),
+        patch: parseInt(versionValues[2])
+    };
+}
+// Is the provided version lower than the minimum version?
+export function isVersionOlder(minimum, version) {
+    if (version.major < minimum.major) {
+        return true;
+    }
+    else if (version.major == minimum.major && version.minor < minimum.minor) {
+        return true;
+    }
+    else if (version.major == minimum.major && version.minor == minimum.minor && version.patch < minimum.patch) {
+        return true;
+    }
+    return false;
+}
 export function removeFromArray(array, element) {
     return array.filter(e => e !== element);
 }

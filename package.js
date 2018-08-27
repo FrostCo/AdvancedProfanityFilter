@@ -5,6 +5,7 @@ const path = require('path');
 const AdmZip = require('adm-zip');
 
 function buildChromeExtension(zip) {
+  console.log('Building ./extension-chrome.zip');
   // try { fs.unlinkSync('./dist/filter.js'); } catch {}; // Remove filter.js as its only used for testing
   zip.deleteFile('filter.js'); // Remove filter.js as its only used for testing
   zip.writeZip('./extension-chrome.zip');
@@ -12,6 +13,7 @@ function buildChromeExtension(zip) {
 
 // Firefox Extension
 function buildFirefox(manifest, zip) {
+  console.log('Building ./extension-firefox.zip');
   let firefoxManifest = {
     "applications": {
       "gecko": {
