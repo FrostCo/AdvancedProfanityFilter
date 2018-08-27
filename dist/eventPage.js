@@ -6,7 +6,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { arrayContains } from './helper.js';
+import { arrayContains, getVersion, isVersionOlder } from './helper.js';
 import Config from './config.js';
 import Domain from './domain.js';
 ////
@@ -22,7 +22,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
         // Open options page to show new features
         // chrome.runtime.openOptionsPage();
         // Run any data migrations on update
-        updateMigrations();
+        updateMigrations(details.previousVersion);
         // Display update notification
         chrome.notifications.create('extensionUpdate', {
             'type': 'basic',
@@ -98,33 +98,42 @@ function toggleDomain(domain, key) {
         Domain.domainMatch(domain, cfg[key]) ? enableDomain(cfg, domain, key) : disableDomain(cfg, domain, key);
     });
 }
-function updateMigrations() {
+// This will look at the version (from before the update) and perform data migrations if necessary
+function updateMigrations(previousVersion) {
     return __awaiter(this, void 0, void 0, function* () {
-        // [1.0.16] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
-        let cfg = yield Config.build();
-        cfg.sanitizeWords();
-        cfg.save();
-        // // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
-        // Note: Not async function
-        // chrome.storage.sync.get({'words': null}, function(oldWords) {
-        //   // console.log('Old words for migration:', oldWords.words);
-        //   if (oldWords.words) {
-        //     chrome.storage.sync.set({'_words0': oldWords.words}, function() {
-        //       if (!chrome.runtime.lastError) {
-        //         chrome.storage.sync.remove('words', function() {
-        //           // Split words if necessary
-        //           var wordsPromise = new Promise(function(resolve, reject) {
-        //             resolve(Config.build());
-        //           });
-        //           wordsPromise
-        //             .then(function(response: Config) {
-        //               response.save();
-        //             });
-        //         });
-        //       }
-        //     });
-        //   }
-        // });
+        let old = getVersion(previousVersion);
+        // let current = chrome.runtime.getManifest().version
+        // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
+        if (isVersionOlder(getVersion('1.1.0'), old)) {
+            console.log('in version update');
+            let cfg = yield Config.build();
+            cfg.sanitizeWords();
+            cfg.save();
+        }
+        // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
+        if (isVersionOlder(getVersion('1.0.13'), old)) {
+            console.log('not in herer');
+            // Note: using promise instead of async/await
+            chrome.storage.sync.get({ 'words': null }, function (oldWords) {
+                // console.log('Old words for migration:', oldWords.words);
+                if (oldWords.words) {
+                    chrome.storage.sync.set({ '_words0': oldWords.words }, function () {
+                        if (!chrome.runtime.lastError) {
+                            chrome.storage.sync.remove('words', function () {
+                                // Split words if necessary
+                                var wordsPromise = new Promise(function (resolve, reject) {
+                                    resolve(Config.build());
+                                });
+                                wordsPromise
+                                    .then(function (response) {
+                                    response.save();
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+        }
     });
 }
 ////
