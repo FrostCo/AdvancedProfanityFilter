@@ -99,17 +99,11 @@ function toggleDomain(domain, key) {
     });
 }
 // This will look at the version (from before the update) and perform data migrations if necessary
+// Only append so the order stays the same (oldest first).
 function updateMigrations(previousVersion) {
     return __awaiter(this, void 0, void 0, function* () {
         let old = getVersion(previousVersion);
         // let current = chrome.runtime.getManifest().version
-        // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
-        if (isVersionOlder(getVersion('1.1.0'), old)) {
-            console.log('in version update');
-            let cfg = yield Config.build();
-            cfg.sanitizeWords();
-            cfg.save();
-        }
         // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
         if (isVersionOlder(getVersion('1.0.13'), old)) {
             console.log('not in herer');
@@ -133,6 +127,13 @@ function updateMigrations(previousVersion) {
                     });
                 }
             });
+        }
+        // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
+        if (isVersionOlder(getVersion('1.1.0'), old)) {
+            console.log('in version update');
+            let cfg = yield Config.build();
+            cfg.sanitizeWords();
+            cfg.save();
         }
     });
 }

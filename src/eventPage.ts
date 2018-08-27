@@ -96,17 +96,10 @@ async function toggleDomain(domain: string, key: string) {
 }
 
 // This will look at the version (from before the update) and perform data migrations if necessary
+// Only append so the order stays the same (oldest first).
 async function updateMigrations(previousVersion) {
   let old = getVersion(previousVersion) as Version;
   // let current = chrome.runtime.getManifest().version
-
-  // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
-  if (isVersionOlder(getVersion('1.1.0'), old)) {
-    console.log('in version update');
-    let cfg = await Config.build();
-    cfg.sanitizeWords();
-    cfg.save();
-  }
 
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
   if (isVersionOlder(getVersion('1.0.13'), old)) {
@@ -131,6 +124,14 @@ async function updateMigrations(previousVersion) {
         });
       }
     });
+  }
+
+  // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
+  if (isVersionOlder(getVersion('1.1.0'), old)) {
+    console.log('in version update');
+    let cfg = await Config.build();
+    cfg.sanitizeWords();
+    cfg.save();
   }
 }
 
