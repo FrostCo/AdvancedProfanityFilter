@@ -103,7 +103,6 @@ async function updateMigrations(previousVersion) {
 
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
   if (isVersionOlder(getVersion('1.0.13'), old)) {
-    console.log('not in herer');
     // Note: using promise instead of async/await
     chrome.storage.sync.get({'words': null}, function(oldWords) {
       // console.log('Old words for migration:', oldWords.words);
@@ -128,7 +127,6 @@ async function updateMigrations(previousVersion) {
 
   // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
   if (isVersionOlder(getVersion('1.1.0'), old)) {
-    console.log('in version update');
     let cfg = await Config.build();
     cfg.sanitizeWords();
     cfg.save();
