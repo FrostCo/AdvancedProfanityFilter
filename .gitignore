@@ -6,3 +6,7 @@ src/filter.bundle.ts
 
 # Filter for testing
 dist/filter.js
+
+# Testing coverage
+.nyc_output/*
+coverage/*
