@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-import { arrayContains, dynamicContains, getVersion, isVersionOlder, removeFromArray } from '../dist/helper';
+import { arrayContains, dynamicList, getVersion, isVersionOlder, removeFromArray } from '../dist/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 
@@ -18,9 +18,6 @@ describe('Helper', function() {
     });
   });
 
-  // describe('dynamicList()', function() {
-  // });
-
   describe('removeFromArray()', function() {
     it('should return an array with the matching element removed', function() {
       expect(removeFromArray(array, 'needle')).to.eql(['a', 'in', 'a', 'large', 'haystack']);
@@ -33,43 +30,55 @@ describe('Helper', function() {
 
   describe('isVersionOlder()', function() {
     it('should return true when provided version is older than minimum', function() {
-      let minimum = getVersion('1.2.15');
       let version = getVersion('1.1.10');
-      expect(isVersionOlder(minimum, version)).to.equal(true);
+      let minimum = getVersion('1.2.15');
+      expect(isVersionOlder(version, minimum)).to.equal(true);
 
-      minimum = getVersion('1.2.15');
       version = getVersion('1.1.0');
-      expect(isVersionOlder(minimum, version)).to.equal(true);
+      minimum = getVersion('1.2.15');
+      expect(isVersionOlder(version, minimum)).to.equal(true);
 
-      minimum = getVersion('4.6.15');
       version = getVersion('1.4.0');
-      expect(isVersionOlder(minimum, version)).to.equal(true);
+      minimum = getVersion('4.6.15');
+      expect(isVersionOlder(version, minimum)).to.equal(true);
 
-      minimum = getVersion('2.3.10');
       version = getVersion('1.5.15');
-      expect(isVersionOlder(minimum, version)).to.equal(true);
+      minimum = getVersion('2.3.10');
+      expect(isVersionOlder(version, minimum)).to.equal(true);
+
+      version = getVersion('1.5.10');
+      minimum = getVersion('1.5.10');
+      expect(isVersionOlder(version, minimum)).to.equal(true);
+
+      version = getVersion('1.5.10');
+      minimum = getVersion('1.5.11');
+      expect(isVersionOlder(version, minimum)).to.equal(true);
     });
 
     it('should return false when provided version is not older than minimum', function() {
-      let minimum = getVersion('1.2.15');
       let version = getVersion('1.5.10');
-      expect(isVersionOlder(minimum, version)).to.equal(false);
+      let minimum = getVersion('1.2.1');
+      expect(isVersionOlder(version, minimum)).to.equal(false);
 
-      minimum = getVersion('1.0.15');
       version = getVersion('1.1.0');
-      expect(isVersionOlder(minimum, version)).to.equal(false);
+      minimum = getVersion('1.0.15');
+      expect(isVersionOlder(version, minimum)).to.equal(false);
 
-      minimum = getVersion('1.0.13');
       version = getVersion('1.0.15');
-      expect(isVersionOlder(minimum, version)).to.equal(false);
-
       minimum = getVersion('1.0.13');
-      version = getVersion('3.2.15');
-      expect(isVersionOlder(minimum, version)).to.equal(false);
+      expect(isVersionOlder(version, minimum)).to.equal(false);
 
-      minimum = getVersion('1.2.12');
+      version = getVersion('3.2.15');
+      minimum = getVersion('1.0.13');
+      expect(isVersionOlder(version, minimum)).to.equal(false);
+
       version = getVersion('1.3.0');
-      expect(isVersionOlder(minimum, version)).to.equal(false);
+      minimum = getVersion('1.2.12');
+      expect(isVersionOlder(version, minimum)).to.equal(false);
+
+      version = getVersion('1.5.11');
+      minimum = getVersion('1.5.10');
+      expect(isVersionOlder(version, minimum)).to.equal(false);
     });
   });
 });

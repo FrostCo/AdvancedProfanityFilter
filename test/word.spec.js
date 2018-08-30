@@ -40,6 +40,10 @@ describe('Word', function() {
       it('should build the proper RegExp for partial match with matchRepeated', function() {
         expect(Word.buildPartRegexp('word', true)).to.eql(/w+o+r+d+/gi);
       });
+
+      it('should throw exception for invalid RegExp', function() {
+        expect(() => { Word.buildPartRegexp(5)}).to.throw();
+      });
     });
 
     describe('buildRegexpForRemoveExact()', function() {
@@ -49,6 +53,10 @@ describe('Word', function() {
 
       it('should build the proper RegExp for remove exact with matchRepeated', function() {
         expect(Word.buildRegexpForRemoveExact('word', true)).to.eql(/\s?\bw+o+r+d+\b\s?/gi);
+      });
+
+      it('should throw exception for invalid RegExp', function() {
+        expect(() => { Word.buildRegexpForRemoveExact(5)}).to.throw();
       });
 
       // Work around for lack of word boundary support for unicode characters
@@ -76,6 +84,10 @@ describe('Word', function() {
         expect(Word.buildRegexpForRemovePart('word', true)).to.eql(/\s?\b[\w-]*w+o+r+d+[\w-]*\b\s?/gi);
       });
 
+      it('should throw exception for invalid RegExp', function() {
+        expect(() => { Word.buildRegexpForRemovePart(5)}).to.throw();
+      });
+
       // Work around for lack of word boundary support for unicode characters
       describe('Unicode', function() {
         it('should build the proper RegExp for remove part', function() {
@@ -99,6 +111,10 @@ describe('Word', function() {
 
       it('should build the proper RegExp for whole match with matchRepeated', function() {
         expect(Word.buildWholeRegexp('word', true)).to.eql(/\b[\w-]*w+o+r+d+[\w-]*\b/gi);
+      });
+
+      it('should throw exception for invalid RegExp', function() {
+        expect(() => { Word.buildWholeRegexp(5)}).to.throw();
       });
 
       // Work around for lack of word boundary support for unicode characters
@@ -158,6 +174,16 @@ describe('Word', function() {
     });
   });
 
+  describe('containsDoubleByte()', function() {
+    it('should return true when string includes a double-byte UTF character', function() {
+      expect(Word.containsDoubleByte('врата')).to.equal(true);
+    });
+
+    it('should return false when string does not include a double-byte UTF character', function() {
+      expect(Word.containsDoubleByte('$p[cialC@se')).to.equal(false);
+    });
+  });
+
   describe('escapeRegExp()', function() {
     it('should escape a string with special characters escaped', function() {
       expect(Word.escapeRegExp('$pecial')).to.equal('\\$pecial');
@@ -172,13 +198,26 @@ describe('Word', function() {
     });
   });
 
-  describe('containsDoubleByte()', function() {
-    it('should return true when string includes a double-byte UTF character', function() {
-      expect(Word.containsDoubleByte('врата')).to.equal(true);
+  describe('randomElement()', function() {
+    it('should return element from defaults when array is empty', function() {
+      let defaults = ['default1', 'default2'];
+      let random = Word.randomElement([], defaults);
+      expect(defaults).to.include(random);
     });
 
-    it('should return false when string does not include a double-byte UTF character', function() {
-      expect(Word.containsDoubleByte('$p[cialC@se')).to.equal(false);
+    it('should return element from array when its not empty', function() {
+      let array = ['element1', 'element2']
+      let defaults = ['default1', 'default2'];
+      let random = Word.randomElement(array, defaults);
+      expect(array).to.include(random);
+      expect(defaults).to.not.include(random);
+    });
+  });
+
+  describe('repeatingCharacterRegexp()', function() {
+    it('should return string with (+) repeat for RegExp', function() {
+      expect(Word.repeatingCharacterRegexp('word')).to.equal('w+o+r+d+');
+      expect(Word.repeatingCharacterRegexp('\\$word')).to.equal('\\$+w+o+r+d+');
     });
   });
 });

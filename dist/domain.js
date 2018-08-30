@@ -35,6 +35,7 @@ export default class Domain {
         return newDomainsList;
     }
     static getCurrentTab() {
+        /* istanbul ignore next */
         return new Promise(function (resolve, reject) {
             chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                 resolve(tabs[0]);

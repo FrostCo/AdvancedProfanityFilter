@@ -14,8 +14,11 @@ describe('Page', function() {
     });
 
     it('should return true when node has a parent node and tag is forbidden', function() {
-      let node = { parentNode: { tagName: 'SCRIPT' } };
-      expect(Page.isForbiddenNode(node)).to.equal(true);
+      expect(Page.isForbiddenNode({ parentNode: { tagName: 'SCRIPT' } })).to.equal(true);
+      expect(Page.isForbiddenNode({ parentNode: { tagName: 'STYLE' } })).to.equal(true);
+      expect(Page.isForbiddenNode({ parentNode: { tagName: 'INPUT' } })).to.equal(true);
+      expect(Page.isForbiddenNode({ parentNode: { tagName: 'TEXTAREA' } })).to.equal(true);
+      expect(Page.isForbiddenNode({ parentNode: { tagName: 'IFRAME' } })).to.equal(true);
     });
 
     it('should return true when node is a forbidden tag', function() {

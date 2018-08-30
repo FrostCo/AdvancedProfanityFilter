@@ -2,8 +2,8 @@ export default class Word {
   private static readonly _escapeRegExp = /[-\/\\^$*+?.()|[\]{}]/g;
   private static readonly _unicodeRegex = /[^\u0000-\u00ff]/;
   private static readonly _unicodeWordBoundary = '[\\s.,\'"+!?|-]';
-  static readonly nonWordRegExp = new RegExp('^\\s*[^\\w]\\s*$', 'g');
-  static readonly whitespaceRegExp = new RegExp('^\\s*$');
+  static readonly nonWordRegExp = new RegExp('^\\s*[^\\w]+\\s*$', 'g');
+  static readonly whitespaceRegExp = /^\s+$/;
 
   static allLowerCase(string: string): boolean {
     return string.toLowerCase() === string;
