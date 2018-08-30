@@ -140,5 +140,5 @@ export default class Word {
 Word._escapeRegExp = /[-\/\\^$*+?.()|[\]{}]/g;
 Word._unicodeRegex = /[^\u0000-\u00ff]/;
 Word._unicodeWordBoundary = '[\\s.,\'"+!?|-]';
-Word.nonWordRegExp = new RegExp('^\\s*[^\\w]\\s*$', 'g');
-Word.whitespaceRegExp = new RegExp('^\\s*$');
+Word.nonWordRegExp = new RegExp('^\\s*[^\\w]+\\s*$', 'g');
+Word.whitespaceRegExp = /^\s+$/;

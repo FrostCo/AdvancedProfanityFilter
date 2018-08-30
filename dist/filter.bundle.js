@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 function arrayContains(array, element) {
     return (array.indexOf(element) > -1);
 }
+/* istanbul ignore next */
 function dynamicList(list, selectEm, title) {
     let options = '';
     if (title !== undefined) {
@@ -28,15 +29,15 @@ function getVersion(version) {
         patch: parseInt(versionValues[2])
     };
 }
-// Is the provided version lower than the minimum version?
-function isVersionOlder(minimum, version) {
+// Is the provided version lower than or equal to the minimum version?
+function isVersionOlder(version, minimum) {
     if (version.major < minimum.major) {
         return true;
     }
     else if (version.major == minimum.major && version.minor < minimum.minor) {
         return true;
     }
-    else if (version.major == minimum.major && version.minor == minimum.minor && version.patch < minimum.patch) {
+    else if (version.major == minimum.major && version.minor == minimum.minor && version.patch <= minimum.patch) {
         return true;
     }
     return false;
@@ -273,6 +274,7 @@ class Domain {
         return newDomainsList;
     }
     static getCurrentTab() {
+        /* istanbul ignore next */
         return new Promise(function (resolve, reject) {
             chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                 resolve(tabs[0]);
@@ -458,8 +460,8 @@ class Word {
 Word._escapeRegExp = /[-\/\\^$*+?.()|[\]{}]/g;
 Word._unicodeRegex = /[^\u0000-\u00ff]/;
 Word._unicodeWordBoundary = '[\\s.,\'"+!?|-]';
-Word.nonWordRegExp = new RegExp('^\\s*[^\\w]\\s*$', 'g');
-Word.whitespaceRegExp = new RegExp('^\\s*$');
+Word.nonWordRegExp = new RegExp('^\\s*[^\\w]+\\s*$', 'g');
+Word.whitespaceRegExp = /^\s+$/;
 class Filter {
     constructor() {
         this.advanced = false;
@@ -717,7 +719,7 @@ class Filter {
                         self.counter++;
                         if (self.wordRegExps[z].unicode) {
                             // Workaround for unicode word boundaries
-                            if (Word.whitespaceRegExp.test(arg1) && Word.whitespaceRegExp.test(arg3)) { // If both surrounds are whitespace
+                            if (Word.whitespaceRegExp.test(arg1) && Word.whitespaceRegExp.test(arg3)) { // If both surrounds are whitespace (only need 1)
                                 return arg1;
                             }
                             else if (Word.nonWordRegExp.test(arg1) || Word.nonWordRegExp.test(arg3)) { // If there is more than just whitesapce (ex. ',')
@@ -744,6 +746,7 @@ class Filter {
         return str;
     }
     updateCounterBadge() {
+        /* istanbul ignore next */
         // console.count('updateCounterBadge'); // Benchmarking - Executaion Count
         if (this.cfg.showCounter && this.counter > 0) {
             chrome.runtime.sendMessage({ counter: this.counter.toString() });
@@ -753,5 +756,6 @@ class Filter {
 // Global
 var filter = new Filter;
 if (typeof window !== 'undefined' && ({}).toString.call(window) === '[object Window]') {
+    /* istanbul ignore next */
     filter.cleanPage();
 }

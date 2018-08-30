@@ -1,6 +1,7 @@
 export function arrayContains(array, element) {
     return (array.indexOf(element) > -1);
 }
+/* istanbul ignore next */
 export function dynamicList(list, selectEm, title) {
     let options = '';
     if (title !== undefined) {
@@ -20,15 +21,15 @@ export function getVersion(version) {
         patch: parseInt(versionValues[2])
     };
 }
-// Is the provided version lower than the minimum version?
-export function isVersionOlder(minimum, version) {
+// Is the provided version lower than or equal to the minimum version?
+export function isVersionOlder(version, minimum) {
     if (version.major < minimum.major) {
         return true;
     }
     else if (version.major == minimum.major && version.minor < minimum.minor) {
         return true;
     }
-    else if (version.major == minimum.major && version.minor == minimum.minor && version.patch < minimum.patch) {
+    else if (version.major == minimum.major && version.minor == minimum.minor && version.patch <= minimum.patch) {
         return true;
     }
     return false;
