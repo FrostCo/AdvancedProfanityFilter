@@ -281,7 +281,7 @@ export class Filter {
             self.counter++;
             if (self.wordRegExps[z].unicode) {
               // Workaround for unicode word boundaries
-              if (Word.whitespaceRegExp.test(arg1) && Word.whitespaceRegExp.test(arg3)) { // If both surrounds are whitespace
+              if (Word.whitespaceRegExp.test(arg1) && Word.whitespaceRegExp.test(arg3)) { // If both surrounds are whitespace (only need 1)
                 return arg1;
               } else if (Word.nonWordRegExp.test(arg1) || Word.nonWordRegExp.test(arg3)) { // If there is more than just whitesapce (ex. ',')
                 return (arg1 + arg3).trim();
@@ -305,6 +305,7 @@ export class Filter {
   }
 
   updateCounterBadge() {
+    /* istanbul ignore next */
     // console.count('updateCounterBadge'); // Benchmarking - Executaion Count
     if (this.cfg.showCounter && this.counter > 0) {
       chrome.runtime.sendMessage({counter: this.counter.toString()});
@@ -315,5 +316,6 @@ export class Filter {
 // Global
 var filter = new Filter;
 if (typeof window !== 'undefined' && ({}).toString.call(window) === '[object Window]') {
+  /* istanbul ignore next */
   filter.cleanPage();
 }

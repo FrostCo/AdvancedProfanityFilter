@@ -132,13 +132,13 @@ describe('Filter', function() {
         expect(filter.replaceText('Words used to be okay, but now even a word is bad.')).to.equal('___ used to be okay, but now even a ___ is bad.');
       });
 
-      it('Should filter an RegExp and fixed length (5) with preserveFirst', function() {
+      it('Should filter an RegExp and fixed length (5) with preserveLast', function() {
         let filter = new Filter;
-        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '_', censorFixedLength: 5, preserveFirst: true, preserveLast: false });
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '_', censorFixedLength: 5, preserveFirst: false, preserveLast: true });
         filter.cfg.words['^The'] = { matchMethod: 4, repeat: false, words: ['substitute'] };
         filter.generateWordList();
         filter.generateRegexpList();
-        expect(filter.replaceText('The best things are always the best.')).to.equal('T____ best things are always the best.');
+        expect(filter.replaceText('The best things are always the best.')).to.equal('____e best things are always the best.');
       });
 
       describe('Unicode characters', function() {
@@ -211,6 +211,17 @@ describe('Filter', function() {
         filter.generateRegexpList();
         expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('This [Piece] is a pretty good [piece]r to [piece].');
       });
+
+      describe('Unicode characters', function() {
+        it('Should filter an exact word with substitions marked and preserveCase with repeated characters', function() {
+          let filter = new Filter;
+          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: true });
+          filter.cfg.words['врата'] = { matchMethod: 0, repeat: true, words: ['door'] };
+          filter.generateWordList();
+          filter.generateRegexpList();
+          expect(filter.replaceText('this even works on unicode WORDS like Врата, cool huh?')).to.equal('this even works on unicode [IDEA] like [Door], cool huh?');
+        });
+      });
     });
 
     describe('Remove Filter', function() {
@@ -259,6 +270,8 @@ describe('Filter', function() {
           filter.generateRegexpList();
           expect(filter.replaceText('This even works on with-врата. Cool huh?')).to.equal('This even works on. Cool huh?');
           expect(filter.replaceText('The вратаs in the hat')).to.equal('The in the hat');
+          expect(filter.replaceText('вратаs. in the hat')).to.equal('. in the hat');
+          expect(filter.replaceText('вратаs')).to.equal('');
         });
       });
     });

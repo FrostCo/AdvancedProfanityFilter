@@ -6,12 +6,12 @@
   "scripts": {
     "build": "node ./prebuild.js && npm run lint && echo \"Running tsc...\" & tsc",
     "build-no-verify": "node ./prebuild.js && echo \"Running tsc...\" & tsc",
-    "debug-test": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap --require babel-core/register test/**/*.spec.js",
+    "debug-test": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
     "lint": "npx eslint ./src/*.ts",
-    "package": "npm run build && npm test && node ./package.js",
-    "package-no-build": "node ./package.js",
-    "test-no-coverage": "npx mocha --require babel-core/register test/**/*.spec.js",
-    "test": "npx nyc --reporter=lcov --reporter=text npx mocha --require babel-core/register test/**/*.spec.js"
+    "package": "npm run build && npm test && node ./package-extension.js",
+    "package-no-build": "node ./package-extension.js",
+    "test-no-coverage": "npx mocha",
+    "test": "npx nyc --reporter=lcov --reporter=text npx mocha"
   },
   "repository": {
     "type": "git",
