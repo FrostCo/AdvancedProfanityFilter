@@ -6,8 +6,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { arrayContains, dynamicList, removeFromArray } from './helper.js';
-import Config from './config.js';
+import { arrayContains, dynamicList, removeFromArray } from './lib/helper.js';
+import WebConfig from './webConfig.js';
 import OptionTab from './optionTab.js';
 import OptionAuth from './optionAuth.js';
 export default class OptionPage {
@@ -113,7 +113,7 @@ export default class OptionPage {
             let self = this;
             try {
                 let configText = document.getElementById('configText');
-                self.cfg = new Config(JSON.parse(configText.value));
+                self.cfg = new WebConfig(JSON.parse(configText.value));
                 self.cfg.sanitizeWords();
                 let resetError = yield self.cfg.reset();
                 if (resetError) {
@@ -132,7 +132,7 @@ export default class OptionPage {
     }
     static load(instance) {
         return __awaiter(this, void 0, void 0, function* () {
-            instance.cfg = yield Config.build();
+            instance.cfg = yield WebConfig.build();
             instance.auth = new OptionAuth(instance.cfg.password);
         });
     }
@@ -148,7 +148,7 @@ export default class OptionPage {
                 OptionPage.show(document.getElementById('passwordContainer'));
             }
             // Show/hide censor options and word substitutions based on filter method
-            dynamicList(Config._filterMethodNames, 'filterMethodSelect');
+            dynamicList(WebConfig._filterMethodNames, 'filterMethodSelect');
             let filterMethodSelect = document.getElementById('filterMethodSelect');
             filterMethodSelect.selectedIndex = self.cfg.filterMethod;
             switch (self.cfg.filterMethod) {
@@ -197,10 +197,10 @@ export default class OptionPage {
             preserveLast.checked = self.cfg.preserveLast;
             showCounter.checked = self.cfg.showCounter;
             substitutionMark.checked = self.cfg.substitutionMark;
-            dynamicList(Config._matchMethodNames.slice(0, -1), 'globalMatchMethodSelect');
+            dynamicList(WebConfig._matchMethodNames.slice(0, -1), 'globalMatchMethodSelect');
             globalMatchMethodSelect.selectedIndex = self.cfg.globalMatchMethod;
             defaultWordMatchRepeated.checked = self.cfg.defaultWordRepeat;
-            dynamicList(Config._matchMethodNames.slice(0, -2), 'defaultMatchMethodSelect');
+            dynamicList(WebConfig._matchMethodNames.slice(0, -2), 'defaultMatchMethodSelect');
             defaultMatchMethodSelect.selectedIndex = self.cfg.defaultWordMatchMethod;
             // Words
             dynamicList(Object.keys(self.cfg.words).sort(), 'wordSelect', 'Words to Filter');
@@ -312,16 +312,16 @@ export default class OptionPage {
     WordLoadOptions(event) {
         let wordSelect = document.getElementById('wordSelect');
         let word = wordSelect.value;
-        dynamicList(Config._matchMethodNames.slice(0, -2).concat(Config._matchMethodNames.slice(-1)), 'wordMatchMethodSelect');
+        dynamicList(WebConfig._matchMethodNames.slice(0, -2).concat(WebConfig._matchMethodNames.slice(-1)), 'wordMatchMethodSelect');
         let wordMatchMethodSelect = document.getElementById('wordMatchMethodSelect');
-        wordMatchMethodSelect.value = Config._matchMethodNames[this.cfg.words[word].matchMethod];
+        wordMatchMethodSelect.value = WebConfig._matchMethodNames[this.cfg.words[word].matchMethod];
         this.wordRepeatLoad(word);
         this.substitutionLoad();
     }
     wordMatchMethodSet(event) {
         let wordSelect = document.getElementById('wordSelect');
         let matchMethodSelect = document.getElementById('wordMatchMethodSelect');
-        this.cfg.words[wordSelect.value].matchMethod = Config._matchMethodNames.indexOf(matchMethodSelect.value);
+        this.cfg.words[wordSelect.value].matchMethod = WebConfig._matchMethodNames.indexOf(matchMethodSelect.value);
         this.saveOptions(event);
     }
     wordMatcRepeatedSet(event) {

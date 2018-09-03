@@ -27,10 +27,18 @@ function cleanFile(file) {
   return cleanLines.join('\n');
 }
 
-function findDependencies(file) {
+function findDependencies(file, relativePath) {
   let imports = [];
-  let content = fs.readFileSync(file, 'utf8');
+  let content = fs.readFileSync(path.join(relativePath, file), 'utf8');
   let lines = content.split('\n');
+
+  // If file is in nested path
+  if (/([^.]\/)/.test(file)) {
+    let nestedPath = file.match(/^(\.*\/.+\/|.+\/)/); // Will break on '../'
+    if (nestedPath) {
+      relativePath = path.join(relativePath, nestedPath[0]);
+    }
+  }
 
   lines.forEach(line => {
     if (/^\s*import\b/.test(line)) {
@@ -41,15 +49,20 @@ function findDependencies(file) {
         // Remove semicolon & quotes, Remove relative path identifier, Change .js to .ts
         importFile = importFile.replace(/[;'"]/g, '').replace(/^\.\//, '').replace(/\.js/, '.ts');
 
-        // Check for sub dependencies and include them as well
-        let subDependencies = findDependencies(path.join(src, importFile));
+        // If file has no extension, add .ts
+        if (!/\.ts$/.test(importFile)) { importFile = importFile + '.ts' }
+
+        let subDependencies = findDependencies(importFile, relativePath);
         subDependencies.forEach(subDep => {
           console.log(' - Including subdepencies for ' + importFile + ': ' + subDependencies.join(', '));
           if (!imports.includes(subDep)) { imports.push(subDep); }
         });
 
         // Add dependency
-        if (!imports.includes(importFile)) { imports.push(importFile); }
+        importFile = path.join(relativePath, importFile); // Use relative path from entry point
+        if (!imports.includes(importFile)) {
+          imports.push(importFile);
+        }
       } else { console.log('Problem with import line: ' + line); }
     }
   });
@@ -73,12 +86,12 @@ function prebuild(files) {
   compileFiles.forEach(file => {
     console.log('Inspecting file: ' + file);
     let output = [];
-    let dependencies = findDependencies(path.join(src,file));
+    let dependencies = findDependencies(file, src);
     console.log('Dependencies for ' + file + ': ' + dependencies.join(', '));
 
     // Gather dependency file content
     dependencies.forEach(dependency => {
-      output.push(cleanFile(path.join(src, dependency)));
+      output.push(cleanFile(dependency));
     });
 
     // Append main file after all dependencies
@@ -91,6 +104,6 @@ function prebuild(files) {
 ////
 // User variables
 const src = './src/';
-const compileFiles = ['filter.ts'];
+const compileFiles = ['webFilter.ts'];
 
 prebuild(compileFiles);

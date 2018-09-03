@@ -1,5 +1,5 @@
-import { arrayContains, getVersion, isVersionOlder } from './helper.js';
-import Config from './config.js';
+import { arrayContains, getVersion, isVersionOlder } from './lib/helper.js';
+import WebConfig from './webConfig.js';
 import Domain from './domain.js';
 
 interface Version {
@@ -61,7 +61,7 @@ chrome.runtime.onMessage.addListener(
 // Add selected word/phrase and reload page (unless already present)
 async function addSelection(selection: string) {
   selection = (selection.trim()).toLowerCase();
-  let cfg = await Config.build(); // TODO: Only need words here
+  let cfg = await WebConfig.build(); // TODO: Only need words here
   let result = cfg.addWord(selection);
 
   if (result) {
@@ -71,7 +71,7 @@ async function addSelection(selection: string) {
 }
 
 // Disable domain and reload page (unless already disabled)
-async function disableDomain(cfg: Config, domain: string, key: string) {
+async function disableDomain(cfg: WebConfig, domain: string, key: string) {
   if (!arrayContains(cfg[key], domain)) {
     cfg[key].push(domain);
     let result = await cfg.save();
@@ -80,7 +80,7 @@ async function disableDomain(cfg: Config, domain: string, key: string) {
 }
 
 // Remove all entries that disable the filter for domain
-async function enableDomain(cfg: Config, domain: string, key: string) {
+async function enableDomain(cfg: WebConfig, domain: string, key: string) {
   let newDomainList = Domain.removeFromList(domain, cfg[key]);
 
   if (newDomainList.length < cfg[key].length) {
@@ -91,7 +91,7 @@ async function enableDomain(cfg: Config, domain: string, key: string) {
 }
 
 async function toggleDomain(domain: string, key: string) {
-  let cfg = await Config.build([key]);
+  let cfg = await WebConfig.build([key]);
   Domain.domainMatch(domain, cfg[key]) ? enableDomain(cfg, domain, key) : disableDomain(cfg, domain, key);
 }
 
@@ -112,10 +112,10 @@ async function updateMigrations(previousVersion) {
             chrome.storage.sync.remove('words', function() {
               // Split words if necessary
               var wordsPromise = new Promise(function(resolve, reject) {
-                resolve(Config.build());
+                resolve(WebConfig.build());
               });
               wordsPromise
-                .then(function(response: Config) {
+                .then(function(response: WebConfig) {
                   response.save();
                 });
             });
@@ -127,7 +127,7 @@ async function updateMigrations(previousVersion) {
 
   // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
   if (isVersionOlder(old, getVersion('1.1.0'))) {
-    let cfg = await Config.build();
+    let cfg = await WebConfig.build();
     cfg.sanitizeWords();
     cfg.save();
   }

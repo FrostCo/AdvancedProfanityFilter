@@ -1,4 +1,4 @@
-import { arrayContains, removeFromArray } from './helper.js';
+import { removeFromArray } from './lib/helper.js';
 
 export default class Domain {
   tab: any;

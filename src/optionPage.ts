@@ -1,10 +1,10 @@
-import { arrayContains, dynamicList, removeFromArray } from './helper.js';
-import Config from './config.js';
+import { arrayContains, dynamicList, removeFromArray } from './lib/helper.js';
+import WebConfig from './webConfig.js';
 import OptionTab from './optionTab.js';
 import OptionAuth from './optionAuth.js';
 
 export default class OptionPage {
-  cfg: Config;
+  cfg: WebConfig;
   auth: OptionAuth;
 
   static activate(element) {
@@ -119,7 +119,7 @@ export default class OptionPage {
     let self = this;
     try {
       let configText = document.getElementById('configText') as HTMLTextAreaElement;
-      self.cfg = new Config(JSON.parse(configText.value));
+      self.cfg = new WebConfig(JSON.parse(configText.value));
       self.cfg.sanitizeWords();
 
       let resetError = await self.cfg.reset();
@@ -138,7 +138,7 @@ export default class OptionPage {
   }
 
   static async load(instance: OptionPage) {
-    instance.cfg = await Config.build();
+    instance.cfg = await WebConfig.build();
     instance.auth = new OptionAuth(instance.cfg.password);
   }
 
@@ -155,7 +155,7 @@ export default class OptionPage {
     }
 
     // Show/hide censor options and word substitutions based on filter method
-    dynamicList(Config._filterMethodNames, 'filterMethodSelect');
+    dynamicList(WebConfig._filterMethodNames, 'filterMethodSelect');
     let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     filterMethodSelect.selectedIndex = self.cfg.filterMethod;
     switch (self.cfg.filterMethod) {
@@ -206,10 +206,10 @@ export default class OptionPage {
     preserveLast.checked = self.cfg.preserveLast;
     showCounter.checked = self.cfg.showCounter;
     substitutionMark.checked = self.cfg.substitutionMark;
-    dynamicList(Config._matchMethodNames.slice(0, -1), 'globalMatchMethodSelect');
+    dynamicList(WebConfig._matchMethodNames.slice(0, -1), 'globalMatchMethodSelect');
     globalMatchMethodSelect.selectedIndex = self.cfg.globalMatchMethod;
     defaultWordMatchRepeated.checked = self.cfg.defaultWordRepeat;
-    dynamicList(Config._matchMethodNames.slice(0,-2), 'defaultMatchMethodSelect');
+    dynamicList(WebConfig._matchMethodNames.slice(0,-2), 'defaultMatchMethodSelect');
     defaultMatchMethodSelect.selectedIndex = self.cfg.defaultWordMatchMethod;
     // Words
     dynamicList(Object.keys(self.cfg.words).sort(), 'wordSelect', 'Words to Filter');
@@ -324,9 +324,9 @@ export default class OptionPage {
   WordLoadOptions(event) {
     let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
     let word = wordSelect.value;
-    dynamicList(Config._matchMethodNames.slice(0,-2).concat(Config._matchMethodNames.slice(-1)), 'wordMatchMethodSelect');
+    dynamicList(WebConfig._matchMethodNames.slice(0,-2).concat(WebConfig._matchMethodNames.slice(-1)), 'wordMatchMethodSelect');
     let wordMatchMethodSelect = document.getElementById('wordMatchMethodSelect') as HTMLSelectElement;
-    wordMatchMethodSelect.value = Config._matchMethodNames[this.cfg.words[word].matchMethod];
+    wordMatchMethodSelect.value = WebConfig._matchMethodNames[this.cfg.words[word].matchMethod];
 
     this.wordRepeatLoad(word);
     this.substitutionLoad();
@@ -335,7 +335,7 @@ export default class OptionPage {
   wordMatchMethodSet(event) {
     let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
     let matchMethodSelect = document.getElementById('wordMatchMethodSelect') as HTMLSelectElement;
-    this.cfg.words[wordSelect.value].matchMethod = Config._matchMethodNames.indexOf(matchMethodSelect.value);
+    this.cfg.words[wordSelect.value].matchMethod = WebConfig._matchMethodNames.indexOf(matchMethodSelect.value);
     this.saveOptions(event);
   }
 

@@ -1,15 +1,15 @@
-import { arrayContains, dynamicList } from './helper.js';
-import Config from './config.js';
+import { arrayContains, dynamicList } from './lib/helper.js';
+import WebConfig from './webConfig.js';
 import Domain from './domain.js';
 
 class Popup {
-  cfg: Config;
+  cfg: WebConfig;
   domain: Domain;
   protected: boolean;
   filterMethodContainer: Element;
 
   static async load(instance: Popup) {
-    instance.cfg = await Config.build(['advancedDomains', 'disabledDomains', 'filterMethod', 'password']);
+    instance.cfg = await WebConfig.build(['advancedDomains', 'disabledDomains', 'filterMethod', 'password']);
     instance.domain = new Domain();
     await instance.domain.load();
     return instance;
@@ -32,7 +32,7 @@ class Popup {
     element.classList.remove('disabled');
   }
 
-  async disableAdvancedMode(cfg: Config, domain: string, key: string) {
+  async disableAdvancedMode(cfg: WebConfig, domain: string, key: string) {
     let newDomainList = Domain.removeFromList(domain, cfg[key]);
 
     if (newDomainList.length < cfg[key].length) {
@@ -57,7 +57,7 @@ class Popup {
     }
   }
 
-  async enableAdvancedMode(cfg: Config, domain: string, key: string) {
+  async enableAdvancedMode(cfg: WebConfig, domain: string, key: string) {
     if (!arrayContains(cfg[key], domain)) {
       cfg[key].push(domain);
       let result = await cfg.save();
@@ -68,7 +68,7 @@ class Popup {
   }
 
   // Remove all entries that disable the filter for domain
-  async enableDomain(cfg: Config, domain: string, key: string) {
+  async enableDomain(cfg: WebConfig, domain: string, key: string) {
     let newDomainList = Domain.removeFromList(domain, cfg[key]);
 
     if (newDomainList.length < cfg[key].length) {
@@ -99,7 +99,7 @@ class Popup {
     let domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
     let advancedMode = document.getElementById('advancedMode') as HTMLInputElement;
     let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
-    dynamicList(Config._filterMethodNames, 'filterMethodSelect');
+    dynamicList(WebConfig._filterMethodNames, 'filterMethodSelect');
     filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
 
     if (popup.cfg.password && popup.cfg.password != '') {

@@ -6,7 +6,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { removeFromArray } from './helper.js';
+import { removeFromArray } from './lib/helper.js';
 export default class Domain {
     static domainMatch(domain, domains) {
         let result = false;

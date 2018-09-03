@@ -46,204 +46,6 @@ function removeFromArray(array, element) {
     return array.filter(e => e !== element);
 }
 ////
-//src/config.ts
-//
-class Config {
-    // Call build() to create a new instance
-    constructor(async_param) {
-        if (typeof async_param === 'undefined') {
-            throw new Error('Cannot be called directly. call build()');
-        }
-        // TODO: Not supported yet
-        // Object.assign(async_param, this);
-        for (let k in async_param)
-            this[k] = async_param[k];
-    }
-    addWord(str) {
-        if (!arrayContains(Object.keys(this.words), str)) {
-            this.words[str] = { matchMethod: this.defaultWordMatchMethod, repeat: this.defaultWordRepeat, words: [] };
-            return true;
-        }
-        return false;
-    }
-    static build(keys) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let async_result = yield Config.getConfig(keys);
-            let instance = new Config(async_result);
-            return instance;
-        });
-    }
-    // Compile words
-    static combineWords(items) {
-        items.words = {};
-        if (items._words0 !== undefined) {
-            // Find all _words* to combine
-            let wordKeys = Object.keys(items).filter(function (key) {
-                return Config._wordsPattern.test(key);
-            });
-            // Add all _words* to words and remove _words*
-            wordKeys.forEach(function (key) {
-                Object.assign(items.words, items[key]);
-                delete items[key];
-            });
-        }
-        // console.log('combineWords', items); // DEBUG
-    }
-    // Persist all configs from defaults and split _words*
-    dataToPersist() {
-        let self = this;
-        let data = {};
-        // Save all settings using keys from _defaults
-        Object.keys(Config._defaults).forEach(function (key) {
-            if (self[key] !== undefined) {
-                data[key] = self[key];
-            }
-        });
-        if (self.words) {
-            // Split words back into _words* for storage
-            let splitWords = self.splitWords();
-            Object.keys(splitWords).forEach(function (key) {
-                data[key] = splitWords[key];
-            });
-            let wordKeys = Object.keys(self).filter(function (key) {
-                return Config._wordsPattern.test(key);
-            });
-            wordKeys.forEach(function (key) {
-                data[key] = self[key];
-            });
-        }
-        // console.log('dataToPersist', data); // DEBUG - Config
-        return data;
-    }
-    // Async call to get provided keys (or default keys) from chrome storage
-    // TODO: Keys: Doesn't support getting words
-    static getConfig(keys) {
-        return new Promise(function (resolve, reject) {
-            // Generate a request to use with chrome.storage
-            let request = null;
-            if (keys !== undefined) {
-                request = {};
-                for (let k of keys) {
-                    request[k] = Config._defaults[k];
-                }
-            }
-            chrome.storage.sync.get(request, function (items) {
-                // Ensure defaults for undefined settings
-                Object.keys(Config._defaults).forEach(function (defaultKey) {
-                    if (request == null || arrayContains(Object.keys(request), defaultKey)) {
-                        if (items[defaultKey] === undefined) {
-                            items[defaultKey] = Config._defaults[defaultKey];
-                        }
-                    }
-                });
-                // Add words if requested, and provide _defaultWords if needed
-                if (keys === undefined || arrayContains(keys, 'words')) {
-                    // Use default words if none were provided
-                    if (items._words0 === undefined || Object.keys(items._words0).length == 0) {
-                        items._words0 = Config._defaultWords;
-                    }
-                    Config.combineWords(items);
-                }
-                resolve(items);
-            });
-        });
-    }
-    removeProp(prop) {
-        chrome.storage.sync.remove(prop);
-        delete this[prop];
-    }
-    repeatForWord(word) {
-        if (this.words[word].repeat === true || this.words[word].repeat === false) {
-            return this.words[word].repeat;
-        }
-        else {
-            return this.defaultWordRepeat;
-        }
-    }
-    reset() {
-        return new Promise(function (resolve, reject) {
-            chrome.storage.sync.clear(function () {
-                resolve(chrome.runtime.lastError ? 1 : 0);
-            });
-        });
-    }
-    sanitizeWords() {
-        let sanitizedWords = {};
-        Object.keys(this.words).sort().forEach((key) => {
-            sanitizedWords[key.trim().toLowerCase()] = this.words[key];
-        });
-        this.words = sanitizedWords;
-    }
-    save() {
-        var self = this;
-        return new Promise(function (resolve, reject) {
-            chrome.storage.sync.set(self.dataToPersist(), function () {
-                resolve(chrome.runtime.lastError ? 1 : 0);
-            });
-        });
-    }
-    splitWords() {
-        let self = this;
-        let currentContainerNum = 0;
-        let currentWordNum = 0;
-        // let wordsLength = JSON.stringify(self.words).length;
-        // let wordContainers = Math.ceil(wordsLength/Config._maxBytes);
-        // let wordsNum = Object.keys(self.words).length;
-        let words = {};
-        words[`_words${currentContainerNum}`] = {};
-        Object.keys(self.words).sort().forEach(function (word) {
-            if (currentWordNum == Config._maxWords) {
-                currentContainerNum++;
-                currentWordNum = 0;
-                words[`_words${currentContainerNum}`] = {};
-            }
-            words[`_words${currentContainerNum}`][word] = self.words[word];
-            currentWordNum++;
-        });
-        return words;
-    }
-}
-Config._defaults = {
-    advancedDomains: [],
-    censorCharacter: '*',
-    censorFixedLength: 0,
-    defaultSubstitutions: ['censored', 'expletive', 'filtered'],
-    defaultWordMatchMethod: 0,
-    defaultWordRepeat: false,
-    disabledDomains: [],
-    filterMethod: 0,
-    globalMatchMethod: 3,
-    password: null,
-    preserveCase: true,
-    preserveFirst: true,
-    preserveLast: false,
-    showCounter: true,
-    substitutionMark: true
-};
-Config._defaultWords = {
-    'ass': { matchMethod: 0, repeat: true, words: ['butt', 'tail'] },
-    'asses': { matchMethod: 0, repeat: true, words: ['butts'] },
-    'asshole': { matchMethod: 1, repeat: true, words: ['butthole', 'jerk'] },
-    'bastard': { matchMethod: 1, repeat: true, words: ['imperfect', 'impure'] },
-    'bitch': { matchMethod: 1, repeat: true, words: ['jerk'] },
-    'cunt': { matchMethod: 1, repeat: true, words: ['explative'] },
-    'dammit': { matchMethod: 1, repeat: true, words: ['dangit'] },
-    'damn': { matchMethod: 1, repeat: true, words: ['dang', 'darn'] },
-    'dumbass': { matchMethod: 0, repeat: true, words: ['idiot'] },
-    'fuck': { matchMethod: 1, repeat: true, words: ['freak', 'fudge'] },
-    'piss': { matchMethod: 1, repeat: true, words: ['pee'] },
-    'pissed': { matchMethod: 0, repeat: true, words: ['ticked'] },
-    'slut': { matchMethod: 1, repeat: true, words: ['imperfect', 'impure'] },
-    'shit': { matchMethod: 1, repeat: true, words: ['crap', 'crud', 'poop'] },
-    'tits': { matchMethod: 1, repeat: true, words: ['explative'] },
-    'whore': { matchMethod: 1, repeat: true, words: ['harlot', 'tramp'] }
-};
-Config._filterMethodNames = ['Censor', 'Substitute', 'Remove'];
-Config._matchMethodNames = ['Exact Match', 'Partial Match', 'Whole Match', 'Per-Word Match', 'Regular Expression'];
-Config._maxBytes = 6500;
-Config._maxWords = 100;
-Config._wordsPattern = /^_words\d+/;
-////
 //src/domain.ts
 //
 class Domain {
@@ -290,33 +92,7 @@ class Domain {
     }
 }
 ////
-//src/page.ts
-//
-class Page {
-    // Returns true if a node should *not* be altered in any way
-    // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
-    static isForbiddenNode(node) {
-        return Boolean(node.isContentEditable || // DraftJS and many others
-            (node.parentNode &&
-                (node.parentNode.isContentEditable || // Special case for Gmail
-                    node.parentNode.tagName == 'SCRIPT' ||
-                    node.parentNode.tagName == 'STYLE' ||
-                    node.parentNode.tagName == 'INPUT' ||
-                    node.parentNode.tagName == 'TEXTAREA' ||
-                    node.parentNode.tagName == 'IFRAME')) || // Some catch-alls
-            (node.tagName &&
-                (node.tagName == 'SCRIPT' ||
-                    node.tagName == 'STYLE' ||
-                    node.tagName == 'INPUT' ||
-                    node.tagName == 'TEXTAREA' ||
-                    node.tagName == 'IFRAME')));
-    }
-}
-Page.forbiddenNodeRegExp = new RegExp('^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)');
-Page.xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
-Page.xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
-////
-//src/word.ts
+//src/lib/word.ts
 //
 class Word {
     static allLowerCase(string) {
@@ -462,73 +238,13 @@ Word._unicodeRegex = /[^\u0000-\u00ff]/;
 Word._unicodeWordBoundary = '[\\s.,\'"+!?|-]';
 Word.nonWordRegExp = new RegExp('^\\s*[^\\w]+\\s*$', 'g');
 Word.whitespaceRegExp = /^\s+$/;
+////
+//src/lib/filter.ts
+//
 class Filter {
     constructor() {
-        this.advanced = false;
         this.counter = 0;
         this.wordRegExps = [];
-    }
-    checkMutationTargetTextForProfanity(mutation) {
-        // console.count('checkMutationTargetTextForProfanity'); // Benchmarking - Executaion Count
-        // console.log('Process mutation.target:', mutation.target, mutation.target.data); // DEBUG - Mutation target text
-        var replacement;
-        if (!Page.isForbiddenNode(mutation.target)) {
-            replacement = filter.replaceText(mutation.target.data);
-            if (replacement != mutation.target.data) {
-                // console.log("Mutation target text changed:", mutation.target.data, replacement); // DEBUG - Mutation target text
-                mutation.target.data = replacement;
-            }
-        }
-        // else { console.log('Forbidden mutation.target node:', mutation.target); } // DEBUG - Mutation target text
-    }
-    checkNodeForProfanity(mutation) {
-        // console.count('checkNodeForProfanity'); // Benchmarking - Executaion Count
-        // console.log('Mutation observed:', mutation); // DEBUG - Mutation addedNodes
-        mutation.addedNodes.forEach(function (node) {
-            // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
-            if (!Page.isForbiddenNode(node)) {
-                // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
-                filter.removeProfanity(Page.xpathNodeText, node);
-            }
-            // else { console.log('Forbidden node:', node); } // DEBUG - Mutation addedNodes
-        });
-        // Only process mutation change if target is text
-        if (mutation.target && mutation.target.nodeName == '#text') {
-            filter.checkMutationTargetTextForProfanity(mutation);
-        }
-    }
-    cleanPage() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.cfg = yield Config.build();
-            // Don't run if this is a disabled domain
-            // Only run on main page (no frames)
-            if (window == window.top) {
-                let disabled = this.disabledPage();
-                let message = { disabled: disabled };
-                if (message.disabled) {
-                    chrome.runtime.sendMessage(message);
-                    return false;
-                }
-                // Check for advanced mode on current domain
-                this.advanced = Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
-                message.advanced = this.advanced;
-                if (this.advanced) {
-                    message.advanced = true;
-                }
-                chrome.runtime.sendMessage(message);
-            }
-            // Remove profanity from the main document and watch for new nodes
-            this.generateWordList();
-            this.generateRegexpList();
-            this.removeProfanity(Page.xpathDocText, document);
-            this.updateCounterBadge();
-            this.observeNewNodes();
-        });
-    }
-    disabledPage() {
-        // console.count('disabledPage'); // Benchmarking - Executaion Count
-        let domain = window.location.hostname;
-        return Domain.domainMatch(domain, this.cfg.disabledDomains);
     }
     // Parse the profanity list
     // ["exact", "partial", "whole", "disabled"]
@@ -597,58 +313,6 @@ class Filter {
         this.cfg.wordList = Object.keys(this.cfg.words).sort(function (a, b) {
             return b.length - a.length;
         });
-    }
-    // Watch for new text nodes and clean them as they are added
-    observeNewNodes() {
-        let self = this;
-        let observerConfig = {
-            characterData: true,
-            childList: true,
-            subtree: true
-        };
-        // When DOM is modified, remove profanity from inserted node
-        let observer = new MutationObserver(function (mutations) {
-            mutations.forEach(function (mutation) {
-                self.checkNodeForProfanity(mutation);
-            });
-            self.updateCounterBadge();
-        });
-        // Remove profanity from new objects
-        observer.observe(document, observerConfig);
-    }
-    removeProfanity(xpathExpression, node) {
-        // console.count('removeProfanity'); // Benchmarking - Executaion Count
-        let evalResult = document.evaluate(xpathExpression, node, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-        if (evalResult.snapshotLength == 0) { // If plaintext node
-            if (node.data) {
-                // Don't mess with tags, styles, or URIs
-                if (!Page.forbiddenNodeRegExp.test(node.data)) {
-                    // console.log('Plaintext:', node.data); // DEBUG
-                    node.data = this.replaceText(node.data);
-                }
-                // else { console.log('Skipping plaintext (protected pattern):', node.data); } // DEBUG
-            }
-            else { // No matches, no node.data
-                if (filter.advanced) {
-                    // console.log('Advanced mode:', evalResult, node.textContent); // DEBUG - Advanced
-                    var replacement;
-                    if (node.textContent) {
-                        replacement = filter.replaceText(node.textContent);
-                        if (replacement != node.textContent) {
-                            // console.log('Advanced replacement with no data:', replacement); // DEBUG - Advanced
-                            node.textContent = replacement;
-                        }
-                    }
-                }
-            }
-        }
-        else { // If evalResult matches
-            for (let i = 0; i < evalResult.snapshotLength; i++) {
-                var item = evalResult.snapshotItem(i);
-                // console.log('Normal cleaning:', item.data); // DEBUG
-                item.data = this.replaceText(item.data);
-            }
-        }
     }
     replaceText(str) {
         // console.count('replaceText'); // Benchmarking - Executaion Count
@@ -745,6 +409,371 @@ class Filter {
         }
         return str;
     }
+}
+////
+//src/page.ts
+//
+class Page {
+    // Returns true if a node should *not* be altered in any way
+    // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
+    static isForbiddenNode(node) {
+        return Boolean(node.isContentEditable || // DraftJS and many others
+            (node.parentNode &&
+                (node.parentNode.isContentEditable || // Special case for Gmail
+                    node.parentNode.tagName == 'SCRIPT' ||
+                    node.parentNode.tagName == 'STYLE' ||
+                    node.parentNode.tagName == 'INPUT' ||
+                    node.parentNode.tagName == 'TEXTAREA' ||
+                    node.parentNode.tagName == 'IFRAME')) || // Some catch-alls
+            (node.tagName &&
+                (node.tagName == 'SCRIPT' ||
+                    node.tagName == 'STYLE' ||
+                    node.tagName == 'INPUT' ||
+                    node.tagName == 'TEXTAREA' ||
+                    node.tagName == 'IFRAME')));
+    }
+}
+Page.forbiddenNodeRegExp = new RegExp('^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)');
+Page.xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
+Page.xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
+////
+//src/lib/config.ts
+//
+class Config {
+    constructor(config) {
+        if (typeof config === 'undefined') {
+            throw new Error('Cannot be called directly. call build()');
+        }
+        for (let k in config)
+            this[k] = config[k];
+    }
+    addWord(str) {
+        if (Object.keys(this.words).includes(str)) {
+            return false; // Already exists
+        }
+        else {
+            this.words[str] = { matchMethod: this.defaultWordMatchMethod, repeat: this.defaultWordRepeat, words: [] };
+            return true;
+        }
+    }
+    repeatForWord(word) {
+        if (this.words[word].repeat === true || this.words[word].repeat === false) {
+            return this.words[word].repeat;
+        }
+        else {
+            return this.defaultWordRepeat;
+        }
+    }
+    sanitizeWords() {
+        let sanitizedWords = {};
+        Object.keys(this.words).sort().forEach((key) => {
+            sanitizedWords[key.trim().toLowerCase()] = this.words[key];
+        });
+        this.words = sanitizedWords;
+    }
+}
+Config.filterMethods = {
+    censor: 0,
+    substitute: 1,
+    remove: 2
+};
+Config.matchMethods = {
+    exact: 0,
+    partial: 1,
+    whole: 2,
+    'Per-Word': 3,
+    'RegExp': 4
+};
+Config._defaults = {
+    advancedDomains: [],
+    censorCharacter: '*',
+    censorFixedLength: 0,
+    defaultSubstitutions: ['censored', 'expletive', 'filtered'],
+    defaultWordMatchMethod: 0,
+    defaultWordRepeat: false,
+    disabledDomains: [],
+    filterMethod: 0,
+    globalMatchMethod: 3,
+    password: null,
+    preserveCase: true,
+    preserveFirst: true,
+    preserveLast: false,
+    showCounter: true,
+    substitutionMark: true
+};
+Config._defaultWords = {
+    'ass': { matchMethod: 0, repeat: true, words: ['butt', 'tail'] },
+    'asses': { matchMethod: 0, repeat: false, words: ['butts'] },
+    'asshole': { matchMethod: 1, repeat: true, words: ['butthole', 'jerk'] },
+    'bastard': { matchMethod: 1, repeat: true, words: ['imperfect', 'impure'] },
+    'bitch': { matchMethod: 1, repeat: true, words: ['jerk'] },
+    'cunt': { matchMethod: 1, repeat: true, words: ['explative'] },
+    'dammit': { matchMethod: 1, repeat: true, words: ['dangit'] },
+    'damn': { matchMethod: 1, repeat: true, words: ['dang', 'darn'] },
+    'dumbass': { matchMethod: 0, repeat: true, words: ['idiot'] },
+    'fuck': { matchMethod: 1, repeat: true, words: ['freak', 'fudge'] },
+    'hell': { matchMethod: 0, repeat: true, words: ['heck'] },
+    'piss': { matchMethod: 1, repeat: true, words: ['pee'] },
+    'pissed': { matchMethod: 0, repeat: true, words: ['ticked'] },
+    'slut': { matchMethod: 1, repeat: true, words: ['imperfect', 'impure'] },
+    'shit': { matchMethod: 1, repeat: true, words: ['crap', 'crud', 'poop'] },
+    'tits': { matchMethod: 1, repeat: true, words: ['explative'] },
+    'whore': { matchMethod: 1, repeat: true, words: ['harlot', 'tramp'] }
+};
+Config._filterMethodNames = ['Censor', 'Substitute', 'Remove'];
+Config._matchMethodNames = ['Exact Match', 'Partial Match', 'Whole Match', 'Per-Word Match', 'Regular Expression'];
+Config._maxBytes = 6500;
+Config._maxWords = 100;
+Config._wordsPattern = /^_words\d+/;
+////
+//src/webConfig.ts
+//
+class WebConfig extends Config {
+    static build(keys) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let async_result = yield WebConfig.getConfig(keys);
+            let instance = new WebConfig(async_result);
+            return instance;
+        });
+    }
+    // Call build() to create a new instance
+    constructor(async_param) {
+        super(async_param);
+    }
+    // Compile words
+    static combineWords(items) {
+        items.words = {};
+        if (items._words0 !== undefined) {
+            // Find all _words* to combine
+            let wordKeys = Object.keys(items).filter(function (key) {
+                return Config._wordsPattern.test(key);
+            });
+            // Add all _words* to words and remove _words*
+            wordKeys.forEach(function (key) {
+                Object.assign(items.words, items[key]);
+                delete items[key];
+            });
+        }
+        // console.log('combineWords', items); // DEBUG
+    }
+    // Persist all configs from defaults and split _words*
+    dataToPersist() {
+        let self = this;
+        let data = {};
+        // Save all settings using keys from _defaults
+        Object.keys(Config._defaults).forEach(function (key) {
+            if (self[key] !== undefined) {
+                data[key] = self[key];
+            }
+        });
+        if (self.words) {
+            // Split words back into _words* for storage
+            let splitWords = self.splitWords();
+            Object.keys(splitWords).forEach(function (key) {
+                data[key] = splitWords[key];
+            });
+            let wordKeys = Object.keys(self).filter(function (key) {
+                return Config._wordsPattern.test(key);
+            });
+            wordKeys.forEach(function (key) {
+                data[key] = self[key];
+            });
+        }
+        // console.log('dataToPersist', data); // DEBUG - Config
+        return data;
+    }
+    // Async call to get provided keys (or default keys) from chrome storage
+    // TODO: Keys: Doesn't support getting words
+    static getConfig(keys) {
+        return new Promise(function (resolve, reject) {
+            // Generate a request to use with chrome.storage
+            let request = null;
+            if (keys !== undefined) {
+                request = {};
+                for (let k of keys) {
+                    request[k] = Config._defaults[k];
+                }
+            }
+            chrome.storage.sync.get(request, function (items) {
+                // Ensure defaults for undefined settings
+                Object.keys(Config._defaults).forEach(function (defaultKey) {
+                    if (request == null || Object.keys(request).includes(defaultKey)) {
+                        if (items[defaultKey] === undefined) {
+                            items[defaultKey] = Config._defaults[defaultKey];
+                        }
+                    }
+                });
+                // Add words if requested, and provide _defaultWords if needed
+                if (keys === undefined || keys.includes('words')) {
+                    // Use default words if none were provided
+                    if (items._words0 === undefined || Object.keys(items._words0).length == 0) {
+                        items._words0 = Config._defaultWords;
+                    }
+                    WebConfig.combineWords(items);
+                }
+                resolve(items);
+            });
+        });
+    }
+    removeProp(prop) {
+        chrome.storage.sync.remove(prop);
+        delete this[prop];
+    }
+    reset() {
+        return new Promise(function (resolve, reject) {
+            chrome.storage.sync.clear(function () {
+                resolve(chrome.runtime.lastError ? 1 : 0);
+            });
+        });
+    }
+    save() {
+        var self = this;
+        return new Promise(function (resolve, reject) {
+            chrome.storage.sync.set(self.dataToPersist(), function () {
+                resolve(chrome.runtime.lastError ? 1 : 0);
+            });
+        });
+    }
+    splitWords() {
+        let self = this;
+        let currentContainerNum = 0;
+        let currentWordNum = 0;
+        // let wordsLength = JSON.stringify(self.words).length;
+        // let wordContainers = Math.ceil(wordsLength/Config._maxBytes);
+        // let wordsNum = Object.keys(self.words).length;
+        let words = {};
+        words[`_words${currentContainerNum}`] = {};
+        Object.keys(self.words).sort().forEach(function (word) {
+            if (currentWordNum == Config._maxWords) {
+                currentContainerNum++;
+                currentWordNum = 0;
+                words[`_words${currentContainerNum}`] = {};
+            }
+            words[`_words${currentContainerNum}`][word] = self.words[word];
+            currentWordNum++;
+        });
+        return words;
+    }
+}
+class WebFilter extends Filter {
+    constructor() {
+        super();
+        this.advanced = false;
+    }
+    checkMutationTargetTextForProfanity(mutation) {
+        // console.count('checkMutationTargetTextForProfanity'); // Benchmarking - Executaion Count
+        // console.log('Process mutation.target:', mutation.target, mutation.target.data); // DEBUG - Mutation target text
+        var replacement;
+        if (!Page.isForbiddenNode(mutation.target)) {
+            replacement = this.replaceText(mutation.target.data);
+            if (replacement != mutation.target.data) {
+                // console.log("Mutation target text changed:", mutation.target.data, replacement); // DEBUG - Mutation target text
+                mutation.target.data = replacement;
+            }
+        }
+        // else { console.log('Forbidden mutation.target node:', mutation.target); } // DEBUG - Mutation target text
+    }
+    checkNodeForProfanity(mutation) {
+        // console.count('checkNodeForProfanity'); // Benchmarking - Executaion Count
+        // console.log('Mutation observed:', mutation); // DEBUG - Mutation addedNodes
+        mutation.addedNodes.forEach(function (node) {
+            // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
+            if (!Page.isForbiddenNode(node)) {
+                // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
+                filter.removeProfanity(Page.xpathNodeText, node);
+            }
+            // else { console.log('Forbidden node:', node); } // DEBUG - Mutation addedNodes
+        });
+        // Only process mutation change if target is text
+        if (mutation.target && mutation.target.nodeName == '#text') {
+            filter.checkMutationTargetTextForProfanity(mutation);
+        }
+    }
+    cleanPage() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.cfg = yield WebConfig.build();
+            // Don't run if this is a disabled domain
+            // Only run on main page (no frames)
+            if (window == window.top) {
+                let disabled = this.disabledPage();
+                let message = { disabled: disabled };
+                if (message.disabled) {
+                    chrome.runtime.sendMessage(message);
+                    return false;
+                }
+                // Check for advanced mode on current domain
+                this.advanced = Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
+                message.advanced = this.advanced;
+                if (this.advanced) {
+                    message.advanced = true;
+                }
+                chrome.runtime.sendMessage(message);
+            }
+            // Remove profanity from the main document and watch for new nodes
+            this.generateWordList();
+            this.generateRegexpList();
+            this.removeProfanity(Page.xpathDocText, document);
+            this.updateCounterBadge();
+            this.observeNewNodes();
+        });
+    }
+    disabledPage() {
+        // console.count('disabledPage'); // Benchmarking - Executaion Count
+        let domain = window.location.hostname;
+        return Domain.domainMatch(domain, this.cfg.disabledDomains);
+    }
+    // Watch for new text nodes and clean them as they are added
+    observeNewNodes() {
+        let self = this;
+        let observerConfig = {
+            characterData: true,
+            childList: true,
+            subtree: true
+        };
+        // When DOM is modified, remove profanity from inserted node
+        let observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                self.checkNodeForProfanity(mutation);
+            });
+            self.updateCounterBadge();
+        });
+        // Remove profanity from new objects
+        observer.observe(document, observerConfig);
+    }
+    removeProfanity(xpathExpression, node) {
+        // console.count('removeProfanity'); // Benchmarking - Executaion Count
+        let evalResult = document.evaluate(xpathExpression, node, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+        if (evalResult.snapshotLength == 0) { // If plaintext node
+            if (node.data) {
+                // Don't mess with tags, styles, or URIs
+                if (!Page.forbiddenNodeRegExp.test(node.data)) {
+                    // console.log('Plaintext:', node.data); // DEBUG
+                    node.data = this.replaceText(node.data);
+                }
+                // else { console.log('Skipping plaintext (protected pattern):', node.data); } // DEBUG
+            }
+            else { // No matches, no node.data
+                if (this.advanced) {
+                    // console.log('Advanced mode:', evalResult, node.textContent); // DEBUG - Advanced
+                    var replacement;
+                    if (node.textContent) {
+                        replacement = this.replaceText(node.textContent);
+                        if (replacement != node.textContent) {
+                            // console.log('Advanced replacement with no data:', replacement); // DEBUG - Advanced
+                            node.textContent = replacement;
+                        }
+                    }
+                }
+            }
+        }
+        else { // If evalResult matches
+            for (let i = 0; i < evalResult.snapshotLength; i++) {
+                var item = evalResult.snapshotItem(i);
+                // console.log('Normal cleaning:', item.data); // DEBUG
+                item.data = this.replaceText(item.data);
+            }
+        }
+    }
     updateCounterBadge() {
         /* istanbul ignore next */
         // console.count('updateCounterBadge'); // Benchmarking - Executaion Count
@@ -754,7 +783,7 @@ class Filter {
     }
 }
 // Global
-var filter = new Filter;
+var filter = new WebFilter;
 if (typeof window !== 'undefined' && ({}).toString.call(window) === '[object Window]') {
     /* istanbul ignore next */
     filter.cleanPage();

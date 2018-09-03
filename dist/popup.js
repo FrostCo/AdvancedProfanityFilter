@@ -6,13 +6,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { arrayContains, dynamicList } from './helper.js';
-import Config from './config.js';
+import { arrayContains, dynamicList } from './lib/helper.js';
+import WebConfig from './webConfig.js';
 import Domain from './domain.js';
 class Popup {
     static load(instance) {
         return __awaiter(this, void 0, void 0, function* () {
-            instance.cfg = yield Config.build(['advancedDomains', 'disabledDomains', 'filterMethod', 'password']);
+            instance.cfg = yield WebConfig.build(['advancedDomains', 'disabledDomains', 'filterMethod', 'password']);
             instance.domain = new Domain();
             yield instance.domain.load();
             return instance;
@@ -100,7 +100,7 @@ class Popup {
             let domainToggle = document.getElementById('domainToggle');
             let advancedMode = document.getElementById('advancedMode');
             let filterMethodSelect = document.getElementById('filterMethodSelect');
-            dynamicList(Config._filterMethodNames, 'filterMethodSelect');
+            dynamicList(WebConfig._filterMethodNames, 'filterMethodSelect');
             filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
             if (popup.cfg.password && popup.cfg.password != '') {
                 popup.protected = true;
