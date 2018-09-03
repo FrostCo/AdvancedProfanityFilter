@@ -10,6 +10,10 @@ export class Filter {
     this.wordRegExps = [];
   }
 
+  foundMatch(word) {
+    this.counter++;
+  }
+
   // Parse the profanity list
   // ["exact", "partial", "whole", "disabled"]
   generateRegexpList() {
@@ -84,7 +88,7 @@ export class Filter {
       case 0: // Censor
         for (let z = 0; z < self.cfg.wordList.length; z++) {
           str = str.replace(self.wordRegExps[z], function(match, arg1, arg2, arg3, arg4, arg5): string {
-            self.counter++;
+            self.foundMatch(self.cfg.wordList[z]);
             if (self.wordRegExps[z].unicode) { match = arg2; } // Workaround for unicode word boundaries
             let censoredString = '';
             let censorLength = self.cfg.censorFixedLength > 0 ? self.cfg.censorFixedLength : match.length;
@@ -109,7 +113,7 @@ export class Filter {
         for (let z = 0; z < self.cfg.wordList.length; z++) {
           str = str.replace(self.wordRegExps[z], function(match, arg1, arg2, arg3, arg4, arg5): string {
             // console.log('Substitute match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
-            self.counter++;
+            self.foundMatch(self.cfg.wordList[z]);
             if (self.wordRegExps[z].unicode) { match = arg2; } // Workaround for unicode word boundaries
             let sub = Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words, self.cfg.defaultSubstitutions);
 
@@ -136,7 +140,7 @@ export class Filter {
           str = str.replace(self.wordRegExps[z], function(match, arg1, arg2, arg3, arg4, arg5): string {
             // console.log('Remove match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
             // console.log('\nmatch: ', match, '\narg1: ', arg1, '\narg2: ', arg2, '\narg3: ', arg3, '\narg4: ', arg4, '\narg5: ', arg5); // DEBUG
-            self.counter++;
+            self.foundMatch(self.cfg.wordList[z]);
             if (self.wordRegExps[z].unicode) {
               // Workaround for unicode word boundaries
               if (Word.whitespaceRegExp.test(arg1) && Word.whitespaceRegExp.test(arg3)) { // If both surrounds are whitespace (only need 1)
