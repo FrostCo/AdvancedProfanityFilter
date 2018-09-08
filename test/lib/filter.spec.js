@@ -184,12 +184,12 @@ describe('Filter', function() {
         expect(filter.replaceText('This Sample is a pretty good sampler to saammppllee.')).to.equal('This Piece is a pretty good piecer to saammppllee.');
       });
 
-      it('Should filter an partial word with substitions marked and preserveCase', function() {
+      it('Should filter an partial word with substitions marked and not preserveCase', function() {
         let filter = new Filter;
-        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: true });
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: false });
         filter.generateWordList();
         filter.generateRegexpList();
-        expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('This [Piece] is a pretty good [piece]r to [piece].');
+        expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('This [piece] is a pretty good [piece]r to [piece].');
       });
 
       describe('Unicode characters', function() {

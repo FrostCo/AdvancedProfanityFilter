@@ -89,6 +89,7 @@ export default class Config {
   }
 
   addWord(str: string) {
+    str = str.trim().toLowerCase();
     if (Object.keys(this.words).includes(str)) {
       return false; // Already exists
     } else {
