@@ -159,7 +159,7 @@ export default class WebFilter extends Filter {
 
 // Global
 var filter = new WebFilter;
-if (typeof window !== 'undefined' && ({}).toString.call(window) === '[object Window]') {
+if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptGlobalScope]'].includes(({}).toString.call(window))) {
   /* istanbul ignore next */
   filter.cleanPage();
 }

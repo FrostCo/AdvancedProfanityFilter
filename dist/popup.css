@@ -84,7 +84,7 @@ input:checked + .slider:before {
   margin: 0;
   transition: 0.2s;
   text-align: center;
-  cursor: hand;
+  cursor: pointer;
   font-weight: normal;
 }
 
@@ -125,7 +125,6 @@ input:checked + .slider:before {
 /* The switch - the box around the slider */
 .switch {
   position: relative;
-  display: inline-block;
   width: 60px;
   height: 34px;
   float: right;
