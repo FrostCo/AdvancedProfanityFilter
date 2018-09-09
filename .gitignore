@@ -1,5 +1,11 @@
-*.zip
+# Dev Dependencies
 node_modules/*
+
+# Packaged extensions
+*.zip
+
+# Dev extensions for debugging
+extension-firefox/*
 
 # Combined file (prebuild.js)
 src/webFilter.bundle.ts
