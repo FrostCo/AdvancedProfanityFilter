@@ -7,6 +7,7 @@ export default class Config {
             this[k] = config[k];
     }
     addWord(str) {
+        str = str.trim().toLowerCase();
         if (Object.keys(this.words).includes(str)) {
             return false; // Already exists
         }

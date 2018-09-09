@@ -52,12 +52,10 @@ class Domain {
     static domainMatch(domain, domains) {
         let result = false;
         for (let x = 0; x < domains.length; x++) {
-            if (domains[x]) {
-                let domainRegex = new RegExp('(^|\.)' + domains[x], 'i');
-                if (domainRegex.test(domain)) {
-                    result = true;
-                    break;
-                }
+            let domainRegex = new RegExp('(^|\.)' + domains[x], 'i');
+            if (domainRegex.test(domain)) {
+                result = true;
+                break;
             }
         }
         return result;
@@ -246,6 +244,9 @@ class Filter {
         this.counter = 0;
         this.wordRegExps = [];
     }
+    foundMatch(word) {
+        this.counter++;
+    }
     // Parse the profanity list
     // ["exact", "partial", "whole", "disabled"]
     generateRegexpList() {
@@ -321,7 +322,7 @@ class Filter {
             case 0: // Censor
                 for (let z = 0; z < self.cfg.wordList.length; z++) {
                     str = str.replace(self.wordRegExps[z], function (match, arg1, arg2, arg3, arg4, arg5) {
-                        self.counter++;
+                        self.foundMatch(self.cfg.wordList[z]);
                         if (self.wordRegExps[z].unicode) {
                             match = arg2;
                         } // Workaround for unicode word boundaries
@@ -351,7 +352,7 @@ class Filter {
                 for (let z = 0; z < self.cfg.wordList.length; z++) {
                     str = str.replace(self.wordRegExps[z], function (match, arg1, arg2, arg3, arg4, arg5) {
                         // console.log('Substitute match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
-                        self.counter++;
+                        self.foundMatch(self.cfg.wordList[z]);
                         if (self.wordRegExps[z].unicode) {
                             match = arg2;
                         } // Workaround for unicode word boundaries
@@ -380,7 +381,7 @@ class Filter {
                     str = str.replace(self.wordRegExps[z], function (match, arg1, arg2, arg3, arg4, arg5) {
                         // console.log('Remove match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
                         // console.log('\nmatch: ', match, '\narg1: ', arg1, '\narg2: ', arg2, '\narg3: ', arg3, '\narg4: ', arg4, '\narg5: ', arg5); // DEBUG
-                        self.counter++;
+                        self.foundMatch(self.cfg.wordList[z]);
                         if (self.wordRegExps[z].unicode) {
                             // Workaround for unicode word boundaries
                             if (Word.whitespaceRegExp.test(arg1) && Word.whitespaceRegExp.test(arg3)) { // If both surrounds are whitespace (only need 1)
@@ -448,6 +449,7 @@ class Config {
             this[k] = config[k];
     }
     addWord(str) {
+        str = str.trim().toLowerCase();
         if (Object.keys(this.words).includes(str)) {
             return false; // Already exists
         }
@@ -784,7 +786,7 @@ class WebFilter extends Filter {
 }
 // Global
 var filter = new WebFilter;
-if (typeof window !== 'undefined' && ({}).toString.call(window) === '[object Window]') {
+if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptGlobalScope]'].includes(({}).toString.call(window))) {
     /* istanbul ignore next */
     filter.cleanPage();
 }

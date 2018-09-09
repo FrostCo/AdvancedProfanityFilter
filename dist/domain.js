@@ -11,12 +11,10 @@ export default class Domain {
     static domainMatch(domain, domains) {
         let result = false;
         for (let x = 0; x < domains.length; x++) {
-            if (domains[x]) {
-                let domainRegex = new RegExp('(^|\.)' + domains[x], 'i');
-                if (domainRegex.test(domain)) {
-                    result = true;
-                    break;
-                }
+            let domainRegex = new RegExp('(^|\.)' + domains[x], 'i');
+            if (domainRegex.test(domain)) {
+                result = true;
+                break;
             }
         }
         return result;
