@@ -308,7 +308,7 @@ export default class OptionPage {
 
   wordAdd(event) {
     let wordText = document.getElementById('wordText') as HTMLInputElement;
-    let word = wordText.value.trim().toLowerCase();
+    let word = wordText.value;
     let result = this.cfg.addWord(word);
 
     if (word != '') {

@@ -56,7 +56,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 // Add selected word/phrase and reload page (unless already present)
 function addSelection(selection) {
     return __awaiter(this, void 0, void 0, function* () {
-        selection = (selection.trim()).toLowerCase();
         let cfg = yield WebConfig.build(); // TODO: Only need words here
         let result = cfg.addWord(selection);
         if (result) {

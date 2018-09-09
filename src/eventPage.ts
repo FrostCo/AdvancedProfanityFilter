@@ -60,7 +60,6 @@ chrome.runtime.onMessage.addListener(
 //
 // Add selected word/phrase and reload page (unless already present)
 async function addSelection(selection: string) {
-  selection = (selection.trim()).toLowerCase();
   let cfg = await WebConfig.build(); // TODO: Only need words here
   let result = cfg.addWord(selection);
 
