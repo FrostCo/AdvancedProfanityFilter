@@ -7,7 +7,7 @@ const AdmZip = require('adm-zip');
 function buildChromeExtension(zip) {
   console.log('Building ./extension-chrome.zip');
   // try { fs.unlinkSync('./dist/filter.js'); } catch {}; // Remove filter.js as its only used for testing
-  zip.deleteFile('filter.js'); // Remove filter.js as its only used for testing
+  zip.deleteFile('webFilter.js'); // Remove filter.js as its only used for testing
   zip.writeZip('./extension-chrome.zip');
 }
 

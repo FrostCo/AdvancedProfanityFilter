@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 // import * as bundle from '../dist/filter.bundle';
-import Config from '../dist/config'
-import {Filter} from '../dist/filter'
+import Config from '../../dist/lib/config';
+import {Filter} from '../../dist/lib/filter';
 
 const testWords = {
   'example': { matchMethod: 0, repeat: true, words: ['demo'] },
@@ -11,26 +11,6 @@ const testWords = {
 }
 
 describe('Filter', function() {
-  describe('disabledPage()', function() {
-    let filter = new Filter;
-    filter.cfg = new Config({ disabledDomains: ['example.com', 'sub.sample.com'] });
-    global.window = { location: { hostname: 'example.com' } };
-
-    it('should return true when on a disabled domain', function() {
-      expect(filter.disabledPage()).to.equal(true);
-    });
-
-    it('should return false when not on a disabled domain', function() {
-      global.window.location.hostname = 'sample.com';
-      expect(filter.disabledPage()).to.equal(false);
-    });
-
-    it('should return true when on a subdomain of a disabled parent domain', function() {
-      global.window.location.hostname = 'sub.example.com';
-      expect(filter.disabledPage()).to.equal(true);
-    });
-  });
-
   describe('generateWordList()', function() {
     it('should generate a sorted word list RegExp list', function() {
       let filter = new Filter;
@@ -204,12 +184,12 @@ describe('Filter', function() {
         expect(filter.replaceText('This Sample is a pretty good sampler to saammppllee.')).to.equal('This Piece is a pretty good piecer to saammppllee.');
       });
 
-      it('Should filter an partial word with substitions marked and preserveCase', function() {
+      it('Should filter an partial word with substitions marked and not preserveCase', function() {
         let filter = new Filter;
-        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: true });
+        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: false });
         filter.generateWordList();
         filter.generateRegexpList();
-        expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('This [Piece] is a pretty good [piece]r to [piece].');
+        expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('This [piece] is a pretty good [piece]r to [piece].');
       });
 
       describe('Unicode characters', function() {

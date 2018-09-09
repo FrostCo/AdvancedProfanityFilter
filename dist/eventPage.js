@@ -6,8 +6,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { arrayContains, getVersion, isVersionOlder } from './helper.js';
-import Config from './config.js';
+import { arrayContains, getVersion, isVersionOlder } from './lib/helper.js';
+import WebConfig from './webConfig.js';
 import Domain from './domain.js';
 ////
 // Actions and messaging
@@ -57,7 +57,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 function addSelection(selection) {
     return __awaiter(this, void 0, void 0, function* () {
         selection = (selection.trim()).toLowerCase();
-        let cfg = yield Config.build(); // TODO: Only need words here
+        let cfg = yield WebConfig.build(); // TODO: Only need words here
         let result = cfg.addWord(selection);
         if (result) {
             let saved = yield cfg.save();
@@ -94,7 +94,7 @@ function enableDomain(cfg, domain, key) {
 }
 function toggleDomain(domain, key) {
     return __awaiter(this, void 0, void 0, function* () {
-        let cfg = yield Config.build([key]);
+        let cfg = yield WebConfig.build([key]);
         Domain.domainMatch(domain, cfg[key]) ? enableDomain(cfg, domain, key) : disableDomain(cfg, domain, key);
     });
 }
@@ -115,7 +115,7 @@ function updateMigrations(previousVersion) {
                             chrome.storage.sync.remove('words', function () {
                                 // Split words if necessary
                                 var wordsPromise = new Promise(function (resolve, reject) {
-                                    resolve(Config.build());
+                                    resolve(WebConfig.build());
                                 });
                                 wordsPromise
                                     .then(function (response) {
@@ -129,7 +129,7 @@ function updateMigrations(previousVersion) {
         }
         // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
         if (isVersionOlder(old, getVersion('1.1.0'))) {
-            let cfg = yield Config.build();
+            let cfg = yield WebConfig.build();
             cfg.sanitizeWords();
             cfg.save();
         }

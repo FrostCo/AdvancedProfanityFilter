@@ -2,10 +2,10 @@
 node_modules/*
 
 # Combined file (prebuild.js)
-src/filter.bundle.ts
+src/webFilter.bundle.ts
 
 # Filter for testing
-dist/filter.js
+dist/webFilter.js
 
 # Testing coverage
 .nyc_output/*
