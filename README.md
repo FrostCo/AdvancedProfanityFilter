@@ -8,6 +8,7 @@ For an overview of features and options, please head to the [wiki](https://githu
 |---------|----------|
 | Chrome  | [Chrome Web Store](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh) |
 | Firefox | [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/advanced_profanity_filter)|
+| Opera   | [Opera addons](https://addons.opera.com/en/extensions/details/advanced-profanity-filter/)
 
 ### Features
 * Multiple Filter Types
