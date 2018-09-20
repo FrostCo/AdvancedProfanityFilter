@@ -1,13 +1,15 @@
 # Advanced Profanity Filter
 A browser extension to filter profanity from webpages.
 
-For an overview of features and options, please head to the [wiki](https://github.com/richardfrost/AdvancedProfanityFilter/wiki)
+For an overview of features and options, please head to the [wiki](https://github.com/richardfrost/AdvancedProfanityFilter/wiki).
 
 ### Installation
 | Browser | Download |
 |---------|----------|
 | Chrome  | [Chrome Web Store](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh) |
 | Firefox | [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/advanced_profanity_filter)|
+| Opera   | [Opera addons](https://addons.opera.com/en/extensions/details/advanced-profanity-filter/)
+| Edge    | [More Info](https://github.com/richardfrost/AdvancedProfanityFilter/issues/102) |
 
 ### Features
 * Multiple Filter Types
@@ -18,7 +20,7 @@ For an overview of features and options, please head to the [wiki](https://githu
 * Customizable word and substitution list
 * Disable filter for specific domains
 * Import/Export settings to share with others
-* Sync settings across browsers
+* Sync settings across browsers (of same type)
 * Counter showing number of filtered words
 * HTTPS Support
 * Supports social media sites such as:
@@ -34,9 +36,6 @@ For an overview of features and options, please head to the [wiki](https://githu
 
 ### Beta Testing
 If you would like to help with development, but don't have experience coding, its very helpful to have users test a release candidate before actually publishing it to everyone. If you are interested in testing new versions see [this page](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Beta-Testing) for more information.
-
-#### Original
-After years of using Simple Profanity Filter, I decided that it was time to give back to the community. Thanks markyd13 for all your work on this great extension! You can download the original extension by markyd13 [here](https://chrome.google.com/webstore/detail/simple-profanity-filter/ackkocjhcalcpgpfjcoinogdejibgbho).
 
 ### Development
 This project is written in TypeScript, and during the build/package process it will be converted to JS. Please see `package.json`'s scripts for more info on the process.
