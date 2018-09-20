@@ -2,6 +2,7 @@
 node_modules/*
 
 # Packaged extensions
+dist/*
 *.zip
 
 # Dev extensions for debugging
@@ -9,9 +10,6 @@ extension-firefox/*
 
 # Combined file (prebuild.js)
 src/webFilter.bundle.ts
-
-# Filter for testing
-dist/webFilter.js
 
 # Testing coverage
 .nyc_output/*
