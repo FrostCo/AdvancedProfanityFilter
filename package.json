@@ -42,7 +42,7 @@
     "mocha": "latest",
     "nyc": "latest",
     "typescript": "^3.0.1",
-    "typescript-eslint-parser": "^17.0.1"
+    "typescript-eslint-parser": "^18.0.0"
   },
   "babel": {
     "presets": [
