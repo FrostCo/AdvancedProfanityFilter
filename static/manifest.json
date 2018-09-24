@@ -20,7 +20,7 @@
     "file://*/*"
   ],
   "options_ui": {
-    "chrome_style": false,
+    "chrome_style": true,
     "open_in_tab": true,
     "page": "optionPage.html"
   },

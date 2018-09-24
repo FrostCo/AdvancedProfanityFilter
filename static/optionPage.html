@@ -1,217 +1,103 @@
+<!-- TODO: Color for active tab -->
+<!-- TODO: Alerts -->
+<!-- TODO: Animations -->
+<!-- TODO: Notes/Bars -->
 <!DOCTYPE html>
 <html>
 <head>
   <title>Advanced Profanity Filter</title>
+  <!-- <link rel="stylesheet" type="text/css" href="w3.css" /> -->
   <link rel="stylesheet" type="text/css" href="optionPage.css" />
 </head>
+<body class="w3-light-grey">
 
-<body>
-<!-- Tabs -->
-<div id="passwordContainer" class="hidden">
-  <label for="password">Password: </label>
-  <input type="password" id="password">
-  <input type="button" value="Submit" id="submitPassword"/>
+<div id="header" class="w3-container w3-flat-emerald">
+  <h2><img src="icons/icon38.png"/> Advanced Profanity Filter</h2>
 </div>
 
-<div id="main" class="visible">
-<div class="tab">
-  <nav>
-    <span class="tablinks active">Settings</span>
-    <span class="tablinks">Words</span>
-    <span class="tablinks">Domains</span>
-    <span class="tablinks">Config</span>
-  </nav>
+<div id="menu" class="w3-bar w3-blue">
+  <a href="#" class="w3-bar-item w3-button w3-purple">Settings</a>
+  <a href="#" class="w3-bar-item w3-button">Words</a>
+  <a href="#" class="w3-bar-item w3-button">Domains</a>
+  <a href="#" class="w3-bar-item w3-button">Config</a>
+  <a href="#" class="w3-bar-item w3-button">Test</a>
+  <a href="#" class="w3-bar-item w3-button w3-right">Help</a>
 </div>
 
-<div id="dialogContainer"></div>
+<div id="settingsPage">Settings...</div>
 
-<!-- Settings Tab -->
-<div id="Settings" class="tabcontent visible">
-  <h4>Filter Method</h4>
-  <select id="filterMethodSelect"></select>
-
-  <div id="optionsCensor" class="moveDown hidden">
-    <h4>Censor Settings</h4>
-    <label>
-      <input type="checkbox" id="preserveFirst">
-      Preserve the first letter
-      <span class="notes">(Dog: dog = d**)</span>
-    </label>
-    <br />
-    <label>
-      <input type="checkbox" id="preserveLast">
-      Preserve the last letter
-      <span class="notes">(Dog: dog = **g)</span>
-    </label>
-    <br />
-    <label>
-      Censor character:
-      <select id="censorCharacterSelect" class="small">
-        <option value="*">*</option>
-        <option value="&">&amp;</option>
-        <option value="$">$</option>
-        <option value="#">#</option>
-        <option value="@">@</option>
-        <option value="^">^</option>
-        <option value="-">-</option>
-        <option value="_">_</option>
-      </select>
-    </label>
-    <br />
-    <label>
-      Fixed length:
-      <select id="censorFixedLengthSelect" class="small">
-        <option value="0">Original</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-      </select>
-    </label>
-  </div>
-
-  <div id="optionsSubstitution" class="moveDown hidden">
-    <h4>Substitution Settings</h4>
-    <label>
-      <input type="checkbox" id="preserveCase">
-      Preserve case of filtered words
-      <span class="notes">(Dog: Dog = Cat)</span>
-    </label>
-    <br />
-    <label>
-      <input type="checkbox" id="substitutionMark">
-      Mark substituted words with [ ]
-      <span class="notes">(Dog: dog = [cat])</span>
-    </label>
-  </div>
-
-  <div id="globalMatchMethod" class="moveDown hidden">
-    <h4>Global Matching Method</h4>
-    <label>
-      <select id="globalMatchMethodSelect"></select>
-    </label>
-  </div>
-
-  <div id="generalOptions" class="moveDown">
-    <h4>General Settings</h4>
-    <label>
-      <input type="checkbox" id="showCounter">
-      Show number of filtered words
-      <span class="notes">(Shown over the extension icon)</span>
-    </label>
-  </div>
-
-  <div id="defaultOptions" class="moveDown">
-    <h4>Default Settings (For new words/phrases)</h4>
-    <label>
-      <input type="checkbox" id="defaultWordMatchRepeated">
-      Match repeated characters in words
-      <span class="notes">(Dog: dddoooggg)</span>
-    </label>
-    <br />
-    <div id="defaultMatchMethod">
+<div id="wordsPage" class="w3-hide" >
+  <div class="w3-sidebar w3-bar-block w3-card w3-sand" style="width:25%">
+    <div class="w3-border-bottom w3-padding">
       <label>
-        Word Match Method:
-        <select id="defaultMatchMethodSelect" class="small"></select>
+        Censor Words
+        <input id="censorWords" type="checkbox" class="w3-check w3-right" style="top: unset;" checked="checked"/>
       </label>
     </div>
+    <a id="wordAdd" href="#" class="w3-bar-item w3-button w3-border-bottom">Add...</a>
+    <div id="wordsSidebarList"></div>
+  </div>
+
+  <div class="w3-container w3-light-grey" style="margin-left:25%">
+    <form>
+      <label><b class="w3-text-teal">Word/Phrase</b></label>
+      <input id="wordText" class="w3-input w3-border w3-light-grey" type="text">
+
+      <b class="w3-text-teal">Match Method</b>
+
+      <br/>
+      <label>
+        <input id="wordMatchExact" class="w3-radio" type="radio" name="matchMethod" value="Exact">
+        Exact
+      </label>
+
+      <br/>
+      <label>
+        <input id="wordMatchPartial" class="w3-radio" type="radio" name="matchMethod" value="Partial">
+        Partial
+      </label>
+
+      <br/>
+      <label>
+        <input id="wordMatchWhole" class="w3-radio" type="radio" name="matchMethod" value="Whole">
+        Whole
+      </label>
+
+      <br/>
+      <label>
+        <input id="wordMatchRegular-Expression" class="w3-radio" type="radio" name="matchMethod" value="Regular-Expression">
+        Regex
+      </label>
+
+      <br/>
+      <label>
+        Match Repeated Characters
+        <input id="wordMatchRepeated" class="w3-check" type="checkbox" name="matchRepeat"/>
+      </label>
+
+      <div id="exampleSentence" class="w3-panel w3-pale-blue w3-leftbar w3-border-blue">
+        <p>Here you can see what the word "<b id="exampleSentenceWord"></b>" looks like in a sentence.</p>
+      </div>
+
+      <br/>
+      <button id="wordSave" class="w3-btn w3-round-xxlarge w3-green w3-right">SAVE</button>
+    </form>
   </div>
 </div>
 
-<!-- Words -->
-<div id="Words" class="tabcontent hidden">
-  <h4>Add New Word/Phrase</h4>
-  <input type="text" id="wordText" name="wordText">
-  <button id="wordAdd">Add</button>
-
-  <div class="moveDown">
-    <h4>Configure Words/Phrases</h4>
-    <div class="notes">Warning: Offensive language</div>
-    <select id="wordSelect"></select>
-    <button id="wordRemove">Remove</button>
-  </div>
-
-  <div id="wordMatchMethodContainer" class="moveDown hidden">
-    <label>
-      Matching Method:
-      <br />
-      <select id="wordMatchMethodSelect">
-        <option value="" disabled selected>Select a Word</option>
-      </select>
-      <button id="wordMatchMethodSet">Set</button>
-    </label>
-  </div>
-
-  <br />
-  <label>
-    <input type="checkbox" id="wordMatchRepeated" disabled>
-    Match repeated characters in words
-    <span class="notes">(Dog: dddoooggg)</span>
-  </label>
-
-  <div id="wordSubstitutions" class="hidden">
-    <div class="moveDown">
-      <h4>Substitutions</h4>
-      <select id="substitutionSelect"></select>
-      <button id="substitutionRemove">Remove</button>
-    </div>
-    <div class="moveDown">
-      <input type="text" id="substitutionText" name="substitutionText">
-      <button id="substitutionAdd">Add</button>
-    </div>
-  </div>
+<div id="domainsPage" class="w3-hide">domains...</div>
+<!-- <div id="advancedDomainsPage" class="w3-hide">advancedDomains</div>
+<div id="disabledDomainsPage" class="w3-hide">disabledDomains</div> -->
+<div id="configPage" class="w3-hide">config</div>
+<div id="securityPage" class="w3-hide">security</div>
+<div id="testPage" class="w3-hide">
+  <h3 class="w3-text-teal">Test Text</h3>
+  <textarea id="testText" class="w3-input" type="text"></textarea>
+  <h3 class="w3-text-teal">Filtered</h3>
+  <div id="filteredTestText" class="w3-panel w3-pale-green w3-leftbar w3-border-green"></div>
 </div>
 
-<!-- Domains Tab -->
-<div id="Domains" class="tabcontent hidden">
-  <h4>Advanced Domains</h4>
-  <div class="notes">
-    Only use when the filter isn't working for a page<br />
-    Warning: This option can have negative results - Use with caution.
-  </div>
-  <div id="advancedDomainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
-  <input type="text" id="advancedDomainText" name="advancedDomainText" pattern="^[a-zA-Z0-9\.\-]+$">
-  <button id="advancedDomainAdd">Add</button>
-  <div class="moveDown">
-    <select id="advancedDomainSelect"></select>
-    <button id="advancedDomainRemove">Remove</button>
-  </div>
-
-  <div class="moveDown"></div>
-  <h4>Disabled Domains</h4>
-  <div id="domainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
-  <input type="text" id="domainText" name="domainText" pattern="^[a-zA-Z0-9\.\-]+$">
-  <button id="domainAdd">Add</button>
-  <div class="moveDown">
-    <select id="domainSelect"></select>
-    <button id="domainRemove">Remove</button>
-  </div>
-</div>
-
-<!-- Export/Import -->
-<div id="Config" class="tabcontent hidden">
-  <h4>Import/Export/Restore Defaults</h4>
-  <button id="default">Restore Defaults</button>
-  <button id="import">Import</button>
-  <button id="export">Export</button>
-  <div id="configNote" class="notes">Import/Export Config:</div>
-  <textarea id="configText"></textarea>
-
-  <div id="setPasswordContainer">
-    <label for="setPassword">Password: </label>
-    <input type="password" id="setPassword">
-    <input type="button" value="Set" id="setPasswordBtn"/>
-  </div>
-</div>
-</div> <!-- #main -->
-
-<!-- Footer -->
-<div id="footer">
+<div id="helpPage" class="w3-container w3-hide">
   <div id="status"></div>
   <span id="contributors">
     <a id="gettingStarted" href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki" target="_blank">Getting Started</a>
@@ -221,6 +107,7 @@
     Created by <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Richard Frost</a><br>
   </span>
 </div>
+
+<script type="module" src="optionPages.js"></script>
 </body>
 </html>
-<script type="module" src="optionPage.js"></script>

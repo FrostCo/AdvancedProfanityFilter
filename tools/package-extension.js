@@ -44,9 +44,11 @@ function updateManifestVersion(manifestPath, manifest) {
   }
 }
 
+// TODO: FIX manifest for static
 const dist = './dist/'
+const static = './static/'
 let zip = new AdmZip();
-let manifestPath = path.join(dist, 'manifest.json');
+let manifestPath = path.join(static, 'manifest.json');
 let manifest = JSON.parse(fs.readFileSync(manifestPath));
 updateManifestVersion(manifestPath, manifest);
 zip.addLocalFolder(dist, null);

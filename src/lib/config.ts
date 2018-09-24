@@ -23,6 +23,7 @@ export default class Config {
     }
   };
 
+  // TODO: Finish removing magic numbers?
   static readonly filterMethods = {
     censor: 0,
     substitute: 1,
@@ -76,7 +77,7 @@ export default class Config {
   };
 
   static readonly _filterMethodNames = ['Censor', 'Substitute', 'Remove'];
-  static readonly _matchMethodNames = ['Exact Match', 'Partial Match', 'Whole Match', 'Per-Word Match', 'Regular Expression'];
+  static readonly _matchMethodNames = ['Exact', 'Partial', 'Whole', 'Per-Word', 'Regular-Expression'];
   static readonly _maxBytes = 6500;
   static readonly _maxWords = 100;
   static readonly _wordsPattern = /^_words\d+/;
