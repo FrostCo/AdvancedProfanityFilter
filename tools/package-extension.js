@@ -4,14 +4,13 @@ const fs = require('fs');
 const path = require('path');
 const AdmZip = require('adm-zip');
 
-function buildChromeExtension(zip) {
+function buildChrome(zip) {
   console.log('Building ./extension-chrome.zip');
   // try { fs.unlinkSync('./dist/filter.js'); } catch {}; // Remove filter.js as its only used for testing
   zip.deleteFile('webFilter.js'); // Remove filter.js as its only used for testing
-  zip.writeZip('./extension-chrome.zip');
+  zip.writeZip(path.join(dist, './extension-chrome.zip'));
 }
 
-// Firefox Extension
 function buildFirefox(manifest, zip) {
   console.log('Building ./extension-firefox.zip');
   let firefoxManifest = {
@@ -23,7 +22,14 @@ function buildFirefox(manifest, zip) {
   };
   manifest.applications = firefoxManifest.applications;
   updateManifestFileInZip(zip, manifest);
-  zip.writeZip('./extension-firefox.zip');
+  zip.writeZip(path.join(dist, './extension-firefox.zip'));
+}
+
+function buildOpera(zip) {
+  console.log('Building ./extension-opera.zip');
+  // try { fs.unlinkSync('./dist/filter.js'); } catch {}; // Remove filter.js as its only used for testing
+  zip.deleteFile('webFilter.js'); // Remove filter.js as its only used for testing
+  zip.writeZip(path.join(dist, './extension-opera.zip'));
 }
 
 function updateManifestFile(file, obj) {
@@ -41,14 +47,17 @@ function updateManifestVersion(manifestPath, manifest) {
     console.log('Version number is being updated: ' + manifest.version + ' -> ' + process.env.npm_package_version)
     manifest.version = process.env.npm_package_version || manifest.version;
     updateManifestFile(manifestPath, manifest);
+    fs.copyFileSync(manifestPath, path.join(dist, 'manifest.json'));
   }
 }
 
 const dist = './dist/'
+const staticDir = './static/'
 let zip = new AdmZip();
-let manifestPath = path.join(dist, 'manifest.json');
+let manifestPath = path.join(staticDir, 'manifest.json');
 let manifest = JSON.parse(fs.readFileSync(manifestPath));
 updateManifestVersion(manifestPath, manifest);
 zip.addLocalFolder(dist, null);
-buildChromeExtension(zip);
+buildChrome(zip);
+buildOpera(zip);
 buildFirefox(manifest, zip);
