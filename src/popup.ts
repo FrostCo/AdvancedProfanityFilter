@@ -188,19 +188,19 @@ class Popup {
   }
 }
 
-// Initial summary data request
-chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-  chrome.tabs.sendMessage(tabs[0].id, {popup: true}, function(response) {
-    popup.populateSummary(response);
-  });
-});
+// // Initial summary data request
+// chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+//   chrome.tabs.sendMessage(tabs[0].id, {popup: true}, function(response) {
+//     popup.populateSummary(response);
+//   });
+// });
 
-// Listen for summary data updates
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    popup.populateSummary(request);
-  }
-);
+// // Listen for summary data updates
+// chrome.runtime.onMessage.addListener(
+//   function(request, sender, sendResponse) {
+//     popup.populateSummary(request);
+//   }
+// );
 
 let popup = new Popup;
 
