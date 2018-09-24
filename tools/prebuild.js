@@ -1,11 +1,11 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+
 // The is a workaround for Chrome extension content scripts not being able to reference other files.
 // It will load all filter dependencies and remove any unsupported import/export statements, and then combine
 // the contents into a single file: filter.bundle.ts. Once this is done you can run `tsc`.
-
-const fs = require('fs');
-const path = require('path');
 
 ////
 // Functions

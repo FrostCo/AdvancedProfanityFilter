@@ -96,20 +96,24 @@ describe('Filter', function() {
         expect(filter.replaceText('A cool example sentence.')).to.equal('A cool ------- sentence.');
       });
 
-      it('Should filter an partial word with preserveFirst and preserveLast', function() {
+      it('Should filter an partial word with preserveFirst and preserveLast and update stats', function() {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
         filter.generateWordList();
         filter.generateRegexpList();
+        expect(filter.counter).to.equal(0);
         expect(filter.replaceText('this sample is a pretty good sampler to sample.')).to.equal('this s****e is a pretty good s****er to s****e.');
+        expect(filter.counter).to.be.above(0);
       });
 
-      it('Should filter a whole word with (_) characters and fixed length (3)', function() {
+      it('Should filter a whole word with (_) characters and fixed length (3) and not update stats', function() {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '_', censorFixedLength: 3, preserveFirst: false, preserveLast: false });
         filter.generateWordList();
         filter.generateRegexpList();
-        expect(filter.replaceText('Words used to be okay, but now even a word is bad.')).to.equal('___ used to be okay, but now even a ___ is bad.');
+        expect(filter.counter).to.equal(0);
+        expect(filter.replaceText('Words used to be okay, but now even a word is bad.', false)).to.equal('___ used to be okay, but now even a ___ is bad.');
+        expect(filter.counter).to.equal(0);
       });
 
       it('Should filter an RegExp and fixed length (5) with preserveLast', function() {
@@ -176,20 +180,24 @@ describe('Filter', function() {
         expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('This Piece is a pretty good piecer to piece.');
       });
 
-      it('Should filter an partial word with substitions not marked, not repeated, and preserveCase', function() {
+      it('Should filter an partial word with substitions not marked, not repeated, and preserveCase and update stats', function() {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: false, preserveCase: true });
         filter.generateWordList();
         filter.generateRegexpList();
+        expect(filter.counter).to.equal(0);
         expect(filter.replaceText('This Sample is a pretty good sampler to saammppllee.')).to.equal('This Piece is a pretty good piecer to saammppllee.');
+        expect(filter.counter).to.be.above(0);
       });
 
-      it('Should filter an partial word with substitions marked and not preserveCase', function() {
+      it('Should filter an partial word with substitions marked and not preserveCase and not update stats', function() {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: false });
         filter.generateWordList();
         filter.generateRegexpList();
-        expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('This [piece] is a pretty good [piece]r to [piece].');
+        expect(filter.counter).to.equal(0);
+        expect(filter.replaceText('This Sample is a pretty good sampler to sample.', false)).to.equal('This [piece] is a pretty good [piece]r to [piece].');
+        expect(filter.counter).to.equal(0);
       });
 
       describe('Unicode characters', function() {
@@ -205,20 +213,24 @@ describe('Filter', function() {
     });
 
     describe('Remove Filter', function() {
-      it('Should filter an exact word', function() {
+      it('Should filter an exact word and update stats', function() {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 });
         filter.generateWordList();
         filter.generateRegexpList();
+        expect(filter.counter).to.equal(0);
         expect(filter.replaceText('A cool, example sentence.')).to.equal('A cool, sentence.');
+        expect(filter.counter).to.be.above(0);
       });
 
-      it('Should filter an partial word', function() {
+      it('Should filter an partial word and not update stats', function() {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 });
         filter.generateWordList();
         filter.generateRegexpList();
-        expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('This is a pretty good to.');
+        expect(filter.counter).to.equal(0);
+        expect(filter.replaceText('This Sample is a pretty good sampler to sample.', false)).to.equal('This is a pretty good to.');
+        expect(filter.counter).to.equal(0);
       });
 
       it('Should filter a RegExp', function() {

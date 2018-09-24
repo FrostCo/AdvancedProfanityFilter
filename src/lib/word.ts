@@ -1,5 +1,5 @@
 export default class Word {
-  private static readonly _escapeRegExp = /[-\/\\^$*+?.()|[\]{}]/g;
+  private static readonly _escapeRegExp = /[\/\\^$*+?.()|[\]{}]/g;
   private static readonly _unicodeRegex = /[^\u0000-\u00ff]/;
   private static readonly _unicodeWordBoundary = '[\\s.,\'"+!?|-]';
   static readonly nonWordRegExp = new RegExp('^\\s*[^\\w]+\\s*$', 'g');
@@ -103,6 +103,7 @@ export default class Word {
 
   // /[-\/\\^$*+?.()|[\]{}]/g
   // /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
+  // Removing '-' for '/пресс-релиз/, giu'
   static escapeRegExp(str: string): string {
     return str.replace(Word._escapeRegExp, '\\$&');
   }

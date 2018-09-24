@@ -2,6 +2,13 @@ import { arrayContains, dynamicList } from './lib/helper.js';
 import WebConfig from './webConfig.js';
 import Domain from './domain.js';
 
+interface Summary {
+  [word: string]: {
+    clean: string;
+    count: number;
+  }
+}
+
 class Popup {
   cfg: WebConfig;
   domain: Domain;
@@ -133,6 +140,29 @@ class Popup {
     }
   }
 
+  populateSummary(message) {
+    if (message && message.summary) {
+      let summary = document.getElementById('summary') as HTMLElement;
+      summary.innerHTML = this.summaryTableHTML(message.summary);
+    } else {
+      // console.log('Unahndled message: ', message); // DEBUG
+    }
+  }
+
+  summaryTableHTML(summary: Summary): string {
+    let tableInnerHTML = '';
+    if (Object.keys(summary).length > 0) {
+      tableInnerHTML = '<table class="w3-table w3-striped w3-border w3-bordered w3-hoverable"><tr class="w3-deep-purple"><th>Word</th><th>Count</th></tr>';
+      Object.keys(summary).forEach(key => {
+        // tableInnerHTML += `<tr><td class="w3-tooltip"><span style="position:absolute;left:0;bottom:18px" class="w3-text w3-tag">${key}</span>${summary[key].clean}</td><td class="w3-right-align">${summary[key].count}</td></tr>`;
+        tableInnerHTML += `<tr><td>${summary[key].clean}</td><td class="w3-right-align">${summary[key].count}</td></tr>`;
+      });
+      tableInnerHTML += '</table>';
+    }
+
+    return tableInnerHTML;
+  }
+
   toggleAdvancedMode() {
     let popup = this;
     if (!popup.protected) {
@@ -157,6 +187,20 @@ class Popup {
     }
   }
 }
+
+// // Initial summary data request
+// chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+//   chrome.tabs.sendMessage(tabs[0].id, {popup: true}, function(response) {
+//     popup.populateSummary(response);
+//   });
+// });
+
+// // Listen for summary data updates
+// chrome.runtime.onMessage.addListener(
+//   function(request, sender, sendResponse) {
+//     popup.populateSummary(request);
+//   }
+// );
 
 let popup = new Popup;
 

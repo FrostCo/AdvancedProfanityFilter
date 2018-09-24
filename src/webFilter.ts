@@ -6,15 +6,18 @@ import WebConfig from './webConfig.js';
 interface Message {
   advanced?: boolean,
   counter?: number,
+  summary?: object,
   disabled?: boolean
 }
 
 export default class WebFilter extends Filter {
   advanced: boolean;
+  summary: object;
 
   constructor() {
     super();
     this.advanced = false;
+    this.summary = {};
   }
 
   checkMutationTargetTextForProfanity(mutation) {
@@ -87,6 +90,15 @@ export default class WebFilter extends Filter {
     return Domain.domainMatch(domain, this.cfg.disabledDomains);
   }
 
+  foundMatch(word) {
+    super.foundMatch(word);
+    if (this.summary[word]) {
+      this.summary[word].count += 1;
+    } else {
+      this.summary[word] = { clean: filter.replaceText(word, false), count: 1 };
+    }
+  }
+
   // Watch for new text nodes and clean them as they are added
   observeNewNodes() {
     let self = this;
@@ -152,7 +164,7 @@ export default class WebFilter extends Filter {
     /* istanbul ignore next */
     // console.count('updateCounterBadge'); // Benchmarking - Executaion Count
     if (this.cfg.showCounter && this.counter > 0) {
-      chrome.runtime.sendMessage({counter: this.counter.toString()});
+      chrome.runtime.sendMessage({counter: this.counter.toString(), summary: this.summary});
     }
   }
 }
@@ -160,6 +172,12 @@ export default class WebFilter extends Filter {
 // Global
 var filter = new WebFilter;
 if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptGlobalScope]'].includes(({}).toString.call(window))) {
+  /* istanbul ignore next */
+  // Send summary data to popup
+  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    if (request.popup) { chrome.runtime.sendMessage({summary: filter.summary}, function(response){}); }
+  });
+
   /* istanbul ignore next */
   filter.cleanPage();
 }
