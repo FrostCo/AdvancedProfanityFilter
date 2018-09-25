@@ -130,6 +130,23 @@ async function updateMigrations(previousVersion) {
     cfg.sanitizeWords();
     cfg.save();
   }
+
+  // [1.2.0] - Change from a word having many substitutions to a single substitution
+  if (isVersionOlder(old, getVersion('1.1.3'))) {
+    let cfg = await WebConfig.build();
+    // console.log('before', JSON.stringify(cfg.words));
+    Object.keys(cfg.words).forEach(word => {
+      let wordObj = cfg.words[word];
+      if (wordObj.hasOwnProperty('words')) {
+        // @ts-ignore
+        wordObj.sub = wordObj.words[0] || '';
+        // @ts-ignore
+        delete wordObj.words;
+      }
+    });
+    // console.log('after', JSON.stringify(cfg.words));
+    cfg.save();
+  }
 }
 
 ////

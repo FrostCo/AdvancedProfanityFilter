@@ -198,22 +198,6 @@ describe('Word', function() {
     });
   });
 
-  describe('randomElement()', function() {
-    it('should return element from defaults when array is empty', function() {
-      let defaults = ['default1', 'default2'];
-      let random = Word.randomElement([], defaults);
-      expect(defaults).to.include(random);
-    });
-
-    it('should return element from array when its not empty', function() {
-      let array = ['element1', 'element2']
-      let defaults = ['default1', 'default2'];
-      let random = Word.randomElement(array, defaults);
-      expect(array).to.include(random);
-      expect(defaults).to.not.include(random);
-    });
-  });
-
   describe('repeatingCharacterRegexp()', function() {
     it('should return string with (+) repeat for RegExp', function() {
       expect(Word.repeatingCharacterRegexp('word')).to.equal('w+o+r+d+');

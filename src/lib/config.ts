@@ -2,7 +2,7 @@ export default class Config {
   advancedDomains: string[];
   censorCharacter: string;
   censorFixedLength: number;
-  defaultSubstitutions: string[];
+  defaultSubstitution: string;
   defaultWordMatchMethod: number;
   defaultWordRepeat: boolean;
   disabledDomains: string[];
@@ -19,7 +19,7 @@ export default class Config {
     [key: string]: {
       matchMethod: number;
       repeat: boolean;
-      words: string[];
+      sub: string;
     }
   };
 
@@ -39,10 +39,10 @@ export default class Config {
   }
 
   static readonly _defaults = {
-    advancedDomains: [],
+    advancedDomains: ['reddit.com'],
     censorCharacter: '*',
     censorFixedLength: 0,
-    defaultSubstitutions: ['censored', 'expletive', 'filtered'],
+    defaultSubstitution: 'censored',
     defaultWordMatchMethod: 0,
     defaultWordRepeat: false,
     disabledDomains: [],
@@ -57,23 +57,23 @@ export default class Config {
   };
 
   static readonly _defaultWords = {
-    'ass': { matchMethod: 0, repeat: true, words: ['butt', 'tail'] },
-    'asses': { matchMethod: 0, repeat: false, words: ['butts'] },
-    'asshole': { matchMethod: 1, repeat: true, words: ['butthole', 'jerk'] },
-    'bastard': { matchMethod: 1, repeat: true, words: ['imperfect', 'impure'] },
-    'bitch': { matchMethod: 1, repeat: true, words: ['jerk'] },
-    'cunt': { matchMethod: 1, repeat: true, words: ['explative'] },
-    'dammit': { matchMethod: 1, repeat: true, words: ['dangit'] },
-    'damn': { matchMethod: 1, repeat: true, words: ['dang', 'darn'] },
-    'dumbass': { matchMethod: 0, repeat: true, words: ['idiot'] },
-    'fuck': { matchMethod: 1, repeat: true, words: ['freak', 'fudge'] },
-    'hell': { matchMethod: 0, repeat: true, words: ['heck'] },
-    'piss': { matchMethod: 1, repeat: true, words: ['pee'] },
-    'pissed': { matchMethod: 0, repeat: true, words: ['ticked'] },
-    'slut': { matchMethod: 1, repeat: true, words: ['imperfect', 'impure'] },
-    'shit': { matchMethod: 1, repeat: true, words: ['crap', 'crud', 'poop'] },
-    'tits': { matchMethod: 1, repeat: true, words: ['explative'] },
-    'whore': { matchMethod: 1, repeat: true, words: ['harlot', 'tramp'] }
+    'ass': { matchMethod: 0, repeat: true, sub: 'butt' },
+    'asses': { matchMethod: 0, repeat: false, sub: 'butts' },
+    'asshole': { matchMethod: 1, repeat: true, sub: 'jerk' },
+    'bastard': { matchMethod: 1, repeat: true, sub: 'jerk' },
+    'bitch': { matchMethod: 1, repeat: true, sub: 'jerk' },
+    'cunt': { matchMethod: 1, repeat: true, sub: 'explative' },
+    'dammit': { matchMethod: 1, repeat: true, sub: 'dangit' },
+    'damn': { matchMethod: 1, repeat: true, sub: 'dang' },
+    'dumbass': { matchMethod: 0, repeat: true, sub: 'idiot' },
+    'fuck': { matchMethod: 1, repeat: true, sub: 'fudge' },
+    'hell': { matchMethod: 0, repeat: true, sub: 'heck' },
+    'piss': { matchMethod: 1, repeat: true, sub: 'pee' },
+    'pissed': { matchMethod: 0, repeat: true, sub: 'ticked' },
+    'slut': { matchMethod: 1, repeat: true, sub: 'tramp' },
+    'shit': { matchMethod: 1, repeat: true, sub: 'crap' },
+    'tits': { matchMethod: 1, repeat: true, sub: 'explative' },
+    'whore': { matchMethod: 1, repeat: true, sub: 'tramp' }
   };
 
   static readonly _filterMethodNames = ['Censor', 'Substitute', 'Remove'];
@@ -94,7 +94,7 @@ export default class Config {
     if (Object.keys(this.words).includes(str)) {
       return false; // Already exists
     } else {
-      this.words[str] = {matchMethod: this.defaultWordMatchMethod, repeat: this.defaultWordRepeat, words: []};
+      this.words[str] = {matchMethod: this.defaultWordMatchMethod, repeat: this.defaultWordRepeat, sub: ''};
       return true;
     }
   }

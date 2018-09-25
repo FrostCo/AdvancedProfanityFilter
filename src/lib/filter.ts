@@ -84,7 +84,7 @@ export class Filter {
 
   // Config Dependencies: filterMethod, wordList,
   // censorFixedLength, preserveFirst, preserveLast, censorCharacter
-  // words, defaultSubstitutions, preserveCase
+  // words, defaultSubstitution, preserveCase
   replaceText(str: string, stats = true): string {
     // console.count('replaceText'); // Benchmarking - Executaion Count
     let self = this;
@@ -119,7 +119,7 @@ export class Filter {
             // console.log('Substitute match:', match, self.cfg.words[self.cfg.wordList[z]].words); // DEBUG
             if (stats) { self.foundMatch(self.cfg.wordList[z]); }
             if (self.wordRegExps[z].unicode) { match = arg2; } // Workaround for unicode word boundaries
-            let sub = Word.randomElement(self.cfg.words[self.cfg.wordList[z]].words, self.cfg.defaultSubstitutions);
+            let sub = self.cfg.words[self.cfg.wordList[z]].sub || self.cfg.defaultSubstitution;
 
             // Make substitution match case of original match
             if (self.cfg.preserveCase) {

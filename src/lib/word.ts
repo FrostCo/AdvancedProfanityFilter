@@ -15,7 +15,7 @@ export default class Word {
 
   // Word must match exactly (not sub-string)
   // /\bword\b/gi
-  static buildExactRegexp(str: string, matchRepeated: boolean = false) {
+  static buildExactRegexp(str: string, matchRepeated: boolean = false): RegExp {
     try {
       if (Word.containsDoubleByte(str)) {
         // Work around for lack of word boundary support for unicode characters
@@ -31,7 +31,7 @@ export default class Word {
 
   // Match any part of a word (sub-string)
   // /word/gi
-  static buildPartRegexp(str: string, matchRepeated: boolean = false) {
+  static buildPartRegexp(str: string, matchRepeated: boolean = false): RegExp {
     try {
       return new RegExp(Word.processPhrase(str, matchRepeated), 'gi');
     } catch(e) {
@@ -41,7 +41,7 @@ export default class Word {
 
   // Match entire word that contains sub-string and surrounding whitespace
   // /\s?\bword\b\s?/gi
-  static buildRegexpForRemoveExact(str: string, matchRepeated: boolean = false) {
+  static buildRegexpForRemoveExact(str: string, matchRepeated: boolean = false): RegExp {
     try {
       if (Word.containsDoubleByte(str)) {
         // Work around for lack of word boundary support for unicode characters
@@ -57,7 +57,7 @@ export default class Word {
 
   // Match entire word that contains sub-string and surrounding whitespace
   // /\s?\b[\w-]*word[\w-]*\b\s?/gi
-  static buildRegexpForRemovePart(str: string, matchRepeated: boolean = false) {
+  static buildRegexpForRemovePart(str: string, matchRepeated: boolean = false): RegExp {
     try {
       if (Word.containsDoubleByte(str)) {
         // Work around for lack of word boundary support for unicode characters
@@ -73,7 +73,7 @@ export default class Word {
 
   // Match entire word that contains sub-string
   // /\b[\w-]*word[\w-]*\b/gi
-  static buildWholeRegexp(str: string, matchRepeated: boolean = false) {
+  static buildWholeRegexp(str: string, matchRepeated: boolean = false): RegExp {
     try {
       if (Word.containsDoubleByte(str)) {
         // Work around for lack of word boundary support for unicode characters
@@ -95,7 +95,7 @@ export default class Word {
     return string.charAt(0).toUpperCase() === string.charAt(0);
   }
 
-  static containsDoubleByte(str) {
+  static containsDoubleByte(str): boolean {
     if (!str.length) return false;
     if (str.charCodeAt(0) > 255) return true;
     return Word._unicodeRegex.test(str);
@@ -117,13 +117,6 @@ export default class Word {
     }
 
     return escaped;
-  }
-
-  static randomElement(array: string[], defaults: string[]) {
-    if (array.length === 0) {
-      array = defaults;
-    }
-    return array[Math.floor((Math.random()*array.length))];
   }
 
   // Regexp to match repeating characters
