@@ -4,10 +4,10 @@ import Config from '../../dist/lib/config';
 import {Filter} from '../../dist/lib/filter';
 
 const testWords = {
-  'example': { matchMethod: 0, repeat: true, words: ['demo'] },
-  'placeholder': { matchMethod: 0, repeat: false, words: ['variable'] },
-  'sample': { matchMethod: 1, repeat: false, words: ['piece'] },
-  'word': { matchMethod: 2, repeat: true, words: ['idea'] }
+  'example': { matchMethod: 0, repeat: true, sub: 'demo' },
+  'placeholder': { matchMethod: 0, repeat: false, sub: 'variable' },
+  'sample': { matchMethod: 1, repeat: false, sub: 'piece' },
+  'word': { matchMethod: 2, repeat: true, sub: 'idea' }
 }
 
 describe('Filter', function() {
@@ -180,6 +180,15 @@ describe('Filter', function() {
         expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('This Piece is a pretty good piecer to piece.');
       });
 
+      it('Should filter an partial word with defaultSubstitution not marked and preserveCase', function() {
+        let filter = new Filter;
+        filter.cfg = new Config({ words: Object.assign({}, testWords), defaultSubstitution: 'censored', filterMethod: 1, globalMatchMethod: 3, substitutionMark: false, preserveCase: true });
+        filter.cfg.words['this'] = { matchMethod: 0, repeat: true, sub: '' };
+        filter.generateWordList();
+        filter.generateRegexpList();
+        expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('Censored Piece is a pretty good piecer to piece.');
+      });
+
       it('Should filter an partial word with substitions not marked, not repeated, and preserveCase and update stats', function() {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: false, preserveCase: true });
@@ -204,7 +213,7 @@ describe('Filter', function() {
         it('Should filter an exact word with substitions marked and preserveCase with repeated characters', function() {
           let filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: true });
-          filter.cfg.words['врата'] = { matchMethod: 0, repeat: true, words: ['door'] };
+          filter.cfg.words['врата'] = { matchMethod: 0, repeat: true, sub: 'door' };
           filter.generateWordList();
           filter.generateRegexpList();
           expect(filter.replaceText('this even works on unicode WORDS like Врата, cool huh?')).to.equal('this even works on unicode [IDEA] like [Door], cool huh?');

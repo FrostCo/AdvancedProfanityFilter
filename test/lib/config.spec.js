@@ -22,7 +22,7 @@ describe('Config', function() {
       expect(Object.keys(config.words)).to.include('newword');
       expect(config.words['newword'].matchMethod).to.equal(config.defaultWordMatchMethod);
       expect(config.words['newword'].repeat).to.equal(config.defaultWordRepeat);
-      expect(config.words['newword'].words).to.eql([]);
+      expect(config.words['newword'].sub).to.equal('');
     });
 
     it('should sanitize a new word before adding', function() {
@@ -30,7 +30,7 @@ describe('Config', function() {
       expect(Object.keys(config.words)).to.include('anothernewword');
       expect(config.words['anothernewword'].matchMethod).to.equal(config.defaultWordMatchMethod);
       expect(config.words['anothernewword'].repeat).to.equal(config.defaultWordRepeat);
-      expect(config.words['anothernewword'].words).to.eql([]);
+      expect(config.words['anothernewword'].sub).to.equal('');
     });
 
     it('should return false when word is already present', function() {
