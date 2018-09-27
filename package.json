@@ -4,16 +4,17 @@
   "description": "A browser extension to filter profanity from webpages.",
   "main": "filter.js",
   "scripts": {
-    "build": "npm run clean && npm run copy-static && node ./tools/prebuild.js && npm run lint && tsc",
+    "build": "npm run clean && npm run copy-static && node ./tools/prebuild.js && tsc",
     "build-no-verify": "node ./tools/prebuild.js && tsc",
     "clean": "node ./tools/clean-dist.js",
     "copy-static": "node ./tools/copy-static.js",
     "debug-test": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
     "lint": "npx eslint ./src/*.ts",
-    "package": "npm run build && npm test && node ./tools/package-extension.js",
+    "package": "npm run lint && npm run build && npm test && node ./tools/package-extension.js",
     "package-no-build": "node ./tools/package-extension.js",
     "test-no-coverage": "npx mocha",
-    "test": "npx nyc --reporter=lcov --reporter=text npx mocha"
+    "test": "npx nyc --reporter=lcov --reporter=text npx mocha",
+    "watch": "node tools/watch.js"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,7 @@
     "babel-preset-env": "latest",
     "babel-require": "latest",
     "chai": "latest",
+    "chokidar": "^2.0.4",
     "eslint": "^5.2.0",
     "eslint-plugin-typescript": "^0.12.0",
     "fs-extra": "^7.0.0",
