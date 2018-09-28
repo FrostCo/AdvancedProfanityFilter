@@ -1,38 +1,53 @@
 const chokidar = require('chokidar');
-const exec = require('child_process').exec
+const execSync = require('child_process').execSync;
 const path = require('path');
+const fse = require('fs-extra');
 
-function copyStatic() {
-  exec('npm run copy-static', function(err, stdout, stderr) {
-    if (err) throw err;
-    else console.log(stdout);
-  });
+function copyStatic(file) {
+  let basename = path.basename(file);
+  console.log('Copying static file: ', basename);
+  fse.copySync(file, path.join('./dist/', basename));
+
+  // Copy all static files
+  // exec('npm run copy-static', function(err, stdout, stderr) {
+  //   if (err) throw err;
+  //   else console.log(stdout);
+  // });
 }
 
-function runBuild() {
-  exec('npm run build', function(err, stdout, stderr) {
-    if (err) throw err;
-    else console.log(stdout);
-  });
+function copyTypeScript(file) {
+  let basename = path.basename(file);
+  console.log('TypeScript file updated: ', basename)
+
+  if (tsBundleFiles.includes(basename)) {
+    console.log('Prebuild Typescript...');
+    execSync('node ./tools/prebuild.js');
+  }
+
+  console.log('Running TypeScript...');
+  execSync('tsc');
+  console.log('Done.');
 }
 
+const tsBundleFiles = ['webFilter.ts', 'helper.ts', 'domain.ts', 'word.ts', 'filter.ts', 'page.ts', 'config.ts', 'webConfig.ts'];
 var watcher = chokidar.watch(
   [
     path.join(process.cwd() + '/src/**/*.ts'),
     path.join(process.cwd() + '/static/**/*.(css|html|json|)')
   ], {
-  ignored: /.*\.bundle\.ts/,
-  persistent: true
-});
+    ignored: /.*\.bundle\.ts/,
+    awaitWriteFinish: true,
+    persistent: true
+  }
+);
 
 var log = console.log.bind(console);
+// watcher.on('add', filePath => log(`File ${filePath} has been added`))
+// watcher.on('unlink', filePath => log(`File ${filePath} has been removed`));
+watcher.on('ready', () => log('Initial scan complete. Ready for changes\n\n'));
 
-watcher
-.on('add', path => log(`File ${path} has been added`))
-.on('unlink', path => log(`File ${path} has been removed`))
-.on('ready', () => log('Initial scan complete. Ready for changes'));
-
-watcher.on('change', (path, stats) => {
-  if (path.match(/[\/\\]static[\/\\]/)) { copyStatic(); }
-  if (path.match(/[\/\\]src[\/\\]/)) { runBuild(); }
+watcher.on('change', (filePath, stats) => {
+  // console.log(filePath, stats);
+  if (filePath.match(/[\/\\]static[\/\\]/)) { copyStatic(filePath); }
+  if (filePath.match(/[\/\\]src[\/\\]/)) { copyTypeScript(filePath); }
 });
