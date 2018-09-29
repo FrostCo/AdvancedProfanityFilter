@@ -14,7 +14,6 @@ export default class Config {
   preserveLast: boolean;
   showCounter: boolean;
   substitutionMark: boolean;
-  wordList: string[];
   words: {
     [key: string]: {
       matchMethod: number;
@@ -65,11 +64,11 @@ export default class Config {
     'cunt': { matchMethod: 1, repeat: true, sub: 'explative' },
     'dammit': { matchMethod: 1, repeat: true, sub: 'dangit' },
     'damn': { matchMethod: 1, repeat: true, sub: 'dang' },
-    'dumbass': { matchMethod: 0, repeat: true, sub: 'idiot' },
+    'dumbass': { matchMethod: 1, repeat: true, sub: 'idiot' },
     'fuck': { matchMethod: 1, repeat: true, sub: 'fudge' },
     'hell': { matchMethod: 0, repeat: true, sub: 'heck' },
     'piss': { matchMethod: 1, repeat: true, sub: 'pee' },
-    'pissed': { matchMethod: 0, repeat: true, sub: 'ticked' },
+    'pissed': { matchMethod: 1, repeat: true, sub: 'ticked' },
     'slut': { matchMethod: 1, repeat: true, sub: 'tramp' },
     'shit': { matchMethod: 1, repeat: true, sub: 'crap' },
     'tits': { matchMethod: 1, repeat: true, sub: 'explative' },

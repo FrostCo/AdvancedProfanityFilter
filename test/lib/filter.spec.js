@@ -16,8 +16,8 @@ describe('Filter', function() {
       let filter = new Filter;
       filter.cfg = new Config({ words: Object.assign({}, testWords) });
       filter.generateWordList();
-      expect(filter.cfg.wordList.length).to.equal(4);
-      expect(filter.cfg.wordList).to.eql(['placeholder', 'example', 'sample', 'word']);
+      expect(filter.wordList.length).to.equal(4);
+      expect(filter.wordList).to.eql(['placeholder', 'example', 'sample', 'word']);
     });
   });
 
