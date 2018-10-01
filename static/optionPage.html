@@ -117,6 +117,11 @@
       Show number of filtered words
       <span class="notes">(Shown over the extension icon)</span>
     </label>
+    <br>
+    <label>
+      <input id="filterWordList" type="checkbox" class="w3-check">
+      Filter word list in Options
+    </label>
   </div>
 
   <div id="defaultOptions">
@@ -126,10 +131,13 @@
       Match repeated characters in words
       <span class="notes">(Dog: dddoooggg)</span>
     </label>
-    <br />
-    <div id="defaultMatchMethod">
-      <label>
-        Word Match Method:
+    <div id="defaultWordSubstitution" style="padding-top:8px;">
+      <label>Substitution
+        <input id="defaultWordSubstitutionText" class="w3-input w3-border small" style="display:inline;">
+      </label>
+    </div>
+    <div id="defaultMatchMethod" style="padding-top:8px;">
+      <label>Match Method
         <select id="defaultWordMatchMethodSelect" class="w3-select w3-border small"></select>
       </label>
     </div>

@@ -154,10 +154,12 @@ export default class OptionPage {
     let selectedFilter = document.getElementById(`filter${WebConfig._filterMethodNames[option.cfg.filterMethod]}`) as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
     let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
+    let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     selectedFilter.checked = true;
-    showCounter.checked = this.cfg.showCounter;
     dynamicList(WebConfig._matchMethodNames.slice(0, -1), 'globalMatchMethodSelect');
     globalMatchMethodSelect.selectedIndex = this.cfg.globalMatchMethod;
+    showCounter.checked = this.cfg.showCounter;
+    filterWordList.checked = this.cfg.filterWordList;
 
     // Censor Settings
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
@@ -179,6 +181,8 @@ export default class OptionPage {
     let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
     let defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
     defaultWordRepeat.checked = this.cfg.defaultWordRepeat;
+    let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
+    defaultWordSubstitution.value = this.cfg.defaultSubstitution;
     let defaultWordMatchMethodSelectHTML = '';
     for(let i = 0; i < WebConfig._matchMethodNames.slice(0,-2).length; i++) {
       defaultWordMatchMethodSelectHTML += '<option value="'+WebConfig._matchMethodNames[i]+'">'+WebConfig._matchMethodNames[i]+'</option>';
@@ -233,7 +237,7 @@ export default class OptionPage {
 
     Object.keys(option.cfg.words).sort().forEach(word => {
       let filteredWord = word;
-      filteredWord = filter.replaceText(word, false);
+      if (this.cfg.filterWordList) filteredWord = filter.replaceText(word, false);
       wordListHTML += `<option value="${word}" data-filtered="${filteredWord}">${filteredWord}</option>`;
     });
 
@@ -285,7 +289,9 @@ export default class OptionPage {
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
+    let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
+    let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     self.cfg.censorCharacter = censorCharacterSelect.value;
     self.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
@@ -295,7 +301,9 @@ export default class OptionPage {
     self.cfg.preserveFirst = preserveFirst.checked;
     self.cfg.preserveLast = preserveLast.checked;
     self.cfg.showCounter = showCounter.checked;
+    self.cfg.filterWordList = filterWordList.checked;
     self.cfg.substitutionMark = substitutionMark.checked;
+    self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
 
     // Save settings
     let error = await self.cfg.save();
@@ -372,18 +380,21 @@ export default class OptionPage {
         OptionPage.show(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
         OptionPage.show(document.getElementById('globalMatchMethod'));
+        OptionPage.hide(document.getElementById('defaultWordSubstitution'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
       case 1: // Substitution
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.show(document.getElementById('substitutionSettings'));
         OptionPage.show(document.getElementById('globalMatchMethod'));
+        OptionPage.show(document.getElementById('defaultWordSubstitution'));
         OptionPage.show(document.getElementById('wordSubstitution'));
         break;
       case 2: // Remove
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
         OptionPage.hide(document.getElementById('globalMatchMethod'));
+        OptionPage.hide(document.getElementById('defaultWordSubstitution'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
     }
@@ -396,14 +407,10 @@ export default class OptionPage {
           if (original != '' && option.cfg[attr].includes(original)) {
             // Update existing record (remove it before adding the new record)
             option.cfg[attr].splice(option.cfg[attr].indexOf(original), 1);
-            // console.log('Removed original: ', original);
           }
           // Save new record
-          option.cfg[attr].push(input.value);
+          option.cfg[attr].push(input.value.trim().toLowerCase());
           option.cfg[attr] = option.cfg[attr].sort();
-          // console.log('adding new item: ', input.value);
-          // console.log('saving: ', option.cfg[attr]);
-          input.value = '';
         } else {
           // OptionPage.updateStatus('Error: Already in list.', true, 3000);
         }
@@ -432,7 +439,9 @@ document.getElementById('preserveCase').addEventListener('click', e => { option.
 document.getElementById('preserveFirst').addEventListener('click', e => { option.saveOptions(e)});
 document.getElementById('preserveLast').addEventListener('click', e => { option.saveOptions(e)});
 document.getElementById('showCounter').addEventListener('click', e => { option.saveOptions(e)});
+document.getElementById('filterWordList').addEventListener('click', e => { option.saveOptions(e)});
 document.getElementById('substitutionMark').addEventListener('click', e => { option.saveOptions(e)});
+document.getElementById('defaultWordSubstitutionText').addEventListener('change', e => { option.saveOptions(e)});
 // Words/Phrases
 document.getElementById('wordList').addEventListener('click', e => { option.populateWord(); });
 document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });

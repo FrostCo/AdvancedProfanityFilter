@@ -13,6 +13,7 @@ export default class Config {
   defaultWordRepeat: boolean;
   disabledDomains: string[];
   filterMethod: number;
+  filterWordList: boolean;
   globalMatchMethod: number;
   password: string;
   preserveCase: boolean;
@@ -48,6 +49,7 @@ export default class Config {
     defaultWordRepeat: false,
     disabledDomains: [],
     filterMethod: 0, // ['Censor', 'Substitute', 'Remove'];
+    filterWordList: true,
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
     password: null,
     preserveCase: true,
