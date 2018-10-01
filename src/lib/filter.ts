@@ -20,7 +20,6 @@ export class Filter {
   // ["exact", "partial", "whole", "disabled"]
   generateRegexpList() {
     // Clean wordRegExps if there are already some present
-    if (this.wordList.length === 0) this.generateWordList();
     if (this.wordRegExps.length > 0) this.wordRegExps = [];
 
     // console.time('generateRegexpList'); // Benchmark - Call Time
@@ -177,5 +176,10 @@ export class Filter {
         break;
     }
     return str;
+  }
+
+  init() {
+    this.generateWordList();
+    this.generateRegexpList();
   }
 }

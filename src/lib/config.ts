@@ -95,7 +95,9 @@ export default class Config {
     if (Object.keys(this.words).includes(str)) {
       return false; // Already exists
     } else if (options) {
+      options.sub = options.sub.trim().toLowerCase();
       this.words[str] = options;
+      return true;
     } else {
       this.words[str] = {matchMethod: this.defaultWordMatchMethod, repeat: this.defaultWordRepeat, sub: ''};
       return true;

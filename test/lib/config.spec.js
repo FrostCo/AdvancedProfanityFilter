@@ -25,6 +25,15 @@ describe('Config', function() {
       expect(config.words['newword'].sub).to.equal('');
     });
 
+    it('should add a new word to the config with provided options', function() {
+      let wordOptions = {matchMethod: 1, repeat: true, sub: 'Older-word'};
+      expect(config.addWord('newer-word', wordOptions)).to.equal(true);
+      expect(Object.keys(config.words)).to.include('newer-word');
+      expect(config.words['newer-word'].matchMethod).to.equal(wordOptions.matchMethod);
+      expect(config.words['newer-word'].repeat).to.equal(wordOptions.repeat);
+      expect(config.words['newer-word'].sub).to.equal(wordOptions.sub.toLowerCase());
+    });
+
     it('should sanitize a new word before adding', function() {
       expect(config.addWord('anotherNewWord')).to.equal(true);
       expect(Object.keys(config.words)).to.include('anothernewword');
