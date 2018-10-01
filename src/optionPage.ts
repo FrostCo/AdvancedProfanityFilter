@@ -81,7 +81,7 @@ export default class OptionPage {
   }
 
   async populateOptions() {
-    filter.generateRegexpList();
+    filter.init();
     this.populateSettings();
     this.populateWordsList();
     this.advancedDomainList();
@@ -134,7 +134,7 @@ export default class OptionPage {
   }
 
   populateWord() {
-    let wordList = document.getElementById('wordList') as HTMLInputElement;
+    let wordList = document.getElementById('wordList') as HTMLSelectElement;
     let wordText = document.getElementById('wordText') as HTMLInputElement;
     let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
@@ -157,17 +157,18 @@ export default class OptionPage {
   }
 
   populateWordsList() {
-    let wordList = document.getElementById('wordList') as HTMLInputElement;
+    filter.init();
+    let wordList = document.getElementById('wordList') as HTMLSelectElement;
     let wordListHTML = '<option selected value="">Add...</option>';
 
     // Workaround for Remove filter (use censor)
     let filterMethod = filter.cfg.filterMethod;
     if (filterMethod === 2) {
       filter.cfg.filterMethod = 0;
-      filter.generateRegexpList();
+      filter.init();
     }
 
-    Object.keys(option.cfg.words).forEach(word => {
+    Object.keys(option.cfg.words).sort().forEach(word => {
       let filteredWord = word;
       filteredWord = filter.replaceText(word, false);
       wordListHTML += `<option value="${word}" data-filtered="${filteredWord}">${filteredWord}</option>`;
@@ -176,7 +177,7 @@ export default class OptionPage {
     // Workaround for Remove filter (use censor)
     if (filterMethod === 2) {
       filter.cfg.filterMethod = filterMethod;
-      filter.generateRegexpList();
+      filter.init();
     }
 
     wordList.innerHTML = wordListHTML;
@@ -229,9 +230,8 @@ export default class OptionPage {
     }
   }
 
-  // if word has changed, update and remove old word
   async saveWord(evt) {
-    let wordList = document.getElementById('wordList') as HTMLInputElement;
+    let wordList = document.getElementById('wordList') as HTMLSelectElement;
     let wordText = document.getElementById('wordText') as HTMLInputElement;
     let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
@@ -245,8 +245,8 @@ export default class OptionPage {
     };
 
     if (wordList.value === '') { // New record
-      let result = this.cfg.addWord(word, wordOptions);
       // console.log('Adding new word: ', word, wordOptions); // DEBUG
+      let result = this.cfg.addWord(word, wordOptions);
     } else { // Updating existing record
       let originalWord = wordList.value;
       if (originalWord == word) { // Word options changed
@@ -255,21 +255,24 @@ export default class OptionPage {
       } else { // Existing word modified
         // console.log('Modifying existing word: ', word, wordOptions); // DEBUG
         let result = this.cfg.addWord(word, wordOptions);
-        // console.log('test: ', JSON.stringify(this.cfg.words));
         delete this.cfg.words[originalWord];
-        // console.log('test: ', JSON.stringify(this.cfg.words));
       }
     }
 
-    // this.saveOptions(evt); TODO
-    // Clear form? TODO
+    await this.saveOptions(evt);
+
+    // Update states and Reset word form
+    filter.init();
+    wordList.selectedIndex = 0;
+    this.populateWordsList();
   }
 
   async selectFilterMethod(evt) {
     option.cfg.filterMethod = WebConfig._filterMethodNames.indexOf(evt.target.value);
     let error = await option.cfg.save('filterMethod');
+    this.init();
     // TODO: Handle error
-    option.updateFilterOptions();
+    // option.updateFilterOptions();
   }
 
   switchPage(ev) {
