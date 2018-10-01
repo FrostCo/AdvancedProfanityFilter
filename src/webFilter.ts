@@ -53,6 +53,7 @@ export default class WebFilter extends Filter {
   }
 
   async cleanPage() {
+    // @ts-ignore: Type WebConfig is not assignable to type Config
     this.cfg = await WebConfig.build();
 
     // Don't run if this is a disabled domain

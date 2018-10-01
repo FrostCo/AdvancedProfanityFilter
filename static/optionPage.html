@@ -17,8 +17,8 @@
   <a href="#" class="w3-bar-item w3-button">Words</a>
   <a href="#" class="w3-bar-item w3-button">Domains</a>
   <a href="#" class="w3-bar-item w3-button">Config</a>
-  <a href="#" class="w3-bar-item w3-button">Test</a>
   <a href="#" class="w3-bar-item w3-button w3-right">Help</a>
+  <a href="#" class="w3-bar-item w3-button w3-right">Test</a>
 </div>
 
 <div id="settingsPage" class="w3-container">
@@ -137,16 +137,14 @@
 </div>
 
 <div id="wordsPage" class="w3-hide w3-container">
-  <h4 class="w3-text-teal">Word/Phrase</h4>
-
+  <h5 class="w3-text-teal">Words & Phrases</h5>
   <select id="wordList" class="w3-select w3-border small"></select>
 
-  <label class="w3-right">
-    <input id="wordText" class="w3-input w3-border small" type="text">
-  </label>
+  <h5 class="w3-text-teal">Word/Phrase</h5>
+  <input id="wordText" class="w3-input w3-border small" type="text">
 
-  <div id="wordSubstitution" class="w3-hide w3-right">
-    <b class="w3-text-teal">Substitution</b>
+  <div id="wordSubstitution" class="w3-hide">
+    <h5 class="w3-text-teal">Substitution</h5>
     <input id="substitutionText" class="w3-input w3-border small"/>
   </div>
 
@@ -182,39 +180,50 @@
     </label>
   </div>
   <br/>
-  <button id="wordSave" class="w3-btn w3-round-xxlarge w3-green w3-right">SAVE</button>
+
+  <div class="w3-right">
+    <button id="wordSave" class="w3-btn w3-round-large w3-flat-nephritis">SAVE</button>
+    <button id="wordRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
+  </div>
 </div>
 
 <div id="domainsPage" class="w3-padding w3-hide">
   <div id="advDomainContainer" class="w3-half">
     <h4 class="w3-text-teal">Advanced Domains</h4>
     <select id="advDomainSelect" class="w3-select w3-border small"></select>
-    <input id="advDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.\-]+$"/>
-    <button id="advDomainSave" class="w3-btn w3-round-xxlarge w3-green w3-right">SAVE</button>
-    <button id="advDomainRemove" class="w3-btn w3-round-xxlarge w3-red w3-right w3-hide w3-animate-opacity">REMOVE</button>
+    <h5 class="w3-text-teal">Domain</h5>
+    <input id="advDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
+    <div style="padding-top: 16px;">
+      <button id="advDomainSave" class="w3-btn w3-round-large w3-flat-nephritis">SAVE</button>
+      <button id="advDomainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
+    </div>
   </div>
 
   <div id="disabledDomainContainer" class="w3-half w3-right">
     <h4 class="w3-text-teal">Whitelist Domains</h4>
     <select id="disabledDomainSelect" class="w3-select w3-border small"></select>
-    <input id="disabledDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.\-]+$"/>
-    <button id="disabledDomainSave" class="w3-btn w3-round-xxlarge w3-green w3-right">SAVE</button>
-    <button id="disabledDomainRemove" class="w3-btn w3-round-xxlarge w3-red w3-right w3-hide w3-animate-opacity">REMOVE</button>
+    <h5 class="w3-text-teal">Domain</h5>
+    <input id="disabledDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
+    <div style="padding-top: 16px;">
+      <button id="disabledDomainSave" class="w3-btn w3-round-large w3-flat-nephritis">SAVE</button>
+      <button id="disabledDomainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
+    </div>
   </div>
 </div>
 
 <div id="configPage" class="w3-hide w3-container">
-  <button id="configExport" class="w3-btn w3-round-xxlarge w3-margin w3-blue">Export</button>
-  <button id="configImport" class="w3-btn w3-round-xxlarge w3-margin w3-blue">Import</button>
-  <button id="configReset" class="w3-btn w3-round-xxlarge w3-margin w3-red w3-right">RESET</button>
-
-  <textarea id="configText" class="w3-input w3-border w3-card" type="text" style="width: 500px; height: 550px;"></textarea>
+  <div style="padding-top:16px;padding-bottom:16px;width:500px;">
+    <button id="configExport" class="w3-btn w3-round-large w3-flat-peter-river">EXPORT</button>
+    <button id="configImport" class="w3-btn w3-round-large w3-flat-peter-river">IMPORT</button>
+    <button id="configReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESET</button>
+  </div>
+  <textarea id="configText" class="w3-input w3-border w3-card padding" type="text" style="width:500px;height:550px;"></textarea>
 </div>
 
 <div id="securityPage" class="w3-hide">security</div>
 
 <div id="testPage" class="w3-padding w3-hide">
-  <h4 class="w3-text-teal">Test Text</h4>
+  <h4 class="w3-text-teal">Test</h4>
   <textarea id="testText" class="w3-input w3-border" type="text"></textarea>
   <h4 class="w3-text-teal">Filtered</h4>
   <div id="filteredTestText" class="w3-panel w3-pale-blue w3-leftbar w3-border-blue"></div>

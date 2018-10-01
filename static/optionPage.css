@@ -2,5 +2,7 @@ body
 {max-width: 1024px; min-height: 768px}
 #menu > a:hover
 {color:#fff!important;background-color:#2980b9!important}
+.disabled
+{cursor:not-allowed!important;}
 .small
 {width:300px}

@@ -6,6 +6,16 @@ import {Filter} from './lib/filter.js';
 export default class OptionPage {
   cfg: WebConfig;
 
+  static disableBtn(element) {
+    element.classList.add('disabled');
+    element.classList.add('w3-flat-silver');
+  }
+
+  static enableBtn(element) {
+    element.classList.remove('disabled');
+    element.classList.remove('w3-flat-silver');
+  }
+
   static hide(element) {
     element.classList.add('w3-hide');
   }
@@ -23,17 +33,27 @@ export default class OptionPage {
     let domainListHTML = '<option selected value="">Add...</option>';
     this.cfg.advancedDomains.forEach(domain => { domainListHTML += `<option value="${domain}">${domain}</option>`; });
     advDomains.innerHTML = domainListHTML;
+    this.advancedDomainPopulate();
   }
 
-  advancedDomainPopulate(evt) {
+  advancedDomainPopulate() {
     let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
     let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
     let advDomainRemove = document.getElementById('advDomainRemove') as HTMLInputElement;
-    advDomains.value !== '' ? OptionPage.show(advDomainRemove) : OptionPage.hide(advDomainRemove);
+    advDomains.value !== '' ? OptionPage.enableBtn(advDomainRemove) : OptionPage.disableBtn(advDomainRemove);
     advDomainText.value = advDomains.value;
   }
 
-  advancedDomainSave(evt) {
+  async advancedDomainRemove(evt) {
+    if (evt.target.classList.contains('disabled')) return false;
+    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
+    let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
+    option.cfg['advancedDomains'].splice(option.cfg['advancedDomains'].indexOf(advDomains.value), 1);
+    let error = await option.cfg.save('advancedDomains');
+    this.advancedDomainList();
+  }
+
+  async advancedDomainSave(evt) {
     let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
     let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
     if (advDomains.value == '') { // New record
@@ -41,6 +61,45 @@ export default class OptionPage {
     } else { // Updating existing record
       option.updateItemList(evt, advDomainText, 'advancedDomains', advDomains.value);
     }
+    let error = await option.cfg.save('advancedDomains');
+    this.advancedDomainList();
+  }
+
+  disabledDomainList() {
+    let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
+    let domainListHTML = '<option selected value="">Add...</option>';
+    this.cfg.disabledDomains.forEach(domain => { domainListHTML += `<option value="${domain}">${domain}</option>`; });
+    disabledDomains.innerHTML = domainListHTML;
+    this.disabledDomainPopulate();
+  }
+
+  disabledDomainPopulate() {
+    let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
+    let disabledDomainText = document.getElementById('disabledDomainText') as HTMLInputElement;
+    let disabledDomainRemove = document.getElementById('disabledDomainRemove') as HTMLInputElement;
+    disabledDomains.value !== '' ? OptionPage.enableBtn(disabledDomainRemove) : OptionPage.disableBtn(disabledDomainRemove);
+    disabledDomainText.value = disabledDomains.value;
+  }
+
+  async disabledDomainRemove(evt) {
+    if (evt.target.classList.contains('disabled')) return false;
+    let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
+    let disabledDomainText = document.getElementById('disabledDomainText') as HTMLInputElement;
+    option.cfg['disabledDomains'].splice(option.cfg['disabledDomains'].indexOf(disabledDomains.value), 1);
+    let error = await option.cfg.save('disabledDomains');
+    this.disabledDomainList();
+  }
+
+  async disabledDomainSave(evt) {
+    let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
+    let disabledDomainText = document.getElementById('disabledDomainText') as HTMLInputElement;
+    if (disabledDomains.value == '') { // New record
+      option.updateItemList(evt, disabledDomainText, 'disabledDomains');
+    } else { // Updating existing record
+      option.updateItemList(evt, disabledDomainText, 'disabledDomains', disabledDomains.value);
+    }
+    let error = await option.cfg.save('disabledDomains');
+    this.disabledDomainList();
   }
 
   exportConfig() {
@@ -85,6 +144,7 @@ export default class OptionPage {
     this.populateSettings();
     this.populateWordsList();
     this.advancedDomainList();
+    this.disabledDomainList();
   }
 
   populateSettings() {
@@ -138,15 +198,18 @@ export default class OptionPage {
     let wordText = document.getElementById('wordText') as HTMLInputElement;
     let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
+    let wordRemove = document.getElementById('wordRemove') as HTMLInputElement;
     let word = wordList.value;
 
     if (word == '') { // New word
       wordText.value = '';
+      OptionPage.disableBtn(wordRemove);
       let selectedMatchMethod = document.getElementById(`wordMatch${WebConfig._matchMethodNames[option.cfg.defaultWordMatchMethod]}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
       wordMatchRepeated.checked = option.cfg.defaultWordRepeat;
       substitutionText.value = '';
     } else { // Existing word
+      OptionPage.enableBtn(wordRemove);
       let wordCfg = option.cfg.words[word];
       wordText.value = word;
       let selectedMatchMethod = document.getElementById(`wordMatch${WebConfig._matchMethodNames[wordCfg.matchMethod]}`) as HTMLInputElement;
@@ -182,6 +245,20 @@ export default class OptionPage {
 
     wordList.innerHTML = wordListHTML;
     this.populateWord();
+  }
+
+  async removeWord(evt) {
+    if (evt.target.classList.contains('disabled')) return false;
+    let wordList = document.getElementById('wordList') as HTMLSelectElement;
+    let word = wordList.value;
+
+    delete this.cfg.words[word];
+    await this.saveOptions(evt);
+
+    // Update states and Reset word form
+    filter.init();
+    wordList.selectedIndex = 0;
+    this.populateWordsList();
   }
 
   async restoreDefaults(evt) {
@@ -326,7 +403,6 @@ export default class OptionPage {
           option.cfg[attr] = option.cfg[attr].sort();
           // console.log('adding new item: ', input.value);
           // console.log('saving: ', option.cfg[attr]);
-          // option.saveOptions(event);
           input.value = '';
         } else {
           // OptionPage.updateStatus('Error: Already in list.', true, 3000);
@@ -345,17 +421,8 @@ let option = new OptionPage;
 // Add event listeners to DOM
 window.addEventListener('load', function(event) { option.init(); });
 document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click', e => { option.switchPage(e); }); });
+// Settings
 document.querySelectorAll('#filterMethod input').forEach(el => { el.addEventListener('click', e => { option.selectFilterMethod(e); }); });
-document.getElementById('testText').addEventListener('input', e => { option.populateTest(e); });
-document.getElementById('configReset').addEventListener('click', e => { option.restoreDefaults(e); });
-document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });
-document.getElementById('configImport').addEventListener('click', e => { option.importConfig(e); });
-document.getElementById('advDomainSelect').addEventListener('change', e => { option.advancedDomainPopulate(e); });
-document.getElementById('advDomainSave').addEventListener('click', e => { option.advancedDomainSave(e); });
-document.getElementById('wordList').addEventListener('click', e => { option.populateWord(); });
-document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
-
-// Settings page to save on change
 document.getElementById('censorCharacterSelect').addEventListener('click', e => { option.saveOptions(e)});
 document.getElementById('censorFixedLengthSelect').addEventListener('click', e => { option.saveOptions(e)});
 document.getElementById('defaultWordMatchMethodSelect').addEventListener('click', e => { option.saveOptions(e)});
@@ -366,3 +433,20 @@ document.getElementById('preserveFirst').addEventListener('click', e => { option
 document.getElementById('preserveLast').addEventListener('click', e => { option.saveOptions(e)});
 document.getElementById('showCounter').addEventListener('click', e => { option.saveOptions(e)});
 document.getElementById('substitutionMark').addEventListener('click', e => { option.saveOptions(e)});
+// Words/Phrases
+document.getElementById('wordList').addEventListener('click', e => { option.populateWord(); });
+document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
+document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
+// Domains
+document.getElementById('advDomainSelect').addEventListener('change', e => { option.advancedDomainPopulate(); });
+document.getElementById('advDomainSave').addEventListener('click', e => { option.advancedDomainSave(e); });
+document.getElementById('advDomainRemove').addEventListener('click', e => { option.advancedDomainRemove(e); });
+document.getElementById('disabledDomainSelect').addEventListener('change', e => { option.disabledDomainPopulate(); });
+document.getElementById('disabledDomainSave').addEventListener('click', e => { option.disabledDomainSave(e); });
+document.getElementById('disabledDomainRemove').addEventListener('click', e => { option.disabledDomainRemove(e); });
+// Config
+document.getElementById('configReset').addEventListener('click', e => { option.restoreDefaults(e); });
+document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });
+document.getElementById('configImport').addEventListener('click', e => { option.importConfig(e); });
+// Test
+document.getElementById('testText').addEventListener('input', e => { option.populateTest(e); });
