@@ -1,3 +1,9 @@
+interface wordOptions {
+  matchMethod: number;
+  repeat: boolean;
+  sub: string;
+}
+
 export default class Config {
   advancedDomains: string[];
   censorCharacter: string;
@@ -15,11 +21,7 @@ export default class Config {
   showCounter: boolean;
   substitutionMark: boolean;
   words: {
-    [key: string]: {
-      matchMethod: number;
-      repeat: boolean;
-      sub: string;
-    }
+    [key: string]: wordOptions;
   };
 
   // TODO: Finish removing magic numbers?
@@ -88,10 +90,12 @@ export default class Config {
     for(let k in config) this[k]=config[k];
   }
 
-  addWord(str: string) {
+  addWord(str: string, options?: wordOptions) {
     str = str.trim().toLowerCase();
     if (Object.keys(this.words).includes(str)) {
       return false; // Already exists
+    } else if (options) {
+      this.words[str] = options;
     } else {
       this.words[str] = {matchMethod: this.defaultWordMatchMethod, repeat: this.defaultWordRepeat, sub: ''};
       return true;

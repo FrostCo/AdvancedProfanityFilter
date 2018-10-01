@@ -8,6 +8,7 @@ export class Filter {
 
   constructor() {
     this.counter = 0;
+    this.wordList = [];
     this.wordRegExps = [];
   }
 
@@ -18,6 +19,10 @@ export class Filter {
   // Parse the profanity list
   // ["exact", "partial", "whole", "disabled"]
   generateRegexpList() {
+    // Clean wordRegExps if there are already some present
+    if (this.wordList.length === 0) this.generateWordList();
+    if (this.wordRegExps.length > 0) this.wordRegExps = [];
+
     // console.time('generateRegexpList'); // Benchmark - Call Time
     // console.count('generateRegexpList: words to filter'); // Benchmarking - Executaion Count
     if (this.cfg.filterMethod == 2) { // Special regexp for "Remove" filter, uses per-word matchMethods
@@ -78,6 +83,9 @@ export class Filter {
   // Sort the words array by longest (most-specific) first
   // Config Dependencies: words
   generateWordList() {
+    // Clean wordRegExps if there are already some present
+    if (this.wordList.length > 0) this.wordList = null;
+
     this.wordList = Object.keys(this.cfg.words).sort(function(a, b) {
       return b.length - a.length;
     });
