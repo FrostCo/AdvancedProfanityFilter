@@ -19,14 +19,18 @@ function copyTypeScript(file) {
   let basename = path.basename(file);
   console.log('TypeScript file updated: ', basename)
 
-  if (tsBundleFiles.includes(basename)) {
-    console.log('Prebuild Typescript...');
-    execSync('node ./tools/prebuild.js');
-  }
+  try {
+    if (tsBundleFiles.includes(basename)) {
+      console.log('Prebuild Typescript...');
+      execSync('node ./tools/prebuild.js');
+    }
 
-  console.log('Running TypeScript...');
-  execSync('tsc');
-  console.log('Done.');
+    console.log('Running TypeScript...');
+    execSync('tsc');
+    console.log('Done.');
+  } catch(err) {
+    console.log('Error: ', err);
+  }
 }
 
 const tsBundleFiles = ['webFilter.ts', 'helper.ts', 'domain.ts', 'word.ts', 'filter.ts', 'page.ts', 'config.ts', 'webConfig.ts'];
