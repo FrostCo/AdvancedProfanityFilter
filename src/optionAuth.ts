@@ -7,8 +7,10 @@ export default class OptionAuth {
     let passwordInput = document.getElementById('password') as HTMLInputElement;
     if (passwordInput.value == this.password) {
       this.authenticated = true;
-      OptionPage.hide(document.getElementById('passwordContainer'));
+      document.getElementById('passwordModal').style.display = 'none';
       OptionPage.show(document.getElementById('main'));
+    } else {
+      passwordInput.classList.add('w3-border-red');
     }
   }
 
@@ -17,13 +19,10 @@ export default class OptionAuth {
     this.authenticated = false;
   }
 
-  setPassword() {
+  setPassword(optionPage: OptionPage) {
     var password = document.getElementById('setPassword') as HTMLInputElement;
-    if (password.value == '') {
-      chrome.storage.sync.remove('password');
-    } else {
-      chrome.storage.sync.set({password: password.value});
-      password.value = '';
-    }
+    optionPage.cfg.password = password.value;
+    optionPage.cfg.save('password');
+    password.value = '';
   }
 }

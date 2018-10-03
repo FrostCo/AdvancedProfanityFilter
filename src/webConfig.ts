@@ -111,7 +111,7 @@ export default class WebConfig extends Config {
   }
 
   // Pass a key to save only that key, otherwise it will save everything
-  save(prop?: any) {
+  save(prop?: string) {
     let data = {};
     prop ? data[prop] = this[prop] : data = this.dataToPersist();
 

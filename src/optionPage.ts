@@ -1,10 +1,11 @@
 import { arrayContains, dynamicList, removeFromArray } from './lib/helper.js';
 import WebConfig from './webConfig.js';
 import {Filter} from './lib/filter.js';
-// import OptionAuth from './optionAuth.js';
+import OptionAuth from './optionAuth.js';
 
 export default class OptionPage {
   cfg: WebConfig;
+  auth: OptionAuth;
 
   static disableBtn(element) {
     element.classList.add('disabled');
@@ -134,8 +135,19 @@ export default class OptionPage {
   async init() {
     let self = this;
     await OptionPage.load(self);
+    if (!self.auth) self.auth = new OptionAuth(self.cfg.password);
     // @ts-ignore: Type WebConfig is not assignable to type Config
     filter.cfg = option.cfg;
+
+    // console.log('Password:', cfg.password, 'Authenticated:', authenticated); // DEBUG Password
+    if (self.cfg.password && !self.auth.authenticated) {
+      // console.log('Prompt for password'); // DEBUG Password
+      document.getElementById('passwordModal').style.display = 'block';
+      document.getElementById('password').focus();
+    } else {
+      OptionPage.show(document.getElementById('main'));
+    }
+
     self.populateOptions();
   }
 
@@ -380,21 +392,18 @@ export default class OptionPage {
         OptionPage.show(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
         OptionPage.show(document.getElementById('globalMatchMethod'));
-        OptionPage.hide(document.getElementById('defaultWordSubstitution'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
       case 1: // Substitution
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.show(document.getElementById('substitutionSettings'));
         OptionPage.show(document.getElementById('globalMatchMethod'));
-        OptionPage.show(document.getElementById('defaultWordSubstitution'));
         OptionPage.show(document.getElementById('wordSubstitution'));
         break;
       case 2: // Remove
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
         OptionPage.hide(document.getElementById('globalMatchMethod'));
-        OptionPage.hide(document.getElementById('defaultWordSubstitution'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
     }
@@ -418,7 +427,7 @@ export default class OptionPage {
         // OptionPage.updateStatus('Error: Invalid entry.', true, 5000);
       }
     }
-  }
+}
 }
 
 let filter = new Filter;
@@ -428,6 +437,7 @@ let option = new OptionPage;
 // Add event listeners to DOM
 window.addEventListener('load', function(event) { option.init(); });
 document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click', e => { option.switchPage(e); }); });
+document.getElementById('submitPassword').addEventListener('click', e=> { option.auth.authenticate(e); })
 // Settings
 document.querySelectorAll('#filterMethod input').forEach(el => { el.addEventListener('click', e => { option.selectFilterMethod(e); }); });
 document.getElementById('censorCharacterSelect').addEventListener('click', e => { option.saveOptions(e)});
@@ -457,5 +467,6 @@ document.getElementById('disabledDomainRemove').addEventListener('click', e => {
 document.getElementById('configReset').addEventListener('click', e => { option.restoreDefaults(e); });
 document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });
 document.getElementById('configImport').addEventListener('click', e => { option.importConfig(e); });
+document.getElementById('setPasswordBtn').addEventListener('click', e=> { option.auth.setPassword(option); })
 // Test
 document.getElementById('testText').addEventListener('input', e => { option.populateTest(e); });
