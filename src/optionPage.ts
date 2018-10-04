@@ -113,11 +113,17 @@ export default class OptionPage {
     switch(action) {
       case 'restoreDefaults':
         OptionPage.configureConfirmModal('Are you sure you want to restore defaults?');
-        document.getElementById('confirmModalOK').addEventListener('click', e => { option.restoreDefaults(e)});
+        document.getElementById('confirmModalOK').addEventListener('click', e => { option.restoreDefaults(e); });
         break;
       case 'importConfig':
         OptionPage.configureConfirmModal('Are you sure you want to overwrite your existing settings?');
-        document.getElementById('confirmModalOK').addEventListener('click', e => { option.importConfig(e)});
+        document.getElementById('confirmModalOK').addEventListener('click', e => { option.importConfig(e); });
+        break;
+      case 'setPassword':
+        let passwordText = document.getElementById('setPassword') as HTMLInputElement;
+        let message = passwordText.value == '' ? 'Are you sure you want to remove the password?' : `Are you sure you want to set the password to '${passwordText.value}'?`;
+        OptionPage.configureConfirmModal(message);
+        document.getElementById('confirmModalOK').addEventListener('click', e => { option.auth.setPassword(e, option); });
         break;
     }
 
@@ -577,6 +583,6 @@ document.getElementById('configReset').addEventListener('click', e => { option.c
 document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });
 document.getElementById('configImport').addEventListener('click', e => { option.confirm(e, 'importConfig'); });
 document.getElementById('setPassword').addEventListener('input', e => { option.auth.setPasswordButtonText(e); });
-document.getElementById('setPasswordBtn').addEventListener('click', e => { option.auth.setPassword(option); });
+document.getElementById('setPasswordBtn').addEventListener('click', e => { option.confirm(e, 'setPassword'); });
 // Test
 document.getElementById('testText').addEventListener('input', e => { option.populateTest(); });

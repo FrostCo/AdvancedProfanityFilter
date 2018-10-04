@@ -20,10 +20,12 @@ export default class OptionAuth {
     this.authenticated = false;
   }
 
-  setPassword(optionPage: OptionPage) {
+  setPassword(evt, option: OptionPage) {
+    OptionPage.closeModal('confirmModal');
+    evt.target.removeEventListener('click', option.auth.setPassword);
     var password = document.getElementById('setPassword') as HTMLInputElement;
-    optionPage.cfg.password = password.value;
-    optionPage.cfg.save('password');
+    option.cfg.password = password.value;
+    option.cfg.save('password');
     password.value = '';
   }
 
