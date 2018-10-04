@@ -28,19 +28,19 @@
   <div id="filterMethod">
     <label>
       <input id="filterCensor" class="w3-radio" type="radio" name="filterMethod" value="Censor">
-      Censor
+      Censor<span class="notes">(dog: dog = d**)</span>
     </label>
 
     <br/>
     <label>
       <input id="filterSubstitute" class="w3-radio" type="radio" name="filterMethod" value="Substitute">
-      Substitute
+      Substitute<span class="notes">(dog -> Cat: dog = cat)</span>
     </label>
 
     <br/>
     <label>
       <input id="filterRemove" class="w3-radio" type="radio" name="filterMethod" value="Remove">
-      Remove
+      Remove<span class="notes">(dog: doghouse = house)</span>
     </label>
   </div>
 
@@ -49,13 +49,13 @@
     <label>
       <input id="preserveFirst" type="checkbox" class="w3-check">
       Preserve the first letter
-      <span class="notes">(Dog: dog = d**)</span>
+      <span class="notes">(dog: dog = d**)</span>
     </label>
     <br />
     <label>
       <input id="preserveLast" type="checkbox" class="w3-check">
       Preserve the last letter
-      <span class="notes">(Dog: dog = **g)</span>
+      <span class="notes">(dog: dog = **g)</span>
     </label>
     <br />
     <label>Censor character:
@@ -92,13 +92,13 @@
     <label>
       <input id="preserveCase" type="checkbox" class="w3-check">
       Preserve case of filtered words
-      <span class="notes">(Dog: Dog = Cat)</span>
+      <span class="notes">(dog: Dog = Cat)</span>
     </label>
     <br />
     <label>
       <input id="substitutionMark" type="checkbox" class="w3-check">
       Mark substituted words with [ ]
-      <span class="notes">(Dog: dog = [cat])</span>
+      <span class="notes">(dog: dog = [cat])</span>
     </label>
     <div style="padding-top:8px;">
       <label>Default Substitution
@@ -133,7 +133,7 @@
     <label>
       <input id="defaultWordRepeat" type="checkbox" class="w3-check">
       Match repeated characters in words
-      <span class="notes">(Dog: dddoooggg)</span>
+      <span class="notes">(dog: dddoooggg)</span>
     </label>
     <div id="defaultMatchMethod" style="padding-top:8px;">
       <label>Match Method
@@ -159,19 +159,19 @@
     <h5 class="w3-text-teal">Match Method</h5>
     <label>
       <input id="wordMatchExact" type="radio" class="w3-radio" name="wordMatchMethod" value="Exact">
-      Exact
+      Exact<span class="notes">(dog: *** in the doghouse)</span>
     </label>
 
     <br/>
     <label>
       <input id="wordMatchPartial" type="radio" class="w3-radio" name="wordMatchMethod" value="Partial">
-      Partial
+      Partial<span class="notes">(dog: *** in the ***house)</span>
     </label>
 
     <br/>
     <label>
       <input id="wordMatchWhole" type="radio" class="w3-radio" name="wordMatchMethod" value="Whole">
-      Whole
+      Whole<span class="notes">(dog: *** in the ********)</span>
     </label>
 
     <br/>
@@ -183,7 +183,7 @@
     <h5 class="w3-text-teal">Other</h5>
     <label>
       <input id="wordMatchRepeated" type="checkbox" class="w3-check" name="matchRepeat"/>
-      Match Repeated Characters
+      Match Repeated Characters<span class="notes">(dog: dddoooggg)</span>
     </label>
   </div>
   <br/>
@@ -197,9 +197,11 @@
 <div id="domainsPage" class="w3-padding w3-hide">
   <div id="advDomainContainer" class="w3-half">
     <h4 class="w3-text-teal">Advanced Domains</h4>
-    <select id="advDomainSelect" class="w3-select w3-border small"></select>
+    <select id="advDomainSelect" class="w3-select w3-border small" style="display:block"></select>
+    <span class="notes">Only use when the filter isn't working.</span>
     <h5 class="w3-text-teal">Domain</h5>
     <input id="advDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
+    <span class="notes">Example: "google.com" or "mail.google.com"</span>
     <div style="padding-top: 16px;">
       <button id="advDomainSave" class="w3-btn w3-round-large w3-flat-nephritis">SAVE</button>
       <button id="advDomainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
@@ -208,9 +210,11 @@
 
   <div id="disabledDomainContainer" class="w3-half w3-right">
     <h4 class="w3-text-teal">Whitelist Domains</h4>
-    <select id="disabledDomainSelect" class="w3-select w3-border small"></select>
+    <select id="disabledDomainSelect" class="w3-select w3-border small" style="display:block"></select>
+    <span class="notes">Disable the filter for a domain</span>
     <h5 class="w3-text-teal">Domain</h5>
     <input id="disabledDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
+    <span class="notes">Example: "google.com" or "mail.google.com"</span>
     <div style="padding-top: 16px;">
       <button id="disabledDomainSave" class="w3-btn w3-round-large w3-flat-nephritis">SAVE</button>
       <button id="disabledDomainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
@@ -241,6 +245,9 @@
 </div>
 
 <div id="helpPage" class="w3-container w3-hide">
+  <div id="gettingStarted">
+  </div>
+
   <span id="contributors">
     <a id="gettingStarted" href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki" target="_blank">Getting Started</a>
     - <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
@@ -249,19 +256,6 @@
     Created by <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Richard Frost</a><br>
   </span>
 </div>
-</div>
-
-<div id="passwordModal" class="w3-modal">
-  <div class="w3-modal-content w3-card-4 w3-animate-opacity">
-    <header class="w3-container w3-flat-peter-river">
-      <h5>Enter Password</h5>
-    </header>
-
-    <div class="w3-container w3-padding w3-margin">
-      <input id="password" class="w3-input w3-border" style="display:inline" type="password">
-      <button id="submitPassword" class="w3-btn w3-round-large w3-flat-peter-river w3-right" style="margin-top:16px">SUBMIT</button>
-    </div>
-  </div>
 </div>
 
 <div id="confirmModal" class="w3-modal">
@@ -276,6 +270,19 @@
         <button id="confirmModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
         <button id="confirmModalCancel" class="w3-btn w3-round-large w3-flat-silver" style="margin-top:16px">CANCEL</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<div id="passwordModal" class="w3-modal">
+  <div class="w3-modal-content w3-card-4 w3-animate-opacity">
+    <header class="w3-container w3-flat-peter-river">
+      <h5>Enter Password</h5>
+    </header>
+
+    <div class="w3-container w3-padding w3-margin">
+      <input id="password" class="w3-input w3-border" style="display:inline" type="password">
+      <button id="submitPassword" class="w3-btn w3-round-large w3-flat-peter-river w3-right" style="margin-top:16px">SUBMIT</button>
     </div>
   </div>
 </div>

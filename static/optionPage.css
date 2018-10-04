@@ -1,8 +1,10 @@
 body
-{min-height:800px}
+{min-height:900px}
 #menu > a:hover
 {color:#fff!important;background-color:#2980b9!important}
 .disabled
 {cursor:not-allowed!important;}
+.notes
+{margin-left:16px;padding-top:5px;font-size:10px;color:gray}
 .small
 {width:300px}
