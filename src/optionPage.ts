@@ -407,36 +407,51 @@ export default class OptionPage {
     let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
     let selectedMatchMethod = document.querySelector('input[name="wordMatchMethod"]:checked') as HTMLInputElement;
+    let word = wordText.value.trim().toLowerCase();
+    let added = true;
 
-    let word = wordText.value;
-    if (word === '') return false; // Empty word
-    let wordOptions = {
-      matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
-      repeat: wordMatchRepeated.checked,
-      sub: substitutionText.value
-    };
-
-    if (wordList.value === '') { // New record
-      // console.log('Adding new word: ', word, wordOptions); // DEBUG
-      let result = this.cfg.addWord(word, wordOptions);
-    } else { // Updating existing record
-      let originalWord = wordList.value;
-      if (originalWord == word) { // Word options changed
-        // console.log('Modifying existing word options: ', word, wordOptions); // DEBUG
-        this.cfg.words[word] = wordOptions;
-      } else { // Existing word modified
-        // console.log('Modifying existing word: ', word, wordOptions); // DEBUG
-        let result = this.cfg.addWord(word, wordOptions);
-        delete this.cfg.words[originalWord];
-      }
+    if (word == '') {
+      OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
+      return false;
     }
 
-    await this.saveOptions(evt);
+    if (wordText.checkValidity()) {
+      let wordOptions = {
+        matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
+        repeat: wordMatchRepeated.checked,
+        sub: substitutionText.value
+      };
 
-    // Update states and Reset word form
-    filter.init();
-    wordList.selectedIndex = 0;
-    this.populateWordsList();
+      if (wordList.value === '') { // New record
+        // console.log('Adding new word: ', word, wordOptions); // DEBUG
+        added = this.cfg.addWord(word, wordOptions);
+      } else { // Updating existing record
+        let originalWord = wordList.value;
+        if (originalWord == word) { // Word options changed
+          // console.log('Modifying existing word options: ', word, wordOptions); // DEBUG
+          this.cfg.words[word] = wordOptions;
+        } else { // Existing word modified
+          // console.log('Modifying existing word: ', word, wordOptions); // DEBUG
+          added = this.cfg.addWord(word, wordOptions);
+          if (added) {
+            delete this.cfg.words[originalWord];
+          } else {
+            OptionPage.showInputError(wordText, `'${word}' already in list.`);
+          }
+        }
+      }
+
+      if (added) {
+        let result = await this.saveOptions(evt);
+
+        // Update states and Reset word form
+        filter.init();
+        wordList.selectedIndex = 0;
+        this.populateWordsList();
+      }
+    } else {
+      OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
+    }
   }
 
   async selectFilterMethod(evt) {
@@ -545,6 +560,7 @@ document.getElementById('substitutionMark').addEventListener('click', e => { opt
 document.getElementById('defaultWordSubstitutionText').addEventListener('change', e => { option.saveOptions(e)});
 // Words/Phrases
 document.getElementById('wordList').addEventListener('click', e => { option.populateWord(); });
+document.getElementById('wordText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
 document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
 document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
 // Domains
