@@ -35,8 +35,9 @@ export default class OptionPage {
     element.classList.add('w3-hide');
   }
 
-  static hideInputError(element: HTMLElement) {
+  static hideInputError(element) {
     element.classList.remove('w3-border-red');
+    element.setCustomValidity('');
   }
 
   static hideStatus() {
@@ -57,8 +58,12 @@ export default class OptionPage {
     element.classList.add('w3-show');
   }
 
-  static showInputError(element: HTMLElement) {
+  static showInputError(element, message = '') {
     element.classList.add('w3-border-red');
+    if (message) {
+      element.setCustomValidity(message);
+      element.reportValidity();
+    }
   }
 
   advancedDomainList() {
@@ -71,8 +76,11 @@ export default class OptionPage {
 
   advancedDomainPopulate() {
     let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
+    let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
     let advDomainRemove = document.getElementById('advDomainRemove') as HTMLInputElement;
+    OptionPage.hideInputError(advDomainText);
     advDomains.value !== '' ? OptionPage.enableBtn(advDomainRemove) : OptionPage.disableBtn(advDomainRemove);
+    advDomainText.value = advDomains.value;
   }
 
   async advancedDomainRemove(evt) {
@@ -86,13 +94,19 @@ export default class OptionPage {
   async advancedDomainSave(evt) {
     let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
     let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
+    let invalidMessage = 'Valid domain example: google.com or www.google.com';
+    let success;
     if (advDomains.value == '') { // New record
-      option.updateItemList(evt, advDomainText, 'advancedDomains');
+      success = option.updateItemList(evt, advDomainText, 'advancedDomains', invalidMessage);
     } else { // Updating existing record
-      option.updateItemList(evt, advDomainText, 'advancedDomains', advDomains.value);
+      success = option.updateItemList(evt, advDomainText, 'advancedDomains', invalidMessage, advDomains.value);
     }
-    let error = await option.cfg.save('advancedDomains');
-    this.advancedDomainList();
+
+    if (success) {
+      let error = await option.cfg.save('advancedDomains');
+      // TODO: Error
+      error ? 'error' : this.advancedDomainList();
+    }
   }
 
   confirm(evt, action) {
@@ -122,6 +136,7 @@ export default class OptionPage {
     let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
     let disabledDomainText = document.getElementById('disabledDomainText') as HTMLInputElement;
     let disabledDomainRemove = document.getElementById('disabledDomainRemove') as HTMLInputElement;
+    OptionPage.hideInputError(disabledDomainText);
     disabledDomains.value !== '' ? OptionPage.enableBtn(disabledDomainRemove) : OptionPage.disableBtn(disabledDomainRemove);
     disabledDomainText.value = disabledDomains.value;
   }
@@ -137,13 +152,18 @@ export default class OptionPage {
   async disabledDomainSave(evt) {
     let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
     let disabledDomainText = document.getElementById('disabledDomainText') as HTMLInputElement;
+    let invalidMessage = 'Valid domain example: google.com or www.google.com';
+    let success;
     if (disabledDomains.value == '') { // New record
-      option.updateItemList(evt, disabledDomainText, 'disabledDomains');
+      success = option.updateItemList(evt, disabledDomainText, 'disabledDomains', invalidMessage);
     } else { // Updating existing record
-      option.updateItemList(evt, disabledDomainText, 'disabledDomains', disabledDomains.value);
+      success = option.updateItemList(evt, disabledDomainText, 'disabledDomains', invalidMessage, disabledDomains.value);
     }
-    let error = await option.cfg.save('disabledDomains');
-    this.disabledDomainList();
+    if (success) {
+      let error = await option.cfg.save('disabledDomains');
+      // TODO: Error
+      error ? 'error' : this.disabledDomainList();
+    }
   }
 
   exportConfig() {
@@ -470,27 +490,30 @@ export default class OptionPage {
     }
   }
 
-  updateItemList(evt, input, attr, original = '') {
-    if (input.value === '') { // No data
-      OptionPage.showInputError(input);
+  updateItemList(evt, input, attr: string, invalidMessage: string, original = ''): boolean {
+    let item = input.value.trim().toLowerCase();
+    if (item == '') { // No data
+      OptionPage.showInputError(input, 'Please enter a value.');
       return false;
     } else {
       if (input.checkValidity()) {
         OptionPage.hideInputError(input);
-        if (!option.cfg[attr].includes(input.value)) {
+        if (!option.cfg[attr].includes(item)) {
           if (original != '' && option.cfg[attr].includes(original)) {
             // Update existing record (remove it before adding the new record)
             option.cfg[attr].splice(option.cfg[attr].indexOf(original), 1);
           }
           // Save new record
-          option.cfg[attr].push(input.value.trim().toLowerCase());
+          option.cfg[attr].push(item);
           option.cfg[attr] = option.cfg[attr].sort();
+          return true;
         } else {
-          // OptionPage.updateStatus('Error: Already in list.', true, 3000);
+          OptionPage.showInputError(input, 'Already in list.');
+          return false;
         }
       } else {
-        OptionPage.showInputError(input);
-        // OptionPage.updateStatus('Error: Invalid entry.', true, 5000);
+        OptionPage.showInputError(input, invalidMessage);
+        return false;
       }
     }
   }
@@ -526,16 +549,18 @@ document.getElementById('wordSave').addEventListener('click', e => { option.save
 document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
 // Domains
 document.getElementById('advDomainSelect').addEventListener('change', e => { option.advancedDomainPopulate(); });
+document.getElementById('advDomainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
 document.getElementById('advDomainSave').addEventListener('click', e => { option.advancedDomainSave(e); });
 document.getElementById('advDomainRemove').addEventListener('click', e => { option.advancedDomainRemove(e); });
 document.getElementById('disabledDomainSelect').addEventListener('change', e => { option.disabledDomainPopulate(); });
+document.getElementById('disabledDomainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
 document.getElementById('disabledDomainSave').addEventListener('click', e => { option.disabledDomainSave(e); });
 document.getElementById('disabledDomainRemove').addEventListener('click', e => { option.disabledDomainRemove(e); });
 // Config
 document.getElementById('configReset').addEventListener('click', e => { option.confirm(e, 'restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });
 document.getElementById('configImport').addEventListener('click', e => { option.confirm(e, 'importConfig'); });
-document.getElementById('setPassword').addEventListener('input', e=> { option.auth.setPasswordButtonText(e); });
-document.getElementById('setPasswordBtn').addEventListener('click', e=> { option.auth.setPassword(option); });
+document.getElementById('setPassword').addEventListener('input', e => { option.auth.setPasswordButtonText(e); });
+document.getElementById('setPasswordBtn').addEventListener('click', e => { option.auth.setPassword(option); });
 // Test
 document.getElementById('testText').addEventListener('input', e => { option.populateTest(); });
