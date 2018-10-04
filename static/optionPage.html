@@ -21,19 +21,6 @@
   <a href="#" class="w3-bar-item w3-button w3-right">Test</a>
 </div>
 
-<div id="passwordModal" class="w3-modal w3-card">
-  <div class="w3-modal-content">
-    <header class="w3-container w3-flat-peter-river">
-      <h5>Enter Password</h5>
-    </header>
-
-    <div class="w3-container w3-padding w3-margin">
-      <input id="password" class="w3-input w3-border" style="display:inline" type="password">
-      <button id="submitPassword" class="w3-btn w3-round-large w3-flat-peter-river w3-right" style="margin-top:16px">SUBMIT</button>
-    </div>
-  </div>
-</div>
-
 <div id="main" class="w3-hide">
 <div id="settingsPage" class="w3-container">
   <h4 class="w3-text-teal">Filter Method</h4>
@@ -235,28 +222,25 @@
   <div style="padding-top:16px;padding-bottom:16px;width:500px;">
     <button id="configExport" class="w3-btn w3-round-large w3-flat-peter-river">EXPORT</button>
     <button id="configImport" class="w3-btn w3-round-large w3-flat-peter-river">IMPORT</button>
-    <button id="configReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESET</button>
+    <button id="configReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESTORE DEFAULTS</button>
   </div>
-  <textarea id="configText" class="w3-input w3-border w3-card padding" type="text" style="width:500px;height:550px;"></textarea>
+  <textarea id="configText" class="w3-input w3-border w3-card" style="width:500px;height:550px;"></textarea>
 
   <div id="setPasswordContainer" style="padding-top:16px;width:500px;">
     <label for="setPassword">Password</label>
     <input id="setPassword" class="w3-input w3-border small" style="display:inline">
-    <button id="setPasswordBtn" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">SET</button>
+    <button id="setPasswordBtn" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">REMOVE</button>
   </div>
 </div>
 
-<div id="securityPage" class="w3-hide">security</div>
-
 <div id="testPage" class="w3-padding w3-hide">
   <h4 class="w3-text-teal">Test</h4>
-  <textarea id="testText" class="w3-input w3-border w3-card" type="text"></textarea>
+  <textarea id="testText" class="w3-input w3-border w3-card"></textarea>
   <h4 class="w3-text-teal">Filtered</h4>
   <div id="filteredTestText" class="w3-panel w3-pale-blue w3-leftbar w3-border-blue"></div>
 </div>
 
 <div id="helpPage" class="w3-container w3-hide">
-  <div id="status"></div>
   <span id="contributors">
     <a id="gettingStarted" href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki" target="_blank">Getting Started</a>
     - <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
@@ -265,6 +249,35 @@
     Created by <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Richard Frost</a><br>
   </span>
 </div>
+</div>
+
+<div id="passwordModal" class="w3-modal">
+  <div class="w3-modal-content w3-card-4 w3-animate-opacity">
+    <header class="w3-container w3-flat-peter-river">
+      <h5>Enter Password</h5>
+    </header>
+
+    <div class="w3-container w3-padding w3-margin">
+      <input id="password" class="w3-input w3-border" style="display:inline" type="password">
+      <button id="submitPassword" class="w3-btn w3-round-large w3-flat-peter-river w3-right" style="margin-top:16px">SUBMIT</button>
+    </div>
+  </div>
+</div>
+
+<div id="confirmModal" class="w3-modal">
+  <div class="w3-modal-content w3-card-4 w3-animate-zoom">
+    <header class="w3-container w3-flat-peter-river">
+      <h5 id="confirmModalTitle"></h5>
+    </header>
+
+    <div class="w3-container w3-padding w3-margin">
+      <div id="confirmModalContent"></div>
+      <div class="w3-right">
+        <button id="confirmModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
+        <button id="confirmModalCancel" class="w3-btn w3-round-large w3-flat-silver" style="margin-top:16px">CANCEL</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script type="module" src="optionPage.js"></script>

@@ -3,14 +3,15 @@ export default class OptionAuth {
   authenticated: boolean;
   password: string;
 
-  authenticate(event) {
+  authenticate(evt) {
     let passwordInput = document.getElementById('password') as HTMLInputElement;
     if (passwordInput.value == this.password) {
       this.authenticated = true;
-      document.getElementById('passwordModal').style.display = 'none';
+      OptionPage.closeModal('passwordModal');
       OptionPage.show(document.getElementById('main'));
+      OptionPage.hideInputError(passwordInput);
     } else {
-      passwordInput.classList.add('w3-border-red');
+      OptionPage.showInputError(passwordInput);
     }
   }
 
@@ -24,5 +25,11 @@ export default class OptionAuth {
     optionPage.cfg.password = password.value;
     optionPage.cfg.save('password');
     password.value = '';
+  }
+
+  setPasswordButtonText(evt) {
+    let passwordText = document.getElementById('setPassword') as HTMLInputElement;
+    let passwordBtn = document.getElementById('setPasswordBtn') as HTMLButtonElement;
+    passwordBtn.innerText = passwordText.value === '' ? 'REMOVE' : 'SET';
   }
 }
