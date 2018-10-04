@@ -65,10 +65,10 @@ function packageSource() {
     'README.md',
     'tsconfig.json'
   ];
+  sourceZip.addLocalFolder('./bin', 'bin');
   sourceZip.addLocalFolder('./src', 'src');
   sourceZip.addLocalFolder('./static', 'static');
   sourceZip.addLocalFolder('./test', 'test');
-  sourceZip.addLocalFolder('./tools', 'tools');
   files.forEach(file => { sourceZip.addLocalFile(path.join('./', file), null)});
   sourceZip.writeZip('./extension-source.zip');
 }

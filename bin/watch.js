@@ -22,7 +22,7 @@ function copyTypeScript(file) {
   try {
     if (tsBundleFiles.includes(basename)) {
       console.log('Prebuild Typescript...');
-      execSync('node ./tools/prebuild.js');
+      execSync('node ./bin/prebuild.js');
     }
 
     console.log('Running TypeScript...');
@@ -48,7 +48,7 @@ var watcher = chokidar.watch(
 var log = console.log.bind(console);
 // watcher.on('add', filePath => log(`File ${filePath} has been added`))
 // watcher.on('unlink', filePath => log(`File ${filePath} has been removed`));
-watcher.on('ready', () => log('Initial scan complete. Ready for changes\n\n'));
+watcher.on('ready', () => log('Initial scan complete. Watching for changes...\n\n'));
 
 watcher.on('change', (filePath, stats) => {
   // console.log(filePath, stats);
