@@ -8,7 +8,7 @@ export default class OptionPage {
   auth: OptionAuth;
 
   static closeModal(id: string) {
-    document.getElementById(id).style.display = 'none';
+    OptionPage.hide(document.getElementById(id));
   }
 
   static configureConfirmModal(content = 'Are you sure?', title = 'Please Confirm', titleColorClass = 'w3-flat-peter-river') {
@@ -37,7 +37,11 @@ export default class OptionPage {
 
   static hideInputError(element) {
     element.classList.remove('w3-border-red');
-    element.setCustomValidity('');
+    try {
+      element.setCustomValidity('');
+    } catch(e) {
+      // TODO: Hide status modal?
+    }
   }
 
   static hideStatus() {
@@ -50,7 +54,7 @@ export default class OptionPage {
   }
 
   static openModal(id: string) {
-    document.getElementById(id).style.display = 'block';
+    OptionPage.show(document.getElementById(id));
   }
 
   static show(element: HTMLElement) {
@@ -61,8 +65,12 @@ export default class OptionPage {
   static showInputError(element, message = '') {
     element.classList.add('w3-border-red');
     if (message) {
-      element.setCustomValidity(message);
-      element.reportValidity();
+      try {
+        element.setCustomValidity(message);
+        element.reportValidity();
+      } catch(e) {
+        // TODO: Show error popup
+      }
     }
   }
 
@@ -110,20 +118,29 @@ export default class OptionPage {
   }
 
   confirm(evt, action) {
+    let ok = document.getElementById('confirmModalOK');
+    ok.removeEventListener('click', importConfig);
+    ok.removeEventListener('click', restoreDefaults);
+    ok.removeEventListener('click', setPassword);
+
     switch(action) {
-      case 'restoreDefaults':
-        OptionPage.configureConfirmModal('Are you sure you want to restore defaults?');
-        document.getElementById('confirmModalOK').addEventListener('click', e => { option.restoreDefaults(e); });
-        break;
       case 'importConfig':
         OptionPage.configureConfirmModal('Are you sure you want to overwrite your existing settings?');
-        document.getElementById('confirmModalOK').addEventListener('click', e => { option.importConfig(e); });
+        ok.addEventListener('click', importConfig);
+        break;
+      case 'restoreDefaults':
+        OptionPage.configureConfirmModal('Are you sure you want to restore defaults?');
+        // ok.addEventListener('click', e => { option.restoreDefaults(e); });
+        ok.addEventListener('click', restoreDefaults);
         break;
       case 'setPassword':
         let passwordText = document.getElementById('setPassword') as HTMLInputElement;
+        let passwordBtn = document.getElementById('setPasswordBtn') as HTMLInputElement;
+        if (passwordBtn.classList.contains('disabled')) return false;
+
         let message = passwordText.value == '' ? 'Are you sure you want to remove the password?' : `Are you sure you want to set the password to '${passwordText.value}'?`;
         OptionPage.configureConfirmModal(message);
-        document.getElementById('confirmModalOK').addEventListener('click', e => { option.auth.setPassword(e, option); });
+        ok.addEventListener('click', setPassword);
         break;
     }
 
@@ -179,8 +196,6 @@ export default class OptionPage {
 
   async importConfig(evt) {
     let self = this;
-    OptionPage.closeModal('confirmModal');
-    evt.target.removeEventListener('click', option.restoreDefaults);
 
     try {
       let configText = document.getElementById('configText') as HTMLTextAreaElement;
@@ -223,12 +238,17 @@ export default class OptionPage {
     self.populateOptions();
   }
 
+  populateConfig() {
+    this.auth.setPasswordButton(option);
+  }
+
   async populateOptions() {
     filter.init();
     this.populateSettings();
     this.populateWordsList();
     this.advancedDomainList();
     this.disabledDomainList();
+    this.populateConfig();
     this.populateTest();
   }
 
@@ -356,9 +376,6 @@ export default class OptionPage {
   }
 
   async restoreDefaults(evt) {
-    OptionPage.closeModal('confirmModal');
-    evt.target.removeEventListener('click', option.restoreDefaults);
-
     this.exportConfig();
     let error = await this.cfg.reset();
     if (error) {
@@ -544,11 +561,17 @@ let filter = new Filter;
 let option = new OptionPage;
 
 ////
+// Events
+// Functions
+function importConfig(e) { option.importConfig(e); }
+function restoreDefaults(e) { option.restoreDefaults(e); }
+function setPassword(e) { option.auth.setPassword(option); }
 // Add event listeners to DOM
 window.addEventListener('load', e => { option.init(); });
 document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click', e => { option.switchPage(e); }); });
 // Modals
 document.getElementById('submitPassword').addEventListener('click', e => { option.auth.authenticate(e); })
+document.getElementById('confirmModalOK').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 // Settings
 document.querySelectorAll('#filterMethod input').forEach(el => { el.addEventListener('click', e => { option.selectFilterMethod(e); }); });
@@ -582,7 +605,7 @@ document.getElementById('disabledDomainRemove').addEventListener('click', e => {
 document.getElementById('configReset').addEventListener('click', e => { option.confirm(e, 'restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });
 document.getElementById('configImport').addEventListener('click', e => { option.confirm(e, 'importConfig'); });
-document.getElementById('setPassword').addEventListener('input', e => { option.auth.setPasswordButtonText(e); });
+document.getElementById('setPassword').addEventListener('input', e => { option.auth.setPasswordButton(option); });
 document.getElementById('setPasswordBtn').addEventListener('click', e => { option.confirm(e, 'setPassword'); });
 // Test
 document.getElementById('testText').addEventListener('input', e => { option.populateTest(); });

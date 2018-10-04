@@ -20,18 +20,28 @@ export default class OptionAuth {
     this.authenticated = false;
   }
 
-  setPassword(evt, option: OptionPage) {
-    OptionPage.closeModal('confirmModal');
-    evt.target.removeEventListener('click', option.auth.setPassword);
+  setPassword(optionPage: OptionPage) {
     var password = document.getElementById('setPassword') as HTMLInputElement;
-    option.cfg.password = password.value;
-    option.cfg.save('password');
+    optionPage.cfg.password = password.value;
+    optionPage.cfg.save('password');
     password.value = '';
+    this.setPasswordButton(optionPage);
   }
 
-  setPasswordButtonText(evt) {
+  setPasswordButton(optionPage: OptionPage) {
     let passwordText = document.getElementById('setPassword') as HTMLInputElement;
     let passwordBtn = document.getElementById('setPasswordBtn') as HTMLButtonElement;
-    passwordBtn.innerText = passwordText.value === '' ? 'REMOVE' : 'SET';
+    if (passwordText.value == '') { // Empty password field
+      if (optionPage.cfg.password == '') { // No password set
+        OptionPage.disableBtn(passwordBtn);
+        passwordBtn.innerText = 'SET';
+      } else {
+        OptionPage.enableBtn(passwordBtn);
+        passwordBtn.innerText = 'REMOVE';
+      }
+    } else {
+      OptionPage.enableBtn(passwordBtn);
+      passwordBtn.innerText = 'SET'
+    }
   }
 }
