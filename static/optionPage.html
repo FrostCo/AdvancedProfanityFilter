@@ -335,10 +335,7 @@
 
 <div id="confirmModal" class="w3-modal">
   <div class="w3-modal-content w3-card-4 w3-animate-zoom">
-    <header class="w3-container w3-flat-peter-river">
-      <h5 id="confirmModalTitle"></h5>
-    </header>
-
+    <header class="w3-container w3-flat-peter-river"><h5 id="confirmModalTitle"></h5></header>
     <div class="w3-container w3-padding w3-margin">
       <div id="confirmModalContent"></div>
       <div class="w3-right">
@@ -351,16 +348,25 @@
 
 <div id="passwordModal" class="w3-modal">
   <div class="w3-modal-content w3-card-4 w3-animate-opacity">
-    <header class="w3-container w3-flat-peter-river">
-      <h5>Enter Password</h5>
-    </header>
-
+    <header class="w3-container w3-flat-peter-river"><h5>Enter Password</h5></header>
     <div class="w3-container w3-padding w3-margin">
       <input id="password" class="w3-input w3-border" style="display:inline" type="password">
       <button id="submitPassword" class="w3-btn w3-round-large w3-flat-peter-river w3-right" style="margin-top:16px">SUBMIT</button>
     </div>
   </div>
 </div>
+
+<div id="statusModal" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-animate-zoom">
+      <header class="w3-container w3-red"><h5 id="statusModalTitle"></h5></header>
+      <div class="w3-container w3-padding w3-margin">
+        <div id="statusModalContent"></div>
+        <div class="w3-right">
+          <button id="statusModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <script type="module" src="optionPage.js"></script>
 </body>

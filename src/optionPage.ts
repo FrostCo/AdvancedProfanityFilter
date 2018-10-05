@@ -11,13 +11,22 @@ export default class OptionPage {
     OptionPage.hide(document.getElementById(id));
   }
 
-  static configureConfirmModal(content = 'Are you sure?', title = 'Please Confirm', titleColorClass = 'w3-flat-peter-river') {
+  static configureConfirmModal(content = 'Are you sure?', title = 'Please Confirm', titleColor = 'w3-flat-peter-river') {
     let modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
     let modalContent = document.getElementById('confirmModalContent') as HTMLElement;
     let modalHeader = document.querySelectorAll('#confirmModal header')[0] as HTMLElement;
     modalTitle.innerText = title;
     modalContent.innerHTML = content;
-    modalHeader.className = `w3-container ${titleColorClass}`;
+    modalHeader.className = `w3-container ${titleColor}`;
+  }
+
+  static configureStatusModal(content: string, title: string, titleColor: string) {
+    let modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
+    let modalContent = document.getElementById('statusModalContent') as HTMLElement;
+    let modalHeader = document.querySelectorAll('#statusModal header')[0] as HTMLElement;
+    modalTitle.innerText = title;
+    modalContent.innerHTML = content;
+    modalHeader.className = `w3-container ${titleColor}`;
   }
 
   static disableBtn(element: HTMLElement) {
@@ -39,9 +48,7 @@ export default class OptionPage {
     element.classList.remove('w3-border-red');
     try {
       element.setCustomValidity('');
-    } catch(e) {
-      // TODO: Hide status modal?
-    }
+    } catch(e) { }
   }
 
   static hideStatus() {
@@ -62,16 +69,32 @@ export default class OptionPage {
     element.classList.add('w3-show');
   }
 
-  static showInputError(element, message = '') {
+  static showErrorModal(content = 'The requested action failed. Please try again or contact support.', title = 'Error', titleColor = 'w3-red') {
+    this.configureStatusModal(content, title, titleColor);
+    OptionPage.openModal('statusModal');
+  }
+
+ static showInputError(element, message = '') {
     element.classList.add('w3-border-red');
     if (message) {
       try {
+        throw 'hi';
         element.setCustomValidity(message);
         element.reportValidity();
       } catch(e) {
-        // TODO: Show error popup
+        OptionPage.showWarningModal(message);
       }
     }
+  }
+
+  static showStatusModal(content = 'Status updated.', title = 'Status', titleColor = 'w3-flat-peter-river') {
+    this.configureStatusModal(content, title, titleColor);
+    OptionPage.openModal('statusModal');
+  }
+
+  static showWarningModal(content = 'Invalid input.', title = 'Warning', titleColor = 'w3-orange') {
+    this.configureStatusModal(content, title, titleColor);
+    OptionPage.openModal('statusModal');
   }
 
   advancedDomainList() {
@@ -91,15 +114,14 @@ export default class OptionPage {
     advDomainText.value = advDomains.value;
   }
 
-  async advancedDomainRemove(evt) {
+  advancedDomainRemove(evt) {
     if (evt.target.classList.contains('disabled')) return false;
     let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
     option.cfg['advancedDomains'].splice(option.cfg['advancedDomains'].indexOf(advDomains.value), 1);
-    let error = await option.cfg.save('advancedDomains');
-    this.advancedDomainList();
+    if (option.saveProp('advancedDomains')) this.advancedDomainList();
   }
 
-  async advancedDomainSave(evt) {
+  advancedDomainSave(evt) {
     let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
     let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
     let invalidMessage = 'Valid domain example: google.com or www.google.com';
@@ -111,9 +133,7 @@ export default class OptionPage {
     }
 
     if (success) {
-      let error = await option.cfg.save('advancedDomains');
-      // TODO: Error
-      error ? 'error' : this.advancedDomainList();
+      if (option.saveProp('advancedDomains')) this.advancedDomainList();
     }
   }
 
@@ -130,7 +150,6 @@ export default class OptionPage {
         break;
       case 'restoreDefaults':
         OptionPage.configureConfirmModal('Are you sure you want to restore defaults?');
-        // ok.addEventListener('click', e => { option.restoreDefaults(e); });
         ok.addEventListener('click', restoreDefaults);
         break;
       case 'setPassword':
@@ -164,15 +183,14 @@ export default class OptionPage {
     disabledDomainText.value = disabledDomains.value;
   }
 
-  async disabledDomainRemove(evt) {
+  disabledDomainRemove(evt) {
     if (evt.target.classList.contains('disabled')) return false;
     let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
     option.cfg['disabledDomains'].splice(option.cfg['disabledDomains'].indexOf(disabledDomains.value), 1);
-    let error = await option.cfg.save('disabledDomains');
-    this.disabledDomainList();
+    if (option.saveProp('disabledDomains')) this.disabledDomainList();
   }
 
-  async disabledDomainSave(evt) {
+  disabledDomainSave(evt) {
     let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
     let disabledDomainText = document.getElementById('disabledDomainText') as HTMLInputElement;
     let invalidMessage = 'Valid domain example: google.com or www.google.com';
@@ -182,10 +200,9 @@ export default class OptionPage {
     } else { // Updating existing record
       success = option.updateItemList(evt, disabledDomainText, 'disabledDomains', invalidMessage, disabledDomains.value);
     }
+
     if (success) {
-      let error = await option.cfg.save('disabledDomains');
-      // TODO: Error
-      error ? 'error' : this.disabledDomainList();
+      if (option.saveProp('disabledDomains')) this.disabledDomainList();
     }
   }
 
@@ -209,13 +226,11 @@ export default class OptionPage {
 
       let error = await self.cfg.save();
       if (!error) {
-        // console.log('Settings imported successfully!'); // DEBUG Save
-        // OptionPage.updateStatus('Settings imported successfully!', false, 3000);
+        OptionPage.showStatusModal('Settings imported successfully');
         self.init();
       }
     } catch (e) {
-      // console.log('Settings not saved'); // DEBUG Save
-      // OptionPage.updateStatus('Settings not saved! Please try again.', true, 5000);
+      OptionPage.showErrorModal();
     }
   }
 
@@ -417,11 +432,19 @@ export default class OptionPage {
     // Save settings
     let error = await self.cfg.save();
     if (error) {
-      console.log('error saving');
-      // OptionPage.updateStatus('Settings not saved! Please try again.', true, 5000);
+      OptionPage.showErrorModal('Settings not saved! Please try again.');
     } else {
       self.init();
     }
+  }
+
+  async saveProp(prop: string) {
+    let error = await option.cfg.save(prop);
+    if (error) {
+      OptionPage.showErrorModal();
+      return false;
+    }
+    return true;
   }
 
   async saveWord(evt) {
@@ -465,7 +488,11 @@ export default class OptionPage {
       }
 
       if (added) {
-        let result = await this.saveOptions(evt);
+        let error = await this.saveOptions(evt);
+        if (error) {
+          OptionPage.showErrorModal();
+          return false;
+        }
 
         // Update states and Reset word form
         filter.init();
@@ -479,10 +506,7 @@ export default class OptionPage {
 
   async selectFilterMethod(evt) {
     option.cfg.filterMethod = WebConfig._filterMethodNames.indexOf(evt.target.value);
-    let error = await option.cfg.save('filterMethod');
-    this.init();
-    // TODO: Handle error
-    // option.updateFilterOptions();
+    if (option.saveProp('filterMethod')) this.init();
   }
 
   switchPage(evt) {
@@ -573,6 +597,7 @@ document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click'
 document.getElementById('submitPassword').addEventListener('click', e => { option.auth.authenticate(e); })
 document.getElementById('confirmModalOK').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
+document.getElementById('statusModalOK').addEventListener('click', e => { OptionPage.closeModal('statusModal'); });
 // Settings
 document.querySelectorAll('#filterMethod input').forEach(el => { el.addEventListener('click', e => { option.selectFilterMethod(e); }); });
 document.getElementById('censorCharacterSelect').addEventListener('click', e => { option.saveOptions(e)});
