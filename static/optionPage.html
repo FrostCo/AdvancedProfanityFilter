@@ -246,6 +246,82 @@
 
 <div id="helpPage" class="w3-container w3-hide">
   <div id="gettingStarted">
+    <h1 id="getting-started">Getting Started</h1>
+    <p>Welcome to AdvancedProfanityFilter, a profanity filter built for Chrome, Firefox, and Opera.</p>
+    <h1 id="settings">Settings</h1>
+    <h3 id="filter-settings">Filter Settings</h3>
+    <p>There are three modes for the filter to operate in, each with different sub-settings to fine-tune your experience.</p>
+    <h4 id="censor-mode">Censor Mode</h4>
+    <p>In Censor mode, actions are taken to hide offensive words through masking them in some fashion. Here is a run down of options and an explanation of each.</p>
+    <ul>
+    <li><strong>Preserve First Letter</strong> - This option will preserve the first letter of a word/phrase, but mask the other letters with a chosen placeholder (Default: <code>*</code>).</li>
+    <li><strong>Preserve Last Letter</strong> - Like the previous option, except this will preserve the last letter of a word/phrase.</li>
+    <li><strong>Censor Character</strong> - Set the character to mask letters with. (Default: <code>*</code>).</li>
+    <li><strong>Fixed Length</strong> - Set a fixed length for words masked by the filter. If No fixed length is selected, the word will be the original length. This may help to make it difficult to guess what the word was. (Default: <code>No fixed length</code>)</li>
+    </ul>
+    <h4 id="substitution-mode">Substitution Mode</h4>
+    <p>In Substitution mode, offensive words are replaced by a less offensive synonym. In this mode most of the settings you do will be in the &quot;Words&quot; tab, where you can fine-tune your list of words/phrases and what you would like to replace them with.</p>
+    <ul>
+    <li><strong>Preserve case</strong> - Preserve the original case of the filtered word. (Default: <code>Enabled</code>)</li>
+    <li><strong>Mark substituted words</strong> - Marks substituted words by surrounding them with <code>[</code> and <code>]</code>.</li>
+    </ul>
+    <h4 id="remove-mode">Remove Mode</h4>
+    <p>When selected, the offensive word will simply be removed completely from the page, with no indicator that it was ever there. Note that this can sometimes lead to strange sentences.</p>
+    <h3 id="global-matching-method">Global Matching Method</h3>
+    <p>The matching method will dictate how the filter matches words from the word list. By default, the <code>Partial Match</code> mode is selected. <em>All matching methods are case-insensitive</em>.</p>
+    <ul>
+    <li><strong>Exact Match</strong> - Requires a full match, which means it only matches words as defined in the word list.  </li>
+    <li><strong>Partial Match</strong> - Will match part of a word, so if a word defined in the list is part of a word, it will be filtered.</li>
+    <li><strong>Whole Match</strong> - Like the partial match, except this mode will apply to the entire word, not just the part of the word that matches.</li>
+    <li><strong>Per-Word Match</strong> - This allows you to specify one of the above match methods for each word, which gives you a lot more power to customize the filter for your needs.</li>
+    <li><strong>Regular Expression Match</strong> - This is an advanced method that only can be applied per word. It is a blank slate for creating a regular expression and will not be auto-escaped like the other methods. All entries will be <code>gi</code>. Here are examples of how to re-create a the exact and partial match methods for the word <code>word</code>:<ul>
+    <li>Exact: <code>\b(w)ord\b</code></li>
+    <li>Partial: <code>(w)ord</code></li>
+    </ul>
+    </li>
+    </ul>
+    <h3 id="general-settings">General Settings</h3>
+    <p>These settings apply to both the <strong>Censor</strong> and <strong>Substitution</strong> filter modes:</p>
+    <ul>
+    <li><strong>Show number of filtered words</strong> - Show a counter on the extension button with the number of filtered words.</li>
+    </ul>
+    <h1 id="words">Words</h1>
+    <p>The words tabs allow you to perform several actions (Some options are unavailable based on other settings):</p>
+    <ul>
+    <li>Add new words/phrases</li>
+    <li>Remove existing words/phrases</li>
+    <li>Set the match method for an existing word (Only when <code>Per-Word Match</code> is selected)</li>
+    <li>Match repeated characters in words</li>
+    <li>Add a new substitution for a word (Only when filter in <code>Substitution</code> mode)</li>
+    <li>Remove an existing substitution for a word (Only when filter in <code>Substitution</code> mode)</li>
+    <li>Words/phrases can also be added by selecting them on a web page and then choosing the <code>Add selection to filter</code> option from the context (right-click) menu.</li>
+    </ul>
+    <h1 id="domains">Domains</h1>
+    <p>This tab allows you to control domains that the filter will be disabled (whitelisted) on, or which domains to use the Advanced mode on.</p>
+    <h3 id="advanced-mode-">Advanced Mode:</h3>
+    <p>Advanced mode for domains that are particularly hard to filter.</p>
+    <ul>
+    <li>To add a domain to the list, go the Advanced Domains on the &quot;Domains&quot; tab on the options page.</li>
+    <li><strong>WARNING</strong>: This mode can break webpages and result in lower performance. Use only when the filter isn&#39;t working on a page.</li>
+    </ul>
+    <h3 id="disabled-whitelist-">Disabled (Whitelist):</h3>
+    <p>Control which domains the filter should not run on. To whitelist Google.com and all its sub-domains, simply add <code>google.com</code>. If you want to just whitelist Gmail, you can add <code>mail.google.com</code>.</p>
+    <p>When browsing a web page, you can also disable the filter for the current domain from the context (right-click) menu.</p>
+    <p><em>Note: Do not include the protocol (ex. <code>http://</code>), or anything after the domain name.</em></p>
+    <h1 id="config">Config</h1>
+    <p>This tab allows you to control your configuration for the filter.</p>
+    <ul>
+    <li><strong>Export</strong> - Export your current settings as a JSON object. Useful if you want to backup your settings or share them with others.</li>
+    <li><strong>Import</strong> - Import settings as a JSON object. <strong>WARNING</strong> There are almost no protections in place when you import a bad config, so before importing I recommend taking a backup (Export) just in case.</li>
+    <li><strong>Restore Defaults</strong> - This restores all settings back to their defaults. (<em>NOTE: This will export your current config before restoring defaults</em>)</li>
+    </ul>
+    <h3 id="password">Password</h3>
+    <p>At the bottom of the page there is a prompt for you to set a password to protect the Options and Pop-up pages. This may be useful to keep others from modifying your settings for the extension. This does not prevent a user from disabling or removing the extension. This is not a secure mechanism. Your password is stored in plain-text, so do not reuse an established password.</p>
+    <ul>
+    <li>To set a password: Enter the desired password in the box and click <code>Set</code>. You will now be prompted for the password when opening the Options page.</li>
+    <li>To remove a password: Leave the password box blank and click <code>Set</code>.</li>
+    <li>If you forget your password, please contact me for information on how to recover it.</li>
+    </ul>
   </div>
 
   <span id="contributors">
