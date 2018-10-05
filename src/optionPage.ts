@@ -1,4 +1,4 @@
-import { arrayContains, dynamicList, removeFromArray } from './lib/helper.js';
+import { dynamicList } from './lib/helper.js';
 import WebConfig from './webConfig.js';
 import {Filter} from './lib/filter.js';
 import OptionAuth from './optionAuth.js';
@@ -78,7 +78,6 @@ export default class OptionPage {
     element.classList.add('w3-border-red');
     if (message) {
       try {
-        throw 'hi';
         element.setCustomValidity(message);
         element.reportValidity();
       } catch(e) {
@@ -219,15 +218,16 @@ export default class OptionPage {
       self.cfg = new WebConfig(JSON.parse(configText.value));
       self.cfg.sanitizeWords();
 
-      let resetError = await self.cfg.reset();
-      if (resetError) {
-        throw new Error('Failed to reset config');
-      }
+      let resetSuccess = await self.restoreDefaults(evt, true);
 
-      let error = await self.cfg.save();
-      if (!error) {
-        OptionPage.showStatusModal('Settings imported successfully');
-        self.init();
+      if (resetSuccess) {
+        let error = await self.cfg.save();
+        if (!error) {
+          OptionPage.showStatusModal('Settings imported successfully.');
+          self.init();
+        } else {
+          OptionPage.showErrorModal('Failed to import settings.');
+        }
       }
     } catch (e) {
       OptionPage.showErrorModal();
@@ -382,22 +382,26 @@ export default class OptionPage {
     let word = wordList.value;
 
     delete this.cfg.words[word];
-    await this.saveOptions(evt);
+    let success = this.saveOptions(evt);
 
-    // Update states and Reset word form
-    filter.init();
-    wordList.selectedIndex = 0;
-    this.populateWordsList();
+    if (success) {
+      // Update states and Reset word form
+      filter.init();
+      wordList.selectedIndex = 0;
+      this.populateWordsList();
+    }
   }
 
-  async restoreDefaults(evt) {
+  async restoreDefaults(evt, silent = false) {
     this.exportConfig();
     let error = await this.cfg.reset();
     if (error) {
-      // OptionPage.updateStatus('Error restoring defaults!', true, 5000);
+      OptionPage.showErrorModal('Error restoring defaults!');
+      return false;
     } else {
-      // OptionPage.updateStatus('Default settings restored!', false, 3000);
+      if (!silent) OptionPage.showStatusModal('Default settings restored');
       this.init();
+      return true;
     }
   }
 
@@ -433,8 +437,10 @@ export default class OptionPage {
     let error = await self.cfg.save();
     if (error) {
       OptionPage.showErrorModal('Settings not saved! Please try again.');
+      return false;
     } else {
       self.init();
+      return true;
     }
   }
 
@@ -488,8 +494,8 @@ export default class OptionPage {
       }
 
       if (added) {
-        let error = await this.saveOptions(evt);
-        if (error) {
+        let success = await this.saveOptions(evt);
+        if (!success) {
           OptionPage.showErrorModal();
           return false;
         }
