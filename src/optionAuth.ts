@@ -31,17 +31,21 @@ export default class OptionAuth {
   setPasswordButton(optionPage: OptionPage) {
     let passwordText = document.getElementById('setPassword') as HTMLInputElement;
     let passwordBtn = document.getElementById('setPasswordBtn') as HTMLButtonElement;
-    if (passwordText.value == '') { // Empty password field
-      if (optionPage.cfg.password == '') { // No password set
-        OptionPage.disableBtn(passwordBtn);
+
+    if (optionPage.cfg.password) { // Password already set
+      OptionPage.enableBtn(passwordBtn);
+      if (passwordText.value) { // Password field filled
         passwordBtn.innerText = 'SET';
-      } else {
-        OptionPage.enableBtn(passwordBtn);
+      } else { // Empty password field
         passwordBtn.innerText = 'REMOVE';
       }
-    } else {
-      OptionPage.enableBtn(passwordBtn);
-      passwordBtn.innerText = 'SET'
+    } else { // Password not already set
+      passwordBtn.innerText = 'SET';
+      if (passwordText.value) { // Password field filled
+        OptionPage.enableBtn(passwordBtn);
+      } else { // Empty password field
+        OptionPage.disableBtn(passwordBtn);
+      }
     }
   }
 }
