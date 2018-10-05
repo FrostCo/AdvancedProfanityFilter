@@ -20,7 +20,6 @@ download(readmeURI).then(data => {
     foundMatch = true;
     let output = prefix;
     html.split('\n').forEach(line => { if (line.trim() != '') output += `\n    ${line}` });
-    // output += postfix;
     return output + postfix;
   });
   if (foundMatch) {
