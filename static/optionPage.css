@@ -1,5 +1,5 @@
-body
-{min-height:900px}
+#main
+{padding-bottom:16px}
 #menu > a:hover
 {color:#fff!important;background-color:#2980b9!important}
 .disabled

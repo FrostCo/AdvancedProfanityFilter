@@ -129,10 +129,10 @@
   </div>
 
   <div id="defaultOptions">
-    <h4 class="w3-text-teal">Default Settings (For new words/phrases)</h4>
+    <h4 class="w3-text-teal">Default Settings (for new words/phrases)</h4>
     <label>
       <input id="defaultWordRepeat" type="checkbox" class="w3-check">
-      Match repeated characters in words
+      Match repeated characters
       <span class="notes">(dog: dddoooggg)</span>
     </label>
     <div id="defaultMatchMethod" style="padding-top:8px;">
@@ -143,7 +143,7 @@
   </div>
 </div>
 
-<div id="wordsPage" class="w3-hide w3-container">
+<div id="wordsPage" class="w3-container w3-hide">
   <h5 class="w3-text-teal">Words & Phrases</h5>
   <select id="wordList" class="w3-select w3-border small"></select>
 
@@ -194,7 +194,7 @@
   </div>
 </div>
 
-<div id="domainsPage" class="w3-padding w3-hide">
+<div id="domainsPage" class="w3-container w3-hide">
   <div id="advDomainContainer" class="w3-half">
     <h4 class="w3-text-teal">Advanced Domains</h4>
     <select id="advDomainSelect" class="w3-select w3-border small" style="display:block"></select>
@@ -222,13 +222,13 @@
   </div>
 </div>
 
-<div id="configPage" class="w3-hide w3-container">
+<div id="configPage" class="w3-container w3-hide">
   <div style="padding-top:16px;padding-bottom:16px;width:500px;">
     <button id="configExport" class="w3-btn w3-round-large w3-flat-peter-river">EXPORT</button>
     <button id="configImport" class="w3-btn w3-round-large w3-flat-peter-river">IMPORT</button>
     <button id="configReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESTORE DEFAULTS</button>
   </div>
-  <textarea id="configText" class="w3-input w3-border w3-card" style="width:500px;height:550px;"></textarea>
+  <textarea id="configText" class="w3-input w3-border w3-card" style="width:500px;height:550px;" spellcheck="false"></textarea>
 
   <div id="setPasswordContainer" style="padding-top:16px;width:500px;">
     <label for="setPassword">Password</label>
@@ -237,7 +237,7 @@
   </div>
 </div>
 
-<div id="testPage" class="w3-padding w3-hide">
+<div id="testPage" class="w3-container w3-hide">
   <h4 class="w3-text-teal">Test</h4>
   <textarea id="testText" class="w3-input w3-border w3-card"></textarea>
   <h4 class="w3-text-teal">Filtered</h4>
