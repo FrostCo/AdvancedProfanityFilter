@@ -1,3 +1,5 @@
+'use strict';
+
 const chokidar = require('chokidar');
 const execSync = require('child_process').execSync;
 const path = require('path');

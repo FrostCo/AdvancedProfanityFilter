@@ -115,14 +115,14 @@ export default class OptionPage {
     advDomainText.value = advDomains.value;
   }
 
-  advancedDomainRemove(evt) {
+  async advancedDomainRemove(evt) {
     if (evt.target.classList.contains('disabled')) return false;
     let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
     option.cfg['advancedDomains'].splice(option.cfg['advancedDomains'].indexOf(advDomains.value), 1);
-    if (option.saveProp('advancedDomains')) this.advancedDomainList();
+    if (await option.saveProp('advancedDomains')) this.advancedDomainList();
   }
 
-  advancedDomainSave(evt) {
+  async advancedDomainSave(evt) {
     let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
     let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
     let invalidMessage = 'Valid domain example: google.com or www.google.com';
@@ -134,7 +134,7 @@ export default class OptionPage {
     }
 
     if (success) {
-      if (option.saveProp('advancedDomains')) this.advancedDomainList();
+      if (await option.saveProp('advancedDomains')) this.advancedDomainList();
     }
   }
 
@@ -185,14 +185,14 @@ export default class OptionPage {
     disabledDomainText.value = disabledDomains.value;
   }
 
-  disabledDomainRemove(evt) {
+  async disabledDomainRemove(evt) {
     if (evt.target.classList.contains('disabled')) return false;
     let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
     option.cfg['disabledDomains'].splice(option.cfg['disabledDomains'].indexOf(disabledDomains.value), 1);
-    if (option.saveProp('disabledDomains')) this.disabledDomainList();
+    if (await option.saveProp('disabledDomains')) this.disabledDomainList();
   }
 
-  disabledDomainSave(evt) {
+  async disabledDomainSave(evt) {
     let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
     let disabledDomainText = document.getElementById('disabledDomainText') as HTMLInputElement;
     let invalidMessage = 'Valid domain example: google.com or www.google.com';
@@ -204,7 +204,7 @@ export default class OptionPage {
     }
 
     if (success) {
-      if (option.saveProp('disabledDomains')) this.disabledDomainList();
+      if (await option.saveProp('disabledDomains')) this.disabledDomainList();
     }
   }
 
@@ -515,7 +515,7 @@ export default class OptionPage {
 
   async selectFilterMethod(evt) {
     option.cfg.filterMethod = WebConfig._filterMethodNames.indexOf(evt.target.value);
-    if (option.saveProp('filterMethod')) this.init();
+    if (await option.saveProp('filterMethod')) this.init();
   }
 
   switchPage(evt) {
