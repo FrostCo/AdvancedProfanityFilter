@@ -41,10 +41,6 @@ input:checked + .slider:before {
   transform: translateX(26px);
 }
 
-#advancedModeContainer {
-  text-align: center;
-}
-
 #banner {
   padding: 0px;
   margin: 0px;
@@ -56,7 +52,7 @@ input:checked + .slider:before {
 }
 
 #filterMethodSelect {
-  width: 200px;
+  width: 150px;
 }
 
 #footer {
@@ -80,16 +76,21 @@ input:checked + .slider:before {
 }
 
 #options {
-  padding: 1rem;
   margin: 0;
   transition: 0.2s;
   text-align: center;
   cursor: pointer;
   font-weight: normal;
+  width: 80%;
 }
 
 #options:hover {
   background-color: #ddd;
+}
+
+.container {
+  margin-top:8px;
+  margin-bottom:8px;
 }
 
 .disabled {
@@ -100,11 +101,6 @@ input:checked + .slider:before {
   border-bottom: solid #ccc 1px;
   width: 200px;
   margin: auto;
-}
-
-.filter {
-  margin-left: 25px;
-  margin-bottom: 1rem;
 }
 
 .options {
