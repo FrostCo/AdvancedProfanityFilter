@@ -1,4 +1,4 @@
-interface wordOptions {
+interface WordOptions {
   matchMethod: number;
   repeat: boolean;
   sub: string;
@@ -22,7 +22,7 @@ export default class Config {
   showCounter: boolean;
   substitutionMark: boolean;
   words: {
-    [key: string]: wordOptions;
+    [key: string]: WordOptions;
   };
 
   // TODO: Finish removing magic numbers?
@@ -92,7 +92,7 @@ export default class Config {
     for(let k in config) this[k]=config[k];
   }
 
-  addWord(str: string, options?: wordOptions) {
+  addWord(str: string, options?: WordOptions) {
     str = str.trim().toLowerCase();
     if (Object.keys(this.words).includes(str)) {
       return false; // Already exists

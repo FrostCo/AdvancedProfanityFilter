@@ -9,7 +9,7 @@
     "clean": "node bin/clean-dist.js",
     "copy-static": "node bin/copy-static.js",
     "debug-test": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
-    "lint": "npx eslint ./src/*.ts",
+    "lint": "npx eslint src/**/*.ts",
     "package": "npm run lint && npm run build && npm test && node bin/package-extension.js",
     "package-no-build": "node bin/package-extension.js",
     "update-readme": "node bin/update-readme.js",

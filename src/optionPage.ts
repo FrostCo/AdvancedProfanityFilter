@@ -1,6 +1,6 @@
 import { dynamicList } from './lib/helper.js';
 import WebConfig from './webConfig.js';
-import {Filter} from './lib/filter.js';
+import { Filter } from './lib/filter.js';
 import OptionAuth from './optionAuth.js';
 
 export default class OptionPage {
@@ -48,7 +48,9 @@ export default class OptionPage {
     element.classList.remove('w3-border-red');
     try {
       element.setCustomValidity('');
-    } catch(e) { }
+    } catch(e) {
+      // If HTML5 validation not supported, the modal will suffice
+     }
   }
 
   static hideStatus() {
@@ -151,7 +153,7 @@ export default class OptionPage {
         OptionPage.configureConfirmModal('Are you sure you want to restore defaults?');
         ok.addEventListener('click', restoreDefaults);
         break;
-      case 'setPassword':
+      case 'setPassword': {
         let passwordText = document.getElementById('setPassword') as HTMLInputElement;
         let passwordBtn = document.getElementById('setPasswordBtn') as HTMLInputElement;
         if (passwordBtn.classList.contains('disabled')) return false;
@@ -160,6 +162,7 @@ export default class OptionPage {
         OptionPage.configureConfirmModal(message);
         ok.addEventListener('click', setPassword);
         break;
+      }
     }
 
     OptionPage.openModal('confirmModal');
@@ -600,24 +603,24 @@ function setPassword(e) { option.auth.setPassword(option); }
 window.addEventListener('load', e => { option.init(); });
 document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click', e => { option.switchPage(e); }); });
 // Modals
-document.getElementById('submitPassword').addEventListener('click', e => { option.auth.authenticate(e); })
+document.getElementById('submitPassword').addEventListener('click', e => { option.auth.authenticate(e); });
 document.getElementById('confirmModalOK').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('statusModalOK').addEventListener('click', e => { OptionPage.closeModal('statusModal'); });
 // Settings
 document.querySelectorAll('#filterMethod input').forEach(el => { el.addEventListener('click', e => { option.selectFilterMethod(e); }); });
-document.getElementById('censorCharacterSelect').addEventListener('click', e => { option.saveOptions(e)});
-document.getElementById('censorFixedLengthSelect').addEventListener('click', e => { option.saveOptions(e)});
-document.getElementById('defaultWordMatchMethodSelect').addEventListener('click', e => { option.saveOptions(e)});
-document.getElementById('defaultWordRepeat').addEventListener('click', e => { option.saveOptions(e)});
-document.getElementById('globalMatchMethodSelect').addEventListener('click', e => { option.saveOptions(e)});
-document.getElementById('preserveCase').addEventListener('click', e => { option.saveOptions(e)});
-document.getElementById('preserveFirst').addEventListener('click', e => { option.saveOptions(e)});
-document.getElementById('preserveLast').addEventListener('click', e => { option.saveOptions(e)});
-document.getElementById('showCounter').addEventListener('click', e => { option.saveOptions(e)});
-document.getElementById('filterWordList').addEventListener('click', e => { option.saveOptions(e)});
-document.getElementById('substitutionMark').addEventListener('click', e => { option.saveOptions(e)});
-document.getElementById('defaultWordSubstitutionText').addEventListener('change', e => { option.saveOptions(e)});
+document.getElementById('censorCharacterSelect').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('censorFixedLengthSelect').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('defaultWordMatchMethodSelect').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('defaultWordRepeat').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('globalMatchMethodSelect').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('preserveCase').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('preserveFirst').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('preserveLast').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('showCounter').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('filterWordList').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('substitutionMark').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('defaultWordSubstitutionText').addEventListener('change', e => { option.saveOptions(e); });
 // Words/Phrases
 document.getElementById('wordList').addEventListener('click', e => { option.populateWord(); });
 document.getElementById('wordText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
