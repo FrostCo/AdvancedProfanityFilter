@@ -12,7 +12,7 @@
     "lint": "npx eslint src/**/*.ts",
     "package": "npm run lint && npm run build && npm test && node bin/package-extension.js",
     "package-no-build": "node bin/package-extension.js",
-    "update-readme": "node bin/update-readme.js",
+    "update-help": "node bin/update-help.js",
     "test-no-coverage": "npx mocha",
     "test": "npx nyc --reporter=lcov --reporter=text npx mocha",
     "watch": "node bin/watch.js"
