@@ -2,6 +2,7 @@ import { dynamicList } from './lib/helper.js';
 import WebConfig from './webConfig.js';
 import { Filter } from './lib/filter.js';
 import OptionAuth from './optionAuth.js';
+import DataMigration from './dataMigration.js';
 
 export default class OptionPage {
   cfg: WebConfig;
@@ -145,10 +146,13 @@ export default class OptionPage {
     ok.removeEventListener('click', setPassword);
 
     switch(action) {
-      case 'importConfig':
+      case 'importConfig': {
+        let configText = document.getElementById('configText') as HTMLTextAreaElement;
+        if (!configText.value) return false;
         OptionPage.configureConfirmModal('Are you sure you want to overwrite your existing settings?');
         ok.addEventListener('click', importConfig);
         break;
+      }
       case 'restoreDefaults':
         OptionPage.configureConfirmModal('Are you sure you want to restore defaults?');
         ok.addEventListener('click', restoreDefaults);
@@ -218,12 +222,14 @@ export default class OptionPage {
 
     try {
       let configText = document.getElementById('configText') as HTMLTextAreaElement;
-      self.cfg = new WebConfig(JSON.parse(configText.value));
-      self.cfg.sanitizeWords();
+      let importedCfg = new WebConfig(JSON.parse(configText.value));
+      let migration = new DataMigration(importedCfg);
+      migration.runImportMigrations();
 
       let resetSuccess = await self.restoreDefaults(evt, true);
 
       if (resetSuccess) {
+        self.cfg = importedCfg;
         let error = await self.cfg.save();
         if (!error) {
           OptionPage.showStatusModal('Settings imported successfully.');
@@ -231,6 +237,8 @@ export default class OptionPage {
         } else {
           OptionPage.showErrorModal('Failed to import settings.');
         }
+      } else {
+        OptionPage.showErrorModal('Failed to import settings.');
       }
     } catch (e) {
       OptionPage.showErrorModal();

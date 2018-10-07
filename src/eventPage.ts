@@ -1,6 +1,7 @@
 import { arrayContains, getVersion, isVersionOlder } from './lib/helper.js';
 import WebConfig from './webConfig.js';
 import Domain from './domain.js';
+import DataMigration from './dataMigration.js';
 
 interface Version {
   major: number,
@@ -94,58 +95,12 @@ async function toggleDomain(domain: string, key: string) {
   Domain.domainMatch(domain, cfg[key]) ? enableDomain(cfg, domain, key) : disableDomain(cfg, domain, key);
 }
 
-// This will look at the version (from before the update) and perform data migrations if necessary
-// Only append so the order stays the same (oldest first).
 async function updateMigrations(previousVersion) {
-  let old = getVersion(previousVersion) as Version;
-  // let current = chrome.runtime.getManifest().version
-
-  // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
-  if (isVersionOlder(old, getVersion('1.0.13'))) {
-    // Note: using promise instead of async/await
-    chrome.storage.sync.get({'words': null}, function(oldWords) {
-      // console.log('Old words for migration:', oldWords.words);
-      if (oldWords.words) {
-        chrome.storage.sync.set({'_words0': oldWords.words}, function() {
-          if (!chrome.runtime.lastError) {
-            chrome.storage.sync.remove('words', function() {
-              // Split words if necessary
-              var wordsPromise = new Promise(function(resolve, reject) {
-                resolve(WebConfig.build());
-              });
-              wordsPromise
-                .then(function(response: WebConfig) {
-                  response.save();
-                });
-            });
-          }
-        });
-      }
-    });
-  }
-
-  // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
-  if (isVersionOlder(old, getVersion('1.1.0'))) {
+  if (DataMigration.migrationNeeded(previousVersion)) {
     let cfg = await WebConfig.build();
-    cfg.sanitizeWords();
-    cfg.save();
-  }
-
-  // [1.2.0] - Change from a word having many substitutions to a single substitution
-  if (isVersionOlder(old, getVersion('1.1.3'))) {
-    let cfg = await WebConfig.build();
-    // console.log('before', JSON.stringify(cfg.words));
-    Object.keys(cfg.words).forEach(word => {
-      let wordObj = cfg.words[word];
-      if (wordObj.hasOwnProperty('words')) {
-        // @ts-ignore
-        wordObj.sub = wordObj.words[0] || '';
-        // @ts-ignore
-        delete wordObj.words;
-      }
-    });
-    // console.log('after', JSON.stringify(cfg.words));
-    cfg.save();
+    let migration = new DataMigration(cfg);
+    let migrated = migration.byVersion(previousVersion);
+    if (migrated) cfg.save();
   }
 }
 
