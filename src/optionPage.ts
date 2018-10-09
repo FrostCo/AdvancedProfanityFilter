@@ -8,6 +8,8 @@ export default class OptionPage {
   cfg: WebConfig;
   auth: OptionAuth;
 
+  static readonly activeClass = 'w3-flat-belize-hole';
+
   static closeModal(id: string) {
     OptionPage.hide(document.getElementById(id));
   }
@@ -527,11 +529,11 @@ export default class OptionPage {
   }
 
   switchPage(evt) {
-    let currentTab = document.querySelector('#menu a.w3-flat-belize-hole') as HTMLElement;
+    let currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
     let newTab = evt.target as HTMLElement;
 
-    currentTab.classList.remove('w3-flat-belize-hole');
-    newTab.classList.add('w3-flat-belize-hole');
+    currentTab.classList.remove(OptionPage.activeClass);
+    newTab.classList.add(OptionPage.activeClass);
 
     let currentPage = document.getElementById(currentTab.innerText.toLowerCase() + 'Page') as HTMLElement;
     let newPage = document.getElementById(newTab.innerText.toLowerCase() + 'Page') as HTMLElement;
