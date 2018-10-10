@@ -1,18 +1,42 @@
 'use strict';
-
 const fse = require('fs-extra');
 const path = require('path');
 const AdmZip = require('adm-zip');
 
+function buildAll() {
+  buildChrome(prepareZip());
+  buildEdge(getManifestJSON(), prepareZip());
+  buildFirefox(getManifestJSON(), prepareZip());
+  buildOpera(prepareZip());
+}
+
 function buildChrome(zip) {
-  fse.removeSync('./extension-chrome.zip');
   console.log('Building ./extension-chrome.zip');
-  zip.deleteFile('webFilter.js'); // Remove filter.js as its only used for testing
+  fse.removeSync('./extension-chrome.zip');
   zip.writeZip('./extension-chrome.zip');
 }
 
+function buildEdge(manifest, zip) {
+  console.log('Building ./extension-edge.zip');
+  let msPreload = {
+    backgroundScript: "backgroundScriptsAPIBridge.js",
+    contentScript: "contentScriptsAPIBridge.js"
+  }
+
+  // Fix options_page
+  manifest.options_page = manifest.options_ui.page;
+  delete manifest.options_ui;
+
+  // Add ms-proload polyfills
+  manifest['-ms-preload'] = msPreload;
+  updateManifestFileInZip(zip, manifest);
+  zip.addLocalFile('./store/edge/src/backgroundScriptsAPIBridge.js', null);
+  zip.addLocalFile('./store/edge/src/contentScriptsAPIBridge.js', null);
+  fse.removeSync('./extension-edge.zip');
+  zip.writeZip('./extension-edge.zip');
+}
+
 function buildFirefox(manifest, zip) {
-  fse.removeSync('./extension-firefox.zip');
   console.log('Building ./extension-firefox.zip');
   let firefoxManifest = {
     "applications": {
@@ -23,32 +47,20 @@ function buildFirefox(manifest, zip) {
   };
   manifest.applications = firefoxManifest.applications;
   updateManifestFileInZip(zip, manifest);
+  fse.removeSync('./extension-firefox.zip');
   zip.writeZip('./extension-firefox.zip');
+
+  packageSource(); // Required due to bundled code
 }
 
 function buildOpera(zip) {
-  fse.removeSync('./extension-opera.zip');
   console.log('Building ./extension-opera.zip');
+  fse.removeSync('./extension-opera.zip');
   zip.writeZip('./extension-opera.zip');
 }
 
-function updateManifestFile(file, obj) {
-  let content = JSON.stringify(obj, null, 2);
-  fse.writeFileSync(file, content);
-}
-
-function updateManifestFileInZip(zip, obj) {
-  let content = JSON.stringify(obj, null, 2);
-  zip.updateFile('manifest.json', Buffer.alloc(content.length, content));
-}
-
-function updateManifestVersion(manifestPath, manifest) {
-  if (manifest.version != process.env.npm_package_version) {
-    console.log('Version number is being updated: ' + manifest.version + ' -> ' + process.env.npm_package_version)
-    manifest.version = process.env.npm_package_version || manifest.version;
-    updateManifestFile(manifestPath, manifest);
-    fse.copyFileSync(manifestPath, path.join(dist, 'manifest.json'));
-  }
+function getManifestJSON() {
+  return JSON.parse(fse.readFileSync(manifestPath));
 }
 
 function packageSource() {
@@ -73,16 +85,34 @@ function packageSource() {
   sourceZip.writeZip('./extension-source.zip');
 }
 
+function prepareZip() {
+  let zip = new AdmZip();
+  zip.addLocalFolder(dist, null);
+  zip.deleteFile('webFilter.js'); // Remove filter.js as its only used for testing
+  return zip;
+}
+
+function updateManifestFile(file, obj) {
+  let content = JSON.stringify(obj, null, 2);
+  fse.writeFileSync(file, content);
+}
+
+function updateManifestFileInZip(zip, obj) {
+  let content = JSON.stringify(obj, null, 2);
+  zip.updateFile('manifest.json', Buffer.alloc(content.length, content));
+}
+
+function updateManifestVersion(manifestPath, manifest) {
+  if (manifest.version != process.env.npm_package_version) {
+    console.log('Version number is being updated: ' + manifest.version + ' -> ' + process.env.npm_package_version)
+    manifest.version = process.env.npm_package_version || manifest.version;
+    updateManifestFile(manifestPath, manifest);
+    fse.copyFileSync(manifestPath, path.join(dist, 'manifest.json'));
+  }
+}
+
 const dist = './dist/'
 const staticDir = './static/'
-let zip = new AdmZip();
 let manifestPath = path.join(staticDir, 'manifest.json');
-let manifest = JSON.parse(fse.readFileSync(manifestPath));
-updateManifestVersion(manifestPath, manifest);
-zip.addLocalFolder(dist, null);
-buildChrome(zip);
-buildOpera(zip);
-buildFirefox(manifest, zip);
-
-// Required for Firefox
-packageSource();
+updateManifestVersion(manifestPath, getManifestJSON());
+buildAll();
