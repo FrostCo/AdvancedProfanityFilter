@@ -1,12 +1,19 @@
+interface WordOptions {
+  matchMethod: number;
+  repeat: boolean;
+  sub: string;
+}
+
 export default class Config {
   advancedDomains: string[];
   censorCharacter: string;
   censorFixedLength: number;
-  defaultSubstitutions: string[];
+  defaultSubstitution: string;
   defaultWordMatchMethod: number;
   defaultWordRepeat: boolean;
   disabledDomains: string[];
   filterMethod: number;
+  filterWordList: boolean;
   globalMatchMethod: number;
   password: string;
   preserveCase: boolean;
@@ -14,15 +21,11 @@ export default class Config {
   preserveLast: boolean;
   showCounter: boolean;
   substitutionMark: boolean;
-  wordList: string[];
   words: {
-    [key: string]: {
-      matchMethod: number;
-      repeat: boolean;
-      words: string[];
-    }
+    [key: string]: WordOptions;
   };
 
+  // TODO: Finish removing magic numbers?
   static readonly filterMethods = {
     censor: 0,
     substitute: 1,
@@ -38,14 +41,15 @@ export default class Config {
   }
 
   static readonly _defaults = {
-    advancedDomains: [],
+    advancedDomains: ['reddit.com'],
     censorCharacter: '*',
     censorFixedLength: 0,
-    defaultSubstitutions: ['censored', 'expletive', 'filtered'],
+    defaultSubstitution: 'censored',
     defaultWordMatchMethod: 0,
     defaultWordRepeat: false,
     disabledDomains: [],
     filterMethod: 0, // ['Censor', 'Substitute', 'Remove'];
+    filterWordList: true,
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
     password: null,
     preserveCase: true,
@@ -56,27 +60,27 @@ export default class Config {
   };
 
   static readonly _defaultWords = {
-    'ass': { matchMethod: 0, repeat: true, words: ['butt', 'tail'] },
-    'asses': { matchMethod: 0, repeat: false, words: ['butts'] },
-    'asshole': { matchMethod: 1, repeat: true, words: ['butthole', 'jerk'] },
-    'bastard': { matchMethod: 1, repeat: true, words: ['imperfect', 'impure'] },
-    'bitch': { matchMethod: 1, repeat: true, words: ['jerk'] },
-    'cunt': { matchMethod: 1, repeat: true, words: ['explative'] },
-    'dammit': { matchMethod: 1, repeat: true, words: ['dangit'] },
-    'damn': { matchMethod: 1, repeat: true, words: ['dang', 'darn'] },
-    'dumbass': { matchMethod: 0, repeat: true, words: ['idiot'] },
-    'fuck': { matchMethod: 1, repeat: true, words: ['freak', 'fudge'] },
-    'hell': { matchMethod: 0, repeat: true, words: ['heck'] },
-    'piss': { matchMethod: 1, repeat: true, words: ['pee'] },
-    'pissed': { matchMethod: 0, repeat: true, words: ['ticked'] },
-    'slut': { matchMethod: 1, repeat: true, words: ['imperfect', 'impure'] },
-    'shit': { matchMethod: 1, repeat: true, words: ['crap', 'crud', 'poop'] },
-    'tits': { matchMethod: 1, repeat: true, words: ['explative'] },
-    'whore': { matchMethod: 1, repeat: true, words: ['harlot', 'tramp'] }
+    'ass': { matchMethod: 0, repeat: true, sub: 'butt' },
+    'asses': { matchMethod: 0, repeat: false, sub: 'butts' },
+    'asshole': { matchMethod: 1, repeat: true, sub: 'jerk' },
+    'bastard': { matchMethod: 1, repeat: true, sub: 'jerk' },
+    'bitch': { matchMethod: 1, repeat: true, sub: 'jerk' },
+    'cunt': { matchMethod: 1, repeat: true, sub: 'explative' },
+    'dammit': { matchMethod: 1, repeat: true, sub: 'dangit' },
+    'damn': { matchMethod: 1, repeat: true, sub: 'dang' },
+    'dumbass': { matchMethod: 1, repeat: true, sub: 'idiot' },
+    'fuck': { matchMethod: 1, repeat: true, sub: 'fudge' },
+    'hell': { matchMethod: 0, repeat: true, sub: 'heck' },
+    'piss': { matchMethod: 1, repeat: true, sub: 'pee' },
+    'pissed': { matchMethod: 1, repeat: true, sub: 'ticked' },
+    'slut': { matchMethod: 1, repeat: true, sub: 'tramp' },
+    'shit': { matchMethod: 1, repeat: true, sub: 'crap' },
+    'tits': { matchMethod: 1, repeat: true, sub: 'explative' },
+    'whore': { matchMethod: 1, repeat: true, sub: 'tramp' }
   };
 
   static readonly _filterMethodNames = ['Censor', 'Substitute', 'Remove'];
-  static readonly _matchMethodNames = ['Exact Match', 'Partial Match', 'Whole Match', 'Per-Word Match', 'Regular Expression'];
+  static readonly _matchMethodNames = ['Exact', 'Partial', 'Whole', 'Per-Word', 'Regular-Expression'];
   static readonly _maxBytes = 6500;
   static readonly _maxWords = 100;
   static readonly _wordsPattern = /^_words\d+/;
@@ -88,12 +92,16 @@ export default class Config {
     for(let k in config) this[k]=config[k];
   }
 
-  addWord(str: string) {
+  addWord(str: string, options?: WordOptions) {
     str = str.trim().toLowerCase();
     if (Object.keys(this.words).includes(str)) {
       return false; // Already exists
+    } else if (options) {
+      options.sub = options.sub.trim().toLowerCase();
+      this.words[str] = options;
+      return true;
     } else {
-      this.words[str] = {matchMethod: this.defaultWordMatchMethod, repeat: this.defaultWordRepeat, words: []};
+      this.words[str] = {matchMethod: this.defaultWordMatchMethod, repeat: this.defaultWordRepeat, sub: ''};
       return true;
     }
   }

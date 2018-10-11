@@ -1,100 +1,216 @@
-import { arrayContains, dynamicList, removeFromArray } from './lib/helper.js';
+import { dynamicList } from './lib/helper.js';
 import WebConfig from './webConfig.js';
-import OptionTab from './optionTab.js';
+import { Filter } from './lib/filter.js';
 import OptionAuth from './optionAuth.js';
+import DataMigration from './dataMigration.js';
 
 export default class OptionPage {
   cfg: WebConfig;
   auth: OptionAuth;
 
-  static activate(element) {
-    element.classList.add('active');
+  static readonly activeClass = 'w3-flat-belize-hole';
+
+  static closeModal(id: string) {
+    OptionPage.hide(document.getElementById(id));
   }
 
-  static deactivate(element) {
-    element.classList.remove('active');
+  static configureConfirmModal(content = 'Are you sure?', title = 'Please Confirm', titleColor = 'w3-flat-peter-river') {
+    let modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
+    let modalContent = document.getElementById('confirmModalContent') as HTMLElement;
+    let modalHeader = document.querySelectorAll('#confirmModal header')[0] as HTMLElement;
+    modalTitle.innerText = title;
+    modalContent.innerHTML = content;
+    modalHeader.className = `w3-container ${titleColor}`;
   }
 
-  static hide(element) {
-    element.classList.remove('visible');
-    element.classList.add('hidden');
+  static configureStatusModal(content: string, title: string, titleColor: string) {
+    let modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
+    let modalContent = document.getElementById('statusModalContent') as HTMLElement;
+    let modalHeader = document.querySelectorAll('#statusModal header')[0] as HTMLElement;
+    modalTitle.innerText = title;
+    modalContent.innerHTML = content;
+    modalHeader.className = `w3-container ${titleColor}`;
   }
 
-  static show(element) {
-    element.classList.remove('hidden');
-    element.classList.add('visible');
+  static disableBtn(element: HTMLElement) {
+    element.classList.add('disabled');
+    element.classList.add('w3-flat-silver');
   }
 
-  // Display status update to user
-  static updateStatus(message, error, timeout) {
-    var status = document.getElementById('status');
-    if (error) {status.className = 'error';}
-    status.textContent = message;
-    setTimeout(function() {status.textContent = ''; status.className = '';}, timeout);
+  static enableBtn(element: HTMLElement) {
+    element.classList.remove('disabled');
+    element.classList.remove('w3-flat-silver');
   }
 
-  addNewItem(event, input, attr) {
-    if (input.value != '') {
-      if (input.checkValidity()) {
-        if (!arrayContains(option.cfg[attr], input.value)) {
-          option.cfg[attr].push(input.value);
-          option.cfg[attr] = option.cfg[attr].sort();
-          option.saveOptions(event);
-          input.value = '';
-        } else {
-          OptionPage.updateStatus('Error: Already in list.', true, 3000);
-        }
-      } else {
-        OptionPage.updateStatus('Error: Invalid entry.', true, 5000);
+  static hide(element: HTMLElement) {
+    element.classList.remove('w3-show');
+    element.classList.add('w3-hide');
+  }
+
+  static hideInputError(element) {
+    element.classList.remove('w3-border-red');
+    try {
+      element.setCustomValidity('');
+    } catch(e) {
+      // If HTML5 validation not supported, the modal will suffice
+     }
+  }
+
+  static hideStatus() {
+    let notificationPanel = document.getElementById('notificationPanel') as HTMLElement;
+    OptionPage.hide(notificationPanel);
+  }
+
+  static async load(instance: OptionPage) {
+    instance.cfg = await WebConfig.build();
+  }
+
+  static openModal(id: string) {
+    OptionPage.show(document.getElementById(id));
+  }
+
+  static show(element: HTMLElement) {
+    element.classList.remove('w3-hide');
+    element.classList.add('w3-show');
+  }
+
+  static showErrorModal(content = 'The requested action failed. Please try again or contact support.', title = 'Error', titleColor = 'w3-red') {
+    this.configureStatusModal(content, title, titleColor);
+    OptionPage.openModal('statusModal');
+  }
+
+ static showInputError(element, message = '') {
+    element.classList.add('w3-border-red');
+    if (message) {
+      try {
+        element.setCustomValidity(message);
+        element.reportValidity();
+      } catch(e) {
+        OptionPage.showWarningModal(message);
       }
     }
   }
 
-  advancedDomainAdd(event) {
-    let input = document.getElementById('advancedDomainText') as HTMLInputElement;
-    option.addNewItem(event, input, 'advancedDomains');
+  static showStatusModal(content = 'Status updated.', title = 'Status', titleColor = 'w3-flat-peter-river') {
+    this.configureStatusModal(content, title, titleColor);
+    OptionPage.openModal('statusModal');
   }
 
-  advancedDomainRemove(event) {
-    let input = document.getElementById('advancedDomainSelect') as HTMLInputElement;
-    if (input.value != '') {
-      option.cfg.advancedDomains = removeFromArray(option.cfg.advancedDomains, input.value);
-      option.saveOptions(event);
+  static showWarningModal(content = 'Invalid input.', title = 'Warning', titleColor = 'w3-orange') {
+    this.configureStatusModal(content, title, titleColor);
+    OptionPage.openModal('statusModal');
+  }
+
+  advancedDomainList() {
+    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
+    let domainListHTML = '<option selected value="">Add...</option>';
+    this.cfg.advancedDomains.forEach(domain => { domainListHTML += `<option value="${domain}">${domain}</option>`; });
+    advDomains.innerHTML = domainListHTML;
+    this.advancedDomainPopulate();
+  }
+
+  advancedDomainPopulate() {
+    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
+    let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
+    let advDomainRemove = document.getElementById('advDomainRemove') as HTMLInputElement;
+    OptionPage.hideInputError(advDomainText);
+    advDomains.value !== '' ? OptionPage.enableBtn(advDomainRemove) : OptionPage.disableBtn(advDomainRemove);
+    advDomainText.value = advDomains.value;
+  }
+
+  async advancedDomainRemove(evt) {
+    if (evt.target.classList.contains('disabled')) return false;
+    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
+    option.cfg['advancedDomains'].splice(option.cfg['advancedDomains'].indexOf(advDomains.value), 1);
+    if (await option.saveProp('advancedDomains')) this.advancedDomainList();
+  }
+
+  async advancedDomainSave(evt) {
+    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
+    let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
+    let invalidMessage = 'Valid domain example: google.com or www.google.com';
+    let success;
+    if (advDomains.value == '') { // New record
+      success = option.updateItemList(evt, advDomainText, 'advancedDomains', invalidMessage);
+    } else { // Updating existing record
+      success = option.updateItemList(evt, advDomainText, 'advancedDomains', invalidMessage, advDomains.value);
+    }
+
+    if (success) {
+      if (await option.saveProp('advancedDomains')) this.advancedDomainList();
     }
   }
 
-  censorCharacter(event) {
-    let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
-    this.cfg.censorCharacter = censorCharacterSelect.value;
-    this.saveOptions(event);
-  }
+  confirm(evt, action) {
+    let ok = document.getElementById('confirmModalOK');
+    ok.removeEventListener('click', importConfig);
+    ok.removeEventListener('click', restoreDefaults);
+    ok.removeEventListener('click', setPassword);
 
-  censorFixedLength(event) {
-    let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
-    this.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
-    this.saveOptions(event);
-  }
+    switch(action) {
+      case 'importConfig': {
+        let configText = document.getElementById('configText') as HTMLTextAreaElement;
+        if (!configText.value) return false;
+        OptionPage.configureConfirmModal('Are you sure you want to overwrite your existing settings?');
+        ok.addEventListener('click', importConfig);
+        break;
+      }
+      case 'restoreDefaults':
+        OptionPage.configureConfirmModal('Are you sure you want to restore defaults?');
+        ok.addEventListener('click', restoreDefaults);
+        break;
+      case 'setPassword': {
+        let passwordText = document.getElementById('setPassword') as HTMLInputElement;
+        let passwordBtn = document.getElementById('setPasswordBtn') as HTMLInputElement;
+        if (passwordBtn.classList.contains('disabled')) return false;
 
-  // Prompt for confirmation
-  confirm(event, action) {
-    // TODO: Add confirmation prompt
-    if (action == 'importConfig') {
-      this.importConfig(event);
-    } else if (action == 'restoreDefaults') {
-      this.restoreDefaults();
+        let message = passwordText.value == '' ? 'Are you sure you want to remove the password?' : `Are you sure you want to set the password to '${passwordText.value}'?`;
+        OptionPage.configureConfirmModal(message);
+        ok.addEventListener('click', setPassword);
+        break;
+      }
     }
+
+    OptionPage.openModal('confirmModal');
   }
 
-  domainAdd(event) {
-    let input = document.getElementById('domainText') as HTMLInputElement;
-    option.addNewItem(event, input, 'disabledDomains');
+  disabledDomainList() {
+    let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
+    let domainListHTML = '<option selected value="">Add...</option>';
+    this.cfg.disabledDomains.forEach(domain => { domainListHTML += `<option value="${domain}">${domain}</option>`; });
+    disabledDomains.innerHTML = domainListHTML;
+    this.disabledDomainPopulate();
   }
 
-  domainRemove(event) {
-    let domainSelect = document.getElementById('domainSelect') as HTMLSelectElement;
-    if (domainSelect.value != '') {
-      option.cfg.disabledDomains = removeFromArray(option.cfg.disabledDomains, domainSelect.value);
-      option.saveOptions(event);
+  disabledDomainPopulate() {
+    let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
+    let disabledDomainText = document.getElementById('disabledDomainText') as HTMLInputElement;
+    let disabledDomainRemove = document.getElementById('disabledDomainRemove') as HTMLInputElement;
+    OptionPage.hideInputError(disabledDomainText);
+    disabledDomains.value !== '' ? OptionPage.enableBtn(disabledDomainRemove) : OptionPage.disableBtn(disabledDomainRemove);
+    disabledDomainText.value = disabledDomains.value;
+  }
+
+  async disabledDomainRemove(evt) {
+    if (evt.target.classList.contains('disabled')) return false;
+    let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
+    option.cfg['disabledDomains'].splice(option.cfg['disabledDomains'].indexOf(disabledDomains.value), 1);
+    if (await option.saveProp('disabledDomains')) this.disabledDomainList();
+  }
+
+  async disabledDomainSave(evt) {
+    let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
+    let disabledDomainText = document.getElementById('disabledDomainText') as HTMLInputElement;
+    let invalidMessage = 'Valid domain example: google.com or www.google.com';
+    let success;
+    if (disabledDomains.value == '') { // New record
+      success = option.updateItemList(evt, disabledDomainText, 'disabledDomains', invalidMessage);
+    } else { // Updating existing record
+      success = option.updateItemList(evt, disabledDomainText, 'disabledDomains', invalidMessage, disabledDomains.value);
+    }
+
+    if (success) {
+      if (await option.saveProp('disabledDomains')) this.disabledDomainList();
     }
   }
 
@@ -103,314 +219,437 @@ export default class OptionPage {
     configText.value = JSON.stringify(this.cfg, null, 2);
   }
 
-  filterMethodSelect(event) {
-    let filterMethodSelectEm = document.getElementById('filterMethodSelect') as HTMLSelectElement;
-    this.cfg.filterMethod = filterMethodSelectEm.selectedIndex;
-    this.saveOptions(event);
-  }
-
-  globalMatchMethod(event) {
-    let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
-    this.cfg.globalMatchMethod = globalMatchMethodSelect.selectedIndex;
-    this.saveOptions(event);
-  }
-
-  async importConfig(event) {
+  async importConfig(evt) {
     let self = this;
+
     try {
       let configText = document.getElementById('configText') as HTMLTextAreaElement;
-      self.cfg = new WebConfig(JSON.parse(configText.value));
-      self.cfg.sanitizeWords();
+      let importedCfg = new WebConfig(JSON.parse(configText.value));
+      let migration = new DataMigration(importedCfg);
+      migration.runImportMigrations();
 
-      let resetError = await self.cfg.reset();
-      if (resetError) {
-        throw new Error('Failed to reset config');
-      }
+      let resetSuccess = await self.restoreDefaults(evt, true);
 
-      let error = await self.cfg.save();
-      if (!error) {
-        OptionPage.updateStatus('Settings imported successfully!', false, 3000);
-        self.populateOptions();
+      if (resetSuccess) {
+        self.cfg = importedCfg;
+        let error = await self.cfg.save();
+        if (!error) {
+          OptionPage.showStatusModal('Settings imported successfully.');
+          self.init();
+        } else {
+          OptionPage.showErrorModal('Failed to import settings.');
+        }
+      } else {
+        OptionPage.showErrorModal('Failed to import settings.');
       }
     } catch (e) {
-      OptionPage.updateStatus('Settings not saved! Please try again.', true, 5000);
+      OptionPage.showErrorModal();
     }
   }
 
-  static async load(instance: OptionPage) {
-    instance.cfg = await WebConfig.build();
-    instance.auth = new OptionAuth(instance.cfg.password);
-  }
-
-  // Restores form state to saved values from Chrome Storage
-  async populateOptions() {
+  async init() {
     let self = this;
     await OptionPage.load(self);
+    if (!self.auth) self.auth = new OptionAuth(self.cfg.password);
+    // @ts-ignore: Type WebConfig is not assignable to type Config
+    filter.cfg = option.cfg;
 
     // console.log('Password:', cfg.password, 'Authenticated:', authenticated); // DEBUG Password
     if (self.cfg.password && !self.auth.authenticated) {
       // console.log('Prompt for password'); // DEBUG Password
-      OptionPage.hide(document.getElementById('main'));
-      OptionPage.show(document.getElementById('passwordContainer'));
-    }
-
-    // Show/hide censor options and word substitutions based on filter method
-    dynamicList(WebConfig._filterMethodNames, 'filterMethodSelect');
-    let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
-    filterMethodSelect.selectedIndex = self.cfg.filterMethod;
-    switch (self.cfg.filterMethod) {
-      case 0:
-        OptionPage.show(document.getElementById('optionsCensor'));
-        OptionPage.hide(document.getElementById('optionsSubstitution'));
-        OptionPage.show(document.getElementById('globalMatchMethod'));
-        OptionPage.hide(document.getElementById('wordSubstitutions'));
-        break;
-      case 1:
-        OptionPage.hide(document.getElementById('optionsCensor'));
-        OptionPage.show(document.getElementById('optionsSubstitution'));
-        OptionPage.show(document.getElementById('globalMatchMethod'));
-        OptionPage.show(document.getElementById('wordSubstitutions'));
-        break;
-      case 2:
-        OptionPage.hide(document.getElementById('optionsCensor'));
-        OptionPage.hide(document.getElementById('optionsSubstitution'));
-        OptionPage.hide(document.getElementById('globalMatchMethod'));
-        OptionPage.hide(document.getElementById('wordSubstitutions'));
-        break;
-    }
-
-    // Hide per-word matching options if not selected globally (always show for Remove filter method)
-    if (self.cfg.globalMatchMethod == 3 || self.cfg.filterMethod == 2) {
-      OptionPage.show(document.getElementById('wordMatchMethodContainer'));
+      OptionPage.openModal('passwordModal');
+      document.getElementById('password').focus();
     } else {
-      OptionPage.hide(document.getElementById('wordMatchMethodContainer'));
+      OptionPage.show(document.getElementById('main'));
     }
+
+    self.populateOptions();
+  }
+
+  populateConfig() {
+    this.auth.setPasswordButton(option);
+  }
+
+  async populateOptions() {
+    filter.init();
+    this.populateSettings();
+    this.populateWordsList();
+    this.advancedDomainList();
+    this.disabledDomainList();
+    this.populateConfig();
+    this.populateTest();
+  }
+
+  populateSettings() {
+    this.updateFilterOptions();
 
     // Settings
-    let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
-    let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
+    let selectedFilter = document.getElementById(`filter${WebConfig._filterMethodNames[option.cfg.filterMethod]}`) as HTMLInputElement;
+    let showCounter = document.getElementById('showCounter') as HTMLInputElement;
     let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
-    let defaultWordMatchRepeated = document.getElementById('defaultWordMatchRepeated') as HTMLInputElement;
-    let defaultMatchMethodSelect = document.getElementById('defaultMatchMethodSelect') as HTMLSelectElement;
-    let matchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
-    let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
+    let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
+    selectedFilter.checked = true;
+    dynamicList(WebConfig._matchMethodNames.slice(0, -1), 'globalMatchMethodSelect');
+    globalMatchMethodSelect.selectedIndex = this.cfg.globalMatchMethod;
+    showCounter.checked = this.cfg.showCounter;
+    filterWordList.checked = this.cfg.filterWordList;
+
+    // Censor Settings
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
-    let showCounter = document.getElementById('showCounter') as HTMLInputElement;
-    let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
+    let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
+    let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
+    preserveFirst.checked = this.cfg.preserveFirst;
+    preserveLast.checked = this.cfg.preserveLast;
+    censorCharacterSelect.value = this.cfg.censorCharacter;
+    censorFixedLengthSelect.selectedIndex = this.cfg.censorFixedLength;
 
-    censorCharacterSelect.value = self.cfg.censorCharacter;
-    censorFixedLengthSelect.selectedIndex = self.cfg.censorFixedLength;
-    preserveCase.checked = self.cfg.preserveCase;
-    preserveFirst.checked = self.cfg.preserveFirst;
-    preserveLast.checked = self.cfg.preserveLast;
-    showCounter.checked = self.cfg.showCounter;
-    substitutionMark.checked = self.cfg.substitutionMark;
-    dynamicList(WebConfig._matchMethodNames.slice(0, -1), 'globalMatchMethodSelect');
-    globalMatchMethodSelect.selectedIndex = self.cfg.globalMatchMethod;
-    defaultWordMatchRepeated.checked = self.cfg.defaultWordRepeat;
-    dynamicList(WebConfig._matchMethodNames.slice(0,-2), 'defaultMatchMethodSelect');
-    defaultMatchMethodSelect.selectedIndex = self.cfg.defaultWordMatchMethod;
-    // Words
-    dynamicList(Object.keys(self.cfg.words).sort(), 'wordSelect', 'Words to Filter');
-    matchRepeated.disabled = true;
-    dynamicList([], 'substitutionSelect', 'Substitutions');
-    dynamicList([], 'wordMatchMethodSelect', 'Select a Word');
-    // Domains
-    dynamicList(self.cfg.advancedDomains, 'advancedDomainSelect', 'Advanced Domains');
-    dynamicList(self.cfg.disabledDomains, 'domainSelect', 'Disabled Domains');
+    // Substitution Settings
+    let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
+    let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
+    preserveCase.checked = this.cfg.preserveCase;
+    substitutionMark.checked = this.cfg.substitutionMark;
+
+    // Default Settings
+    let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
+    let defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
+    defaultWordRepeat.checked = this.cfg.defaultWordRepeat;
+    let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
+    defaultWordSubstitution.value = this.cfg.defaultSubstitution;
+    let defaultWordMatchMethodSelectHTML = '';
+    for(let i = 0; i < WebConfig._matchMethodNames.slice(0,-2).length; i++) {
+      defaultWordMatchMethodSelectHTML += '<option value="'+WebConfig._matchMethodNames[i]+'">'+WebConfig._matchMethodNames[i]+'</option>';
+    }
+    defaultWordMatchMethodSelect.innerHTML = defaultWordMatchMethodSelectHTML;
+    defaultWordMatchMethodSelect.selectedIndex = this.cfg.defaultWordMatchMethod;
   }
 
-  // Restore default settings
-  async restoreDefaults() {
-    let self = this;
-    self.exportConfig();
-    let error = await self.cfg.reset();
-    if (error) {
-      OptionPage.updateStatus('Error restoring defaults!', true, 5000);
+  populateTest() {
+    let testText = document.getElementById('testText') as HTMLInputElement;
+    let filteredTestText = document.getElementById('filteredTestText') as HTMLElement;
+
+    if (testText.value === '') {
+      filteredTestText.innerText = 'Enter some text above to test the filter...';
     } else {
-      OptionPage.updateStatus('Default settings restored!', false, 3000);
-      self.populateOptions();
+      filteredTestText.innerText = filter.replaceText(testText.value);
     }
   }
 
-  saveDefaultMatchMethod(event) {
-    let defaultMatchMethodSelect = document.getElementById('defaultMatchMethodSelect') as HTMLSelectElement;
-    this.cfg.defaultWordMatchMethod = defaultMatchMethodSelect.selectedIndex;
-    this.saveOptions(event);
+  populateWord() {
+    let wordList = document.getElementById('wordList') as HTMLSelectElement;
+    let wordText = document.getElementById('wordText') as HTMLInputElement;
+    let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
+    let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
+    let wordRemove = document.getElementById('wordRemove') as HTMLInputElement;
+    let word = wordList.value;
+
+    if (word == '') { // New word
+      wordText.value = '';
+      OptionPage.disableBtn(wordRemove);
+      let selectedMatchMethod = document.getElementById(`wordMatch${WebConfig._matchMethodNames[option.cfg.defaultWordMatchMethod]}`) as HTMLInputElement;
+      selectedMatchMethod.checked = true;
+      wordMatchRepeated.checked = option.cfg.defaultWordRepeat;
+      substitutionText.value = '';
+    } else { // Existing word
+      OptionPage.enableBtn(wordRemove);
+      let wordCfg = option.cfg.words[word];
+      wordText.value = word;
+      let selectedMatchMethod = document.getElementById(`wordMatch${WebConfig._matchMethodNames[wordCfg.matchMethod]}`) as HTMLInputElement;
+      selectedMatchMethod.checked = true;
+      wordMatchRepeated.checked = wordCfg.repeat;
+      substitutionText.value = wordCfg.sub;
+    }
   }
 
-  // Saves options to sync storage
-  async saveOptions(event) {
+  populateWordsList() {
+    filter.init();
+    let wordList = document.getElementById('wordList') as HTMLSelectElement;
+    let wordListHTML = '<option selected value="">Add...</option>';
+
+    // Workaround for Remove filter (use censor)
+    let filterMethod = filter.cfg.filterMethod;
+    if (filterMethod === 2) {
+      filter.cfg.filterMethod = 0;
+      filter.init();
+    }
+
+    Object.keys(option.cfg.words).sort().forEach(word => {
+      let filteredWord = word;
+      if (this.cfg.filterWordList) filteredWord = filter.replaceText(word, false);
+      wordListHTML += `<option value="${word}" data-filtered="${filteredWord}">${filteredWord}</option>`;
+    });
+
+    // Workaround for Remove filter (use censor)
+    if (filterMethod === 2) {
+      filter.cfg.filterMethod = filterMethod;
+      filter.init();
+    }
+
+    wordList.innerHTML = wordListHTML;
+    this.populateWord();
+  }
+
+  async removeWord(evt) {
+    if (evt.target.classList.contains('disabled')) return false;
+    let wordList = document.getElementById('wordList') as HTMLSelectElement;
+    let word = wordList.value;
+
+    delete this.cfg.words[word];
+    let success = this.saveOptions(evt);
+
+    if (success) {
+      // Update states and Reset word form
+      filter.init();
+      wordList.selectedIndex = 0;
+      this.populateWordsList();
+    }
+  }
+
+  async restoreDefaults(evt, silent = false) {
+    this.exportConfig();
+    let error = await this.cfg.reset();
+    if (error) {
+      OptionPage.showErrorModal('Error restoring defaults!');
+      return false;
+    } else {
+      if (!silent) OptionPage.showStatusModal('Default settings restored');
+      this.init();
+      return true;
+    }
+  }
+
+  async saveOptions(evt) {
     let self = this;
     // Gather current settings
+    let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
+    let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
+    let defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
+    let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
+    let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
     let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
+    let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
-    let defaultWordMatchRepeated = document.getElementById('defaultWordMatchRepeated') as HTMLInputElement;
+    let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
+    self.cfg.censorCharacter = censorCharacterSelect.value;
+    self.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
+    self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
+    self.cfg.defaultWordRepeat = defaultWordRepeat.checked;
+    self.cfg.globalMatchMethod = globalMatchMethodSelect.selectedIndex;
     self.cfg.preserveCase = preserveCase.checked;
     self.cfg.preserveFirst = preserveFirst.checked;
     self.cfg.preserveLast = preserveLast.checked;
     self.cfg.showCounter = showCounter.checked;
+    self.cfg.filterWordList = filterWordList.checked;
     self.cfg.substitutionMark = substitutionMark.checked;
-    self.cfg.defaultWordRepeat = defaultWordMatchRepeated.checked;
+    self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
 
     // Save settings
     let error = await self.cfg.save();
     if (error) {
-      OptionPage.updateStatus('Settings not saved! Please try again.', true, 5000);
+      OptionPage.showErrorModal('Settings not saved! Please try again.');
+      return false;
     } else {
-      self.populateOptions();
+      self.init();
+      return true;
     }
   }
 
-  substitutionAdd(event) {
-    let self = this;
-    let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
-    let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
-
-    let word = wordSelect.value;
-    let sub = substitutionText.value;
-    if (word != '' && sub != '') {
-      if (!arrayContains(self.cfg.words[word].words, sub)) {
-        self.cfg.words[word].words.push(sub);
-        self.cfg.words[word].words = self.cfg.words[word].words.sort();
-        self.saveOptions(event);
-        dynamicList(self.cfg.words[word].words, 'substitutionSelect', 'Substitutions');
-        substitutionText.value = '';
-      } else {
-        OptionPage.updateStatus('Substitution already in list.', true, 3000);
-      }
+  async saveProp(prop: string) {
+    let error = await option.cfg.save(prop);
+    if (error) {
+      OptionPage.showErrorModal();
+      return false;
     }
+    return true;
   }
 
-  substitutionLoad() {
-    if (this.cfg.filterMethod === 1) {
-      let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
-      let selectedText = wordSelect.value;
-      dynamicList(this.cfg.words[selectedText].words, 'substitutionSelect', 'Substitutions');
-    }
-  }
-
-  substitutionRemove(event) {
-    let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
-    let substitutionSelect = document.getElementById('substitutionSelect') as HTMLSelectElement;
-
-    let word = wordSelect.value;
-    let sub = substitutionSelect.value;
-    if (word != '' && sub != '') {
-      this.cfg.words[word].words = removeFromArray(this.cfg.words[word].words, sub);
-      this.saveOptions(event);
-    }
-  }
-
-  wordAdd(event) {
+  async saveWord(evt) {
+    let wordList = document.getElementById('wordList') as HTMLSelectElement;
     let wordText = document.getElementById('wordText') as HTMLInputElement;
-    let word = wordText.value;
-    let result = this.cfg.addWord(word);
+    let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
+    let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
+    let selectedMatchMethod = document.querySelector('input[name="wordMatchMethod"]:checked') as HTMLInputElement;
+    let word = wordText.value.trim().toLowerCase();
+    let added = true;
 
-    if (word != '') {
-      if (result) {
-        this.saveOptions(event);
-        wordText.value = '';
+    if (word == '') {
+      OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
+      return false;
+    }
+
+    if (wordText.checkValidity()) {
+      let wordOptions = {
+        matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
+        repeat: wordMatchRepeated.checked,
+        sub: substitutionText.value
+      };
+
+      if (wordList.value === '') { // New record
+        // console.log('Adding new word: ', word, wordOptions); // DEBUG
+        added = this.cfg.addWord(word, wordOptions);
+      } else { // Updating existing record
+        let originalWord = wordList.value;
+        if (originalWord == word) { // Word options changed
+          // console.log('Modifying existing word options: ', word, wordOptions); // DEBUG
+          this.cfg.words[word] = wordOptions;
+        } else { // Existing word modified
+          // console.log('Modifying existing word: ', word, wordOptions); // DEBUG
+          added = this.cfg.addWord(word, wordOptions);
+          if (added) {
+            delete this.cfg.words[originalWord];
+          } else {
+            OptionPage.showInputError(wordText, `'${word}' already in list.`);
+          }
+        }
+      }
+
+      if (added) {
+        let success = await this.saveOptions(evt);
+        if (!success) {
+          OptionPage.showErrorModal();
+          return false;
+        }
+
+        // Update states and Reset word form
+        filter.init();
+        wordList.selectedIndex = 0;
+        this.populateWordsList();
+      }
+    } else {
+      OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
+    }
+  }
+
+  async selectFilterMethod(evt) {
+    option.cfg.filterMethod = WebConfig._filterMethodNames.indexOf(evt.target.value);
+    if (await option.saveProp('filterMethod')) this.init();
+  }
+
+  switchPage(evt) {
+    let currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
+    let newTab = evt.target as HTMLElement;
+
+    currentTab.classList.remove(OptionPage.activeClass);
+    newTab.classList.add(OptionPage.activeClass);
+
+    let currentPage = document.getElementById(currentTab.innerText.toLowerCase() + 'Page') as HTMLElement;
+    let newPage = document.getElementById(newTab.innerText.toLowerCase() + 'Page') as HTMLElement;
+    OptionPage.hide(currentPage);
+    OptionPage.show(newPage);
+
+    switch (newTab.innerText.toLowerCase()) {
+      case 'test':
+        document.getElementById('testText').focus();
+        break;
+    }
+  }
+
+  updateFilterOptions() {
+    // Show/hide options as needed
+    switch(this.cfg.filterMethod) {
+      case 0: // Censor
+        OptionPage.show(document.getElementById('censorSettings'));
+        OptionPage.hide(document.getElementById('substitutionSettings'));
+        OptionPage.show(document.getElementById('globalMatchMethod'));
+        OptionPage.hide(document.getElementById('wordSubstitution'));
+        break;
+      case 1: // Substitution
+        OptionPage.hide(document.getElementById('censorSettings'));
+        OptionPage.show(document.getElementById('substitutionSettings'));
+        OptionPage.show(document.getElementById('globalMatchMethod'));
+        OptionPage.show(document.getElementById('wordSubstitution'));
+        break;
+      case 2: // Remove
+        OptionPage.hide(document.getElementById('censorSettings'));
+        OptionPage.hide(document.getElementById('substitutionSettings'));
+        OptionPage.hide(document.getElementById('globalMatchMethod'));
+        OptionPage.hide(document.getElementById('wordSubstitution'));
+        break;
+    }
+  }
+
+  updateItemList(evt, input, attr: string, invalidMessage: string, original = ''): boolean {
+    let item = input.value.trim().toLowerCase();
+    if (item == '') { // No data
+      OptionPage.showInputError(input, 'Please enter a value.');
+      return false;
+    } else {
+      if (input.checkValidity()) {
+        OptionPage.hideInputError(input);
+        if (!option.cfg[attr].includes(item)) {
+          if (original != '' && option.cfg[attr].includes(original)) {
+            // Update existing record (remove it before adding the new record)
+            option.cfg[attr].splice(option.cfg[attr].indexOf(original), 1);
+          }
+          // Save new record
+          option.cfg[attr].push(item);
+          option.cfg[attr] = option.cfg[attr].sort();
+          return true;
+        } else {
+          OptionPage.showInputError(input, 'Already in list.');
+          return false;
+        }
       } else {
-        OptionPage.updateStatus('Word already in list.', true, 3000);
+        OptionPage.showInputError(input, invalidMessage);
+        return false;
       }
     }
-  }
-
-  WordLoadOptions(event) {
-    let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
-    let word = wordSelect.value;
-    dynamicList(WebConfig._matchMethodNames.slice(0,-2).concat(WebConfig._matchMethodNames.slice(-1)), 'wordMatchMethodSelect');
-    let wordMatchMethodSelect = document.getElementById('wordMatchMethodSelect') as HTMLSelectElement;
-    wordMatchMethodSelect.value = WebConfig._matchMethodNames[this.cfg.words[word].matchMethod];
-
-    this.wordRepeatLoad(word);
-    this.substitutionLoad();
-  }
-
-  wordMatchMethodSet(event) {
-    let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
-    let matchMethodSelect = document.getElementById('wordMatchMethodSelect') as HTMLSelectElement;
-    this.cfg.words[wordSelect.value].matchMethod = WebConfig._matchMethodNames.indexOf(matchMethodSelect.value);
-    this.saveOptions(event);
-  }
-
-  wordMatcRepeatedSet(event) {
-    let self = this;
-    let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
-    let matchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
-    let word = wordSelect.value;
-
-    if (word != '') {
-      self.cfg.words[word].repeat = matchRepeated.checked;
-      self.saveOptions(event);
-    }
-  }
-
-  wordRemove(event) {
-    let wordSelect = document.getElementById('wordSelect') as HTMLSelectElement;
-    let word = wordSelect.value;
-    if (word != '') {
-      delete this.cfg.words[word];
-      this.saveOptions(event);
-    }
-  }
-
-  wordRepeatLoad(word: string) {
-    let matchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
-    matchRepeated.checked = this.cfg.repeatForWord(word);
-    matchRepeated.disabled = false;
   }
 }
 
+let filter = new Filter;
 let option = new OptionPage;
 
 ////
+// Events
+// Functions
+function importConfig(e) { option.importConfig(e); }
+function restoreDefaults(e) { option.restoreDefaults(e); }
+function setPassword(e) { option.auth.setPassword(option); }
 // Add event listeners to DOM
-window.addEventListener('load', function(event) { option.populateOptions(); });
-
-let tabs = document.getElementsByClassName('tablinks');
-for (let i = 0; i < tabs.length; i++) {
-  tabs[i].addEventListener('click', function(e) { OptionTab.openTab(e); });
-}
-// Filter
-document.getElementById('filterMethodSelect').addEventListener('change', function(e) { option.filterMethodSelect(e); });
-// Filter - Censor
-document.getElementById('preserveFirst').addEventListener('click', function(e) { option.saveOptions(e); });
-document.getElementById('preserveLast').addEventListener('click', function(e) { option.saveOptions(e); });
-document.getElementById('censorCharacterSelect').addEventListener('change', function(e) { option.censorCharacter(e); });
-document.getElementById('censorFixedLengthSelect').addEventListener('change', function(e) { option.censorFixedLength(e); });
-// Filter - Substitute
-document.getElementById('preserveCase').addEventListener('click', function(e) { option.saveOptions(e); });
-document.getElementById('substitutionMark').addEventListener('click', function(e) { option.saveOptions(e); });
-// Global Matching Method
-document.getElementById('globalMatchMethodSelect').addEventListener('change', function(e) { option.globalMatchMethod(e); });
-// General
-document.getElementById('showCounter').addEventListener('click', function(e) { option.saveOptions(e); });
-// Defaults
-document.getElementById('defaultWordMatchRepeated').addEventListener('click', function(e) { option.saveOptions(e); });
-document.getElementById('defaultMatchMethodSelect').addEventListener('click', function(e) { option.saveDefaultMatchMethod(e); });
-// Words
-document.getElementById('wordAdd').addEventListener('click', function(e) { option.wordAdd(e); });
-document.getElementById('wordRemove').addEventListener('click', function(e) { option.wordRemove(e); });
-document.getElementById('wordSelect').addEventListener('change', function(e) { option.WordLoadOptions(e); });
-document.getElementById('wordMatchMethodSet').addEventListener('click', function(e) { option.wordMatchMethodSet(e); });
-document.getElementById('wordMatchRepeated').addEventListener('click', function(e) { option.wordMatcRepeatedSet(e); });
-document.getElementById('substitutionAdd').addEventListener('click', function(e) { option.substitutionAdd(e); });
-document.getElementById('substitutionRemove').addEventListener('click', function(e) { option.substitutionRemove(e); });
+window.addEventListener('load', e => { option.init(); });
+document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click', e => { option.switchPage(e); }); });
+// Modals
+document.getElementById('submitPassword').addEventListener('click', e => { option.auth.authenticate(e); });
+document.getElementById('confirmModalOK').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
+document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
+document.getElementById('statusModalOK').addEventListener('click', e => { OptionPage.closeModal('statusModal'); });
+// Settings
+document.querySelectorAll('#filterMethod input').forEach(el => { el.addEventListener('click', e => { option.selectFilterMethod(e); }); });
+document.getElementById('censorCharacterSelect').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('censorFixedLengthSelect').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('defaultWordMatchMethodSelect').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('defaultWordRepeat').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('globalMatchMethodSelect').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('preserveCase').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('preserveFirst').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('preserveLast').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('showCounter').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('filterWordList').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('substitutionMark').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('defaultWordSubstitutionText').addEventListener('change', e => { option.saveOptions(e); });
+// Words/Phrases
+document.getElementById('wordList').addEventListener('click', e => { option.populateWord(); });
+document.getElementById('wordText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
+document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
+document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
 // Domains
-document.getElementById('advancedDomainAdd').addEventListener('click', function(e) { option.advancedDomainAdd(e); });
-document.getElementById('advancedDomainRemove').addEventListener('click', function(e) { option.advancedDomainRemove(e); });
-document.getElementById('domainAdd').addEventListener('click', function(e) { option.domainAdd(e); });
-document.getElementById('domainRemove').addEventListener('click', function(e) { option.domainRemove(e); });
+document.getElementById('advDomainSelect').addEventListener('change', e => { option.advancedDomainPopulate(); });
+document.getElementById('advDomainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
+document.getElementById('advDomainSave').addEventListener('click', e => { option.advancedDomainSave(e); });
+document.getElementById('advDomainRemove').addEventListener('click', e => { option.advancedDomainRemove(e); });
+document.getElementById('disabledDomainSelect').addEventListener('change', e => { option.disabledDomainPopulate(); });
+document.getElementById('disabledDomainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
+document.getElementById('disabledDomainSave').addEventListener('click', e => { option.disabledDomainSave(e); });
+document.getElementById('disabledDomainRemove').addEventListener('click', e => { option.disabledDomainRemove(e); });
 // Config
-document.getElementById('default').addEventListener('click', function(e) { option.confirm(e, 'restoreDefaults'); });
-document.getElementById('import').addEventListener('click', function(e) { option.confirm(e, 'importConfig'); });
-document.getElementById('export').addEventListener('click', function(e) { option.exportConfig(); });
-// Password
-document.getElementById('submitPassword').addEventListener('click', function(e) { option.auth.authenticate(e); });
-document.getElementById('setPasswordBtn').addEventListener('click', function(e) { option.auth.setPassword(); });
+document.getElementById('configReset').addEventListener('click', e => { option.confirm(e, 'restoreDefaults'); });
+document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });
+document.getElementById('configImport').addEventListener('click', e => { option.confirm(e, 'importConfig'); });
+document.getElementById('setPassword').addEventListener('input', e => { option.auth.setPasswordButton(option); });
+document.getElementById('setPasswordBtn').addEventListener('click', e => { option.confirm(e, 'setPassword'); });
+// Test
+document.getElementById('testText').addEventListener('input', e => { option.populateTest(); });

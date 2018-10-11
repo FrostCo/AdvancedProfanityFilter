@@ -1,16 +1,16 @@
 # Dev Dependencies
-node_modules/*
+/node_modules/*
 
 # Packaged extensions
-dist/*
-*.zip
+/dist/*
+/*.zip
 
 # Dev extensions for debugging
-extension-firefox/*
+/extension-*/*
 
 # Combined file (prebuild.js)
-src/webFilter.bundle.ts
+/src/webFilter.bundle.ts
 
 # Testing coverage
-.nyc_output/*
-coverage/*
+/.nyc_output/*
+/coverage/*

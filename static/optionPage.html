@@ -2,51 +2,64 @@
 <html>
 <head>
   <title>Advanced Profanity Filter</title>
-  <link rel="stylesheet" type="text/css" href="optionPage.css" />
+  <link rel="stylesheet" type="text/css" href="w3.css"/>
+  <link rel="stylesheet" type="text/css" href="w3-color-flat.css"/>
+  <link rel="stylesheet" type="text/css" href="optionPage.css"/>
 </head>
+<body class="w3-content w3-card w3-light-grey">
 
-<body>
-<!-- Tabs -->
-<div id="passwordContainer" class="hidden">
-  <label for="password">Password: </label>
-  <input type="password" id="password">
-  <input type="button" value="Submit" id="submitPassword"/>
+<div id="header" class="w3-container">
+  <h2><img src="icons/icon38.png"/> Advanced Profanity Filter</h2>
 </div>
 
-<div id="main" class="visible">
-<div class="tab">
-  <nav>
-    <span class="tablinks active">Settings</span>
-    <span class="tablinks">Words</span>
-    <span class="tablinks">Domains</span>
-    <span class="tablinks">Config</span>
-  </nav>
+<div id="menu" class="w3-bar w3-flat-peter-river w3-card">
+  <a href="#" class="w3-bar-item w3-button w3-flat-belize-hole">Settings</a>
+  <a href="#" class="w3-bar-item w3-button">Words</a>
+  <a href="#" class="w3-bar-item w3-button">Domains</a>
+  <a href="#" class="w3-bar-item w3-button">Config</a>
+  <a href="#" class="w3-bar-item w3-button w3-right">Help</a>
+  <a href="#" class="w3-bar-item w3-button w3-right">Test</a>
 </div>
 
-<div id="dialogContainer"></div>
+<div id="main" class="w3-hide">
+<div id="settingsPage" class="w3-container">
+  <h4 class="w3-text-teal">Filter Method</h4>
 
-<!-- Settings Tab -->
-<div id="Settings" class="tabcontent visible">
-  <h4>Filter Method</h4>
-  <select id="filterMethodSelect"></select>
-
-  <div id="optionsCensor" class="moveDown hidden">
-    <h4>Censor Settings</h4>
+  <div id="filterMethod">
     <label>
-      <input type="checkbox" id="preserveFirst">
+      <input id="filterCensor" class="w3-radio" type="radio" name="filterMethod" value="Censor">
+      Censor<span class="notes">(dog: dog = d**)</span>
+    </label>
+
+    <br/>
+    <label>
+      <input id="filterSubstitute" class="w3-radio" type="radio" name="filterMethod" value="Substitute">
+      Substitute<span class="notes">(dog > Cat: dog = cat)</span>
+    </label>
+
+    <br/>
+    <label>
+      <input id="filterRemove" class="w3-radio" type="radio" name="filterMethod" value="Remove">
+      Remove<span class="notes">(dog: doghouse = house)</span>
+    </label>
+  </div>
+
+  <div id="censorSettings" class="w3-hide">
+    <h4 class="w3-text-teal">Censor Settings</h4>
+    <label>
+      <input id="preserveFirst" type="checkbox" class="w3-check">
       Preserve the first letter
-      <span class="notes">(Dog: dog = d**)</span>
+      <span class="notes">(dog: dog = d**)</span>
     </label>
     <br />
     <label>
-      <input type="checkbox" id="preserveLast">
+      <input id="preserveLast" type="checkbox" class="w3-check">
       Preserve the last letter
-      <span class="notes">(Dog: dog = **g)</span>
+      <span class="notes">(dog: dog = **g)</span>
     </label>
     <br />
-    <label>
-      Censor character:
-      <select id="censorCharacterSelect" class="small">
+    <label>Censor character:
+      <select id="censorCharacterSelect" class="w3-select w3-border small" style="margin-top:8px;">
         <option value="*">*</option>
         <option value="&">&amp;</option>
         <option value="$">$</option>
@@ -58,9 +71,8 @@
       </select>
     </label>
     <br />
-    <label>
-      Fixed length:
-      <select id="censorFixedLengthSelect" class="small">
+    <label>Fixed length:
+      <select id="censorFixedLengthSelect" class="w3-select w3-border small" style="margin-top:8px;">
         <option value="0">Original</option>
         <option value="1">1</option>
         <option value="2">2</option>
@@ -75,152 +87,310 @@
     </label>
   </div>
 
-  <div id="optionsSubstitution" class="moveDown hidden">
-    <h4>Substitution Settings</h4>
+  <div id="substitutionSettings" class="w3-hide">
+    <h4 class="w3-text-teal">Substitution Settings</h4>
     <label>
-      <input type="checkbox" id="preserveCase">
+      <input id="preserveCase" type="checkbox" class="w3-check">
       Preserve case of filtered words
-      <span class="notes">(Dog: Dog = Cat)</span>
+      <span class="notes">(dog: Dog = Cat)</span>
     </label>
     <br />
     <label>
-      <input type="checkbox" id="substitutionMark">
+      <input id="substitutionMark" type="checkbox" class="w3-check">
       Mark substituted words with [ ]
-      <span class="notes">(Dog: dog = [cat])</span>
+      <span class="notes">(dog: dog = [cat])</span>
+    </label>
+    <div style="padding-top:8px;">
+      <label>Default Substitution
+        <input id="defaultWordSubstitutionText" class="w3-input w3-border small" style="display:inline;">
+      </label>
+    </div>
+  </div>
+
+  <div id="globalMatchMethod" class="w3-hide">
+    <h4 class="w3-text-teal">Global Matching Method</h4>
+    <label>
+      <select id="globalMatchMethodSelect" class="w3-select w3-border small"></select>
     </label>
   </div>
 
-  <div id="globalMatchMethod" class="moveDown hidden">
-    <h4>Global Matching Method</h4>
+  <div id="generalOptions">
+    <h4 class="w3-text-teal">General Settings</h4>
     <label>
-      <select id="globalMatchMethodSelect"></select>
-    </label>
-  </div>
-
-  <div id="generalOptions" class="moveDown">
-    <h4>General Settings</h4>
-    <label>
-      <input type="checkbox" id="showCounter">
+      <input id="showCounter" type="checkbox" class="w3-check">
       Show number of filtered words
       <span class="notes">(Shown over the extension icon)</span>
     </label>
+    <br>
+    <label>
+      <input id="filterWordList" type="checkbox" class="w3-check">
+      Filter word list in Options
+    </label>
   </div>
 
-  <div id="defaultOptions" class="moveDown">
-    <h4>Default Settings (For new words/phrases)</h4>
+  <div id="defaultOptions">
+    <h4 class="w3-text-teal">Default Settings (for new words/phrases)</h4>
     <label>
-      <input type="checkbox" id="defaultWordMatchRepeated">
-      Match repeated characters in words
-      <span class="notes">(Dog: dddoooggg)</span>
+      <input id="defaultWordRepeat" type="checkbox" class="w3-check">
+      Match repeated characters
+      <span class="notes">(dog: dddoooggg)</span>
     </label>
-    <br />
-    <div id="defaultMatchMethod">
-      <label>
-        Word Match Method:
-        <select id="defaultMatchMethodSelect" class="small"></select>
+    <div id="defaultMatchMethod" style="padding-top:8px;">
+      <label>Match Method
+        <select id="defaultWordMatchMethodSelect" class="w3-select w3-border small"></select>
       </label>
     </div>
   </div>
 </div>
 
-<!-- Words -->
-<div id="Words" class="tabcontent hidden">
-  <h4>Add New Word/Phrase</h4>
-  <input type="text" id="wordText" name="wordText">
-  <button id="wordAdd">Add</button>
+<div id="wordsPage" class="w3-container w3-hide">
+  <h4 class="w3-text-teal">Words & Phrases</h4>
+  <select id="wordList" class="w3-select w3-border small"></select>
 
-  <div class="moveDown">
-    <h4>Configure Words/Phrases</h4>
-    <div class="notes">Warning: Offensive language</div>
-    <select id="wordSelect"></select>
-    <button id="wordRemove">Remove</button>
+  <h4 class="w3-text-teal">Word/Phrase</h4>
+  <input id="wordText" class="w3-input w3-border small" type="text" pattern=".+">
+
+  <div id="wordSubstitution" class="w3-hide">
+    <h4 class="w3-text-teal">Substitution</h4>
+    <input id="substitutionText" class="w3-input w3-border small"/>
   </div>
 
-  <div id="wordMatchMethodContainer" class="moveDown hidden">
+  <div id="wordMatchMethod">
+    <h4 class="w3-text-teal">Match Method</h4>
     <label>
-      Matching Method:
-      <br />
-      <select id="wordMatchMethodSelect">
-        <option value="" disabled selected>Select a Word</option>
-      </select>
-      <button id="wordMatchMethodSet">Set</button>
+      <input id="wordMatchExact" type="radio" class="w3-radio" name="wordMatchMethod" value="Exact">
+      Exact<span class="notes">(dog: *** in the doghouse)</span>
+    </label>
+
+    <br/>
+    <label>
+      <input id="wordMatchPartial" type="radio" class="w3-radio" name="wordMatchMethod" value="Partial">
+      Partial<span class="notes">(dog: *** in the ***house)</span>
+    </label>
+
+    <br/>
+    <label>
+      <input id="wordMatchWhole" type="radio" class="w3-radio" name="wordMatchMethod" value="Whole">
+      Whole<span class="notes">(dog: *** in the ********)</span>
+    </label>
+
+    <br/>
+    <label>
+      <input id="wordMatchRegular-Expression" type="radio" class="w3-radio" name="wordMatchMethod" value="Regular-Expression">
+      Regex
+    </label>
+
+    <h4 class="w3-text-teal">Other</h4>
+    <label>
+      <input id="wordMatchRepeated" type="checkbox" class="w3-check" name="matchRepeat"/>
+      Match Repeated Characters<span class="notes">(dog: dddoooggg)</span>
     </label>
   </div>
+  <br/>
 
-  <br />
-  <label>
-    <input type="checkbox" id="wordMatchRepeated" disabled>
-    Match repeated characters in words
-    <span class="notes">(Dog: dddoooggg)</span>
-  </label>
+  <div class="w3-right">
+    <button id="wordSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
+    <button id="wordRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
+  </div>
+</div>
 
-  <div id="wordSubstitutions" class="hidden">
-    <div class="moveDown">
-      <h4>Substitutions</h4>
-      <select id="substitutionSelect"></select>
-      <button id="substitutionRemove">Remove</button>
+<div id="domainsPage" class="w3-container w3-hide">
+  <div id="advDomainContainer" class="w3-half">
+    <h4 class="w3-text-teal">Advanced Domains</h4>
+    <select id="advDomainSelect" class="w3-select w3-border small" style="display:block"></select>
+    <span class="notes">Only use when the filter isn't working.</span>
+    <h4 class="w3-text-teal">Domain</h4>
+    <input id="advDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
+    <span class="notes">Example: "google.com" or "mail.google.com"</span>
+    <div style="padding-top: 16px;">
+      <button id="advDomainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
+      <button id="advDomainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
     </div>
-    <div class="moveDown">
-      <input type="text" id="substitutionText" name="substitutionText">
-      <button id="substitutionAdd">Add</button>
+  </div>
+
+  <div id="disabledDomainContainer" class="w3-half w3-right">
+    <h4 class="w3-text-teal">Whitelist Domains</h4>
+    <select id="disabledDomainSelect" class="w3-select w3-border small" style="display:block"></select>
+    <span class="notes">Disable the filter for a domain</span>
+    <h4 class="w3-text-teal">Domain</h4>
+    <input id="disabledDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
+    <span class="notes">Example: "google.com" or "mail.google.com"</span>
+    <div style="padding-top: 16px;">
+      <button id="disabledDomainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
+      <button id="disabledDomainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
     </div>
   </div>
 </div>
 
-<!-- Domains Tab -->
-<div id="Domains" class="tabcontent hidden">
-  <h4>Advanced Domains</h4>
-  <div class="notes">
-    Only use when the filter isn't working for a page<br />
-    Warning: This option can have negative results - Use with caution.
+<div id="configPage" class="w3-container w3-hide">
+  <div style="padding-top:16px;padding-bottom:16px;width:500px;">
+    <button id="configExport" class="w3-btn w3-round-large w3-flat-peter-river">EXPORT</button>
+    <button id="configImport" class="w3-btn w3-round-large w3-flat-peter-river">IMPORT</button>
+    <button id="configReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESTORE DEFAULTS</button>
   </div>
-  <div id="advancedDomainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
-  <input type="text" id="advancedDomainText" name="advancedDomainText" pattern="^[a-zA-Z0-9\.\-]+$">
-  <button id="advancedDomainAdd">Add</button>
-  <div class="moveDown">
-    <select id="advancedDomainSelect"></select>
-    <button id="advancedDomainRemove">Remove</button>
-  </div>
+  <textarea id="configText" class="w3-input w3-border w3-card" style="width:500px;height:550px;" spellcheck="false"></textarea>
 
-  <div class="moveDown"></div>
-  <h4>Disabled Domains</h4>
-  <div id="domainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
-  <input type="text" id="domainText" name="domainText" pattern="^[a-zA-Z0-9\.\-]+$">
-  <button id="domainAdd">Add</button>
-  <div class="moveDown">
-    <select id="domainSelect"></select>
-    <button id="domainRemove">Remove</button>
+  <div id="setPasswordContainer" style="padding-top:16px;width:500px;">
+    <label for="setPassword">Password</label>
+    <input id="setPassword" class="w3-input w3-border small" style="display:inline">
+    <button id="setPasswordBtn" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">REMOVE</button>
   </div>
 </div>
 
-<!-- Export/Import -->
-<div id="Config" class="tabcontent hidden">
-  <h4>Import/Export/Restore Defaults</h4>
-  <button id="default">Restore Defaults</button>
-  <button id="import">Import</button>
-  <button id="export">Export</button>
-  <div id="configNote" class="notes">Import/Export Config:</div>
-  <textarea id="configText"></textarea>
+<div id="testPage" class="w3-container w3-hide">
+  <h4 class="w3-text-teal">Test</h4>
+  <textarea id="testText" class="w3-input w3-border w3-card"></textarea>
+  <h4 class="w3-text-teal">Filtered</h4>
+  <div id="filteredTestText" class="w3-panel w3-leftbar w3-border-grey w3-flat-silver"></div>
+</div>
 
-  <div id="setPasswordContainer">
-    <label for="setPassword">Password: </label>
-    <input type="password" id="setPassword">
-    <input type="button" value="Set" id="setPasswordBtn"/>
+<div id="helpPage" class="w3-container w3-hide">
+  <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki" target="_blank">Wiki</a>
+  <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
+  <a href="https://github.com/richardfrost/AdvancedProfanityFilter/issues" target="_blank">Support</a>
+  <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Created by Richard Frost</a><br>
+
+  <div id="helpContainer">
+    <p>Welcome to AdvancedProfanityFilter, a profanity filter built for <a href="https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh">Chrome</a>, <a href="https://addons.mozilla.org/firefox/addon/advanced_profanity_filter">Firefox</a>, and <a href="https://addons.opera.com/en/extensions/details/advanced-profanity-filter/">Opera</a>.</p>
+    <h1 id="settings">Settings</h1>
+    <h3 id="filter-settings">Filter Settings</h3>
+    <p>There are three modes for the filter to operate in, each with different sub-settings to fine-tune your experience.</p>
+    <h4 id="censor-mode">Censor Mode</h4>
+    <p>In Censor mode, actions are taken to hide offensive words through masking them in some fashion. Here is a run down of options and an explanation of each.</p>
+    <ul>
+    <li><strong>Preserve First Letter</strong> - This option will preserve the first letter of a word/phrase, but mask the other letters with a chosen placeholder (Default: <code>*</code>).</li>
+    <li><strong>Preserve Last Letter</strong> - Like the previous option, except this will preserve the last letter of a word/phrase.</li>
+    <li><strong>Censor Character</strong> - Set the character to mask letters with. (Default: <code>*</code>).</li>
+    <li><strong>Fixed Length</strong> - Set a fixed length for words masked by the filter. If No fixed length is selected, the word will be the original length. This may help to make it difficult to guess what the word was. (Default: <code>No fixed length</code>)</li>
+    </ul>
+    <h4 id="substitution-mode">Substitution Mode</h4>
+    <p>In Substitution mode, offensive words are replaced by a less offensive synonym. In this mode most of the configuration you do will be in the &quot;Words&quot; tab, where you can fine-tune your list of words/phrases and what you would like to replace them with.</p>
+    <ul>
+    <li><strong>Preserve case</strong> - Preserve the original case of the filtered word. (Default: <code>Enabled</code>).</li>
+    <li><strong>Mark substituted words</strong> - Marks substituted words by surrounding them with <code>[</code> and <code>]</code>.</li>
+    <li><strong>Default Substitution</strong> - This will be used as the substitution for words that don&#39;t have a set substitution.</li>
+    </ul>
+    <h4 id="remove-mode">Remove Mode</h4>
+    <p>When selected, the offensive word will simply be removed completely from the page, with no indicator that it was ever there. Note that this can sometimes lead to strange sentences.</p>
+    <h3 id="global-matching-method">Global Matching Method</h3>
+    <p>The matching method will dictate how the filter matches words from the word list. By default, the <code>Partial Match</code> mode is selected. <em>All matching methods are case-insensitive</em>.</p>
+    <ul>
+    <li><strong>Exact Match</strong> - Requires a full match, which means it only matches words as defined in the word list.  </li>
+    <li><strong>Partial Match</strong> - Will match part of a word, so if a word defined in the list is part of a word, it will be filtered.</li>
+    <li><strong>Whole Match</strong> - Like the partial match, except this mode will apply to the entire word, not just the part of the word that matches.</li>
+    <li><strong>Per-Word Match</strong> - This allows you to specify one of the above match methods for each word, which gives you a lot more power to customize the filter for your needs.</li>
+    <li><strong>Regular Expression Match</strong> - This is an advanced method that only can be applied per word. It is a blank slate for creating a regular expression and will not be auto-escaped like the other methods. All entries will be <code>gi</code>. Here are examples of how to re-create a the exact and partial match methods for the word <code>word</code>:<ul>
+    <li>Exact: <code>\bword\b</code></li>
+    <li>Partial: <code>word</code></li>
+    </ul>
+    </li>
+    </ul>
+    <h3 id="general-settings">General Settings</h3>
+    <p>These settings apply to both the <strong>Censor</strong> and <strong>Substitution</strong> filter modes:</p>
+    <ul>
+    <li><strong>Show number of filtered words</strong> - Show a counter on the extension button with the number of filtered words.</li>
+    <li><strong>Filter word list in Options</strong> - This option will filter the word list in the options page.</li>
+    </ul>
+    <h3 id="default-settings-for-new-word-phrases-">Default Settings (for new word/phrases)</h3>
+    <ul>
+    <li><strong>Match repeated characters</strong> - This option will match repeated characters in words. They must still appear in the same order. This should be managed per-word to help avoid false-positives.</li>
+    <li><strong>Match Method</strong> - When new words are added they will automatically be assigned this match method.</li>
+    </ul>
+    <h1 id="words">Words</h1>
+    <p>The words tabs allow you to perform several actions (Some options are unavailable based on other settings):</p>
+    <ul>
+    <li>Add new words/phrases.</li>
+    <li>Modify existing words/phrases.</li>
+    <li>Remove existing words/phrases.</li>
+    <li>Configure <code>match repeated characters</code> in words.</li>
+    <li>Set the substitution (replacement) for a word/phrase (Only when filter in <code>Substitution</code> mode).</li>
+    <li>Words/phrases can also be added by selecting them on a web page and then choosing the <code>Add selection to filter</code> option from the context (right-click) menu. New words will use the settings found in the &quot;Default Settings (for new word/phrases)&quot; section.</li>
+    </ul>
+    <h1 id="domains">Domains</h1>
+    <p>This tab allows you to control domains that the filter will be whitelisted (disabled) on, or which domains to use the Advanced mode on.</p>
+    <h3 id="advanced-mode-">Advanced Mode:</h3>
+    <p>Advanced mode for domains that are particularly hard to filter.</p>
+    <ul>
+    <li>To add a domain to the list, go the Advanced Domains on the &quot;Domains&quot; tab on the options page.</li>
+    <li><strong>WARNING</strong>: This mode can break webpages and result in lower performance. Use only when the filter isn&#39;t working on a page.</li>
+    </ul>
+    <h3 id="whitelist-disabled-">Whitelist (Disabled):</h3>
+    <p>Control which domains the filter should not run on. To whitelist Google.com and all its sub-domains, simply add <code>google.com</code>. If you want to just whitelist Gmail, you can add <code>mail.google.com</code>.</p>
+    <p>When browsing a web page, you can also disable the filter for the current domain from the context (right-click) menu, or using the extensions Popup menu.</p>
+    <p><em>Note: Do not include the protocol (ex. <code>http://</code>), or anything after the domain name.</em></p>
+    <h1 id="config">Config</h1>
+    <p>This tab allows you to control your configuration for the filter.</p>
+    <ul>
+    <li><strong>Export</strong> - Export your current settings as a JSON object. Useful if you want to backup your settings or share them with others.</li>
+    <li><strong>Import</strong> - Import settings as a JSON object. This is a full replace of your config, so I <strong>strongly</strong> recommend taking a backup (Export) before doing this. </li>
+    <li><strong>Restore Defaults</strong> - This restores all settings back to their defaults.</li>
+    </ul>
+    <p><em>NOTE: Importing or Restoring defaults will export your current config, just in case you forgot to. You will need to copy and save it elsewhere if you want it.</em></p>
+    <h3 id="password">Password</h3>
+    <p>At the bottom of the page there is a prompt for you to set a password to protect the Options and Pop-up pages. This may be useful to keep others from modifying your settings for the extension. This does not prevent a user from disabling or removing the extension. This is not a secure mechanism. Your password is stored in plain-text, so do not reuse an established password.</p>
+    <ul>
+    <li>To set a password: Enter the desired password in the box and click <code>Set</code>. You will now be prompted for the password when opening the Options page.</li>
+    <li>To remove a password: Leave the password box blank and click <code>Remove</code>.</li>
+    <li>If you forget your password, please contact me for information on how to recover it.</li>
+    </ul>
+    <h1 id="test">Test</h1>
+    <p>Here you can write/paste text into the test area and see the filtered output in real time. This provides a way to test new changes without having to leave settings.</p>
+    <h1 id="popup">Popup</h1>
+    <p>The popup provides access to some quick settings:</p>
+    <ul>
+    <li><strong>Domain Toggle</strong> - Switch to turn the filter on/off for the current domain.</li>
+    <li><strong>Advanced Mode</strong> - Switch Advanced Mode on/off for the current domain.</li>
+    <li><strong>Filter</strong> - Change the filter mode. This is a global setting and affects all pages.</li>
+    <li><strong>Summary</strong> - A summary will appear when words have been filtered on the current page detailing what was filtered. The words are censored, but the original word can be seen by hovering over a word.</li>
+    </ul>
+    <p>In addition to the above, there are links to the Options page and support pages.</p>
+    <h1 id="context-menu">Context Menu</h1>
+    <p>The context-menu (right-click) menu also provides access to some quick settings:</p>
+    <ul>
+    <li><strong>Add selection to filter</strong> - Adds the current selection to the filter and refreshes the page. This is useful when you come across a word you would like to add to the filter. <em>(Only available when text is selected)</em></li>
+    <li><strong>Toggle filter for domain</strong> - Turn the filter on/off for the current domain.</li>
+    <li><strong>Toggle advanced mode for domain</strong> - Switch the Advanced Mode on/off for the current domain.</li>
+    <li><strong>Options</strong> - Open the options page.</li>
+    </ul>
   </div>
 </div>
-</div> <!-- #main -->
-
-<!-- Footer -->
-<div id="footer">
-  <div id="status"></div>
-  <span id="contributors">
-    <a id="gettingStarted" href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki" target="_blank">Getting Started</a>
-    - <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
-    - <a href="https://github.com/richardfrost/AdvancedProfanityFilter/issues" target="_blank">Support</a>
-    <br>
-    Created by <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Richard Frost</a><br>
-  </span>
 </div>
+
+<div id="confirmModal" class="w3-modal">
+  <div class="w3-modal-content w3-card-4 w3-animate-zoom">
+    <header class="w3-container w3-flat-peter-river"><h5 id="confirmModalTitle"></h5></header>
+    <div class="w3-container w3-padding w3-margin">
+      <div id="confirmModalContent"></div>
+      <div class="w3-right">
+        <button id="confirmModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
+        <button id="confirmModalCancel" class="w3-btn w3-round-large w3-flat-silver" style="margin-top:16px">CANCEL</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="passwordModal" class="w3-modal">
+  <div class="w3-modal-content w3-card-4 w3-animate-opacity">
+    <header class="w3-container w3-flat-peter-river"><h5>Enter Password</h5></header>
+    <div class="w3-container w3-padding w3-margin">
+      <input id="password" class="w3-input w3-border" style="display:inline" type="password">
+      <button id="submitPassword" class="w3-btn w3-round-large w3-flat-peter-river w3-right" style="margin-top:16px">SUBMIT</button>
+    </div>
+  </div>
+</div>
+
+<div id="statusModal" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-animate-zoom">
+      <header class="w3-container w3-red"><h5 id="statusModalTitle"></h5></header>
+      <div class="w3-container w3-padding w3-margin">
+        <div id="statusModalContent"></div>
+        <div class="w3-right">
+          <button id="statusModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script type="module" src="optionPage.js"></script>
 </body>
 </html>
-<script type="module" src="optionPage.js"></script>

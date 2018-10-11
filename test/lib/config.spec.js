@@ -22,7 +22,16 @@ describe('Config', function() {
       expect(Object.keys(config.words)).to.include('newword');
       expect(config.words['newword'].matchMethod).to.equal(config.defaultWordMatchMethod);
       expect(config.words['newword'].repeat).to.equal(config.defaultWordRepeat);
-      expect(config.words['newword'].words).to.eql([]);
+      expect(config.words['newword'].sub).to.equal('');
+    });
+
+    it('should add a new word to the config with provided options', function() {
+      let wordOptions = {matchMethod: 1, repeat: true, sub: 'Older-word'};
+      expect(config.addWord('newer-word', wordOptions)).to.equal(true);
+      expect(Object.keys(config.words)).to.include('newer-word');
+      expect(config.words['newer-word'].matchMethod).to.equal(wordOptions.matchMethod);
+      expect(config.words['newer-word'].repeat).to.equal(wordOptions.repeat);
+      expect(config.words['newer-word'].sub).to.equal(wordOptions.sub.toLowerCase());
     });
 
     it('should sanitize a new word before adding', function() {
@@ -30,7 +39,7 @@ describe('Config', function() {
       expect(Object.keys(config.words)).to.include('anothernewword');
       expect(config.words['anothernewword'].matchMethod).to.equal(config.defaultWordMatchMethod);
       expect(config.words['anothernewword'].repeat).to.equal(config.defaultWordRepeat);
-      expect(config.words['anothernewword'].words).to.eql([]);
+      expect(config.words['anothernewword'].sub).to.equal('');
     });
 
     it('should return false when word is already present', function() {

@@ -3,12 +3,15 @@ export default class OptionAuth {
   authenticated: boolean;
   password: string;
 
-  authenticate(event) {
+  authenticate(evt) {
     let passwordInput = document.getElementById('password') as HTMLInputElement;
     if (passwordInput.value == this.password) {
       this.authenticated = true;
-      OptionPage.hide(document.getElementById('passwordContainer'));
+      OptionPage.closeModal('passwordModal');
       OptionPage.show(document.getElementById('main'));
+      OptionPage.hideInputError(passwordInput);
+    } else {
+      OptionPage.showInputError(passwordInput);
     }
   }
 
@@ -17,13 +20,32 @@ export default class OptionAuth {
     this.authenticated = false;
   }
 
-  setPassword() {
+  setPassword(optionPage: OptionPage) {
     var password = document.getElementById('setPassword') as HTMLInputElement;
-    if (password.value == '') {
-      chrome.storage.sync.remove('password');
-    } else {
-      chrome.storage.sync.set({password: password.value});
-      password.value = '';
+    optionPage.cfg.password = password.value;
+    optionPage.saveProp('password');
+    password.value = '';
+    this.setPasswordButton(optionPage);
+  }
+
+  setPasswordButton(optionPage: OptionPage) {
+    let passwordText = document.getElementById('setPassword') as HTMLInputElement;
+    let passwordBtn = document.getElementById('setPasswordBtn') as HTMLButtonElement;
+
+    if (optionPage.cfg.password) { // Password already set
+      OptionPage.enableBtn(passwordBtn);
+      if (passwordText.value) { // Password field filled
+        passwordBtn.innerText = 'SET';
+      } else { // Empty password field
+        passwordBtn.innerText = 'REMOVE';
+      }
+    } else { // Password not already set
+      passwordBtn.innerText = 'SET';
+      if (passwordText.value) { // Password field filled
+        OptionPage.enableBtn(passwordBtn);
+      } else { // Empty password field
+        OptionPage.disableBtn(passwordBtn);
+      }
     }
   }
 }

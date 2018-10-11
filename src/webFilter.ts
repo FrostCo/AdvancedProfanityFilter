@@ -53,6 +53,7 @@ export default class WebFilter extends Filter {
   }
 
   async cleanPage() {
+    // @ts-ignore: Type WebConfig is not assignable to type Config
     this.cfg = await WebConfig.build();
 
     // Don't run if this is a disabled domain
@@ -77,8 +78,7 @@ export default class WebFilter extends Filter {
     }
 
     // Remove profanity from the main document and watch for new nodes
-    this.generateWordList();
-    this.generateRegexpList();
+    this.init();
     this.removeProfanity(Page.xpathDocText, document);
     this.updateCounterBadge();
     this.observeNewNodes();

@@ -110,10 +110,13 @@ export default class WebConfig extends Config {
     });
   }
 
-  save() {
-    var self = this;
+  // Pass a key to save only that key, otherwise it will save everything
+  save(prop?: string) {
+    let data = {};
+    prop ? data[prop] = this[prop] : data = this.dataToPersist();
+
     return new Promise(function(resolve, reject) {
-      chrome.storage.sync.set(self.dataToPersist(), function() {
+      chrome.storage.sync.set(data, function() {
         resolve(chrome.runtime.lastError ? 1 : 0);
       });
     });
@@ -141,5 +144,4 @@ export default class WebConfig extends Config {
 
     return words;
   }
-
 }

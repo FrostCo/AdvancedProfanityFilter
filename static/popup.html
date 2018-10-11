@@ -1,37 +1,42 @@
 <!doctype html>
 <html>
 <head>
-  <!-- <link rel="stylesheet" type="text/css" href="w3.css" /> -->
+  <link rel="stylesheet" type="text/css" href="w3.css" />
   <link rel="stylesheet" type="text/css" href="popup.css" />
 </head>
 <body tabindex="1">
-  <div>
-    <img id="logo" src="icons/icon64.png"/>
-    <label class="switch">
-      <input class="unselectable" id="domainFilter" type="checkbox" checked>
-      <span id="domainToggle" class="slider round"></span>
-    </label>
-  </div>
+  <img id="logo" src="icons/icon64.png"/>
+  <label class="switch">
+    <input class="unselectable" id="domainFilter" type="checkbox" checked>
+    <span id="domainToggle" class="slider round"></span>
+  </label>
+
   <div class="divider"></div>
-  <div id="advancedModeContainer">
-    <label>
-      Advanced Mode:
-      <input class="unselectable" id="advancedMode" type="checkbox">
-    </label>
+
+  <div id="advancedModeContainer" class="w3-center container">
+    <label>Advanced Mode <input id="advancedMode" class="w3-check unselectable" type="checkbox"></label>
   </div>
-  <div id="filterMethodContainer">
+
+  <div class="divider"></div>
+
+  <div id="filterMethodContainer" class="w3-center container">
     <div class="filter">
-      <h4>Filter Method</h4>
-      <select id="filterMethodSelect"></select>
+      <label>Filter <select id="filterMethodSelect" class="w3-select w3-border" style="display:inline;"></select></label>
     </div>
-    <div class="divider"></div>
   </div>
-  <div id="summary" style="display: none;"></div>
-  <div class="options unselectable">
-    <h3 id="options">Options</h3>
+
+  <div class="divider"></div>
+
+  <div id="summary" class="w3-hide w3-margin-left w3-margin-right container"></div>
+
+  <div id="summaryDivider" class="divider w3-hide"></div>
+
+  <div class="options unselectable w3-center container">
+    <button id="options" class="w3-button w3-border w3-border-blue">Options</button>
   </div>
-  <div id="footer">
-    <a id="gettingStarted" href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki" target="_blank">Getting Started</a>
+
+  <div id="footer" style="margin-top:8px">
+    <a id="gettingStarted" href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki" target="_blank">Help</a>
     - <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
     - <a href="https://github.com/richardfrost/AdvancedProfanityFilter/issues" target="_blank">Support</a>
   </div>
