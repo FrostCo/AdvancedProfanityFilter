@@ -23,7 +23,7 @@
 
 <div id="main" class="w3-hide">
 <div id="settingsPage" class="w3-container">
-  <h4 class="w3-text-teal">Filter Method</h4>
+  <h4 class="sectionHeader">Filter Method</h4>
 
   <div id="filterMethod">
     <label>
@@ -45,7 +45,7 @@
   </div>
 
   <div id="censorSettings" class="w3-hide">
-    <h4 class="w3-text-teal">Censor Settings</h4>
+    <h4 class="sectionHeader">Censor Settings</h4>
     <label>
       <input id="preserveFirst" type="checkbox" class="w3-check">
       Preserve the first letter
@@ -88,7 +88,7 @@
   </div>
 
   <div id="substitutionSettings" class="w3-hide">
-    <h4 class="w3-text-teal">Substitution Settings</h4>
+    <h4 class="sectionHeader">Substitution Settings</h4>
     <label>
       <input id="preserveCase" type="checkbox" class="w3-check">
       Preserve case of filtered words
@@ -108,14 +108,14 @@
   </div>
 
   <div id="globalMatchMethod" class="w3-hide">
-    <h4 class="w3-text-teal">Global Matching Method</h4>
+    <h4 class="sectionHeader">Global Matching Method</h4>
     <label>
       <select id="globalMatchMethodSelect" class="w3-select w3-border small"></select>
     </label>
   </div>
 
   <div id="generalOptions">
-    <h4 class="w3-text-teal">General Settings</h4>
+    <h4 class="sectionHeader">General Settings</h4>
     <label>
       <input id="showCounter" type="checkbox" class="w3-check">
       Show number of filtered words
@@ -129,7 +129,7 @@
   </div>
 
   <div id="defaultOptions">
-    <h4 class="w3-text-teal">Default Settings (for new words/phrases)</h4>
+    <h4 class="sectionHeader">Default Settings (for new words/phrases)</h4>
     <label>
       <input id="defaultWordRepeat" type="checkbox" class="w3-check">
       Match repeated characters
@@ -144,19 +144,19 @@
 </div>
 
 <div id="wordsPage" class="w3-container w3-hide">
-  <h4 class="w3-text-teal">Words & Phrases</h4>
+  <h4 class="sectionHeader">Words & Phrases</h4>
   <select id="wordList" class="w3-select w3-border small"></select>
 
-  <h4 class="w3-text-teal">Word/Phrase</h4>
+  <h4 class="sectionHeader">Word/Phrase</h4>
   <input id="wordText" class="w3-input w3-border small" type="text" pattern=".+">
 
   <div id="wordSubstitution" class="w3-hide">
-    <h4 class="w3-text-teal">Substitution</h4>
+    <h4 class="sectionHeader">Substitution</h4>
     <input id="substitutionText" class="w3-input w3-border small"/>
   </div>
 
   <div id="wordMatchMethod">
-    <h4 class="w3-text-teal">Match Method</h4>
+    <h4 class="sectionHeader">Match Method</h4>
     <label>
       <input id="wordMatchExact" type="radio" class="w3-radio" name="wordMatchMethod" value="Exact">
       Exact<span class="notes">(dog: *** in the doghouse)</span>
@@ -180,7 +180,7 @@
       Regex
     </label>
 
-    <h4 class="w3-text-teal">Other</h4>
+    <h4 class="sectionHeader">Other</h4>
     <label>
       <input id="wordMatchRepeated" type="checkbox" class="w3-check" name="matchRepeat"/>
       Match Repeated Characters<span class="notes">(dog: dddoooggg)</span>
@@ -196,10 +196,10 @@
 
 <div id="domainsPage" class="w3-container w3-hide">
   <div id="advDomainContainer" class="w3-half">
-    <h4 class="w3-text-teal">Advanced Domains</h4>
+    <h4 class="sectionHeader">Advanced Domains</h4>
     <select id="advDomainSelect" class="w3-select w3-border small" style="display:block"></select>
     <span class="notes">Only use when the filter isn't working.</span>
-    <h4 class="w3-text-teal">Domain</h4>
+    <h4 class="sectionHeader">Domain</h4>
     <input id="advDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
     <span class="notes">Example: "google.com" or "mail.google.com"</span>
     <div style="padding-top: 16px;">
@@ -209,10 +209,10 @@
   </div>
 
   <div id="disabledDomainContainer" class="w3-half w3-right">
-    <h4 class="w3-text-teal">Whitelist Domains</h4>
+    <h4 class="sectionHeader">Whitelist Domains</h4>
     <select id="disabledDomainSelect" class="w3-select w3-border small" style="display:block"></select>
     <span class="notes">Disable the filter for a domain</span>
-    <h4 class="w3-text-teal">Domain</h4>
+    <h4 class="sectionHeader">Domain</h4>
     <input id="disabledDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
     <span class="notes">Example: "google.com" or "mail.google.com"</span>
     <div style="padding-top: 16px;">
@@ -238,9 +238,9 @@
 </div>
 
 <div id="testPage" class="w3-container w3-hide">
-  <h4 class="w3-text-teal">Test</h4>
+  <h4 class="sectionHeader">Test</h4>
   <textarea id="testText" class="w3-input w3-border w3-card"></textarea>
-  <h4 class="w3-text-teal">Filtered</h4>
+  <h4 class="sectionHeader">Filtered</h4>
   <div id="filteredTestText" class="w3-panel w3-leftbar w3-border-grey w3-flat-silver"></div>
 </div>
 
