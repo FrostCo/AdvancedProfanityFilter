@@ -1,3 +1,9 @@
 * eol=lf
 *.jpg binary
 *.png binary
+
+# https://github.com/github/linguist#overrides
+/static/w3.css linguist-vendored
+/static/w3-color-flat.css linguist-vendored
+/store/* linguist-vendored
+/test/* linguist-documentation
