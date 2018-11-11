@@ -1,4 +1,5 @@
 body {
+  --blue: #3498db; /* .w3-flat-peter-river */
   font-family: Arial;
   width: 250px;
   height: 100%;
@@ -28,11 +29,11 @@ h4 {
 }
 
 input:checked + .slider {
-  background-color: teal;
+  background-color: var(--blue);
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px teal;
+  box-shadow: 0 0 1px var(--blue);
 }
 
 input:checked + .slider:before {
@@ -63,7 +64,7 @@ input:checked + .slider:before {
 }
 
 #gettingStarted {
-  color: teal;
+  color: var(--blue);
   font-weight: bold;
 }
 
