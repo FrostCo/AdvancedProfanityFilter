@@ -201,11 +201,11 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 });
 
 // Listen for summary data updates
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    popup.populateSummary(request);
-  }
-);
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    if (sender.tab.id == tabs[0].id) popup.populateSummary(request);
+  });
+});
 
 let popup = new Popup;
 

@@ -175,7 +175,7 @@ if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptG
   /* istanbul ignore next */
   // Send summary data to popup
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    if (request.popup) { chrome.runtime.sendMessage({summary: filter.summary}, function(response){}); }
+    if (request.popup && filter.counter > 0) chrome.runtime.sendMessage({summary: filter.summary}, function(response){});
   });
 
   /* istanbul ignore next */
