@@ -20,6 +20,7 @@ export default class Config {
   preserveFirst: boolean;
   preserveLast: boolean;
   showCounter: boolean;
+  showSummary: boolean;
   substitutionMark: boolean;
   words: {
     [key: string]: WordOptions;
@@ -56,6 +57,7 @@ export default class Config {
     preserveFirst: true,
     preserveLast: false,
     showCounter: true,
+    showSummary: true,
     substitutionMark: true
   };
 

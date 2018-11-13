@@ -286,12 +286,14 @@ export default class OptionPage {
     // Settings
     let selectedFilter = document.getElementById(`filter${WebConfig._filterMethodNames[option.cfg.filterMethod]}`) as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
+    let showSummary = document.getElementById('showSummary') as HTMLInputElement;
     let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
     let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     selectedFilter.checked = true;
     dynamicList(WebConfig._matchMethodNames.slice(0, -1), 'globalMatchMethodSelect');
     globalMatchMethodSelect.selectedIndex = this.cfg.globalMatchMethod;
     showCounter.checked = this.cfg.showCounter;
+    showSummary.checked = this.cfg.showSummary;
     filterWordList.checked = this.cfg.filterWordList;
 
     // Censor Settings
@@ -430,6 +432,7 @@ export default class OptionPage {
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
+    let showSummary = document.getElementById('showSummary') as HTMLInputElement;
     let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
@@ -442,6 +445,7 @@ export default class OptionPage {
     self.cfg.preserveFirst = preserveFirst.checked;
     self.cfg.preserveLast = preserveLast.checked;
     self.cfg.showCounter = showCounter.checked;
+    self.cfg.showSummary = showSummary.checked;
     self.cfg.filterWordList = filterWordList.checked;
     self.cfg.substitutionMark = substitutionMark.checked;
     self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
@@ -628,6 +632,7 @@ document.getElementById('preserveCase').addEventListener('click', e => { option.
 document.getElementById('preserveFirst').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('preserveLast').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('showCounter').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('showSummary').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('filterWordList').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('substitutionMark').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('defaultWordSubstitutionText').addEventListener('change', e => { option.saveOptions(e); });
