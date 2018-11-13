@@ -158,7 +158,7 @@ class Popup {
   summaryTableHTML(summary: Summary): string {
     let tableInnerHTML = '';
     if (Object.keys(summary).length > 0) {
-      tableInnerHTML = '<table class="w3-table w3-striped w3-border w3-bordered w3-card w3-small"><tr class="w3-deep-purple"><th colspan="2" class="w3-center">Filtered Words</th></tr>';
+      tableInnerHTML = '<table class="w3-table w3-striped w3-border w3-bordered w3-card w3-small"><tr class="w3-flat-peter-river"><th colspan="2" class="w3-center">Filtered Words</th></tr>';
       Object.keys(summary).forEach(key => {
         tableInnerHTML += `<tr><td class="w3-tooltip"><span style="position:absolute;left:0;bottom:18px" class="w3-text w3-tag">${key}</span>${summary[key].clean}</td><td class="w3-right">${summary[key].count}</td></tr>`;
       });
@@ -201,11 +201,13 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 });
 
 // Listen for summary data updates
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    popup.populateSummary(request);
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.summary) {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      if (sender.tab.id == tabs[0].id) popup.populateSummary(request);
+    });
   }
-);
+});
 
 let popup = new Popup;
 

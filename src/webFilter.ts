@@ -92,10 +92,12 @@ export default class WebFilter extends Filter {
 
   foundMatch(word) {
     super.foundMatch(word);
-    if (this.summary[word]) {
-      this.summary[word].count += 1;
-    } else {
-      this.summary[word] = { clean: filter.replaceText(word, false), count: 1 };
+    if (this.cfg.showSummary) {
+      if (this.summary[word]) {
+        this.summary[word].count += 1;
+      } else {
+        this.summary[word] = { clean: filter.replaceText(word, false), count: 1 };
+      }
     }
   }
 
@@ -163,8 +165,9 @@ export default class WebFilter extends Filter {
   updateCounterBadge() {
     /* istanbul ignore next */
     // console.count('updateCounterBadge'); // Benchmarking - Executaion Count
-    if (this.cfg.showCounter && this.counter > 0) {
-      chrome.runtime.sendMessage({counter: this.counter.toString(), summary: this.summary});
+    if (this.counter > 0) {
+      if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter.toString() });
+      if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
     }
   }
 }
@@ -175,7 +178,7 @@ if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptG
   /* istanbul ignore next */
   // Send summary data to popup
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    if (request.popup) { chrome.runtime.sendMessage({summary: filter.summary}, function(response){}); }
+    if (filter.cfg.showSummary && request.popup && filter.counter > 0) chrome.runtime.sendMessage({ summary: filter.summary });
   });
 
   /* istanbul ignore next */

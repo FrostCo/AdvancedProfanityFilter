@@ -20,6 +20,7 @@ export default class Config {
   preserveFirst: boolean;
   preserveLast: boolean;
   showCounter: boolean;
+  showSummary: boolean;
   substitutionMark: boolean;
   words: {
     [key: string]: WordOptions;
@@ -56,6 +57,7 @@ export default class Config {
     preserveFirst: true,
     preserveLast: false,
     showCounter: true,
+    showSummary: true,
     substitutionMark: true
   };
 
@@ -66,11 +68,12 @@ export default class Config {
     'bastard': { matchMethod: 1, repeat: true, sub: 'jerk' },
     'bitch': { matchMethod: 1, repeat: true, sub: 'jerk' },
     'cunt': { matchMethod: 1, repeat: true, sub: 'explative' },
-    'dammit': { matchMethod: 1, repeat: true, sub: 'dangit' },
+    'dammit': { matchMethod: 1, repeat: false, sub: 'dangit' },
     'damn': { matchMethod: 1, repeat: true, sub: 'dang' },
     'dumbass': { matchMethod: 1, repeat: true, sub: 'idiot' },
     'fuck': { matchMethod: 1, repeat: true, sub: 'fudge' },
     'hell': { matchMethod: 0, repeat: true, sub: 'heck' },
+    'nigger': { matchMethod: 1, repeat: true, sub: 'explative' },
     'piss': { matchMethod: 1, repeat: true, sub: 'pee' },
     'pissed': { matchMethod: 1, repeat: true, sub: 'ticked' },
     'slut': { matchMethod: 1, repeat: true, sub: 'tramp' },
