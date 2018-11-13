@@ -1,5 +1,6 @@
 body {
-  --blue: #3498db; /* .w3-flat-peter-river */
+  /* .w3-flat-peter-river */
+  --blue: #3498db;
   font-family: Arial;
   width: 250px;
   height: 100%;
