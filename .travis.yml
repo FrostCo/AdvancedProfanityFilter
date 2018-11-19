@@ -1,4 +1,8 @@
-language: nodejs
+language: node_js
+
+node_js:
+  - "10"
+  - "node"
 
 before_script:
   - npm install
@@ -6,6 +10,3 @@ before_script:
 
 script:
   - npm run test
-
-nodejs:
-  - node
