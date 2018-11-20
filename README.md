@@ -1,4 +1,6 @@
 # Advanced Profanity Filter
+[![Build Status](https://travis-ci.com/richardfrost/AdvancedProfanityFilter.svg?branch=master)](https://travis-ci.com/richardfrost/AdvancedProfanityFilter)
+
 A browser extension to filter profanity from webpages.
 
 For an overview of features and options, please head to the [wiki](https://github.com/richardfrost/AdvancedProfanityFilter/wiki).
