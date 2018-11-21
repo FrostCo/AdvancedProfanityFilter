@@ -1,5 +1,7 @@
 # Advanced Profanity Filter
-[![Build Status](https://travis-ci.com/richardfrost/AdvancedProfanityFilter.svg?branch=master)](https://travis-ci.com/richardfrost/AdvancedProfanityFilter)
+[![Build Status](https://img.shields.io/travis/richardfrost/AdvancedProfanityFilter.svg?style=flat-square)](https://travis-ci.com/richardfrost/AdvancedProfanityFilter.svg?branch=master)
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/d/piajkpdbaniagacofgklljacgjhefjeh.svg?style=flat-square)](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/stars/piajkpdbaniagacofgklljacgjhefjeh.svg?style=flat-square)](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
 
 A browser extension to filter profanity from webpages.
 
