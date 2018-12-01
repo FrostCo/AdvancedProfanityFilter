@@ -6,18 +6,30 @@ import WebConfig from './webConfig.js';
 interface Message {
   advanced?: boolean,
   counter?: number,
-  summary?: object,
-  disabled?: boolean
+  disabled?: boolean,
+  mute?: boolean,
+  summary?: object
 }
 
 export default class WebFilter extends Filter {
   advanced: boolean;
+  lastSubtitle: string;
+  muted: boolean;
   summary: object;
 
   constructor() {
     super();
     this.advanced = false;
+    this.muted = false;
     this.summary = {};
+  }
+
+  advancedPage(): boolean {
+    return Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
+  }
+
+  audioPage(): boolean {
+    return Domain.domainMatch(window.location.hostname, ['app.plex.tv']);
   }
 
   checkMutationTargetTextForProfanity(mutation) {
@@ -68,7 +80,7 @@ export default class WebFilter extends Filter {
       }
 
       // Check for advanced mode on current domain
-      this.advanced = Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
+      this.advanced = this.advancedPage();
       message.advanced = this.advanced;
       if (this.advanced) {
         message.advanced = true;
@@ -77,17 +89,53 @@ export default class WebFilter extends Filter {
       chrome.runtime.sendMessage(message);
     }
 
-    // Remove profanity from the main document and watch for new nodes
     this.init();
-    this.removeProfanity(Page.xpathDocText, document);
-    this.updateCounterBadge();
-    this.observeNewNodes();
+
+    // Advanced Audio Muting
+    if (this.advanced && this.audioPage()) {
+      this.processAudioPage();
+    } else {
+      // Remove profanity from the main document and watch for new nodes
+      this.removeProfanity(Page.xpathDocText, document);
+      this.updateCounterBadge();
+      this.observeNewNodes();
+    }
+  }
+
+  cleanAudioPlex() {
+    var subtitleContainer = document.querySelectorAll('[data-dialogue-id]') as any;
+
+    // Turn audio on when subtitles are absent
+    if (subtitleContainer.length == 0) {
+      filter.unmute();
+    }
+
+    subtitleContainer.forEach(node => {
+      // If the current subtitle lines haven't already been checked
+      if (filter.lastSubtitle != node.dataset.dialogueId) {
+        filter.lastSubtitle = node.dataset.dialogueId;
+
+        filter.unmute(); // Turn on audio if we haven't already
+
+        // Process subtitles
+        [].forEach.call(node.children, function(child) {
+          let subLine = child.children[0];
+          if (subLine) {
+            var newText = filter.replaceText(subLine.textContent);
+            if (subLine.textContent != newText) {
+              subLine.textContent = newText;
+              filter.mute(); // Mute the audio if we haven't already
+              filter.updateCounterBadge();
+            }
+          }
+        });
+      }
+    });
   }
 
   disabledPage(): boolean {
     // console.count('disabledPage'); // Benchmarking - Executaion Count
-    let domain = window.location.hostname;
-    return Domain.domainMatch(domain, this.cfg.disabledDomains);
+    return Domain.domainMatch(window.location.hostname, this.cfg.disabledDomains);
   }
 
   foundMatch(word) {
@@ -100,6 +148,14 @@ export default class WebFilter extends Filter {
       }
     }
   }
+
+  mute() {
+    if (filter.muted === false) {
+      this.muted = true;
+      chrome.runtime.sendMessage({mute: filter.muted});
+    }
+  }
+
 
   // Watch for new text nodes and clean them as they are added
   observeNewNodes() {
@@ -159,6 +215,22 @@ export default class WebFilter extends Filter {
         // console.log('Normal cleaning:', item.data); // DEBUG
         item.data = this.replaceText(item.data);
       }
+    }
+  }
+
+  processAudioPage() {
+    let interval = 100; // TODO: Make configurable
+    switch(window.location.hostname) {
+      case 'app.plex.tv':
+        setInterval(filter.cleanAudioPlex, interval);
+        break;
+    }
+  }
+
+  unmute() {
+    if (filter.muted === true) {
+      this.muted = false;
+      chrome.runtime.sendMessage({mute: filter.muted});
     }
   }
 
