@@ -4,9 +4,10 @@
   "description": "A browser extension to filter profanity from webpages.",
   "main": "filter.js",
   "scripts": {
-    "build": "npm run clean && npm run copy-static && node bin/prebuild.js && tsc",
+    "build": "npm run copy-static && node bin/prebuild.js && tsc",
     "build-no-verify": "node bin/prebuild.js && tsc",
     "clean": "node bin/clean-dist.js",
+    "clean-build": "npm run clean && npm run build",
     "copy-static": "node bin/copy-static.js",
     "debug-test": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
     "lint": "npx eslint src/**/*.ts",
