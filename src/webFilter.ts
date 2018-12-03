@@ -28,8 +28,16 @@ export default class WebFilter extends Filter {
     return Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
   }
 
+  advancedReplaceText(string: string) {
+    let result = {} as any;
+    result.original = string;
+    result.filtered = filter.replaceText(string);
+    result.modified = (result.filtered != string)
+    return result;
+  }
+
   audioPage(): boolean {
-    return Domain.domainMatch(window.location.hostname, ['app.plex.tv', 'www.amazon.com']);
+    return Domain.domainMatch(window.location.hostname, ['app.plex.tv', 'play.google.com', 'www.amazon.com']);
   }
 
   checkMutationTargetTextForProfanity(mutation) {
@@ -131,6 +139,35 @@ export default class WebFilter extends Filter {
       }
     });
   }
+
+  // TODO: change lastsub to array and use include?
+  // TODO: Check if video is playing?
+  // div.lava-timed-text-viewport span.lava-tt-caption-default
+  // //*[@id="player-container"]/div[1]/div/div[1]/span/text()[1]
+  // cleanAudioGooglePlay() {
+  //   var filtered = false;
+  //   var subtitles = document.querySelectorAll('div.lava-timed-text-viewport span.lava-tt-caption-default');
+  //   if (subtitles.length == 0) { filter.unmute(); return; } // Turn audio on when subtitles are absent
+
+  //   var allSubtitles = document.querySelectorAll('div.lava-timed-text-viewport')[0].textContent;
+  //   if (filter.lastSubtitle != allSubtitles) { // This subtitle hasn't been checked yet
+  //     filter.lastSubtitle = allSubtitles; // Update the last subtitle tracker
+  //     filter.unmute(); // Turn on audio if we haven't already
+
+  //     // Process subtitles
+  //     subtitles.forEach(subtitle => {
+  //       let result = filter.advancedReplaceText(subtitle.textContent);
+  //       if (result.modified) {
+  //         subtitle.textContent = result.filtered;
+  //         filtered = true;
+  //         filter.mute(); // Mute the audio if we haven't already
+  //         filter.lastSubtitle = filter.lastSubtitle.replace(result.original, result.filtered);
+  //       }
+  //     });
+
+  //     if (filtered) filter.updateCounterBadge(); // Update if modified
+  //   }
+  // }
 
   cleanAudioPlex() {
     var subtitleContainer = document.querySelectorAll('[data-dialogue-id]') as any;
@@ -251,6 +288,9 @@ export default class WebFilter extends Filter {
       case 'app.plex.tv':
         setInterval(filter.cleanAudioPlex, interval);
         break;
+      // case 'play.google.com':
+      //   setInterval(filter.cleanAudioGooglePlay, interval);
+      //   break;
       case 'www.amazon.com':
         setInterval(filter.cleanAudioAmazon, interval);
         break;
