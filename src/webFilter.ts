@@ -29,7 +29,7 @@ export default class WebFilter extends Filter {
   }
 
   audioPage(): boolean {
-    return Domain.domainMatch(window.location.hostname, ['app.plex.tv']);
+    return Domain.domainMatch(window.location.hostname, ['app.plex.tv', 'www.amazon.com']);
   }
 
   checkMutationTargetTextForProfanity(mutation) {
@@ -102,13 +102,40 @@ export default class WebFilter extends Filter {
     }
   }
 
+  // Rules:
+  // - Multiline subtitles are separated by `<br>`
+  // - If a subtitle line is empty: "", then we'll unmute and stop processing
+  cleanAudioAmazon() {
+    var subtitleContainer = document.querySelectorAll('span.captions span.timedTextBackground');
+    if (subtitleContainer.length == 0) filter.unmute(); // Turn audio on when subtitles are absent
+
+    subtitleContainer.forEach(subtitle => {
+      if (subtitle.innerHTML == '') { filter.unmute(); return; } // Turn audio on when subtitles are absent
+      if (filter.lastSubtitle != subtitle.innerHTML) { // This subtitle hasn't been checked yet
+        filter.lastSubtitle = subtitle.innerHTML; // Update the last subtitle tracker
+        filter.unmute(); // Turn on audio if we haven't already
+
+        // Process subtitles
+        let subLines = subtitle.innerHTML.split('<br>');
+        let newLines = [];
+        subLines.forEach(line => { newLines.push(filter.replaceText(line)); });
+        let newSub = newLines.join('<br>');
+
+        // Update if modified
+        if (subtitle.innerHTML != newSub) {
+          subtitle.innerHTML = newSub;
+          filter.lastSubtitle = newSub; // Update the last subtitle tracker
+          filter.mute(); // Mute the audio if we haven't already
+          filter.updateCounterBadge();
+        }
+      }
+    });
+  }
+
   cleanAudioPlex() {
     var subtitleContainer = document.querySelectorAll('[data-dialogue-id]') as any;
 
-    // Turn audio on when subtitles are absent
-    if (subtitleContainer.length == 0) {
-      filter.unmute();
-    }
+    if (subtitleContainer.length == 0) filter.unmute(); // Turn audio on when subtitles are absent
 
     subtitleContainer.forEach(node => {
       // If the current subtitle lines haven't already been checked
@@ -223,6 +250,9 @@ export default class WebFilter extends Filter {
     switch(window.location.hostname) {
       case 'app.plex.tv':
         setInterval(filter.cleanAudioPlex, interval);
+        break;
+      case 'www.amazon.com':
+        setInterval(filter.cleanAudioAmazon, interval);
         break;
     }
   }
