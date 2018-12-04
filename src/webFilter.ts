@@ -37,7 +37,7 @@ export default class WebFilter extends Filter {
   }
 
   audioPage(): boolean {
-    return Domain.domainMatch(window.location.hostname, ['app.plex.tv', 'play.google.com', 'www.amazon.com']);
+    return Domain.domainMatch(window.location.hostname, ['app.plex.tv', 'play.google.com', 'www.amazon.com', 'www.youtube.com']);
   }
 
   checkMutationTargetTextForProfanity(mutation) {
@@ -197,6 +197,35 @@ export default class WebFilter extends Filter {
     });
   }
 
+  // Container: div.caption-window divspan.captions-text
+  // Subtitles: span.caption-visual-line
+  cleanAudioYoutube() {
+    let filtered = false;
+    let subtitles = document.querySelectorAll('span.captions-text span.caption-visual-line');
+    if (subtitles.length == 0) { filter.unmute(); return; } // Turn audio on and return when subtitles are absent
+    // console.log('Processing subtitles...'); // DEBUG - Audio
+
+    let allSubtitles = document.querySelectorAll('div.caption-window span.captions-text')[0].textContent;
+    if (filter.lastSubtitle != allSubtitles) { // This subtitle hasn't been checked yet
+      // console.log('New subtitles found!'); // DEBUG - Audio
+      filter.lastSubtitle = allSubtitles; // Update the last subtitle tracker
+      filter.unmute(); // Turn on audio if we haven't already
+
+      // Process subtitles
+      subtitles.forEach(subtitle => {
+        let result = filter.advancedReplaceText(subtitle.textContent);
+        if (result.modified) {
+          filtered = true;
+          subtitle.textContent = result.filtered;
+          filter.mute(); // Mute the audio if we haven't already
+          filter.lastSubtitle = filter.lastSubtitle.replace(result.original, result.filtered);
+        }
+      });
+
+      if (filtered) filter.updateCounterBadge(); // Update if modified
+    }
+  }
+
   disabledPage(): boolean {
     // console.count('disabledPage'); // Benchmarking - Executaion Count
     return Domain.domainMatch(window.location.hostname, this.cfg.disabledDomains);
@@ -283,6 +312,7 @@ export default class WebFilter extends Filter {
   }
 
   processAudioPage() {
+    // TODO: Add an optional delay to unmuting?
     let interval = 100; // TODO: Make configurable
     switch(window.location.hostname) {
       case 'app.plex.tv':
@@ -293,6 +323,9 @@ export default class WebFilter extends Filter {
       //   break;
       case 'www.amazon.com':
         setInterval(filter.cleanAudioAmazon, interval);
+        break;
+      case 'www.youtube.com':
+        setInterval(filter.cleanAudioYoutube, interval);
         break;
     }
   }
