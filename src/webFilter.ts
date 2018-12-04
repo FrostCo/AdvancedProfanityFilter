@@ -36,8 +36,20 @@ export default class WebFilter extends Filter {
     return result;
   }
 
+  // Is this a subtitle container?
+  audioNode(node): boolean {
+    let result = false;
+    switch(window.location.hostname) {
+    case 'app.plex.tv':
+      result = !!(node.dataset && node.dataset.hasOwnProperty('dialogueId'));
+      break;
+    }
+
+    return result;
+  }
+
   audioPage(): boolean {
-    return Domain.domainMatch(window.location.hostname, ['app.plex.tv', 'play.google.com', 'www.amazon.com', 'www.youtube.com']);
+    return Domain.domainMatch(window.location.hostname, ['app.plex.tv', 'www.amazon.com', 'www.youtube.com']);
   }
 
   checkMutationTargetTextForProfanity(mutation) {
@@ -59,11 +71,24 @@ export default class WebFilter extends Filter {
     // console.log('Mutation observed:', mutation); // DEBUG - Mutation addedNodes
     mutation.addedNodes.forEach(function(node) {
       // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
+
       if (!Page.isForbiddenNode(node)) {
-        // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
-        filter.removeProfanity(Page.xpathNodeText, node);
+        // TODO: Add filter.muteAudio option
+        if (true && filter.audioPage() && filter.audioNode(node)) {
+          filter.cleanAudio(node);
+        } else {
+          // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
+          filter.removeProfanity(Page.xpathNodeText, node);
+        }
       }
       // else { console.log('Forbidden node:', node); } // DEBUG - Mutation addedNodes
+    });
+
+    // TODO: Add filter.muteAudio option
+    mutation.removedNodes.forEach(function(removedNode) {
+      if (true && filter.audioPage() && filter.audioNode(removedNode)) {
+        filter.unmute();
+      }
     });
 
     // Only process mutation change if target is text
@@ -99,15 +124,10 @@ export default class WebFilter extends Filter {
 
     this.init();
 
-    // Advanced Audio Muting
-    if (this.advanced && this.audioPage()) {
-      this.processAudioPage();
-    } else {
-      // Remove profanity from the main document and watch for new nodes
-      this.removeProfanity(Page.xpathDocText, document);
-      this.updateCounterBadge();
-      this.observeNewNodes();
-    }
+    // Remove profanity from the main document and watch for new nodes
+    this.removeProfanity(Page.xpathDocText, document);
+    this.updateCounterBadge();
+    this.observeNewNodes();
   }
 
   // Rules:
@@ -140,32 +160,32 @@ export default class WebFilter extends Filter {
     });
   }
 
-  cleanAudioPlex() {
-    var subtitleContainer = document.querySelectorAll('[data-dialogue-id]') as any;
+  // TODO: Plex handle resize
+  // Container: '[data-dialogue-id]'
+  // Subtitles: Container's children
+  cleanAudioPlex(subtitleContainer) {
+    let filtered = false;
+    // If the current subtitle lines haven't already been checked
+    if (filter.lastSubtitle != subtitleContainer.dataset.dialogueId) {
+      filter.lastSubtitle = subtitleContainer.dataset.dialogueId;
+      filter.unmute(); // Turn on audio if we haven't already TODO: This should only be needed if we don't watch removedNodes
 
-    if (subtitleContainer.length == 0) filter.unmute(); // Turn audio on when subtitles are absent
-
-    subtitleContainer.forEach(node => {
-      // If the current subtitle lines haven't already been checked
-      if (filter.lastSubtitle != node.dataset.dialogueId) {
-        filter.lastSubtitle = node.dataset.dialogueId;
-
-        filter.unmute(); // Turn on audio if we haven't already
-
-        // Process subtitles
-        [].forEach.call(node.children, function(child) {
-          let subLine = child.children[0];
-          if (subLine) {
-            var newText = filter.replaceText(subLine.textContent);
-            if (subLine.textContent != newText) {
-              subLine.textContent = newText;
-              filter.mute(); // Mute the audio if we haven't already
-              filter.updateCounterBadge();
-            }
+      // Process subtitles
+      [].forEach.call(subtitleContainer.children, function(child) {
+        let subtitle = child.children[0];
+        if (subtitle) {
+          let result  = filter.advancedReplaceText(subtitle.textContent)
+          if (result.modified) {
+            filtered = true;
+            subtitle.textContent = result.filtered;
+            filter.mute(); // Mute the audio if we haven't already
+            filter.lastSubtitle = filter.lastSubtitle.replace(result.original, result.filtered);
           }
-        });
-      }
-    });
+        }
+      });
+    }
+
+    if (filtered) filter.updateCounterBadge(); // Update if modified
   }
 
   // Container: div.caption-window divspan.captions-text
@@ -282,22 +302,11 @@ export default class WebFilter extends Filter {
     }
   }
 
-  processAudioPage() {
-    // TODO: Add an optional delay to unmuting?
-    let interval = 100; // TODO: Make configurable
+  cleanAudio(node) {
     switch(window.location.hostname) {
-      case 'app.plex.tv':
-        setInterval(filter.cleanAudioPlex, interval);
-        break;
-      // case 'play.google.com':
-      //   setInterval(filter.cleanAudioGooglePlay, interval);
-      //   break;
-      case 'www.amazon.com':
-        setInterval(filter.cleanAudioAmazon, interval);
-        break;
-      case 'www.youtube.com':
-        setInterval(filter.cleanAudioYoutube, interval);
-        break;
+      case 'app.plex.tv': filter.cleanAudioPlex(node); break;
+      case 'www.amazon.com': setInterval(filter.cleanAudioAmazon, 100); break;
+      case 'www.youtube.com': setInterval(filter.cleanAudioYoutube, 100); break;
     }
   }
 
