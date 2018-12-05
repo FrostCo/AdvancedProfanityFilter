@@ -43,6 +43,12 @@ export default class WebFilter extends Filter {
     case 'app.plex.tv':
       result = !!(node.dataset && node.dataset.hasOwnProperty('dialogueId'));
       break;
+    case 'www.amazon.com':
+      result = !!(node.tagName == 'P' && node.querySelectorAll('span.timedTextWindow > span.timedTextBackground').length > 0);
+      break;
+    case 'www.youtube.com':
+      result = !!(node.tagName == 'DIV' && node.className.includes('caption-window') && node.querySelectorAll('span.captions-text span span.caption-visual-line').length > 0);
+      break;
     }
 
     return result;
@@ -133,11 +139,13 @@ export default class WebFilter extends Filter {
   // Rules:
   // - Multiline subtitles are separated by `<br>`
   // - If a subtitle line is empty: "", then we'll unmute and stop processing
-  cleanAudioAmazon() {
-    var subtitleContainer = document.querySelectorAll('span.captions span.timedTextBackground');
-    if (subtitleContainer.length == 0) filter.unmute(); // Turn audio on when subtitles are absent
+  // 'span.captions span.timedTextBackground'
+  cleanAudioAmazon(subtitleContainer) {
+    let filtered = false;
+    // if (subtitleContainer.length == 0) filter.unmute(); // Turn audio on when subtitles are absent
 
-    subtitleContainer.forEach(subtitle => {
+    // TODO: Handle more than one?
+    subtitleContainer.querySelectorAll('span.timedTextBackground').forEach(subtitle => {
       if (subtitle.innerHTML == '') { filter.unmute(); return; } // Turn audio on when subtitles are absent
       if (filter.lastSubtitle != subtitle.innerHTML) { // This subtitle hasn't been checked yet
         filter.lastSubtitle = subtitle.innerHTML; // Update the last subtitle tracker
@@ -146,18 +154,22 @@ export default class WebFilter extends Filter {
         // Process subtitles
         let subLines = subtitle.innerHTML.split('<br>');
         let newLines = [];
-        subLines.forEach(line => { newLines.push(filter.replaceText(line)); });
-        let newSub = newLines.join('<br>');
+        subLines.forEach(line => {
+          let result = filter.advancedReplaceText(line);
+          newLines.push(result.filtered);
+          if (result.modified) { filtered = true; }
+        });
 
-        // Update if modified
-        if (subtitle.innerHTML != newSub) {
+        if (filtered) {
+          let newSub = newLines.join('<br>');
           subtitle.innerHTML = newSub;
           filter.lastSubtitle = newSub; // Update the last subtitle tracker
           filter.mute(); // Mute the audio if we haven't already
-          filter.updateCounterBadge();
         }
       }
     });
+
+    if (filtered) filter.updateCounterBadge(); // Update if modified
   }
 
   // TODO: Plex handle resize
@@ -190,9 +202,9 @@ export default class WebFilter extends Filter {
 
   // Container: div.caption-window divspan.captions-text
   // Subtitles: span.caption-visual-line
-  cleanAudioYoutube() {
+  cleanAudioYoutube(subtitleContainer) {
     let filtered = false;
-    let subtitles = document.querySelectorAll('span.captions-text span.caption-visual-line');
+    let subtitles = subtitleContainer.querySelectorAll('span.caption-visual-line');
     if (subtitles.length == 0) { filter.unmute(); return; } // Turn audio on and return when subtitles are absent
     // console.log('Processing subtitles...'); // DEBUG - Audio
 
@@ -212,9 +224,9 @@ export default class WebFilter extends Filter {
           filter.lastSubtitle = filter.lastSubtitle.replace(result.original, result.filtered);
         }
       });
-
-      if (filtered) filter.updateCounterBadge(); // Update if modified
     }
+
+    if (filtered) filter.updateCounterBadge(); // Update if modified
   }
 
   disabledPage(): boolean {
@@ -305,8 +317,8 @@ export default class WebFilter extends Filter {
   cleanAudio(node) {
     switch(window.location.hostname) {
       case 'app.plex.tv': filter.cleanAudioPlex(node); break;
-      case 'www.amazon.com': setInterval(filter.cleanAudioAmazon, 100); break;
-      case 'www.youtube.com': setInterval(filter.cleanAudioYoutube, 100); break;
+      case 'www.amazon.com': filter.cleanAudioAmazon(node); break;
+      case 'www.youtube.com': filter.cleanAudioYoutube(node); break;
     }
   }
 
