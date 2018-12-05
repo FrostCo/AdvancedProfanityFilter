@@ -79,8 +79,7 @@ export default class WebFilter extends Filter {
       // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
 
       if (!Page.isForbiddenNode(node)) {
-        // TODO: Add filter.muteAudio option
-        if (true && filter.audioPage() && filter.audioNode(node)) {
+        if (filter.cfg.muteAudio && filter.audioPage() && filter.audioNode(node)) {
           filter.cleanAudio(node);
         } else {
           // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
@@ -90,9 +89,8 @@ export default class WebFilter extends Filter {
       // else { console.log('Forbidden node:', node); } // DEBUG - Mutation addedNodes
     });
 
-    // TODO: Add filter.muteAudio option
     mutation.removedNodes.forEach(function(removedNode) {
-      if (true && filter.audioPage() && filter.audioNode(removedNode)) {
+      if (filter.cfg.muteAudio && filter.audioPage() && filter.audioNode(removedNode)) {
         filter.unmute();
       }
     });
