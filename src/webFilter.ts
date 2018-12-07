@@ -13,6 +13,7 @@ interface Message {
 
 export default class WebFilter extends Filter {
   advanced: boolean;
+  cfg: WebConfig;
   lastSubtitle: string;
   muted: boolean;
   summary: object;
@@ -24,6 +25,7 @@ export default class WebFilter extends Filter {
     this.summary = {};
   }
 
+  // Always use the top frame for page check
   advancedPage(): boolean {
     return Domain.domainMatch(window.location.hostname, this.cfg.advancedDomains);
   }
@@ -36,26 +38,16 @@ export default class WebFilter extends Filter {
     return result;
   }
 
-  // Is this a subtitle container?
   audioNode(node): boolean {
     let result = false;
-    switch(window.location.hostname) {
-    case 'app.plex.tv':
-      result = !!(node.dataset && node.dataset.hasOwnProperty('dialogueId'));
-      break;
-    case 'www.amazon.com':
-      result = !!(node.tagName == 'P' && node.querySelectorAll('span.timedTextWindow > span.timedTextBackground').length > 0);
-      break;
-    case 'www.youtube.com':
-      result = !!(node.tagName == 'DIV' && node.className.includes('caption-window') && node.querySelectorAll('span.captions-text span span.caption-visual-line').length > 0);
-      break;
+    if (Object.keys(WebConfig.audioSites).includes(window.location.hostname)) {
+      result = WebConfig.audioSites[window.location.hostname].supportedNode(node);
     }
-
     return result;
   }
 
   audioPage(): boolean {
-    return Domain.domainMatch(window.location.hostname, ['app.plex.tv', 'www.amazon.com', 'www.youtube.com']);
+    return Domain.domainMatch(window.location.hostname, Object.keys(WebConfig.audioSites));
   }
 
   checkMutationTargetTextForProfanity(mutation) {
@@ -80,7 +72,7 @@ export default class WebFilter extends Filter {
 
       if (!Page.isForbiddenNode(node)) {
         if (filter.cfg.muteAudio && filter.audioPage() && filter.audioNode(node)) {
-          filter.cleanAudio(node);
+          WebConfig.audioSites[window.location.hostname].cleanAudio(node);
         } else {
           // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
           filter.removeProfanity(Page.xpathNodeText, node);
@@ -105,30 +97,20 @@ export default class WebFilter extends Filter {
     // @ts-ignore: Type WebConfig is not assignable to type Config
     this.cfg = await WebConfig.build();
 
-    // Don't run if this is a disabled domain
-    // Only run on main page (no frames)
-    if (window == window.top) {
-      let disabled = this.disabledPage();
-      let message = { disabled: disabled } as Message;
-
-      if (message.disabled) {
-        chrome.runtime.sendMessage(message);
-        return false;
-      }
-
-      // Check for advanced mode on current domain
-      this.advanced = this.advancedPage();
-      message.advanced = this.advanced;
-      if (this.advanced) {
-        message.advanced = true;
-      }
-
+    // Check if the topmost frame is a disabled domain
+    let message = { disabled: this.disabledPage() } as Message;
+    if (message.disabled) {
       chrome.runtime.sendMessage(message);
+      return false;
     }
 
-    this.init();
+    // Check for advanced mode on current domain
+    this.advanced = this.advancedPage();
+    if (this.advanced) { message.advanced = true; }
+    chrome.runtime.sendMessage(message);
 
     // Remove profanity from the main document and watch for new nodes
+    this.init();
     this.removeProfanity(Page.xpathDocText, document);
     this.updateCounterBadge();
     this.observeNewNodes();
@@ -198,8 +180,23 @@ export default class WebFilter extends Filter {
     if (filtered) filter.updateCounterBadge(); // Update if modified
   }
 
-  // Container: div.caption-window divspan.captions-text
-  // Subtitles: span.caption-visual-line
+  cleanAudioVudu(subtitleContainer, subSelector) {
+    let filtered = false;
+    let subtitles = subtitleContainer.querySelectorAll(subSelector);
+
+    // Process subtitles
+    subtitles.forEach(subtitle => {
+      let result = filter.advancedReplaceText(subtitle.textContent);
+      if (result.modified) {
+        filtered = true;
+        filter.mute(); // Mute the audio if we haven't already
+        subtitle.textContent = result.filtered;
+      }
+    });
+
+    if (filtered) filter.updateCounterBadge(); // Update if modified
+  }
+
   cleanAudioYoutube(subtitleContainer) {
     let filtered = false;
     let subtitles = subtitleContainer.querySelectorAll('span.caption-visual-line');
@@ -227,9 +224,10 @@ export default class WebFilter extends Filter {
     if (filtered) filter.updateCounterBadge(); // Update if modified
   }
 
+  // Always use the top frame for page check
   disabledPage(): boolean {
     // console.count('disabledPage'); // Benchmarking - Executaion Count
-    return Domain.domainMatch(window.location.hostname, this.cfg.disabledDomains);
+    return Domain.domainMatch(window.top.location.hostname, this.cfg.disabledDomains);
   }
 
   foundMatch(word) {
@@ -309,14 +307,6 @@ export default class WebFilter extends Filter {
         // console.log('Normal cleaning:', item.data); // DEBUG
         item.data = this.replaceText(item.data);
       }
-    }
-  }
-
-  cleanAudio(node) {
-    switch(window.location.hostname) {
-      case 'app.plex.tv': filter.cleanAudioPlex(node); break;
-      case 'www.amazon.com': filter.cleanAudioAmazon(node); break;
-      case 'www.youtube.com': filter.cleanAudioYoutube(node); break;
     }
   }
 

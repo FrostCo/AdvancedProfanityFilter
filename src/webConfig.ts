@@ -1,6 +1,25 @@
 import Config from './lib/config.js';
 
 export default class WebConfig extends Config {
+  static readonly audioSites = {
+    'app.plex.tv': {
+      cleanAudio: (node => {filter.cleanAudioPlex(node);}),
+      supportedNode: (node => {return !!(node.dataset && node.dataset.hasOwnProperty('dialogueId'));})
+    },
+    'www.amazon.com': {
+      cleanAudio: (node => {filter.cleanAudioAmazon(node);}),
+      supportedNode: (node => {return !!(node.tagName == 'P' && node.querySelectorAll('span.timedTextWindow > span.timedTextBackground').length > 0);})
+    },
+    'www.vudu.com': {
+      cleanAudio: (node => {filter.cleanAudioVudu(node, 'span.subtitles');}),
+      supportedNode: (node => {return !!(node.tagName == 'DIV' && node.querySelectorAll('span.subtitles').length > 0);})
+    },
+    'www.youtube.com': {
+      cleanAudio: (node => {filter.cleanAudioYoutube(node);}),
+      supportedNode: (node => {return !!(node.tagName == 'DIV' && node.className.includes('caption-window') && node.querySelectorAll('span.captions-text span span.caption-visual-line').length > 0);})
+    }
+  };
+
   static async build(keys?: string[]) {
     let async_result = await WebConfig.getConfig(keys);
     let instance = new WebConfig(async_result);
