@@ -15,7 +15,7 @@ export default class WebConfig extends Config {
       supportedNode: (node => {return !!(node.tagName == 'DIV' && node.querySelectorAll('span.subtitles').length > 0);})
     },
     'www.youtube.com': {
-      cleanAudio: (node => {filter.cleanAudioYoutube(node);}),
+      cleanAudio: (node => {filter.cleanAudioYoutube(node, 'span.caption-visual-line');}),
       supportedNode: (node => {return !!(node.tagName == 'DIV' && node.className.includes('caption-window') && node.querySelectorAll('span.captions-text span span.caption-visual-line').length > 0);})
     }
   };

@@ -197,29 +197,19 @@ export default class WebFilter extends Filter {
     if (filtered) filter.updateCounterBadge(); // Update if modified
   }
 
-  cleanAudioYoutube(subtitleContainer) {
+  cleanAudioYoutube(subtitleContainer, subSelector) {
     let filtered = false;
-    let subtitles = subtitleContainer.querySelectorAll('span.caption-visual-line');
-    if (subtitles.length == 0) { filter.unmute(); return; } // Turn audio on and return when subtitles are absent
-    // console.log('Processing subtitles...'); // DEBUG - Audio
+    let subtitles = subtitleContainer.querySelectorAll(subSelector);
 
-    let allSubtitles = document.querySelectorAll('div.caption-window span.captions-text')[0].textContent;
-    if (filter.lastSubtitle != allSubtitles) { // This subtitle hasn't been checked yet
-      // console.log('New subtitles found!'); // DEBUG - Audio
-      filter.lastSubtitle = allSubtitles; // Update the last subtitle tracker
-      filter.unmute(); // Turn on audio if we haven't already
-
-      // Process subtitles
-      subtitles.forEach(subtitle => {
-        let result = filter.advancedReplaceText(subtitle.textContent);
-        if (result.modified) {
-          filtered = true;
-          subtitle.textContent = result.filtered;
-          filter.mute(); // Mute the audio if we haven't already
-          filter.lastSubtitle = filter.lastSubtitle.replace(result.original, result.filtered);
-        }
-      });
-    }
+    // Process subtitles
+    subtitles.forEach(subtitle => {
+      let result = filter.advancedReplaceText(subtitle.textContent);
+      if (result.modified) {
+        filtered = true;
+        subtitle.textContent = result.filtered;
+        filter.mute(); // Mute the audio if we haven't already
+      }
+    });
 
     if (filtered) filter.updateCounterBadge(); // Update if modified
   }
