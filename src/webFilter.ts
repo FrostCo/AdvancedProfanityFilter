@@ -152,6 +152,23 @@ export default class WebFilter extends Filter {
     if (filtered) filter.updateCounterBadge(); // Update if modified
   }
 
+  cleanAudioNetflix(subtitleContainer, subSelector) {
+    let filtered = false;
+    let subtitles = subtitleContainer.querySelectorAll(subSelector);
+
+    // Process subtitles
+    subtitles.forEach(subtitle => {
+      let result = filter.advancedReplaceText(subtitle.innerHTML);
+      if (result.modified) {
+        filtered = true;
+        subtitle.innerHTML = result.filtered;
+        filter.mute(); // Mute the audio if we haven't already
+      }
+    });
+
+    if (filtered) filter.updateCounterBadge(); // Update if modified
+  }
+
   // TODO: Plex handle resize
   // Container: '[data-dialogue-id]'
   // Subtitles: Container's children

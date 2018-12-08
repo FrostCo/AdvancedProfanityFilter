@@ -10,6 +10,10 @@ export default class WebConfig extends Config {
       cleanAudio: (node => {filter.cleanAudioAmazon(node);}),
       supportedNode: (node => {return !!(node.tagName == 'P' && node.querySelectorAll('span.timedTextWindow > span.timedTextBackground').length > 0);})
     },
+    'www.netflix.com': {
+      cleanAudio: (node => {filter.cleanAudioNetflix(node, 'span');}),
+      supportedNode: (node => {return !!(node.tagName == 'DIV' && node.className.includes('player-timedtext-text-container') && node.querySelectorAll('span').length > 0);})
+    },
     'www.vudu.com': {
       cleanAudio: (node => {filter.cleanAudioVudu(node, 'span.subtitles');}),
       supportedNode: (node => {return !!(node.tagName == 'DIV' && node.querySelectorAll('span.subtitles').length > 0);})
