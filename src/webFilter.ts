@@ -15,6 +15,7 @@ export default class WebFilter extends Filter {
   advanced: boolean;
   cfg: WebConfig;
   hostname: string;
+  mutePage: boolean;
   lastSubtitle: string;
   muted: boolean;
   summary: object;
@@ -24,6 +25,7 @@ export default class WebFilter extends Filter {
     this.advanced = false;
     // href should resolve to the actual URI of the page, or the parent of an IFRAME for disabled/advanced page checks
     this.hostname = (window.location == window.parent.location) ? document.location.hostname : new URL(document.referrer).hostname;
+    this.mutePage = this.audioPage();
     this.muted = false;
     this.summary = {};
   }
@@ -42,11 +44,7 @@ export default class WebFilter extends Filter {
   }
 
   audioNode(node): boolean {
-    let result = false;
-    if (Object.keys(WebConfig.audioSites).includes(this.hostname)) {
-      result = WebConfig.audioSites[this.hostname].supportedNode(node);
-    }
-    return result;
+    return WebConfig.audioSites[this.hostname].supportedNode(node);
   }
 
   audioPage(): boolean {
@@ -74,8 +72,8 @@ export default class WebFilter extends Filter {
       // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
 
       if (!Page.isForbiddenNode(node)) {
-        if (filter.cfg.muteAudio && filter.audioPage() && filter.audioNode(node)) {
-          WebConfig.audioSites[this.hostname].cleanAudio(node);
+        if (filter.cfg.muteAudio && filter.mutePage && filter.audioNode(node)) {
+          WebConfig.audioSites[filter.hostname].cleanAudio(node);
         } else {
           // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
           filter.removeProfanity(Page.xpathNodeText, node);
@@ -85,8 +83,10 @@ export default class WebFilter extends Filter {
     });
 
     mutation.removedNodes.forEach(function(removedNode) {
-      if (filter.cfg.muteAudio && filter.audioPage() && filter.audioNode(removedNode)) {
-        filter.unmute();
+      if (!Page.isForbiddenNode(removedNode)) {
+        if (filter.cfg.muteAudio && filter.mutePage && filter.audioNode(removedNode)) {
+          filter.unmute();
+        }
       }
     });
 

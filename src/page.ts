@@ -14,6 +14,7 @@ export default class Page {
       (node.parentNode &&
         (
           node.parentNode.isContentEditable || // Special case for Gmail
+          node.parentNode.tagName == 'LINK' ||
           node.parentNode.tagName == 'SCRIPT' ||
           node.parentNode.tagName == 'STYLE' ||
           node.parentNode.tagName == 'INPUT' ||
@@ -23,6 +24,7 @@ export default class Page {
       ) || // Some catch-alls
       (node.tagName &&
         (
+          node.tagName == 'LINK' ||
           node.tagName == 'SCRIPT' ||
           node.tagName == 'STYLE' ||
           node.tagName == 'INPUT' ||
