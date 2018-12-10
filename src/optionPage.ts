@@ -477,6 +477,7 @@ export default class OptionPage {
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
     let selectedMatchMethod = document.querySelector('input[name="wordMatchMethod"]:checked') as HTMLInputElement;
     let word = wordText.value.trim().toLowerCase();
+    let sub = substitutionText.value.trim().toLowerCase();
     let added = true;
 
     if (word == '') {
@@ -484,11 +485,18 @@ export default class OptionPage {
       return false;
     }
 
+    // Make sure word and substitution are different
+    // TODO: More in-depth checking might be needed
+    if (word == sub) {
+      OptionPage.showInputError(substitutionText, 'Word and substitution must be different.');
+      return false;
+    }
+
     if (wordText.checkValidity()) {
       let wordOptions = {
         matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
         repeat: wordMatchRepeated.checked,
-        sub: substitutionText.value
+        sub: sub
       };
 
       if (wordList.value === '') { // New record
