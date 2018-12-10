@@ -14,7 +14,7 @@ interface Message {
 export default class WebFilter extends Filter {
   advanced: boolean;
   cfg: WebConfig;
-  href: string;
+  hostname: string;
   lastSubtitle: string;
   muted: boolean;
   summary: object;
@@ -23,14 +23,14 @@ export default class WebFilter extends Filter {
     super();
     this.advanced = false;
     // href should resolve to the actual URI of the page, or the parent of an IFRAME for disabled/advanced page checks
-    this.href = (window.location == window.parent.location) ? document.location.href : document.referrer;
+    this.hostname = (window.location == window.parent.location) ? document.location.hostname : new URL(document.referrer).hostname;
     this.muted = false;
     this.summary = {};
   }
 
   // Always use the top frame for page check
   advancedPage(): boolean {
-    return Domain.domainMatch(this.href, this.cfg.advancedDomains);
+    return Domain.domainMatch(this.hostname, this.cfg.advancedDomains);
   }
 
   advancedReplaceText(string: string) {
@@ -43,14 +43,14 @@ export default class WebFilter extends Filter {
 
   audioNode(node): boolean {
     let result = false;
-    if (Object.keys(WebConfig.audioSites).includes(this.href)) {
-      result = WebConfig.audioSites[this.href].supportedNode(node);
+    if (Object.keys(WebConfig.audioSites).includes(this.hostname)) {
+      result = WebConfig.audioSites[this.hostname].supportedNode(node);
     }
     return result;
   }
 
   audioPage(): boolean {
-    return Domain.domainMatch(this.href, Object.keys(WebConfig.audioSites));
+    return Domain.domainMatch(this.hostname, Object.keys(WebConfig.audioSites));
   }
 
   checkMutationTargetTextForProfanity(mutation) {
@@ -75,7 +75,7 @@ export default class WebFilter extends Filter {
 
       if (!Page.isForbiddenNode(node)) {
         if (filter.cfg.muteAudio && filter.audioPage() && filter.audioNode(node)) {
-          WebConfig.audioSites[this.href].cleanAudio(node);
+          WebConfig.audioSites[this.hostname].cleanAudio(node);
         } else {
           // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
           filter.removeProfanity(Page.xpathNodeText, node);
@@ -237,7 +237,7 @@ export default class WebFilter extends Filter {
   // Always use the top frame for page check
   disabledPage(): boolean {
     // console.count('disabledPage'); // Benchmarking - Executaion Count
-    return Domain.domainMatch(this.href, this.cfg.disabledDomains);
+    return Domain.domainMatch(this.hostname, this.cfg.disabledDomains);
   }
 
   foundMatch(word) {
