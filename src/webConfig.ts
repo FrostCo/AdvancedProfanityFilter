@@ -4,7 +4,10 @@ export default class WebConfig extends Config {
   static readonly audioSites = {
     'app.plex.tv': {
       cleanAudio: (node => {filter.cleanAudio(node, 'span > span');}),
-      supportedNode: (node => {return !!(node.tagName == 'DIV' && node.dataset && node.dataset.hasOwnProperty('dialogueId'));})
+      supportedNode: (node => {return !!(
+        node.tagName == 'DIV' && (node.dataset && node.dataset.hasOwnProperty('dialogueId'))
+          || (typeof node.querySelectorAll === "function" && node.querySelectorAll('div[data-dialogue-id]').length > 0)
+      )})
     },
     'www.amazon.com': {
       cleanAudio: (node => {filter.cleanAudio(node, 'span.timedTextBackground');}),
