@@ -23,7 +23,7 @@ export default class WebFilter extends Filter {
   constructor() {
     super();
     this.advanced = false;
-    // href should resolve to the actual URI of the page, or the parent of an IFRAME for disabled/advanced page checks
+    // hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
     this.hostname = (window.location == window.parent.location) ? document.location.hostname : new URL(document.referrer).hostname;
     this.mutePage = this.audioPage();
     this.muted = false;
@@ -119,114 +119,17 @@ export default class WebFilter extends Filter {
     this.observeNewNodes();
   }
 
-  // Rules:
-  // - Multiline subtitles are separated by `<br>`
-  // - If a subtitle line is empty: "", then we'll unmute and stop processing
-  // 'span.captions span.timedTextBackground'
-  cleanAudioAmazon(subtitleContainer) {
-    let filtered = false;
-    // if (subtitleContainer.length == 0) filter.unmute(); // Turn audio on when subtitles are absent
-
-    // TODO: Handle more than one?
-    subtitleContainer.querySelectorAll('span.timedTextBackground').forEach(subtitle => {
-      if (subtitle.innerHTML == '') { filter.unmute(); return; } // Turn audio on when subtitles are absent
-      if (filter.lastSubtitle != subtitle.innerHTML) { // This subtitle hasn't been checked yet
-        filter.lastSubtitle = subtitle.innerHTML; // Update the last subtitle tracker
-        filter.unmute(); // Turn on audio if we haven't already
-
-        // Process subtitles
-        let subLines = subtitle.innerHTML.split('<br>');
-        let newLines = [];
-        subLines.forEach(line => {
-          let result = filter.advancedReplaceText(line);
-          newLines.push(result.filtered);
-          if (result.modified) { filtered = true; }
-        });
-
-        if (filtered) {
-          let newSub = newLines.join('<br>');
-          subtitle.innerHTML = newSub;
-          filter.lastSubtitle = newSub; // Update the last subtitle tracker
-          filter.mute(); // Mute the audio if we haven't already
-        }
-      }
-    });
-
-    if (filtered) filter.updateCounterBadge(); // Update if modified
-  }
-
-  cleanAudioNetflix(subtitleContainer, subSelector) {
+  // TODO: Catch to prevent double-checking modified subtitles
+  cleanAudio(subtitleContainer, subSelector) {
     let filtered = false;
     let subtitles = subtitleContainer.querySelectorAll(subSelector);
 
     // Process subtitles
     subtitles.forEach(subtitle => {
-      let result = filter.advancedReplaceText(subtitle.innerHTML);
+      let result = filter.advancedReplaceText(subtitle.innerText);
       if (result.modified) {
         filtered = true;
-        subtitle.innerHTML = result.filtered;
-        filter.mute(); // Mute the audio if we haven't already
-      }
-    });
-
-    if (filtered) filter.updateCounterBadge(); // Update if modified
-  }
-
-  // TODO: Plex handle resize
-  // Container: '[data-dialogue-id]'
-  // Subtitles: Container's children
-  cleanAudioPlex(subtitleContainer) {
-    let filtered = false;
-    // If the current subtitle lines haven't already been checked
-    if (filter.lastSubtitle != subtitleContainer.dataset.dialogueId) {
-      filter.lastSubtitle = subtitleContainer.dataset.dialogueId;
-      filter.unmute(); // Turn on audio if we haven't already TODO: This should only be needed if we don't watch removedNodes
-
-      // Process subtitles
-      [].forEach.call(subtitleContainer.children, function(child) {
-        let subtitle = child.children[0];
-        if (subtitle) {
-          let result  = filter.advancedReplaceText(subtitle.textContent)
-          if (result.modified) {
-            filtered = true;
-            subtitle.textContent = result.filtered;
-            filter.mute(); // Mute the audio if we haven't already
-            filter.lastSubtitle = filter.lastSubtitle.replace(result.original, result.filtered);
-          }
-        }
-      });
-    }
-
-    if (filtered) filter.updateCounterBadge(); // Update if modified
-  }
-
-  cleanAudioVudu(subtitleContainer, subSelector) {
-    let filtered = false;
-    let subtitles = subtitleContainer.querySelectorAll(subSelector);
-
-    // Process subtitles
-    subtitles.forEach(subtitle => {
-      let result = filter.advancedReplaceText(subtitle.textContent);
-      if (result.modified) {
-        filtered = true;
-        filter.mute(); // Mute the audio if we haven't already
-        subtitle.textContent = result.filtered;
-      }
-    });
-
-    if (filtered) filter.updateCounterBadge(); // Update if modified
-  }
-
-  cleanAudioYoutube(subtitleContainer, subSelector) {
-    let filtered = false;
-    let subtitles = subtitleContainer.querySelectorAll(subSelector);
-
-    // Process subtitles
-    subtitles.forEach(subtitle => {
-      let result = filter.advancedReplaceText(subtitle.textContent);
-      if (result.modified) {
-        filtered = true;
-        subtitle.textContent = result.filtered;
+        subtitle.innerText = result.filtered;
         filter.mute(); // Mute the audio if we haven't already
       }
     });
@@ -257,7 +160,6 @@ export default class WebFilter extends Filter {
       chrome.runtime.sendMessage({mute: filter.muted});
     }
   }
-
 
   // Watch for new text nodes and clean them as they are added
   observeNewNodes() {
