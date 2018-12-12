@@ -25,7 +25,6 @@ export default class WebFilter extends Filter {
     this.advanced = false;
     // hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
     this.hostname = (window.location == window.parent.location) ? document.location.hostname : new URL(document.referrer).hostname;
-    this.mutePage = this.audioPage();
     this.muted = false;
     this.summary = {};
   }
@@ -72,7 +71,7 @@ export default class WebFilter extends Filter {
       // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
 
       if (!Page.isForbiddenNode(node)) {
-        if (filter.cfg.muteAudio && filter.mutePage && filter.audioNode(node)) {
+        if (filter.mutePage && filter.audioNode(node)) {
           WebConfig.audioSites[filter.hostname].cleanAudio(node);
         } else {
           // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
@@ -84,7 +83,7 @@ export default class WebFilter extends Filter {
 
     mutation.removedNodes.forEach(function(removedNode) {
       if (!Page.isForbiddenNode(removedNode)) {
-        if (filter.cfg.muteAudio && filter.mutePage && filter.audioNode(removedNode)) {
+        if (filter.mutePage && filter.audioNode(removedNode)) {
           filter.unmute();
         }
       }
@@ -111,6 +110,9 @@ export default class WebFilter extends Filter {
     this.advanced = this.advancedPage();
     if (this.advanced) { message.advanced = true; }
     chrome.runtime.sendMessage(message);
+
+    // Detect if we should mute audio for the current page
+    this.mutePage = (this.cfg.muteAudio && this.audioPage());
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
