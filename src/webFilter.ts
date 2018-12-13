@@ -23,8 +23,6 @@ export default class WebFilter extends Filter {
   constructor() {
     super();
     this.advanced = false;
-    // hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
-    this.hostname = (window.location == window.parent.location) ? document.location.hostname : new URL(document.referrer).hostname;
     this.muted = false;
     this.summary = {};
   }
@@ -98,6 +96,9 @@ export default class WebFilter extends Filter {
   async cleanPage() {
     // @ts-ignore: Type WebConfig is not assignable to type Config
     this.cfg = await WebConfig.build();
+
+    // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
+    this.hostname = (window.location == window.parent.location) ? document.location.hostname : new URL(document.referrer).hostname;
 
     // Check if the topmost frame is a disabled domain
     let message = { disabled: this.disabledPage() } as Message;
