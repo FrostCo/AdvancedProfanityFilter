@@ -4,7 +4,7 @@ export default class OptionAuth {
   password: string;
 
   authenticate(evt) {
-    let passwordInput = document.getElementById('password') as HTMLInputElement;
+    let passwordInput = document.getElementById('passwordInput') as HTMLInputElement;
     if (passwordInput.value == this.password) {
       this.authenticated = true;
       OptionPage.closeModal('passwordModal');

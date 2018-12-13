@@ -258,7 +258,7 @@ export default class OptionPage {
     if (self.cfg.password && !self.auth.authenticated) {
       // console.log('Prompt for password'); // DEBUG Password
       OptionPage.openModal('passwordModal');
-      document.getElementById('password').focus();
+      document.getElementById('passwordInput').focus();
     } else {
       OptionPage.show(document.getElementById('main'));
     }

@@ -3,7 +3,7 @@
   "short_name": "Profanity Filter",
   "author": "Richard Frost",
   "manifest_version": 2,
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Hide offensive words on the webpages you visit",
   "icons": {
     "16": "icons/icon16.png",
