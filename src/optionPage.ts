@@ -266,6 +266,11 @@ export default class OptionPage {
     self.populateOptions();
   }
 
+  populateAudio() {
+    let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
+    muteAudioInput.checked = this.cfg.muteAudio;
+  }
+
   populateConfig() {
     this.auth.setPasswordButton(option);
   }
@@ -276,6 +281,7 @@ export default class OptionPage {
     this.populateWordsList();
     this.advancedDomainList();
     this.disabledDomainList();
+    this.populateAudio();
     this.populateConfig();
     this.populateTest();
   }
@@ -436,6 +442,7 @@ export default class OptionPage {
     let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
+    let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
     self.cfg.censorCharacter = censorCharacterSelect.value;
     self.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
@@ -449,6 +456,7 @@ export default class OptionPage {
     self.cfg.filterWordList = filterWordList.checked;
     self.cfg.substitutionMark = substitutionMark.checked;
     self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
+    self.cfg.muteAudio = muteAudioInput.checked;
 
     // Save settings
     let error = await self.cfg.save();
@@ -658,6 +666,8 @@ document.getElementById('disabledDomainSelect').addEventListener('change', e => 
 document.getElementById('disabledDomainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
 document.getElementById('disabledDomainSave').addEventListener('click', e => { option.disabledDomainSave(e); });
 document.getElementById('disabledDomainRemove').addEventListener('click', e => { option.disabledDomainRemove(e); });
+// Audio
+document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
 // Config
 document.getElementById('configReset').addEventListener('click', e => { option.confirm(e, 'restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });
