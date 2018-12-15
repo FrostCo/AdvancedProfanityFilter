@@ -137,7 +137,14 @@ export default class WebFilter extends Filter {
       }
     });
 
-    if (filtered) filter.updateCounterBadge(); // Update if modified
+    // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
+    switch (filter.cfg.showSubtitles) {
+      case 1: if (!filtered) { subtitles.forEach(subtitle => { subtitle.innerText = ''; }) }; break;
+      case 2: if (filtered) { subtitles.forEach(subtitle => { subtitle.innerText = ''; }) }; break;
+      case 3: subtitles.forEach(subtitle => { subtitle.innerText = ''; }); break;
+    }
+
+    if (filtered) { filter.updateCounterBadge(); } // Update if modified
   }
 
   // Always use the top frame for page check

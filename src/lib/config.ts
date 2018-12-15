@@ -21,6 +21,7 @@ export default class Config {
   preserveFirst: boolean;
   preserveLast: boolean;
   showCounter: boolean;
+  showSubtitles: number;
   showSummary: boolean;
   substitutionMark: boolean;
   words: {
@@ -59,6 +60,7 @@ export default class Config {
     preserveFirst: true,
     preserveLast: false,
     showCounter: true,
+    showSubtitles: 0,
     showSummary: true,
     substitutionMark: true
   };
