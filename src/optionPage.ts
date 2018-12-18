@@ -268,6 +268,8 @@ export default class OptionPage {
 
   populateAudio() {
     let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
+    let selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
+    selectedshowSubtitle.checked = true;
     muteAudioInput.checked = this.cfg.muteAudio;
   }
 
@@ -443,6 +445,7 @@ export default class OptionPage {
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
+    let showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
     self.cfg.censorCharacter = censorCharacterSelect.value;
     self.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
@@ -457,6 +460,7 @@ export default class OptionPage {
     self.cfg.substitutionMark = substitutionMark.checked;
     self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
     self.cfg.muteAudio = muteAudioInput.checked;
+    self.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
 
     // Save settings
     let error = await self.cfg.save();
@@ -668,6 +672,7 @@ document.getElementById('disabledDomainSave').addEventListener('click', e => { o
 document.getElementById('disabledDomainRemove').addEventListener('click', e => { option.disabledDomainRemove(e); });
 // Audio
 document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
+document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 // Config
 document.getElementById('configReset').addEventListener('click', e => { option.confirm(e, 'restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });
