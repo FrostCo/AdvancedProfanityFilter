@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-import Word from '../../dist/lib/word';
+import Word from '../../built/lib/word';
 
 describe('Word', function() {
   describe('Regular Expressions', function() {
