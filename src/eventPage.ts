@@ -1,7 +1,7 @@
-import { arrayContains, getVersion, isVersionOlder } from './lib/helper.js';
-import WebConfig from './webConfig.js';
-import Domain from './domain.js';
-import DataMigration from './dataMigration.js';
+import { arrayContains, getVersion, isVersionOlder } from './lib/helper';
+import WebConfig from './webConfig';
+import Domain from './domain';
+import DataMigration from './dataMigration';
 
 interface Version {
   major: number,

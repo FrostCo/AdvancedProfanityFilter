@@ -1,4 +1,4 @@
-import Word from './word.js';
+import Word from './word';
 
 export class Filter {
   cfg: Config;

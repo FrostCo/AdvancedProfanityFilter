@@ -1,8 +1,8 @@
-import { dynamicList } from './lib/helper.js';
-import WebConfig from './webConfig.js';
-import { Filter } from './lib/filter.js';
-import OptionAuth from './optionAuth.js';
-import DataMigration from './dataMigration.js';
+import { dynamicList } from './lib/helper';
+import WebConfig from './webConfig';
+import { Filter } from './lib/filter';
+import OptionAuth from './optionAuth';
+import DataMigration from './dataMigration';
 
 export default class OptionPage {
   cfg: WebConfig;

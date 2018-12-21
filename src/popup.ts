@@ -1,6 +1,6 @@
-import { arrayContains, dynamicList } from './lib/helper.js';
-import WebConfig from './webConfig.js';
-import Domain from './domain.js';
+import { arrayContains, dynamicList } from './lib/helper';
+import WebConfig from './webConfig';
+import Domain from './domain';
 
 interface Summary {
   [word: string]: {

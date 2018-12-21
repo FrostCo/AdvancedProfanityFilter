@@ -1,4 +1,4 @@
-import OptionPage from './optionPage.js';
+import OptionPage from './optionPage';
 export default class OptionAuth {
   authenticated: boolean;
   password: string;
