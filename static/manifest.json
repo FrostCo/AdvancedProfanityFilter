@@ -42,7 +42,7 @@
         "<all_urls>"
       ],
       "js": [
-        "webFilter.bundle.js"
+        "webFilter.js"
       ],
       "run_at": "document_start",
       "all_frames": true

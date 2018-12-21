@@ -88,7 +88,6 @@ function packageSource() {
 function prepareZip() {
   let zip = new AdmZip();
   zip.addLocalFolder(dist, null);
-  zip.deleteFile('webFilter.js'); // Remove filter.js as its only used for testing
   return zip;
 }
 

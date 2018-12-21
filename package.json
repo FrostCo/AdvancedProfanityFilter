@@ -4,17 +4,23 @@
   "description": "A browser extension to filter profanity from webpages.",
   "main": "filter.js",
   "scripts": {
-    "build": "npm run clean && npm run copy-static && node bin/prebuild.js && tsc",
-    "build-no-verify": "node bin/prebuild.js && tsc",
+    "build:js-sm": "babel src --out-dir built --extensions \".ts,.tsx\" --source-maps inline",
+    "build:js": "babel src --out-dir built --extensions \".ts,.tsx\"",
+    "build": "npm run type-check && npm run build:js",
     "clean": "node bin/clean-dist.js",
     "copy-static": "node bin/copy-static.js",
-    "debug-test": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
     "lint": "npx eslint src/**/*.ts",
-    "package": "npm run lint && npm run build && npm test && node bin/package-extension.js",
-    "package-no-build": "node bin/package-extension.js",
+    "package:extension": "node bin/package-extension.js",
+    "package:webpack": "npx webpack",
+    "package": "npm run package:webpack && npm run copy-static && npm run package:extension",
+    "test:cov": "npx nyc --reporter=lcov --reporter=text node_modules/mocha/bin/_mocha test/**/*.spec.js",
+    "test:debug": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
+    "test:nocov": "node_modules/mocha/bin/_mocha --compiler @babel/register test/domain.spec.js",
+    "test": "npm run test:cov",
+    "type-check:watch": "npm run type-check -- --watch",
+    "type-check": "tsc --noEmit",
     "update-help": "node bin/update-help.js",
-    "test-no-coverage": "npx mocha",
-    "test": "npx nyc --reporter=lcov --reporter=text npx mocha",
+    "verify": "npm run lint && npm run build:js && npm run test",
     "watch": "node bin/watch.js"
   },
   "repository": {
@@ -32,26 +38,29 @@
   },
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
   "devDependencies": {
+    "@babel/cli": "^7.2.0",
+    "@babel/core": "^7.2.0",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-typescript": "^7.1.0",
+    "@babel/register": "^7.0.0",
     "@types/chrome": "latest",
     "adm-zip": "^0.4.11",
-    "babel-core": "latest",
-    "babel-preset-env": "latest",
-    "babel-require": "latest",
+    "babel-loader": "^8.0.4",
     "chai": "latest",
     "chokidar": "^2.0.4",
     "download": "^7.1.0",
     "eslint": "^5.2.0",
-    "eslint-plugin-typescript": "^0.12.0",
+    "eslint-plugin-typescript": "^0.14.0",
     "fs-extra": "^7.0.0",
     "marked": "^0.5.1",
     "mocha": "latest",
     "nyc": "latest",
-    "typescript": "^3.0.1",
-    "typescript-eslint-parser": "^18.0.0"
+    "typescript": "^3.2.2",
+    "typescript-eslint-parser": "^18.0.0",
+    "webpack": "^4.28.1",
+    "webpack-cli": "^3.1.2"
   },
-  "babel": {
-    "presets": [
-      "env"
-    ]
-  }
+  "browserslist": "firefox 58"
 }
