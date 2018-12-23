@@ -62,5 +62,9 @@
     "webpack": "^4.28.1",
     "webpack-cli": "^3.1.2"
   },
-  "browserslist": "firefox 58"
+  "browserslist": [
+    "last 1 version",
+    "> 0.2%",
+    "not dead"
+  ]
 }
