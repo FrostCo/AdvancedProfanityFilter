@@ -5,7 +5,7 @@
   "main": "filter.js",
   "scripts": {
     "build:js-sm": "babel src --out-dir built --extensions \".ts,.tsx\" --source-maps inline",
-    "build:js": "babel src --out-dir built --extensions \".ts,.tsx\"",
+    "build:js": "babel src --out-dir built --extensions \".ts,.tsx\" --config test/.babelrc",
     "build": "npm run type-check && npm run build:js",
     "clean": "node bin/clean-dist.js",
     "copy-static": "node bin/copy-static.js",
@@ -61,10 +61,5 @@
     "typescript-eslint-parser": "^18.0.0",
     "webpack": "^4.28.1",
     "webpack-cli": "^3.1.2"
-  },
-  "browserslist": [
-    "last 1 version",
-    "> 0.2%",
-    "not dead"
-  ]
+  }
 }

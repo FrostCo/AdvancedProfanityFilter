@@ -21,6 +21,15 @@ module.exports = {
         test: /\.tsx?$/,
         use: {
           loader: 'babel-loader',
+          options: {
+            "presets": [
+              "@babel/typescript",
+            ],
+            "plugins": [
+              "@babel/proposal-class-properties",
+              "@babel/proposal-object-rest-spread",
+            ]
+          }
         }
       }
     ]
