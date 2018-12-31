@@ -1,13 +1,6 @@
-import { arrayContains, getVersion, isVersionOlder } from './lib/helper';
 import WebConfig from './webConfig';
 import Domain from './domain';
 import DataMigration from './dataMigration';
-
-interface Version {
-  major: number,
-  minor: number,
-  patch: number
-}
 
 ////
 // Actions and messaging
@@ -72,7 +65,7 @@ async function addSelection(selection: string) {
 
 // Disable domain and reload page (unless already disabled)
 async function disableDomain(cfg: WebConfig, domain: string, key: string) {
-  if (!arrayContains(cfg[key], domain)) {
+  if (!cfg[key].includes(domain)) {
     cfg[key].push(domain);
     let result = await cfg.save();
     if (!result) { chrome.tabs.reload(); }

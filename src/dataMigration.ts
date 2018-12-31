@@ -1,7 +1,6 @@
 import { getVersion, isVersionOlder } from './lib/helper';
 import WebConfig from './webConfig';
 
-// This doesn't save/persist config
 export default class DataMigration {
   cfg: WebConfig;
 
