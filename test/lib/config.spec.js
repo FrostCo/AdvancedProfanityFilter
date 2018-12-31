@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-import Config from '../../built/lib/config';
+import Config from '../built/lib/config';
 
 describe('Config', function() {
   describe('constructor()', function() {

@@ -14,6 +14,7 @@
     "package:webpack": "npx webpack",
     "package": "npm run package:webpack && npm run copy-static && npm run package:extension",
     "test": "npx nyc --reporter=lcov --reporter=text node_modules/mocha/bin/_mocha",
+    "test:build": "npx babel src --out-dir ./test/built --extensions \".ts,.tsx\"",
     "test:debug": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
     "test:nocov": "node_modules/mocha/bin/_mocha",
     "type-check:watch": "npm run type-check -- --watch",

@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 // import * as bundle from '../built/filter.bundle';
-import WebConfig from '../built/webConfig';
-import WebFilter from '../built/webFilter';
+import WebConfig from './built/webConfig';
+import WebFilter from './built/webFilter';
 
 describe('WebFilter', function() {
   describe('disabledPage()', function() {

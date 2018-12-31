@@ -12,6 +12,6 @@
 /src/webFilter.bundle.ts
 
 # Testing
-/built/*
+/test/built/*
 /.nyc_output/*
 /coverage/*

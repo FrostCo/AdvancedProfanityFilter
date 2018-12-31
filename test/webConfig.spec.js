@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-import Config from '../built/webConfig';
+import Config from './built/webConfig';
 
 describe('WebConfig', function() {
   describe('combineWords()', function() {
