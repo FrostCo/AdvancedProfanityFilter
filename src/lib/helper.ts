@@ -4,10 +4,6 @@ interface Version {
   patch: number
 }
 
-export function arrayContains(array: string[], element: string) {
-  return (array.indexOf(element) > -1);
-}
-
 /* istanbul ignore next */
 export function dynamicList(list, selectEm, title?: string) {
   let options = '';

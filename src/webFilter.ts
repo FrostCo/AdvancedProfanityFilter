@@ -1,7 +1,7 @@
-import Domain from './domain.js';
-import {Filter} from './lib/filter.js';
-import Page from './page.js';
-import WebConfig from './webConfig.js';
+import Domain from './domain';
+import {Filter} from './lib/filter';
+import Page from './page';
+import WebConfig from './webConfig';
 
 interface Message {
   advanced?: boolean,
