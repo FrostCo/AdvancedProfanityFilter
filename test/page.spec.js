@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-import Page from '../dist/page';
+import Page from './built/page';
 
 describe('Page', function() {
   describe('isForbiddenNode()', function() {

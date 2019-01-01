@@ -1,4 +1,4 @@
-import Config from './lib/config.js';
+import Config from './lib/config';
 
 export default class WebConfig extends Config {
   static async build(keys?: string[]) {

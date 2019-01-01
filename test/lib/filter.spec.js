@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
-// import * as bundle from '../dist/filter.bundle';
-import Config from '../../dist/lib/config';
-import {Filter} from '../../dist/lib/filter';
+// import * as bundle from '../built/filter.bundle';
+import Config from '../built/lib/config';
+import {Filter} from '../built/lib/filter';
 
 const testWords = {
   'example': { matchMethod: 0, repeat: true, sub: 'demo' },

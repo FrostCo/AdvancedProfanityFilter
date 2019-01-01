@@ -11,6 +11,7 @@
 # Combined file (prebuild.js)
 /src/webFilter.bundle.ts
 
-# Testing coverage
-/.nyc_output/*
-/coverage/*
+# Testing
+/test/built/*
+/test/.nyc_output/*
+/test/coverage/*

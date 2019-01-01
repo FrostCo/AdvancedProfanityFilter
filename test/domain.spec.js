@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-import Domain from '../dist/domain';
+import Domain from './built/domain';
 
 const domains = ['example.com', 'sub.example.com', 'alt.example.com', 'another.sample.com'];
 

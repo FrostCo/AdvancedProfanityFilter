@@ -1,6 +1,6 @@
-import { arrayContains, dynamicList } from './lib/helper.js';
-import WebConfig from './webConfig.js';
-import Domain from './domain.js';
+import { dynamicList } from './lib/helper';
+import WebConfig from './webConfig';
+import Domain from './domain';
 
 interface Summary {
   [word: string]: {
@@ -53,7 +53,7 @@ class Popup {
 
   async disableDomain() {
     let popup = this;
-    if (!arrayContains(popup.cfg.disabledDomains, popup.domain.hostname)) {
+    if (!popup.cfg.disabledDomains.includes(popup.domain.hostname)) {
       popup.cfg.disabledDomains.push(popup.domain.hostname);
       let result = await popup.cfg.save();
       if (!result) {
@@ -65,7 +65,7 @@ class Popup {
   }
 
   async enableAdvancedMode(cfg: WebConfig, domain: string, key: string) {
-    if (!arrayContains(cfg[key], domain)) {
+    if (!cfg[key].includes(domain)) {
       cfg[key].push(domain);
       let result = await cfg.save();
       if (!result) {

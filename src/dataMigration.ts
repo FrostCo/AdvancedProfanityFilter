@@ -1,7 +1,12 @@
-import { getVersion, isVersionOlder } from './lib/helper.js';
-import WebConfig from './webConfig.js';
+import { getVersion, isVersionOlder } from './lib/helper';
+import WebConfig from './webConfig';
 
-// This doesn't save/persist config
+interface WordOptions {
+  matchMethod: number;
+  repeat: boolean;
+  sub: string;
+}
+
 export default class DataMigration {
   cfg: WebConfig;
 
