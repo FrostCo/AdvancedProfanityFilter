@@ -1,6 +1,12 @@
 import { getVersion, isVersionOlder } from './lib/helper';
 import WebConfig from './webConfig';
 
+interface WordOptions {
+  matchMethod: number;
+  repeat: boolean;
+  sub: string;
+}
+
 export default class DataMigration {
   cfg: WebConfig;
 
