@@ -37,6 +37,12 @@
     "url": "https://github.com/richardfrost/AdvancedProfanityFilter/issues"
   },
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
+  "nyc": {
+    "cwd": "test/",
+    "exclude": [
+      "**/*.spec.js"
+    ]
+  },
   "devDependencies": {
     "@babel/cli": "^7.2.0",
     "@babel/core": "^7.2.0",
@@ -59,7 +65,7 @@
     "mocha": "latest",
     "nyc": "latest",
     "typescript": "^3.2.2",
-    "typescript-eslint-parser": "^18.0.0",
+    "typescript-eslint-parser": "^21.0.2",
     "webpack": "^4.28.1",
     "webpack-cli": "^3.1.2"
   }

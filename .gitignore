@@ -13,5 +13,5 @@
 
 # Testing
 /test/built/*
-/.nyc_output/*
-/coverage/*
+/test/.nyc_output/*
+/test/coverage/*
