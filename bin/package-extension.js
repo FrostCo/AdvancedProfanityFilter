@@ -70,7 +70,6 @@ function packageSource() {
 
   let sourceZip = new AdmZip();
   let files = [
-    '.eslintrc.json',
     'LICENSE',
     'package.json',
     'package-lock.json',

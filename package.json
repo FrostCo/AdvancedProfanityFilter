@@ -3,26 +3,6 @@
   "version": "1.2.2",
   "description": "A browser extension to filter profanity from webpages.",
   "main": "filter.js",
-  "scripts": {
-    "build:js-sm": "babel src --out-dir built --extensions \".ts,.tsx\" --source-maps inline",
-    "build:test": "npx babel src --out-dir built --extensions \".ts,.tsx\"",
-    "build": "npm run type-check && npm run build:test",
-    "clean": "node bin/clean.js",
-    "copy-static": "node bin/copy-static.js",
-    "lint": "npx eslint src/**/*.ts",
-    "package:extension": "node bin/package-extension.js",
-    "package:webpack": "npx webpack",
-    "package": "npm run package:webpack && npm run copy-static && npm run package:extension",
-    "test": "npx nyc --reporter=lcov --reporter=text node_modules/mocha/bin/_mocha",
-    "test:build": "npx babel src --out-dir ./test/built --extensions \".ts,.tsx\"",
-    "test:debug": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
-    "test:nocov": "node_modules/mocha/bin/_mocha",
-    "type-check:watch": "npm run type-check -- --watch",
-    "type-check": "tsc --noEmit",
-    "update-help": "node bin/update-help.js",
-    "verify": "npm run lint && npm run build:test && npm run test",
-    "watch": "node bin/watch.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/richardfrost/AdvancedProfanityFilter.git"
@@ -37,11 +17,25 @@
     "url": "https://github.com/richardfrost/AdvancedProfanityFilter/issues"
   },
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
-  "nyc": {
-    "cwd": "test/",
-    "exclude": [
-      "**/*.spec.js"
-    ]
+  "scripts": {
+    "build:test-sm": "babel src --out-dir built --extensions \".ts,.tsx\" --source-maps inline",
+    "build:test": "babel src --out-dir ./test/built --extensions \".ts,.tsx\"",
+    "build": "npm run type-check && npm run build:test",
+    "clean": "node bin/clean.js",
+    "copy-static": "node bin/copy-static.js",
+    "lint": "eslint src/**/*.ts",
+    "package:extension": "node bin/package-extension.js",
+    "package:webpack": "webpack --config bin/webpack.config.js",
+    "package": "npm run package:webpack && npm run copy-static && npm run package:extension",
+    "test:cov": "nyc --reporter=lcov --reporter=text node_modules/mocha/bin/_mocha",
+    "test:debug": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
+    "test:nocov": "node_modules/mocha/bin/_mocha",
+    "test": "npm run build:test && npm run test:cov",
+    "type-check:watch": "npm run type-check -- --watch",
+    "type-check": "tsc --noEmit",
+    "update-help": "node bin/update-help.js",
+    "verify": "npm run type-check && npm run lint && npm run test",
+    "watch": "node bin/watch.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.0",
@@ -68,5 +62,47 @@
     "typescript-eslint-parser": "^21.0.2",
     "webpack": "^4.28.1",
     "webpack-cli": "^3.1.2"
+  },
+  "babel": {
+    "presets": [
+      "@babel/typescript",
+      ["@babel/preset-env", {"modules": "commonjs", "targets": {"node": "current"}}]
+    ],
+    "plugins": [
+      "@babel/proposal-class-properties",
+      "@babel/proposal-object-rest-spread"
+    ]
+  },
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "parser": "typescript-eslint-parser",
+    "parserOptions": {
+      "ecmaVersion": 6,
+      "sourceType": "module",
+      "ecmaFeatures": { }
+    },
+    "plugins": [
+      "typescript"
+    ],
+    "rules": {
+      "no-console": "warn",
+      "no-control-regex": ["off"],
+      "no-undef": ["off"],
+      "no-unused-vars": ["off"],
+      "no-useless-escape": ["off"],
+      "quotes": ["error", "single"],
+      "semi": ["error", "always"],
+      "typescript/class-name-casing": "error",
+      "typescript/explicit-function-return-type": "off",
+      "typescript/no-unused-vars": "error",
+      "typescript/no-use-before-define": "off",
+      "typescript/type-annotation-spacing": "error"
+    }
+  },
+  "nyc": {
+    "cwd": "test/",
+    "exclude": [
+      "**/*.spec.js"
+    ]
   }
 }
