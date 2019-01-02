@@ -1,6 +1,7 @@
 import Domain from './domain';
 import {Filter} from './lib/filter';
 import Page from './page';
+import WebAudio from './webAudio';
 import WebConfig from './webConfig';
 
 interface Message {
@@ -40,12 +41,8 @@ export default class WebFilter extends Filter {
     return result;
   }
 
-  audioNode(node): boolean {
-    return WebConfig.audioSites[this.hostname].supportedNode(node);
-  }
-
   audioPage(): boolean {
-    return Domain.domainMatch(this.hostname, Object.keys(WebConfig.audioSites));
+    return Domain.domainMatch(this.hostname, Object.keys(WebAudio.subtitleSelectors));
   }
 
   checkMutationTargetTextForProfanity(mutation) {
@@ -69,8 +66,8 @@ export default class WebFilter extends Filter {
       // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
 
       if (!Page.isForbiddenNode(node)) {
-        if (filter.mutePage && filter.audioNode(node)) {
-          WebConfig.audioSites[filter.hostname].cleanAudio(node);
+        if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
+          filter.cleanAudio(node, WebAudio.subtitleSelector(filter.hostname));
         } else {
           // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
           filter.removeProfanity(Page.xpathNodeText, node);
@@ -81,7 +78,7 @@ export default class WebFilter extends Filter {
 
     mutation.removedNodes.forEach(function(removedNode) {
       if (!Page.isForbiddenNode(removedNode)) {
-        if (filter.mutePage && filter.audioNode(removedNode)) {
+        if (filter.mutePage && WebAudio.supportedNode(filter.hostname, removedNode)) {
           filter.unmute();
         }
       }

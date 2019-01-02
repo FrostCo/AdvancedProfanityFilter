@@ -1,32 +1,6 @@
 import Config from './lib/config';
 
 export default class WebConfig extends Config {
-  static readonly audioSites = {
-    'app.plex.tv': {
-      cleanAudio: (node => {filter.cleanAudio(node, 'span > span');}),
-      supportedNode: (node => {return !!(
-        node.tagName == 'DIV' && (node.dataset && node.dataset.hasOwnProperty('dialogueId'))
-          || (typeof node.querySelectorAll === "function" && node.querySelectorAll('div[data-dialogue-id]').length > 0)
-      );})
-    },
-    'www.amazon.com': {
-      cleanAudio: (node => {filter.cleanAudio(node, 'span.timedTextBackground');}),
-      supportedNode: (node => {return !!(node.tagName == 'P' && node.querySelectorAll('span.timedTextWindow > span.timedTextBackground').length > 0);})
-    },
-    'www.netflix.com': {
-      cleanAudio: (node => {filter.cleanAudio(node, 'span');}),
-      supportedNode: (node => {return !!(node.tagName == 'DIV' && node.className.includes('player-timedtext-text-container') && node.querySelectorAll('span').length > 0);})
-    },
-    'www.vudu.com': {
-      cleanAudio: (node => {filter.cleanAudio(node, 'span.subtitles');}),
-      supportedNode: (node => {return !!(node.tagName == 'DIV' && node.querySelectorAll('span.subtitles').length > 0);})
-    },
-    'www.youtube.com': {
-      cleanAudio: (node => {filter.cleanAudio(node, 'span.caption-visual-line');}),
-      supportedNode: (node => {return !!(node.tagName == 'DIV' && node.className.includes('caption-window') && node.querySelectorAll('span.captions-text span span.caption-visual-line').length > 0);})
-    }
-  };
-
   static async build(keys?: string[]) {
     let async_result = await WebConfig.getConfig(keys);
     let instance = new WebConfig(async_result);
