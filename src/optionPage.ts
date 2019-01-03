@@ -269,8 +269,10 @@ export default class OptionPage {
   populateAudio() {
     let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
     let selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
-    selectedshowSubtitle.checked = true;
+    let muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
     muteAudioInput.checked = this.cfg.muteAudio;
+    this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
+    selectedshowSubtitle.checked = true;
   }
 
   populateConfig() {

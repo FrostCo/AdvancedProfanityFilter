@@ -233,28 +233,30 @@
 <div id="audioPage" class="w3-container w3-hide">
   <h4 class="sectionHeader">Audio (Experimental)</h4>
   <p>This is an experimental feature that will attempt to mute the audio while playing a video when a word in your filter list appears in the subtitles.</p>
-  <h4 class="sectionHeader">Instructions</h4>
-  <ol>
-    <li><a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio" target="_blank">Learn about the feature</a></li>
-    <li>Enable the feature below</li>
-    <li>Play a video on a supported site</li>
-    <li>Turn on subtitles for the video</li>
-  </ol>
 
   <label>
     <input id="muteAudio" type="checkbox" class="w3-check">
     Mute tab audio on supported video sites
   </label>
 
-  <h4 class="sectionHeader">Subtitles</h4>
-  <div id="audioSubtitleSelection">
-    <label><input id="audioShowAllSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="0">Show all</label>
-    <br>
-    <label><input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="1">Show only filtered</label>
-    <br>
-    <label><input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="2">Show only unfiltered</label>
-    <br>
-    <label><input id="audioHideSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="3">Hide all</label>
+  <div id="muteAudioOptions" class="w3-hide">
+    <h4 class="sectionHeader">Instructions</h4>
+    <ol>
+      <li><a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio" target="_blank">Read about the feature</a></li>
+      <li>Play a video on a supported site</li>
+      <li>Turn on subtitles for the video</li>
+    </ol>
+
+    <h4 class="sectionHeader">Subtitles</h4>
+    <div id="audioSubtitleSelection">
+      <label><input id="audioShowAllSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="0">Show all</label>
+      <br>
+      <label><input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="1">Show only filtered</label>
+      <br>
+      <label><input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="2">Show only unfiltered</label>
+      <br>
+      <label><input id="audioHideSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="3">Hide all</label>
+    </div>
   </div>
 </div>
 
