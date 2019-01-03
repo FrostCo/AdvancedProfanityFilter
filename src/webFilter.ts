@@ -19,6 +19,7 @@ export default class WebFilter extends Filter {
   mutePage: boolean;
   lastSubtitle: string;
   muted: boolean;
+  subtitleSelector: string;
   summary: object;
 
   constructor() {
@@ -39,10 +40,6 @@ export default class WebFilter extends Filter {
     result.filtered = filter.replaceText(string);
     result.modified = (result.filtered != string)
     return result;
-  }
-
-  audioPage(): boolean {
-    return Domain.domainMatch(this.hostname, Object.keys(WebAudio.subtitleSelectors));
   }
 
   checkMutationTargetTextForProfanity(mutation) {
@@ -67,7 +64,7 @@ export default class WebFilter extends Filter {
 
       if (!Page.isForbiddenNode(node)) {
         if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
-          filter.cleanAudio(node, WebAudio.subtitleSelector(filter.hostname));
+          WebAudio.clean(filter, node, filter.subtitleSelector);
         } else {
           // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
           filter.removeProfanity(Page.xpathNodeText, node);
@@ -79,7 +76,7 @@ export default class WebFilter extends Filter {
     mutation.removedNodes.forEach(function(removedNode) {
       if (!Page.isForbiddenNode(removedNode)) {
         if (filter.mutePage && WebAudio.supportedNode(filter.hostname, removedNode)) {
-          filter.unmute();
+          WebAudio.unmute(filter);
         }
       }
     });
@@ -110,38 +107,14 @@ export default class WebFilter extends Filter {
     chrome.runtime.sendMessage(message);
 
     // Detect if we should mute audio for the current page
-    this.mutePage = (this.cfg.muteAudio && this.audioPage());
+    this.mutePage = (this.cfg.muteAudio && Domain.domainMatch(this.hostname, WebAudio.supportedPages()));
+    if (this.mutePage) { this.subtitleSelector = WebAudio.subtitleSelector(this.hostname)}
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
     this.removeProfanity(Page.xpathDocText, document);
     this.updateCounterBadge();
     this.observeNewNodes();
-  }
-
-  // TODO: Catch to prevent double-checking modified subtitles
-  cleanAudio(subtitleContainer, subSelector) {
-    let filtered = false;
-    let subtitles = subtitleContainer.querySelectorAll(subSelector);
-
-    // Process subtitles
-    subtitles.forEach(subtitle => {
-      let result = filter.advancedReplaceText(subtitle.innerText);
-      if (result.modified) {
-        filtered = true;
-        subtitle.innerText = result.filtered;
-        filter.mute(); // Mute the audio if we haven't already
-      }
-    });
-
-    // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
-    switch (filter.cfg.showSubtitles) {
-      case 1: if (!filtered) { subtitles.forEach(subtitle => { subtitle.innerText = ''; }) }; break;
-      case 2: if (filtered) { subtitles.forEach(subtitle => { subtitle.innerText = ''; }) }; break;
-      case 3: subtitles.forEach(subtitle => { subtitle.innerText = ''; }); break;
-    }
-
-    if (filtered) { filter.updateCounterBadge(); } // Update if modified
   }
 
   // Always use the top frame for page check
@@ -158,13 +131,6 @@ export default class WebFilter extends Filter {
       } else {
         this.summary[word] = { clean: filter.replaceText(word, false), count: 1 };
       }
-    }
-  }
-
-  mute() {
-    if (filter.muted === false) {
-      this.muted = true;
-      chrome.runtime.sendMessage({mute: filter.muted});
     }
   }
 
@@ -226,13 +192,6 @@ export default class WebFilter extends Filter {
         // console.log('Normal cleaning:', item.data); // DEBUG
         item.data = this.replaceText(item.data);
       }
-    }
-  }
-
-  unmute() {
-    if (filter.muted === true) {
-      this.muted = false;
-      chrome.runtime.sendMessage({mute: filter.muted});
     }
   }
 
