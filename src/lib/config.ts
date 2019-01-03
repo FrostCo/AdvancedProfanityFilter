@@ -54,7 +54,7 @@ export default class Config {
     filterMethod: 0, // ['Censor', 'Substitute', 'Remove'];
     filterWordList: true,
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
-    muteAudio: true,
+    muteAudio: false,
     password: null,
     preserveCase: true,
     preserveFirst: true,
