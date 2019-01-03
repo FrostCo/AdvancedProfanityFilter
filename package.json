@@ -31,7 +31,7 @@
     "test:debug": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
     "test:nocov": "node_modules/mocha/bin/_mocha",
     "test:types": "tsc --noEmit",
-    "test": "npm run build:test && npm run type-check && npm run test:cov",
+    "test": "npm run build:test && npm run test:types && npm run test:cov",
     "type-check:watch": "npm run type-check -- --watch",
     "update:help": "node bin/update-help.js",
     "verify": "npm run lint && npm run test",
