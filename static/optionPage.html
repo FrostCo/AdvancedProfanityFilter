@@ -233,7 +233,7 @@
 
 <div id="audioPage" class="w3-container w3-hide">
   <h4 class="sectionHeader">Audio (Experimental)</h4>
-  <p>This is an experimental feature that will attempt to mute the audio while playing a video when a word in your filter list appears in the subtitles.</p>
+  <p>This feature mutes the audio when a filtered word is detected in the subtitles/captions on a supported website. This is very experimental at this point, and its effectiveness is completely dependent on the quality of the subtitles accompanying the video. For more information, please see the <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio"Audio wiki. target="_blank">Audio wiki</a>.</p>
 
   <label>
     <input id="muteAudio" type="checkbox" class="w3-check">
@@ -243,7 +243,6 @@
   <div id="muteAudioOptionsContainer" class="w3-hide">
     <h4 class="sectionHeader">Instructions</h4>
     <ol>
-      <li><a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio" target="_blank">Read about the feature</a></li>
       <li>Play a video on a supported site</li>
       <li>Turn on subtitles for the video</li>
     </ol>
@@ -420,16 +419,16 @@
 </div>
 
 <div id="statusModal" class="w3-modal">
-    <div class="w3-modal-content w3-card-4 w3-animate-zoom">
-      <header class="w3-container w3-red"><h5 id="statusModalTitle"></h5></header>
-      <div class="w3-container w3-padding w3-margin">
-        <div id="statusModalContent"></div>
-        <div class="w3-right">
-          <button id="statusModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
-        </div>
+  <div class="w3-modal-content w3-card-4 w3-animate-zoom">
+    <header class="w3-container w3-red"><h5 id="statusModalTitle"></h5></header>
+    <div class="w3-container w3-padding w3-margin">
+      <div id="statusModalContent"></div>
+      <div class="w3-right">
+        <button id="statusModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
       </div>
     </div>
   </div>
+</div>
 
 <script src="optionPage.js"></script>
 </body>
