@@ -557,6 +557,7 @@ export default class OptionPage {
   switchPage(evt) {
     let currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
     let newTab = evt.target as HTMLElement;
+    if (newTab.classList.contains('donationTab')) { return false; }
 
     currentTab.classList.remove(OptionPage.activeClass);
     newTab.classList.add(OptionPage.activeClass);
