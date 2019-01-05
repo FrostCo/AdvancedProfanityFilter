@@ -4,7 +4,7 @@
   "author": "Richard Frost",
   "manifest_version": 2,
   "version": "1.2.2",
-  "description": "Hide offensive words on the webpages you visit",
+  "description": "Advanced Profanity Filter helps to clean up bad language on the websites you and your family visit.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
