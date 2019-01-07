@@ -18,22 +18,29 @@ For an overview of features and options, please head to the [wiki](https://githu
 
 ### Features
 * Multiple Filter Types
-  * Censor - Hide offending words
-  * Substitute - Replace offensive words
-  * Remove - Remove offensive words
-* Optional Advanced Mode for troublesome pages
+    * Censor - Hide offending words
+    * Substitute - Replace offensive words
+    * Remove - Remove offensive words
 * Customizable word and substitution list
+* Optional Advanced Mode for troublesome pages
 * Disable filter for specific domains
 * Import/Export settings to share with others
-* Sync settings across browsers (of same type)
+* Sync settings across browsers
+* Context menu for easily adding words and disabling the filter
 * Counter showing number of filtered words
-* HTTPS Support
-* Supports social media sites such as:
-  * Facebook
-  * Twitter
-  * YouTube
-  * Pinterest
-  * Reddit
+* Basic password protection for options page
+* Supports popular sites such as:
+    * Facebook
+    * Pinterest
+    * Reddit
+    * Twitter
+    * YouTube
+* Experimental audio muting for videos on supported sites:
+    * Amazon Video
+    * Netflix
+    * Plex
+    * Vudu
+    * YouTube
 
 ### Issues, Suggestions or Feedback?
 * Found a bug? Please open an [issue](https://github.com/richardfrost/AdvancedProfanityFilter/issues/new).
