@@ -6,9 +6,9 @@
   "version": "1.2.2",
   "description": "Advanced Profanity Filter helps to clean up bad language on the websites you and your family visit.",
   "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "16": "img/icon16.png",
+    "48": "img/icon48.png",
+    "128": "img/icon128.png"
   },
   "permissions": [
     "contextMenus",
@@ -32,8 +32,8 @@
   },
   "browser_action": {
     "default_icon": {
-      "19": "icons/icon19.png",
-      "38": "icons/icon38.png"
+      "19": "img/icon19.png",
+      "38": "img/icon38.png"
     },
     "default_title": "Advanced Profanity Filter",
     "default_popup": "popup.html"

@@ -18,8 +18,8 @@
   },
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
   "scripts": {
-    "build:test-sm": "babel src --out-dir built --extensions \".ts,.tsx\" --source-maps inline",
-    "build:test": "babel src --out-dir ./test/built --extensions \".ts,.tsx\"",
+    "build:test-sm": "babel src/script --out-dir built --extensions \".ts,.tsx\" --source-maps inline",
+    "build:test": "babel src/script --out-dir ./test/built --extensions \".ts,.tsx\"",
     "build": "npm run copy-static && npm run package:webpack",
     "clean": "node bin/clean.js",
     "copy-static": "node bin/copy-static.js",

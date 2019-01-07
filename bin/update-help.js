@@ -6,7 +6,7 @@ const marked = require('marked');
 const download = require('download');
 
 let readmeURI = 'https://raw.githubusercontent.com/wiki/richardfrost/AdvancedProfanityFilter/Home.md';
-let optionPage = path.join('static', 'optionPage.html');
+let optionPage = path.join('src/static', 'optionPage.html');
 let optionPageHTML = fs.readFileSync(optionPage).toString();
 let prefix = '<div id="helpContainer">';
 let postfix = '\n  </div>';

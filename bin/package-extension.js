@@ -78,7 +78,6 @@ function packageSource() {
   ];
   sourceZip.addLocalFolder('./bin', 'bin');
   sourceZip.addLocalFolder('./src', 'src');
-  sourceZip.addLocalFolder('./static', 'static');
   sourceZip.addLocalFolder('./test', 'test');
   files.forEach(file => { sourceZip.addLocalFile(path.join('./', file), null)});
   sourceZip.writeZip('./extension-source.zip');
@@ -110,7 +109,7 @@ function updateManifestVersion(manifestPath, manifest) {
 }
 
 const dist = './dist/'
-const staticDir = './static/'
+const staticDir = './src/static/'
 let manifestPath = path.join(staticDir, 'manifest.json');
 updateManifestVersion(manifestPath, getManifestJSON());
 buildAll();

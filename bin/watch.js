@@ -17,37 +17,29 @@ function copyStatic(file) {
   // });
 }
 
-function copyTypeScript(file) {
+function compileScript(file) {
   let basename = path.basename(file);
   console.log('TypeScript file updated: ', basename)
 
   try {
-    if (tsBundleFiles.includes(basename)) {
-      console.log('Prebuild Typescript...');
-      execSync('node ./bin/prebuild.js');
-    }
-
-    console.log('Running TypeScript...');
-    execSync('tsc');
-    console.log('Done.');
+    console.log('Building Typescript...');
+    execSync('npm run webpack');
   } catch(err) {
     console.log('Error: ', err);
   }
 }
 
-const tsBundleFiles = ['webFilter.ts', 'helper.ts', 'domain.ts', 'word.ts', 'filter.ts', 'page.ts', 'config.ts', 'webConfig.ts'];
-var watcher = chokidar.watch(
+let watcher = chokidar.watch(
   [
     path.join(process.cwd() + '/src/**/*.ts'),
-    path.join(process.cwd() + '/static/**/*.(css|html|json|)')
+    path.join(process.cwd() + '/src/static/**/*.(css|html|json|)')
   ], {
-    ignored: /.*\.bundle\.ts/,
     awaitWriteFinish: true,
     persistent: true
   }
 );
 
-var log = console.log.bind(console);
+let log = console.log.bind(console);
 // watcher.on('add', filePath => log(`File ${filePath} has been added`))
 // watcher.on('unlink', filePath => log(`File ${filePath} has been removed`));
 watcher.on('ready', () => log('Initial scan complete. Watching for changes...\n\n'));
@@ -55,5 +47,5 @@ watcher.on('ready', () => log('Initial scan complete. Watching for changes...\n\
 watcher.on('change', (filePath, stats) => {
   // console.log(filePath, stats);
   if (filePath.match(/[\/\\]static[\/\\]/)) { copyStatic(filePath); }
-  if (filePath.match(/[\/\\]src[\/\\]/)) { copyTypeScript(filePath); }
+  if (filePath.match(/[\/\\]src[\/\\]/)) { compileScript(filePath); }
 });

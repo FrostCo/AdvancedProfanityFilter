@@ -2,10 +2,10 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    eventPage: './src/eventPage.ts',
-    webFilter: './src/webFilter.ts',
-    optionPage: './src/optionPage.ts',
-    popup: './src/popup.ts'
+    eventPage: './src/script/eventPage.ts',
+    webFilter: './src/script/webFilter.ts',
+    optionPage: './src/script/optionPage.ts',
+    popup: './src/script/popup.ts'
   },
   output: {
     path: path.resolve('dist'),
