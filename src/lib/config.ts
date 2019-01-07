@@ -15,11 +15,13 @@ export default class Config {
   filterMethod: number;
   filterWordList: boolean;
   globalMatchMethod: number;
+  muteAudio: boolean;
   password: string;
   preserveCase: boolean;
   preserveFirst: boolean;
   preserveLast: boolean;
   showCounter: boolean;
+  showSubtitles: number;
   showSummary: boolean;
   substitutionMark: boolean;
   words: {
@@ -52,11 +54,13 @@ export default class Config {
     filterMethod: 0, // ['Censor', 'Substitute', 'Remove'];
     filterWordList: true,
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
+    muteAudio: false,
     password: null,
     preserveCase: true,
     preserveFirst: true,
     preserveLast: false,
     showCounter: true,
+    showSubtitles: 0,
     showSummary: true,
     substitutionMark: true
   };

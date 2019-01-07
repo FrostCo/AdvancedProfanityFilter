@@ -266,6 +266,15 @@ export default class OptionPage {
     self.populateOptions();
   }
 
+  populateAudio() {
+    let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
+    let selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
+    let muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
+    muteAudioInput.checked = this.cfg.muteAudio;
+    this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
+    selectedshowSubtitle.checked = true;
+  }
+
   populateConfig() {
     this.auth.setPasswordButton(option);
   }
@@ -276,6 +285,7 @@ export default class OptionPage {
     this.populateWordsList();
     this.advancedDomainList();
     this.disabledDomainList();
+    this.populateAudio();
     this.populateConfig();
     this.populateTest();
   }
@@ -436,6 +446,8 @@ export default class OptionPage {
     let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
+    let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
+    let showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
     self.cfg.censorCharacter = censorCharacterSelect.value;
     self.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
@@ -449,6 +461,8 @@ export default class OptionPage {
     self.cfg.filterWordList = filterWordList.checked;
     self.cfg.substitutionMark = substitutionMark.checked;
     self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
+    self.cfg.muteAudio = muteAudioInput.checked;
+    self.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
 
     // Save settings
     let error = await self.cfg.save();
@@ -477,6 +491,7 @@ export default class OptionPage {
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
     let selectedMatchMethod = document.querySelector('input[name="wordMatchMethod"]:checked') as HTMLInputElement;
     let word = wordText.value.trim().toLowerCase();
+    let sub = substitutionText.value.trim().toLowerCase();
     let added = true;
 
     if (word == '') {
@@ -484,11 +499,18 @@ export default class OptionPage {
       return false;
     }
 
+    // Make sure word and substitution are different
+    // TODO: More in-depth checking might be needed
+    if (word == sub) {
+      OptionPage.showInputError(substitutionText, 'Word and substitution must be different.');
+      return false;
+    }
+
     if (wordText.checkValidity()) {
       let wordOptions = {
         matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
         repeat: wordMatchRepeated.checked,
-        sub: substitutionText.value
+        sub: sub
       };
 
       if (wordList.value === '') { // New record
@@ -535,6 +557,7 @@ export default class OptionPage {
   switchPage(evt) {
     let currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
     let newTab = evt.target as HTMLElement;
+    if (newTab.classList.contains('donationTab')) { return false; }
 
     currentTab.classList.remove(OptionPage.activeClass);
     newTab.classList.add(OptionPage.activeClass);
@@ -650,6 +673,9 @@ document.getElementById('disabledDomainSelect').addEventListener('change', e => 
 document.getElementById('disabledDomainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
 document.getElementById('disabledDomainSave').addEventListener('click', e => { option.disabledDomainSave(e); });
 document.getElementById('disabledDomainRemove').addEventListener('click', e => { option.disabledDomainRemove(e); });
+// Audio
+document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
+document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 // Config
 document.getElementById('configReset').addEventListener('click', e => { option.confirm(e, 'restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });

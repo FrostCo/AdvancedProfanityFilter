@@ -8,9 +8,6 @@
 # Dev extensions for debugging
 /extension-*/*
 
-# Combined file (prebuild.js)
-/src/webFilter.bundle.ts
-
 # Testing
 /test/built/*
 /test/.nyc_output/*

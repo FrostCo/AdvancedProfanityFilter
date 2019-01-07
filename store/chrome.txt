@@ -1,25 +1,28 @@
-Advanced Profanity Filter replaces profanity seen on websites.
-
 Features:
 • Multiple Filter Types
     • Censor - Hide offending words
     • Substitute - Replace offensive words
     • Remove - Remove offensive words
-• Optional Advanced Mode for troublesome pages
 • Customizable word and substitution list
+• Optional Advanced Mode for troublesome pages
 • Disable filter for specific domains
 • Import/Export settings to share with others
-• Context menu for easily adding words and disabling the filter
 • Sync settings across browsers
+• Context menu for easily adding words and disabling the filter
 • Counter showing number of filtered words
 • Basic password protection for options page
-• HTTPS Support
-• Supports social media sites such as:
+• Supports popular sites such as:
     • Facebook
-    • Twitter
-    • YouTube
     • Pinterest
     • Reddit
+    • Twitter
+    • YouTube
+• Experimental audio muting for videos on supported sites:
+    • Amazon Video
+    • Netflix
+    • Plex
+    • Vudu
+    • YouTube
 
 For a detailed overview of the features and settings, please see the Wiki here:
 

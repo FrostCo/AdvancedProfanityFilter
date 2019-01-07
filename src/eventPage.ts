@@ -45,6 +45,10 @@ chrome.runtime.onMessage.addListener(
       } else if (request.advanced === false) {
         chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255] }); // Blue - Normal
       }
+
+      if (request.mute != undefined) {
+        chrome.tabs.update(sender.tab.id, {muted: request.mute});
+      }
     }
   }
 );
