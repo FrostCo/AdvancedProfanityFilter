@@ -107,25 +107,28 @@ chrome.contextMenus.removeAll(function() {
   chrome.contextMenus.create({
     id: 'addSelection',
     title: 'Add selection to filter',
-    contexts: ['selection']
+    contexts: ['selection'],
+    documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
   });
 
   chrome.contextMenus.create({
     id: 'toggleFilterForDomain',
     title: 'Toggle filter for domain',
-    contexts: ['all']
+    contexts: ['all'],
+    documentUrlPatterns: ['http://*/*', 'https://*/*']
   });
 
   chrome.contextMenus.create({
     id: 'toggleAdvancedModeForDomain',
     title: 'Toggle advanced mode for domain',
-    contexts: ['all']
+    contexts: ['all'],
+    documentUrlPatterns: ['http://*/*', 'https://*/*']
   });
 
   chrome.contextMenus.create({
     id: 'options',
     title: 'Options',
-    contexts: ['page', 'selection']
+    contexts: ['all']
   });
 });
 
