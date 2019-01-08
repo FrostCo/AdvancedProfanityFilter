@@ -24,7 +24,7 @@ chrome.runtime.onInstalled.addListener(function(details){
       'type': 'basic',
       'title': 'Advanced Profanity Filter',
       'message': 'Update installed, click for changelog.',
-      'iconUrl': 'icons/icon64.png',
+      'iconUrl': 'img/icon64.png',
       'isClickable': true,
     });
   }
@@ -34,7 +34,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.disabled === true) {
-      chrome.browserAction.setIcon({path: 'icons/icon19-disabled.png', tabId: sender.tab.id});
+      chrome.browserAction.setIcon({path: 'img/icon19-disabled.png', tabId: sender.tab.id});
     } else {
       if (request.counter) {
         chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
