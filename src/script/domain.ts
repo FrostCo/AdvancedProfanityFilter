@@ -19,7 +19,7 @@ export default class Domain {
     return result;
   }
 
-  // If a parent domain (example.com) is included, it will not +match all subdomains.
+  // If a parent domain (example.com) is included, it will not match all subdomains.
   // If a subdomain is included, it will match itself and the parent, if present.
   static removeFromList(domain: string, domains: string[]): string[] {
     let domainRegex;
