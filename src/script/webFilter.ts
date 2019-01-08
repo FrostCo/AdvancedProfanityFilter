@@ -38,7 +38,7 @@ export default class WebFilter extends Filter {
     let result = {} as any;
     result.original = string;
     result.filtered = filter.replaceText(string);
-    result.modified = (result.filtered != string)
+    result.modified = (result.filtered != string);
     return result;
   }
 
@@ -108,7 +108,7 @@ export default class WebFilter extends Filter {
 
     // Detect if we should mute audio for the current page
     this.mutePage = (this.cfg.muteAudio && Domain.domainMatch(this.hostname, WebAudio.supportedPages()));
-    if (this.mutePage) { this.subtitleSelector = WebAudio.subtitleSelector(this.hostname)}
+    if (this.mutePage) { this.subtitleSelector = WebAudio.subtitleSelector(this.hostname); }
 
     // Remove profanity from the main document and watch for new nodes
     this.init();

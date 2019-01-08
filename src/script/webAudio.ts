@@ -23,8 +23,8 @@ export default class WebAudio {
 
     // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
     switch (filter.cfg.showSubtitles) {
-      case 1: if (!filtered) { subtitles.forEach(subtitle => { subtitle.innerText = ''; }) }; break;
-      case 2: if (filtered) { subtitles.forEach(subtitle => { subtitle.innerText = ''; }) }; break;
+      case 1: if (!filtered) { subtitles.forEach(subtitle => { subtitle.innerText = ''; }); } break;
+      case 2: if (filtered) { subtitles.forEach(subtitle => { subtitle.innerText = ''; }); } break;
       case 3: subtitles.forEach(subtitle => { subtitle.innerText = ''; }); break;
     }
 
@@ -45,7 +45,7 @@ export default class WebAudio {
   static supportedNode(hostname: string, node: any): boolean {
     switch(hostname) {
       case 'app.plex.tv':
-        return !!(node.tagName == 'DIV' && (node.dataset && node.dataset.hasOwnProperty('dialogueId')) || (typeof node.querySelectorAll === "function" && node.querySelectorAll('div[data-dialogue-id]').length > 0));
+        return !!(node.tagName == 'DIV' && (node.dataset && node.dataset.hasOwnProperty('dialogueId')) || (typeof node.querySelectorAll === 'function' && node.querySelectorAll('div[data-dialogue-id]').length > 0));
       case 'www.amazon.com':
         return !!(node.tagName == 'P' && node.querySelectorAll('span.timedTextWindow > span.timedTextBackground').length > 0);
       case 'www.netflix.com':
