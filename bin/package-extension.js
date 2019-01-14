@@ -17,6 +17,7 @@ function buildChrome(zip) {
 }
 
 function buildEdge(manifest, zip) {
+  if (!fse.existsSync('./store/edge')) { return false; }
   console.log('Building ./extension-edge.zip');
   let msPreload = {
     backgroundScript: "backgroundScriptsAPIBridge.js",
@@ -66,7 +67,7 @@ function getManifestJSON() {
 function packageSource() {
   fse.removeSync('./extension-source.zip');
   console.log('Building ./extension-source.zip');
-  console.log('Build from source: npm install && npm run build && npm run package-no-build');
+  console.log('Build from source: npm install && npm run package');
 
   let sourceZip = new AdmZip();
   let files = [
