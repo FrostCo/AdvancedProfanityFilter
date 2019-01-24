@@ -21,12 +21,14 @@ export default class WebFilter extends Filter {
   muted: boolean;
   subtitleSelector: string;
   summary: object;
+  volume: number;
 
   constructor() {
     super();
     this.advanced = false;
     this.muted = false;
     this.summary = {};
+    this.volume = 1;
   }
 
   // Always use the top frame for page check

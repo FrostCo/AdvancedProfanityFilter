@@ -32,9 +32,21 @@ export default class WebAudio {
   }
 
   static mute(filter) {
-    if (filter.muted === false) {
-      filter.muted = true;
-      chrome.runtime.sendMessage({mute: true});
+    if (!filter.muted) {
+      switch(filter.cfg.filterAudioMethod) {
+        case 0: // Mute tab
+          filter.muted = true;
+          chrome.runtime.sendMessage({mute: true});
+          break;
+        case 1: // Mute video
+          let video = document.getElementsByTagName('video')[0];
+          if (video.volume > 0) {
+            filter.muted = true;
+            filter.volume = video.volume; // Save original volume
+            video.volume = 0;
+          }
+          break;
+      }
     }
   }
 
@@ -63,9 +75,20 @@ export default class WebAudio {
   }
 
   static unmute(filter) {
-    if (filter.muted === true) {
-      filter.muted = false;
-      chrome.runtime.sendMessage({mute: false});
+    if (filter.muted) {
+      switch(filter.cfg.filterAudioMethod) {
+        case 0: // Mute tab
+          filter.muted = false;
+          chrome.runtime.sendMessage({mute: false});
+          break;
+        case 1: // Mute video
+          let video = document.getElementsByTagName('video')[0];
+          if (video.volume == 0) {
+            filter.muted = false;
+            video.volume = filter.volume;
+          }
+          break;
+      }
     }
   }
 }
