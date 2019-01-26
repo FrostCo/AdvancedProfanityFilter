@@ -2,36 +2,24 @@ export default class Page {
   xpathDocText: string;
   xpathNodeText: string;
 
+  static readonly allowedAdvancedTags = ['SCRIPT'];
   static readonly forbiddenNodeRegExp = new RegExp('^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)');
+  static readonly forbiddenTags = ['LINK', 'STYLE', 'INPUT', 'TEXTAREA', 'IFRAME'];
   static readonly xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
   static readonly xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != \"\"]';
 
   // Returns true if a node should *not* be altered in any way
   // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
-  static isForbiddenNode(node: any): boolean {
-    return Boolean(
-      node.isContentEditable || // DraftJS and many others
-      (node.parentNode &&
-        (
-          node.parentNode.isContentEditable || // Special case for Gmail
-          node.parentNode.tagName == 'LINK' ||
-          node.parentNode.tagName == 'SCRIPT' ||
-          node.parentNode.tagName == 'STYLE' ||
-          node.parentNode.tagName == 'INPUT' ||
-          node.parentNode.tagName == 'TEXTAREA' ||
-          node.parentNode.tagName == 'IFRAME'
-        )
-      ) || // Some catch-alls
-      (node.tagName &&
-        (
-          node.tagName == 'LINK' ||
-          node.tagName == 'SCRIPT' ||
-          node.tagName == 'STYLE' ||
-          node.tagName == 'INPUT' ||
-          node.tagName == 'TEXTAREA' ||
-          node.tagName == 'IFRAME'
-        )
-      )
+  static isForbiddenNode(node: any, advanced: boolean = false): boolean {
+    if (node.parentNode) { node = node.parentNode }
+    if (node.isContentEditable) { return true; }
+    return Page.forbiddenTag(node.tagName, advanced);
+  }
+
+  static forbiddenTag(tagName: string, advanced: boolean): boolean {
+    return Boolean (
+      Page.forbiddenTags.includes(tagName) ||
+      (!advanced && Page.allowedAdvancedTags.includes(tagName))
     );
   }
 }
