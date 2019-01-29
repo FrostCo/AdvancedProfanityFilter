@@ -11,11 +11,20 @@ export default class Page {
   // Returns true if a node should *not* be altered in any way
   // Credit: https://github.com/ericwbailey/millennials-to-snake-people/blob/master/Source/content_script.js
   static isForbiddenNode(node: any, advanced: boolean = false): boolean {
-    if (node.parentNode) { node = node.parentNode }
     if (node.isContentEditable) { return true; }
-    return Page.forbiddenTag(node.tagName, advanced);
+
+    if (node.parentNode && Page.forbiddenTag(Page.getTagFromNode(node.parentNode), advanced)) {
+      return true;
+    }
+
+    return Page.forbiddenTag(Page.getTagFromNode(node), advanced);
   }
 
+  static getTagFromNode(node): string {
+    return node.tagName || node.nodeName;
+  }
+
+  // TODO: Remove advanced
   static forbiddenTag(tagName: string, advanced: boolean): boolean {
     return Boolean (
       Page.forbiddenTags.includes(tagName) ||

@@ -3,6 +3,7 @@ import {Filter} from './lib/filter';
 import Page from './page';
 import WebAudio from './webAudio';
 import WebConfig from './webConfig';
+import '../../findAndReplaceDOMText';
 
 interface Message {
   advanced?: boolean,
@@ -42,6 +43,7 @@ export default class WebFilter extends Filter {
     return result;
   }
 
+  // TODO: Fix for count goes here?
   checkMutationTargetTextForProfanity(mutation) {
     // console.count('checkMutationTargetTextForProfanity'); // Benchmarking - Executaion Count
     // console.log('Process mutation.target:', mutation.target, mutation.target.data); // DEBUG - Mutation target text
@@ -49,6 +51,7 @@ export default class WebFilter extends Filter {
     if (!Page.isForbiddenNode(mutation.target)) {
       replacement = this.replaceText(mutation.target.data);
       if (replacement != mutation.target.data) {
+        console.log('changed: ', mutation.target, replacement); // TEMP
         // console.log("Mutation target text changed:", mutation.target.data, replacement); // DEBUG - Mutation target text
         mutation.target.data = replacement;
       }
@@ -56,19 +59,40 @@ export default class WebFilter extends Filter {
     // else { console.log('Forbidden mutation.target node:', mutation.target); } // DEBUG - Mutation target text
   }
 
-  checkNodeForProfanity(mutation) {
-    // console.count('checkNodeForProfanity'); // Benchmarking - Executaion Count
+  checkMutationForProfanity(mutation) {
+    // console.count('checkMutationForProfanity'); // Benchmarking - Executaion Count
     // console.log('Mutation observed:', mutation); // DEBUG - Mutation addedNodes
+    let a = 1;
     mutation.addedNodes.forEach(function(node) {
       // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
 
+      // if (node.data) {
+      //   if (node.data.match(/pissed/)) {
+      //     console.log('found matching mutation!', node);
+      //   } else if (node.data.match(/p\*\*/)) {
+      //     console.log('found filtered mutation!', node);
+      //   }
+      // } else if (node.textContent != '') {
+      //   if (node.textContent.match(/p(issed|\*\*)/)) {
+      //     console.log('found .textContent', node);
+      //   }
+      // } else {
+      //   console.log('node without .data or .textContent:', node);
+      // }
+
+      // TODO: Where to do this check?
       if (!Page.isForbiddenNode(node)) {
-        if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
-          WebAudio.clean(filter, node, filter.subtitleSelector);
-        } else {
-          // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
-          filter.removeProfanity(Page.xpathNodeText, node);
+        if (node.data && node.data.trim() == '') {
+          return false;
         }
+
+        // if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
+        //   WebAudio.clean(filter, node, filter.subtitleSelector);
+        // } else {
+          // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
+          // filter.removeProfanity(Page.xpathNodeText, node);
+          filter.cleanNode(node);
+        // }
       }
       // else { console.log('Forbidden node:', node); } // DEBUG - Mutation addedNodes
     });
@@ -112,8 +136,8 @@ export default class WebFilter extends Filter {
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
-    this.removeProfanity(Page.xpathDocText, document);
-    this.updateCounterBadge();
+    // this.removeProfanity(Page.xpathDocText, document);
+    // this.updateCounterBadge();
     this.observeNewNodes();
   }
 
@@ -139,14 +163,15 @@ export default class WebFilter extends Filter {
     let self = this;
     let observerConfig = {
       characterData: true,
+      characterDataOldValue: true,
       childList: true,
-      subtree: true
+      subtree: true,
     };
 
     // When DOM is modified, remove profanity from inserted node
     let observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
-        self.checkNodeForProfanity(mutation);
+        self.checkMutationForProfanity(mutation);
       });
       self.updateCounterBadge();
     });
@@ -154,6 +179,43 @@ export default class WebFilter extends Filter {
     // Remove profanity from new objects
     observer.observe(document, observerConfig);
   }
+
+  // TODO: Don't do COMMENT?
+  cleanNode(node, mutation: MutationRecord = null) {
+    if (node.childElementCount > 0) { // Tree node
+      let treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+      while(treeWalker.nextNode()) {
+        if (treeWalker.currentNode.childNodes.length > 0) {
+          treeWalker.currentNode.childNodes.forEach(childNode => {
+            this.cleanNode(childNode);
+          });
+        } else {
+          this.cleanNode(treeWalker.currentNode);
+        }
+      }
+    } else { // Leaf node
+      if (node.nodeName) {
+        if (!Page.isForbiddenNode(node)){
+          // node.data = this.replaceText(node.data);
+          // TODO: Fix Count?
+          // TODO: Check for empty string again?
+          let result = this.advancedReplaceText(node.textContent);
+
+          if (result.modified) {
+            console.log('normal change: ', node, result.modified)
+            node.textContent = result.filtered;
+          }
+        }
+      } else {
+        // console.log('node without nodeName:', node); // Debug
+      }
+    }
+  }
+
+  // Advanced Mode
+  // filter.wordRegExps.forEach(element => {
+  //   findAndReplaceDOMText(node, {preset: 'prose', find: element});
+  // });
 
   removeProfanity(xpathExpression: string, node: any) {
     // console.count('removeProfanity'); // Benchmarking - Executaion Count
