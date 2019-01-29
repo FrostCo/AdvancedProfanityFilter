@@ -25,11 +25,6 @@ describe('Page', function() {
       expect(Page.isForbiddenNode({ tagName: 'SCRIPT' })).to.equal(true);
     });
 
-    it('should return false when node is not a forbidden tag when advanced mode', function() {
-      let advanced = true;
-      expect(Page.isForbiddenNode({ tagName: 'SCRIPT' }, advanced)).to.equal(false);
-    });
-
     it('should return false when node is not a forbidden tag', function() {
       expect(Page.isForbiddenNode({ tagName: 'HTML' })).to.equal(false);
     });
