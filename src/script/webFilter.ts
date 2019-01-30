@@ -35,7 +35,7 @@ export default class WebFilter extends Filter {
     return Domain.domainMatch(this.hostname, this.cfg.advancedDomains);
   }
 
-  replaceTextResult(string: string) {
+  replaceTextResult(string: string, stats: boolean = true) {
     let result = {} as any;
     result.original = string;
     result.filtered = filter.replaceText(string);
@@ -62,7 +62,7 @@ export default class WebFilter extends Filter {
           WebAudio.clean(filter, node, filter.subtitleSelector);
         } else {
           // console.log('Added node to filter', node); // DEBUG - Mutation addedNodes
-          if (filter.advanced) {
+          if (filter.advanced && node.parentNode) {
             filter.advancedReplaceText(node);
           } else {
             filter.cleanNode(node);

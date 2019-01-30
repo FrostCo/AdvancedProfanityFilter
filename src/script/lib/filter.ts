@@ -85,7 +85,7 @@ export class Filter {
   // Config Dependencies: filterMethod, wordList,
   // censorFixedLength, preserveFirst, preserveLast, censorCharacter
   // words, defaultSubstitution, preserveCase
-  replaceText(str: string, stats = true): string {
+  replaceText(str: string, stats: boolean = true): string {
     // console.count('replaceText'); // Benchmarking - Executaion Count
     let self = this;
     switch(self.cfg.filterMethod) {
