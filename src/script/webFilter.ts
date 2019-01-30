@@ -3,7 +3,7 @@ import {Filter} from './lib/filter';
 import Page from './page';
 import WebAudio from './webAudio';
 import WebConfig from './webConfig';
-// import '../../findAndReplaceDOMText';
+import './vendor/findAndReplaceDOMText';
 
 interface Message {
   advanced?: boolean,
@@ -35,12 +35,21 @@ export default class WebFilter extends Filter {
     return Domain.domainMatch(this.hostname, this.cfg.advancedDomains);
   }
 
-  advancedReplaceText(string: string) {
+  replaceTextResult(string: string) {
     let result = {} as any;
     result.original = string;
     result.filtered = filter.replaceText(string);
     result.modified = (result.filtered != string);
     return result;
+  }
+
+  advancedReplaceText(node) {
+    filter.wordRegExps.forEach((regExp, index) => {
+      // @ts-ignore - External library function
+      window.findAndReplaceDOMText(node, {preset: 'prose', find: regExp, replace: function(portion, match) {
+        return filter.replaceText(match[0]);
+      }});
+    });
   }
 
   checkMutationForProfanity(mutation) {
@@ -53,7 +62,11 @@ export default class WebFilter extends Filter {
           WebAudio.clean(filter, node, filter.subtitleSelector);
         } else {
           // console.log('Added node to filter', node); // DEBUG - Mutation addedNodes
-          filter.cleanNode(node);
+          if (filter.advanced) {
+            filter.advancedReplaceText(node);
+          } else {
+            filter.cleanNode(node);
+          }
         }
       }
       // else { console.log('Forbidden node:', node); } // DEBUG - Mutation addedNodes
@@ -75,7 +88,7 @@ export default class WebFilter extends Filter {
     // console.count('checkMutationTargetTextForProfanity'); // Benchmarking - Executaion Count
     // console.log('Process mutation.target:', mutation.target, mutation.target.data); // DEBUG - Mutation target text
     if (!Page.isForbiddenNode(mutation.target)) {
-      let result =  this.advancedReplaceText(mutation.target.data);
+      let result = this.replaceTextResult(mutation.target.data);
       if (result.modified) {
         // console.log('Text target changed:', result.original, result.filtered); // DEBUG - Mutation target text
         mutation.target.data = result.filtered;
@@ -99,7 +112,7 @@ export default class WebFilter extends Filter {
     } else { // Leaf node
       if (node.nodeName) {
         if (!Page.isForbiddenNode(node) || node.textContent.trim() != '') {
-          let result = this.advancedReplaceText(node.textContent);
+          let result = this.replaceTextResult(node.textContent);
           if (result.modified) {
             // console.log('Normal node changed:', result.original, result.filtered); // DEBUG - Mutation node
             node.textContent = result.filtered;
@@ -135,6 +148,8 @@ export default class WebFilter extends Filter {
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
+    this.cleanNode(document);
+    this.updateCounterBadge();
     this.observeNewNodes();
   }
 
