@@ -19,7 +19,7 @@
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
   "scripts": {
     "build:test-sm": "babel src/script --out-dir built --extensions \".ts,.tsx\" --source-maps inline",
-    "build:test": "babel src/script --out-dir ./test/built --extensions \".ts,.tsx\"",
+    "build:test": "babel src/script --out-dir ./test/built --extensions \".ts,.tsx,.js\"",
     "build": "npm run copy-static && npm run package:webpack",
     "clean": "node bin/clean.js",
     "copy-static": "node bin/copy-static.js",
@@ -47,26 +47,34 @@
     "@babel/preset-typescript": "^7.1.0",
     "@babel/register": "^7.0.0",
     "@types/chrome": "latest",
+    "@typescript-eslint/eslint-plugin": "^1.1.1",
+    "@typescript-eslint/parser": "^1.1.1",
     "adm-zip": "^0.4.11",
     "babel-loader": "^8.0.4",
     "chai": "latest",
     "chokidar": "^2.0.4",
     "download": "^7.1.0",
     "eslint": "^5.2.0",
-    "eslint-plugin-typescript": "^0.14.0",
     "fs-extra": "^7.0.0",
     "marked": "^0.5.1",
     "mocha": "latest",
     "nyc": "latest",
     "typescript": "^3.2.2",
-    "typescript-eslint-parser": "^21.0.2",
     "webpack": "^4.28.1",
     "webpack-cli": "^3.1.2"
   },
   "babel": {
     "presets": [
       "@babel/typescript",
-      ["@babel/preset-env", {"modules": "commonjs", "targets": {"node": "current"}}]
+      [
+        "@babel/preset-env",
+        {
+          "modules": "commonjs",
+          "targets": {
+            "node": "current"
+          }
+        }
+      ]
     ],
     "plugins": [
       "@babel/proposal-class-properties",
@@ -74,29 +82,53 @@
     ]
   },
   "eslintConfig": {
-    "extends": "eslint:recommended",
-    "parser": "typescript-eslint-parser",
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
       "ecmaVersion": 6,
       "sourceType": "module",
-      "ecmaFeatures": { }
+      "ecmaFeatures": {}
     },
     "plugins": [
-      "typescript"
+      "@typescript-eslint"
     ],
     "rules": {
+      "indent": "off",
       "no-console": "warn",
-      "no-control-regex": ["off"],
-      "no-undef": ["off"],
-      "no-unused-vars": ["off"],
-      "no-useless-escape": ["off"],
-      "quotes": ["error", "single"],
-      "semi": ["error", "always"],
-      "typescript/class-name-casing": "error",
-      "typescript/explicit-function-return-type": "off",
-      "typescript/no-unused-vars": "error",
-      "typescript/no-use-before-define": "off",
-      "typescript/type-annotation-spacing": "error"
+      "no-control-regex": [
+        "off"
+      ],
+      "no-undef": [
+        "off"
+      ],
+      "no-unused-vars": [
+        "off"
+      ],
+      "no-useless-escape": [
+        "off"
+      ],
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "semi": [
+        "error",
+        "always"
+      ],
+      "@typescript-eslint/class-name-casing": "error",
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/indent": [
+        "error",
+        2
+      ],
+      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/no-use-before-define": "off",
+      "@typescript-eslint/explicit-member-accessibility": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/type-annotation-spacing": "error"
     }
   },
   "nyc": {
