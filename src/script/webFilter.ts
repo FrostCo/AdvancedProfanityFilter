@@ -139,7 +139,7 @@ export default class WebFilter extends Filter {
 
     // Check for advanced mode on current domain
     this.advanced = this.advancedPage();
-    if (this.advanced) { message.advanced = true; }
+    message.advanced = this.advanced; // Set badge color
     chrome.runtime.sendMessage(message);
 
     // Detect if we should mute audio for the current page

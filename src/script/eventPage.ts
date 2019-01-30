@@ -40,10 +40,14 @@ chrome.runtime.onMessage.addListener(
         chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
       }
 
-      if (request.advanced === true) {
-        chrome.browserAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255] }); // Red - Advanced
-      } else if (request.advanced === false) {
-        chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255] }); // Blue - Normal
+      // Set badge color
+      if (request.hasOwnProperty('advanced')) {
+        if (request.advanced) {
+          chrome.browserAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255] }); // Red - Advanced
+        } else {
+          chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255] }); // Blue - Normal
+          // chrome.browserAction.setBadgeBackgroundColor({ color: [85, 85, 85, 255] }); // Grey - Normal
+        }
       }
 
       if (request.mute != undefined) {
