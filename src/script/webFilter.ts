@@ -46,7 +46,7 @@ export default class WebFilter extends Filter {
   advancedReplaceText(node) {
     filter.wordRegExps.forEach((regExp, index) => {
       // @ts-ignore - External library function
-      window.findAndReplaceDOMText(node, {preset: 'prose', find: regExp, replace: function(portion, match) {
+      findAndReplaceDOMText(node, {preset: 'prose', find: regExp, replace: function(portion, match) {
         return filter.replaceText(match[0]);
       }});
     });
@@ -148,7 +148,7 @@ export default class WebFilter extends Filter {
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
-    this.cleanNode(document);
+    this.advanced ? this.advancedReplaceText(document) : this.cleanNode(document);
     this.updateCounterBadge();
     this.observeNewNodes();
   }
