@@ -47,6 +47,7 @@ export default class WebFilter extends Filter {
     filter.wordRegExps.forEach((regExp, index) => {
       // @ts-ignore - External library function
       findAndReplaceDOMText(node, {preset: 'prose', find: regExp, replace: function(portion, match) {
+        // console.log('[APF] Advanced node match:', node.textContent); // DEBUG - Advanced match
         return filter.replaceText(match[0]);
       }});
     });
@@ -97,7 +98,9 @@ export default class WebFilter extends Filter {
     // else { console.log('Forbidden mutation.target node:', mutation.target); } // DEBUG - Mutation target text
   }
 
-  cleanNode(node, mutation: MutationRecord = null) {
+  cleanNode(node) {
+    if (Page.isForbiddenNode(node)) { return false; }
+
     if (node.childElementCount > 0) { // Tree node
       let treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
       while(treeWalker.nextNode()) {
@@ -111,15 +114,15 @@ export default class WebFilter extends Filter {
       }
     } else { // Leaf node
       if (node.nodeName) {
-        if (!Page.isForbiddenNode(node) || node.textContent.trim() != '') {
+        if (node.textContent.trim() != '') {
           let result = this.replaceTextResult(node.textContent);
           if (result.modified) {
-            // console.log('Normal node changed:', result.original, result.filtered); // DEBUG - Mutation node
+            // console.log('[APF] Normal node changed:', result.original, result.filtered); // DEBUG - Mutation node
             node.textContent = result.filtered;
           }
         }
       }
-      // else { console.log('node without nodeName:', node); // Debug
+      // else { console.log('node without nodeName:', node); } // Debug
     }
   }
 
