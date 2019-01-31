@@ -34,18 +34,18 @@ chrome.runtime.onInstalled.addListener(function(details){
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.disabled === true) {
-      chrome.browserAction.setIcon({path: 'img/icon19-disabled.png', tabId: sender.tab.id});
+      chrome.browserAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
     } else {
       if (request.counter) {
-        chrome.browserAction.setBadgeText({text: request.counter, tabId: sender.tab.id});
+        chrome.browserAction.setBadgeText({ text: request.counter, tabId: sender.tab.id });
       }
 
       // Set badge color
       if (request.hasOwnProperty('advanced')) {
         if (request.advanced) {
-          chrome.browserAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255] }); // Red - Advanced
+          chrome.browserAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255], tabId: sender.tab.id }); // Red - Advanced
         } else {
-          chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255] }); // Blue - Normal
+          chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255], tabId: sender.tab.id }); // Blue - Normal
           // chrome.browserAction.setBadgeBackgroundColor({ color: [85, 85, 85, 255] }); // Grey - Normal
         }
       }
