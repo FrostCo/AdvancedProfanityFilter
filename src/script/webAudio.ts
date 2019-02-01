@@ -38,7 +38,7 @@ export default class WebAudio {
           filter.muted = true;
           chrome.runtime.sendMessage({mute: true});
           break;
-        case 1: // Mute video
+        case 1: { // Mute video
           let video = document.getElementsByTagName('video')[0];
           if (video.volume > 0) {
             filter.muted = true;
@@ -46,6 +46,7 @@ export default class WebAudio {
             video.volume = 0;
           }
           break;
+        }
       }
     }
   }
@@ -81,13 +82,14 @@ export default class WebAudio {
           filter.muted = false;
           chrome.runtime.sendMessage({mute: false});
           break;
-        case 1: // Mute video
+        case 1: { // Mute video
           let video = document.getElementsByTagName('video')[0];
           if (video.volume == 0) {
             filter.muted = false;
             video.volume = filter.volume;
           }
           break;
+        }
       }
     }
   }
