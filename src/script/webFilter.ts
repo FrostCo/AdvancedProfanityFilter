@@ -3,13 +3,14 @@ import {Filter} from './lib/filter';
 import Page from './page';
 import WebAudio from './webAudio';
 import WebConfig from './webConfig';
+import './vendor/findAndReplaceDOMText';
 
 interface Message {
-  advanced?: boolean,
-  counter?: number,
-  disabled?: boolean,
-  mute?: boolean,
-  summary?: object
+  advanced?: boolean;
+  counter?: number;
+  disabled?: boolean;
+  mute?: boolean;
+  summary?: object;
 }
 
 export default class WebFilter extends Filter {
@@ -34,7 +35,7 @@ export default class WebFilter extends Filter {
     return Domain.domainMatch(this.hostname, this.cfg.advancedDomains);
   }
 
-  advancedReplaceText(string: string) {
+  replaceTextResult(string: string, stats: boolean = true) {
     let result = {} as any;
     result.original = string;
     result.filtered = filter.replaceText(string);
@@ -42,48 +43,86 @@ export default class WebFilter extends Filter {
     return result;
   }
 
-  checkMutationTargetTextForProfanity(mutation) {
-    // console.count('checkMutationTargetTextForProfanity'); // Benchmarking - Executaion Count
-    // console.log('Process mutation.target:', mutation.target, mutation.target.data); // DEBUG - Mutation target text
-    var replacement;
-    if (!Page.isForbiddenNode(mutation.target)) {
-      replacement = this.replaceText(mutation.target.data);
-      if (replacement != mutation.target.data) {
-        // console.log("Mutation target text changed:", mutation.target.data, replacement); // DEBUG - Mutation target text
-        mutation.target.data = replacement;
-      }
-    }
-    // else { console.log('Forbidden mutation.target node:', mutation.target); } // DEBUG - Mutation target text
+  advancedReplaceText(node) {
+    filter.wordRegExps.forEach((regExp) => {
+      // @ts-ignore - External library function
+      findAndReplaceDOMText(node, {preset: 'prose', find: regExp, replace: function(portion, match) {
+        // console.log('[APF] Advanced node match:', node.textContent); // DEBUG - Advanced match
+        return filter.replaceText(match[0]);
+      }});
+    });
   }
 
-  checkNodeForProfanity(mutation) {
-    // console.count('checkNodeForProfanity'); // Benchmarking - Executaion Count
-    // console.log('Mutation observed:', mutation); // DEBUG - Mutation addedNodes
-    mutation.addedNodes.forEach(function(node) {
-      // console.log('Added node(s):', node); // DEBUG - Mutation addedNodes
-
+  checkMutationForProfanity(mutation) {
+    // console.count('checkMutationForProfanity'); // Benchmarking - Mutation
+    // console.log('Mutation observed:', mutation); // DEBUG - Mutation
+    mutation.addedNodes.forEach(node => {
       if (!Page.isForbiddenNode(node)) {
+        // console.log('Added node(s):', node); // DEBUG - Mutation - addedNodes
         if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
           WebAudio.clean(filter, node, filter.subtitleSelector);
         } else {
-          // console.log('Node to removeProfanity', node); // DEBUG - Mutation addedNodes
-          filter.removeProfanity(Page.xpathNodeText, node);
+          // console.log('Added node to filter', node); // DEBUG - Mutation addedNodes
+          if (filter.advanced && node.parentNode) {
+            filter.advancedReplaceText(node);
+          } else {
+            filter.cleanNode(node);
+          }
         }
       }
       // else { console.log('Forbidden node:', node); } // DEBUG - Mutation addedNodes
     });
 
-    mutation.removedNodes.forEach(function(removedNode) {
-      if (!Page.isForbiddenNode(removedNode)) {
-        if (filter.mutePage && WebAudio.supportedNode(filter.hostname, removedNode)) {
-          WebAudio.unmute(filter);
-        }
+    mutation.removedNodes.forEach(node => {
+      if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
+        WebAudio.unmute(filter);
       }
     });
 
     // Only process mutation change if target is text
     if (mutation.target && mutation.target.nodeName == '#text') {
       filter.checkMutationTargetTextForProfanity(mutation);
+    }
+  }
+
+  checkMutationTargetTextForProfanity(mutation) {
+    // console.count('checkMutationTargetTextForProfanity'); // Benchmarking - Executaion Count
+    // console.log('Process mutation.target:', mutation.target, mutation.target.data); // DEBUG - Mutation target text
+    if (!Page.isForbiddenNode(mutation.target)) {
+      let result = this.replaceTextResult(mutation.target.data);
+      if (result.modified) {
+        // console.log('Text target changed:', result.original, result.filtered); // DEBUG - Mutation target text
+        mutation.target.data = result.filtered;
+      }
+    }
+    // else { console.log('Forbidden mutation.target node:', mutation.target); } // DEBUG - Mutation target text
+  }
+
+  cleanNode(node) {
+    if (Page.isForbiddenNode(node)) { return false; }
+
+    if (node.childElementCount > 0) { // Tree node
+      let treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+      while(treeWalker.nextNode()) {
+        if (treeWalker.currentNode.childNodes.length > 0) {
+          treeWalker.currentNode.childNodes.forEach(childNode => {
+            this.cleanNode(childNode);
+          });
+        } else {
+          this.cleanNode(treeWalker.currentNode);
+        }
+      }
+    } else { // Leaf node
+      if (node.nodeName) {
+        if (node.textContent.trim() != '') {
+          let result = this.replaceTextResult(node.textContent);
+          if (result.modified) {
+            // console.log('[APF] Normal node changed:', result.original, result.filtered); // DEBUG - Mutation node
+            node.textContent = result.filtered;
+          }
+        }
+      }
+      // else { console.log('node without nodeName:', node); } // Debug
     }
   }
 
@@ -95,7 +134,7 @@ export default class WebFilter extends Filter {
     this.hostname = (window.location == window.parent.location) ? document.location.hostname : new URL(document.referrer).hostname;
 
     // Check if the topmost frame is a disabled domain
-    let message = { disabled: this.disabledPage() } as Message;
+    let message: Message = { disabled: this.disabledPage() };
     if (message.disabled) {
       chrome.runtime.sendMessage(message);
       return false;
@@ -103,7 +142,7 @@ export default class WebFilter extends Filter {
 
     // Check for advanced mode on current domain
     this.advanced = this.advancedPage();
-    if (this.advanced) { message.advanced = true; }
+    message.advanced = this.advanced; // Set badge color
     chrome.runtime.sendMessage(message);
 
     // Detect if we should mute audio for the current page
@@ -112,14 +151,13 @@ export default class WebFilter extends Filter {
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
-    this.removeProfanity(Page.xpathDocText, document);
+    this.advanced ? this.advancedReplaceText(document) : this.cleanNode(document);
     this.updateCounterBadge();
     this.observeNewNodes();
   }
 
   // Always use the top frame for page check
   disabledPage(): boolean {
-    // console.count('disabledPage'); // Benchmarking - Executaion Count
     return Domain.domainMatch(this.hostname, this.cfg.disabledDomains);
   }
 
@@ -134,65 +172,24 @@ export default class WebFilter extends Filter {
     }
   }
 
-  // Watch for new text nodes and clean them as they are added
   observeNewNodes() {
     let self = this;
     let observerConfig = {
       characterData: true,
+      characterDataOldValue: true,
       childList: true,
-      subtree: true
+      subtree: true,
     };
 
-    // When DOM is modified, remove profanity from inserted node
+    // When DOM is modified, check for nodes to filter
     let observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
-        self.checkNodeForProfanity(mutation);
+        self.checkMutationForProfanity(mutation);
       });
       self.updateCounterBadge();
     });
 
-    // Remove profanity from new objects
     observer.observe(document, observerConfig);
-  }
-
-  removeProfanity(xpathExpression: string, node: any) {
-    // console.count('removeProfanity'); // Benchmarking - Executaion Count
-    let evalResult = document.evaluate(
-      xpathExpression,
-      node,
-      null,
-      XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
-      null
-    );
-
-    if (evalResult.snapshotLength == 0) { // If plaintext node
-      if (node.data) {
-        // Don't mess with tags, styles, or URIs
-        if (!Page.forbiddenNodeRegExp.test(node.data)) {
-          // console.log('Plaintext:', node.data); // DEBUG
-          node.data = this.replaceText(node.data);
-        }
-        // else { console.log('Skipping plaintext (protected pattern):', node.data); } // DEBUG
-      } else { // No matches, no node.data
-        if (this.advanced) {
-          // console.log('Advanced mode:', evalResult, node.textContent); // DEBUG - Advanced
-          var replacement;
-          if (node.textContent) {
-            replacement = this.replaceText(node.textContent);
-            if (replacement != node.textContent) {
-              // console.log('Advanced replacement with no data:', replacement); // DEBUG - Advanced
-              node.textContent = replacement;
-            }
-          }
-        }
-      }
-    } else { // If evalResult matches
-      for (let i = 0; i < evalResult.snapshotLength; i++) {
-        var item = evalResult.snapshotItem(i) as any;
-        // console.log('Normal cleaning:', item.data); // DEBUG
-        item.data = this.replaceText(item.data);
-      }
-    }
   }
 
   updateCounterBadge() {

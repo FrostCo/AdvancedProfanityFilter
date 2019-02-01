@@ -2,14 +2,14 @@ import Config from './lib/config';
 
 export default class WebConfig extends Config {
   static async build(keys?: string[]) {
-    let async_result = await WebConfig.getConfig(keys);
-    let instance = new WebConfig(async_result);
+    let asyncResult = await WebConfig.getConfig(keys);
+    let instance = new WebConfig(asyncResult);
     return instance;
   }
 
   // Call build() to create a new instance
-  constructor(async_param) {
-    super(async_param);
+  constructor(asyncParam) {
+    super(asyncParam);
   }
 
   // Compile words

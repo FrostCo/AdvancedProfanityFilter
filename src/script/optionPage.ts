@@ -53,7 +53,7 @@ export default class OptionPage {
       element.setCustomValidity('');
     } catch(e) {
       // If HTML5 validation not supported, the modal will suffice
-     }
+    }
   }
 
   static hideStatus() {
@@ -79,7 +79,7 @@ export default class OptionPage {
     OptionPage.openModal('statusModal');
   }
 
- static showInputError(element, message = '') {
+  static showInputError(element, message = '') {
     element.classList.add('w3-border-red');
     if (message) {
       try {
