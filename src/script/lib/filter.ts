@@ -20,60 +20,53 @@ export class Filter {
   // Parse the profanity list
   // ["exact", "partial", "whole", "disabled"]
   generateRegexpList() {
-    // Clean wordRegExps if there are already some present
-    if (this.wordRegExps.length > 0) this.wordRegExps = [];
+    let self = this;
+    self.wordRegExps = [];
 
     // console.time('generateRegexpList'); // Benchmark - Call Time
     // console.count('generateRegexpList: words to filter'); // Benchmarking - Executaion Count
-    if (this.cfg.filterMethod == 2) { // Special regexp for "Remove" filter, uses per-word matchMethods
-      for (let x = 0; x < this.wordList.length; x++) {
-        let repeat = this.cfg.repeatForWord(this.wordList[x]);
-        if (this.cfg.words[this.wordList[x]].matchMethod == 0) { // If word matchMethod is exact
-          this.wordRegExps.push(Word.buildRegexpForRemoveExact(this.wordList[x], repeat));
-        } else if (this.cfg.words[this.wordList[x]].matchMethod == 4) { // If word matchMethod is RegExp
-          this.wordRegExps.push(new RegExp(this.wordList[x], 'gi'));
+    if (self.cfg.filterMethod == 2) { // Special regexp for "Remove" filter, uses per-word matchMethods
+      self.wordList.forEach(word => {
+        let repeat = self.cfg.repeatForWord(word);
+
+        if (self.cfg.words[word].matchMethod == 0) { // If word matchMethod is exact
+          self.wordRegExps.push(Word.buildRegexpForRemoveExact(word, repeat));
+        } else if (self.cfg.words[word].matchMethod == 4) { // If word matchMethod is RegExp
+          self.wordRegExps.push(new RegExp(word, 'gi'));
         } else {
-          this.wordRegExps.push(Word.buildRegexpForRemovePart(this.wordList[x], repeat));
+          self.wordRegExps.push(Word.buildRegexpForRemovePart(word, repeat));
         }
-      }
+      });
     } else {
-      switch(this.cfg.globalMatchMethod) {
+      switch(self.cfg.globalMatchMethod) {
         case 0: // Global: Exact match
-          for (let x = 0; x < this.wordList.length; x++) {
-            let repeat = this.cfg.repeatForWord(this.wordList[x]);
-            this.wordRegExps.push(Word.buildExactRegexp(this.wordList[x], repeat));
-          }
+          self.wordList.forEach(word => {
+            let repeat = self.cfg.repeatForWord(word);
+            self.wordRegExps.push(Word.buildExactRegexp(word, repeat));
+          });
           break;
         case 2: // Global: Whole word match
-          for (let x = 0; x < this.wordList.length; x++) {
-            let repeat = this.cfg.repeatForWord(this.wordList[x]);
-            this.wordRegExps.push(Word.buildWholeRegexp(this.wordList[x], repeat));
-          }
+          self.wordList.forEach(word => {
+            let repeat = self.cfg.repeatForWord(word);
+            self.wordRegExps.push(Word.buildWholeRegexp(word, repeat));
+          });
           break;
         case 3: // Per-word matching
-          for (let x = 0; x < this.wordList.length; x++) {
-            let repeat = this.cfg.repeatForWord(this.wordList[x]);
-            switch(this.cfg.words[this.wordList[x]].matchMethod) {
-              case 0: // Exact match
-                this.wordRegExps.push(Word.buildExactRegexp(this.wordList[x], repeat));
-                break;
-              case 2: // Whole word match
-                this.wordRegExps.push(Word.buildWholeRegexp(this.wordList[x], repeat));
-                break;
-              case 4: // Regular Expression (Advanced)
-                this.wordRegExps.push(new RegExp(this.wordList[x], 'gi'));
-                break;
-              default: // case 1 - Partial word match (Default)
-              this.wordRegExps.push(Word.buildPartRegexp(this.wordList[x], repeat));
-                break;
+          self.wordList.forEach(word => {
+            let repeat = self.cfg.repeatForWord(word);
+            switch(self.cfg.words[word].matchMethod) {
+              case 0: self.wordRegExps.push(Word.buildExactRegexp(word, repeat)); break; // Exact match
+              case 2: self.wordRegExps.push(Word.buildWholeRegexp(word, repeat)); break; // Whole word match
+              case 4: self.wordRegExps.push(new RegExp(word, 'gi')); break; // Regular Expression (Advanced)
+              default: self.wordRegExps.push(Word.buildPartRegexp(word, repeat)); break; // case 1 - Partial word match (Default)
             }
-          }
+          });
           break;
         default: // case 1 - Global: Partial word match (Default)
-          for (let x = 0; x < this.wordList.length; x++) {
-            let repeat = this.cfg.repeatForWord(this.wordList[x]);
-            this.wordRegExps.push(Word.buildPartRegexp(this.wordList[x], repeat));
-          }
+          self.wordList.forEach(word => {
+            let repeat = self.cfg.repeatForWord(word);
+            self.wordRegExps.push(Word.buildPartRegexp(word, repeat));
+          });
           break;
       }
     }
@@ -83,10 +76,8 @@ export class Filter {
   // Sort the words array by longest (most-specific) first
   // Config Dependencies: words
   generateWordList() {
-    // Clean wordRegExps if there are already some present
-    if (this.wordList.length > 0) this.wordList = null;
-
-    this.wordList = Object.keys(this.cfg.words).sort(function(a, b) {
+    this.wordList = null;
+    this.wordList = Object.keys(this.cfg.words).sort((a, b) => {
       return b.length - a.length;
     });
   }
@@ -94,15 +85,15 @@ export class Filter {
   // Config Dependencies: filterMethod, wordList,
   // censorFixedLength, preserveFirst, preserveLast, censorCharacter
   // words, defaultSubstitution, preserveCase
-  replaceText(str: string, stats = true): string {
+  replaceText(str: string, stats: boolean = true): string {
     // console.count('replaceText'); // Benchmarking - Executaion Count
     let self = this;
     switch(self.cfg.filterMethod) {
       case 0: // Censor
-        for (let z = 0; z < self.wordList.length; z++) {
-          str = str.replace(self.wordRegExps[z], function(match, arg1, arg2, arg3, arg4, arg5): string {
-            if (stats) { self.foundMatch(self.wordList[z]); }
-            if (self.wordRegExps[z].unicode) { match = arg2; } // Workaround for unicode word boundaries
+        self.wordRegExps.forEach((regExp, index) => {
+          str = str.replace(regExp, function(match, arg1, arg2, arg3, arg4, arg5): string {
+            if (stats) { self.foundMatch(self.wordList[index]); }
+            if (regExp.unicode) { match = arg2; } // Workaround for unicode word boundaries
             let censoredString = '';
             let censorLength = self.cfg.censorFixedLength > 0 ? self.cfg.censorFixedLength : match.length;
 
@@ -116,19 +107,18 @@ export class Filter {
               censoredString = self.cfg.censorCharacter.repeat(censorLength);
             }
 
-            if (self.wordRegExps[z].unicode) { censoredString = arg1 + censoredString + arg3; } // Workaround for unicode word boundaries
+            if (regExp.unicode) { censoredString = arg1 + censoredString + arg3; } // Workaround for unicode word boundaries
             // console.log('Censor match:', match, censoredString); // DEBUG
             return censoredString;
           });
-        }
+        });
         break;
       case 1: // Substitute
-        for (let z = 0; z < self.wordList.length; z++) {
-          str = str.replace(self.wordRegExps[z], function(match, arg1, arg2, arg3, arg4, arg5): string {
-            // console.log('Substitute match:', match, self.cfg.words[self.wordList[z]].words); // DEBUG
-            if (stats) { self.foundMatch(self.wordList[z]); }
-            if (self.wordRegExps[z].unicode) { match = arg2; } // Workaround for unicode word boundaries
-            let sub = self.cfg.words[self.wordList[z]].sub || self.cfg.defaultSubstitution;
+        self.wordRegExps.forEach((regExp, index) => {
+          str = str.replace(regExp, function(match, arg1, arg2, arg3, arg4, arg5): string {
+            if (stats) { self.foundMatch(self.wordList[index]); }
+            if (regExp.unicode) { match = arg2; } // Workaround for unicode word boundaries
+            let sub = self.cfg.words[self.wordList[index]].sub || self.cfg.defaultSubstitution;
 
             // Make substitution match case of original match
             if (self.cfg.preserveCase) {
@@ -143,18 +133,18 @@ export class Filter {
               sub = '[' + sub + ']';
             }
 
-            if (self.wordRegExps[z].unicode) { sub = arg1 + sub + arg3; } // Workaround for unicode word boundaries
+            if (regExp.unicode) { sub = arg1 + sub + arg3; } // Workaround for unicode word boundaries
+            // console.log('Substitute match:', match, sub); // DEBUG
             return sub;
           });
-        }
+        });
         break;
       case 2: // Remove
-        for (let z = 0; z < self.wordList.length; z++) {
-          str = str.replace(self.wordRegExps[z], function(match, arg1, arg2, arg3, arg4, arg5): string {
-            // console.log('Remove match:', match, self.cfg.words[self.wordList[z]].words); // DEBUG
+        self.wordRegExps.forEach((regExp, index) => {
+          str = str.replace(regExp, function(match, arg1, arg2, arg3, arg4, arg5): string {
             // console.log('\nmatch: ', match, '\narg1: ', arg1, '\narg2: ', arg2, '\narg3: ', arg3, '\narg4: ', arg4, '\narg5: ', arg5); // DEBUG
-            if (stats) { self.foundMatch(self.wordList[z]); }
-            if (self.wordRegExps[z].unicode) {
+            if (stats) { self.foundMatch(self.wordList[index]); }
+            if (regExp.unicode) {
               // Workaround for unicode word boundaries
               if (Word.whitespaceRegExp.test(arg1) && Word.whitespaceRegExp.test(arg3)) { // If both surrounds are whitespace (only need 1)
                 return arg1;
@@ -165,17 +155,18 @@ export class Filter {
               }
             } else {
               // Don't remove both leading and trailing whitespace
-              // console.log('Remove match:', match); // DEBUG
               if (Word.whitespaceRegExp.test(match[0]) && Word.whitespaceRegExp.test(match[match.length - 1])) {
                 return match[0];
               } else {
+                // console.log('Remove match:', match); // DEBUG
                 return '';
               }
             }
           });
-        }
+        });
         break;
     }
+
     return str;
   }
 

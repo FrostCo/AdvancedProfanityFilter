@@ -13,7 +13,7 @@ export default class WebAudio {
 
     // Process subtitles
     subtitles.forEach(subtitle => {
-      let result = filter.advancedReplaceText(subtitle.innerText);
+      let result = filter.replaceTextResult(subtitle.innerText);
       if (result.modified) {
         filtered = true;
         subtitle.innerText = result.filtered;

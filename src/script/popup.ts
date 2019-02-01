@@ -6,7 +6,7 @@ interface Summary {
   [word: string]: {
     clean: string;
     count: number;
-  }
+  };
 }
 
 class Popup {
