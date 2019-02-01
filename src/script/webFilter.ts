@@ -6,11 +6,11 @@ import WebConfig from './webConfig';
 import './vendor/findAndReplaceDOMText';
 
 interface Message {
-  advanced?: boolean,
-  counter?: number,
-  disabled?: boolean,
-  mute?: boolean,
-  summary?: object
+  advanced?: boolean;
+  counter?: number;
+  disabled?: boolean;
+  mute?: boolean;
+  summary?: object;
 }
 
 export default class WebFilter extends Filter {
@@ -44,7 +44,7 @@ export default class WebFilter extends Filter {
   }
 
   advancedReplaceText(node) {
-    filter.wordRegExps.forEach((regExp, index) => {
+    filter.wordRegExps.forEach((regExp) => {
       // @ts-ignore - External library function
       findAndReplaceDOMText(node, {preset: 'prose', find: regExp, replace: function(portion, match) {
         // console.log('[APF] Advanced node match:', node.textContent); // DEBUG - Advanced match
@@ -134,7 +134,7 @@ export default class WebFilter extends Filter {
     this.hostname = (window.location == window.parent.location) ? document.location.hostname : new URL(document.referrer).hostname;
 
     // Check if the topmost frame is a disabled domain
-    let message = { disabled: this.disabledPage() } as Message;
+    let message: Message = { disabled: this.disabledPage() };
     if (message.disabled) {
       chrome.runtime.sendMessage(message);
       return false;

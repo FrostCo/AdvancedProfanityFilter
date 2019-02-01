@@ -124,7 +124,13 @@
         "error",
         2
       ],
-      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "vars": "all",
+          "args": "none"
+        }
+      ],
       "@typescript-eslint/no-use-before-define": "off",
       "@typescript-eslint/explicit-member-accessibility": "off",
       "@typescript-eslint/no-explicit-any": "off",
