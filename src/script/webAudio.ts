@@ -35,7 +35,7 @@ export default class WebAudio {
     if (!filter.muted) {
       filter.muted = true;
 
-      switch(filter.cfg.filterAudioMethod) {
+      switch(filter.cfg.muteMethod) {
         case 0: // Mute tab
           chrome.runtime.sendMessage({ mute: true });
           break;
@@ -49,6 +49,10 @@ export default class WebAudio {
         }
       }
     }
+  }
+
+  static playing(video: HTMLMediaElement): boolean {
+    return !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
 
   static subtitleSelector(hostname: string): string {
@@ -79,7 +83,7 @@ export default class WebAudio {
     if (filter.muted) {
       filter.muted = false;
 
-      switch(filter.cfg.filterAudioMethod) {
+      switch(filter.cfg.muteMethod) {
         case 0: // Mute tab
           chrome.runtime.sendMessage({ mute: false });
           break;
