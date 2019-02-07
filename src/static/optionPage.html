@@ -247,15 +247,44 @@
       <li>Turn on subtitles for the video</li>
     </ol>
 
+    <h4 class="sectionHeader">Mute Method</h4>
+    <div id="audioMuteMethod">
+      <label>
+        <input id="audioMuteMethodTab" type="radio" class="w3-radio" name="audioMuteMethod" value="0">
+        Browser Tab
+      </label>
+
+      <br>
+      <label>
+        <input id="audioMuteMethodVideo" type="radio" class="w3-radio" name="audioMuteMethod" value="1">
+        Video Volume
+      </label>
+    </div>
+
     <h4 class="sectionHeader">Subtitles</h4>
     <div id="audioSubtitleSelection">
-      <label><input id="audioShowAllSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="0">Show all</label>
+      <label>
+        <input id="audioShowAllSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="0">
+        Show all
+      </label>
+
       <br>
-      <label><input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="1">Show only filtered</label>
+      <label>
+        <input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="1">
+        Show only filtered
+      </label>
+
       <br>
-      <label><input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="2">Show only unfiltered</label>
+      <label>
+        <input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="2">
+        Show only unfiltered
+      </label>
+
       <br>
-      <label><input id="audioHideSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="3">Hide all</label>
+      <label>
+        <input id="audioHideSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="3">
+        Hide all
+      </label>
     </div>
   </div>
 </div>
@@ -360,7 +389,12 @@
     <h1 id="audio-experimental-">Audio (Experimental)</h1>
     <p>This feature mutes the audio when a filtered word is detected in the subtitles/captions on a supported website. This is very experimental at this point, and its effectiveness is completely dependent on the quality of the subtitles accompanying the video. For more information, please see the <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio">Audio wiki</a>.</p>
     <ul>
-    <li><strong>Mute tab audio on supported video sites</strong> - Enables the feature. Without this on audio filtering will occur.</li>
+    <li><strong>Mute audio on supported video sites</strong> - Enables the feature. Without this no audio filtering will occur.</li>
+    <li><strong>Mute Method</strong> - Controls which method to use for muting audio<ul>
+    <li>Browser Tab - Disables all audio from the current browser tab</li>
+    <li>Video Volume - Changes the video volume to 0 when necessary</li>
+    </ul>
+    </li>
     <li><strong>Subtitles</strong> - Controls which subtitles will be visible.<ul>
     <li>Show all subtitles (<em>default</em>)</li>
     <li>Show only filtered subtitles - Least distracting</li>

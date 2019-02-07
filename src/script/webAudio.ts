@@ -32,10 +32,27 @@ export default class WebAudio {
   }
 
   static mute(filter) {
-    if (filter.muted === false) {
+    if (!filter.muted) {
       filter.muted = true;
-      chrome.runtime.sendMessage({mute: true});
+
+      switch(filter.cfg.muteMethod) {
+        case 0: // Mute tab
+          chrome.runtime.sendMessage({ mute: true });
+          break;
+        case 1: { // Mute video
+          let video = document.getElementsByTagName('video')[0];
+          if (video && video.hasOwnProperty('volume')) {
+            filter.volume = video.volume; // Save original volume
+            video.volume = 0;
+          }
+          break;
+        }
+      }
     }
+  }
+
+  static playing(video: HTMLMediaElement): boolean {
+    return !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
 
   static subtitleSelector(hostname: string): string {
@@ -63,9 +80,21 @@ export default class WebAudio {
   }
 
   static unmute(filter) {
-    if (filter.muted === true) {
+    if (filter.muted) {
       filter.muted = false;
-      chrome.runtime.sendMessage({mute: false});
+
+      switch(filter.cfg.muteMethod) {
+        case 0: // Mute tab
+          chrome.runtime.sendMessage({ mute: false });
+          break;
+        case 1: { // Mute video
+          let video = document.getElementsByTagName('video')[0];
+          if (video && video.hasOwnProperty('volume')) {
+            video.volume = filter.volume;
+          }
+          break;
+        }
+      }
     }
   }
 }

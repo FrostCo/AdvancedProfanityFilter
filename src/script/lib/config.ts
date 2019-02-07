@@ -16,6 +16,7 @@ export default class Config {
   filterWordList: boolean;
   globalMatchMethod: number;
   muteAudio: boolean;
+  muteMethod: number;
   password: string;
   preserveCase: boolean;
   preserveFirst: boolean;
@@ -54,7 +55,8 @@ export default class Config {
     filterMethod: 0, // ['Censor', 'Substitute', 'Remove'];
     filterWordList: true,
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
-    muteAudio: false,
+    muteAudio: false, // Filter audio
+    muteMethod: 0, // 0: Mute Tab, 1: Video Volume
     password: null,
     preserveCase: true,
     preserveFirst: true,
