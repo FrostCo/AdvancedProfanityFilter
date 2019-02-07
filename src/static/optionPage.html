@@ -389,7 +389,12 @@
     <h1 id="audio-experimental-">Audio (Experimental)</h1>
     <p>This feature mutes the audio when a filtered word is detected in the subtitles/captions on a supported website. This is very experimental at this point, and its effectiveness is completely dependent on the quality of the subtitles accompanying the video. For more information, please see the <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio">Audio wiki</a>.</p>
     <ul>
-    <li><strong>Mute tab audio on supported video sites</strong> - Enables the feature. Without this on audio filtering will occur.</li>
+    <li><strong>Mute audio on supported video sites</strong> - Enables the feature. Without this no audio filtering will occur.</li>
+    <li><strong>Mute Method</strong> - Controls which method to use for muting audio<ul>
+    <li>Browser Tab - Disables all audio from the current browser tab</li>
+    <li>Video Volume - Changes the video volume to 0 when necessary</li>
+    </ul>
+    </li>
     <li><strong>Subtitles</strong> - Controls which subtitles will be visible.<ul>
     <li>Show all subtitles (<em>default</em>)</li>
     <li>Show only filtered subtitles - Least distracting</li>
