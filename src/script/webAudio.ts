@@ -41,7 +41,7 @@ export default class WebAudio {
           break;
         case 1: { // Mute video
           let video = document.getElementsByTagName('video')[0];
-          if (video && video.hasOwnProperty('volume')) {
+          if (video && video.volume != null) {
             filter.volume = video.volume; // Save original volume
             video.volume = 0;
           }
@@ -89,7 +89,7 @@ export default class WebAudio {
           break;
         case 1: { // Mute video
           let video = document.getElementsByTagName('video')[0];
-          if (video && video.hasOwnProperty('volume')) {
+          if (video && video.volume != null) {
             video.volume = filter.volume;
           }
           break;
