@@ -61,7 +61,7 @@ export default class WebFilter extends Filter {
     mutation.addedNodes.forEach(node => {
       if (!Page.isForbiddenNode(node)) {
         // console.log('Added node(s):', node); // DEBUG - Mutation - addedNodes
-        if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
+        if (filter.mutePage && (WebAudio.supportedNode(filter.hostname, node) || WebAudio.supportedNodeYouTubeAutoGen(filter.hostname, node))) {
           WebAudio.clean(filter, node, filter.subtitleSelector);
         } else {
           // console.log('Added node to filter', node); // DEBUG - Mutation addedNodes

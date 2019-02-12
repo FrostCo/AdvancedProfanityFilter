@@ -8,6 +8,11 @@ export default class WebAudio {
   }
 
   static clean(filter, subtitleContainer, subSelector) {
+    if (filter.hostname == 'www.youtube.com' && subtitleContainer.nodeName == '#text') { // YouTube Auto-gen subs
+      WebAudio.cleanYouTubeAutoGen(filter, subtitleContainer);
+      return true;
+    }
+
     let filtered = false;
     let subtitles = subtitleContainer.querySelectorAll(subSelector);
 
@@ -26,6 +31,20 @@ export default class WebAudio {
       case 1: if (!filtered) { subtitles.forEach(subtitle => { subtitle.innerText = ''; }); } break;
       case 2: if (filtered) { subtitles.forEach(subtitle => { subtitle.innerText = ''; }); } break;
       case 3: subtitles.forEach(subtitle => { subtitle.innerText = ''; }); break;
+    }
+
+    if (filtered) { filter.updateCounterBadge(); } // Update if modified
+  }
+
+  static cleanYouTubeAutoGen(filter, node) {
+    let filtered = false;
+    let result = filter.replaceTextResult(node.textContent);
+    if (result.modified) {
+      filtered = true;
+      node.textContent = result.filtered;
+      WebAudio.mute(filter); // Mute the audio if we haven't already
+    } else {
+      WebAudio.unmute(filter);
     }
 
     if (filtered) { filter.updateCounterBadge(); } // Update if modified
@@ -71,6 +90,16 @@ export default class WebAudio {
         return !!(node.tagName == 'DIV' && node.querySelectorAll('span.subtitles').length > 0);
       case 'www.youtube.com':
         return !!(node.tagName == 'DIV' && node.className.includes('caption-window') && node.querySelectorAll('span.captions-text span span.caption-visual-line').length > 0);
+    }
+    return false;
+  }
+
+  static supportedNodeYouTubeAutoGen(hostname: string, node: any): boolean {
+    if (hostname == 'www.youtube.com' && node.nodeName == '#text' && node.textContent != '') {
+      let captionWindow = document.querySelectorAll('div.caption-window')[0];
+      if (captionWindow && captionWindow.contains(node)) {
+        return !!(document.querySelectorAll('div.caption-window')[0].contains(node)); // YouTube Auto-gen subs
+      }
     }
     return false;
   }
