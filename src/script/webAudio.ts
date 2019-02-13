@@ -7,7 +7,7 @@ export default class WebAudio {
     'www.youtube.com': 'span.caption-visual-line'
   }
 
-  static clean(filter, subtitleContainer, subSelector) {
+  static clean(filter, subtitleContainer, subSelector): void {
     let filtered = false;
     let subtitles = subtitleContainer.querySelectorAll(subSelector);
 
@@ -31,7 +31,7 @@ export default class WebAudio {
     if (filtered) { filter.updateCounterBadge(); } // Update if modified
   }
 
-  static cleanYouTubeAutoSubs(filter, node) {
+  static cleanYouTubeAutoSubs(filter, node): void {
     let filtered = false;
     let result = filter.replaceTextResult(node.textContent);
     if (result.modified) {
@@ -45,7 +45,7 @@ export default class WebAudio {
     if (filtered) { filter.updateCounterBadge(); } // Update if modified
   }
 
-  static mute(filter) {
+  static mute(filter): void {
     if (!filter.muted) {
       filter.muted = true;
 
@@ -93,7 +93,7 @@ export default class WebAudio {
     return Object.keys(WebAudio.subtitleSelectors);
   }
 
-  static unmute(filter) {
+  static unmute(filter): void {
     if (filter.muted) {
       filter.muted = false;
 
