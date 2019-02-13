@@ -8,11 +8,6 @@ export default class WebAudio {
   }
 
   static clean(filter, subtitleContainer, subSelector) {
-    if (filter.hostname == 'www.youtube.com' && subtitleContainer.nodeName == '#text') { // YouTube Auto-gen subs
-      WebAudio.cleanYouTubeAutoGen(filter, subtitleContainer);
-      return true;
-    }
-
     let filtered = false;
     let subtitles = subtitleContainer.querySelectorAll(subSelector);
 
@@ -36,7 +31,7 @@ export default class WebAudio {
     if (filtered) { filter.updateCounterBadge(); } // Update if modified
   }
 
-  static cleanYouTubeAutoGen(filter, node) {
+  static cleanYouTubeAutoSubs(filter, node) {
     let filtered = false;
     let result = filter.replaceTextResult(node.textContent);
     if (result.modified) {
@@ -94,16 +89,6 @@ export default class WebAudio {
     return false;
   }
 
-  static supportedNodeYouTubeAutoGen(hostname: string, node: any): boolean {
-    if (hostname == 'www.youtube.com' && node.nodeName == '#text' && node.textContent != '') {
-      let captionWindow = document.querySelectorAll('div.caption-window')[0];
-      if (captionWindow && captionWindow.contains(node)) {
-        return !!(document.querySelectorAll('div.caption-window')[0].contains(node)); // YouTube Auto-gen subs
-      }
-    }
-    return false;
-  }
-
   static supportedPages(): string[] {
     return Object.keys(WebAudio.subtitleSelectors);
   }
@@ -125,5 +110,21 @@ export default class WebAudio {
         }
       }
     }
+  }
+
+  static youTubeAutoSubsContainer(node): boolean {
+    let captionWindow = document.querySelectorAll('div.caption-window')[0]; // YouTube Auto-gen subs
+    return !!(captionWindow && captionWindow.contains(node));
+  }
+
+  static youTubeAutoSubsPresent(filter): boolean {
+    return !!(filter.hostname == 'www.youtube.com' && document.querySelectorAll('div.ytp-caption-window-rollup')[0]);
+  }
+
+  static youTubeAutoSubsSupportedNode(hostname: string, node: any): boolean {
+    if (hostname == 'www.youtube.com' && node.nodeName == '#text' && node.textContent != '') {
+      return !!(WebAudio.youTubeAutoSubsContainer(node));
+    }
+    return false;
   }
 }
