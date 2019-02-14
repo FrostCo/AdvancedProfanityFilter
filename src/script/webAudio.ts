@@ -37,7 +37,7 @@ export default class WebAudio {
     if (result.modified) {
       filtered = true;
       node.textContent = result.filtered;
-      WebAudio.mute(filter); // Mute the audio if we haven't already
+      WebAudio.mute(filter);
     } else {
       WebAudio.unmute(filter);
     }
@@ -112,7 +112,7 @@ export default class WebAudio {
     }
   }
 
-  static youTubeAutoSubsNodeInContainer(node): boolean {
+  static youTubeAutoSubsNodeIsSubtitleText(node): boolean {
     let captionWindow = document.querySelectorAll('div.caption-window')[0]; // YouTube Auto-gen subs
     return !!(captionWindow && captionWindow.contains(node));
   }
@@ -123,7 +123,7 @@ export default class WebAudio {
 
   static youTubeAutoSubsSupportedNode(hostname: string, node: any): boolean {
     if (hostname == 'www.youtube.com' && node.nodeName == '#text' && node.textContent != '') {
-      return !!(WebAudio.youTubeAutoSubsNodeInContainer(node));
+      return !!(WebAudio.youTubeAutoSubsNodeIsSubtitleText(node));
     }
     return false;
   }
