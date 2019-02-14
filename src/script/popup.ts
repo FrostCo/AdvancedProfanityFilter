@@ -196,7 +196,9 @@ class Popup {
 // Initial summary data request
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
   chrome.tabs.sendMessage(tabs[0].id, {popup: true}, function(response) {
-    popup.populateSummary(response);
+    if (!chrome.runtime.lastError) {
+      popup.populateSummary(response)
+    }
   });
 });
 
