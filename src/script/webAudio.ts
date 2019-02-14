@@ -7,7 +7,7 @@ export default class WebAudio {
     'www.youtube.com': 'span.caption-visual-line'
   }
 
-  static clean(filter, subtitleContainer, subSelector) {
+  static clean(filter, subtitleContainer, subSelector): void {
     let filtered = false;
     let subtitles = subtitleContainer.querySelectorAll(subSelector);
 
@@ -31,7 +31,21 @@ export default class WebAudio {
     if (filtered) { filter.updateCounterBadge(); } // Update if modified
   }
 
-  static mute(filter) {
+  static cleanYouTubeAutoSubs(filter, node): void {
+    let filtered = false;
+    let result = filter.replaceTextResult(node.textContent);
+    if (result.modified) {
+      filtered = true;
+      node.textContent = result.filtered;
+      WebAudio.mute(filter);
+    } else {
+      WebAudio.unmute(filter);
+    }
+
+    if (filtered) { filter.updateCounterBadge(); } // Update if modified
+  }
+
+  static mute(filter): void {
     if (!filter.muted) {
       filter.muted = true;
 
@@ -79,7 +93,7 @@ export default class WebAudio {
     return Object.keys(WebAudio.subtitleSelectors);
   }
 
-  static unmute(filter) {
+  static unmute(filter): void {
     if (filter.muted) {
       filter.muted = false;
 
@@ -96,5 +110,21 @@ export default class WebAudio {
         }
       }
     }
+  }
+
+  static youTubeAutoSubsNodeIsSubtitleText(node): boolean {
+    let captionWindow = document.querySelectorAll('div.caption-window')[0]; // YouTube Auto-gen subs
+    return !!(captionWindow && captionWindow.contains(node));
+  }
+
+  static youTubeAutoSubsPresent(filter): boolean {
+    return !!(filter.hostname == 'www.youtube.com' && document.querySelectorAll('div.ytp-caption-window-rollup')[0]);
+  }
+
+  static youTubeAutoSubsSupportedNode(hostname: string, node: any): boolean {
+    if (hostname == 'www.youtube.com' && node.nodeName == '#text' && node.textContent != '') {
+      return !!(WebAudio.youTubeAutoSubsNodeIsSubtitleText(node));
+    }
+    return false;
   }
 }
