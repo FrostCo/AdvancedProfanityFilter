@@ -32,13 +32,13 @@
 
   <script>
     function updateBookmarklet() {
-      let prefix = "javascript:(function(){document.body.appendChild(document.createElement('script')).src='"
-      let postfix = "';})();";
+      let prefix = "(function(){if(!document.querySelector('script.apfBookmarklet')){let apfScriptEl=document.body.appendChild(document.createElement('script'));apfScriptEl.src='"
+      let postfix = "';apfScriptEl.className='apfBookmarklet';}})()";
       let fileURL = document.getElementById('fileURL').value;
       if (fileURL == '') {
         window.alert('Please enter a file URL');
       } else {
-        document.getElementById('bookmarkletText').value = prefix + fileURL + postfix;
+        document.getElementById('bookmarkletText').value = 'javascript:' + encodeURIComponent(prefix + fileURL + postfix);
       }
     }
 
