@@ -11,11 +11,11 @@
   <h1>Generate Bookmarklet Code</h1>
 
   Custom Config (Export from extension):<br>
-  <textarea id="config"></textarea>
+  <textarea id="config" style="width:500px;height:100px;"></textarea>
   <br>
 
   Code (Save to file):<br>
-  <textarea id="code" width="600" height="800"></textarea>
+  <textarea id="code" style="width:500px;height:550px;"></textarea>
   <br>
 
   <br>
@@ -24,11 +24,13 @@
   <h1>Generate Bookmarklet</h1>
 
   Hosting URL:
-  <input id="fileURL" type="text"/>
+  <br>
+  <textarea id="fileURL" style="width:500px;height:24px;"></textarea>
+  <br>
+
+  <textarea id="bookmarkletText" style="width:500px;height:100px;"></textarea>
   <br>
   <button id="generateBookmarklet">Generate Bookmarklet</button>
-
-  <input id="bookmarkletText" type="text"/>
 
   <script>
     function updateBookmarklet() {
