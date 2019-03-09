@@ -37,14 +37,6 @@ export default class WebFilter extends Filter {
     return Domain.domainMatch(this.hostname, this.cfg.advancedDomains);
   }
 
-  replaceTextResult(string: string, stats: boolean = true) {
-    let result = {} as any;
-    result.original = string;
-    result.filtered = filter.replaceText(string);
-    result.modified = (result.filtered != string);
-    return result;
-  }
-
   advancedReplaceText(node) {
     filter.wordRegExps.forEach((regExp) => {
       // @ts-ignore - External library function
@@ -198,6 +190,14 @@ export default class WebFilter extends Filter {
     });
 
     observer.observe(document, observerConfig);
+  }
+
+  replaceTextResult(string: string, stats: boolean = true) {
+    let result = {} as any;
+    result.original = string;
+    result.filtered = filter.replaceText(string);
+    result.modified = (result.filtered != string);
+    return result;
   }
 
   updateCounterBadge() {
