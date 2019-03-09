@@ -24,6 +24,7 @@
     "clean": "node bin/clean.js",
     "copy-static": "node bin/copy-static.js",
     "lint": "eslint src/**/*.ts",
+    "package:bookmarklet": "webpack --config bin/bookmark.webpack.config.js",
     "package:extension": "node bin/package-extension.js",
     "package:webpack": "webpack --config bin/webpack.config.js",
     "package": "npm run build && npm run package:extension",
