@@ -18,6 +18,7 @@
   <a href="#" class="w3-bar-item w3-button">Words</a>
   <a href="#" class="w3-bar-item w3-button">Domains</a>
   <a href="#" class="w3-bar-item w3-button">Audio</a>
+  <a href="#" class="w3-bar-item w3-button">Bookmarklet</a>
   <a href="#" class="w3-bar-item w3-button">Config</a>
   <a href="#" class="w3-bar-item w3-button w3-right">Help</a>
   <a href="#" class="w3-bar-item w3-button w3-right">Test</a>
@@ -287,6 +288,29 @@
       </label>
     </div>
   </div>
+</div>
+
+<div id="bookmarkletPage" class="w3-container w3-hide">
+  <h4 class="sectionHeader">Bookmarklet</h4>
+  <p>This feature allows you to create a Bookmarklet to run the filter on the current page without needing Advanced Profanity Filter installed.  For more information, please see the <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio"Audio wiki. target="_blank">Bookmarklet wiki page</a>.</p>
+
+  <h4 class="sectionHeader">Instructions</h4>
+  <ol>
+    <li>Click "Generate Bookmarklet File"</li>
+    <li>Save the bookmarklet file to a public hosting service (Example: Google Drive or a Github Gist)</li>
+    <li>Copy the public URL to the file into the "Generate Bookmarklet" section</li>
+    <li>Save the bookmarklet by copying the link or dragging it to your Browser's bookmarks</li>
+  </ol>
+  <!-- To update the bookmarklet (config, filter version, etc.) just update the hosted file. -->
+
+  <h4 class="sectionHeader">Bookmarklet Code</h4>
+  <button id="bookmarkletFile">Generate Bookmarklet File</button>
+  <h4 class="sectionHeader">Generate Bookmarklet</h4>
+
+  Hosted File URL:<br>
+  <input id="bookmarkletHostedURL" type="text" class="w3-input w3-border" style="width:500px;"></input>
+  <br>
+  <a id="bookmarkletLink" href="" style="border: 1px black solid">APF</a>
 </div>
 
 <div id="configPage" class="w3-container w3-hide">

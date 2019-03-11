@@ -1,8 +1,9 @@
-import { dynamicList } from './lib/helper';
+import { dynamicList, exportToFile } from './lib/helper';
 import WebConfig from './webConfig';
 import { Filter } from './lib/filter';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
+import Bookmarklet from './bookmarklet';
 
 export default class OptionPage {
   cfg: WebConfig;
@@ -174,6 +175,13 @@ export default class OptionPage {
     OptionPage.openModal('confirmModal');
   }
 
+  createBookmarklet() {
+    let bookmarklet = Bookmarklet.updateBookmarklet();
+    let bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
+    // TODO: Check for valid url, and if so then show the bookmarklet
+    bookmarkletLink.href = bookmarklet;
+  }
+
   disabledDomainList() {
     let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
     let domainListHTML = '<option selected value="">Add...</option>';
@@ -212,6 +220,12 @@ export default class OptionPage {
     if (success) {
       if (await option.saveProp('disabledDomains')) this.disabledDomainList();
     }
+  }
+
+  async exportBookmarkletFile() {
+    let code = await Bookmarklet.injectConfig(option.cfg);
+    exportToFile(code, 'apfBookmarklet.js');
+    // Bookmarklet.injectConfig(option.cfg).then((code) => { exportToFile(code, 'apfBookmarklet.js')} );
   }
 
   exportConfig() {
@@ -681,6 +695,9 @@ document.getElementById('disabledDomainRemove').addEventListener('click', e => {
 document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
 document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
+// Bookmarklet
+document.getElementById('bookmarkletHostedURL').addEventListener('change', e => { option.createBookmarklet(); });
+document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });
 // Config
 document.getElementById('configReset').addEventListener('click', e => { option.confirm(e, 'restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });

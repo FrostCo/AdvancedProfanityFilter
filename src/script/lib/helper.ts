@@ -17,6 +17,15 @@ export function dynamicList(list, selectEm, title?: string) {
   document.getElementById(selectEm).innerHTML = options;
 }
 
+export function exportToFile(dataStr, fileName = 'data.txt') {
+  let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+  let linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', fileName);
+  linkElement.click();
+  linkElement.remove();
+}
+
 // /^\d+\.\d+\.\d+$/
 export function getVersion(version: string): Version {
   let versionValues = version.split('.');
