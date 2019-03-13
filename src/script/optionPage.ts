@@ -176,10 +176,20 @@ export default class OptionPage {
   }
 
   createBookmarklet() {
-    let bookmarklet = Bookmarklet.updateBookmarklet();
     let bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
-    // TODO: Check for valid url, and if so then show the bookmarklet
-    bookmarkletLink.href = bookmarklet;
+    let bookmarkletHostedURLInput = document.getElementById('bookmarkletHostedURL') as HTMLInputElement;
+    OptionPage.hideInputError(bookmarkletHostedURLInput);
+
+    if (bookmarkletHostedURLInput.checkValidity()) {
+      let bookmarkletHostedURL = bookmarkletHostedURLInput.value;
+      bookmarkletLink.href = Bookmarklet.updateBookmarklet(bookmarkletHostedURL);
+      OptionPage.enableBtn(bookmarkletLink);
+    } else {
+      OptionPage.showInputError(bookmarkletHostedURLInput, 'Please enter a valid URL.');
+      bookmarkletLink.href = '#';
+      OptionPage.disableBtn(bookmarkletLink);
+      return false;
+    }
   }
 
   disabledDomainList() {
@@ -696,8 +706,8 @@ document.getElementById('muteAudio').addEventListener('click', e => { option.sav
 document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 // Bookmarklet
-document.getElementById('bookmarkletHostedURL').addEventListener('change', e => { option.createBookmarklet(); });
 document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });
+document.getElementById('bookmarkletHostedURL').addEventListener('input', e => { option.createBookmarklet(); });
 // Config
 document.getElementById('configReset').addEventListener('click', e => { option.confirm(e, 'restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });

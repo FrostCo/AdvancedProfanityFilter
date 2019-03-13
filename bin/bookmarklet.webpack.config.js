@@ -1,15 +1,36 @@
 const path = require('path');
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
   entry: {
-    bookmarkFilter: './src/script/bookmarkFilter.ts'
+    bookmarkletFilter: './src/script/bookmarkletFilter.ts'
   },
   output: {
     path: path.resolve('dist'),
   },
   mode: 'production',
   optimization: {
-    minimize: false
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          ecma: undefined,
+          warnings: false,
+          parse: {},
+          compress: {},
+          mangle: true, // Note `mangle.properties` is `false` by default.
+          module: false,
+          output: {
+            comments: 'some',
+          },
+          toplevel: false,
+          nameCache: null,
+          ie8: false,
+          keep_classnames: undefined,
+          keep_fnames: false,
+          safari10: false,
+        },
+      }),
+    ],
   },
   module: {
     rules: [

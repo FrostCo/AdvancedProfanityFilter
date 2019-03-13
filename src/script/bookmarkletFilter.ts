@@ -10,10 +10,10 @@ var chrome = {} as any;
 chrome.runtime = {};
 chrome.runtime.sendMessage = function(obj){};
 
-/* << Start User Config >> */
+/* @preserve - Start User Config */
 var config = Config._defaults as any;
 config.words = Config._defaultWords;
-/* << End User Config >> */
+/* @preserve - End User Config */
 
 export default class BookmarkletFilter extends Filter {
   advanced: boolean;
