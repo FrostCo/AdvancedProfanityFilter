@@ -182,7 +182,8 @@ export default class OptionPage {
 
     if (bookmarkletHostedURLInput.checkValidity()) {
       let bookmarkletHostedURL = bookmarkletHostedURLInput.value;
-      bookmarkletLink.href = Bookmarklet.updateBookmarklet(bookmarkletHostedURL);
+      let bookmarklet = new Bookmarklet(bookmarkletHostedURL);
+      bookmarkletLink.href = bookmarklet.destination();
       OptionPage.enableBtn(bookmarkletLink);
     } else {
       OptionPage.showInputError(bookmarkletHostedURLInput, 'Please enter a valid URL.');
