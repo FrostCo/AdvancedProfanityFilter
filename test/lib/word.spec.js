@@ -121,13 +121,13 @@ describe('Word', function() {
       describe('Unicode', function() {
         it('should build the proper RegExp for whole match', function() {
           expect(Word.buildWholeRegexp('куче')).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-]+)([\\w-]*куче[\\w-]*)([\\s.,\'"+!?|-]+|$)', 'giu')
+            new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*куче[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
           );
         });
 
         it('should build the proper RegExp for whole match with matchRepeated', function() {
           expect(Word.buildWholeRegexp('куче', true)).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-]+)([\\w-]*к+у+ч+е+[\\w-]*)([\\s.,\'"+!?|-]+|$)', 'giu')
+            new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*к+у+ч+е+[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
           );
         });
       });
