@@ -77,8 +77,8 @@ export default class Word {
     try {
       if (Word.containsDoubleByte(str)) {
         // Work around for lack of word boundary support for unicode characters
-        // (^|[\s.,'"+!?|-]*)([\w-]*куче[\w-]*)([\s.,'"+!?|-]*|$)/giu
-        return new RegExp('(^|' + Word._unicodeWordBoundary + '+)([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*)(' + Word._unicodeWordBoundary + '+|$)', 'giu');
+        // (^|[\s.,'"+!?|-]*)([\S]*куче[\S]*)([\s.,'"+!?|-]*|$)/giu
+        return new RegExp('(^|' + Word._unicodeWordBoundary + '*)([\\S]*' + Word.processPhrase(str, matchRepeated) + '[\\S]*)(' + Word._unicodeWordBoundary + '*|$)', 'giu');
       } else {
         return new RegExp('\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi');
       }

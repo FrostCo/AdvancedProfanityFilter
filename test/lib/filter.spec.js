@@ -151,6 +151,15 @@ describe('Filter', function() {
           filter.init();
           expect(filter.replaceText('The bigкучеs ran around the yard.')).to.equal('The b_______ ran around the yard.');
         });
+
+        it('Should filter a whole word with (*) characters', function() {
+          let filter = new Filter;
+          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: false, preserveLast: false });
+          filter.cfg.words['словен'] = { matchMethod: 2, repeat: false };
+          filter.init();
+          debugger;
+          expect(filter.replaceText('За пределами Словении этнические словенцы компактно')).to.equal('За пределами ******** этнические ******** компактно');
+        });
       });
     });
 
