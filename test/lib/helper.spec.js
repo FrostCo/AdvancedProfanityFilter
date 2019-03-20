@@ -4,16 +4,6 @@ import { dynamicList, getVersion, isVersionOlder, removeFromArray } from '../bui
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 
 describe('Helper', function() {
-  describe('removeFromArray()', function() {
-    it('should return an array with the matching element removed', function() {
-      expect(removeFromArray(array, 'needle')).to.eql(['a', 'in', 'a', 'large', 'haystack']);
-    });
-
-    it('should return an array with the same values if no match is found', function() {
-      expect(removeFromArray(array, 'pin')).to.eql(array);
-    });
-  });
-
   describe('isVersionOlder()', function() {
     it('should return true when provided version is older than minimum', function() {
       let version = getVersion('1.1.10');
@@ -65,6 +55,16 @@ describe('Helper', function() {
       version = getVersion('1.5.11');
       minimum = getVersion('1.5.10');
       expect(isVersionOlder(version, minimum)).to.equal(false);
+    });
+  });
+
+  describe('removeFromArray()', function() {
+    it('should return an array with the matching element removed', function() {
+      expect(removeFromArray(array, 'needle')).to.eql(['a', 'in', 'a', 'large', 'haystack']);
+    });
+
+    it('should return an array with the same values if no match is found', function() {
+      expect(removeFromArray(array, 'pin')).to.eql(array);
     });
   });
 });
