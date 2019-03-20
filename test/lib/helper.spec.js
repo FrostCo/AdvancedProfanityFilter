@@ -1,9 +1,17 @@
 const expect = require('chai').expect;
-import { dynamicList, getVersion, isVersionOlder, removeFromArray } from '../built/lib/helper';
+import { dynamicList, escapeHTML, getVersion, isVersionOlder, removeFromArray } from '../built/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 
 describe('Helper', function() {
+  describe('escapeHTML()', function() {
+    it('should return HTML safe string', function() {
+      expect(escapeHTML('a>b')).to.eql('a&gt;b');
+      expect(escapeHTML('(?<!un)censored')).to.eql('(?&lt;!un)censored');
+      expect(escapeHTML('already safe')).to.eql('already safe');
+    });
+  });
+
   describe('isVersionOlder()', function() {
     it('should return true when provided version is older than minimum', function() {
       let version = getVersion('1.1.10');
