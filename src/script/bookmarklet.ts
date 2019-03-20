@@ -17,7 +17,7 @@ export default class Bookmarklet {
     let match = url.match(Bookmarklet.gitHubGistRegExp);
     if (match && match[1] && match[2]) {
       // return `https://gist.githubusercontent.com/${match[1]}/${match[2]}/raw`; // Have to use a CDN
-      return `https://cdn.statically.com/gist/${match[1]}/${match[2]}/raw/apfBookmarklet.js?env=dev`
+      return `https://cdn.statically.com/gist/${match[1]}/${match[2]}/raw/apfBookmarklet.js?env=dev`;
     }
     return url;
   }
@@ -64,8 +64,8 @@ export default class Bookmarklet {
   }
 
   destination(): string {
-    let prefix = "(function(){if(!document.querySelector('script.apfBookmarklet')){let apfScriptEl=document.body.appendChild(document.createElement('script'));apfScriptEl.src='"
-    let postfix = "';apfScriptEl.className='apfBookmarklet';}})()";
+    let prefix = '(function(){if(!document.querySelector("script.apfBookmarklet")){let apfScriptEl=document.body.appendChild(document.createElement("script"));apfScriptEl.src="';
+    let postfix = '";apfScriptEl.className="apfBookmarklet";}})()';
     return 'javascript:' + encodeURIComponent(prefix + this.hostedUrl + postfix);
   }
 }
