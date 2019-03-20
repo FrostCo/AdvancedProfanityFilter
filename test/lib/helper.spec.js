@@ -1,16 +1,14 @@
 const expect = require('chai').expect;
-import { dynamicList, getVersion, isVersionOlder, removeFromArray } from '../built/lib/helper';
+import { dynamicList, escapeHTML, getVersion, isVersionOlder, removeFromArray } from '../built/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 
 describe('Helper', function() {
-  describe('removeFromArray()', function() {
-    it('should return an array with the matching element removed', function() {
-      expect(removeFromArray(array, 'needle')).to.eql(['a', 'in', 'a', 'large', 'haystack']);
-    });
-
-    it('should return an array with the same values if no match is found', function() {
-      expect(removeFromArray(array, 'pin')).to.eql(array);
+  describe('escapeHTML()', function() {
+    it('should return HTML safe string', function() {
+      expect(escapeHTML('a>b')).to.eql('a&gt;b');
+      expect(escapeHTML('(?<!un)censored')).to.eql('(?&lt;!un)censored');
+      expect(escapeHTML('already safe')).to.eql('already safe');
     });
   });
 
@@ -65,6 +63,16 @@ describe('Helper', function() {
       version = getVersion('1.5.11');
       minimum = getVersion('1.5.10');
       expect(isVersionOlder(version, minimum)).to.equal(false);
+    });
+  });
+
+  describe('removeFromArray()', function() {
+    it('should return an array with the matching element removed', function() {
+      expect(removeFromArray(array, 'needle')).to.eql(['a', 'in', 'a', 'large', 'haystack']);
+    });
+
+    it('should return an array with the same values if no match is found', function() {
+      expect(removeFromArray(array, 'pin')).to.eql(array);
     });
   });
 });

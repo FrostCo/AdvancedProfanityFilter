@@ -17,6 +17,10 @@ export function dynamicList(list, selectEm, title?: string) {
   document.getElementById(selectEm).innerHTML = options;
 }
 
+export function escapeHTML(str: string): string {
+  return str.replace(/</g, '&lt;').replace(/>/g,'&gt;');
+}
+
 // /^\d+\.\d+\.\d+$/
 export function getVersion(version: string): Version {
   let versionValues = version.split('.');
