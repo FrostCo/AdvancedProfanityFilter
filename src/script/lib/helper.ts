@@ -17,6 +17,10 @@ export function dynamicList(list, selectEm, title?: string) {
   document.getElementById(selectEm).innerHTML = options;
 }
 
+export function escapeHTML(str: string): string {
+  return str.replace(/</g, '&lt;').replace(/>/g,'&gt;');
+}
+
 export function exportToFile(dataStr, fileName = 'data.txt') {
   let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
   let linkElement = document.createElement('a');

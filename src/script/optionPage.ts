@@ -1,4 +1,4 @@
-import { dynamicList, exportToFile } from './lib/helper';
+import { dynamicList, escapeHTML, exportToFile } from './lib/helper';
 import WebConfig from './webConfig';
 import { Filter } from './lib/filter';
 import OptionAuth from './optionAuth';
@@ -415,7 +415,7 @@ export default class OptionPage {
     Object.keys(option.cfg.words).sort().forEach(word => {
       let filteredWord = word;
       if (this.cfg.filterWordList) filteredWord = filter.replaceText(word, false);
-      wordListHTML += `<option value="${word}" data-filtered="${filteredWord}">${filteredWord}</option>`;
+      wordListHTML += `<option value="${word}" data-filtered="${filteredWord}">${escapeHTML(filteredWord)}</option>`;
     });
 
     // Workaround for Remove filter (use censor)
