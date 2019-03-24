@@ -1,8 +1,9 @@
-import { dynamicList, escapeHTML } from './lib/helper';
+import { dynamicList, escapeHTML, exportToFile } from './lib/helper';
 import WebConfig from './webConfig';
 import { Filter } from './lib/filter';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
+import Bookmarklet from './bookmarklet';
 
 export default class OptionPage {
   cfg: WebConfig;
@@ -174,6 +175,24 @@ export default class OptionPage {
     OptionPage.openModal('confirmModal');
   }
 
+  createBookmarklet() {
+    let bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
+    let bookmarkletHostedURLInput = document.getElementById('bookmarkletHostedURL') as HTMLInputElement;
+    OptionPage.hideInputError(bookmarkletHostedURLInput);
+
+    if (bookmarkletHostedURLInput.checkValidity()) {
+      let bookmarkletHostedURL = bookmarkletHostedURLInput.value;
+      let bookmarklet = new Bookmarklet(bookmarkletHostedURL);
+      bookmarkletLink.href = bookmarklet.destination();
+      OptionPage.enableBtn(bookmarkletLink);
+    } else {
+      OptionPage.showInputError(bookmarkletHostedURLInput, 'Please enter a valid URL.');
+      bookmarkletLink.href = '#';
+      OptionPage.disableBtn(bookmarkletLink);
+      return false;
+    }
+  }
+
   disabledDomainList() {
     let disabledDomains = document.getElementById('disabledDomainSelect') as HTMLInputElement;
     let domainListHTML = '<option selected value="">Add...</option>';
@@ -212,6 +231,12 @@ export default class OptionPage {
     if (success) {
       if (await option.saveProp('disabledDomains')) this.disabledDomainList();
     }
+  }
+
+  async exportBookmarkletFile() {
+    let code = await Bookmarklet.injectConfig(option.cfg);
+    exportToFile(code, 'apfBookmarklet.js');
+    // Bookmarklet.injectConfig(option.cfg).then((code) => { exportToFile(code, 'apfBookmarklet.js')} );
   }
 
   exportConfig() {
@@ -681,6 +706,9 @@ document.getElementById('disabledDomainRemove').addEventListener('click', e => {
 document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
 document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
+// Bookmarklet
+document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });
+document.getElementById('bookmarkletHostedURL').addEventListener('input', e => { option.createBookmarklet(); });
 // Config
 document.getElementById('configReset').addEventListener('click', e => { option.confirm(e, 'restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });

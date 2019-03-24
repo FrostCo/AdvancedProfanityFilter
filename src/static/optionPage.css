@@ -16,3 +16,6 @@ h4.sectionHeader
 {margin-left:16px;padding-top:5px;font-size:10px;color:gray}
 .small
 {width:300px}
+/* Bookmarklet Link */
+a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited
+{color: #fff}

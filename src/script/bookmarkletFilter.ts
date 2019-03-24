@@ -2,20 +2,22 @@ import Domain from './domain';
 import {Filter} from './lib/filter';
 import Page from './page';
 import WebAudio from './webAudio';
-import WebConfig from './webConfig';
+import Config from './lib/config';
 import './vendor/findAndReplaceDOMText';
 
-interface Message {
-  advanced?: boolean;
-  counter?: number;
-  disabled?: boolean;
-  mute?: boolean;
-  summary?: object;
-}
+// NO-OP for chrome.* API
+var chrome = {} as any;
+chrome.runtime = {};
+chrome.runtime.sendMessage = function(obj){};
 
-export default class WebFilter extends Filter {
+/* @preserve - Start User Config */
+var config = Config._defaults as any;
+config.words = Config._defaultWords;
+/* @preserve - End User Config */
+
+export default class BookmarkletFilter extends Filter {
   advanced: boolean;
-  cfg: WebConfig;
+  cfg: Config;
   hostname: string;
   mutePage: boolean;
   lastSubtitle: string;
@@ -41,18 +43,14 @@ export default class WebFilter extends Filter {
     filter.wordRegExps.forEach((regExp) => {
       // @ts-ignore - External library function
       findAndReplaceDOMText(node, {preset: 'prose', find: regExp, replace: function(portion, match) {
-        // console.log('[APF] Advanced node match:', node.textContent); // DEBUG - Advanced match
         return filter.replaceText(match[0]);
       }});
     });
   }
 
   checkMutationForProfanity(mutation) {
-    // console.count('checkMutationForProfanity'); // Benchmarking - Mutation
-    // console.log('Mutation observed:', mutation); // DEBUG - Mutation
     mutation.addedNodes.forEach(node => {
       if (!Page.isForbiddenNode(node)) {
-        // console.log('Added node(s):', node); // DEBUG - Mutation - addedNodes
         if (filter.mutePage && WebAudio.youTubeAutoSubsPresent(filter)) { // YouTube Auto subs
           if (WebAudio.youTubeAutoSubsSupportedNode(filter.hostname, node)) {
             WebAudio.cleanYouTubeAutoSubs(filter, node); // Clean Auto subs
@@ -62,7 +60,6 @@ export default class WebFilter extends Filter {
         } else if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
           WebAudio.clean(filter, node, filter.subtitleSelector);
         } else {
-          // console.log('Added node to filter', node); // DEBUG - Mutation addedNodes
           if (filter.advanced && node.parentNode) {
             filter.advancedReplaceText(node);
           } else {
@@ -70,7 +67,6 @@ export default class WebFilter extends Filter {
           }
         }
       }
-      // else { console.log('Forbidden node:', node); } // DEBUG - Mutation addedNodes
     });
 
     mutation.removedNodes.forEach(node => {
@@ -86,16 +82,12 @@ export default class WebFilter extends Filter {
   }
 
   checkMutationTargetTextForProfanity(mutation) {
-    // console.count('checkMutationTargetTextForProfanity'); // Benchmarking - Executaion Count
-    // console.log('Process mutation.target:', mutation.target, mutation.target.data); // DEBUG - Mutation target text
     if (!Page.isForbiddenNode(mutation.target)) {
       let result = this.replaceTextResult(mutation.target.data);
       if (result.modified) {
-        // console.log('Text target changed:', result.original, result.filtered); // DEBUG - Mutation target text
         mutation.target.data = result.filtered;
       }
     }
-    // else { console.log('Forbidden mutation.target node:', mutation.target); } // DEBUG - Mutation target text
   }
 
   cleanNode(node) {
@@ -117,33 +109,27 @@ export default class WebFilter extends Filter {
         if (node.textContent.trim() != '') {
           let result = this.replaceTextResult(node.textContent);
           if (result.modified) {
-            // console.log('[APF] Normal node changed:', result.original, result.filtered); // DEBUG - Mutation node
             node.textContent = result.filtered;
           }
         }
       }
-      // else { console.log('node without nodeName:', node); } // Debug
     }
   }
 
-  async cleanPage() {
-    // @ts-ignore: Type WebConfig is not assignable to type Config
-    this.cfg = await WebConfig.build();
+  cleanPage() {
+    this.cfg = new Config(config);
+    this.cfg.muteMethod = 1; // Bookmarklet: Force audio muteMethod = 1 (Volume)
 
     // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
     this.hostname = (window.location == window.parent.location) ? document.location.hostname : new URL(document.referrer).hostname;
 
     // Check if the topmost frame is a disabled domain
-    let message: Message = { disabled: this.disabledPage() };
-    if (message.disabled) {
-      chrome.runtime.sendMessage(message);
+    if (this.disabledPage()) {
       return false;
     }
 
     // Check for advanced mode on current domain
     this.advanced = this.advancedPage();
-    message.advanced = this.advanced; // Set badge color
-    chrome.runtime.sendMessage(message);
 
     // Detect if we should mute audio for the current page
     this.mutePage = (this.cfg.muteAudio && Domain.domainMatch(this.hostname, WebAudio.supportedPages()));
@@ -152,24 +138,12 @@ export default class WebFilter extends Filter {
     // Remove profanity from the main document and watch for new nodes
     this.init();
     this.advanced ? this.advancedReplaceText(document) : this.cleanNode(document);
-    this.updateCounterBadge();
     this.observeNewNodes();
   }
 
   // Always use the top frame for page check
   disabledPage(): boolean {
     return Domain.domainMatch(this.hostname, this.cfg.disabledDomains);
-  }
-
-  foundMatch(word) {
-    super.foundMatch(word);
-    if (this.cfg.showSummary) {
-      if (this.summary[word]) {
-        this.summary[word].count += 1;
-      } else {
-        this.summary[word] = { clean: filter.replaceText(word, false), count: 1 };
-      }
-    }
   }
 
   observeNewNodes() {
@@ -186,7 +160,6 @@ export default class WebFilter extends Filter {
       mutations.forEach(function(mutation) {
         self.checkMutationForProfanity(mutation);
       });
-      self.updateCounterBadge();
     });
 
     observer.observe(document, observerConfig);
@@ -200,25 +173,10 @@ export default class WebFilter extends Filter {
     return result;
   }
 
-  updateCounterBadge() {
-    /* istanbul ignore next */
-    // console.count('updateCounterBadge'); // Benchmarking - Executaion Count
-    if (this.counter > 0) {
-      if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter.toString() });
-      if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
-    }
-  }
+  updateCounterBadge() {} // NO-OP
 }
 
-// Global
-var filter = new WebFilter;
-if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptGlobalScope]'].includes(({}).toString.call(window))) {
-  /* istanbul ignore next */
-  // Send summary data to popup
-  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    if (filter.cfg.showSummary && request.popup && filter.counter > 0) chrome.runtime.sendMessage({ summary: filter.summary });
-  });
-
-  /* istanbul ignore next */
+var filter = new BookmarkletFilter;
+if (typeof window !== 'undefined') {
   filter.cleanPage();
 }
