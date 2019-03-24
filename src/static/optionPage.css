@@ -17,11 +17,5 @@ h4.sectionHeader
 .small
 {width:300px}
 /* Bookmarklet Link */
-a#bookmarkletLink:active
-{color: #fff}
-a#bookmarkletLink:hover
-{color: #fff}
-a#bookmarkletLink:link
-{color: #fff}
-a#bookmarkletLink:visited
+a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited
 {color: #fff}
