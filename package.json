@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
   "scripts": {
+    "build:libs": "tsc -p ./src/script/lib/tsconfig.json",
     "build:static": "node bin/copy-static.js",
     "build:test-sm": "babel src/script --out-dir built --extensions \".ts,.tsx\" --source-maps inline",
     "build:test": "babel src/script --out-dir ./test/built --extensions \".ts,.tsx,.js\"",
