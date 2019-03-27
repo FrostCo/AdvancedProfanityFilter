@@ -82,6 +82,7 @@ export default class Config {
     'damn': { matchMethod: 1, repeat: false, sub: 'dang' },
     'dumbass': { matchMethod: 1, repeat: true, sub: 'idiot' },
     'fuck': { matchMethod: 1, repeat: true, sub: 'fudge' },
+    'goddammit': { matchMethod: 1, repeat: true, sub: 'goshdangit' },
     'hell': { matchMethod: 0, repeat: true, sub: 'heck' },
     'jackass': { matchMethod: 1, repeat: true, sub: 'idiot' },
     'jesus christ': { matchMethod: 1, repeat: true, sub: 'deity' },
