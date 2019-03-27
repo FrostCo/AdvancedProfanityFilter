@@ -204,8 +204,12 @@ export default class WebFilter extends Filter {
     /* istanbul ignore next */
     // console.count('updateCounterBadge'); // Benchmarking - Executaion Count
     if (this.counter > 0) {
-      if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter.toString() });
-      if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
+      try {
+        if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter.toString() });
+        if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
+      } catch (e) {
+        // console.log('Failed to sendMessage', e); // Error - Extension context invalidated.
+      }
     }
   }
 }

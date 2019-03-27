@@ -18,7 +18,15 @@ export function dynamicList(list, selectEm, title?: string) {
 }
 
 export function escapeHTML(str: string): string {
-  return str.replace(/</g, '&lt;').replace(/>/g,'&gt;');
+  return str.replace(/([<>&"'])/g, (match, p1) => (
+    {
+      '<': '&lt;',
+      '>': '&gt;',
+      '&': '&amp;',
+      '"': '&quot;',
+      "'": '&apos;'
+    }[p1])
+  );
 }
 
 export function exportToFile(dataStr, fileName = 'data.txt') {

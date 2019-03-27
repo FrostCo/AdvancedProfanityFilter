@@ -97,7 +97,7 @@ export default class Word {
 
   static containsDoubleByte(str): boolean {
     if (!str.length) return false;
-    if (str.charCodeAt(0) > 255) return true;
+    if (str.charCodeAt(0) > 127) return true;
     return Word._unicodeRegex.test(str);
   }
 

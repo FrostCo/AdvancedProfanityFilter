@@ -24,6 +24,7 @@ export default class Config {
   showCounter: boolean;
   showSubtitles: number;
   showSummary: boolean;
+  showUpdateNotification: boolean;
   substitutionMark: boolean;
   words: {
     [key: string]: WordOptions;
@@ -45,7 +46,7 @@ export default class Config {
   }
 
   static readonly _defaults = {
-    advancedDomains: ['reddit.com'],
+    advancedDomains: [],
     censorCharacter: '*',
     censorFixedLength: 0,
     defaultSubstitution: 'censored',
@@ -64,6 +65,7 @@ export default class Config {
     showCounter: true,
     showSubtitles: 0,
     showSummary: true,
+    showUpdateNotification: true,
     substitutionMark: true
   };
 
@@ -73,18 +75,28 @@ export default class Config {
     'asshole': { matchMethod: 1, repeat: true, sub: 'jerk' },
     'bastard': { matchMethod: 1, repeat: true, sub: 'jerk' },
     'bitch': { matchMethod: 1, repeat: true, sub: 'jerk' },
+    'christ': { matchMethod: 0, repeat: true, sub: 'deity' },
+    'cocksucker': { matchMethod: 1, repeat: true, sub: 'idiot' },
     'cunt': { matchMethod: 1, repeat: true, sub: 'explative' },
     'dammit': { matchMethod: 1, repeat: false, sub: 'dangit' },
-    'damn': { matchMethod: 1, repeat: true, sub: 'dang' },
+    'damn': { matchMethod: 1, repeat: false, sub: 'dang' },
     'dumbass': { matchMethod: 1, repeat: true, sub: 'idiot' },
     'fuck': { matchMethod: 1, repeat: true, sub: 'fudge' },
+    'goddammit': { matchMethod: 1, repeat: true, sub: 'goshdangit' },
     'hell': { matchMethod: 0, repeat: true, sub: 'heck' },
-    'nigger': { matchMethod: 1, repeat: true, sub: 'explative' },
+    'jackass': { matchMethod: 1, repeat: true, sub: 'idiot' },
+    'jesus christ': { matchMethod: 1, repeat: true, sub: 'deity' },
+    'jesus': { matchMethod: 1, repeat: true, sub: 'deity' },
+    'nigga': { matchMethod: 1, repeat: true, sub: 'ethnic slur' },
+    'nigger': { matchMethod: 1, repeat: true, sub: 'ethnic slur' },
     'piss': { matchMethod: 1, repeat: true, sub: 'pee' },
     'pissed': { matchMethod: 1, repeat: true, sub: 'ticked' },
-    'slut': { matchMethod: 1, repeat: true, sub: 'tramp' },
+    'pussies': { matchMethod: 0, repeat: true, sub: 'softies' },
+    'pussy': { matchMethod: 0, repeat: true, sub: 'softie' },
     'shit': { matchMethod: 1, repeat: true, sub: 'crap' },
+    'slut': { matchMethod: 1, repeat: true, sub: 'tramp' },
     'tits': { matchMethod: 1, repeat: true, sub: 'explative' },
+    'twat': { matchMethod: 1, repeat: true, sub: 'explative' },
     'whore': { matchMethod: 1, repeat: true, sub: 'tramp' }
   };
 

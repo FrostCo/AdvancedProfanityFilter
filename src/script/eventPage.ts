@@ -20,12 +20,16 @@ chrome.runtime.onInstalled.addListener(function(details){
     updateMigrations(details.previousVersion);
 
     // Display update notification
-    chrome.notifications.create('extensionUpdate', {
-      'type': 'basic',
-      'title': 'Advanced Profanity Filter',
-      'message': 'Update installed, click for changelog.',
-      'iconUrl': 'img/icon64.png',
-      'isClickable': true,
+    chrome.storage.sync.get({showUpdateNotification: true}, function(data) {
+      if (data.showUpdateNotification) {
+        chrome.notifications.create('extensionUpdate', {
+          'type': 'basic',
+          'title': 'Advanced Profanity Filter',
+          'message': 'Update installed, click for changelog.',
+          'iconUrl': 'img/icon64.png',
+          'isClickable': true,
+        });
+      }
     });
   }
 });
