@@ -24,6 +24,7 @@ export default class Config {
   showCounter: boolean;
   showSubtitles: number;
   showSummary: boolean;
+  showUpdateNotification: boolean;
   substitutionMark: boolean;
   words: {
     [key: string]: WordOptions;
@@ -64,6 +65,7 @@ export default class Config {
     showCounter: true,
     showSubtitles: 0,
     showSummary: true,
+    showUpdateNotification: true,
     substitutionMark: true
   };
 

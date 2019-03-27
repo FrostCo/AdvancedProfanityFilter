@@ -236,7 +236,6 @@ export default class OptionPage {
   async exportBookmarkletFile() {
     let code = await Bookmarklet.injectConfig(option.cfg);
     exportToFile(code, 'apfBookmarklet.js');
-    // Bookmarklet.injectConfig(option.cfg).then((code) => { exportToFile(code, 'apfBookmarklet.js')} );
   }
 
   exportConfig() {
@@ -324,6 +323,7 @@ export default class OptionPage {
     let selectedFilter = document.getElementById(`filter${WebConfig._filterMethodNames[option.cfg.filterMethod]}`) as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
     let showSummary = document.getElementById('showSummary') as HTMLInputElement;
+    let showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
     let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
     let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     selectedFilter.checked = true;
@@ -331,6 +331,7 @@ export default class OptionPage {
     globalMatchMethodSelect.selectedIndex = this.cfg.globalMatchMethod;
     showCounter.checked = this.cfg.showCounter;
     showSummary.checked = this.cfg.showSummary;
+    showUpdateNotification.checked = this.cfg.showUpdateNotification;
     filterWordList.checked = this.cfg.filterWordList;
 
     // Censor Settings
@@ -470,6 +471,7 @@ export default class OptionPage {
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
     let showSummary = document.getElementById('showSummary') as HTMLInputElement;
+    let showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
     let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
@@ -486,6 +488,7 @@ export default class OptionPage {
     self.cfg.preserveLast = preserveLast.checked;
     self.cfg.showCounter = showCounter.checked;
     self.cfg.showSummary = showSummary.checked;
+    self.cfg.showUpdateNotification = showUpdateNotification.checked;
     self.cfg.filterWordList = filterWordList.checked;
     self.cfg.substitutionMark = substitutionMark.checked;
     self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
@@ -685,6 +688,7 @@ document.getElementById('preserveFirst').addEventListener('click', e => { option
 document.getElementById('preserveLast').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('showCounter').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('showSummary').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('showUpdateNotification').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('filterWordList').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('substitutionMark').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('defaultWordSubstitutionText').addEventListener('change', e => { option.saveOptions(e); });
