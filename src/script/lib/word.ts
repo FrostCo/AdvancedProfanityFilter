@@ -1,7 +1,7 @@
 export default class Word {
   private static readonly _edgePunctuationRegExp = /(^[,.'"!?%$]|[,.'"!?%$]$)/;
   private static readonly _escapeRegExp = /[\/\\^$*+?.()|[\]{}]/g;
-  private static readonly _unicodeRegex = /[^\u0000-\u00ff]/;
+  private static readonly _unicodeRegExp = /[^\u0000-\u00ff]/;
   private static readonly _unicodeWordBoundary = '[\\s.,\'"+!?|-]';
   static readonly nonWordRegExp = new RegExp('^\\s*[^\\w]+\\s*$', 'g');
   static readonly whitespaceRegExp = /^\s+$/;
@@ -101,7 +101,7 @@ export default class Word {
   static containsDoubleByte(str): boolean {
     if (!str.length) return false;
     if (str.charCodeAt(0) > 127) return true;
-    return Word._unicodeRegex.test(str);
+    return Word._unicodeRegExp.test(str);
   }
 
   // /[-\/\\^$*+?.()|[\]{}]/g
