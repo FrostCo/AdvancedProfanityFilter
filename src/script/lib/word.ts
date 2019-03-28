@@ -1,4 +1,5 @@
 export default class Word {
+  private static readonly _edgePunctuationRegExp = /(^[,.'"!?%$]|[,.'"!?%$]$)/;
   private static readonly _escapeRegExp = /[\/\\^$*+?.()|[\]{}]/g;
   private static readonly _unicodeRegex = /[^\u0000-\u00ff]/;
   private static readonly _unicodeWordBoundary = '[\\s.,\'"+!?|-]';
@@ -21,6 +22,8 @@ export default class Word {
         // Work around for lack of word boundary support for unicode characters
         // /(^|[\s.,'"+!?|-]+)(word)([\s.,'"+!?|-]+|$)/giu
         return new RegExp('(^|' + Word._unicodeWordBoundary + '+)(' + Word.processPhrase(str, matchRepeated) + ')(' + Word._unicodeWordBoundary + '+|$)', 'giu');
+      } else if (str.match(Word._edgePunctuationRegExp)) { // Begin or end with punctuation (not \w))
+        return new RegExp('(^|\\s)(' + Word.processPhrase(str, matchRepeated) + ')(\\s|$)', 'giu');
       } else {
         return new RegExp('\\b' + Word.processPhrase(str, matchRepeated) + '\\b', 'gi');
       }

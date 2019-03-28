@@ -178,6 +178,29 @@ describe('Filter', function() {
         expect(filter.replaceText('I love having good examples as an Exxaammppllee.')).to.equal('I love having good examples as an [Demo].');
       });
 
+      it('Should filter an exact word ending with punctuation', function() {
+        let filter = new Filter;
+        filter.cfg = new Config(
+          {
+            filterMethod: 1,
+            globalMatchMethod: 3,
+            substitutionMark: false,
+            preserveCase: true,
+            words: {
+              'this!': { matchMethod: 0, repeat: false, sub: 'that!' },
+              '!bang': { matchMethod: 0, repeat: true, sub: '!poof' },
+              '!another!': { matchMethod: 0, repeat: false, sub: '$znother#' }
+            },
+          }
+        );
+        filter.init();
+        expect(filter.replaceText('I love This! Do you?')).to.equal('I love That! Do you?');
+        expect(filter.replaceText('I love this!')).to.equal('I love that!');
+        expect(filter.replaceText('Go out with a !baangg')).to.equal('Go out with a !poof');
+        expect(filter.replaceText('Go out with a !Bang!')).to.equal('Go out with a !Bang!');
+        expect(filter.replaceText('!ANOTHER! so cool!')).to.equal('$ZNOTHER# so cool!');
+      });
+
       it('Should filter an partial word with substitions not marked and preserveCase', function() {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: false, preserveCase: true });
