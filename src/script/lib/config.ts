@@ -53,7 +53,7 @@ export default class Config {
     defaultWordMatchMethod: 0,
     defaultWordRepeat: false,
     disabledDomains: [],
-    filterMethod: 0, // ['Censor', 'Substitute', 'Remove'];
+    filterMethod: 1, // ['Censor', 'Substitute', 'Remove'];
     filterWordList: true,
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
     muteAudio: false, // Filter audio
@@ -73,6 +73,7 @@ export default class Config {
     'ass': { matchMethod: 0, repeat: true, sub: 'butt' },
     'asses': { matchMethod: 0, repeat: false, sub: 'butts' },
     'asshole': { matchMethod: 1, repeat: true, sub: 'jerk' },
+    'badass': { matchMethod: 1, repeat: true, sub: 'cool' },
     'bastard': { matchMethod: 1, repeat: true, sub: 'jerk' },
     'bitch': { matchMethod: 1, repeat: true, sub: 'jerk' },
     'christ': { matchMethod: 0, repeat: true, sub: 'deity' },
