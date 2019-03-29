@@ -110,6 +110,15 @@ describe('Filter', function() {
         expect(filter.counter).to.be.above(0);
       });
 
+      it('Should filter a partial word ending with punctuation', function() {
+        let filter = new Filter;
+        debugger;
+        filter.cfg = new Config({ words: {'this!': { matchMethod: 1 }}, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3 });
+        filter.init();
+        expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love all_____ Do you?');
+        expect(filter.replaceText('I love this! Do you?')).to.equal('I love _____ Do you?');
+      });
+
       it('Should filter a whole word with (_) characters and fixed length (3) and not update stats', function() {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '_', censorFixedLength: 3, preserveFirst: false, preserveLast: false });
@@ -117,6 +126,15 @@ describe('Filter', function() {
         expect(filter.counter).to.equal(0);
         expect(filter.replaceText('Words used to be okay, but now even a word is bad.', false)).to.equal('___ used to be okay, but now even a ___ is bad.');
         expect(filter.counter).to.equal(0);
+      });
+
+      it('Should filter a whole word ending with punctuation', function() {
+        let filter = new Filter;
+        debugger;
+        filter.cfg = new Config({ words: {'this!': { matchMethod: 2 }}, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3 });
+        filter.init();
+        expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love ________ Do you?');
+        expect(filter.replaceText('I love this! Do you?')).to.equal('I love _____ Do you?');
       });
 
       it('Should filter an RegExp and fixed length (5) with preserveLast', function() {
@@ -264,12 +282,28 @@ describe('Filter', function() {
         expect(filter.counter).to.equal(0);
       });
 
+      it('Should filter an partial word ending with punctuation', function() {
+        let filter = new Filter;
+        filter.cfg = new Config({filterMethod: 2, globalMatchMethod: 3, words: {'this!': { matchMethod: 1, repeat: false }}});
+        filter.init();
+        expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love Do you?');
+        expect(filter.replaceText('I love this! Do you?')).to.equal('I love Do you?');
+      });
+
       it('Should filter a RegExp', function() {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 });
         filter.cfg.words['this and everything after.*$'] = { matchMethod: 4, repeat: false, words: ['substitute'] };
         filter.init();
         expect(filter.replaceText('Have you ever done this and everything after it?')).to.equal('Have you ever done ');
+      });
+
+      it('Should filter an exact word ending with punctuation', function() {
+        let filter = new Filter;
+        filter.cfg = new Config({filterMethod: 2, globalMatchMethod: 3, words: {'this!': { matchMethod: 0, repeat: false }}});
+        filter.init();
+        expect(filter.replaceText('I love This! Do you?')).to.equal('I love Do you?');
+        expect(filter.replaceText('I love this!')).to.equal('I love');
       });
 
       describe('Unicode characters', function() {
