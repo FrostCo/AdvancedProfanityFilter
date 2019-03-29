@@ -50,6 +50,8 @@ export default class Word {
         // Work around for lack of word boundary support for unicode characters
         // /(^|[\s.,'"+!?|-]+)(word)([\s.,'"+!?|-]+|$)/giu
         return new RegExp('(^|' + Word._unicodeWordBoundary + ')(' + Word.processPhrase(str, matchRepeated) + ')(' + Word._unicodeWordBoundary + '|$)', 'giu');
+      } else if (str.match(Word._edgePunctuationRegExp)) { // Begin or end with punctuation (not \w))
+        return new RegExp('(^|\\s)(' + Word.processPhrase(str, matchRepeated) + ')(\\s|$)', 'giu');
       } else {
         return new RegExp('\\s?\\b' + Word.processPhrase(str, matchRepeated) + '\\b\\s?', 'gi');
       }
@@ -66,6 +68,8 @@ export default class Word {
         // Work around for lack of word boundary support for unicode characters
         // /(^|[\s.,'"+!?|-]?)[\w-]*(word)[\w-]*([\s.,'"+!?|-]?|$)/giu
         return new RegExp('(^|' + Word._unicodeWordBoundary + '?)([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*)(' + Word._unicodeWordBoundary + '?|$)', 'giu');
+      } else if (str.match(Word._edgePunctuationRegExp)) { // Begin or end with punctuation (not \w))
+        return new RegExp('(^|\\s)([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*)(\\s|$)', 'giu');
       } else {
         return new RegExp('\\s?\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b\\s?', 'gi');
       }
@@ -82,6 +86,8 @@ export default class Word {
         // Work around for lack of word boundary support for unicode characters
         // (^|[\s.,'"+!?|-]*)([\S]*куче[\S]*)([\s.,'"+!?|-]*|$)/giu
         return new RegExp('(^|' + Word._unicodeWordBoundary + '*)([\\S]*' + Word.processPhrase(str, matchRepeated) + '[\\S]*)(' + Word._unicodeWordBoundary + '*|$)', 'giu');
+      } else if (str.match(Word._edgePunctuationRegExp)) { // Begin or end with punctuation (not \w))
+        return new RegExp('(^|\\s)([\\S]*' + Word.processPhrase(str, matchRepeated) + '[\\S]*)(\\s|$)', 'giu');
       } else {
         return new RegExp('\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi');
       }
