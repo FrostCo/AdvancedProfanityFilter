@@ -158,7 +158,7 @@ export default class OptionPage {
         break;
       }
       case 'removeAllWords':
-      OptionPage.configureConfirmModal('Are you sure you want to remove all words?<br><br><i>(Note: The default words will return if no words are added.)</i>');
+        OptionPage.configureConfirmModal('Are you sure you want to remove all words?<br><br><i>(Note: The default words will return if no words are added.)</i>');
         ok.addEventListener('click', removeAllWords);
         break;
       case 'restoreDefaults':
