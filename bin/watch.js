@@ -23,7 +23,7 @@ function compileScript(file) {
 
   try {
     console.log('Building Typescript...');
-    execSync('npm run webpack');
+    execSync('npm run build');
   } catch(err) {
     console.log('Error: ', err);
   }
@@ -47,5 +47,5 @@ watcher.on('ready', () => log('Initial scan complete. Watching for changes...\n\
 watcher.on('change', (filePath, stats) => {
   // console.log(filePath, stats);
   if (filePath.match(/[\/\\]static[\/\\]/)) { copyStatic(filePath); }
-  if (filePath.match(/[\/\\]src[\/\\]/)) { compileScript(filePath); }
+  if (filePath.match(/[\/\\]script[\/\\]/)) { compileScript(filePath); }
 });
