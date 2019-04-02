@@ -16,6 +16,10 @@ describe('Word', function() {
         expect(() => { Word.buildExactRegexp(5, true)}).to.throw();
       });
 
+      it('should build RegExp with ending punctuation', function() {
+        expect(Word.buildExactRegexp('word!')).to.eql(/(^|\s)(word!)(\s|$)/giu);
+      });
+
       // Work around for lack of word boundary support for unicode characters
       describe('Unicode', function() {
         it('should use workaround for UTF word boundaries for exact match', function() {
@@ -59,6 +63,10 @@ describe('Word', function() {
         expect(() => { Word.buildRegexpForRemoveExact(5)}).to.throw();
       });
 
+      it('should build RegExp with ending punctuation', function() {
+        expect(Word.buildRegexpForRemoveExact('word!')).to.eql(/(^|\s)(word!)(\s|$)/giu);
+      });
+
       // Work around for lack of word boundary support for unicode characters
       describe('Unicode', function() {
         it('should build the proper RegExp for remove exact', function() {
@@ -88,6 +96,10 @@ describe('Word', function() {
         expect(() => { Word.buildRegexpForRemovePart(5)}).to.throw();
       });
 
+      it('should build RegExp with ending punctuation', function() {
+        expect(Word.buildRegexpForRemovePart('word!')).to.eql(/(^|\s)([\w-]*word![\w-]*)(\s|$)/giu);
+      });
+
       // Work around for lack of word boundary support for unicode characters
       describe('Unicode', function() {
         it('should build the proper RegExp for remove part', function() {
@@ -115,6 +127,10 @@ describe('Word', function() {
 
       it('should throw exception for invalid RegExp', function() {
         expect(() => { Word.buildWholeRegexp(5)}).to.throw();
+      });
+
+      it('should build RegExp with ending punctuation', function() {
+        expect(Word.buildWholeRegexp('word!')).to.eql(/(^|\s)([\S]*word![\S]*)(\s|$)/giu);
       });
 
       // Work around for lack of word boundary support for unicode characters
