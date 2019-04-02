@@ -145,6 +145,7 @@ export default class OptionPage {
   confirm(evt, action) {
     let ok = document.getElementById('confirmModalOK');
     ok.removeEventListener('click', importConfig);
+    ok.removeEventListener('click', removeAllWords);
     ok.removeEventListener('click', restoreDefaults);
     ok.removeEventListener('click', setPassword);
 
@@ -156,6 +157,10 @@ export default class OptionPage {
         ok.addEventListener('click', importConfig);
         break;
       }
+      case 'removeAllWords':
+        OptionPage.configureConfirmModal('Are you sure you want to remove all words?<br><br><i>(Note: The default words will return if no words are added.)</i>');
+        ok.addEventListener('click', removeAllWords);
+        break;
       case 'restoreDefaults':
         OptionPage.configureConfirmModal('Are you sure you want to restore defaults?');
         ok.addEventListener('click', restoreDefaults);
@@ -429,17 +434,23 @@ export default class OptionPage {
     this.populateWord();
   }
 
+  removeAllWords(evt) {
+    this.cfg.words = {};
+    let wordList = document.getElementById('wordList') as HTMLSelectElement;
+    wordList.selectedIndex = 0;
+    this.populateWordsList();
+  }
+
   async removeWord(evt) {
     if (evt.target.classList.contains('disabled')) return false;
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     let word = wordList.value;
 
     delete this.cfg.words[word];
-    let success = this.saveOptions(evt);
+    let success = await this.saveOptions(evt);
 
     if (success) {
       // Update states and Reset word form
-      filter.init();
       wordList.selectedIndex = 0;
       this.populateWordsList();
     }
@@ -666,6 +677,7 @@ let option = new OptionPage;
 // Events
 // Functions
 function importConfig(e) { option.importConfig(e); }
+function removeAllWords(e) { option.removeAllWords(e); }
 function restoreDefaults(e) { option.restoreDefaults(e); }
 function setPassword(e) { option.auth.setPassword(option); }
 // Add event listeners to DOM
@@ -697,6 +709,7 @@ document.getElementById('wordList').addEventListener('click', e => { option.popu
 document.getElementById('wordText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
 document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
 document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
+document.getElementById('wordRemoveAll').addEventListener('click', e => { option.confirm(e, 'removeAllWords'); });
 // Domains
 document.getElementById('advDomainSelect').addEventListener('change', e => { option.advancedDomainPopulate(); });
 document.getElementById('advDomainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
