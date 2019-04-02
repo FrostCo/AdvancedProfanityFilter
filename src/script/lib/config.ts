@@ -66,7 +66,7 @@ export default class Config {
     showSubtitles: 0,
     showSummary: true,
     showUpdateNotification: true,
-    substitutionMark: true
+    substitutionMark: false
   };
 
   static readonly _defaultWords = {
