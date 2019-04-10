@@ -61,6 +61,3 @@ To Build the extension
 ```
 npm run package
 ```
-
-##### License
-This project is licensed under the terms of the GPL v3.0 license.
