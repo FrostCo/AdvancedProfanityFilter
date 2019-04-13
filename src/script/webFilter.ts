@@ -167,7 +167,14 @@ export default class WebFilter extends Filter {
       if (this.summary[word]) {
         this.summary[word].count += 1;
       } else {
-        this.summary[word] = { clean: filter.replaceText(word, false), count: 1 };
+        let result;
+        if (this.cfg.words[word].matchMethod == 4) { // Regexp
+          result = this.cfg.words[word].sub || this.cfg.defaultSubstitution;
+        } else {
+          result = filter.replaceText(word, false);
+        }
+
+        this.summary[word] = { filtered: result, count: 1 };
       }
     }
   }

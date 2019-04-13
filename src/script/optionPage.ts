@@ -453,7 +453,14 @@ export default class OptionPage {
 
     Object.keys(option.cfg.words).sort().forEach(word => {
       let filteredWord = word;
-      if (this.cfg.filterWordList) filteredWord = filter.replaceText(word, false);
+      if (filter.cfg.filterWordList) {
+        if (filter.cfg.words[word].matchMethod == 4) { // Regexp
+          filteredWord = filter.cfg.words[word].sub || filter.cfg.defaultSubstitution;
+        } else {
+          filteredWord = filter.replaceText(word, false);
+        }
+      }
+
       wordListHTML += `<option value="${word}" data-filtered="${filteredWord}">${escapeHTML(filteredWord)}</option>`;
     });
 
