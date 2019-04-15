@@ -12,3 +12,6 @@
 /test/built/*
 /test/.nyc_output/*
 /test/coverage/*
+
+# Built shared libs
+/src/script/lib/*.js

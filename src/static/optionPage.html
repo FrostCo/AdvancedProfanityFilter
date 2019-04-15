@@ -306,15 +306,18 @@
 </div>
 
 <div id="configPage" class="w3-container w3-hide">
+  <h4 class="sectionHeader">Configuration</h4>
+  <label style="display:block;"><input id="configInlineInput" type="checkbox" class="w3-check">  Inline Editor</label>
   <div style="padding-top:16px;padding-bottom:16px;width:500px;">
+    <input type="file" id="importFileInput" accept=".json" style="display:none"/>
     <button id="configExport" class="w3-btn w3-round-large w3-flat-peter-river">EXPORT</button>
     <button id="configImport" class="w3-btn w3-round-large w3-flat-peter-river">IMPORT</button>
     <button id="configReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESTORE DEFAULTS</button>
   </div>
-  <textarea id="configText" class="w3-input w3-border w3-card" style="width:500px;height:550px;" spellcheck="false"></textarea>
+  <textarea id="configText" class="w3-input w3-border w3-card w3-hide" style="width:500px;height:550px;" spellcheck="false"></textarea>
 
-  <div id="setPasswordContainer" style="padding-top:16px;width:500px;">
-    <label for="setPassword">Password</label>
+  <div id="setPasswordContainer" style="width:500px;">
+    <h4 class="sectionHeader">Password</h4>
     <input id="setPassword" class="w3-input w3-border small" style="display:inline">
     <button id="setPasswordBtn" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">REMOVE</button>
   </div>
@@ -374,6 +377,7 @@
     <li><strong>Show number of filtered words</strong> - Show a counter on the extension button with the number of filtered words.</li>
     <li><strong>Show summary of filtered words</strong> - Show a summary of the words filtered on the current page.</li>
     <li><strong>Filter word list in Options</strong> - This option will filter the word list in the options page.</li>
+    <li><strong>Show update notification</strong> - Show a notification when the extension gets updated.</li>
     </ul>
     <h3 id="default-settings-for-new-word-phrases-">Default Settings (for new word/phrases)</h3>
     <ul>
@@ -412,13 +416,15 @@
     </ul>
     </li>
     <li><strong>Subtitles</strong> - Controls which subtitles will be visible.<ul>
-    <li>Show all subtitles (<em>default</em>)</li>
+    <li>Show all subtitles (_default_)</li>
     <li>Show only filtered subtitles - Least distracting</li>
     <li>Show only unfiltered subtitles</li>
     <li>Hide all subtitles - This may make it difficult to know what is happening when the audio is muted</li>
     </ul>
     </li>
     </ul>
+    <h1 id="bookmarklet">Bookmarklet</h1>
+    <p>The bookmarklet allows you to run a minimal version of the filter on devices that can&#39;t install the full version. It is an advanced tool, and requires several steps to set it up. Learn more <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Bookmarklet">here</a>.</p>
     <h1 id="config">Config</h1>
     <p>This tab allows you to control your configuration for the filter.</p>
     <ul>

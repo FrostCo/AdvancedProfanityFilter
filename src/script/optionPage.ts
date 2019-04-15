@@ -1,4 +1,4 @@
-import { dynamicList, escapeHTML, exportToFile } from './lib/helper';
+import { dynamicList, escapeHTML, exportToFile, readFile } from './lib/helper';
 import WebConfig from './webConfig';
 import { Filter } from './lib/filter';
 import OptionAuth from './optionAuth';
@@ -142,6 +142,18 @@ export default class OptionPage {
     }
   }
 
+  configInlineToggle() {
+    let input = document.getElementById('configInlineInput') as HTMLInputElement;
+    let configText = document.getElementById('configText') as HTMLTextAreaElement;
+    if (input.checked) {
+      OptionPage.show(configText);
+      option.exportConfig();
+    } else {
+      OptionPage.hide(configText);
+      configText.value = '';
+    }
+  }
+
   confirm(evt, action) {
     let ok = document.getElementById('confirmModalOK');
     ok.removeEventListener('click', importConfig);
@@ -151,8 +163,6 @@ export default class OptionPage {
 
     switch(action) {
       case 'importConfig': {
-        let configText = document.getElementById('configText') as HTMLTextAreaElement;
-        if (!configText.value) return false;
         OptionPage.configureConfirmModal('Are you sure you want to overwrite your existing settings?');
         ok.addEventListener('click', importConfig);
         break;
@@ -244,20 +254,45 @@ export default class OptionPage {
   }
 
   exportConfig() {
-    let configText = document.getElementById('configText') as HTMLTextAreaElement;
-    configText.value = JSON.stringify(this.cfg, null, 2);
+    let input = document.getElementById('configInlineInput') as HTMLInputElement;
+
+    if (input.checked) { // inline editor
+      let configText = document.getElementById('configText') as HTMLTextAreaElement;
+      configText.value = JSON.stringify(this.cfg, null, 2);
+    } else {
+      let date = new Date;
+      let today = `${date.getUTCFullYear()}-${('0'+(date.getUTCMonth()+1)).slice(-2)}-${('0'+(date.getUTCDate()+1)).slice(-2)}`;
+      exportToFile(JSON.stringify(this.cfg, null, 2), `apf-backup-${today}.json`);
+    }
   }
 
-  async importConfig(evt) {
+  async importConfig(e) {
+    let input = document.getElementById('configInlineInput') as HTMLInputElement;
+    if (input.checked) { // inline editor
+      let configText = document.getElementById('configText') as HTMLTextAreaElement;
+      this.importConfigText(configText.value);
+    } else {
+      let importFileInput = document.getElementById('importFileInput') as HTMLInputElement;
+      importFileInput.click();
+    }
+  }
+
+  async importConfigFile(e) {
+    let file = e.target.files[0];
+    let importFileInput = document.getElementById('importFileInput') as HTMLInputElement;
+    let fileText = await readFile(file) as string;
+    option.importConfigText(fileText);
+    importFileInput.value = '';
+  }
+
+  async importConfigText(cfg: string) {
     let self = this;
 
     try {
-      let configText = document.getElementById('configText') as HTMLTextAreaElement;
-      let importedCfg = new WebConfig(JSON.parse(configText.value));
+      let importedCfg = new WebConfig(JSON.parse(cfg));
       let migration = new DataMigration(importedCfg);
       migration.runImportMigrations();
-
-      let resetSuccess = await self.restoreDefaults(evt, true);
+      let resetSuccess = await self.restoreDefaults(null, true);
 
       if (resetSuccess) {
         self.cfg = importedCfg;
@@ -268,11 +303,9 @@ export default class OptionPage {
         } else {
           OptionPage.showErrorModal('Failed to import settings.');
         }
-      } else {
-        OptionPage.showErrorModal('Failed to import settings.');
       }
-    } catch (e) {
-      OptionPage.showErrorModal();
+    } catch(e) {
+      OptionPage.showErrorModal('Failed to import settings.');
     }
   }
 
@@ -420,7 +453,14 @@ export default class OptionPage {
 
     Object.keys(option.cfg.words).sort().forEach(word => {
       let filteredWord = word;
-      if (this.cfg.filterWordList) filteredWord = filter.replaceText(word, false);
+      if (filter.cfg.filterWordList) {
+        if (filter.cfg.words[word].matchMethod == 4) { // Regexp
+          filteredWord = filter.cfg.words[word].sub || filter.cfg.defaultSubstitution;
+        } else {
+          filteredWord = filter.replaceText(word, false);
+        }
+      }
+
       wordListHTML += `<option value="${word}" data-filtered="${filteredWord}">${escapeHTML(filteredWord)}</option>`;
     });
 
@@ -727,6 +767,8 @@ document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.ad
 document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });
 document.getElementById('bookmarkletHostedURL').addEventListener('input', e => { option.createBookmarklet(); });
 // Config
+document.getElementById('configInlineInput').addEventListener('click', e => { option.configInlineToggle(); });
+document.getElementById('importFileInput').addEventListener('change', e => { option.importConfigFile(e); });
 document.getElementById('configReset').addEventListener('click', e => { option.confirm(e, 'restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });
 document.getElementById('configImport').addEventListener('click', e => { option.confirm(e, 'importConfig'); });

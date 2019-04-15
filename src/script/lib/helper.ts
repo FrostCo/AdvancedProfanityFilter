@@ -61,6 +61,14 @@ export function isVersionOlder(version: Version, minimum: Version): boolean {
   return false;
 }
 
+export function readFile(file) {
+  return new Promise((resolve, reject) => {
+    let fr = new FileReader();
+    fr.onload = () => { resolve(fr.result); };
+    fr.readAsText(file);
+  });
+}
+
 export function removeFromArray(array: string[], element: string) {
   return array.filter(e => e !== element);
 }

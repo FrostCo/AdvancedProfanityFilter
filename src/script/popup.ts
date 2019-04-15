@@ -4,7 +4,7 @@ import Domain from './domain';
 
 interface Summary {
   [word: string]: {
-    clean: string;
+    filtered: string;
     count: number;
   };
 }
@@ -159,8 +159,8 @@ class Popup {
     let tableInnerHTML = '';
     if (Object.keys(summary).length > 0) {
       tableInnerHTML = '<table class="w3-table w3-striped w3-border w3-bordered w3-card w3-small"><tr class="w3-flat-peter-river"><th colspan="2" class="w3-center">Filtered Words</th></tr>';
-      Object.keys(summary).forEach(key => {
-        tableInnerHTML += `<tr><td class="w3-tooltip"><span style="position:absolute;left:0;bottom:18px" class="w3-text w3-tag">${escapeHTML(key)}</span>${escapeHTML(summary[key].clean)}</td><td class="w3-right">${summary[key].count}</td></tr>`;
+      Object.keys(summary).sort((a,b) => summary[b].count - summary[a].count).forEach(key => {
+        tableInnerHTML += `<tr><td class="w3-tooltip"><span style="position:absolute;left:0;bottom:18px" class="w3-text w3-tag">${escapeHTML(key)}</span>${escapeHTML(summary[key].filtered)}</td><td class="w3-right">${summary[key].count}</td></tr>`;
       });
       tableInnerHTML += '</table>';
     }

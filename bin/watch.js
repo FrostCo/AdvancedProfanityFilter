@@ -24,6 +24,7 @@ function compileScript(file) {
   try {
     console.log('Building Typescript...');
     execSync('npm run build');
+    console.log('done.');
   } catch(err) {
     console.log('Error: ', err);
   }
