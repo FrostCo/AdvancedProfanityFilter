@@ -29,6 +29,7 @@ export default class Config {
   words: {
     [key: string]: WordOptions;
   };
+  youTubeAutoSubsMin: number;
 
   // TODO: Finish removing magic numbers?
   static readonly filterMethods = {
@@ -66,7 +67,8 @@ export default class Config {
     showSubtitles: 0,
     showSummary: true,
     showUpdateNotification: true,
-    substitutionMark: false
+    substitutionMark: false,
+    youTubeAutoSubsMin: 0
   };
 
   static readonly _defaultWords = {

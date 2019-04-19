@@ -333,10 +333,12 @@ export default class OptionPage {
     let selectedMuteMethod = document.querySelector(`input[name=audioMuteMethod][value='${this.cfg.muteMethod}']`) as HTMLInputElement;
     let selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
     let muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
+    let audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
     muteAudioInput.checked = this.cfg.muteAudio;
     this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
     selectedMuteMethod.checked = true;
     selectedshowSubtitle.checked = true;
+    audioYouTubeAutoSubsMin.value = this.cfg.youTubeAutoSubsMin.toString();
   }
 
   populateConfig() {
@@ -527,8 +529,9 @@ export default class OptionPage {
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
-    let showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
     let muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
+    let showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
+    let audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
     self.cfg.censorCharacter = censorCharacterSelect.value;
     self.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
@@ -546,6 +549,7 @@ export default class OptionPage {
     self.cfg.muteAudio = muteAudioInput.checked;
     self.cfg.muteMethod = parseInt(muteMethodInput.value);
     self.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
+    self.cfg.youTubeAutoSubsMin = parseFloat(audioYouTubeAutoSubsMin.value);
 
     // Save settings
     let error = await self.cfg.save();
@@ -708,6 +712,16 @@ export default class OptionPage {
       }
     }
   }
+
+  async updateYouTubeAutoMin(target) {
+    OptionPage.hideInputError(target);
+    if (target.checkValidity()) {
+      this.cfg.youTubeAutoSubsMin = parseFloat(target.value);
+      await option.saveProp('youTubeAutoSubsMin');
+    } else {
+      OptionPage.showInputError(target, 'Please enter a valid number of seconds.');
+    }
+  }
 }
 
 let filter = new Filter;
@@ -763,6 +777,7 @@ document.getElementById('disabledDomainRemove').addEventListener('click', e => {
 document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
 document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
+document.getElementById('audioYouTubeAutoSubsMin').addEventListener('input', e => { option.updateYouTubeAutoMin(e.target); });
 // Bookmarklet
 document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });
 document.getElementById('bookmarkletHostedURL').addEventListener('input', e => { option.createBookmarklet(); });
