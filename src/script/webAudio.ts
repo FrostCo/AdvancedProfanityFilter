@@ -32,17 +32,21 @@ export default class WebAudio {
   }
 
   static cleanYouTubeAutoSubs(filter, node): void {
-    let filtered = false;
     let result = filter.replaceTextResult(node.textContent);
+    let currentTime = document.getElementsByTagName('video')[0].currentTime;
     if (result.modified) {
-      filtered = true;
       node.textContent = result.filtered;
       WebAudio.mute(filter);
+      filter.mutedAt = currentTime;
+      filter.updateCounterBadge();
     } else {
-      WebAudio.unmute(filter);
+      if (filter.muted) {
+        if (currentTime < filter.mutedAt) { filter.mutedAt = 0; } // Reset mutedAt if video reversed
+        if (currentTime > (filter.mutedAt + filter.cfg.youTubeAutoSubsMin)) {
+          WebAudio.unmute(filter);
+        }
+      }
     }
-
-    if (filtered) { filter.updateCounterBadge(); } // Update if modified
   }
 
   static mute(filter): void {
@@ -94,26 +98,24 @@ export default class WebAudio {
   }
 
   static unmute(filter): void {
-    if (filter.muted) {
-      filter.muted = false;
+    filter.muted = false;
 
-      switch(filter.cfg.muteMethod) {
-        case 0: // Mute tab
-          chrome.runtime.sendMessage({ mute: false });
-          break;
-        case 1: { // Mute video
-          let video = document.getElementsByTagName('video')[0];
-          if (video && video.volume != null) {
-            video.volume = filter.volume;
-          }
-          break;
+    switch(filter.cfg.muteMethod) {
+      case 0: // Mute tab
+        chrome.runtime.sendMessage({ mute: false });
+        break;
+      case 1: { // Mute video
+        let video = document.getElementsByTagName('video')[0];
+        if (video && video.volume != null) {
+          video.volume = filter.volume;
         }
+        break;
       }
     }
   }
 
   static youTubeAutoSubsCurrentRow(node): boolean {
-    return !!(node.parentElement.parentElement == node.parentElement.parentElement.parentElement.lastChild) // Bottom row (or only row)
+    return !!(node.parentElement.parentElement == node.parentElement.parentElement.parentElement.lastChild);
   }
 
   static youTubeAutoSubsNodeIsSubtitleText(node): boolean {

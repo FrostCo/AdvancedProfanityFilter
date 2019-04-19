@@ -20,6 +20,7 @@ export default class WebFilter extends Filter {
   mutePage: boolean;
   lastSubtitle: string;
   muted: boolean;
+  mutedAt: number;
   subtitleSelector: string;
   summary: object;
   volume: number;
@@ -28,6 +29,7 @@ export default class WebFilter extends Filter {
     super();
     this.advanced = false;
     this.muted = false;
+    this.mutedAt = 0;
     this.summary = {};
     this.volume = 1;
   }
@@ -78,7 +80,7 @@ export default class WebFilter extends Filter {
     });
 
     mutation.removedNodes.forEach(node => {
-      if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
+      if (filter.mutePage && filter.muted && WebAudio.supportedNode(filter.hostname, node)) {
         WebAudio.unmute(filter);
       }
     });

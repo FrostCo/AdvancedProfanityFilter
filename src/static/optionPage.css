@@ -10,6 +10,8 @@ h4.sectionHeader
 {padding-bottom:16px}
 #menu > a:hover
 {color:#fff!important;background-color:#2980b9!important}
+#audioYouTubeAutoSubsMin
+{width:80px;text-align:right;}
 .disabled
 {cursor:not-allowed!important;}
 .notes
