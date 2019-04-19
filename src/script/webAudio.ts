@@ -4,7 +4,7 @@ export default class WebAudio {
     'www.amazon.com': 'span.timedTextBackground',
     'www.netflix.com': 'span',
     'www.vudu.com': 'span.subtitles',
-    'www.youtube.com': 'span.caption-visual-line'
+    'www.youtube.com': 'span.ytp-caption-segment'
   }
 
   static clean(filter, subtitleContainer, subSelector): void {
@@ -84,7 +84,7 @@ export default class WebAudio {
       case 'www.vudu.com':
         return !!(node.tagName == 'DIV' && node.querySelectorAll('span.subtitles').length > 0);
       case 'www.youtube.com':
-        return !!(node.tagName == 'DIV' && node.className.includes('caption-window') && node.querySelectorAll('span.captions-text span span.caption-visual-line').length > 0);
+        return !!(node.tagName == 'DIV' && node.className.includes('caption-window') && node.querySelectorAll('span.captions-text span.ytp-caption-segment').length > 0);
     }
     return false;
   }
