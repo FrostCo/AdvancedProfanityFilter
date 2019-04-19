@@ -137,7 +137,11 @@ export default class WebFilter extends Filter {
     this.cfg = await WebConfig.build();
 
     // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
-    this.hostname = (window.location == window.parent.location) ? document.location.hostname : new URL(document.referrer).hostname;
+    if (window.location == window.parent.location || document.referrer == '') {
+      this.hostname = document.location.hostname;
+    } else if (document.referrer != '') {
+      this.hostname = new URL(document.referrer).hostname;
+    }
 
     // Check if the topmost frame is a disabled domain
     let message: Message = { disabled: this.disabledPage() };
