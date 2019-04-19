@@ -104,7 +104,7 @@ export default class WebFilter extends Filter {
     // else { console.log('Forbidden mutation.target node:', mutation.target); } // DEBUG - Mutation target text
   }
 
-  cleanNode(node, stats = true) {
+  cleanNode(node, stats: boolean = true) {
     if (Page.isForbiddenNode(node)) { return false; }
 
     if (node.childElementCount > 0) { // Tree node
