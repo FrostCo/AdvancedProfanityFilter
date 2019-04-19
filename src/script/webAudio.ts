@@ -112,6 +112,10 @@ export default class WebAudio {
     }
   }
 
+  static youTubeAutoSubsCurrentRow(node): boolean {
+    return !!(node.parentElement.parentElement == node.parentElement.parentElement.parentElement.lastChild) // Bottom row (or only row)
+  }
+
   static youTubeAutoSubsNodeIsSubtitleText(node): boolean {
     let captionWindow = document.querySelectorAll('div.caption-window')[0]; // YouTube Auto-gen subs
     return !!(captionWindow && captionWindow.contains(node));

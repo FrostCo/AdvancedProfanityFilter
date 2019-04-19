@@ -55,7 +55,11 @@ export default class WebFilter extends Filter {
         // console.log('Added node(s):', node); // DEBUG - Mutation - addedNodes
         if (filter.mutePage && WebAudio.youTubeAutoSubsPresent(filter)) { // YouTube Auto subs
           if (WebAudio.youTubeAutoSubsSupportedNode(filter.hostname, node)) {
-            WebAudio.cleanYouTubeAutoSubs(filter, node); // Clean Auto subs
+            if (WebAudio.youTubeAutoSubsCurrentRow(node)) {
+              WebAudio.cleanYouTubeAutoSubs(filter, node);
+            } else {
+              filter.cleanNode(node);
+            }
           } else if (!WebAudio.youTubeAutoSubsNodeIsSubtitleText(node)) {
             filter.cleanNode(node); // Clean the rest of the page
           }
