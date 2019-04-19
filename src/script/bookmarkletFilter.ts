@@ -22,6 +22,7 @@ export default class BookmarkletFilter extends Filter {
   mutePage: boolean;
   lastSubtitle: string;
   muted: boolean;
+  mutedAt: number;
   subtitleSelector: string;
   summary: object;
   volume: number;
@@ -30,6 +31,7 @@ export default class BookmarkletFilter extends Filter {
     super();
     this.advanced = false;
     this.muted = false;
+    this.mutedAt = 0;
     this.summary = {};
     this.volume = 1;
   }
@@ -53,9 +55,11 @@ export default class BookmarkletFilter extends Filter {
       if (!Page.isForbiddenNode(node)) {
         if (filter.mutePage && WebAudio.youTubeAutoSubsPresent(filter)) { // YouTube Auto subs
           if (WebAudio.youTubeAutoSubsSupportedNode(filter.hostname, node)) {
-            WebAudio.cleanYouTubeAutoSubs(filter, node); // Clean Auto subs
-          } else if (!WebAudio.youTubeAutoSubsNodeIsSubtitleText(node)) {
-            filter.cleanNode(node); // Clean the rest of the page
+            if (WebAudio.youTubeAutoSubsCurrentRow(node)) {
+              WebAudio.cleanYouTubeAutoSubs(filter, node);
+            } else {
+              filter.cleanNode(node, false);
+            }
           }
         } else if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
           WebAudio.clean(filter, node, filter.subtitleSelector);
@@ -70,7 +74,7 @@ export default class BookmarkletFilter extends Filter {
     });
 
     mutation.removedNodes.forEach(node => {
-      if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
+      if (filter.mutePage && filter.muted && WebAudio.supportedNode(filter.hostname, node)) {
         WebAudio.unmute(filter);
       }
     });
@@ -90,7 +94,7 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  cleanNode(node) {
+  cleanNode(node, stats: boolean = true) {
     if (Page.isForbiddenNode(node)) { return false; }
 
     if (node.childElementCount > 0) { // Tree node
@@ -98,16 +102,16 @@ export default class BookmarkletFilter extends Filter {
       while(treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
           treeWalker.currentNode.childNodes.forEach(childNode => {
-            this.cleanNode(childNode);
+            this.cleanNode(childNode, stats);
           });
         } else {
-          this.cleanNode(treeWalker.currentNode);
+          this.cleanNode(treeWalker.currentNode, stats);
         }
       }
     } else { // Leaf node
       if (node.nodeName) {
         if (node.textContent.trim() != '') {
-          let result = this.replaceTextResult(node.textContent);
+          let result = this.replaceTextResult(node.textContent, stats);
           if (result.modified) {
             node.textContent = result.filtered;
           }
@@ -121,7 +125,11 @@ export default class BookmarkletFilter extends Filter {
     this.cfg.muteMethod = 1; // Bookmarklet: Force audio muteMethod = 1 (Volume)
 
     // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
-    this.hostname = (window.location == window.parent.location) ? document.location.hostname : new URL(document.referrer).hostname;
+    if (window.location == window.parent.location || document.referrer == '') {
+      this.hostname = document.location.hostname;
+    } else if (document.referrer != '') {
+      this.hostname = new URL(document.referrer).hostname;
+    }
 
     // Check if the topmost frame is a disabled domain
     if (this.disabledPage()) {
@@ -168,7 +176,7 @@ export default class BookmarkletFilter extends Filter {
   replaceTextResult(string: string, stats: boolean = true) {
     let result = {} as any;
     result.original = string;
-    result.filtered = filter.replaceText(string);
+    result.filtered = filter.replaceText(string, stats);
     result.modified = (result.filtered != string);
     return result;
   }
