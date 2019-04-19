@@ -531,7 +531,6 @@ export default class OptionPage {
     let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
     let muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
     let showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
-    let audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
     self.cfg.censorCharacter = censorCharacterSelect.value;
     self.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
@@ -549,7 +548,6 @@ export default class OptionPage {
     self.cfg.muteAudio = muteAudioInput.checked;
     self.cfg.muteMethod = parseInt(muteMethodInput.value);
     self.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
-    self.cfg.youTubeAutoSubsMin = parseFloat(audioYouTubeAutoSubsMin.value);
 
     // Save settings
     let error = await self.cfg.save();
