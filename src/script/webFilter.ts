@@ -60,7 +60,7 @@ export default class WebFilter extends Filter {
             if (WebAudio.youTubeAutoSubsCurrentRow(node)) {
               WebAudio.cleanYouTubeAutoSubs(filter, node);
             } else {
-              filter.cleanNode(node);
+              filter.cleanNode(node, false);
             }
           } else if (!WebAudio.youTubeAutoSubsNodeIsSubtitleText(node)) {
             filter.cleanNode(node); // Clean the rest of the page
@@ -104,7 +104,7 @@ export default class WebFilter extends Filter {
     // else { console.log('Forbidden mutation.target node:', mutation.target); } // DEBUG - Mutation target text
   }
 
-  cleanNode(node) {
+  cleanNode(node, stats = true) {
     if (Page.isForbiddenNode(node)) { return false; }
 
     if (node.childElementCount > 0) { // Tree node
@@ -112,16 +112,16 @@ export default class WebFilter extends Filter {
       while(treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
           treeWalker.currentNode.childNodes.forEach(childNode => {
-            this.cleanNode(childNode);
+            this.cleanNode(childNode, stats);
           });
         } else {
-          this.cleanNode(treeWalker.currentNode);
+          this.cleanNode(treeWalker.currentNode, stats);
         }
       }
     } else { // Leaf node
       if (node.nodeName) {
         if (node.textContent.trim() != '') {
-          let result = this.replaceTextResult(node.textContent);
+          let result = this.replaceTextResult(node.textContent, stats);
           if (result.modified) {
             // console.log('[APF] Normal node changed:', result.original, result.filtered); // DEBUG - Mutation node
             node.textContent = result.filtered;
@@ -212,7 +212,7 @@ export default class WebFilter extends Filter {
   replaceTextResult(string: string, stats: boolean = true) {
     let result = {} as any;
     result.original = string;
-    result.filtered = filter.replaceText(string);
+    result.filtered = filter.replaceText(string, stats);
     result.modified = (result.filtered != string);
     return result;
   }
