@@ -9,7 +9,8 @@ Issues are used primarily to track bugs in the project. Feature requests can be 
 
 ### Details (Bugs Only)
 <!--- Please provide all details that are applicable --->
-Chrome Version:
+Browser Name:
+Browser Version:
 Extension Version:
 Operating System:
 Site(s) Affected:
