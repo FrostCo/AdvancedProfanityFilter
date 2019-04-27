@@ -160,7 +160,6 @@ export default class BookmarkletFilter extends Filter {
     mutations.forEach(function(mutation) {
       filter.checkMutationForProfanity(mutation);
     });
-    filter.updateCounterBadge();
   }
 
   replaceTextResult(string: string, stats: boolean = true) {
