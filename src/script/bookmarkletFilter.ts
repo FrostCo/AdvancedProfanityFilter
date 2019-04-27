@@ -115,6 +115,8 @@ export default class BookmarkletFilter extends Filter {
           if (result.modified) {
             node.textContent = result.filtered;
           }
+        } else if (node.shadowRoot != undefined) {
+          shadowObserver.observe(node.shadowRoot, observerConfig);
         }
       }
     }
@@ -146,7 +148,7 @@ export default class BookmarkletFilter extends Filter {
     // Remove profanity from the main document and watch for new nodes
     this.init();
     this.advanced ? this.advancedReplaceText(document) : this.cleanNode(document);
-    this.observeNewNodes();
+    observer.observe(document, observerConfig);
   }
 
   // Always use the top frame for page check
@@ -154,23 +156,10 @@ export default class BookmarkletFilter extends Filter {
     return Domain.domainMatch(this.hostname, this.cfg.disabledDomains);
   }
 
-  observeNewNodes() {
-    let self = this;
-    let observerConfig = {
-      characterData: true,
-      characterDataOldValue: true,
-      childList: true,
-      subtree: true,
-    };
-
-    // When DOM is modified, check for nodes to filter
-    let observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        self.checkMutationForProfanity(mutation);
-      });
+  processMutations(mutations) {
+    mutations.forEach(function(mutation) {
+      filter.checkMutationForProfanity(mutation);
     });
-
-    observer.observe(document, observerConfig);
   }
 
   replaceTextResult(string: string, stats: boolean = true) {
@@ -184,7 +173,19 @@ export default class BookmarkletFilter extends Filter {
   updateCounterBadge() {} // NO-OP
 }
 
-var filter = new BookmarkletFilter;
+let filter = new BookmarkletFilter;
+let observer;
+let shadowObserver;
+
+let observerConfig = {
+  characterData: true,
+  characterDataOldValue: true,
+  childList: true,
+  subtree: true,
+};
+
 if (typeof window !== 'undefined') {
+  observer = new MutationObserver(filter.processMutations);
+  shadowObserver = new MutationObserver(filter.processMutations);
   filter.cleanPage();
 }
