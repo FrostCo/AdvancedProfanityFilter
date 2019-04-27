@@ -126,6 +126,8 @@ export default class WebFilter extends Filter {
             // console.log('[APF] Normal node changed:', result.original, result.filtered); // DEBUG - Mutation node
             node.textContent = result.filtered;
           }
+        } else if (node.shadowRoot != undefined) {
+          shadowObserver.observe(node.shadowRoot, observerConfig);
         }
       }
       // else { console.log('node without nodeName:', node); } // Debug
@@ -163,7 +165,7 @@ export default class WebFilter extends Filter {
     this.init();
     this.advanced ? this.advancedReplaceText(document) : this.cleanNode(document);
     this.updateCounterBadge();
-    this.observeNewNodes();
+    observer.observe(document, observerConfig);
   }
 
   // Always use the top frame for page check
@@ -189,24 +191,11 @@ export default class WebFilter extends Filter {
     }
   }
 
-  observeNewNodes() {
-    let self = this;
-    let observerConfig = {
-      characterData: true,
-      characterDataOldValue: true,
-      childList: true,
-      subtree: true,
-    };
-
-    // When DOM is modified, check for nodes to filter
-    let observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        self.checkMutationForProfanity(mutation);
-      });
-      self.updateCounterBadge();
+  processMutations(mutations) {
+    mutations.forEach(function(mutation) {
+      filter.checkMutationForProfanity(mutation);
     });
-
-    observer.observe(document, observerConfig);
+    filter.updateCounterBadge();
   }
 
   replaceTextResult(string: string, stats: boolean = true) {
@@ -232,13 +221,26 @@ export default class WebFilter extends Filter {
 }
 
 // Global
-var filter = new WebFilter;
+let filter = new WebFilter;
+let observer;
+let shadowObserver;
+
+let observerConfig = {
+  characterData: true,
+  characterDataOldValue: true,
+  childList: true,
+  subtree: true,
+};
+
 if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptGlobalScope]'].includes(({}).toString.call(window))) {
   /* istanbul ignore next */
   // Send summary data to popup
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (filter.cfg.showSummary && request.popup && filter.counter > 0) chrome.runtime.sendMessage({ summary: filter.summary });
   });
+
+  observer = new MutationObserver(filter.processMutations);
+  shadowObserver = new MutationObserver(filter.processMutations);
 
   /* istanbul ignore next */
   filter.cleanPage();
