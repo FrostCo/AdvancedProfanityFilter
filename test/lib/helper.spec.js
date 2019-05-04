@@ -31,10 +31,6 @@ describe('Helper', function() {
       expect(isVersionOlder(version, minimum)).to.equal(true);
 
       version = getVersion('1.5.10');
-      minimum = getVersion('1.5.10');
-      expect(isVersionOlder(version, minimum)).to.equal(true);
-
-      version = getVersion('1.5.10');
       minimum = getVersion('1.5.11');
       expect(isVersionOlder(version, minimum)).to.equal(true);
     });
@@ -58,6 +54,10 @@ describe('Helper', function() {
 
       version = getVersion('1.3.0');
       minimum = getVersion('1.2.12');
+      expect(isVersionOlder(version, minimum)).to.equal(false);
+
+      version = getVersion('1.5.10');
+      minimum = getVersion('1.5.10');
       expect(isVersionOlder(version, minimum)).to.equal(false);
 
       version = getVersion('1.5.11');
