@@ -10,7 +10,7 @@ interface WordOptions {
 export default class DataMigration {
   cfg: WebConfig;
 
-  static readonly newestMigration = '1.2.0'; // Migration required by any version less than/equal to this
+  static readonly newestMigration = '2.1.4'; // Migration required by any version less than this
 
   constructor(config) {
     this.cfg = config;
@@ -46,7 +46,23 @@ export default class DataMigration {
       this.singleWordSubstitution();
     }
 
+    if (isVersionOlder(version, getVersion('2.1.4'))) {
+      migrated = true;
+      this.fixSubExpletiveTypo();
+    }
+
     return migrated;
+  }
+
+  // [2.1.4] - Fix typo in word substitutions
+  fixSubExpletiveTypo() {
+    let cfg = this.cfg;
+    Object.keys(cfg.words).forEach(word => {
+      let wordObj = cfg.words[word] as WordOptions;
+      if (wordObj.sub == 'explative') {
+        wordObj.sub = 'expletive';
+      }
+    });
   }
 
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
@@ -65,8 +81,9 @@ export default class DataMigration {
   }
 
   runImportMigrations() {
-    this.sanitizeWords();
-    this.singleWordSubstitution();
+    this.sanitizeWords(); // 1.1.0
+    this.singleWordSubstitution(); // 1.2.0
+    this.fixSubExpletiveTypo(); // 2.1.4
   }
 
   // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
