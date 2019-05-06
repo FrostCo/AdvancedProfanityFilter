@@ -79,7 +79,7 @@ export default class Config {
     'bastard': { matchMethod: 1, repeat: true, sub: 'jerk' },
     'bitch': { matchMethod: 1, repeat: true, sub: 'jerk' },
     'cocksucker': { matchMethod: 1, repeat: true, sub: 'idiot' },
-    'cunt': { matchMethod: 1, repeat: true, sub: 'explative' },
+    'cunt': { matchMethod: 1, repeat: true, sub: 'expletive' },
     'dammit': { matchMethod: 1, repeat: false, sub: 'dangit' },
     'damn': { matchMethod: 1, repeat: false, sub: 'dang' },
     'dumbass': { matchMethod: 1, repeat: true, sub: 'idiot' },
@@ -99,8 +99,8 @@ export default class Config {
     'pussy': { matchMethod: 0, repeat: true, sub: 'softie' },
     'shit': { matchMethod: 1, repeat: true, sub: 'crap' },
     'slut': { matchMethod: 1, repeat: true, sub: 'tramp' },
-    'tits': { matchMethod: 1, repeat: true, sub: 'explative' },
-    'twat': { matchMethod: 1, repeat: true, sub: 'explative' },
+    'tits': { matchMethod: 1, repeat: true, sub: 'expletive' },
+    'twat': { matchMethod: 1, repeat: true, sub: 'expletive' },
     'whore': { matchMethod: 1, repeat: true, sub: 'tramp' }
   };
 

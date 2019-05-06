@@ -48,13 +48,13 @@ export function getVersion(version: string): Version {
   };
 }
 
-// Is the provided version lower than or equal to the minimum version?
+// Is the provided version lower than the minimum version?
 export function isVersionOlder(version: Version, minimum: Version): boolean {
   if (version.major < minimum.major) {
     return true;
   } else if (version.major == minimum.major && version.minor < minimum.minor) {
     return true;
-  } else if (version.major == minimum.major && version.minor == minimum.minor && version.patch <= minimum.patch) {
+  } else if (version.major == minimum.major && version.minor == minimum.minor && version.patch < minimum.patch) {
     return true;
   }
 
