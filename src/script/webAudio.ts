@@ -2,6 +2,7 @@ export default class WebAudio {
   static readonly subtitleSelectors = {
     'app.plex.tv': 'span > span',
     'www.amazon.com': 'span.timedTextBackground',
+    'www.hulu.com': 'p',
     'www.netflix.com': 'span',
     'www.vudu.com': 'span.subtitles',
     'www.youtube.com': 'span.ytp-caption-segment'
@@ -83,6 +84,8 @@ export default class WebAudio {
         return !!(node.tagName == 'DIV' && (node.dataset && node.dataset.hasOwnProperty('dialogueId')) || (typeof node.querySelectorAll === 'function' && node.querySelectorAll('div[data-dialogue-id]').length > 0));
       case 'www.amazon.com':
         return !!(node.tagName == 'P' && node.querySelectorAll('span.timedTextWindow > span.timedTextBackground').length > 0);
+      case 'www.hulu.com':
+        return !!(node.tagName == 'DIV' && node.className.includes('caption-text-box') && node.childElementCount > 0);
       case 'www.netflix.com':
         return !!(node.tagName == 'DIV' && node.className.includes('player-timedtext-text-container') && node.querySelectorAll('span').length > 0);
       case 'www.vudu.com':
