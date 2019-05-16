@@ -48,19 +48,36 @@ export default class DataMigration {
 
     if (isVersionOlder(version, getVersion('2.1.4'))) {
       migrated = true;
-      this.fixSubExpletiveTypo();
+      this.updateDefaultSubs();
     }
 
     return migrated;
   }
 
-  // [2.1.4] - Fix typo in word substitutions
-  fixSubExpletiveTypo() {
+  // [2.1.4] - Update default sub values
+  updateDefaultSubs() {
     let cfg = this.cfg;
-    Object.keys(cfg.words).forEach(word => {
-      let wordObj = cfg.words[word] as WordOptions;
-      if (wordObj.sub == 'explative') {
-        wordObj.sub = 'expletive';
+    let updates = {
+      cocksucker: {original: 'idiot', update: 'suckup'},
+      fag: {original: 'slur', update: 'gay'},
+      faggot: {original: 'slur', update: 'gay'},
+      fags: {original: 'slur', update: 'gays'},
+      goddammit: {original: 'goshdangit', update: 'dangit'},
+      jackass: {original: 'idiot', update: 'jerk'},
+      nigga: {original: 'ethnic slur', update: 'bruh'},
+      nigger: {original: 'ethnic slur', update: 'man'},
+      niggers: {original: 'ethnic slurs', update: 'people'},
+      tits: {original: 'explative', update: 'chest'},
+      twat: {original: 'explative', update: 'dumbo'},
+      // expletive
+    }
+
+    Object.keys(updates).forEach(update => {
+      if (cfg.words[update]) {
+        let wordObj = cfg.words[update] as WordOptions;
+        if (wordObj.sub == update['original']) {
+          wordObj.sub = update['update'];
+        }
       }
     });
   }
@@ -83,7 +100,7 @@ export default class DataMigration {
   runImportMigrations() {
     this.sanitizeWords(); // 1.1.0
     this.singleWordSubstitution(); // 1.2.0
-    this.fixSubExpletiveTypo(); // 2.1.4
+    this.updateDefaultSubs(); // 2.1.4
   }
 
   // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
