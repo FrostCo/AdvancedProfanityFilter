@@ -333,12 +333,12 @@ export default class OptionPage {
     let selectedMuteMethod = document.querySelector(`input[name=audioMuteMethod][value='${this.cfg.muteMethod}']`) as HTMLInputElement;
     let selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
     let muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
-    let audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
+    let audioYouTubeAutoExtraWords = document.getElementById('audioYouTubeAutoExtraWords') as HTMLInputElement;
     muteAudioInput.checked = this.cfg.muteAudio;
     this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
     selectedMuteMethod.checked = true;
     selectedshowSubtitle.checked = true;
-    audioYouTubeAutoSubsMin.value = this.cfg.youTubeAutoSubsMin.toString();
+    audioYouTubeAutoExtraWords.value = this.cfg.youTubeAutoExtraWords.toString();
   }
 
   populateConfig() {
@@ -714,8 +714,8 @@ export default class OptionPage {
   async updateYouTubeAutoMin(target) {
     OptionPage.hideInputError(target);
     if (target.checkValidity()) {
-      this.cfg.youTubeAutoSubsMin = parseFloat(target.value);
-      await option.saveProp('youTubeAutoSubsMin');
+      this.cfg.youTubeAutoExtraWords = parseFloat(target.value);
+      await option.saveProp('youTubeAutoExtraWords');
     } else {
       OptionPage.showInputError(target, 'Please enter a valid number of seconds.');
     }
@@ -775,7 +775,7 @@ document.getElementById('disabledDomainRemove').addEventListener('click', e => {
 document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
 document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
-document.getElementById('audioYouTubeAutoSubsMin').addEventListener('input', e => { option.updateYouTubeAutoMin(e.target); });
+document.getElementById('audioYouTubeAutoExtraWords').addEventListener('input', e => { option.updateYouTubeAutoMin(e.target); });
 // Bookmarklet
 document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });
 document.getElementById('bookmarkletHostedURL').addEventListener('input', e => { option.createBookmarklet(); });
