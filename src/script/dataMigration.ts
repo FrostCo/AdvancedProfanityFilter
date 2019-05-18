@@ -70,7 +70,7 @@ export default class DataMigration {
       tits: {original: 'explative', update: 'chest'},
       twat: {original: 'explative', update: 'dumbo'},
       // expletive
-    }
+    };
 
     Object.keys(updates).forEach(update => {
       if (cfg.words[update]) {
