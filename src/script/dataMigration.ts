@@ -58,10 +58,14 @@ export default class DataMigration {
   updateDefaultSubs() {
     let cfg = this.cfg;
     let updates = {
+      bastard: {original: 'jerk', update: 'idiot'},
+      bitch: {original: 'jerk', update: 'bench'},
       cocksucker: {original: 'idiot', update: 'suckup'},
+      cunt: {original: 'explative', update: 'expletive' },
       fag: {original: 'slur', update: 'gay'},
       faggot: {original: 'slur', update: 'gay'},
       fags: {original: 'slur', update: 'gays'},
+      fuck: { original: 'fudge', update: 'freak' },
       goddammit: {original: 'goshdangit', update: 'dangit'},
       jackass: {original: 'idiot', update: 'jerk'},
       nigga: {original: 'ethnic slur', update: 'bruh'},
@@ -69,7 +73,6 @@ export default class DataMigration {
       niggers: {original: 'ethnic slurs', update: 'people'},
       tits: {original: 'explative', update: 'chest'},
       twat: {original: 'explative', update: 'dumbo'},
-      // expletive
     };
 
     Object.keys(updates).forEach(update => {
