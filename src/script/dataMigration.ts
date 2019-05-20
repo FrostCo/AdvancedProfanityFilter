@@ -57,7 +57,7 @@ export default class DataMigration {
   // [2.1.4] - Update default sub values
   updateDefaultSubs() {
     let cfg = this.cfg;
-    let updates = {
+    let updatedWords = {
       bastard: {original: 'jerk', update: 'idiot'},
       bitch: {original: 'jerk', update: 'bench'},
       cocksucker: {original: 'idiot', update: 'suckup'},
@@ -75,11 +75,11 @@ export default class DataMigration {
       twat: {original: 'explative', update: 'dumbo'},
     };
 
-    Object.keys(updates).forEach(update => {
-      if (cfg.words[update]) {
-        let wordObj = cfg.words[update] as WordOptions;
-        if (wordObj.sub == update['original']) {
-          wordObj.sub = update['update'];
+    Object.keys(updatedWords).forEach(updatedWord => {
+      if (cfg.words[updatedWord]) {
+        let wordObj = cfg.words[updatedWord] as WordOptions;
+        if (wordObj.sub == updatedWords[updatedWord].original) {
+          wordObj.sub = updatedWords[updatedWord].update;
         }
       }
     });
