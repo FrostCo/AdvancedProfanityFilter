@@ -22,7 +22,7 @@ export default class BookmarkletFilter extends Filter {
   mutePage: boolean;
   lastSubtitle: string;
   muted: boolean;
-  mutedAt: number;
+  unmuteDelay: number;
   subtitleSelector: string;
   summary: object;
   volume: number;
@@ -31,7 +31,7 @@ export default class BookmarkletFilter extends Filter {
     super();
     this.advanced = false;
     this.muted = false;
-    this.mutedAt = 0;
+    this.unmuteDelay = 0;
     this.summary = {};
     this.volume = 1;
   }

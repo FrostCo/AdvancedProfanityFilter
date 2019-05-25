@@ -34,16 +34,24 @@ export default class WebAudio {
 
   static cleanYouTubeAutoSubs(filter, node): void {
     let result = filter.replaceTextResult(node.textContent);
-    let currentTime = document.getElementsByTagName('video')[0].currentTime;
     if (result.modified) {
       node.textContent = result.filtered;
       WebAudio.mute(filter);
-      filter.mutedAt = currentTime;
+      filter.unmuteDelay = null;
       filter.updateCounterBadge();
     } else {
       if (filter.muted) {
-        if (currentTime < filter.mutedAt) { filter.mutedAt = 0; } // Reset mutedAt if video reversed
-        if (currentTime > (filter.mutedAt + filter.cfg.youTubeAutoSubsMin)) {
+        if (filter.cfg.youTubeAutoSubsMin > 0) {
+          let currentTime = document.getElementsByTagName('video')[0].currentTime;
+          if (filter.unmuteDelay == null) { // Start tracking unmuteDelay when next unfiltered word is found
+            filter.unmuteDelay = currentTime;
+          } else {
+            if (currentTime < filter.unmuteDelay) { filter.unmuteDelay = 0; } // Reset unmuteDelay if video reversed
+            if (currentTime > (filter.unmuteDelay + filter.cfg.youTubeAutoSubsMin)) { // Unmute if its been long enough
+              WebAudio.unmute(filter);
+            }
+          }
+        } else { // Unmute immediately if youTubeAutoSubsMin = 0
           WebAudio.unmute(filter);
         }
       }
