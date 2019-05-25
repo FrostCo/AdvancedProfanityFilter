@@ -43,7 +43,7 @@ export default class WebAudio {
       if (filter.muted) {
         if (filter.cfg.youTubeAutoSubsMin > 0) {
           let currentTime = document.getElementsByTagName('video')[0].currentTime;
-          if (filter.unmuteDelay == null) { // Start tracking unmute delay when next unfiltered word is found
+          if (filter.unmuteDelay == null) { // Start tracking unmuteDelay when next unfiltered word is found
             filter.unmuteDelay = currentTime;
           } else {
             if (currentTime < filter.unmuteDelay) { filter.unmuteDelay = 0; } // Reset unmuteDelay if video reversed
