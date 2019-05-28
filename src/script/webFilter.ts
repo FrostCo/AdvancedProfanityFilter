@@ -10,6 +10,7 @@ interface Message {
   counter?: number;
   disabled?: boolean;
   mute?: boolean;
+  mutePage?: boolean;
   summary?: object;
 }
 
@@ -145,7 +146,7 @@ export default class WebFilter extends Filter {
       this.hostname = new URL(document.referrer).hostname;
     }
 
-    // Check if the topmost frame is a disabled domain
+    // Exit if the topmost frame is a disabled domain
     let message: Message = { disabled: this.disabledPage() };
     if (message.disabled) {
       chrome.runtime.sendMessage(message);
@@ -154,12 +155,12 @@ export default class WebFilter extends Filter {
 
     // Check for advanced mode on current domain
     this.advanced = this.advancedPage();
-    message.advanced = this.advanced; // Set badge color
-    chrome.runtime.sendMessage(message);
 
     // Detect if we should mute audio for the current page
     this.mutePage = (this.cfg.muteAudio && Domain.domainMatch(this.hostname, WebAudio.supportedPages()));
     if (this.mutePage) { this.subtitleSelector = WebAudio.subtitleSelector(this.hostname); }
+
+    this.setBadgeColor(message);
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
@@ -206,12 +207,20 @@ export default class WebFilter extends Filter {
     return result;
   }
 
+  setBadgeColor(message: Message) {
+    // Send page state to color icon badge
+    message.advanced = this.advanced;
+    message.mutePage = this.mutePage;
+    if (this.mutePage && this.cfg.showCounter) { message.counter = this.counter }; // Always show counter when muting audio
+    chrome.runtime.sendMessage(message);
+  }
+
   updateCounterBadge() {
     /* istanbul ignore next */
     // console.count('updateCounterBadge'); // Benchmarking - Executaion Count
     if (this.counter > 0) {
       try {
-        if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter.toString() });
+        if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter });
         if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
       } catch (e) {
         // console.log('Failed to sendMessage', e); // Error - Extension context invalidated.
