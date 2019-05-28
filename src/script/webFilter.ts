@@ -161,6 +161,7 @@ export default class WebFilter extends Filter {
     if (this.mutePage) { this.subtitleSelector = WebAudio.subtitleSelector(this.hostname); }
 
     this.setBadgeColor(message);
+    this.popupListener();
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
@@ -190,6 +191,16 @@ export default class WebFilter extends Filter {
         this.summary[word] = { filtered: result, count: 1 };
       }
     }
+  }
+
+  // Listen for data requests from Popup
+  popupListener() {
+    /* istanbul ignore next */
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+      if (filter.cfg.showSummary && request.popup && (filter.counter > 0 || filter.mutePage)) {
+        chrome.runtime.sendMessage({ mutePage: filter.mutePage, summary: filter.summary });
+      }
+    });
   }
 
   processMutations(mutations) {
@@ -242,12 +253,6 @@ let observerConfig = {
 };
 
 if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptGlobalScope]'].includes(({}).toString.call(window))) {
-  /* istanbul ignore next */
-  // Send summary data to popup
-  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    if (filter.cfg.showSummary && request.popup && filter.counter > 0) chrome.runtime.sendMessage({ summary: filter.summary });
-  });
-
   observer = new MutationObserver(filter.processMutations);
   shadowObserver = new MutationObserver(filter.processMutations);
 

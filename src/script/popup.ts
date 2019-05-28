@@ -193,22 +193,18 @@ class Popup {
   }
 }
 
-// Initial summary data request
-chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-  chrome.tabs.sendMessage(tabs[0].id, {popup: true}, function(response) {
-    if (!chrome.runtime.lastError) {
-      popup.populateSummary(response);
-    }
-  });
-});
-
-// Listen for summary data updates
+// Listen for data updates from filter
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.summary) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       if (sender.tab.id == tabs[0].id) popup.populateSummary(request);
     });
   }
+});
+
+// Initial data request
+chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+  chrome.tabs.sendMessage(tabs[0].id, {popup: true});
 });
 
 let popup = new Popup;
