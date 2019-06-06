@@ -7,6 +7,7 @@ import './vendor/findAndReplaceDOMText';
 
 interface Message {
   advanced?: boolean;
+  clearMute?: boolean;
   counter?: number;
   disabled?: boolean;
   mute?: boolean;
@@ -160,7 +161,7 @@ export default class WebFilter extends Filter {
     this.mutePage = (this.cfg.muteAudio && Domain.domainMatch(this.hostname, WebAudio.supportedPages()));
     if (this.mutePage) { this.subtitleSelector = WebAudio.subtitleSelector(this.hostname); }
 
-    this.setBadgeColor(message);
+    this.sendInitState(message);
     this.popupListener();
 
     // Remove profanity from the main document and watch for new nodes
@@ -218,7 +219,10 @@ export default class WebFilter extends Filter {
     return result;
   }
 
-  setBadgeColor(message: Message) {
+  sendInitState(message: Message) {
+    // Reset muted state on page load if we muted the tab audio
+    if (this.cfg.muteAudio && this.cfg.muteMethod == 0) { message.clearMute = true; }
+
     // Send page state to color icon badge
     message.advanced = this.advanced;
     message.mutePage = this.mutePage;

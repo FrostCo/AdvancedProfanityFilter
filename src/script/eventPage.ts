@@ -58,7 +58,15 @@ chrome.runtime.onMessage.addListener(
       }
 
       if (request.mute != undefined) {
-        chrome.tabs.update(sender.tab.id, {muted: request.mute});
+        chrome.tabs.update(sender.tab.id, { muted: request.mute });
+      }
+
+      // Unmute on page reload
+      if (request.clearMute === true && sender.tab != undefined) {
+        let {muted, reason, extensionId} = sender.tab.mutedInfo;
+        if (muted && reason == 'extension' && extensionId == chrome.runtime.id) {
+          chrome.tabs.update(sender.tab.id, { muted: false });
+        }
       }
     }
   }
