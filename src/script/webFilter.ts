@@ -226,7 +226,7 @@ export default class WebFilter extends Filter {
     // Send page state to color icon badge
     message.advanced = this.advanced;
     message.mutePage = this.mutePage;
-    if (this.mutePage && this.cfg.showCounter) { message.counter = this.counter }; // Always show counter when muting audio
+    if (this.mutePage && this.cfg.showCounter) { message.counter = this.counter; } // Always show counter when muting audio
     chrome.runtime.sendMessage(message);
   }
 
