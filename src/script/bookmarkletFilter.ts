@@ -133,7 +133,7 @@ export default class BookmarkletFilter extends Filter {
       this.hostname = new URL(document.referrer).hostname;
     }
 
-    // Check if the topmost frame is a disabled domain
+    // Exit if the topmost frame is a disabled domain
     if (this.disabledPage()) {
       return false;
     }
