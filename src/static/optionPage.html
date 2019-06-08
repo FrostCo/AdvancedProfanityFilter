@@ -382,7 +382,12 @@
     <h3 id="general-settings">General Settings</h3>
     <p>These settings apply to both the <strong>Censor</strong> and <strong>Substitution</strong> filter modes:</p>
     <ul>
-    <li><strong>Show number of filtered words</strong> - Show a counter on the extension button with the number of filtered words.</li>
+    <li><strong>Show number of filtered words</strong> - Show a counter on the extension button with the number of filtered words on the current page.<ul>
+    <li><strong>Blue</strong>: Normal mode</li>
+    <li><strong>Red</strong>: Advanced mode</li>
+    <li><strong>Green</strong>: Audio Muting mode (Shows even when no words have been filtered)</li>
+    </ul>
+    </li>
     <li><strong>Show summary of filtered words</strong> - Show a summary of the words filtered on the current page.</li>
     <li><strong>Filter word list in Options</strong> - This option will filter the word list in the options page.</li>
     <li><strong>Show update notification</strong> - Show a notification when the extension gets updated.</li>
@@ -416,6 +421,7 @@
     <p><em>Note: Do not include the protocol (ex. <code>http://</code>), or anything after the domain name.</em></p>
     <h1 id="audio-experimental">Audio (Experimental)</h1>
     <p>This feature mutes the audio when a filtered word is detected in the subtitles/captions on a supported website. This is very experimental at this point, and its effectiveness is completely dependent on the quality of the subtitles accompanying the video. For more information, please see the <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio">Audio wiki</a>.</p>
+    <p><em>Note: If the &quot;Show number of filtered words&quot; option is enabled, the badge will be green when audio muting is enabled on a supported site.</em></p>
     <ul>
     <li><strong>Mute audio on supported video sites</strong> - Enables the feature. Without this no audio filtering will occur.</li>
     <li><strong>Mute Method</strong> - Controls which method to use for muting audio<ul>
