@@ -7,9 +7,11 @@ import './vendor/findAndReplaceDOMText';
 
 interface Message {
   advanced?: boolean;
+  clearMute?: boolean;
   counter?: number;
   disabled?: boolean;
   mute?: boolean;
+  mutePage?: boolean;
   summary?: object;
 }
 
@@ -145,7 +147,7 @@ export default class WebFilter extends Filter {
       this.hostname = new URL(document.referrer).hostname;
     }
 
-    // Check if the topmost frame is a disabled domain
+    // Exit if the topmost frame is a disabled domain
     let message: Message = { disabled: this.disabledPage() };
     if (message.disabled) {
       chrome.runtime.sendMessage(message);
@@ -154,12 +156,13 @@ export default class WebFilter extends Filter {
 
     // Check for advanced mode on current domain
     this.advanced = this.advancedPage();
-    message.advanced = this.advanced; // Set badge color
-    chrome.runtime.sendMessage(message);
 
     // Detect if we should mute audio for the current page
     this.mutePage = (this.cfg.muteAudio && Domain.domainMatch(this.hostname, WebAudio.supportedPages()));
     if (this.mutePage) { this.subtitleSelector = WebAudio.subtitleSelector(this.hostname); }
+
+    this.sendInitState(message);
+    this.popupListener();
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
@@ -191,6 +194,16 @@ export default class WebFilter extends Filter {
     }
   }
 
+  // Listen for data requests from Popup
+  popupListener() {
+    /* istanbul ignore next */
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+      if (filter.cfg.showSummary && request.popup && (filter.counter > 0 || filter.mutePage)) {
+        chrome.runtime.sendMessage({ mutePage: filter.mutePage, summary: filter.summary });
+      }
+    });
+  }
+
   processMutations(mutations) {
     mutations.forEach(function(mutation) {
       filter.checkMutationForProfanity(mutation);
@@ -206,12 +219,23 @@ export default class WebFilter extends Filter {
     return result;
   }
 
+  sendInitState(message: Message) {
+    // Reset muted state on page load if we muted the tab audio
+    if (this.cfg.muteAudio && this.cfg.muteMethod == 0) { message.clearMute = true; }
+
+    // Send page state to color icon badge
+    message.advanced = this.advanced;
+    message.mutePage = this.mutePage;
+    if (this.mutePage && this.cfg.showCounter) { message.counter = this.counter; } // Always show counter when muting audio
+    chrome.runtime.sendMessage(message);
+  }
+
   updateCounterBadge() {
     /* istanbul ignore next */
     // console.count('updateCounterBadge'); // Benchmarking - Executaion Count
     if (this.counter > 0) {
       try {
-        if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter.toString() });
+        if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter });
         if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
       } catch (e) {
         // console.log('Failed to sendMessage', e); // Error - Extension context invalidated.
@@ -233,12 +257,6 @@ let observerConfig = {
 };
 
 if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptGlobalScope]'].includes(({}).toString.call(window))) {
-  /* istanbul ignore next */
-  // Send summary data to popup
-  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    if (filter.cfg.showSummary && request.popup && filter.counter > 0) chrome.runtime.sendMessage({ summary: filter.summary });
-  });
-
   observer = new MutationObserver(filter.processMutations);
   shadowObserver = new MutationObserver(filter.processMutations);
 
