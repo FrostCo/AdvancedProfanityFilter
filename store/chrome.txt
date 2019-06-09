@@ -19,6 +19,7 @@ Features:
     • YouTube
 • Experimental audio muting for videos on supported sites:
     • Amazon Video
+    • Hulu
     • Netflix
     • Plex
     • Vudu
