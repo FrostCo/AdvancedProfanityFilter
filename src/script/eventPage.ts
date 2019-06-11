@@ -40,15 +40,16 @@ chrome.runtime.onMessage.addListener(
       chrome.browserAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
     } else {
       // Set badge color
+      // chrome.browserAction.setBadgeBackgroundColor({ color: [138, 43, 226, 255], tabId: sender.tab.id }); // Blue Violet
+      // chrome.browserAction.setBadgeBackgroundColor({ color: [85, 85, 85, 255], tabId: sender.tab.id }); // Grey (Default)
+      // chrome.browserAction.setBadgeBackgroundColor({ color: [236, 147, 41, 255], tabId: sender.tab.id }); // Orange
       if (request.setBadgeColor) {
         if (request.mutePage) {
-          chrome.browserAction.setBadgeBackgroundColor({ color: [0, 204, 0, 255], tabId: sender.tab.id }); // Green - Audio
+          chrome.browserAction.setBadgeBackgroundColor({ color: [34, 139, 34, 255], tabId: sender.tab.id }); // Forest Green - Audio
         } else if (request.advanced) {
           chrome.browserAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255], tabId: sender.tab.id }); // Red - Advanced
         } else {
           chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255], tabId: sender.tab.id }); // Blue - Normal
-          // chrome.browserAction.setBadgeBackgroundColor({ color: [85, 85, 85, 255], tabId: sender.tab.id }); // Grey - Normal
-          // chrome.browserAction.setBadgeBackgroundColor({ color: [236, 147, 41, 255], tabId: sender.tab.id }); // Orange
         }
       }
 
