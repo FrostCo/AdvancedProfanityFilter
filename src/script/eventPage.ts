@@ -34,16 +34,11 @@ chrome.runtime.onInstalled.addListener(function(details){
   }
 });
 
-// Show badge with number of words filtered
 chrome.runtime.onMessage.addListener(
   function(request: Message, sender, sendResponse) {
     if (request.disabled === true) {
       chrome.browserAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
     } else {
-      if (request.counter != undefined) {
-        chrome.browserAction.setBadgeText({ text: request.counter.toString(), tabId: sender.tab.id });
-      }
-
       // Set badge color
       if (request.setBadgeColor) {
         if (request.mutePage) {
@@ -57,6 +52,12 @@ chrome.runtime.onMessage.addListener(
         }
       }
 
+      // Show count of words filtered on badge
+      if (request.counter != undefined) {
+        chrome.browserAction.setBadgeText({ text: request.counter.toString(), tabId: sender.tab.id });
+      }
+
+      // Set mute state for tab
       if (request.mute != undefined) {
         chrome.tabs.update(sender.tab.id, { muted: request.mute });
       }
