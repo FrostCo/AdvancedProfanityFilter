@@ -24,7 +24,7 @@ export default class BookmarkletFilter extends Filter {
   muted: boolean;
   unmuteDelay: number;
   subtitleSelector: string;
-  summary: object;
+  summary: Summary;
   volume: number;
 
   constructor() {

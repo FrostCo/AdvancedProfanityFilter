@@ -5,16 +5,6 @@ import WebAudio from './webAudio';
 import WebConfig from './webConfig';
 import './vendor/findAndReplaceDOMText';
 
-interface Message {
-  advanced?: boolean;
-  clearMute?: boolean;
-  counter?: number;
-  disabled?: boolean;
-  mute?: boolean;
-  mutePage?: boolean;
-  summary?: object;
-}
-
 export default class WebFilter extends Filter {
   advanced: boolean;
   cfg: WebConfig;
@@ -24,7 +14,7 @@ export default class WebFilter extends Filter {
   muted: boolean;
   unmuteDelay: number;
   subtitleSelector: string;
-  summary: object;
+  summary: Summary;
   volume: number;
 
   constructor() {

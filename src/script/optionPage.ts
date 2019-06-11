@@ -592,7 +592,7 @@ export default class OptionPage {
     }
 
     if (wordText.checkValidity()) {
-      let wordOptions = {
+      let wordOptions: WordOptions = {
         matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
         repeat: wordMatchRepeated.checked,
         sub: sub

@@ -1,9 +1,3 @@
-interface WordOptions {
-  matchMethod: number;
-  repeat: boolean;
-  sub: string;
-}
-
 export default class Config {
   advancedDomains: string[];
   censorCharacter: string;

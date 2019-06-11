@@ -1,12 +1,6 @@
 import { getVersion, isVersionOlder } from './lib/helper';
 import WebConfig from './webConfig';
 
-interface WordOptions {
-  matchMethod: number;
-  repeat: boolean;
-  sub: string;
-}
-
 export default class DataMigration {
   cfg: WebConfig;
 
@@ -28,7 +22,7 @@ export default class DataMigration {
   // This will look at the version (from before the update) and perform data migrations if necessary
   // Only append so the order stays the same (oldest first).
   byVersion(oldVersion: string) {
-    let version = getVersion(oldVersion);
+    let version = getVersion(oldVersion) as Version;
     let migrated = false;
 
     if (isVersionOlder(version, getVersion('1.0.13'))) {

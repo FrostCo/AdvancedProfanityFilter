@@ -1,9 +1,3 @@
-interface Version {
-  major: number,
-  minor: number,
-  patch: number
-}
-
 /* istanbul ignore next */
 export function dynamicList(list, selectEm, title?: string) {
   let options = '';

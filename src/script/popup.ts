@@ -2,13 +2,6 @@ import { dynamicList, escapeHTML } from './lib/helper';
 import WebConfig from './webConfig';
 import Domain from './domain';
 
-interface Summary {
-  [word: string]: {
-    filtered: string;
-    count: number;
-  };
-}
-
 class Popup {
   cfg: WebConfig;
   domain: Domain;
@@ -140,14 +133,14 @@ class Popup {
     }
   }
 
-  populateSummary(message) {
+  populateSummary(message: Message) {
     if (message && message.summary) {
-      let summary = document.getElementById('summary') as HTMLElement;
-      summary.innerHTML = this.summaryTableHTML(message.summary);
+      let summaryEl = document.getElementById('summary') as HTMLElement;
+      summaryEl.innerHTML = this.summaryTableHTML(message.summary);
 
-      if (summary.classList.contains('w3-hide')) {
-        summary.classList.remove('w3-hide');
-        summary.classList.add('w3-show');
+      if (summaryEl.classList.contains('w3-hide')) {
+        summaryEl.classList.remove('w3-hide');
+        summaryEl.classList.add('w3-show');
         document.getElementById('summaryDivider').classList.remove('w3-hide');
       }
     } else {
@@ -194,7 +187,7 @@ class Popup {
 }
 
 // Listen for data updates from filter
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) => {
   if (request.summary) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       if (sender.tab.id == tabs[0].id) popup.populateSummary(request);
