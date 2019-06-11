@@ -36,7 +36,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 
 // Show badge with number of words filtered
 chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
+  function(request: Message, sender, sendResponse) {
     if (request.disabled === true) {
       chrome.browserAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
     } else {
@@ -45,7 +45,7 @@ chrome.runtime.onMessage.addListener(
       }
 
       // Set badge color
-      if (request.advanced != undefined || request.mutePage != undefined) {
+      if (request.setBadgeColor) {
         if (request.mutePage) {
           chrome.browserAction.setBadgeBackgroundColor({ color: [0, 204, 0, 255], tabId: sender.tab.id }); // Green - Audio
         } else if (request.advanced) {

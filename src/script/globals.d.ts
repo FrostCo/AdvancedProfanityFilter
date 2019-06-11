@@ -6,6 +6,7 @@ interface Message {
   mute?: boolean;
   mutePage?: boolean;
   popup?: boolean;
+  setBadgeColor?: boolean;
   summary?: Summary;
 }
 
