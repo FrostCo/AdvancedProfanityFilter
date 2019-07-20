@@ -330,11 +330,13 @@ export default class OptionPage {
 
   populateAudio() {
     let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
+    let muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
     let selectedMuteMethod = document.querySelector(`input[name=audioMuteMethod][value='${this.cfg.muteMethod}']`) as HTMLInputElement;
     let selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
     let muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
     let audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
     muteAudioInput.checked = this.cfg.muteAudio;
+    muteAudioOnlyInput.checked = this.cfg.muteAudioOnly;
     this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
     selectedMuteMethod.checked = true;
     selectedshowSubtitle.checked = true;
@@ -529,6 +531,7 @@ export default class OptionPage {
     let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
+    let muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
     let muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
     let showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
     self.cfg.censorCharacter = censorCharacterSelect.value;
@@ -546,6 +549,7 @@ export default class OptionPage {
     self.cfg.substitutionMark = substitutionMark.checked;
     self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
     self.cfg.muteAudio = muteAudioInput.checked;
+    self.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
     self.cfg.muteMethod = parseInt(muteMethodInput.value);
     self.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
 
@@ -773,6 +777,7 @@ document.getElementById('disabledDomainSave').addEventListener('click', e => { o
 document.getElementById('disabledDomainRemove').addEventListener('click', e => { option.disabledDomainRemove(e); });
 // Audio
 document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('muteAudioOnly').addEventListener('click', e => { option.saveOptions(e); });
 document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.getElementById('audioYouTubeAutoSubsMin').addEventListener('input', e => { option.updateYouTubeAutoMin(e.target); });
