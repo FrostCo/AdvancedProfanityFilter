@@ -9,20 +9,20 @@ export default class WebFilter extends Filter {
   advanced: boolean;
   cfg: WebConfig;
   hostname: string;
-  mutePage: boolean;
   lastSubtitle: string;
   muted: boolean;
-  unmuteDelay: number;
+  mutePage: boolean;
   subtitleSelector: string;
   summary: Summary;
+  unmuteDelay: number;
   volume: number;
 
   constructor() {
     super();
     this.advanced = false;
     this.muted = false;
-    this.unmuteDelay = 0;
     this.summary = {};
+    this.unmuteDelay = 0;
     this.volume = 1;
   }
 
