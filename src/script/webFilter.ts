@@ -22,18 +22,10 @@ export default class WebFilter extends Filter {
   constructor() {
     super();
     this.advanced = false;
-    this.iframe = (window != window.top);
     this.muted = false;
     this.summary = {};
     this.unmuteDelay = 0;
     this.volume = 1;
-
-    // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
-    if (window.location == window.parent.location || document.referrer == '') {
-      this.hostname = document.location.hostname;
-    } else if (document.referrer != '') {
-      this.hostname = new URL(document.referrer).hostname;
-    }
   }
 
   // Always use the top frame for page check
@@ -263,6 +255,15 @@ let observerConfig = {
 if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptGlobalScope]'].includes(({}).toString.call(window))) {
   observer = new MutationObserver(filter.processMutations);
   shadowObserver = new MutationObserver(filter.processMutations);
+
+  filter.iframe = (window != window.top);
+
+  // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
+  if (window.location == window.parent.location || document.referrer == '') {
+    filter.hostname = document.location.hostname;
+  } else if (document.referrer != '') {
+    filter.hostname = new URL(document.referrer).hostname;
+  }
 
   /* istanbul ignore next */
   filter.cleanPage();
