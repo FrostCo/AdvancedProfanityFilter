@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-_Instructions: Fill in the applicable sections (you can erase the examples if you'd like). For more information, please see [this page](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/New-Audio-Muting-Site)._
+_Instructions: This template is written in Markdown. Click the "Preview" tab to see what it will look like when submitted. Fill in the applicable sections (you can erase the examples if you'd like). For more information, please see [this page](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/New-Audio-Muting-Site)._
 
 #### :movie_camera: The Site
 _Example: www.youtube.com_
