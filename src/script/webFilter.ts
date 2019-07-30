@@ -10,6 +10,7 @@ export default class WebFilter extends Filter {
   audioOnly: boolean;
   cfg: WebConfig;
   hostname: string;
+  iframe: boolean;
   lastSubtitle: string;
   muted: boolean;
   mutePage: boolean;
@@ -21,10 +22,18 @@ export default class WebFilter extends Filter {
   constructor() {
     super();
     this.advanced = false;
+    this.iframe = (window != window.top);
     this.muted = false;
     this.summary = {};
     this.unmuteDelay = 0;
     this.volume = 1;
+
+    // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
+    if (window.location == window.parent.location || document.referrer == '') {
+      this.hostname = document.location.hostname;
+    } else if (document.referrer != '') {
+      this.hostname = new URL(document.referrer).hostname;
+    }
   }
 
   // Always use the top frame for page check
@@ -130,13 +139,6 @@ export default class WebFilter extends Filter {
   async cleanPage() {
     // @ts-ignore: Type WebConfig is not assignable to type Config
     this.cfg = await WebConfig.build();
-
-    // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
-    if (window.location == window.parent.location || document.referrer == '') {
-      this.hostname = document.location.hostname;
-    } else if (document.referrer != '') {
-      this.hostname = new URL(document.referrer).hostname;
-    }
 
     // Exit if the topmost frame is a disabled domain
     let message: Message = { disabled: this.disabledPage() };
