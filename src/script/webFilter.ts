@@ -7,22 +7,24 @@ import './vendor/findAndReplaceDOMText';
 
 export default class WebFilter extends Filter {
   advanced: boolean;
+  audioOnly: boolean;
   cfg: WebConfig;
   hostname: string;
-  mutePage: boolean;
+  iframe: boolean;
   lastSubtitle: string;
   muted: boolean;
-  unmuteDelay: number;
+  mutePage: boolean;
   subtitleSelector: string;
   summary: Summary;
+  unmuteDelay: number;
   volume: number;
 
   constructor() {
     super();
     this.advanced = false;
     this.muted = false;
-    this.unmuteDelay = 0;
     this.summary = {};
+    this.unmuteDelay = 0;
     this.volume = 1;
   }
 
@@ -59,7 +61,7 @@ export default class WebFilter extends Filter {
           }
         } else if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
           WebAudio.clean(filter, node, filter.subtitleSelector);
-        } else {
+        } else if (!filter.audioOnly) {
           // console.log('Added node to filter', node); // DEBUG - Mutation addedNodes
           if (filter.advanced && node.parentNode) {
             filter.advancedReplaceText(node);
@@ -78,7 +80,7 @@ export default class WebFilter extends Filter {
     });
 
     // Only process mutation change if target is text
-    if (mutation.target && mutation.target.nodeName == '#text') {
+    if (!filter.audioOnly && mutation.target && mutation.target.nodeName == '#text') {
       filter.checkMutationTargetTextForProfanity(mutation);
     }
   }
@@ -130,13 +132,6 @@ export default class WebFilter extends Filter {
     // @ts-ignore: Type WebConfig is not assignable to type Config
     this.cfg = await WebConfig.build();
 
-    // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
-    if (window.location == window.parent.location || document.referrer == '') {
-      this.hostname = document.location.hostname;
-    } else if (document.referrer != '') {
-      this.hostname = new URL(document.referrer).hostname;
-    }
-
     // Exit if the topmost frame is a disabled domain
     let message: Message = { disabled: this.disabledPage() };
     if (message.disabled) {
@@ -151,12 +146,23 @@ export default class WebFilter extends Filter {
     this.mutePage = (this.cfg.muteAudio && Domain.domainMatch(this.hostname, WebAudio.supportedPages()));
     if (this.mutePage) { this.subtitleSelector = WebAudio.subtitleSelector(this.hostname); }
 
+    // Disable if muteAudioOnly mode is active and this is not a suported page
+    if (this.cfg.muteAudioOnly) {
+      if (this.mutePage) {
+        this.audioOnly = true;
+      } else {
+        message.disabled = true;
+        chrome.runtime.sendMessage(message);
+        return false;
+      }
+    }
+
     this.sendInitState(message);
     this.popupListener();
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
-    this.advanced ? this.advancedReplaceText(document) : this.cleanNode(document);
+    if (!this.audioOnly) { this.advanced ? this.advancedReplaceText(document) : this.cleanNode(document); }
     this.updateCounterBadge();
     observer.observe(document, observerConfig);
   }
@@ -239,7 +245,6 @@ export default class WebFilter extends Filter {
 let filter = new WebFilter;
 let observer;
 let shadowObserver;
-
 let observerConfig = {
   characterData: true,
   characterDataOldValue: true,
@@ -250,6 +255,15 @@ let observerConfig = {
 if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptGlobalScope]'].includes(({}).toString.call(window))) {
   observer = new MutationObserver(filter.processMutations);
   shadowObserver = new MutationObserver(filter.processMutations);
+
+  filter.iframe = (window != window.top);
+
+  // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
+  if (window.location == window.parent.location || document.referrer == '') {
+    filter.hostname = document.location.hostname;
+  } else if (document.referrer != '') {
+    filter.hostname = new URL(document.referrer).hostname;
+  }
 
   /* istanbul ignore next */
   filter.cleanPage();

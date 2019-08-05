@@ -10,6 +10,7 @@ export default class Config {
   filterWordList: boolean;
   globalMatchMethod: number;
   muteAudio: boolean;
+  muteAudioOnly: boolean;
   muteMethod: number;
   password: string;
   preserveCase: boolean;
@@ -52,6 +53,7 @@ export default class Config {
     filterWordList: true,
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
     muteAudio: false, // Filter audio
+    muteAudioOnly: false,
     muteMethod: 0, // 0: Mute Tab, 1: Video Volume
     password: null,
     preserveCase: true,
