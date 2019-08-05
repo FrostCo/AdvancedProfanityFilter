@@ -17,22 +17,24 @@ config.words = Config._defaultWords;
 
 export default class BookmarkletFilter extends Filter {
   advanced: boolean;
+  audioOnly: boolean;
   cfg: Config;
   hostname: string;
-  mutePage: boolean;
+  iframe: boolean;
   lastSubtitle: string;
   muted: boolean;
-  unmuteDelay: number;
+  mutePage: boolean;
   subtitleSelector: string;
   summary: Summary;
+  unmuteDelay: number;
   volume: number;
 
   constructor() {
     super();
     this.advanced = false;
     this.muted = false;
-    this.unmuteDelay = 0;
     this.summary = {};
+    this.unmuteDelay = 0;
     this.volume = 1;
   }
 
@@ -63,7 +65,7 @@ export default class BookmarkletFilter extends Filter {
           }
         } else if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
           WebAudio.clean(filter, node, filter.subtitleSelector);
-        } else {
+        } else if (!filter.audioOnly) {
           if (filter.advanced && node.parentNode) {
             filter.advancedReplaceText(node);
           } else {
@@ -80,7 +82,7 @@ export default class BookmarkletFilter extends Filter {
     });
 
     // Only process mutation change if target is text
-    if (mutation.target && mutation.target.nodeName == '#text') {
+    if (!filter.audioOnly && mutation.target && mutation.target.nodeName == '#text') {
       filter.checkMutationTargetTextForProfanity(mutation);
     }
   }
@@ -126,15 +128,10 @@ export default class BookmarkletFilter extends Filter {
     this.cfg = new Config(config);
     this.cfg.muteMethod = 1; // Bookmarklet: Force audio muteMethod = 1 (Volume)
 
-    // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
-    if (window.location == window.parent.location || document.referrer == '') {
-      this.hostname = document.location.hostname;
-    } else if (document.referrer != '') {
-      this.hostname = new URL(document.referrer).hostname;
-    }
-
     // Exit if the topmost frame is a disabled domain
-    if (this.disabledPage()) {
+    let message: Message = { disabled: this.disabledPage() };
+    if (message.disabled) {
+      chrome.runtime.sendMessage(message);
       return false;
     }
 
@@ -145,9 +142,20 @@ export default class BookmarkletFilter extends Filter {
     this.mutePage = (this.cfg.muteAudio && Domain.domainMatch(this.hostname, WebAudio.supportedPages()));
     if (this.mutePage) { this.subtitleSelector = WebAudio.subtitleSelector(this.hostname); }
 
+    // Disable if muteAudioOnly mode is active and this is not a suported page
+    if (this.cfg.muteAudioOnly) {
+      if (this.mutePage) {
+        this.audioOnly = true;
+      } else {
+        message.disabled = true;
+        chrome.runtime.sendMessage(message);
+        return false;
+      }
+    }
+
     // Remove profanity from the main document and watch for new nodes
     this.init();
-    this.advanced ? this.advancedReplaceText(document) : this.cleanNode(document);
+    if (!this.audioOnly) { this.advanced ? this.advancedReplaceText(document) : this.cleanNode(document); }
     observer.observe(document, observerConfig);
   }
 
@@ -176,7 +184,6 @@ export default class BookmarkletFilter extends Filter {
 let filter = new BookmarkletFilter;
 let observer;
 let shadowObserver;
-
 let observerConfig = {
   characterData: true,
   characterDataOldValue: true,
@@ -187,5 +194,15 @@ let observerConfig = {
 if (typeof window !== 'undefined') {
   observer = new MutationObserver(filter.processMutations);
   shadowObserver = new MutationObserver(filter.processMutations);
+
+  filter.iframe = (window != window.top);
+
+  // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
+  if (window.location == window.parent.location || document.referrer == '') {
+    filter.hostname = document.location.hostname;
+  } else if (document.referrer != '') {
+    filter.hostname = new URL(document.referrer).hostname;
+  }
+
   filter.cleanPage();
 }
