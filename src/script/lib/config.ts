@@ -2,6 +2,7 @@ export default class Config {
   advancedDomains: string[];
   censorCharacter: string;
   censorFixedLength: number;
+  customAudioSites: { [site: string]: AudioSite };
   defaultSubstitution: string;
   defaultWordMatchMethod: number;
   defaultWordRepeat: boolean;
@@ -20,12 +21,9 @@ export default class Config {
   showSummary: boolean;
   showUpdateNotification: boolean;
   substitutionMark: boolean;
-  words: {
-    [key: string]: WordOptions;
-  };
+  words: { [key: string]: WordOptions; };
   youTubeAutoSubsMin: number;
 
-  // TODO: Finish removing magic numbers?
   static readonly filterMethods = {
     censor: 0,
     substitute: 1,
@@ -44,6 +42,7 @@ export default class Config {
     advancedDomains: [],
     censorCharacter: '*',
     censorFixedLength: 0,
+    customAudioSites: null,
     defaultSubstitution: 'censored',
     defaultWordMatchMethod: 0,
     defaultWordRepeat: false,
