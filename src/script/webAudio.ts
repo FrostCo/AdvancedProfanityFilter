@@ -81,7 +81,7 @@ export default class WebAudio {
 
   clean(filter, subtitleContainer): void {
     let filtered = false;
-    let subtitles = subtitleContainer.querySelectorAll(this.subtitleSelector);
+    let subtitles = this.subtitleSelector ? subtitleContainer.querySelectorAll(this.subtitleSelector) : [subtitleContainer];
 
     // Process subtitles
     subtitles.forEach(subtitle => {
