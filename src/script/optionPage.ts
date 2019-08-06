@@ -335,12 +335,14 @@ export default class OptionPage {
     let selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
     let muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
     let audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
+    let customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
     muteAudioInput.checked = this.cfg.muteAudio;
     muteAudioOnlyInput.checked = this.cfg.muteAudioOnly;
     this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
     selectedMuteMethod.checked = true;
     selectedshowSubtitle.checked = true;
     audioYouTubeAutoSubsMin.value = this.cfg.youTubeAutoSubsMin.toString();
+    customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
   }
 
   populateConfig() {
@@ -510,6 +512,20 @@ export default class OptionPage {
       if (!silent) OptionPage.showStatusModal('Default settings restored');
       this.init();
       return true;
+    }
+  }
+
+  async saveCustomAudioSites() {
+    let self = this;
+    let customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
+    try {
+      let text = customAudioSitesTextArea.value;
+      self.cfg.customAudioSites = text == '' ? null : JSON.parse(text);
+      if (await option.saveProp('customAudioSites')) {
+        OptionPage.showStatusModal('Custom Audio Sites saved.');
+      }
+    } catch(e) {
+      OptionPage.showErrorModal('Invalid custom audio sites');
     }
   }
 
@@ -781,6 +797,7 @@ document.getElementById('muteAudioOnly').addEventListener('click', e => { option
 document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.getElementById('audioYouTubeAutoSubsMin').addEventListener('input', e => { option.updateYouTubeAutoMin(e.target); });
+document.getElementById('customAudioSitesSave').addEventListener('click', e => { option.saveCustomAudioSites() });
 // Bookmarklet
 document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });
 document.getElementById('bookmarkletHostedURL').addEventListener('input', e => { option.createBookmarklet(); });

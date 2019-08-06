@@ -240,68 +240,77 @@
 
   <label>
     <input id="muteAudio" type="checkbox" class="w3-check">
-    Mute tab audio on supported video sites
+    Mute audio on supported video sites
   </label>
 
   <div id="muteAudioOptionsContainer" class="w3-hide">
-    <label>
-      <input id="muteAudioOnly" type="checkbox" class="w3-check">
-      Only mute audio
-      <span class="notes">(Disable text filter)</span>
-    </label>
+    <div class="w3-twothird">
+      <h4 class="sectionHeader">Instructions</h4>
+      <ol>
+        <li>Play a video on a supported site</li>
+        <li>Turn on subtitles for the video</li>
+      </ol>
 
-    <h4 class="sectionHeader">Instructions</h4>
-    <ol>
-      <li>Play a video on a supported site</li>
-      <li>Turn on subtitles for the video</li>
-    </ol>
+      <h4 class="sectionHeader">Mute Method</h4>
+      <div id="audioMuteMethod">
+        <label>
+          <input id="audioMuteMethodTab" type="radio" class="w3-radio" name="audioMuteMethod" value="0">
+          Browser Tab
+        </label>
 
-    <h4 class="sectionHeader">Mute Method</h4>
-    <div id="audioMuteMethod">
-      <label>
-        <input id="audioMuteMethodTab" type="radio" class="w3-radio" name="audioMuteMethod" value="0">
-        Browser Tab
-      </label>
+        <br>
+        <label>
+          <input id="audioMuteMethodVideo" type="radio" class="w3-radio" name="audioMuteMethod" value="1">
+          Video Volume
+        </label>
+      </div>
 
-      <br>
-      <label>
-        <input id="audioMuteMethodVideo" type="radio" class="w3-radio" name="audioMuteMethod" value="1">
-        Video Volume
-      </label>
+      <h4 class="sectionHeader">Subtitles</h4>
+      <div id="audioSubtitleSelection">
+        <label>
+          <input id="audioShowAllSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="0">
+          Show all
+        </label>
+
+        <br>
+        <label>
+          <input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="1">
+          Show only filtered
+        </label>
+
+        <br>
+        <label>
+          <input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="2">
+          Show only unfiltered
+        </label>
+
+        <br>
+        <label>
+          <input id="audioHideSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="3">
+          Hide all
+        </label>
+      </div>
+
+      <h4 class="sectionHeader">Other</h4>
+      <div id="audioOther">
+        <label>
+          <input id="muteAudioOnly" type="checkbox" class="w3-check">
+          Only mute audio
+          <span class="notes">(Disable text filter)</span>
+        </label>
+
+        <br>
+        <label>YouTube Minimum Muting
+          <input id="audioYouTubeAutoSubsMin" class="w3-input w3-border small" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
+        </label>
+        <span class="notes">For Auto-Generated Subtitles (0.5 = half a second)</span>
+      </div>
     </div>
-
-    <h4 class="sectionHeader">Subtitles</h4>
-    <div id="audioSubtitleSelection">
-      <label>
-        <input id="audioShowAllSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="0">
-        Show all
-      </label>
-
-      <br>
-      <label>
-        <input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="1">
-        Show only filtered
-      </label>
-
-      <br>
-      <label>
-        <input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="2">
-        Show only unfiltered
-      </label>
-
-      <br>
-      <label>
-        <input id="audioHideSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="3">
-        Hide all
-      </label>
-    </div>
-
-    <h4 class="sectionHeader">Other</h4>
-    <div id="audioOther">
-      <label>YouTube Minimum Muting
-        <input id="audioYouTubeAutoSubsMin" class="w3-input w3-border small" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
-        <span class="notes">For Auto-Generated Subtitles, expressed as seconds (0.5 = half a second)</span>
-      </label>
+    <div class="w3-third w3-right">
+      <h4 class="sectionHeader">Custom Sites</h4>
+        <p><b>Advanced:</b> Add <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site" target="_blank">suport for other sites</a>.</p>
+      <textarea id="customAudioSitesText" class="w3-input w3-border w3-card" style="width:300px;height:350px;font-size:11px;" spellcheck="false"></textarea>
+      <button id="customAudioSitesSave" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top: 16px;">SAVE</button>
     </div>
   </div>
 </div>
@@ -328,7 +337,7 @@
     <button id="configImport" class="w3-btn w3-round-large w3-flat-peter-river">IMPORT</button>
     <button id="configReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESTORE DEFAULTS</button>
   </div>
-  <textarea id="configText" class="w3-input w3-border w3-card w3-hide" style="width:500px;height:550px;" spellcheck="false"></textarea>
+  <textarea id="configText" class="w3-input w3-border w3-card w3-hide" style="width:500px;height:550px;font-size:11px;" spellcheck="false"></textarea>
 
   <div id="setPasswordContainer" style="width:500px;">
     <h4 class="sectionHeader">Password</h4>
