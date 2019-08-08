@@ -797,7 +797,7 @@ document.getElementById('muteAudioOnly').addEventListener('click', e => { option
 document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.getElementById('audioYouTubeAutoSubsMin').addEventListener('input', e => { option.updateYouTubeAutoMin(e.target); });
-document.getElementById('customAudioSitesSave').addEventListener('click', e => { option.saveCustomAudioSites() });
+document.getElementById('customAudioSitesSave').addEventListener('click', e => { option.saveCustomAudioSites(); });
 // Bookmarklet
 document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });
 document.getElementById('bookmarkletHostedURL').addEventListener('input', e => { option.createBookmarklet(); });
