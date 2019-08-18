@@ -68,11 +68,11 @@ export default class WebAudio {
 
     return new Function('node',`
     if (node.tagName == '${tagName.toUpperCase()}') {
-      ${className ? `if (!node.className.includes('${className}')) { return false; }` : ''}
+      ${className ? `if (!node.className || !node.className.includes('${className}')) { return false; }` : ''}
       ${dataPropPresent ? `if (!node.dataset || !node.dataset.hasOwnProperty('${dataPropPresent}')) { return false; }` : ''}
-      ${hasChildrenElements ? `if (node.childElementCount('${querySelectorAllPresent}').length == 0) { return false; }` : ''}
-      ${subtitleSelector ? `if (node.querySelectorAll('${subtitleSelector}').length == 0) { return false; }` : ''}
-      ${querySelectorAllPresent ? `if (node.querySelectorAll('${querySelectorAllPresent}').length == 0) { return false; }` : ''}
+      ${hasChildrenElements ? 'if (typeof node.childElementCount !== "number" || node.childElementCount < 1) { return false; }' : ''}
+      ${subtitleSelector ? `if (typeof node.querySelectorAll !== 'function' || node.querySelectorAll('${subtitleSelector}').length == 0) { return false; }` : ''}
+      ${querySelectorAllPresent ? `if (typeof node.querySelectorAll !== 'function' || node.querySelectorAll('${querySelectorAllPresent}').length == 0) { return false; }` : ''}
       return true;
     } else {
       return false;
