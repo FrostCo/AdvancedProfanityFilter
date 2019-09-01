@@ -175,12 +175,12 @@ export default class WebAudio {
   }
 
   youTubeAutoSubsNodeIsSubtitleText(node): boolean {
-    let captionWindow = document.querySelectorAll('div.caption-window')[0]; // YouTube Auto-gen subs
+    let captionWindow = document.querySelector('div.caption-window'); // YouTube Auto-gen subs
     return !!(captionWindow && captionWindow.contains(node));
   }
 
   youTubeAutoSubsPresent(): boolean {
-    return !!(document.querySelectorAll('div.ytp-caption-window-rollup')[0]);
+    return !!(document.querySelector('div.ytp-caption-window-rollup'));
   }
 
   youTubeAutoSubsSupportedNode(node: any): boolean {

@@ -18,7 +18,7 @@ export default class OptionPage {
   static configureConfirmModal(content = 'Are you sure?', title = 'Please Confirm', titleColor = 'w3-flat-peter-river') {
     let modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
     let modalContent = document.getElementById('confirmModalContent') as HTMLElement;
-    let modalHeader = document.querySelectorAll('#confirmModal header')[0] as HTMLElement;
+    let modalHeader = document.querySelector('#confirmModal header') as HTMLElement;
     modalTitle.innerText = title;
     modalContent.innerHTML = content;
     modalHeader.className = `w3-container ${titleColor}`;
@@ -27,7 +27,7 @@ export default class OptionPage {
   static configureStatusModal(content: string, title: string, titleColor: string) {
     let modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
     let modalContent = document.getElementById('statusModalContent') as HTMLElement;
-    let modalHeader = document.querySelectorAll('#statusModal header')[0] as HTMLElement;
+    let modalHeader = document.querySelector('#statusModal header') as HTMLElement;
     modalTitle.innerText = title;
     modalContent.innerHTML = content;
     modalHeader.className = `w3-container ${titleColor}`;
