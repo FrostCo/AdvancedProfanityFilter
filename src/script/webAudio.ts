@@ -67,7 +67,7 @@ export default class WebAudio {
     if (!tagName) { throw('tagName is required.'); }
 
     return new Function('node',`
-    if (node.tagName == '${tagName.toUpperCase()}') {
+    if (node.nodeName == '${tagName.toUpperCase()}') {
       ${className ? `if (!node.className || !node.className.includes('${className}')) { return false; }` : ''}
       ${dataPropPresent ? `if (!node.dataset || !node.dataset.hasOwnProperty('${dataPropPresent}')) { return false; }` : ''}
       ${hasChildrenElements ? 'if (typeof node.childElementCount !== "number" || node.childElementCount < 1) { return false; }' : ''}
