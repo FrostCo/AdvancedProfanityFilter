@@ -70,11 +70,13 @@ export default class WebFilter extends Filter {
       // else { console.log('[APF] Forbidden node:', node); } // Debug: Filter - Mutation addedNodes
     });
 
-    mutation.removedNodes.forEach(node => {
-      if (filter.mutePage && filter.audio.muted && filter.audio.supportedNode(node)) {
-        filter.audio.unmute();
-      }
-    });
+    if (filter.mutePage) {
+      mutation.removedNodes.forEach(node => {
+        if (filter.audio.muted && filter.audio.supportedNode(node)) {
+          filter.audio.unmute();
+        }
+      });
+    }
 
     // Only process mutation change if target is text
     if (!filter.audioOnly && mutation.target && mutation.target.nodeName == '#text') {
