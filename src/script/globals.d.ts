@@ -1,10 +1,10 @@
 interface AudioSite {
   className?: string;               // node.className.includes()
+  containsSelector?: string;        // node.querySelector() [Not commonly used]
   dataPropPresent?: string;         // node.dataset.hasOwnProperty()
-  hasChildrenElements?: boolean;    // node.childElementCount > 0
-  querySelectorAllPresent?: string; // node.querySelectorAll().length > 0
-  subtitleSelector?: string;        // *Used for Filtering*: node.querySelectorAll().length > 0
-  tagName: string;                  // *REQUIRED*: node.tagName
+  hasChildrenElements?: boolean;    // node.childElementCount > 0 [Not commonly used]
+  subtitleSelector?: string;        // *Used for Filtering*: node.querySelector()
+  tagName?: string;                 // *REQUIRED*: node.nodeName
 }
 
 interface Message {

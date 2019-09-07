@@ -63,7 +63,7 @@ export default class WebAudio {
   }
 
   static buildSupportedNodeFunction(hostname): Function {
-    let { className, dataPropPresent, tagName, hasChildrenElements, querySelectorAllPresent, subtitleSelector } = this.sites[hostname];
+    let { className, containsSelector, dataPropPresent, tagName, hasChildrenElements, subtitleSelector } = this.sites[hostname];
     if (!tagName) { throw('tagName is required.'); }
 
     return new Function('node',`
@@ -71,8 +71,8 @@ export default class WebAudio {
       ${className ? `if (!node.className || !node.className.includes('${className}')) { return false; }` : ''}
       ${dataPropPresent ? `if (!node.dataset || !node.dataset.hasOwnProperty('${dataPropPresent}')) { return false; }` : ''}
       ${hasChildrenElements ? 'if (typeof node.childElementCount !== "number" || node.childElementCount < 1) { return false; }' : ''}
-      ${subtitleSelector ? `if (typeof node.querySelectorAll !== 'function' || node.querySelectorAll('${subtitleSelector}').length == 0) { return false; }` : ''}
-      ${querySelectorAllPresent ? `if (typeof node.querySelectorAll !== 'function' || node.querySelectorAll('${querySelectorAllPresent}').length == 0) { return false; }` : ''}
+      ${subtitleSelector ? `if (typeof node.querySelector !== 'function' || !node.querySelector('${subtitleSelector}')) { return false; }` : ''}
+      ${containsSelector ? `if (typeof node.querySelector !== 'function' || !node.querySelector('${containsSelector}')) { return false; }` : ''}
       return true;
     } else {
       return false;
