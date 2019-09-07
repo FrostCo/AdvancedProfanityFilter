@@ -85,19 +85,19 @@ export default class WebAudio {
 
     // Process subtitles
     subtitles.forEach(subtitle => {
-      let result = filter.replaceTextResult(subtitle.innerText);
+      let result = filter.replaceTextResult(subtitle.textContent);
       if (result.modified) {
         filtered = true;
-        subtitle.innerText = result.filtered;
+        subtitle.textContent = result.filtered;
         this.mute(); // Mute the audio if we haven't already
       }
     });
 
     // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
     switch (this.showSubtitles) {
-      case 1: if (!filtered) { subtitles.forEach(subtitle => { subtitle.innerText = ''; }); } break;
-      case 2: if (filtered) { subtitles.forEach(subtitle => { subtitle.innerText = ''; }); } break;
-      case 3: subtitles.forEach(subtitle => { subtitle.innerText = ''; }); break;
+      case 1: if (!filtered) { subtitles.forEach(subtitle => { subtitle.textContent = ''; }); } break;
+      case 2: if (filtered) { subtitles.forEach(subtitle => { subtitle.textContent = ''; }); } break;
+      case 3: subtitles.forEach(subtitle => { subtitle.textContent = ''; }); break;
     }
 
     if (filtered) { filter.updateCounterBadge(); } // Update if modified
