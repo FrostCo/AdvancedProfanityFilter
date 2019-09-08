@@ -70,9 +70,10 @@ export default class WebFilter extends Filter {
       // else { console.log('[APF] Forbidden node:', node); } // Debug: Filter - Mutation addedNodes
     });
 
-    if (filter.mutePage) {
+    // Check removed nodes to see if we should unmute
+    if (filter.mutePage && filter.audio.muted) {
       mutation.removedNodes.forEach(node => {
-        if (filter.audio.muted && filter.audio.supportedNode(node)) {
+        if (filter.audio.supportedNode(node) || node == filter.audio.lastFilteredNode) {
           filter.audio.unmute();
         }
       });

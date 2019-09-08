@@ -1,4 +1,5 @@
 export default class WebAudio {
+  lastFilteredNode: HTMLElement;
   muted: boolean;
   muteMethod: number;
   showSubtitles: number;
@@ -12,6 +13,7 @@ export default class WebAudio {
   youTubeAutoSubsMin: number;
 
   constructor(params: WebAudioConstructorArgs) {
+    this.lastFilteredNode = null;
     this.muted = false;
     this.muteMethod = params.muteMethod;
     this.showSubtitles = params.showSubtitles;
@@ -63,7 +65,19 @@ export default class WebAudio {
   }
 
   static buildSupportedNodeFunction(hostname): Function {
-    let { className, containsSelector, dataPropPresent, tagName, hasChildrenElements, subtitleSelector } = this.sites[hostname];
+    let { className, containsSelector, dataPropPresent, hasChildrenElements, subtitleSelector, tagName, textParentSelector } = this.sites[hostname];
+
+    // Plain text mode
+    if (textParentSelector)  {
+      return new Function('node',`
+      if (node.nodeName === '#text') {
+        let textParent = document.querySelector('${textParentSelector}');
+        if (textParent && textParent.contains(node)) { return true; }
+      }
+      return false;`);
+    }
+
+    // Normal mode
     if (!tagName) { throw('tagName is required.'); }
 
     return new Function('node',`
@@ -90,6 +104,7 @@ export default class WebAudio {
         filtered = true;
         subtitle.textContent = result.filtered;
         this.mute(); // Mute the audio if we haven't already
+        if (subtitle.nodeName === '#text') { this.lastFilteredNode = subtitle; }
       }
     });
 

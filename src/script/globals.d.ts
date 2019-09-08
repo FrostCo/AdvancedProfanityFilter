@@ -5,6 +5,7 @@ interface AudioSite {
   hasChildrenElements?: boolean;    // node.childElementCount > 0 [Not commonly used]
   subtitleSelector?: string;        // *Used for Filtering*: node.querySelector()
   tagName?: string;                 // *REQUIRED*: node.nodeName
+  textParentSelector?: string;      // [Text Mode]: parent.contains(node)
 }
 
 interface Message {
