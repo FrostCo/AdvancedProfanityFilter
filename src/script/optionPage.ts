@@ -4,6 +4,7 @@ import { Filter } from './lib/filter';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
+import WebAudio from './webAudio';
 
 export default class OptionPage {
   cfg: WebConfig;
@@ -659,6 +660,23 @@ export default class OptionPage {
     if (await option.saveProp('filterMethod')) this.init();
   }
 
+  showSupportedAudioSites() {
+    let title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
+    let content = document.querySelector('#supportedAudioSitesModal div.modalContent') as HTMLDivElement;
+    let sites = [];
+    let sortedSites = Object.keys(WebAudio.sites).sort(function(a,b) {
+      let domainA = a.match(/\w*\.\w*$/)[0];
+      let domainB = b.match(/\w*\.\w*$/)[0];
+      return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
+    });
+    sortedSites.forEach(site => {
+      sites.push(`<li><a href="https://${site}" target="_blank">${site}</a></li>`);
+    });
+    title.textContent = 'Supported Audio Sites';
+    content.innerHTML = `<ul>${sites.join('\n')}</ul>`;
+    OptionPage.openModal('supportedAudioSitesModal');
+  }
+
   switchPage(evt) {
     let currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
     let newTab = evt.target as HTMLElement;
@@ -760,6 +778,7 @@ document.getElementById('submitPassword').addEventListener('click', e => { optio
 document.getElementById('confirmModalOK').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('statusModalOK').addEventListener('click', e => { OptionPage.closeModal('statusModal'); });
+document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', e => { OptionPage.closeModal('supportedAudioSitesModal'); });
 // Settings
 document.querySelectorAll('#filterMethod input').forEach(el => { el.addEventListener('click', e => { option.selectFilterMethod(e); }); });
 document.getElementById('censorCharacterSelect').addEventListener('click', e => { option.saveOptions(e); });
@@ -793,6 +812,7 @@ document.getElementById('disabledDomainSave').addEventListener('click', e => { o
 document.getElementById('disabledDomainRemove').addEventListener('click', e => { option.disabledDomainRemove(e); });
 // Audio
 document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('supportedAudioSites').addEventListener('click', e => { option.showSupportedAudioSites(); });
 document.getElementById('muteAudioOnly').addEventListener('click', e => { option.saveOptions(e); });
 document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });

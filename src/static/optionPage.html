@@ -235,8 +235,9 @@
 </div>
 
 <div id="audioPage" class="w3-container w3-hide">
-  <h4 class="sectionHeader">Audio (Experimental)</h4>
-  <p>This feature mutes the audio when a filtered word is detected in the subtitles/captions on a supported website. This is very experimental at this point, and its effectiveness is completely dependent on the quality of the subtitles accompanying the video. For more information, please see the <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio"Audio wiki. target="_blank">Audio wiki</a>.</p>
+  <p>Mute audio during video playback when a filtered word is detected in the subtitles/captions (which must be enabled). <i>Effectiveness is dependent on the quality/timing of the subtitles accompanying the video.</i> <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio". target="_blank">Learn more</a>.</p>
+
+  <button id="supportedAudioSites" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-bottom: 15px; display: block;">View Supported Sites</button>
 
   <label>
     <input id="muteAudio" type="checkbox" class="w3-check">
@@ -245,12 +246,6 @@
 
   <div id="muteAudioOptionsContainer" class="w3-hide">
     <div class="w3-twothird">
-      <h4 class="sectionHeader">Instructions</h4>
-      <ol>
-        <li>Play a video on a supported site</li>
-        <li>Turn on subtitles for the video</li>
-      </ol>
-
       <h4 class="sectionHeader">Mute Method</h4>
       <div id="audioMuteMethod">
         <label>
@@ -307,10 +302,10 @@
       </div>
     </div>
     <div class="w3-third w3-right">
-      <h4 class="sectionHeader">Custom Sites</h4>
-        <p><b>Advanced:</b> Add <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site" target="_blank">suport for other sites</a>.</p>
+      <h4 class="sectionHeader">Custom Sites (Advanced)</h4>
       <textarea id="customAudioSitesText" class="w3-input w3-border w3-card" style="width:300px;height:350px;font-size:11px;" spellcheck="false"></textarea>
       <button id="customAudioSitesSave" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top: 16px;">SAVE</button>
+      <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site" class="notes" target="_blank">How to add a custom site</a>
     </div>
   </div>
 </div>
@@ -523,6 +518,18 @@
       <div id="statusModalContent"></div>
       <div class="w3-right">
         <button id="statusModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="supportedAudioSitesModal" class="w3-modal">
+  <div class="w3-modal-content w3-card-4 w3-animate-zoom">
+    <header class="w3-container w3-flat-peter-river"><h5 class="modalTitle"></h5></header>
+    <div class="w3-container w3-padding w3-margin">
+      <div class="modalContent"></div>
+      <div class="w3-right">
+        <button class="modalOK w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
       </div>
     </div>
   </div>
