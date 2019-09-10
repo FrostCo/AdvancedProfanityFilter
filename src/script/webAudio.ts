@@ -99,10 +99,12 @@ export default class WebAudio {
 
     // Process subtitles
     subtitles.forEach(subtitle => {
-      let result = filter.replaceTextResult(subtitle.textContent);
+      // innerText handles line feeds/spacing better, but is not available to #text nodes
+      let textMethod = subtitle.nodeName === '#text' ? 'textContent' : 'innerText';
+      let result = filter.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
         filtered = true;
-        subtitle.textContent = result.filtered;
+        subtitle[textMethod] = result.filtered;
         this.mute(); // Mute the audio if we haven't already
         if (subtitle.nodeName === '#text') { this.lastFilteredNode = subtitle; }
       }
