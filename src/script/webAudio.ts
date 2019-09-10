@@ -43,13 +43,11 @@ export default class WebAudio {
     },
     'www.hulu.com': {
       className: 'caption-text-box',
-      hasChildrenElements: true,
       subtitleSelector: 'p',
       tagName: 'DIV'
     },
     'www.netflix.com': {
       className: 'player-timedtext-text-container',
-      hasChildrenElements: true,
       subtitleSelector: 'span',
       tagName: 'DIV'
     },
