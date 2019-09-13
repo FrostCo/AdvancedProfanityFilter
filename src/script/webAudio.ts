@@ -32,34 +32,12 @@ export default class WebAudio {
   }
 
   static readonly sites: { [site: string]: AudioSite } = {
-    'app.plex.tv': {
-      dataPropPresent: 'dialogueId',
-      subtitleSelector: 'span > span',
-      tagName: 'DIV'
-    },
-    'www.amazon.com': {
-      subtitleSelector: 'span.timedTextBackground',
-      tagName: 'P'
-    },
-    'www.hulu.com': {
-      className: 'caption-text-box',
-      subtitleSelector: 'p',
-      tagName: 'DIV'
-    },
-    'www.netflix.com': {
-      className: 'player-timedtext-text-container',
-      subtitleSelector: 'span',
-      tagName: 'DIV'
-    },
-    'www.vudu.com': {
-      subtitleSelector: 'span.subtitles',
-      tagName: 'DIV'
-    },
-    'www.youtube.com': {
-      className: 'caption-window',
-      subtitleSelector: 'span.ytp-caption-segment',
-      tagName: 'DIV'
-    }
+    'app.plex.tv': { dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' },
+    'www.amazon.com': { subtitleSelector: 'span.timedTextBackground', tagName: 'P' },
+    'www.hulu.com': { className: 'caption-text-box', subtitleSelector: 'p', tagName: 'DIV' },
+    'www.netflix.com': { className: 'player-timedtext-text-container', subtitleSelector: 'span', tagName: 'DIV' },
+    'www.vudu.com': { subtitleSelector: 'span.subtitles', tagName: 'DIV' },
+    'www.youtube.com': { className: 'caption-window', subtitleSelector: 'span.ytp-caption-segment', tagName: 'DIV' }
   }
 
   static buildSupportedNodeFunction(hostname): Function {
