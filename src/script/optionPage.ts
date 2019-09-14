@@ -4,6 +4,7 @@ import { Filter } from './lib/filter';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
+import WebAudio from './webAudio';
 
 export default class OptionPage {
   cfg: WebConfig;
@@ -18,7 +19,7 @@ export default class OptionPage {
   static configureConfirmModal(content = 'Are you sure?', title = 'Please Confirm', titleColor = 'w3-flat-peter-river') {
     let modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
     let modalContent = document.getElementById('confirmModalContent') as HTMLElement;
-    let modalHeader = document.querySelectorAll('#confirmModal header')[0] as HTMLElement;
+    let modalHeader = document.querySelector('#confirmModal header') as HTMLElement;
     modalTitle.innerText = title;
     modalContent.innerHTML = content;
     modalHeader.className = `w3-container ${titleColor}`;
@@ -27,7 +28,7 @@ export default class OptionPage {
   static configureStatusModal(content: string, title: string, titleColor: string) {
     let modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
     let modalContent = document.getElementById('statusModalContent') as HTMLElement;
-    let modalHeader = document.querySelectorAll('#statusModal header')[0] as HTMLElement;
+    let modalHeader = document.querySelector('#statusModal header') as HTMLElement;
     modalTitle.innerText = title;
     modalContent.innerHTML = content;
     modalHeader.className = `w3-container ${titleColor}`;
@@ -335,12 +336,14 @@ export default class OptionPage {
     let selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
     let muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
     let audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
+    let customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
     muteAudioInput.checked = this.cfg.muteAudio;
     muteAudioOnlyInput.checked = this.cfg.muteAudioOnly;
     this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
     selectedMuteMethod.checked = true;
     selectedshowSubtitle.checked = true;
     audioYouTubeAutoSubsMin.value = this.cfg.youTubeAutoSubsMin.toString();
+    customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
   }
 
   populateConfig() {
@@ -513,6 +516,20 @@ export default class OptionPage {
     }
   }
 
+  async saveCustomAudioSites() {
+    let self = this;
+    let customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
+    try {
+      let text = customAudioSitesTextArea.value;
+      self.cfg.customAudioSites = text == '' ? null : JSON.parse(text);
+      if (await option.saveProp('customAudioSites')) {
+        OptionPage.showStatusModal('Custom Audio Sites saved.');
+      }
+    } catch(e) {
+      OptionPage.showErrorModal('Invalid custom audio sites');
+    }
+  }
+
   async saveOptions(evt) {
     let self = this;
     // Gather current settings
@@ -643,6 +660,23 @@ export default class OptionPage {
     if (await option.saveProp('filterMethod')) this.init();
   }
 
+  showSupportedAudioSites() {
+    let title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
+    let content = document.querySelector('#supportedAudioSitesModal div.modalContent') as HTMLDivElement;
+    let sites = [];
+    let sortedSites = Object.keys(WebAudio.sites).sort(function(a,b) {
+      let domainA = a.match(/\w*\.\w*$/)[0];
+      let domainB = b.match(/\w*\.\w*$/)[0];
+      return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
+    });
+    sortedSites.forEach(site => {
+      sites.push(`<li><a href="https://${site}" target="_blank">${site}</a></li>`);
+    });
+    title.textContent = 'Supported Audio Sites';
+    content.innerHTML = `<ul>${sites.join('\n')}</ul>`;
+    OptionPage.openModal('supportedAudioSitesModal');
+  }
+
   switchPage(evt) {
     let currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
     let newTab = evt.target as HTMLElement;
@@ -744,6 +778,7 @@ document.getElementById('submitPassword').addEventListener('click', e => { optio
 document.getElementById('confirmModalOK').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('statusModalOK').addEventListener('click', e => { OptionPage.closeModal('statusModal'); });
+document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', e => { OptionPage.closeModal('supportedAudioSitesModal'); });
 // Settings
 document.querySelectorAll('#filterMethod input').forEach(el => { el.addEventListener('click', e => { option.selectFilterMethod(e); }); });
 document.getElementById('censorCharacterSelect').addEventListener('click', e => { option.saveOptions(e); });
@@ -777,10 +812,12 @@ document.getElementById('disabledDomainSave').addEventListener('click', e => { o
 document.getElementById('disabledDomainRemove').addEventListener('click', e => { option.disabledDomainRemove(e); });
 // Audio
 document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('supportedAudioSites').addEventListener('click', e => { option.showSupportedAudioSites(); });
 document.getElementById('muteAudioOnly').addEventListener('click', e => { option.saveOptions(e); });
 document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.getElementById('audioYouTubeAutoSubsMin').addEventListener('input', e => { option.updateYouTubeAutoMin(e.target); });
+document.getElementById('customAudioSitesSave').addEventListener('click', e => { option.saveCustomAudioSites(); });
 // Bookmarklet
 document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });
 document.getElementById('bookmarkletHostedURL').addEventListener('input', e => { option.createBookmarklet(); });

@@ -14,19 +14,19 @@ describe('Page', function() {
     });
 
     it('should return true when node has a parent node and tag is forbidden', function() {
-      expect(Page.isForbiddenNode({ parentNode: { tagName: 'SCRIPT' } })).to.equal(true);
-      expect(Page.isForbiddenNode({ parentNode: { tagName: 'STYLE' } })).to.equal(true);
-      expect(Page.isForbiddenNode({ parentNode: { tagName: 'INPUT' } })).to.equal(true);
-      expect(Page.isForbiddenNode({ parentNode: { tagName: 'TEXTAREA' } })).to.equal(true);
-      expect(Page.isForbiddenNode({ parentNode: { tagName: 'IFRAME' } })).to.equal(true);
+      expect(Page.isForbiddenNode({ parentNode: { nodeName: 'SCRIPT' } })).to.equal(true);
+      expect(Page.isForbiddenNode({ parentNode: { nodeName: 'STYLE' } })).to.equal(true);
+      expect(Page.isForbiddenNode({ parentNode: { nodeName: 'INPUT' } })).to.equal(true);
+      expect(Page.isForbiddenNode({ parentNode: { nodeName: 'TEXTAREA' } })).to.equal(true);
+      expect(Page.isForbiddenNode({ parentNode: { nodeName: 'IFRAME' } })).to.equal(true);
     });
 
     it('should return true when node is a forbidden tag', function() {
-      expect(Page.isForbiddenNode({ tagName: 'SCRIPT' })).to.equal(true);
+      expect(Page.isForbiddenNode({ nodeName: 'SCRIPT' })).to.equal(true);
     });
 
     it('should return false when node is not a forbidden tag', function() {
-      expect(Page.isForbiddenNode({ tagName: 'HTML' })).to.equal(false);
+      expect(Page.isForbiddenNode({ nodeName: 'HTML' })).to.equal(false);
     });
   });
 });

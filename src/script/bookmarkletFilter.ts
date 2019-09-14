@@ -17,25 +17,20 @@ config.words = Config._defaultWords;
 
 export default class BookmarkletFilter extends Filter {
   advanced: boolean;
+  audio: WebAudio;
   audioOnly: boolean;
   cfg: Config;
   hostname: string;
   iframe: boolean;
-  lastSubtitle: string;
-  muted: boolean;
   mutePage: boolean;
-  subtitleSelector: string;
   summary: Summary;
-  unmuteDelay: number;
-  volume: number;
+  youTubeMutePage: boolean;
 
   constructor() {
     super();
     this.advanced = false;
-    this.muted = false;
+    this.mutePage = false;
     this.summary = {};
-    this.unmuteDelay = 0;
-    this.volume = 1;
   }
 
   // Always use the top frame for page check
@@ -55,16 +50,18 @@ export default class BookmarkletFilter extends Filter {
   checkMutationForProfanity(mutation) {
     mutation.addedNodes.forEach(node => {
       if (!Page.isForbiddenNode(node)) {
-        if (filter.mutePage && WebAudio.youTubeAutoSubsPresent(filter)) { // YouTube Auto subs
-          if (WebAudio.youTubeAutoSubsSupportedNode(filter.hostname, node)) {
-            if (WebAudio.youTubeAutoSubsCurrentRow(node)) {
-              WebAudio.cleanYouTubeAutoSubs(filter, node);
+        if (filter.youTubeMutePage && filter.audio.youTubeAutoSubsPresent()) { // YouTube Auto subs
+          if (filter.audio.youTubeAutoSubsSupportedNode(node)) {
+            if (filter.audio.youTubeAutoSubsCurrentRow(node)) {
+              filter.audio.cleanYouTubeAutoSubs(filter, node);
             } else {
               filter.cleanNode(node, false);
             }
+          } else if (!filter.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
+            filter.cleanNode(node); // Clean the rest of the page
           }
-        } else if (filter.mutePage && WebAudio.supportedNode(filter.hostname, node)) {
-          WebAudio.clean(filter, node, filter.subtitleSelector);
+        } else if (filter.mutePage && filter.audio.supportedNode(node)) {
+          filter.audio.clean(filter, node);
         } else if (!filter.audioOnly) {
           if (filter.advanced && node.parentNode) {
             filter.advancedReplaceText(node);
@@ -75,11 +72,13 @@ export default class BookmarkletFilter extends Filter {
       }
     });
 
-    mutation.removedNodes.forEach(node => {
-      if (filter.mutePage && filter.muted && WebAudio.supportedNode(filter.hostname, node)) {
-        WebAudio.unmute(filter);
-      }
-    });
+    if (filter.mutePage && filter.audio.muted) {
+      mutation.removedNodes.forEach(node => {
+        if (filter.audio.supportedNode(node) || node == filter.audio.lastFilteredNode) {
+          filter.audio.unmute();
+        }
+      });
+    }
 
     // Only process mutation change if target is text
     if (!filter.audioOnly && mutation.target && mutation.target.nodeName == '#text') {
@@ -139,18 +138,16 @@ export default class BookmarkletFilter extends Filter {
     this.advanced = this.advancedPage();
 
     // Detect if we should mute audio for the current page
-    this.mutePage = (this.cfg.muteAudio && Domain.domainMatch(this.hostname, WebAudio.supportedPages()));
-    if (this.mutePage) { this.subtitleSelector = WebAudio.subtitleSelector(this.hostname); }
-
-    // Disable if muteAudioOnly mode is active and this is not a suported page
-    if (this.cfg.muteAudioOnly) {
-      if (this.mutePage) {
-        this.audioOnly = true;
-      } else {
-        message.disabled = true;
-        chrome.runtime.sendMessage(message);
-        return false;
-      }
+    if (this.cfg.muteAudio) {
+      this.audio = new WebAudio({
+        hostname: this.hostname,
+        muteMethod: this.cfg.muteMethod,
+        showSubtitles: this.cfg.showSubtitles,
+        sites: this.cfg.customAudioSites,
+        youTubeAutoSubsMin: this.cfg.youTubeAutoSubsMin
+      });
+      this.mutePage = this.audio.supportedPage;
+      this.youTubeMutePage = this.audio.youTube;
     }
 
     // Remove profanity from the main document and watch for new nodes

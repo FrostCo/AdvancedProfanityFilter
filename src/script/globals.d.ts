@@ -1,3 +1,13 @@
+interface AudioSite {
+  className?: string;               // node.className.includes()
+  containsSelector?: string;        // node.querySelector() [Not commonly used]
+  dataPropPresent?: string;         // node.dataset.hasOwnProperty()
+  hasChildrenElements?: boolean;    // node.childElementCount > 0 [Not commonly used]
+  subtitleSelector?: string;        // *Used for Filtering*: node.querySelector()
+  tagName?: string;                 // *REQUIRED*: node.nodeName
+  textParentSelector?: string;      // [Text Mode]: parent.contains(node)
+}
+
 interface Message {
   advanced?: boolean;
   clearMute?: boolean;
@@ -21,6 +31,14 @@ interface Version {
   major: number;
   minor: number;
   patch: number;
+}
+
+interface WebAudioConstructorArgs {
+  hostname: string;
+  muteMethod: number;
+  showSubtitles: number;
+  sites: { [site: string]: AudioSite };
+  youTubeAutoSubsMin: number;
 }
 
 interface WordOptions {
