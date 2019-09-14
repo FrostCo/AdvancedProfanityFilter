@@ -72,11 +72,13 @@ export default class BookmarkletFilter extends Filter {
       }
     });
 
-    mutation.removedNodes.forEach(node => {
-      if (filter.mutePage && filter.audio.muted && filter.audio.supportedNode(node)) {
-        filter.audio.unmute();
-      }
-    });
+    if (filter.mutePage && filter.audio.muted) {
+      mutation.removedNodes.forEach(node => {
+        if (filter.audio.supportedNode(node) || node == filter.audio.lastFilteredNode) {
+          filter.audio.unmute();
+        }
+      });
+    }
 
     // Only process mutation change if target is text
     if (!filter.audioOnly && mutation.target && mutation.target.nodeName == '#text') {
