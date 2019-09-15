@@ -17,30 +17,26 @@ For an overview of features and options, please head to the [wiki](https://githu
 | Edge    | [More Info](https://github.com/richardfrost/AdvancedProfanityFilter/issues/102) |
 
 ### Features
-* Multiple Filter Types
+* Filter modes
     * Censor - Hide offending words
     * Substitute - Replace offensive words
     * Remove - Remove offensive words
-* Customizable word and substitution list
-* Optional Advanced Mode for troublesome pages
-* Disable filter for specific domains
-* Import/Export settings to share with others
-* Sync settings across browsers
-* Context menu for easily adding words and disabling the filter
-* Counter showing number of filtered words
-* Basic password protection for options page
-* Supports popular sites such as:
+* Customizable word and substitution lists
+* Works everywhere, including popular pages such as:
     * Facebook
     * Pinterest
     * Reddit
     * Twitter
-    * YouTube
-* Experimental audio muting for videos on supported sites:
+* Audio muting for videos on supported sites:
     * Amazon Video
+    * Hulu
     * Netflix
     * Plex
     * Vudu
     * YouTube
+    * And more! You can even add your own! (advanced)
+
+For a detailed overview of the features and settings, please see the [Getting Started page](https://github.com/richardfrost/AdvancedProfanityFilter/wiki).
 
 ### Issues, Suggestions or Feedback?
 * Found a bug? Please open an [issue](https://github.com/richardfrost/AdvancedProfanityFilter/issues/new).
