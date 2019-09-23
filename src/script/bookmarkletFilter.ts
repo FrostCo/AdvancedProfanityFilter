@@ -53,7 +53,7 @@ export default class BookmarkletFilter extends Filter {
         if (filter.youTubeMutePage && filter.audio.youTubeAutoSubsPresent()) { // YouTube Auto subs
           if (filter.audio.youTubeAutoSubsSupportedNode(node)) {
             if (filter.audio.youTubeAutoSubsCurrentRow(node)) {
-              filter.audio.cleanYouTubeAutoSubs(filter, node);
+              filter.audio.cleanYouTubeAutoSubs(node);
             } else {
               filter.cleanNode(node, false);
             }
@@ -61,7 +61,7 @@ export default class BookmarkletFilter extends Filter {
             filter.cleanNode(node); // Clean the rest of the page
           }
         } else if (filter.mutePage && filter.audio.supportedNode(node)) {
-          filter.audio.clean(filter, node);
+          filter.audio.clean(node);
         } else if (!filter.audioOnly) {
           if (filter.advanced && node.parentNode) {
             filter.advancedReplaceText(node);
@@ -139,13 +139,7 @@ export default class BookmarkletFilter extends Filter {
 
     // Detect if we should mute audio for the current page
     if (this.cfg.muteAudio) {
-      this.audio = new WebAudio({
-        hostname: this.hostname,
-        muteMethod: this.cfg.muteMethod,
-        showSubtitles: this.cfg.showSubtitles,
-        sites: this.cfg.customAudioSites,
-        youTubeAutoSubsMin: this.cfg.youTubeAutoSubsMin
-      });
+      this.audio = new WebAudio(this);
       this.mutePage = this.audio.supportedPage;
       this.youTubeMutePage = this.audio.youTube;
     }

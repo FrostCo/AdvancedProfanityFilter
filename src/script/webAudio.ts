@@ -1,4 +1,8 @@
+import WebFilter from './webFilter';
+import BookmarkletFilter from './bookmarkletFilter';
+
 export default class WebAudio {
+  filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement;
   muted: boolean;
   muteMethod: number;
@@ -12,22 +16,23 @@ export default class WebAudio {
   youTube: boolean;
   youTubeAutoSubsMin: number;
 
-  constructor(params: WebAudioConstructorArgs) {
+  constructor(filter: WebFilter | BookmarkletFilter) {
+    this.filter = filter;
     this.lastFilteredNode = null;
     this.muted = false;
-    this.muteMethod = params.muteMethod;
-    this.showSubtitles = params.showSubtitles;
-    this.sites = Object.assign(WebAudio.sites, params.sites);
+    this.muteMethod = filter.cfg.muteMethod;
+    this.showSubtitles = filter.cfg.showSubtitles;
+    this.sites = Object.assign(WebAudio.sites, filter.cfg.customAudioSites);
     this.unmuteDelay = 0;
     this.volume = 1;
-    this.youTubeAutoSubsMin = params.youTubeAutoSubsMin;
+    this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;
 
     // Additional setup
-    this.supportedPage = Object.keys(this.sites).includes(params.hostname);
+    this.supportedPage = Object.keys(this.sites).includes(filter.hostname);
     if (this.supportedPage) {
-      if (params.hostname == 'www.youtube.com') { this.youTube = true; }
-      this.subtitleSelector = this.sites[params.hostname].subtitleSelector;
-      this.supportedNode = WebAudio.buildSupportedNodeFunction(params.hostname);
+      if (filter.hostname == 'www.youtube.com') { this.youTube = true; }
+      this.subtitleSelector = this.sites[filter.hostname].subtitleSelector;
+      this.supportedNode = this.buildSupportedNodeFunction();
     }
   }
 
@@ -48,11 +53,11 @@ export default class WebAudio {
     'www.youtube.com': { className: 'caption-window', subtitleSelector: 'span.ytp-caption-segment', tagName: 'DIV' }
   }
 
-  static buildSupportedNodeFunction(hostname): Function {
-    let { className, containsSelector, dataPropPresent, hasChildrenElements, subtitleSelector, tagName, textParentSelector } = this.sites[hostname];
+  buildSupportedNodeFunction(): Function {
+    let { className, containsSelector, dataPropPresent, hasChildrenElements, subtitleSelector, tagName, textParentSelector } = this.sites[this.filter.hostname];
 
     // Plain text mode
-    if (textParentSelector)  {
+    if (textParentSelector) {
       return new Function('node',`
       if (node.nodeName === '#text') {
         let textParent = document.querySelector('${textParentSelector}');
@@ -77,7 +82,7 @@ export default class WebAudio {
     }`.replace(/^\s*\n/gm, ''));
   }
 
-  clean(filter, subtitleContainer): void {
+  clean(subtitleContainer): void {
     let filtered = false;
     let subtitles = this.subtitleSelector ? subtitleContainer.querySelectorAll(this.subtitleSelector) : [subtitleContainer];
 
@@ -85,7 +90,7 @@ export default class WebAudio {
     subtitles.forEach(subtitle => {
       // innerText handles line feeds/spacing better, but is not available to #text nodes
       let textMethod = subtitle.nodeName === '#text' ? 'textContent' : 'innerText';
-      let result = filter.replaceTextResult(subtitle[textMethod]);
+      let result = this.filter.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
         filtered = true;
         subtitle[textMethod] = result.filtered;
@@ -101,16 +106,16 @@ export default class WebAudio {
       case 3: subtitles.forEach(subtitle => { subtitle.textContent = ''; }); break;
     }
 
-    if (filtered) { filter.updateCounterBadge(); } // Update if modified
+    if (filtered) { this.filter.updateCounterBadge(); } // Update if modified
   }
 
-  cleanYouTubeAutoSubs(filter, node): void {
-    let result = filter.replaceTextResult(node.textContent);
+  cleanYouTubeAutoSubs(node): void {
+    let result = this.filter.replaceTextResult(node.textContent);
     if (result.modified) {
       node.textContent = result.filtered;
       this.mute();
       this.unmuteDelay = null;
-      filter.updateCounterBadge();
+      this.filter.updateCounterBadge();
     } else {
       if (this.muted) {
         if (this.youTubeAutoSubsMin > 0) {

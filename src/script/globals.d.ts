@@ -33,14 +33,6 @@ interface Version {
   patch: number;
 }
 
-interface WebAudioConstructorArgs {
-  hostname: string;
-  muteMethod: number;
-  showSubtitles: number;
-  sites: { [site: string]: AudioSite };
-  youTubeAutoSubsMin: number;
-}
-
 interface WordOptions {
   matchMethod: number;
   repeat: boolean;

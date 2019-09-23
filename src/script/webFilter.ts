@@ -48,7 +48,7 @@ export default class WebFilter extends Filter {
           if (filter.audio.youTubeAutoSubsSupportedNode(node)) {
             if (filter.audio.youTubeAutoSubsCurrentRow(node)) {
               // console.log('[APF] YouTube subtitle node:', node); // Debug: Audio
-              filter.audio.cleanYouTubeAutoSubs(filter, node);
+              filter.audio.cleanYouTubeAutoSubs(node);
             } else {
               filter.cleanNode(node, false);
             }
@@ -57,7 +57,7 @@ export default class WebFilter extends Filter {
           }
         } else if (filter.mutePage && filter.audio.supportedNode(node)) {
           // console.log('[APF] Audio subtitle node:', node); // Debug: Audio
-          filter.audio.clean(filter, node);
+          filter.audio.clean(node);
         } else if (!filter.audioOnly) {
           // console.log('[APF] New node to filter', node); // Debug: Filter
           if (filter.advanced && node.parentNode) {
@@ -147,13 +147,7 @@ export default class WebFilter extends Filter {
 
     // Detect if we should mute audio for the current page
     if (this.cfg.muteAudio) {
-      this.audio = new WebAudio({
-        hostname: this.hostname,
-        muteMethod: this.cfg.muteMethod,
-        showSubtitles: this.cfg.showSubtitles,
-        sites: this.cfg.customAudioSites,
-        youTubeAutoSubsMin: this.cfg.youTubeAutoSubsMin
-      });
+      this.audio = new WebAudio(this);
       this.mutePage = this.audio.supportedPage;
       // if (this.mutePage) { console.log(`[APF] Enabling audio muting on ${this.hostname}`); } // Debug: Audio
       this.youTubeMutePage = this.audio.youTube;
