@@ -7,6 +7,7 @@ export default class WebAudio {
   muted: boolean;
   muteMethod: number;
   showSubtitles: number;
+  site: AudioSite;
   sites: { [site: string]: AudioSite };
   subtitleSelector: string;
   supportedNode: Function;
@@ -28,10 +29,11 @@ export default class WebAudio {
     this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;
 
     // Additional setup
-    this.supportedPage = Object.keys(this.sites).includes(filter.hostname);
-    if (this.supportedPage) {
+    this.site = this.sites[filter.hostname];
+    this.supportedPage = (this.site != null);
+    if (this.site) {
       if (filter.hostname == 'www.youtube.com') { this.youTube = true; }
-      this.subtitleSelector = this.sites[filter.hostname].subtitleSelector;
+      this.subtitleSelector = this.site.subtitleSelector;
       this.supportedNode = this.buildSupportedNodeFunction();
     }
   }
@@ -54,7 +56,7 @@ export default class WebAudio {
   }
 
   buildSupportedNodeFunction(): Function {
-    let { className, containsSelector, dataPropPresent, hasChildrenElements, subtitleSelector, tagName, textParentSelector } = this.sites[this.filter.hostname];
+    let { className, containsSelector, dataPropPresent, hasChildrenElements, subtitleSelector, tagName, textParentSelector } = this.site;
 
     // Plain text mode
     if (textParentSelector) {
