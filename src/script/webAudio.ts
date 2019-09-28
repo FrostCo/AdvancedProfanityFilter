@@ -24,6 +24,7 @@ export default class WebAudio {
     this.muteMethod = filter.cfg.muteMethod;
     this.showSubtitles = filter.cfg.showSubtitles;
     this.sites = Object.assign(WebAudio.sites, filter.cfg.customAudioSites);
+    Object.keys(filter.cfg.customAudioSites).forEach(x => { this.sites[x].custom = true; });
     this.unmuteDelay = 0;
     this.volume = 1;
     this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;
@@ -56,28 +57,28 @@ export default class WebAudio {
   }
 
   buildSupportedNodeFunction(): Function {
-    let { className, containsSelector, dataPropPresent, hasChildrenElements, subtitleSelector, tagName, textParentSelector } = this.site;
+    let site = this.site;
 
     // Plain text mode
-    if (textParentSelector) {
+    if (site.textParentSelector) {
       return new Function('node',`
       if (node.nodeName === '#text') {
-        let textParent = document.querySelector('${textParentSelector}');
+        let textParent = document.querySelector('${site.textParentSelector}');
         if (textParent && textParent.contains(node)) { return true; }
       }
       return false;`);
     }
 
-    // Normal mode
-    if (!tagName) { throw('tagName is required.'); }
+    // Element mode (Default)
+    if (!site.tagName) { throw('tagName is required.'); }
 
     return new Function('node',`
-    if (node.nodeName == '${tagName.toUpperCase()}') {
-      ${className ? `if (!node.className || !node.className.includes('${className}')) { return false; }` : ''}
-      ${dataPropPresent ? `if (!node.dataset || !node.dataset.hasOwnProperty('${dataPropPresent}')) { return false; }` : ''}
-      ${hasChildrenElements ? 'if (typeof node.childElementCount !== "number" || node.childElementCount < 1) { return false; }' : ''}
-      ${subtitleSelector ? `if (typeof node.querySelector !== 'function' || !node.querySelector('${subtitleSelector}')) { return false; }` : ''}
-      ${containsSelector ? `if (typeof node.querySelector !== 'function' || !node.querySelector('${containsSelector}')) { return false; }` : ''}
+    if (node.nodeName == '${site.tagName.toUpperCase()}') {
+      ${site.className ? `if (!node.className || !node.className.includes('${site.className}')) { return false; }` : ''}
+      ${site.dataPropPresent ? `if (!node.dataset || !node.dataset.hasOwnProperty('${site.dataPropPresent}')) { return false; }` : ''}
+      ${site.hasChildrenElements ? 'if (typeof node.childElementCount !== "number" || node.childElementCount < 1) { return false; }' : ''}
+      ${site.subtitleSelector ? `if (typeof node.querySelector !== 'function' || !node.querySelector('${site.subtitleSelector}')) { return false; }` : ''}
+      ${site.containsSelector ? `if (typeof node.querySelector !== 'function' || !node.querySelector('${site.containsSelector}')) { return false; }` : ''}
       return true;
     } else {
       return false;
