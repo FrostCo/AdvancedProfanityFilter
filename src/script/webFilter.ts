@@ -114,7 +114,7 @@ export default class WebFilter extends Filter {
       }
     } else { // Leaf node
       if (node.nodeName) {
-        if (node.textContent.trim() != '') {
+        if (node.textContent && node.textContent.trim() != '') {
           let result = this.replaceTextResult(node.textContent, stats);
           if (result.modified) {
             // console.log('[APF] Normal node changed:', result.original, result.filtered); // Debug: Filter - Mutation node filtered

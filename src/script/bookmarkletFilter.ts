@@ -111,7 +111,7 @@ export default class BookmarkletFilter extends Filter {
       }
     } else { // Leaf node
       if (node.nodeName) {
-        if (node.textContent.trim() != '') {
+        if (node.textContent && node.textContent.trim() != '') {
           let result = this.replaceTextResult(node.textContent, stats);
           if (result.modified) {
             node.textContent = result.filtered;
