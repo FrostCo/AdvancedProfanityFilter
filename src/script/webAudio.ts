@@ -162,18 +162,20 @@ export default class WebAudio {
   }
 
   unmute(): void {
-    this.muted = false;
+    if (this.muted) {
+      this.muted = false;
 
-    switch(this.muteMethod) {
-      case 0: // Mute tab
-        chrome.runtime.sendMessage({ mute: false });
-        break;
-      case 1: { // Mute video
-        let video = document.getElementsByTagName('video')[0];
-        if (video && video.volume != null) {
-          video.volume = this.volume;
+      switch(this.muteMethod) {
+        case 0: // Mute tab
+          chrome.runtime.sendMessage({ mute: false });
+          break;
+        case 1: { // Mute video
+          let video = document.getElementsByTagName('video')[0];
+          if (video && video.volume != null) {
+            video.volume = this.volume;
+          }
+          break;
         }
-        break;
       }
     }
   }
