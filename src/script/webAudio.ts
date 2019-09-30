@@ -34,9 +34,18 @@ export default class WebAudio {
     this.supportedPage = (this.site != null);
     if (this.site) {
       if (filter.hostname == 'www.youtube.com') { this.youTube = true; }
+      if (this.site.videoCueMode) {
+        this.site = Object.assign(WebAudio._videoModeDefaults, this.site);
+        setInterval(this.watchForVideo, this.site.videoInterval, this);
+      }
       this.subtitleSelector = this.site.subtitleSelector;
       this.supportedNode = this.buildSupportedNodeFunction();
     }
+  }
+
+  static readonly _videoModeDefaults = {
+    videoSelector: 'video',
+    videoInterval: 100
   }
 
   static readonly sites: { [site: string]: AudioSite } = {
@@ -67,6 +76,11 @@ export default class WebAudio {
         if (textParent && textParent.contains(node)) { return true; }
       }
       return false;`);
+    }
+
+    // Video cue mode
+    if (site.videoCueMode) {
+      return new Function('node', 'return false;');
     }
 
     // Element mode (Default)
@@ -138,6 +152,20 @@ export default class WebAudio {
     }
   }
 
+  getVideoTextTrack(video: HTMLVideoElement) {
+    if (video.textTracks && video.textTracks.length > 0) {
+      if (this.site.videoCueLanguage) {
+        for (let i = 0; i < video.textTracks.length; i++) {
+          if (video.textTracks[i].language == this.site.videoCueLanguage) {
+            return video.textTracks[i];
+          }
+        }
+      } else {
+        return video.textTracks[0];
+      }
+    }
+  }
+
   mute(): void {
     if (!this.muted) {
       this.muted = true;
@@ -162,6 +190,24 @@ export default class WebAudio {
     return !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
 
+  processCues(cues: FilteredTextTrackCue[]) {
+    for (let i = 0; i < cues.length; i++) {
+      let cue = cues[i];
+      if (cue.hasOwnProperty('filtered')) { continue; }
+
+      cue.index = i;
+      let result = this.filter.replaceTextResult(cue.text);
+      if (result.modified) {
+        cue.filtered = true;
+        cue.originalText = cue.text;
+        cue.text = result.filtered;
+        // console.log('[APF] video cue filtered:', i, cue.originalText, cue.text); // DEBUG: Audio
+      } else {
+        cue.filtered = false;
+      }
+    }
+  }
+
   unmute(): void {
     if (this.muted) {
       this.muted = false;
@@ -176,6 +222,36 @@ export default class WebAudio {
             video.volume = this.volume;
           }
           break;
+        }
+      }
+    }
+  }
+
+  watchForVideo(instance: WebAudio) {
+    let video = document.querySelector(instance.site.videoSelector) as HTMLVideoElement;
+    if (video && video.textTracks) {
+      let textTrack = instance.getVideoTextTrack(video);
+      if (textTrack && textTrack.cues && textTrack.cues[0]) {
+        if (instance.playing(video)) {
+          let filtered = false;
+
+          for (let i = 0; i < textTrack.activeCues.length; i++) {
+            let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
+            if (!activeCue.hasOwnProperty('filtered')) {
+              let cues = textTrack.cues as any as FilteredTextTrackCue[];
+              instance.processCues(cues);
+            }
+
+            if (activeCue.filtered) {
+              filtered = true;
+            }
+          }
+
+          if (filtered == true) {
+            instance.mute();
+          } else {
+            instance.unmute();
+          }
         }
       }
     }

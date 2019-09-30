@@ -6,6 +6,17 @@ interface AudioSite {
   subtitleSelector?: string;        // *Used for Filtering*: node.querySelector()
   tagName?: string;                 // *REQUIRED*: node.nodeName
   textParentSelector?: string;      // [Text Mode]: parent.contains(node)
+  videoCueLanguage?: string;        // Language for video TextTrack
+  videoCueMode?: boolean;           // [Video cue mode]
+  videoInterval?: number;           // Set a custom watch interval (in ms)
+  videoSelector?: string;           // Video selector: defaults to 'video'
+  custom?: boolean;                 // Added automatically for custom sites
+}
+
+interface FilteredTextTrackCue extends TextTrackCue {
+  filtered: boolean;
+  index: number;
+  originalText: string;
 }
 
 interface Message {
