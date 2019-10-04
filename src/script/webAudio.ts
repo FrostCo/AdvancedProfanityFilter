@@ -166,7 +166,7 @@ export default class WebAudio {
     }
   }
 
-  mute(): void {
+  mute(video?: HTMLVideoElement): void {
     if (!this.muted) {
       this.muted = true;
 
@@ -175,7 +175,7 @@ export default class WebAudio {
           chrome.runtime.sendMessage({ mute: true });
           break;
         case 1: { // Mute video
-          let video = document.getElementsByTagName('video')[0];
+          if (!video) { video = document.querySelector('video'); }
           if (video && video.volume != null) {
             this.volume = video.volume; // Save original volume
             video.volume = 0;
@@ -208,7 +208,7 @@ export default class WebAudio {
     }
   }
 
-  unmute(): void {
+  unmute(video?: HTMLVideoElement): void {
     if (this.muted) {
       this.muted = false;
 
@@ -217,7 +217,7 @@ export default class WebAudio {
           chrome.runtime.sendMessage({ mute: false });
           break;
         case 1: { // Mute video
-          let video = document.getElementsByTagName('video')[0];
+          if (!video) { video = document.querySelector('video'); }
           if (video && video.volume != null) {
             video.volume = this.volume;
           }
@@ -248,9 +248,9 @@ export default class WebAudio {
           }
 
           if (filtered == true) {
-            instance.mute();
+            instance.mute(video);
           } else {
-            instance.unmute();
+            instance.unmute(video);
           }
         }
       }
