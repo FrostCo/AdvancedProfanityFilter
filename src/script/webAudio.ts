@@ -160,9 +160,9 @@ export default class WebAudio {
             return video.textTracks[i];
           }
         }
-      } else {
-        return video.textTracks[0];
       }
+
+      return video.textTracks[0];
     }
   }
 
