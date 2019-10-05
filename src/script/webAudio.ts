@@ -233,6 +233,7 @@ export default class WebAudio {
       let textTrack = instance.getVideoTextTrack(video);
       if (textTrack && textTrack.cues && textTrack.cues[0]) {
         if (instance.playing(video)) {
+          if (instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }
           let filtered = false;
 
           for (let i = 0; i < textTrack.activeCues.length; i++) {
@@ -248,8 +249,16 @@ export default class WebAudio {
           }
 
           if (filtered == true) {
+            switch (instance.showSubtitles) {
+              case 1: textTrack.mode = 'showing'; break;
+              case 2: textTrack.mode = 'hidden'; break;
+            }
             instance.mute(video);
           } else {
+            switch (instance.showSubtitles) {
+              case 1: textTrack.mode = 'hidden'; break;
+              case 2: textTrack.mode = 'showing'; break;
+            }
             instance.unmute(video);
           }
         }
