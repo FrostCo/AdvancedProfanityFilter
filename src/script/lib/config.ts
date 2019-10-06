@@ -37,7 +37,7 @@ export default class Config {
     whole: 2,
     'Per-Word': 3,
     'RegExp': 4
-  }
+  };
 
   static readonly _defaults = {
     advancedDomains: [],

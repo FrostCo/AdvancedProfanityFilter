@@ -63,7 +63,7 @@ export default class WebAudio {
     'www.usanetwork.com': { className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
     'www.vudu.com': { subtitleSelector: 'span.subtitles', tagName: 'DIV' },
     'www.youtube.com': { className: 'caption-window', subtitleSelector: 'span.ytp-caption-segment', tagName: 'DIV' }
-  }
+  };
 
   buildSupportedNodeFunction(): Function {
     let site = this.site;
