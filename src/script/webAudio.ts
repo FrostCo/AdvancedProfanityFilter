@@ -45,8 +45,8 @@ export default class WebAudio {
 
   static readonly _videoModeDefaults = {
     videoSelector: 'video',
-    videoInterval: 100
-  }
+    videoInterval: 200
+  };
 
   static readonly sites: { [site: string]: AudioSite } = {
     'abc.go.com': { className: 'akamai-caption-text', tagName: 'DIV' },
@@ -229,39 +229,42 @@ export default class WebAudio {
 
   watchForVideo(instance: WebAudio) {
     let video = document.querySelector(instance.site.videoSelector) as HTMLVideoElement;
-    if (video && video.textTracks) {
+    if (video && video.textTracks && instance.playing(video)) {
       let textTrack = instance.getVideoTextTrack(video);
-      if (textTrack && textTrack.cues && textTrack.cues[0]) {
-        if (instance.playing(video)) {
-          if (instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }
-          let filtered = false;
 
-          for (let i = 0; i < textTrack.activeCues.length; i++) {
-            let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
-            if (!activeCue.hasOwnProperty('filtered')) {
-              let cues = textTrack.cues as any as FilteredTextTrackCue[];
-              instance.processCues(cues);
+      if (!textTrack.oncuechange) {
+        if (instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }
+
+        textTrack.oncuechange = () => {
+          if (textTrack.activeCues.length > 0) {
+            let filtered = false;
+
+            for (let i = 0; i < textTrack.activeCues.length; i++) {
+              let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
+              if (!activeCue.hasOwnProperty('filtered')) {
+                let cues = textTrack.cues as any as FilteredTextTrackCue[];
+                instance.processCues(cues);
+              }
+              if (activeCue.filtered) { filtered = true; }
             }
 
-            if (activeCue.filtered) {
-              filtered = true;
+            if (filtered) {
+              instance.mute(video);
+              switch (instance.showSubtitles) {
+                case 1: textTrack.mode = 'showing'; break;
+                case 2: textTrack.mode = 'hidden'; break;
+              }
+            } else {
+              instance.unmute(video);
+              switch (instance.showSubtitles) {
+                case 1: textTrack.mode = 'hidden'; break;
+                case 2: textTrack.mode = 'showing'; break;
+              }
             }
-          }
-
-          if (filtered == true) {
-            switch (instance.showSubtitles) {
-              case 1: textTrack.mode = 'showing'; break;
-              case 2: textTrack.mode = 'hidden'; break;
-            }
-            instance.mute(video);
-          } else {
-            switch (instance.showSubtitles) {
-              case 1: textTrack.mode = 'hidden'; break;
-              case 2: textTrack.mode = 'showing'; break;
-            }
+          } else { // No active cues
             instance.unmute(video);
           }
-        }
+        };
       }
     }
   }
