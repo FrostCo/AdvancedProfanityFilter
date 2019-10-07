@@ -8,6 +8,7 @@ interface AudioSite {
   textParentSelector?: string;      // [Text Mode]: parent.contains(node)
   videoCueLanguage?: string;        // Language for video TextTrack
   videoCueMode?: boolean;           // [Video cue mode]
+  videoCueSync?: number;            // Adjust subtitle sync +/- (in seconds)
   videoInterval?: number;           // Set a custom watch interval (in ms)
   videoSelector?: string;           // Video selector: defaults to 'video'
   custom?: boolean;                 // Added automatically for custom sites

@@ -195,6 +195,11 @@ export default class WebAudio {
       let cue = cues[i];
       if (cue.hasOwnProperty('filtered')) { continue; }
 
+      if (this.site.videoCueSync) {
+        cue.startTime += this.site.videoCueSync;
+        cue.endTime += this.site.videoCueSync;
+      }
+
       cue.index = i;
       let result = this.filter.replaceTextResult(cue.text);
       if (result.modified) {
