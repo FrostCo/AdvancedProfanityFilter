@@ -1,4 +1,5 @@
 interface AudioSite {
+  _custom?: boolean;                // Added automatically for custom sites
   className?: string;               // node.className.includes()
   containsSelector?: string;        // node.querySelector() [Not commonly used]
   dataPropPresent?: string;         // node.dataset.hasOwnProperty()
@@ -6,6 +7,17 @@ interface AudioSite {
   subtitleSelector?: string;        // *Used for Filtering*: node.querySelector()
   tagName?: string;                 // *REQUIRED*: node.nodeName
   textParentSelector?: string;      // [Text Mode]: parent.contains(node)
+  videoCueLanguage?: string;        // Language for video TextTrack
+  videoCueMode?: boolean;           // [Video cue mode]
+  videoCueSync?: number;            // Adjust subtitle sync +/- (in seconds)
+  videoInterval?: number;           // Set a custom watch interval (in ms)
+  videoSelector?: string;           // Video selector: defaults to 'video'
+}
+
+interface FilteredTextTrackCue extends TextTrackCue {
+  filtered: boolean;
+  index: number;
+  originalText: string;
 }
 
 interface Message {
@@ -31,14 +43,6 @@ interface Version {
   major: number;
   minor: number;
   patch: number;
-}
-
-interface WebAudioConstructorArgs {
-  hostname: string;
-  muteMethod: number;
-  showSubtitles: number;
-  sites: { [site: string]: AudioSite };
-  youTubeAutoSubsMin: number;
 }
 
 interface WordOptions {
