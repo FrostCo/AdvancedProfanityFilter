@@ -24,7 +24,7 @@ export default class WebAudio {
     this.muteMethod = filter.cfg.muteMethod;
     this.showSubtitles = filter.cfg.showSubtitles;
     this.sites = Object.assign(WebAudio.sites, filter.cfg.customAudioSites);
-    Object.keys(filter.cfg.customAudioSites).forEach(x => { this.sites[x].custom = true; });
+    Object.keys(filter.cfg.customAudioSites).forEach(x => { this.sites[x]._custom = true; });
     this.unmuteDelay = 0;
     this.volume = 1;
     this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;
@@ -44,8 +44,8 @@ export default class WebAudio {
   }
 
   static readonly _videoModeDefaults = {
-    videoSelector: 'video',
-    videoInterval: 200
+    videoInterval: 200,
+    videoSelector: 'video'
   };
 
   static readonly sites: { [site: string]: AudioSite } = {
@@ -206,7 +206,6 @@ export default class WebAudio {
         cue.filtered = true;
         cue.originalText = cue.text;
         cue.text = result.filtered;
-        // console.log('[APF] video cue filtered:', i, cue.originalText, cue.text); // DEBUG: Audio
       } else {
         cue.filtered = false;
       }
@@ -237,7 +236,7 @@ export default class WebAudio {
     if (video && video.textTracks && instance.playing(video)) {
       let textTrack = instance.getVideoTextTrack(video);
 
-      if (!textTrack.oncuechange) {
+      if (textTrack && !textTrack.oncuechange) {
         if (instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }
 
         textTrack.oncuechange = () => {

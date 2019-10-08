@@ -1,4 +1,5 @@
 interface AudioSite {
+  _custom?: boolean;                // Added automatically for custom sites
   className?: string;               // node.className.includes()
   containsSelector?: string;        // node.querySelector() [Not commonly used]
   dataPropPresent?: string;         // node.dataset.hasOwnProperty()
@@ -11,7 +12,6 @@ interface AudioSite {
   videoCueSync?: number;            // Adjust subtitle sync +/- (in seconds)
   videoInterval?: number;           // Set a custom watch interval (in ms)
   videoSelector?: string;           // Video selector: defaults to 'video'
-  custom?: boolean;                 // Added automatically for custom sites
 }
 
 interface FilteredTextTrackCue extends TextTrackCue {
