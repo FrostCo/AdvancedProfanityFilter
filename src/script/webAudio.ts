@@ -118,9 +118,9 @@ export default class WebAudio {
 
     // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
     switch (this.showSubtitles) {
-      case 1: if (!filtered) { subtitles.forEach(subtitle => { subtitle.textContent = ''; }); } break;
-      case 2: if (filtered) { subtitles.forEach(subtitle => { subtitle.textContent = ''; }); } break;
-      case 3: subtitles.forEach(subtitle => { subtitle.textContent = ''; }); break;
+      case 1: if (!filtered) { subtitleContainer.textContent = ''; } break;
+      case 2: if (filtered) { subtitleContainer.textContent = ''; } break;
+      case 3: subtitleContainer.textContent = ''; break;
     }
 
     if (filtered) { this.filter.updateCounterBadge(); } // Update if modified
