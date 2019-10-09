@@ -126,6 +126,16 @@ export default class Config {
     }
   }
 
+  removeWord(str: string) {
+    str = str.trim().toLowerCase();
+    if (Object.keys(this.words).includes(str)) {
+      delete this.words[str];
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   repeatForWord(word: string): boolean {
     if (this.words[word].repeat === true || this.words[word].repeat === false) {
       return this.words[word].repeat;
