@@ -95,7 +95,8 @@ export default class Config {
     'shit': { matchMethod: 1, repeat: true, sub: 'crap' },
     'slut': { matchMethod: 1, repeat: true, sub: 'tramp' },
     'tits': { matchMethod: 1, repeat: true, sub: 'chest' },
-    'twat': { matchMethod: 1, repeat: true, sub: 'dumbo' },
+    'twat': { matchMethod: 0, repeat: true, sub: 'dumbo' },
+    'twats': { matchMethod: 0, repeat: true, sub: 'dumbos' },
     'whore': { matchMethod: 1, repeat: true, sub: 'tramp' }
   };
 
@@ -123,6 +124,16 @@ export default class Config {
     } else {
       this.words[str] = {matchMethod: this.defaultWordMatchMethod, repeat: this.defaultWordRepeat, sub: ''};
       return true;
+    }
+  }
+
+  removeWord(str: string) {
+    str = str.trim().toLowerCase();
+    if (Object.keys(this.words).includes(str)) {
+      delete this.words[str];
+      return true;
+    } else {
+      return false;
     }
   }
 

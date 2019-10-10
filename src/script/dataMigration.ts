@@ -4,7 +4,14 @@ import WebConfig from './webConfig';
 export default class DataMigration {
   cfg: WebConfig;
 
-  static readonly newestMigration = '2.1.4'; // Migration required by any version less than this
+  // Only append so the order stays the same (oldest first).
+  static readonly migrations = new Map([
+    ['1.0.13', 'moveToNewWordsStorage'],
+    ['1.1.0', 'sanitizeWords'],
+    ['1.2.0', 'singleWordSubstitution'],
+    ['2.1.4', 'updateDefaultSubs'],
+    ['2.3.0', 'fixSmartWatch'],
+  ]);
 
   constructor(config) {
     this.cfg = config;
@@ -15,68 +22,46 @@ export default class DataMigration {
     return new DataMigration(cfg);
   }
 
+  static latestMigration(): string {
+    return Array.from(DataMigration.migrations)[DataMigration.migrations.size - 1][0];
+  }
+
   static migrationNeeded(oldVersion: string): boolean {
-    return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.newestMigration));
+    return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.latestMigration()));
   }
 
   // This will look at the version (from before the update) and perform data migrations if necessary
-  // Only append so the order stays the same (oldest first).
   byVersion(oldVersion: string) {
     let version = getVersion(oldVersion) as Version;
     let migrated = false;
-
-    if (isVersionOlder(version, getVersion('1.0.13'))) {
-      migrated = true;
-      this.moveToNewWordsStorage();
-    }
-
-    if (isVersionOlder(version, getVersion('1.1.0'))) {
-      migrated = true;
-      this.sanitizeWords();
-    }
-
-    if (isVersionOlder(version, getVersion('1.2.0'))) {
-      migrated = true;
-      this.singleWordSubstitution();
-    }
-
-    if (isVersionOlder(version, getVersion('2.1.4'))) {
-      migrated = true;
-      this.updateDefaultSubs();
+    for (let [migrationVersion, migrationName] of DataMigration.migrations) {
+      if (isVersionOlder(version, getVersion(migrationVersion))) {
+        migrated = true;
+        this[migrationName]();
+      }
     }
 
     return migrated;
   }
 
-  // [2.1.4] - Update default sub values
-  updateDefaultSubs() {
+  // [2.3.0]
+  fixSmartWatch() {
     let cfg = this.cfg;
-    let updatedWords = {
-      bastard: {original: 'jerk', update: 'idiot'},
-      bitch: {original: 'jerk', update: 'bench'},
-      cocksucker: {original: 'idiot', update: 'suckup'},
-      cunt: {original: 'explative', update: 'expletive' },
-      fag: {original: 'slur', update: 'gay'},
-      faggot: {original: 'slur', update: 'gay'},
-      fags: {original: 'slur', update: 'gays'},
-      fuck: { original: 'fudge', update: 'freak' },
-      goddammit: {original: 'goshdangit', update: 'dangit'},
-      jackass: {original: 'idiot', update: 'jerk'},
-      nigga: {original: 'ethnic slur', update: 'bruh'},
-      nigger: {original: 'ethnic slur', update: 'man'},
-      niggers: {original: 'ethnic slurs', update: 'people'},
-      tits: {original: 'explative', update: 'chest'},
-      twat: {original: 'explative', update: 'dumbo'},
+    let originalWord = 'twat';
+    let originalWordConf = { matchMethod: 1, repeat: true, sub: 'dumbo' };
+    let update = {
+      twat: { matchMethod: 0, repeat: true, sub: 'dumbo' },
+      twats: { matchMethod: 0, repeat: true, sub: 'dumbos' }
     };
 
-    Object.keys(updatedWords).forEach(updatedWord => {
-      if (cfg.words[updatedWord]) {
-        let wordObj = cfg.words[updatedWord] as WordOptions;
-        if (wordObj.sub == updatedWords[updatedWord].original) {
-          wordObj.sub = updatedWords[updatedWord].update;
-        }
-      }
-    });
+    if (cfg.words[originalWord]
+      && cfg.words[originalWord].matchMethod == originalWordConf.matchMethod
+      && cfg.words[originalWord].sub == originalWordConf.sub
+    ) {
+      Object.keys(update).forEach(word => {
+        cfg.words[word] = update[word];
+      });
+    }
   }
 
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
@@ -120,5 +105,36 @@ export default class DataMigration {
       }
     });
     // console.log('after', JSON.stringify(cfg.words));
+  }
+
+  // [2.1.4] - Update default sub values
+  updateDefaultSubs() {
+    let cfg = this.cfg;
+    let updatedWords = {
+      bastard: {original: 'jerk', update: 'idiot'},
+      bitch: {original: 'jerk', update: 'bench'},
+      cocksucker: {original: 'idiot', update: 'suckup'},
+      cunt: {original: 'explative', update: 'expletive' },
+      fag: {original: 'slur', update: 'gay'},
+      faggot: {original: 'slur', update: 'gay'},
+      fags: {original: 'slur', update: 'gays'},
+      fuck: { original: 'fudge', update: 'freak' },
+      goddammit: {original: 'goshdangit', update: 'dangit'},
+      jackass: {original: 'idiot', update: 'jerk'},
+      nigga: {original: 'ethnic slur', update: 'bruh'},
+      nigger: {original: 'ethnic slur', update: 'man'},
+      niggers: {original: 'ethnic slurs', update: 'people'},
+      tits: {original: 'explative', update: 'chest'},
+      twat: {original: 'explative', update: 'dumbo'},
+    };
+
+    Object.keys(updatedWords).forEach(updatedWord => {
+      if (cfg.words[updatedWord]) {
+        let wordObj = cfg.words[updatedWord] as WordOptions;
+        if (wordObj.sub == updatedWords[updatedWord].original) {
+          wordObj.sub = updatedWords[updatedWord].update;
+        }
+      }
+    });
   }
 }

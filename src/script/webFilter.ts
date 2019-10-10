@@ -120,6 +120,9 @@ export default class WebFilter extends Filter {
             // console.log('[APF] Normal node changed:', result.original, result.filtered); // Debug: Filter - Mutation node filtered
             node.textContent = result.filtered;
           }
+        } else if (node.nodeName == 'IMG') {
+          if (node.alt != '') { node.alt = this.replaceText(node.alt, stats); }
+          if (node.title != '') { node.title = this.replaceText(node.title, stats); }
         } else if (node.shadowRoot != undefined) {
           shadowObserver.observe(node.shadowRoot, observerConfig);
         }

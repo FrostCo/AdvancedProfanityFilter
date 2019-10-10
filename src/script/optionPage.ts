@@ -493,13 +493,14 @@ export default class OptionPage {
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     let word = wordList.value;
 
-    delete this.cfg.words[word];
-    let success = await this.saveOptions(evt);
-
-    if (success) {
-      // Update states and Reset word form
-      wordList.selectedIndex = 0;
-      this.populateWordsList();
+    let result = this.cfg.removeWord(word);
+    if (result) {
+      result = await this.saveOptions(evt);
+      if (result) {
+        // Update states and Reset word form
+        wordList.selectedIndex = 0;
+        this.populateWordsList();
+      }
     }
   }
 

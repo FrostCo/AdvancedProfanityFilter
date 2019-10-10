@@ -78,9 +78,9 @@ chrome.runtime.onMessage.addListener(
 // Context menu
 //
 // Add selected word/phrase and reload page (unless already present)
-async function addSelection(selection: string) {
+async function processSelection(action: string, selection: string) {
   let cfg = await WebConfig.build(); // TODO: Only need words here
-  let result = cfg.addWord(selection);
+  let result = cfg[action](selection);
 
   if (result) {
     let saved = await cfg.save();
@@ -133,6 +133,13 @@ chrome.contextMenus.removeAll(function() {
   });
 
   chrome.contextMenus.create({
+    id: 'removeSelection',
+    title: 'Remove selection from filter',
+    contexts: ['selection'],
+    documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+  });
+
+  chrome.contextMenus.create({
     id: 'toggleFilterForDomain',
     title: 'Toggle filter for domain',
     contexts: ['all'],
@@ -158,7 +165,9 @@ chrome.contextMenus.removeAll(function() {
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
   switch(info.menuItemId) {
     case 'addSelection':
-      addSelection(info.selectionText); break;
+      processSelection('addWord', info.selectionText); break;
+    case 'removeSelection':
+      processSelection('removeWord', info.selectionText); break;
     case 'toggleFilterForDomain': {
       let url = new URL(tab.url);
       toggleDomain(url.hostname, 'disabledDomains'); break;

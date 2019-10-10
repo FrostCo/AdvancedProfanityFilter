@@ -23,8 +23,16 @@ export default class WebAudio {
     this.muted = false;
     this.muteMethod = filter.cfg.muteMethod;
     this.showSubtitles = filter.cfg.showSubtitles;
-    this.sites = Object.assign(WebAudio.sites, filter.cfg.customAudioSites);
-    Object.keys(filter.cfg.customAudioSites).forEach(x => { this.sites[x]._custom = true; });
+    if (
+      filter.cfg.customAudioSites
+      && typeof filter.cfg.customAudioSites == 'object'
+      && Object.keys(filter.cfg.customAudioSites).length > 0
+    ) {
+      this.sites = Object.assign(WebAudio.sites, filter.cfg.customAudioSites);
+      Object.keys(filter.cfg.customAudioSites).forEach(x => { this.sites[x]._custom = true; });
+    } else {
+      this.sites = WebAudio.sites;
+    }
     this.unmuteDelay = 0;
     this.volume = 1;
     this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;
@@ -59,6 +67,7 @@ export default class WebAudio {
     'www.netflix.com': { className: 'player-timedtext-text-container', subtitleSelector: 'span', tagName: 'DIV' },
     'www.sonycrackle.com': { textParentSelector: 'div.clpp-subtitles-container' },
     'www.syfy.com': { className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
+    'www.tntdrama.com': { videoCueMode: true, videoCueLanguage: 'en', videoSelector: 'video.top-media-element' },
     'www.universalkids.com': { subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' },
     'www.usanetwork.com': { className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
     'www.vudu.com': { subtitleSelector: 'span.subtitles', tagName: 'DIV' },
@@ -118,9 +127,9 @@ export default class WebAudio {
 
     // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
     switch (this.showSubtitles) {
-      case 1: if (!filtered) { subtitles.forEach(subtitle => { subtitle.textContent = ''; }); } break;
-      case 2: if (filtered) { subtitles.forEach(subtitle => { subtitle.textContent = ''; }); } break;
-      case 3: subtitles.forEach(subtitle => { subtitle.textContent = ''; }); break;
+      case 1: if (!filtered) { subtitleContainer.textContent = ''; } break;
+      case 2: if (filtered) { subtitleContainer.textContent = ''; } break;
+      case 3: subtitleContainer.textContent = ''; break;
     }
 
     if (filtered) { this.filter.updateCounterBadge(); } // Update if modified
