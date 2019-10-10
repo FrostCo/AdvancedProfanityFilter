@@ -408,7 +408,7 @@
     <li><strong>Match Method</strong> - When new words are added they will automatically be assigned this match method.</li>
     </ul>
     <h1 id="words">Words</h1>
-    <p>The words tab allow you to perform several actions (Some options are unavailable based on other settings):</p>
+    <p>The words tab allows you to perform several actions (Some options are unavailable based on other settings):</p>
     <ul>
     <li>Add new words/phrases.</li>
     <li>Modify existing words/phrases.</li>
@@ -420,11 +420,11 @@
     <h1 id="domains">Domains</h1>
     <p>This tab allows you to control domains that the filter will be whitelisted (disabled) on, or which domains to use the Advanced mode on.</p>
     <h3 id="advanced-mode">Advanced Mode:</h3>
-    <p>Advanced mode for domains that are particularly hard to filter.</p>
-    <ul>
-    <li>To add a domain to the list, go the Advanced Domains on the &quot;Domains&quot; tab on the options page.</li>
-    <li><strong>WARNING</strong>: This mode can break webpages and result in lower performance. Use only when the filter isn&#39;t working on a page.</li>
-    </ul>
+    <p><em><strong>WARNING</strong>: This mode will result in lower performance.</em></p>
+    <p>Handle matching text that is split between multiple elements on the page. This is not usually necessary.</p>
+    <p><em>Example:</em></p>
+    <pre><code class="language-html">&lt;span&gt;some text to fil&lt;/span&gt;&lt;span&gt;ter&lt;/span&gt;</code></pre>
+    <p>On the page, this would look like: &quot;some text to filter&quot;, but the extension (without advanced mode) would see <code>some text to fil</code>, and <code>ter</code>. If you were trying to filter the word <code>text</code>, it would work as expected (because &quot;text&quot; isn&#39;t split across elements). If you were trying to filter the word <code>filter</code>, it would fail without Advanced mode being turned on, because it doesn&#39;t match on <code>some text to fil</code>, or <code>ter</code>. This is not a common practice, and is only needed in a very small number of websites.</p>
     <h3 id="whitelist-disabled">Whitelist (Disabled):</h3>
     <p>Control which domains the filter should not run on. To whitelist Google.com and all its sub-domains, simply add <code>google.com</code>. If you want to just whitelist Gmail, you can add <code>mail.google.com</code>.</p>
     <p>When browsing a web page, you can also disable the filter for the current domain from the context (right-click) menu, or using the extensions Popup menu.</p>
