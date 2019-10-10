@@ -10,6 +10,7 @@ export default class DataMigration {
     ['1.1.0', 'sanitizeWords'],
     ['1.2.0', 'singleWordSubstitution'],
     ['2.1.4', 'updateDefaultSubs'],
+    ['2.3.0', 'fixSmartWatch'],
   ]);
 
   constructor(config) {
@@ -41,6 +42,26 @@ export default class DataMigration {
     }
 
     return migrated;
+  }
+
+  // [2.3.0]
+  fixSmartWatch() {
+    let cfg = this.cfg;
+    let originalWord = 'twat';
+    let originalWordConf = { matchMethod: 1, repeat: true, sub: 'dumbo' };
+    let update = {
+      twat: { matchMethod: 0, repeat: true, sub: 'dumbo' },
+      twats: { matchMethod: 0, repeat: true, sub: 'dumbos' }
+    };
+
+    if (cfg.words[originalWord]
+      && cfg.words[originalWord].matchMethod == originalWordConf.matchMethod
+      && cfg.words[originalWord].sub == originalWordConf.sub
+    ) {
+      Object.keys(update).forEach(word => {
+        cfg.words[word] = update[word];
+      });
+    }
   }
 
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood

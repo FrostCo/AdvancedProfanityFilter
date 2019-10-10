@@ -95,7 +95,8 @@ export default class Config {
     'shit': { matchMethod: 1, repeat: true, sub: 'crap' },
     'slut': { matchMethod: 1, repeat: true, sub: 'tramp' },
     'tits': { matchMethod: 1, repeat: true, sub: 'chest' },
-    'twat': { matchMethod: 1, repeat: true, sub: 'dumbo' },
+    'twat': { matchMethod: 0, repeat: true, sub: 'dumbo' },
+    'twats': { matchMethod: 0, repeat: true, sub: 'dumbos' },
     'whore': { matchMethod: 1, repeat: true, sub: 'tramp' }
   };
 
