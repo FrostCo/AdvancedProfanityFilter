@@ -67,6 +67,7 @@ export default class WebAudio {
     'www.netflix.com': { className: 'player-timedtext-text-container', subtitleSelector: 'span', tagName: 'DIV' },
     'www.sonycrackle.com': { textParentSelector: 'div.clpp-subtitles-container' },
     'www.syfy.com': { className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
+    'www.tntdrama.com': { videoCueMode: true, videoCueLanguage: 'en', videoSelector: 'video.top-media-element' },
     'www.universalkids.com': { subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' },
     'www.usanetwork.com': { className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
     'www.vudu.com': { subtitleSelector: 'span.subtitles', tagName: 'DIV' },
