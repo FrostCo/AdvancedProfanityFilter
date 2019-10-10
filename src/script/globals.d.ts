@@ -4,6 +4,7 @@ interface AudioSite {
   containsSelector?: string;        // [Element] node.querySelector() [Not commonly used]
   dataPropPresent?: string;         // [Element] node.dataset.hasOwnProperty()
   hasChildrenElements?: boolean;    // [Element] node.childElementCount > 0 [Not commonly used]
+  removeSubtitleSpacing?: boolean;  // [Element] Remove subtitle padding/margin when hiding
   subtitleSelector?: string;        // [Element] *Used for Filtering*: node.querySelector()
   tagName?: string;                 // [Element] *REQUIRED*: node.nodeName
   textParentSelector?: string;      // [Text] parent.contains(node)
