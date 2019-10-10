@@ -4,7 +4,13 @@ import WebConfig from './webConfig';
 export default class DataMigration {
   cfg: WebConfig;
 
-  static readonly newestMigration = '2.1.4'; // Migration required by any version less than this
+  // Only append so the order stays the same (oldest first).
+  static readonly migrations = new Map([
+    ['1.0.13', 'moveToNewWordsStorage'],
+    ['1.1.0', 'sanitizeWords'],
+    ['1.2.0', 'singleWordSubstitution'],
+    ['2.1.4', 'updateDefaultSubs'],
+  ]);
 
   constructor(config) {
     this.cfg = config;
@@ -15,34 +21,23 @@ export default class DataMigration {
     return new DataMigration(cfg);
   }
 
+  static latestMigration(): string {
+    return Array.from(DataMigration.migrations)[DataMigration.migrations.size - 1][0];
+  }
+
   static migrationNeeded(oldVersion: string): boolean {
-    return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.newestMigration));
+    return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.latestMigration()));
   }
 
   // This will look at the version (from before the update) and perform data migrations if necessary
-  // Only append so the order stays the same (oldest first).
   byVersion(oldVersion: string) {
     let version = getVersion(oldVersion) as Version;
     let migrated = false;
-
-    if (isVersionOlder(version, getVersion('1.0.13'))) {
-      migrated = true;
-      this.moveToNewWordsStorage();
-    }
-
-    if (isVersionOlder(version, getVersion('1.1.0'))) {
-      migrated = true;
-      this.sanitizeWords();
-    }
-
-    if (isVersionOlder(version, getVersion('1.2.0'))) {
-      migrated = true;
-      this.singleWordSubstitution();
-    }
-
-    if (isVersionOlder(version, getVersion('2.1.4'))) {
-      migrated = true;
-      this.updateDefaultSubs();
+    for (let [migrationVersion, migrationName] of DataMigration.migrations) {
+      if (isVersionOlder(version, getVersion(migrationVersion))) {
+        migrated = true;
+        this[migrationName]();
+      }
     }
 
     return migrated;
