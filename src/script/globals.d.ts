@@ -1,17 +1,17 @@
 interface AudioSite {
   _custom?: boolean;                // Added automatically for custom sites
-  className?: string;               // node.className.includes()
-  containsSelector?: string;        // node.querySelector() [Not commonly used]
-  dataPropPresent?: string;         // node.dataset.hasOwnProperty()
-  hasChildrenElements?: boolean;    // node.childElementCount > 0 [Not commonly used]
-  subtitleSelector?: string;        // *Used for Filtering*: node.querySelector()
-  tagName?: string;                 // *REQUIRED*: node.nodeName
-  textParentSelector?: string;      // [Text Mode]: parent.contains(node)
-  videoCueLanguage?: string;        // Language for video TextTrack
-  videoCueMode?: boolean;           // [Video cue mode]
-  videoCueSync?: number;            // Adjust subtitle sync +/- (in seconds)
-  videoInterval?: number;           // Set a custom watch interval (in ms) [Shouldn't be needed]
-  videoSelector?: string;           // Video selector: defaults to 'video'
+  className?: string;               // [Element] node.className.includes()
+  containsSelector?: string;        // [Element] node.querySelector() [Not commonly used]
+  dataPropPresent?: string;         // [Element] node.dataset.hasOwnProperty()
+  hasChildrenElements?: boolean;    // [Element] node.childElementCount > 0 [Not commonly used]
+  subtitleSelector?: string;        // [Element] *Used for Filtering*: node.querySelector()
+  tagName?: string;                 // [Element] *REQUIRED*: node.nodeName
+  textParentSelector?: string;      // [Text] parent.contains(node)
+  videoCueLanguage?: string;        // [Video Cue] Language for video TextTrack
+  videoCueMode?: boolean;           // [Video Cue] Enabled when true
+  videoCueSync?: number;            // [Video Cue] Adjust subtitle sync +/- (in seconds)
+  videoInterval?: number;           // [Video Cue] Set a custom watch interval (in ms) [Shouldn't be needed]
+  videoSelector?: string;           // [Video Cue] Video selector: defaults to 'video'
 }
 
 interface FilteredTextTrackCue extends TextTrackCue {
