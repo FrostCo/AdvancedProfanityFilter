@@ -43,37 +43,6 @@ export default class DataMigration {
     return migrated;
   }
 
-  // [2.1.4] - Update default sub values
-  updateDefaultSubs() {
-    let cfg = this.cfg;
-    let updatedWords = {
-      bastard: {original: 'jerk', update: 'idiot'},
-      bitch: {original: 'jerk', update: 'bench'},
-      cocksucker: {original: 'idiot', update: 'suckup'},
-      cunt: {original: 'explative', update: 'expletive' },
-      fag: {original: 'slur', update: 'gay'},
-      faggot: {original: 'slur', update: 'gay'},
-      fags: {original: 'slur', update: 'gays'},
-      fuck: { original: 'fudge', update: 'freak' },
-      goddammit: {original: 'goshdangit', update: 'dangit'},
-      jackass: {original: 'idiot', update: 'jerk'},
-      nigga: {original: 'ethnic slur', update: 'bruh'},
-      nigger: {original: 'ethnic slur', update: 'man'},
-      niggers: {original: 'ethnic slurs', update: 'people'},
-      tits: {original: 'explative', update: 'chest'},
-      twat: {original: 'explative', update: 'dumbo'},
-    };
-
-    Object.keys(updatedWords).forEach(updatedWord => {
-      if (cfg.words[updatedWord]) {
-        let wordObj = cfg.words[updatedWord] as WordOptions;
-        if (wordObj.sub == updatedWords[updatedWord].original) {
-          wordObj.sub = updatedWords[updatedWord].update;
-        }
-      }
-    });
-  }
-
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
   moveToNewWordsStorage() {
     chrome.storage.sync.get({'words': null}, function(oldWords) {
@@ -115,5 +84,36 @@ export default class DataMigration {
       }
     });
     // console.log('after', JSON.stringify(cfg.words));
+  }
+
+  // [2.1.4] - Update default sub values
+  updateDefaultSubs() {
+    let cfg = this.cfg;
+    let updatedWords = {
+      bastard: {original: 'jerk', update: 'idiot'},
+      bitch: {original: 'jerk', update: 'bench'},
+      cocksucker: {original: 'idiot', update: 'suckup'},
+      cunt: {original: 'explative', update: 'expletive' },
+      fag: {original: 'slur', update: 'gay'},
+      faggot: {original: 'slur', update: 'gay'},
+      fags: {original: 'slur', update: 'gays'},
+      fuck: { original: 'fudge', update: 'freak' },
+      goddammit: {original: 'goshdangit', update: 'dangit'},
+      jackass: {original: 'idiot', update: 'jerk'},
+      nigga: {original: 'ethnic slur', update: 'bruh'},
+      nigger: {original: 'ethnic slur', update: 'man'},
+      niggers: {original: 'ethnic slurs', update: 'people'},
+      tits: {original: 'explative', update: 'chest'},
+      twat: {original: 'explative', update: 'dumbo'},
+    };
+
+    Object.keys(updatedWords).forEach(updatedWord => {
+      if (cfg.words[updatedWord]) {
+        let wordObj = cfg.words[updatedWord] as WordOptions;
+        if (wordObj.sub == updatedWords[updatedWord].original) {
+          wordObj.sub = updatedWords[updatedWord].update;
+        }
+      }
+    });
   }
 }
