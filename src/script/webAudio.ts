@@ -23,8 +23,16 @@ export default class WebAudio {
     this.muted = false;
     this.muteMethod = filter.cfg.muteMethod;
     this.showSubtitles = filter.cfg.showSubtitles;
-    this.sites = Object.assign(WebAudio.sites, filter.cfg.customAudioSites);
-    Object.keys(filter.cfg.customAudioSites).forEach(x => { this.sites[x]._custom = true; });
+    if (
+      filter.cfg.customAudioSites
+      && typeof filter.cfg.customAudioSites == 'object'
+      && Object.keys(filter.cfg.customAudioSites).length > 0
+    ) {
+      this.sites = Object.assign(WebAudio.sites, filter.cfg.customAudioSites);
+      Object.keys(filter.cfg.customAudioSites).forEach(x => { this.sites[x]._custom = true; });
+    } else {
+      this.sites = WebAudio.sites;
+    }
     this.unmuteDelay = 0;
     this.volume = 1;
     this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;

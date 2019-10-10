@@ -10,7 +10,7 @@ interface AudioSite {
   videoCueLanguage?: string;        // Language for video TextTrack
   videoCueMode?: boolean;           // [Video cue mode]
   videoCueSync?: number;            // Adjust subtitle sync +/- (in seconds)
-  videoInterval?: number;           // Set a custom watch interval (in ms)
+  videoInterval?: number;           // Set a custom watch interval (in ms) [Shouldn't be needed]
   videoSelector?: string;           // Video selector: defaults to 'video'
 }
 
