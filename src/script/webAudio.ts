@@ -59,7 +59,7 @@ export default class WebAudio {
   static readonly sites: { [site: string]: AudioSite } = {
     'abc.go.com': { className: 'akamai-caption-text', tagName: 'DIV' },
     'app.plex.tv': { dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' },
-    'www.amazon.com': { subtitleSelector: 'span.timedTextBackground', tagName: 'P' },
+    'www.amazon.com': { removeSubtitleSpacing: true, subtitleSelector: 'span.timedTextBackground', tagName: 'P' },
     'www.dishanywhere.com': { className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' },
     'www.fox.com': { className: 'jw-text-track-container', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' },
     'www.hulu.com': { className: 'caption-text-box', subtitleSelector: 'p', tagName: 'DIV' },
@@ -127,9 +127,9 @@ export default class WebAudio {
 
     // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
     switch (this.showSubtitles) {
-      case 1: if (!filtered) { subtitleContainer.textContent = ''; } break;
-      case 2: if (filtered) { subtitleContainer.textContent = ''; } break;
-      case 3: subtitleContainer.textContent = ''; break;
+      case 1: if (!filtered) { this.hideElementSubtitles(subtitles); } break;
+      case 2: if (filtered) { this.hideElementSubtitles(subtitles); } break;
+      case 3: this.hideElementSubtitles(subtitles); break;
     }
 
     if (filtered) { this.filter.updateCounterBadge(); } // Update if modified
@@ -174,6 +174,17 @@ export default class WebAudio {
       return video.textTracks[0];
     }
   }
+
+  hideElementSubtitles(subtitles) {
+    subtitles.forEach(subtitle => {
+      subtitle.innerText = '';
+      if (this.site.removeSubtitleSpacing && subtitle.style) {
+        if (subtitle.style.padding) { subtitle.style.padding = 0; }
+        if (subtitle.style.margin) { subtitle.style.margin = 0; }
+      }
+    });
+  }
+
 
   mute(video?: HTMLVideoElement): void {
     if (!this.muted) {
