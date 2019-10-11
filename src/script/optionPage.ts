@@ -782,11 +782,11 @@ document.getElementById('statusModalOK').addEventListener('click', e => { Option
 document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', e => { OptionPage.closeModal('supportedAudioSitesModal'); });
 // Settings
 document.querySelectorAll('#filterMethod input').forEach(el => { el.addEventListener('click', e => { option.selectFilterMethod(e); }); });
-document.getElementById('censorCharacterSelect').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('censorFixedLengthSelect').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('defaultWordMatchMethodSelect').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('censorCharacterSelect').addEventListener('change', e => { option.saveOptions(e); });
+document.getElementById('censorFixedLengthSelect').addEventListener('change', e => { option.saveOptions(e); });
+document.getElementById('defaultWordMatchMethodSelect').addEventListener('change', e => { option.saveOptions(e); });
 document.getElementById('defaultWordRepeat').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('globalMatchMethodSelect').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('globalMatchMethodSelect').addEventListener('change', e => { option.saveOptions(e); });
 document.getElementById('preserveCase').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('preserveFirst').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('preserveLast').addEventListener('click', e => { option.saveOptions(e); });
@@ -797,7 +797,7 @@ document.getElementById('filterWordList').addEventListener('click', e => { optio
 document.getElementById('substitutionMark').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('defaultWordSubstitutionText').addEventListener('change', e => { option.saveOptions(e); });
 // Words/Phrases
-document.getElementById('wordList').addEventListener('click', e => { option.populateWord(); });
+document.getElementById('wordList').addEventListener('change', e => { option.populateWord(); });
 document.getElementById('wordText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
 document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
 document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
