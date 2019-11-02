@@ -50,24 +50,10 @@ export default class BookmarkletFilter extends Filter {
   checkMutationForProfanity(mutation) {
     mutation.addedNodes.forEach(node => {
       if (!Page.isForbiddenNode(node)) {
-        if (filter.youTubeMutePage && filter.audio.youTubeAutoSubsPresent()) { // YouTube Auto subs
-          if (filter.audio.youTubeAutoSubsSupportedNode(node)) {
-            if (filter.audio.youTubeAutoSubsCurrentRow(node)) {
-              filter.audio.cleanYouTubeAutoSubs(node);
-            } else {
-              filter.cleanNode(node, false);
-            }
-          } else if (!filter.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
-            filter.cleanNode(node); // Clean the rest of the page
-          }
-        } else if (filter.mutePage && filter.audio.supportedNode(node)) {
-          filter.audio.clean(node);
+        if (filter.mutePage) {
+          filter.cleanAudio(node);
         } else if (!filter.audioOnly) {
-          if (filter.advanced && node.parentNode) {
-            filter.advancedReplaceText(node);
-          } else {
-            filter.cleanNode(node);
-          }
+          filter.cleanNodeText(node);
         }
       }
     });
@@ -91,6 +77,26 @@ export default class BookmarkletFilter extends Filter {
       let result = this.replaceTextResult(mutation.target.data);
       if (result.modified) {
         mutation.target.data = result.filtered;
+      }
+    }
+  }
+
+  cleanAudio(node) {
+    if (filter.audio.youTube && filter.audio.youTubeAutoSubsPresent()) {
+      if (filter.audio.youTubeAutoSubsSupportedNode(node)) {
+        if (filter.audio.youTubeAutoSubsCurrentRow(node)) {
+          filter.audio.cleanYouTubeAutoSubs(node);
+        } else if (!filter.audioOnly) {
+          filter.cleanNodeText(node);
+        }
+      } else if (!filter.audioOnly && !filter.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
+        filter.cleanNodeText(node);
+      }
+    } else {
+      if (filter.audio.supportedNode(node)) {
+        filter.audio.clean(node);
+      } else if (!filter.audioOnly) {
+        filter.cleanNodeText(node);
       }
     }
   }
@@ -123,6 +129,14 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
+  cleanNodeText(node) {
+    if (filter.advanced && node.parentNode || node == document) {
+      filter.advancedReplaceText(node);
+    } else {
+      filter.cleanNode(node);
+    }
+  }
+
   cleanPage() {
     this.cfg = new Config(config);
     this.cfg.muteMethod = 1; // Bookmarklet: Force audio muteMethod = 1 (Volume)
@@ -146,7 +160,7 @@ export default class BookmarkletFilter extends Filter {
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
-    if (!this.audioOnly) { this.advanced ? this.advancedReplaceText(document) : this.cleanNode(document); }
+    if (!this.audioOnly) { this.cleanNodeText(document); }
     observer.observe(document, observerConfig);
   }
 
