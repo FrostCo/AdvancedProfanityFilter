@@ -60,7 +60,8 @@ export default class BookmarkletFilter extends Filter {
 
     if (filter.mutePage && filter.audio.muted) {
       mutation.removedNodes.forEach(node => {
-        if (filter.audio.supportedNode(node) || node == filter.audio.lastFilteredNode) {
+        let supported = filter.audio.supportedNode(node);
+        if (supported !== false || node == filter.audio.lastFilteredNode) {
           filter.audio.unmute();
         }
       });
@@ -93,8 +94,9 @@ export default class BookmarkletFilter extends Filter {
         filter.cleanNodeText(node);
       }
     } else {
-      if (filter.audio.supportedNode(node)) {
-        filter.audio.clean(node);
+      let supported = filter.audio.supportedNode(node);
+      if (supported !== false) {
+        filter.audio.clean(node, supported);
       } else if (!filter.audioOnly) {
         filter.cleanNodeText(node);
       }

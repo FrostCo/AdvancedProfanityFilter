@@ -1,5 +1,5 @@
-interface AudioSite {
-  _custom?: boolean;                // Added automatically for custom sites
+interface AudioRules {
+  mode: string;                     // 'cue', 'element', 'text'
   className?: string;               // [Element] node.className.includes()
   containsSelector?: string;        // [Element] node.querySelector() [Not commonly used]
   dataPropPresent?: string;         // [Element] node.dataset.hasOwnProperty()
@@ -8,11 +8,10 @@ interface AudioSite {
   subtitleSelector?: string;        // [Element] *Used for Filtering*: node.querySelector()
   tagName?: string;                 // [Element] *REQUIRED*: node.nodeName
   textParentSelector?: string;      // [Text] parent.contains(node)
-  videoCueLanguage?: string;        // [Video Cue] Language for video TextTrack
-  videoCueMode?: boolean;           // [Video Cue] Enabled when true
-  videoCueSync?: number;            // [Video Cue] Adjust subtitle sync +/- (in seconds)
-  videoInterval?: number;           // [Video Cue] Set a custom watch interval (in ms) [Shouldn't be needed]
-  videoSelector?: string;           // [Video Cue] Video selector: defaults to 'video'
+  videoCueLanguage?: string;        // [Cue] Language for video TextTrack
+  videoCueSync?: number;            // [Cue] Adjust subtitle sync +/- (in seconds)
+  videoInterval?: number;           // [Cue] Set a custom watch interval (in ms) [Shouldn't be needed]
+  videoSelector?: string;           // [Cue] Video selector: defaults to 'video'
 }
 
 interface FilteredTextTrackCue extends TextTrackCue {

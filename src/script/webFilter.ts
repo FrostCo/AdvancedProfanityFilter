@@ -56,7 +56,8 @@ export default class WebFilter extends Filter {
     // Check removed nodes to see if we should unmute
     if (filter.mutePage && filter.audio.muted) {
       mutation.removedNodes.forEach(node => {
-        if (filter.audio.supportedNode(node) || node == filter.audio.lastFilteredNode) {
+        let supported = filter.audio.supportedNode(node);
+        if (supported !== false || node == filter.audio.lastFilteredNode) {
           filter.audio.unmute();
         }
       });
@@ -95,9 +96,10 @@ export default class WebFilter extends Filter {
         filter.cleanNodeText(node); // Clean the rest of the page
       }
     } else { // Other audio muting
-      if (filter.audio.supportedNode(node)) {
+      let supported = filter.audio.supportedNode(node);
+      if (supported !== false) {
         // console.log('[APF] Audio subtitle node:', node); // Debug: Audio
-        filter.audio.clean(node);
+        filter.audio.clean(node, supported);
       } else if (!filter.audioOnly) {
         filter.cleanNodeText(node); // Clean the rest of the page
       }
