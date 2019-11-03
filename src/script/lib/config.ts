@@ -2,7 +2,7 @@ export default class Config {
   advancedDomains: string[];
   censorCharacter: string;
   censorFixedLength: number;
-  customAudioSites: { [site: string]: AudioSite };
+  customAudioSites: { [site: string]: AudioRules[] };
   defaultSubstitution: string;
   defaultWordMatchMethod: number;
   defaultWordRepeat: boolean;
