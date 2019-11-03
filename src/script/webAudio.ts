@@ -93,7 +93,7 @@ export default class WebAudio {
       }
 
       if (rule.textParentSelector) {
-        rule.mode = 'text'
+        rule.mode = 'text';
       }
 
       switch(rule.mode) {
@@ -106,7 +106,7 @@ export default class WebAudio {
             if (node.nodeName === '#text') {
               let textParent = document.querySelector('${rule.textParentSelector}');
               if (textParent && textParent.contains(node)) { return ${index}; }
-            }`
+            }`;
           break;
         default: // Element
           if (!rule.tagName) { throw('tagName is required.'); }
