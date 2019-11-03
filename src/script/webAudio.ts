@@ -69,7 +69,10 @@ export default class WebAudio {
     'abc.go.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
     'app.plex.tv': [ { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' } ],
     'www.amazon.com': [ { mode: 'element', removeSubtitleSpacing: true, subtitleSelector: 'span.timedTextBackground', tagName: 'P' } ],
-    'www.dishanywhere.com': [ { mode: 'element', className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' } ],
+    'www.dishanywhere.com': [
+      { mode: 'element', className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' },
+      { mode: 'element', className: 'bmpui-subtitle-region-container', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' }
+    ],
     'www.fox.com': [ { mode: 'element', className: 'jw-text-track-container', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' } ],
     'www.hulu.com': [ { mode: 'element', className: 'caption-text-box', subtitleSelector: 'p', tagName: 'DIV' } ],
     'www.nbc.com': [ { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' } ],
