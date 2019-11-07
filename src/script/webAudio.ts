@@ -286,7 +286,7 @@ export default class WebAudio {
           if (instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }
 
           textTrack.oncuechange = () => {
-            if (textTrack.activeCues.length > 0) {
+            if (textTrack.activeCues && textTrack.activeCues.length > 0) {
               let filtered = false;
 
               for (let i = 0; i < textTrack.activeCues.length; i++) {
