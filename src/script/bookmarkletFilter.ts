@@ -21,7 +21,7 @@ export default class BookmarkletFilter extends Filter {
   audioOnly: boolean;
   cfg: Config;
   hostname: string;
-  iframe: boolean;
+  iframe: Location;
   mutePage: boolean;
   summary: Summary;
   youTubeMutePage: boolean;
@@ -202,13 +202,19 @@ if (typeof window !== 'undefined') {
   observer = new MutationObserver(filter.processMutations);
   shadowObserver = new MutationObserver(filter.processMutations);
 
-  filter.iframe = (window != window.top);
-
-  // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
-  if (window.location == window.parent.location || document.referrer == '') {
+  if (window != window.top) {
+    filter.iframe = document.location;
+    try {
+      filter.hostname = window.parent.location.hostname;
+    } catch(e) {
+      if (document.referrer) {
+        filter.hostname = new URL(document.referrer).hostname;
+      } else {
+        filter.hostname = document.location.hostname;
+      }
+    }
+  } else {
     filter.hostname = document.location.hostname;
-  } else if (document.referrer != '') {
-    filter.hostname = new URL(document.referrer).hostname;
   }
 
   filter.cleanPage();
