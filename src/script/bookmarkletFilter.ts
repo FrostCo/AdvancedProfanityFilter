@@ -124,6 +124,9 @@ export default class BookmarkletFilter extends Filter {
           if (result.modified) {
             node.textContent = result.filtered;
           }
+        } else if (node.nodeName == 'IMG') {
+          if (node.alt != '') { node.alt = this.replaceText(node.alt, stats); }
+          if (node.title != '') { node.title = this.replaceText(node.title, stats); }
         } else if (node.shadowRoot != undefined) {
           shadowObserver.observe(node.shadowRoot, observerConfig);
         }
