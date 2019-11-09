@@ -11,7 +11,7 @@ export default class WebFilter extends Filter {
   audioOnly: boolean;
   cfg: WebConfig;
   hostname: string;
-  iframe: Location | undefined;
+  iframe: Location;
   mutePage: boolean;
   summary: Summary;
   youTubeMutePage: boolean;
