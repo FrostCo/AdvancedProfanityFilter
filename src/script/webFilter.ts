@@ -198,7 +198,11 @@ export default class WebFilter extends Filter {
 
   // Always use the top frame for page check
   disabledPage(): boolean {
-    return Domain.domainMatch(this.hostname, this.cfg.disabledDomains);
+    if (this.cfg.enabledDomainsOnly) {
+      return !(Domain.domainMatch(this.hostname, this.cfg.enabledDomains));
+    } else {
+      return Domain.domainMatch(this.hostname, this.cfg.disabledDomains);
+    }
   }
 
   foundMatch(word) {

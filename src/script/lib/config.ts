@@ -7,6 +7,8 @@ export default class Config {
   defaultWordMatchMethod: number;
   defaultWordRepeat: boolean;
   disabledDomains: string[];
+  enabledDomains: string[];
+  enabledDomainsOnly: boolean;
   filterMethod: number;
   filterWordList: boolean;
   globalMatchMethod: number;
@@ -48,6 +50,8 @@ export default class Config {
     defaultWordMatchMethod: 0,
     defaultWordRepeat: false,
     disabledDomains: [],
+    enabledDomains: [],
+    enabledDomainsOnly: false,
     filterMethod: 1, // ['Censor', 'Substitute', 'Remove'];
     filterWordList: true,
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']

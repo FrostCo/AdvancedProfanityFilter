@@ -207,7 +207,36 @@
 </div>
 
 <div id="domainsPage" class="w3-container w3-hide">
-  <div id="advDomainContainer" class="w3-half">
+  <div id="disabledDomainContainer" class="w3-half">
+      <h4 class="sectionHeader">Domain Mode</h4>
+
+      <div id="domainMode">
+        <label>
+          <input id="domainModeWhitelist" type="radio" class="w3-radio" name="domainMode" value="disabledDomains">
+          Whitelist
+          <span class="notes">Filter all but these domains</span>
+        </label>
+
+        <br>
+        <label>
+          <input id="domainModeBlacklist" type="radio" class="w3-radio" name="domainMode" value="enabledDomains">
+          Blacklist
+          <span class="notes">Only filter these domains</span>
+        </label>
+      </div>
+
+      <h4 class="sectionHeader">Domains</h4>
+      <select id="domainSelect" class="w3-select w3-border small" style="display:block"></select>
+      <h4 class="sectionHeader">Domain</h4>
+      <input id="domainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
+      <span class="notes">Example: "google.com" or "mail.google.com"</span>
+      <div style="padding-top: 16px;">
+        <button id="domainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
+        <button id="domainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
+      </div>
+    </div>
+
+  <div id="advDomainContainer" class="w3-half w3-right">
     <h4 class="sectionHeader">Advanced Domains</h4>
     <select id="advDomainSelect" class="w3-select w3-border small" style="display:block"></select>
     <span class="notes">Only use when the filter isn't working.</span>
@@ -217,19 +246,6 @@
     <div style="padding-top: 16px;">
       <button id="advDomainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
       <button id="advDomainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
-    </div>
-  </div>
-
-  <div id="disabledDomainContainer" class="w3-half w3-right">
-    <h4 class="sectionHeader">Whitelist Domains</h4>
-    <select id="disabledDomainSelect" class="w3-select w3-border small" style="display:block"></select>
-    <span class="notes">Disable the filter for a domain</span>
-    <h4 class="sectionHeader">Domain</h4>
-    <input id="disabledDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
-    <span class="notes">Example: "google.com" or "mail.google.com"</span>
-    <div style="padding-top: 16px;">
-      <button id="disabledDomainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
-      <button id="disabledDomainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
     </div>
   </div>
 </div>
@@ -418,17 +434,22 @@
     <li>Words/phrases can also be added by selecting them on a web page and then choosing the <code>Add selection to filter</code> option from the context (right-click) menu. New words will use the settings found in the &quot;Default Settings (for new word/phrases)&quot; section.</li>
     </ul>
     <h1 id="domains">Domains</h1>
-    <p>This tab allows you to control domains that the filter will be whitelisted (disabled) on, or which domains to use the Advanced mode on.</p>
+    <p>This tab allows you to control which domains will be filtered, or which domains to use the Advanced mode on.</p>
+    <h3 id="domain-mode">Domain Mode:</h3>
+    <ul>
+    <li><strong>Whitelist: <em>(default)</em></strong> - Filter all pages unless they are specifically added to the whitelist. </li>
+    <li><strong>Blacklist:</strong> - Only filter pages that are specifically added to the blacklist.</li>
+    </ul>
+    <h3 id="domains-1">Domains:</h3>
+    <p>Adjust the domain list for the currently selected mode. To match Google.com and all its sub-domains, simply add <code>google.com</code>. If you want to just match Gmail, you can add <code>mail.google.com</code>.</p>
+    <p>When browsing a web page, you can also toggle the filter for the current domain from the context (right-click) menu, or using the extension&#39;s Popup menu.</p>
+    <p><em>Note: Do not include the protocol (ex. <code>http://</code>), or anything after the domain name.</em></p>
     <h3 id="advanced-mode">Advanced Mode:</h3>
     <p><em><strong>WARNING</strong>: This mode will result in lower performance.</em></p>
     <p>Handle matching text that is split between multiple elements on the page. This is not usually necessary.</p>
     <p><em>Example:</em></p>
     <pre><code class="language-html">&lt;span&gt;some text to fil&lt;/span&gt;&lt;span&gt;ter&lt;/span&gt;</code></pre>
     <p>On the page, this would look like: &quot;some text to filter&quot;, but the extension (without advanced mode) would see <code>some text to fil</code>, and <code>ter</code>. If you were trying to filter the word <code>text</code>, it would work as expected (because &quot;text&quot; isn&#39;t split across elements). If you were trying to filter the word <code>filter</code>, it would fail without Advanced mode being turned on, because it doesn&#39;t match on <code>some text to fil</code>, or <code>ter</code>. This is not a common practice, and is only needed in a very small number of websites.</p>
-    <h3 id="whitelist-disabled">Whitelist (Disabled):</h3>
-    <p>Control which domains the filter should not run on. To whitelist Google.com and all its sub-domains, simply add <code>google.com</code>. If you want to just whitelist Gmail, you can add <code>mail.google.com</code>.</p>
-    <p>When browsing a web page, you can also disable the filter for the current domain from the context (right-click) menu, or using the extensions Popup menu.</p>
-    <p><em>Note: Do not include the protocol (ex. <code>http://</code>), or anything after the domain name.</em></p>
     <h1 id="audio-experimental">Audio (Experimental)</h1>
     <p>This feature mutes the audio when a filtered word is detected in the subtitles/captions on a supported website. This is very experimental at this point, and its effectiveness is completely dependent on the quality of the subtitles accompanying the video. For more information, please see the <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio">Audio wiki</a>.</p>
     <p><em>Note: If the &quot;Show number of filtered words&quot; option is enabled, the badge will be green when audio muting is enabled on a supported site.</em></p>
