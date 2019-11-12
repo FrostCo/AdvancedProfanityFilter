@@ -21,7 +21,7 @@ export default class BookmarkletFilter extends Filter {
   audioOnly: boolean;
   cfg: Config;
   hostname: string;
-  iframe: boolean;
+  iframe: Location;
   mutePage: boolean;
   summary: Summary;
   youTubeMutePage: boolean;
@@ -50,31 +50,18 @@ export default class BookmarkletFilter extends Filter {
   checkMutationForProfanity(mutation) {
     mutation.addedNodes.forEach(node => {
       if (!Page.isForbiddenNode(node)) {
-        if (filter.youTubeMutePage && filter.audio.youTubeAutoSubsPresent()) { // YouTube Auto subs
-          if (filter.audio.youTubeAutoSubsSupportedNode(node)) {
-            if (filter.audio.youTubeAutoSubsCurrentRow(node)) {
-              filter.audio.cleanYouTubeAutoSubs(node);
-            } else {
-              filter.cleanNode(node, false);
-            }
-          } else if (!filter.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
-            filter.cleanNode(node); // Clean the rest of the page
-          }
-        } else if (filter.mutePage && filter.audio.supportedNode(node)) {
-          filter.audio.clean(node);
+        if (filter.mutePage) {
+          filter.cleanAudio(node);
         } else if (!filter.audioOnly) {
-          if (filter.advanced && node.parentNode) {
-            filter.advancedReplaceText(node);
-          } else {
-            filter.cleanNode(node);
-          }
+          filter.cleanNodeText(node);
         }
       }
     });
 
     if (filter.mutePage && filter.audio.muted) {
       mutation.removedNodes.forEach(node => {
-        if (filter.audio.supportedNode(node) || node == filter.audio.lastFilteredNode) {
+        let supported = filter.audio.supportedNode(node);
+        if (supported !== false || node == filter.audio.lastFilteredNode) {
           filter.audio.unmute();
         }
       });
@@ -91,6 +78,27 @@ export default class BookmarkletFilter extends Filter {
       let result = this.replaceTextResult(mutation.target.data);
       if (result.modified) {
         mutation.target.data = result.filtered;
+      }
+    }
+  }
+
+  cleanAudio(node) {
+    if (filter.audio.youTube && filter.audio.youTubeAutoSubsPresent()) {
+      if (filter.audio.youTubeAutoSubsSupportedNode(node)) {
+        if (filter.audio.youTubeAutoSubsCurrentRow(node)) {
+          filter.audio.cleanYouTubeAutoSubs(node);
+        } else if (!filter.audioOnly) {
+          filter.cleanNodeText(node);
+        }
+      } else if (!filter.audioOnly && !filter.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
+        filter.cleanNodeText(node);
+      }
+    } else {
+      let supported = filter.audio.supportedNode(node);
+      if (supported !== false) {
+        filter.audio.clean(node, supported);
+      } else if (!filter.audioOnly) {
+        filter.cleanNodeText(node);
       }
     }
   }
@@ -116,10 +124,21 @@ export default class BookmarkletFilter extends Filter {
           if (result.modified) {
             node.textContent = result.filtered;
           }
+        } else if (node.nodeName == 'IMG') {
+          if (node.alt != '') { node.alt = this.replaceText(node.alt, stats); }
+          if (node.title != '') { node.title = this.replaceText(node.title, stats); }
         } else if (node.shadowRoot != undefined) {
           shadowObserver.observe(node.shadowRoot, observerConfig);
         }
       }
+    }
+  }
+
+  cleanNodeText(node) {
+    if (filter.advanced && node.parentNode || node == document) {
+      filter.advancedReplaceText(node);
+    } else {
+      filter.cleanNode(node);
     }
   }
 
@@ -146,7 +165,7 @@ export default class BookmarkletFilter extends Filter {
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
-    if (!this.audioOnly) { this.advanced ? this.advancedReplaceText(document) : this.cleanNode(document); }
+    if (!this.audioOnly) { this.cleanNodeText(document); }
     observer.observe(document, observerConfig);
   }
 
@@ -186,13 +205,19 @@ if (typeof window !== 'undefined') {
   observer = new MutationObserver(filter.processMutations);
   shadowObserver = new MutationObserver(filter.processMutations);
 
-  filter.iframe = (window != window.top);
-
-  // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
-  if (window.location == window.parent.location || document.referrer == '') {
+  if (window != window.top) {
+    filter.iframe = document.location;
+    try {
+      filter.hostname = window.parent.location.hostname;
+    } catch(e) {
+      if (document.referrer) {
+        filter.hostname = new URL(document.referrer).hostname;
+      } else {
+        filter.hostname = document.location.hostname;
+      }
+    }
+  } else {
     filter.hostname = document.location.hostname;
-  } else if (document.referrer != '') {
-    filter.hostname = new URL(document.referrer).hostname;
   }
 
   filter.cleanPage();

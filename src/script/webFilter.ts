@@ -11,7 +11,7 @@ export default class WebFilter extends Filter {
   audioOnly: boolean;
   cfg: WebConfig;
   hostname: string;
-  iframe: boolean;
+  iframe: Location;
   mutePage: boolean;
   summary: Summary;
   youTubeMutePage: boolean;
@@ -44,27 +44,10 @@ export default class WebFilter extends Filter {
     mutation.addedNodes.forEach(node => {
       if (!Page.isForbiddenNode(node)) {
         // console.log('[APF] Added node(s):', node); // Debug: Filter - Mutation addedNodes
-        if (filter.youTubeMutePage && filter.audio.youTubeAutoSubsPresent()) { // YouTube Auto subs
-          if (filter.audio.youTubeAutoSubsSupportedNode(node)) {
-            if (filter.audio.youTubeAutoSubsCurrentRow(node)) {
-              // console.log('[APF] YouTube subtitle node:', node); // Debug: Audio
-              filter.audio.cleanYouTubeAutoSubs(node);
-            } else {
-              filter.cleanNode(node, false);
-            }
-          } else if (!filter.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
-            filter.cleanNode(node); // Clean the rest of the page
-          }
-        } else if (filter.mutePage && filter.audio.supportedNode(node)) {
-          // console.log('[APF] Audio subtitle node:', node); // Debug: Audio
-          filter.audio.clean(node);
+        if (filter.mutePage) {
+          filter.cleanAudio(node);
         } else if (!filter.audioOnly) {
-          // console.log('[APF] New node to filter', node); // Debug: Filter
-          if (filter.advanced && node.parentNode) {
-            filter.advancedReplaceText(node);
-          } else {
-            filter.cleanNode(node);
-          }
+          filter.cleanNodeText(node);
         }
       }
       // else { console.log('[APF] Forbidden node:', node); } // Debug: Filter - Mutation addedNodes
@@ -73,7 +56,8 @@ export default class WebFilter extends Filter {
     // Check removed nodes to see if we should unmute
     if (filter.mutePage && filter.audio.muted) {
       mutation.removedNodes.forEach(node => {
-        if (filter.audio.supportedNode(node) || node == filter.audio.lastFilteredNode) {
+        let supported = filter.audio.supportedNode(node);
+        if (supported !== false || node == filter.audio.lastFilteredNode) {
           filter.audio.unmute();
         }
       });
@@ -96,6 +80,30 @@ export default class WebFilter extends Filter {
       }
     }
     // else { console.log('[APF] Forbidden mutation.target node:', mutation.target); } // Debug: Filter - Mutation text
+  }
+
+  cleanAudio(node) {
+    // YouTube Auto subs
+    if (filter.audio.youTube && filter.audio.youTubeAutoSubsPresent()) {
+      if (filter.audio.youTubeAutoSubsSupportedNode(node)) {
+        if (filter.audio.youTubeAutoSubsCurrentRow(node)) {
+          // console.log('[APF] YouTube subtitle node:', node); // Debug: Audio
+          filter.audio.cleanYouTubeAutoSubs(node);
+        } else if (!filter.audioOnly) {
+          filter.cleanNodeText(node); // Clean the rest of the page
+        }
+      } else if (!filter.audioOnly && !filter.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
+        filter.cleanNodeText(node); // Clean the rest of the page
+      }
+    } else { // Other audio muting
+      let supported = filter.audio.supportedNode(node);
+      if (supported !== false) {
+        // console.log('[APF] Audio subtitle node:', node); // Debug: Audio
+        filter.audio.clean(node, supported);
+      } else if (!filter.audioOnly) {
+        filter.cleanNodeText(node); // Clean the rest of the page
+      }
+    }
   }
 
   cleanNode(node, stats: boolean = true) {
@@ -128,6 +136,15 @@ export default class WebFilter extends Filter {
         }
       }
       // else { console.log('[APF] node without nodeName:', node); } // Debug: Filter
+    }
+  }
+
+  cleanNodeText(node) {
+    // console.log('[APF] New node to filter', node); // Debug: Filter
+    if (filter.advanced && node.parentNode || node == document) {
+      filter.advancedReplaceText(node);
+    } else {
+      filter.cleanNode(node);
     }
   }
 
@@ -174,7 +191,7 @@ export default class WebFilter extends Filter {
     // Remove profanity from the main document and watch for new nodes
     this.init();
     // console.log('[APF] Filter initialized.', this); // Debug: General
-    if (!this.audioOnly) { this.advanced ? this.advancedReplaceText(document) : this.cleanNode(document); }
+    if (!this.audioOnly) { this.cleanNodeText(document); }
     this.updateCounterBadge();
     observer.observe(document, observerConfig);
   }
@@ -268,13 +285,20 @@ if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptG
   observer = new MutationObserver(filter.processMutations);
   shadowObserver = new MutationObserver(filter.processMutations);
 
-  filter.iframe = (window != window.top);
-
   // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
-  if (window.location == window.parent.location || document.referrer == '') {
+  if (window != window.top) {
+    filter.iframe = document.location;
+    try { // same domain
+      filter.hostname = window.parent.location.hostname;
+    } catch(e) { // different domain
+      if (document.referrer) {
+        filter.hostname = new URL(document.referrer).hostname;
+      } else {
+        filter.hostname = document.location.hostname;
+      }
+    }
+  } else {
     filter.hostname = document.location.hostname;
-  } else if (document.referrer != '') {
-    filter.hostname = new URL(document.referrer).hostname;
   }
 
   /* istanbul ignore next */
