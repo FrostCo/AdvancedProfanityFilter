@@ -42,7 +42,7 @@ class Popup {
           case 'enabledDomains':
             Popup.enable(document.getElementById('advancedMode'));
             Popup.enable(document.getElementById('filterMethodSelect'));
-          break;
+            break;
           case 'disabledDomains':
             Popup.disable(document.getElementById('advancedMode'));
             Popup.disable(document.getElementById('filterMethodSelect'));
