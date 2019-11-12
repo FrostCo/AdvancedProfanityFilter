@@ -207,7 +207,36 @@
 </div>
 
 <div id="domainsPage" class="w3-container w3-hide">
-  <div id="advDomainContainer" class="w3-half">
+  <div id="disabledDomainContainer" class="w3-half">
+      <h4 class="sectionHeader">Domain Mode</h4>
+
+      <div id="domainMode">
+        <label>
+          <input id="domainModeWhitelist" type="radio" class="w3-radio" name="domainMode" value="disabledDomains">
+          Whitelist
+          <span class="notes">Filter all but these domains</span>
+        </label>
+
+        <br>
+        <label>
+          <input id="domainModeBlacklist" type="radio" class="w3-radio" name="domainMode" value="enabledDomains">
+          Blacklist
+          <span class="notes">Only filter these domains</span>
+        </label>
+      </div>
+
+      <h4 class="sectionHeader">Domains</h4>
+      <select id="domainSelect" class="w3-select w3-border small" style="display:block"></select>
+      <h4 class="sectionHeader">Domain</h4>
+      <input id="domainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
+      <span class="notes">Example: "google.com" or "mail.google.com"</span>
+      <div style="padding-top: 16px;">
+        <button id="domainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
+        <button id="domainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
+      </div>
+    </div>
+
+  <div id="advDomainContainer" class="w3-half w3-right">
     <h4 class="sectionHeader">Advanced Domains</h4>
     <select id="advDomainSelect" class="w3-select w3-border small" style="display:block"></select>
     <span class="notes">Only use when the filter isn't working.</span>
@@ -217,19 +246,6 @@
     <div style="padding-top: 16px;">
       <button id="advDomainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
       <button id="advDomainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
-    </div>
-  </div>
-
-  <div id="disabledDomainContainer" class="w3-half w3-right">
-    <h4 class="sectionHeader">Whitelist Domains</h4>
-    <select id="disabledDomainSelect" class="w3-select w3-border small" style="display:block"></select>
-    <span class="notes">Disable the filter for a domain</span>
-    <h4 class="sectionHeader">Domain</h4>
-    <input id="disabledDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
-    <span class="notes">Example: "google.com" or "mail.google.com"</span>
-    <div style="padding-top: 16px;">
-      <button id="disabledDomainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
-      <button id="disabledDomainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
     </div>
   </div>
 </div>
