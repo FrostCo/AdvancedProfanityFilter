@@ -66,7 +66,7 @@ export default class WebAudio {
   };
 
   static readonly sites: { [site: string]: AudioRules[] } = {
-    'abc.go.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
+    'abc.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
     'app.plex.tv': [ { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' } ],
     'www.amazon.com': [ { mode: 'element', removeSubtitleSpacing: true, subtitleSelector: 'span.timedTextBackground', tagName: 'P' } ],
     'www.dishanywhere.com': [
