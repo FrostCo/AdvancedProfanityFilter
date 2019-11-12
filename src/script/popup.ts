@@ -9,7 +9,7 @@ class Popup {
   filterMethodContainer: Element;
 
   static async load(instance: Popup) {
-    instance.cfg = await WebConfig.build(['advancedDomains', 'disabledDomains', 'filterMethod', 'password']);
+    instance.cfg = await WebConfig.build(['advancedDomains', 'disabledDomains', 'enabledDomains', 'enabledDomainsOnly', 'filterMethod', 'password']);
     instance.domain = new Domain();
     await instance.domain.load();
     return instance;
@@ -32,51 +32,22 @@ class Popup {
     element.classList.remove('disabled');
   }
 
-  async disableAdvancedMode(cfg: WebConfig, domain: string, key: string) {
-    let newDomainList = Domain.removeFromList(domain, cfg[key]);
-
-    if (newDomainList.length < cfg[key].length) {
-      cfg[key] = newDomainList;
-      let result = await cfg.save();
-      if (!result) {
-        chrome.tabs.reload();
-      }
-    }
-  }
-
-  async disableDomain() {
+  async addDomain(key: string) {
     let popup = this;
-    if (!popup.cfg.disabledDomains.includes(popup.domain.hostname)) {
-      popup.cfg.disabledDomains.push(popup.domain.hostname);
-      let result = await popup.cfg.save();
-      if (!result) {
-        Popup.disable(document.getElementById('advancedMode'));
-        Popup.disable(document.getElementById('filterMethodSelect'));
-        chrome.tabs.reload();
-      }
-    }
-  }
-
-  async enableAdvancedMode(cfg: WebConfig, domain: string, key: string) {
-    if (!cfg[key].includes(domain)) {
-      cfg[key].push(domain);
-      let result = await cfg.save();
-      if (!result) {
-        chrome.tabs.reload();
-      }
-    }
-  }
-
-  // Remove all entries that disable the filter for domain
-  async enableDomain(cfg: WebConfig, domain: string, key: string) {
-    let newDomainList = Domain.removeFromList(domain, cfg[key]);
-
-    if (newDomainList.length < cfg[key].length) {
-      cfg[key] = newDomainList;
-      let result = await cfg.save();
-      if (!result) {
-        Popup.enable(document.getElementById('advancedMode'));
-        Popup.enable(document.getElementById('filterMethodSelect'));
+    if (!popup.cfg[key].includes(popup.domain.hostname)) {
+      popup.cfg[key].push(popup.domain.hostname);
+      let error = await popup.cfg.save();
+      if (!error) {
+        switch(key) {
+          case 'enabledDomains':
+            Popup.enable(document.getElementById('advancedMode'));
+            Popup.enable(document.getElementById('filterMethodSelect'));
+          break;
+          case 'disabledDomains':
+            Popup.disable(document.getElementById('advancedMode'));
+            Popup.disable(document.getElementById('filterMethodSelect'));
+            break;
+        }
         chrome.tabs.reload();
       }
     }
@@ -121,7 +92,13 @@ class Popup {
     }
 
     // Set initial value for domain filter and disable options if they are not applicable
-    if (Domain.domainMatch(popup.domain.hostname, popup.cfg['disabledDomains'])) {
+    if (
+      (
+        popup.cfg.enabledDomainsOnly
+        && !Domain.domainMatch(popup.domain.hostname, popup.cfg.enabledDomains)
+      )
+      || Domain.domainMatch(popup.domain.hostname, popup.cfg.disabledDomains)
+    ) {
       domainFilter.checked = false;
       Popup.disable(advancedMode);
       Popup.disable(filterMethodSelect);
@@ -148,6 +125,29 @@ class Popup {
     }
   }
 
+  async removeDomain(key: string) {
+    let popup = this;
+    let newDomainList = Domain.removeFromList(popup.domain.hostname, popup.cfg[key]);
+
+    if (newDomainList.length < popup.cfg[key].length) {
+      popup.cfg[key] = newDomainList;
+      let error = await popup.cfg.save();
+      if (!error) {
+        switch(key) {
+          case 'enabledDomains':
+            Popup.disable(document.getElementById('advancedMode'));
+            Popup.disable(document.getElementById('filterMethodSelect'));
+            break;
+          case 'disabledDomains':
+            Popup.enable(document.getElementById('advancedMode'));
+            Popup.enable(document.getElementById('filterMethodSelect'));
+            break;
+        }
+        chrome.tabs.reload();
+      }
+    }
+  }
+
   summaryTableHTML(summary: Summary): string {
     let tableInnerHTML = '';
     if (Object.keys(summary).length > 0) {
@@ -165,11 +165,7 @@ class Popup {
     let popup = this;
     if (!popup.protected) {
       let advancedMode = document.getElementById('advancedMode') as HTMLInputElement;
-      if (advancedMode.checked) {
-        popup.enableAdvancedMode(popup.cfg, popup.domain.hostname, 'advancedDomains');
-      } else {
-        popup.disableAdvancedMode(popup.cfg, popup.domain.hostname, 'advancedDomains');
-      }
+      advancedMode.checked ? popup.addDomain('advancedDomains') : popup.removeDomain('advancedDomains');
     }
   }
 
@@ -177,10 +173,10 @@ class Popup {
     let popup = this;
     if (!popup.protected) {
       let domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
-      if (domainFilter.checked) {
-        popup.enableDomain(popup.cfg, popup.domain.hostname, 'disabledDomains');
+      if (popup.cfg.enabledDomainsOnly) {
+        domainFilter.checked ? popup.addDomain('enabledDomains') : popup.removeDomain('enabledDomains');
       } else {
-        popup.disableDomain();
+        domainFilter.checked ? popup.removeDomain('disabledDomains') : popup.addDomain('disabledDomains');
       }
     }
   }
