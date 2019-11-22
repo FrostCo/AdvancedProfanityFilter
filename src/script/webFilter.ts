@@ -278,7 +278,7 @@ export default class WebFilter extends Filter {
 let filter = new WebFilter;
 let observer;
 let shadowObserver;
-let observerConfig = {
+let observerConfig: MutationObserverInit = {
   characterData: true,
   characterDataOldValue: true,
   childList: true,
