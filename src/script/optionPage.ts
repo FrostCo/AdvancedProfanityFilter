@@ -338,6 +338,7 @@ export default class OptionPage {
   populateAudio() {
     let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
     let muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
+    let muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
     let selectedMuteMethod = document.querySelector(`input[name=audioMuteMethod][value='${this.cfg.muteMethod}']`) as HTMLInputElement;
     let selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
     let muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
@@ -345,6 +346,7 @@ export default class OptionPage {
     let customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
     muteAudioInput.checked = this.cfg.muteAudio;
     muteAudioOnlyInput.checked = this.cfg.muteAudioOnly;
+    muteCueRequireShowingInput.checked = this.cfg.muteCueRequireShowing;
     this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
     selectedMuteMethod.checked = true;
     selectedshowSubtitle.checked = true;
@@ -557,6 +559,7 @@ export default class OptionPage {
     let domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
     let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
     let muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
+    let muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
     let muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
     let showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
     self.cfg.censorCharacter = censorCharacterSelect.value;
@@ -576,6 +579,7 @@ export default class OptionPage {
     self.cfg.enabledDomainsOnly = (domainMode.value == 'enabledDomains');
     self.cfg.muteAudio = muteAudioInput.checked;
     self.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
+    self.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
     self.cfg.muteMethod = parseInt(muteMethodInput.value);
     self.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
 
@@ -824,6 +828,7 @@ document.getElementById('domainRemove').addEventListener('click', e => { option.
 document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('supportedAudioSites').addEventListener('click', e => { option.showSupportedAudioSites(); });
 document.getElementById('muteAudioOnly').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('muteCueRequireShowing').addEventListener('click', e => { option.saveOptions(e); });
 document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.getElementById('audioYouTubeAutoSubsMin').addEventListener('input', e => { option.updateYouTubeAutoMin(e.target); });

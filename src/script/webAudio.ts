@@ -179,17 +179,21 @@ export default class WebAudio {
     }
   }
 
-  getVideoTextTrack(video: HTMLVideoElement, language: string) {
+  getVideoTextTrack(video: HTMLVideoElement, language: string, requireShowing: boolean = true) {
     if (video.textTracks && video.textTracks.length > 0) {
-      if (language) {
-        for (let i = 0; i < video.textTracks.length; i++) {
-          if (video.textTracks[i].language == language) {
+      for (let i = 0; i < video.textTracks.length; i++) {
+        if (language) {
+          if (language == video.textTracks[i].language) {
+            if (!requireShowing || (requireShowing && video.textTracks[i].mode === 'showing')) {
+              return video.textTracks[i];
+            }
+          }
+        } else {
+          if (!requireShowing || (requireShowing && video.textTracks[i].mode === 'showing')) {
             return video.textTracks[i];
           }
         }
       }
-
-      return video.textTracks[0];
     }
   }
 
@@ -205,6 +209,7 @@ export default class WebAudio {
 
   initCueRule(rule) {
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
+    if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
   }
 
   mute(video?: HTMLVideoElement): void {
@@ -276,7 +281,7 @@ export default class WebAudio {
       let rule = instance.rules[cueRuleId] as AudioRules;
       let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
-        let textTrack = instance.getVideoTextTrack(video, rule.videoCueLanguage);
+        let textTrack = instance.getVideoTextTrack(video, rule.videoCueLanguage, rule.videoCueRequireShowing);
 
         if (textTrack && !textTrack.oncuechange) {
           if (instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }

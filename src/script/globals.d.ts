@@ -9,6 +9,7 @@ interface AudioRules {
   tagName?: string;                 // [Element] *REQUIRED*: node.nodeName
   textParentSelector?: string;      // [Text] parent.contains(node)
   videoCueLanguage?: string;        // [Cue] Language for video TextTrack
+  videoCueRequireShowing?: boolean; // [Cue] Override global setting for muteCueRequireShowing
   videoCueSync?: number;            // [Cue] Adjust subtitle sync +/- (in seconds)
   videoInterval?: number;           // [Cue] Set a custom watch interval (in ms) [Shouldn't be needed]
   videoSelector?: string;           // [Cue] Video selector: defaults to 'video'
