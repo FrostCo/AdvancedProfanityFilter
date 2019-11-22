@@ -281,9 +281,10 @@ export default class WebAudio {
 
   watchForVideo(instance: WebAudio) {
     instance.cueRuleIds.forEach(cueRuleId => {
-      let video = document.querySelector(instance.rules[cueRuleId].videoSelector) as HTMLVideoElement;
+      let rule = instance.rules[cueRuleId] as AudioRules;
+      let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
-        let textTrack = instance.getVideoTextTrack(video, instance.rules[cueRuleId].videoCueLanguage);
+        let textTrack = instance.getVideoTextTrack(video, rule.videoCueLanguage);
 
         if (textTrack && !textTrack.oncuechange) {
           if (instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }
@@ -296,7 +297,7 @@ export default class WebAudio {
                 let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
                 if (!activeCue.hasOwnProperty('filtered')) {
                   let cues = textTrack.cues as any as FilteredTextTrackCue[];
-                  instance.processCues(cues, instance.rules[cueRuleId]);
+                  instance.processCues(cues, rule);
                 }
                 if (activeCue.filtered) { filtered = true; }
               }
