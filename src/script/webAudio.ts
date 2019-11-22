@@ -249,7 +249,6 @@ export default class WebAudio {
         cue.endTime += rule.videoCueSync;
       }
 
-      cue.index = i;
       let result = this.filter.replaceTextResult(cue.text);
       if (result.modified) {
         cue.filtered = true;

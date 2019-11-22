@@ -16,7 +16,6 @@ interface AudioRules {
 
 interface FilteredTextTrackCue extends TextTrackCue {
   filtered: boolean;
-  index: number;
   originalText: string;
 }
 
