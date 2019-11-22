@@ -91,7 +91,6 @@ export default class WebAudio {
   };
 
   buildSupportedNodeFunction(): Function {
-    // let site = this.site;
     let block = '';
 
     this.rules.forEach((rule, index) => {
@@ -105,8 +104,8 @@ export default class WebAudio {
 
       switch(rule.mode) {
         case 'cue':
+          // NO-OP for supportedNode()
           this.cueRuleIds.push(index); // Save list of cue rule ids
-          // NO-OP
           break;
         case 'text':
           block += `
@@ -115,7 +114,8 @@ export default class WebAudio {
               if (textParent && textParent.contains(node)) { return ${index}; }
             }`;
           break;
-        default: // Element
+        case 'element':
+        default:
           if (!rule.tagName) { throw('tagName is required.'); }
           block += `
           if (node.nodeName == '${rule.tagName.toUpperCase()}') {
