@@ -675,7 +675,8 @@ export default class OptionPage {
 
   showSupportedAudioSites() {
     let title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
-    let content = document.querySelector('#supportedAudioSitesModal div.modalContent') as HTMLDivElement;
+    let contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
+    let contentRight = document.querySelector('#supportedAudioSitesModal div#modalContentRight') as HTMLDivElement;
     let sites = [];
     let sortedSites = Object.keys(WebAudio.sites).sort(function(a,b) {
       let domainA = a.match(/\w*\.\w*$/)[0];
@@ -686,7 +687,11 @@ export default class OptionPage {
       sites.push(`<li><a href="https://${site}" target="_blank">${site}</a></li>`);
     });
     title.textContent = 'Supported Audio Sites';
-    content.innerHTML = `<ul>${sites.join('\n')}</ul>`;
+    contentLeft.innerHTML = `<ul>${sites.join('\n')}</ul>`;
+    contentRight.innerHTML = `
+      <h4 class="sectionHeader">Site Config</h4>
+      <textarea class="w3-input w3-border w3-card" style="width:375px;height:400px;font-size:11px;" spellcheck="false">${JSON.stringify(WebAudio.sites, null, 2)}</textarea>
+    `;
     OptionPage.openModal('supportedAudioSitesModal');
   }
 
