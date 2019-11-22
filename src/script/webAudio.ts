@@ -48,22 +48,10 @@ export default class WebAudio {
 
       this.supportedNode = this.buildSupportedNodeFunction();
 
-      // Video TextTrack Cue
-      if (this.cueRuleIds.length > 0) {
-        this.cueRuleIds.forEach(cueRuleId => { // set defaults for cue rules
-          this.rules[cueRuleId] = Object.assign(WebAudio._videoModeDefaults, this.rules[cueRuleId]);
-        });
-
-        // First rule's videoInterval will override subsequent rules
-        setInterval(this.watchForVideo, this.rules[this.cueRuleIds[0]].videoInterval, this);
-      }
+      // Watch for videos when there are cue rules
+      if (this.cueRuleIds.length > 0) { setInterval(this.watchForVideo, 250, this); }
     }
   }
-
-  static readonly _videoModeDefaults = {
-    videoInterval: 200,
-    videoSelector: 'video'
-  };
 
   static readonly sites: { [site: string]: AudioRules[] } = {
     'abc.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
@@ -106,6 +94,7 @@ export default class WebAudio {
         case 'cue':
           // NO-OP for supportedNode()
           this.cueRuleIds.push(index); // Save list of cue rule ids
+          this.initCueRule(rule);
           break;
         case 'text':
           block += `
@@ -214,6 +203,9 @@ export default class WebAudio {
     });
   }
 
+  initCueRule(rule) {
+    if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
+  }
 
   mute(video?: HTMLVideoElement): void {
     if (!this.muted) {
