@@ -15,6 +15,7 @@ export default class Config {
   muteAudio: boolean;
   muteAudioOnly: boolean;
   muteMethod: number;
+  muteCueRequireShowing: boolean;
   password: string;
   preserveCase: boolean;
   preserveFirst: boolean;
@@ -58,6 +59,7 @@ export default class Config {
     muteAudio: false, // Filter audio
     muteAudioOnly: false,
     muteMethod: 0, // 0: Mute Tab, 1: Video Volume
+    muteCueRequireShowing: true,
     password: null,
     preserveCase: true,
     preserveFirst: true,

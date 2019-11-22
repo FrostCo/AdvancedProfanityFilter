@@ -48,22 +48,10 @@ export default class WebAudio {
 
       this.supportedNode = this.buildSupportedNodeFunction();
 
-      // Video TextTrack Cue
-      if (this.cueRuleIds.length > 0) {
-        this.cueRuleIds.forEach(cueRuleId => { // set defaults for cue rules
-          this.rules[cueRuleId] = Object.assign(WebAudio._videoModeDefaults, this.rules[cueRuleId]);
-        });
-
-        // First rule's videoInterval will override subsequent rules
-        setInterval(this.watchForVideo, this.rules[this.cueRuleIds[0]].videoInterval, this);
-      }
+      // Watch for videos when there are cue rules
+      if (this.cueRuleIds.length > 0) { setInterval(this.watchForVideo, 250, this); }
     }
   }
-
-  static readonly _videoModeDefaults = {
-    videoInterval: 200,
-    videoSelector: 'video'
-  };
 
   static readonly sites: { [site: string]: AudioRules[] } = {
     'abc.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
@@ -76,6 +64,7 @@ export default class WebAudio {
       { mode: 'element', className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' },
       { mode: 'element', className: 'bmpui-subtitle-region-container', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' }
     ],
+    'www.disneyplus.com': [ { mode: 'cue', videoSelector: 'video.btm-media-client-element' } ],
     'www.fox.com': [ { mode: 'element', className: 'jw-text-track-container', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' } ],
     'www.hulu.com': [ { mode: 'element', className: 'caption-text-box', subtitleSelector: 'p', tagName: 'DIV' } ],
     'www.nbc.com': [ { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' } ],
@@ -91,7 +80,6 @@ export default class WebAudio {
   };
 
   buildSupportedNodeFunction(): Function {
-    // let site = this.site;
     let block = '';
 
     this.rules.forEach((rule, index) => {
@@ -105,8 +93,9 @@ export default class WebAudio {
 
       switch(rule.mode) {
         case 'cue':
+          // NO-OP for supportedNode()
           this.cueRuleIds.push(index); // Save list of cue rule ids
-          // NO-OP
+          this.initCueRule(rule);
           break;
         case 'text':
           block += `
@@ -115,7 +104,8 @@ export default class WebAudio {
               if (textParent && textParent.contains(node)) { return ${index}; }
             }`;
           break;
-        default: // Element
+        case 'element':
+        default:
           if (!rule.tagName) { throw('tagName is required.'); }
           block += `
           if (node.nodeName == '${rule.tagName.toUpperCase()}') {
@@ -190,17 +180,21 @@ export default class WebAudio {
     }
   }
 
-  getVideoTextTrack(video: HTMLVideoElement, language: string) {
+  getVideoTextTrack(video: HTMLVideoElement, language: string, requireShowing: boolean = true) {
     if (video.textTracks && video.textTracks.length > 0) {
-      if (language) {
-        for (let i = 0; i < video.textTracks.length; i++) {
-          if (video.textTracks[i].language == language) {
+      for (let i = 0; i < video.textTracks.length; i++) {
+        if (language) {
+          if (language == video.textTracks[i].language) {
+            if (!requireShowing || (requireShowing && video.textTracks[i].mode === 'showing')) {
+              return video.textTracks[i];
+            }
+          }
+        } else {
+          if (!requireShowing || (requireShowing && video.textTracks[i].mode === 'showing')) {
             return video.textTracks[i];
           }
         }
       }
-
-      return video.textTracks[0];
     }
   }
 
@@ -214,6 +208,10 @@ export default class WebAudio {
     });
   }
 
+  initCueRule(rule) {
+    if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
+    if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
+  }
 
   mute(video?: HTMLVideoElement): void {
     if (!this.muted) {
@@ -249,7 +247,6 @@ export default class WebAudio {
         cue.endTime += rule.videoCueSync;
       }
 
-      cue.index = i;
       let result = this.filter.replaceTextResult(cue.text);
       if (result.modified) {
         cue.filtered = true;
@@ -282,12 +279,13 @@ export default class WebAudio {
 
   watchForVideo(instance: WebAudio) {
     instance.cueRuleIds.forEach(cueRuleId => {
-      let video = document.querySelector(instance.rules[cueRuleId].videoSelector) as HTMLVideoElement;
+      let rule = instance.rules[cueRuleId] as AudioRules;
+      let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
-        let textTrack = instance.getVideoTextTrack(video, instance.rules[cueRuleId].videoCueLanguage);
+        let textTrack = instance.getVideoTextTrack(video, rule.videoCueLanguage, rule.videoCueRequireShowing);
 
         if (textTrack && !textTrack.oncuechange) {
-          if (instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }
+          if (!rule.videoCueHideCues && instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }
 
           textTrack.oncuechange = () => {
             if (textTrack.activeCues && textTrack.activeCues.length > 0) {
@@ -297,22 +295,42 @@ export default class WebAudio {
                 let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
                 if (!activeCue.hasOwnProperty('filtered')) {
                   let cues = textTrack.cues as any as FilteredTextTrackCue[];
-                  instance.processCues(cues, instance.rules[cueRuleId]);
+                  instance.processCues(cues, rule);
                 }
-                if (activeCue.filtered) { filtered = true; }
+                if (activeCue.filtered) {
+                  filtered = true;
+                  instance.mute(video);
+                }
               }
 
-              if (filtered) {
-                instance.mute(video);
-                switch (instance.showSubtitles) {
-                  case 1: textTrack.mode = 'showing'; break;
-                  case 2: textTrack.mode = 'hidden'; break;
+              if (!filtered) { instance.unmute(video); }
+
+              if (rule.videoCueHideCues) {
+                // Some sites don't care if textTrack.mode = 'hidden' and will continue showing.
+                // This is a fallback (not preferred) method that can be used for hiding the cues.
+                if (
+                  instance.showSubtitles === 1 && !filtered ||
+                  instance.showSubtitles === 2 && filtered ||
+                  instance.showSubtitles === 3
+                ) {
+                  for (let i = 0; i < textTrack.activeCues.length; i++) {
+                    let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
+                    activeCue.text = '';
+                    activeCue.position = 100;
+                    activeCue.size = 0;
+                  }
                 }
               } else {
-                instance.unmute(video);
-                switch (instance.showSubtitles) {
-                  case 1: textTrack.mode = 'hidden'; break;
-                  case 2: textTrack.mode = 'showing'; break;
+                if (filtered) {
+                  switch (instance.showSubtitles) {
+                    case 1: textTrack.mode = 'showing'; break;
+                    case 2: textTrack.mode = 'hidden'; break;
+                  }
+                } else {
+                  switch (instance.showSubtitles) {
+                    case 1: textTrack.mode = 'hidden'; break;
+                    case 2: textTrack.mode = 'showing'; break;
+                  }
                 }
               }
             } else { // No active cues
