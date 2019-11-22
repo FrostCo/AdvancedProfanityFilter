@@ -284,7 +284,7 @@ export default class WebAudio {
         let textTrack = instance.getVideoTextTrack(video, rule.videoCueLanguage, rule.videoCueRequireShowing);
 
         if (textTrack && !textTrack.oncuechange) {
-          if (instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }
+          if (!rule.videoCueHideCues && instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }
 
           textTrack.oncuechange = () => {
             if (textTrack.activeCues && textTrack.activeCues.length > 0) {
@@ -296,20 +296,40 @@ export default class WebAudio {
                   let cues = textTrack.cues as any as FilteredTextTrackCue[];
                   instance.processCues(cues, rule);
                 }
-                if (activeCue.filtered) { filtered = true; }
+                if (activeCue.filtered) {
+                  filtered = true;
+                  instance.mute(video);
+                }
               }
 
-              if (filtered) {
-                instance.mute(video);
-                switch (instance.showSubtitles) {
-                  case 1: textTrack.mode = 'showing'; break;
-                  case 2: textTrack.mode = 'hidden'; break;
+              if (!filtered) { instance.unmute(video); }
+
+              if (rule.videoCueHideCues) {
+                // Some sites don't care if textTrack.mode = 'hidden' and will continue showing.
+                // This is a fallback (not preferred) method that can be used for hiding the cues.
+                if (
+                  instance.showSubtitles === 1 && !filtered ||
+                  instance.showSubtitles === 2 && filtered ||
+                  instance.showSubtitles === 3
+                ) {
+                  for (let i = 0; i < textTrack.activeCues.length; i++) {
+                    let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
+                    activeCue.text = '';
+                    activeCue.position = 100;
+                    activeCue.size = 0;
+                  }
                 }
               } else {
-                instance.unmute(video);
-                switch (instance.showSubtitles) {
-                  case 1: textTrack.mode = 'hidden'; break;
-                  case 2: textTrack.mode = 'showing'; break;
+                if (filtered) {
+                  switch (instance.showSubtitles) {
+                    case 1: textTrack.mode = 'showing'; break;
+                    case 2: textTrack.mode = 'hidden'; break;
+                  }
+                } else {
+                  switch (instance.showSubtitles) {
+                    case 1: textTrack.mode = 'hidden'; break;
+                    case 2: textTrack.mode = 'showing'; break;
+                  }
                 }
               }
             } else { // No active cues

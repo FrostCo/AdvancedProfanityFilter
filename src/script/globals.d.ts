@@ -8,6 +8,7 @@ interface AudioRules {
   subtitleSelector?: string;        // [Element] *Used for Filtering*: node.querySelector()
   tagName?: string;                 // [Element] *REQUIRED*: node.nodeName
   textParentSelector?: string;      // [Text] parent.contains(node)
+  videoCueHideCues?: boolean;       // [Cue] Hide activeCues instead of textTrack.mode = 'hidden'
   videoCueLanguage?: string;        // [Cue] Language for video TextTrack
   videoCueRequireShowing?: boolean; // [Cue] Override global setting for muteCueRequireShowing
   videoCueSync?: number;            // [Cue] Adjust subtitle sync +/- (in seconds)
@@ -18,6 +19,8 @@ interface AudioRules {
 interface FilteredTextTrackCue extends TextTrackCue {
   filtered: boolean;
   originalText: string;
+  position: number; // TextTrackCue
+  size: number; // TextTrackCue
 }
 
 interface Message {
