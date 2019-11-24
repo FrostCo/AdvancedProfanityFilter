@@ -1,4 +1,12 @@
 export default class Word {
+  matchMethod: number;
+  matchRepeated: boolean;
+  sub: string;
+  unicode: boolean;
+  value: string;
+
+  private static readonly _defaultFilterOptions = { zfilterMethod: 0, zglobalMatchMethod: 3 }
+  private static readonly _defaultWordOptions = { sub: 'censored', matchMethod: 0, repeat: false, capitalized: true };
   private static readonly _edgePunctuationRegExp = /(^[,.'"!?%$]|[,.'"!?%$]$)/;
   private static readonly _escapeRegExp = /[\/\\^$*+?.()|[\]{}]/g;
   private static readonly _unicodeRegExp = /[^\u0000-\u00ff]/;
@@ -6,94 +14,18 @@ export default class Word {
   static readonly nonWordRegExp = new RegExp('^\\s*[^\\w]+\\s*$', 'g');
   static readonly whitespaceRegExp = /^\s+$/;
 
+  static defaultWordOptions = Word._defaultWordOptions;
+  static filterMethod = Word._defaultFilterOptions.zfilterMethod;
+  static globalMatchMethod = Word._defaultFilterOptions.zglobalMatchMethod;
+  static list = [];
+  static regExps = [];
+
   static allLowerCase(string: string): boolean {
     return string.toLowerCase() === string;
   }
 
   static allUpperCase(string: string): boolean {
     return string.toUpperCase() === string;
-  }
-
-  // Word must match exactly (not sub-string)
-  // /\bword\b/gi
-  static buildExactRegexp(str: string, matchRepeated: boolean = false): RegExp {
-    try {
-      if (Word.containsDoubleByte(str)) {
-        // Work around for lack of word boundary support for unicode characters
-        // /(^|[\s.,'"+!?|-]+)(word)([\s.,'"+!?|-]+|$)/giu
-        return new RegExp('(^|' + Word._unicodeWordBoundary + '+)(' + Word.processPhrase(str, matchRepeated) + ')(' + Word._unicodeWordBoundary + '+|$)', 'giu');
-      } else if (str.match(Word._edgePunctuationRegExp)) { // Begin or end with punctuation (not \w))
-        return new RegExp('(^|\\s)(' + Word.processPhrase(str, matchRepeated) + ')(\\s|$)', 'giu');
-      } else {
-        return new RegExp('\\b' + Word.processPhrase(str, matchRepeated) + '\\b', 'gi');
-      }
-    } catch(e) {
-      throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
-    }
-  }
-
-  // Match any part of a word (sub-string)
-  // /word/gi
-  static buildPartRegexp(str: string, matchRepeated: boolean = false): RegExp {
-    try {
-      return new RegExp(Word.processPhrase(str, matchRepeated), 'gi');
-    } catch(e) {
-      throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
-    }
-  }
-
-  // Match entire word that contains sub-string and surrounding whitespace
-  // /\s?\bword\b\s?/gi
-  static buildRegexpForRemoveExact(str: string, matchRepeated: boolean = false): RegExp {
-    try {
-      if (Word.containsDoubleByte(str)) {
-        // Work around for lack of word boundary support for unicode characters
-        // /(^|[\s.,'"+!?|-]+)(word)([\s.,'"+!?|-]+|$)/giu
-        return new RegExp('(^|' + Word._unicodeWordBoundary + ')(' + Word.processPhrase(str, matchRepeated) + ')(' + Word._unicodeWordBoundary + '|$)', 'giu');
-      } else if (str.match(Word._edgePunctuationRegExp)) { // Begin or end with punctuation (not \w))
-        return new RegExp('(^|\\s)(' + Word.processPhrase(str, matchRepeated) + ')(\\s|$)', 'giu');
-      } else {
-        return new RegExp('\\s?\\b' + Word.processPhrase(str, matchRepeated) + '\\b\\s?', 'gi');
-      }
-    } catch(e) {
-      throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
-    }
-  }
-
-  // Match entire word that contains sub-string and surrounding whitespace
-  // /\s?\b[\w-]*word[\w-]*\b\s?/gi
-  static buildRegexpForRemovePart(str: string, matchRepeated: boolean = false): RegExp {
-    try {
-      if (Word.containsDoubleByte(str)) {
-        // Work around for lack of word boundary support for unicode characters
-        // /(^|[\s.,'"+!?|-]?)[\w-]*(word)[\w-]*([\s.,'"+!?|-]?|$)/giu
-        return new RegExp('(^|' + Word._unicodeWordBoundary + '?)([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*)(' + Word._unicodeWordBoundary + '?|$)', 'giu');
-      } else if (str.match(Word._edgePunctuationRegExp)) { // Begin or end with punctuation (not \w))
-        return new RegExp('(^|\\s)([\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*)(\\s|$)', 'giu');
-      } else {
-        return new RegExp('\\s?\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b\\s?', 'gi');
-      }
-    } catch(e) {
-      throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
-    }
-  }
-
-  // Match entire word that contains sub-string
-  // /\b[\w-]*word[\w-]*\b/gi
-  static buildWholeRegexp(str: string, matchRepeated: boolean = false): RegExp {
-    try {
-      if (Word.containsDoubleByte(str)) {
-        // Work around for lack of word boundary support for unicode characters
-        // (^|[\s.,'"+!?|-]*)([\S]*куче[\S]*)([\s.,'"+!?|-]*|$)/giu
-        return new RegExp('(^|' + Word._unicodeWordBoundary + '*)([\\S]*' + Word.processPhrase(str, matchRepeated) + '[\\S]*)(' + Word._unicodeWordBoundary + '*|$)', 'giu');
-      } else if (str.match(Word._edgePunctuationRegExp)) { // Begin or end with punctuation (not \w))
-        return new RegExp('(^|\\s)([\\S]*' + Word.processPhrase(str, matchRepeated) + '[\\S]*)(\\s|$)', 'giu');
-      } else {
-        return new RegExp('\\b[\\w-]*' + Word.processPhrase(str, matchRepeated) + '[\\w-]*\\b', 'gi');
-      }
-    } catch(e) {
-      throw new Error('Failed to create RegExp for "' + str + '" - ' + e.name + ' ' + e.message);
-    }
   }
 
   static capitalize(string: string): string {
@@ -117,33 +49,141 @@ export default class Word {
     return str.replace(Word._escapeRegExp, '\\$&');
   }
 
-  // Process the rest of the word (word excluding first character)
-  // This will escape the word and optionally include repeating characters
-  static processPhrase(str: string, matchRepeated: boolean): string {
-    var escaped = Word.escapeRegExp(str);
-    if (matchRepeated) {
-      return Word.repeatingCharacterRegexp(escaped);
-    }
+  static initWords(words, filterOptions: any = {}, wordDefaults = {}) {
+    // Sort the words array by longest (most-specific) first
+    Word.list = []; // TODO: Was null
+    Word.regExps = [];
+    filterOptions = Object.assign(Word._defaultFilterOptions, filterOptions);
+    Word.filterMethod = filterOptions.filterMethod;
+    // Special regexp for "Remove" filter, uses per-word matchMethods
+    Word.globalMatchMethod = Word.filterMethod === 2 ? Word.globalMatchMethod = 3 : filterOptions.globalMatchMethod;
+    Word.defaultWordOptions = Object.assign(Word._defaultWordOptions, wordDefaults)
 
-    return escaped;
+    Word.list = Object.keys(words).sort((a, b) => {
+      return b.length - a.length;
+    });
+
+    Word.list.forEach(word => {
+      Word.regExps.push(new Word(word, words[word]).buildRegexp());
+    });
   }
 
-  // Regexp to match repeating characters
+  constructor(word: string, options) {
+    this.value = word;
+    this.sub = options.sub == null ? Word.defaultWordOptions.sub : options.sub;
+    this.matchRepeated = options.repeat === undefined ? Word.defaultWordOptions.repeat : options.repeat;
+    this.unicode = Word.containsDoubleByte(word);
+    this.matchMethod = Word.globalMatchMethod === 3 ? options.matchMethod : Word.globalMatchMethod;
+    if (this.matchMethod === undefined) { Word.defaultWordOptions.matchMethod };
+  }
+
+  // Word must match exactly (not sub-string)
+  // /\bword\b/gi
+  buildRegexp(): RegExp {
+    let word = this;
+    try {
+      switch(word.matchMethod) {
+        case 0: // Exact: Word must match exactly (not sub-string)
+          // Filter Method: Remove
+          // Match entire word that contains sub-string and surrounding whitespace
+          // /\s?\bword\b\s?/gi
+          if (Word.filterMethod === 2) { // Remove method
+            if (word.unicode) {
+              // Work around for lack of word boundary support for unicode characters
+              // /(^|[\s.,'"+!?|-])(word)([\s.,'"+!?|-]+|$)/giu
+              return new RegExp('(^|' + Word._unicodeWordBoundary + ')(' + word.processedPhrase() + ')(' + Word._unicodeWordBoundary + '|$)', word.regexOptions());
+            } else if (word.hasEdgePunctuation()) { // Begin or end with punctuation (not \w))
+              return new RegExp('(^|\\s)(' + word.processedPhrase() + ')(\\s|$)', word.regexOptions());
+            } else {
+              return new RegExp('\\s?\\b' + word.processedPhrase() + '\\b\\s?', word.regexOptions());
+            }
+          } else {
+            if (word.unicode) {
+              // Work around for lack of word boundary support for unicode characters
+              // /(^|[\s.,'"+!?|-]+)(word)([\s.,'"+!?|-]+|$)/giu
+              return new RegExp('(^|' + Word._unicodeWordBoundary + '+)(' + word.processedPhrase() + ')(' + Word._unicodeWordBoundary + '+|$)', word.regexOptions());
+            } else if (word.hasEdgePunctuation()) {
+              // Begin or end with punctuation (not \w))
+              return new RegExp('(^|\\s)(' + word.processedPhrase() + ')(\\s|$)', word.regexOptions());
+            } else {
+              return new RegExp('\\b' + word.processedPhrase() + '\\b', word.regexOptions());
+            }
+          }
+          break;
+        case 2: // Whole: Match entire word that contains sub-string
+          // /\b[\w-]*word[\w-]*\b/gi
+          if (word.unicode) {
+            // Work around for lack of word boundary support for unicode characters
+            // (^|[\s.,'"+!?|-]*)([\S]*куче[\S]*)([\s.,'"+!?|-]*|$)/giu
+            return new RegExp('(^|' + Word._unicodeWordBoundary + '*)([\\S]*' + word.processedPhrase() + '[\\S]*)(' + Word._unicodeWordBoundary + '*|$)', word.regexOptions());
+          } else if (word.hasEdgePunctuation()) { // Begin or end with punctuation (not \w))
+            return new RegExp('(^|\\s)([\\S]*' + word.processedPhrase() + '[\\S]*)(\\s|$)', word.regexOptions());
+          } else {
+            return new RegExp('\\b[\\w-]*' + word.processedPhrase() + '[\\w-]*\\b', word.regexOptions());
+          }
+          break;
+        case 4: // Regular Expression (Advanced)
+          return new RegExp(word.value, word.regexOptions());
+          break;
+        case 1: // Partial: Match any part of a word (sub-string)
+        default:
+          if (Word.filterMethod === 2) { // Filter Method: Remove
+            // Match entire word that contains sub-string and surrounding whitespace
+            // /\s?\b[\w-]*word[\w-]*\b\s?/gi
+            if (word.unicode) {
+              // Work around for lack of word boundary support for unicode characters
+              // /(^|[\s.,'"+!?|-]?)[\w-]*(word)[\w-]*([\s.,'"+!?|-]?|$)/giu
+              return new RegExp('(^|' + Word._unicodeWordBoundary + '?)([\\w-]*' +  word.processedPhrase() + '[\\w-]*)(' + Word._unicodeWordBoundary + '?|$)', word.regexOptions());
+            } else if (word.hasEdgePunctuation()) { // Begin or end with punctuation (not \w))
+              return new RegExp('(^|\\s)([\\w-]*' +  word.processedPhrase() + '[\\w-]*)(\\s|$)', word.regexOptions());
+            } else {
+              return new RegExp('\\s?\\b[\\w-]*' +  word.processedPhrase() + '[\\w-]*\\b\\s?', word.regexOptions());
+            }
+          } else {
+            // /word/gi
+            return new RegExp(word.processedPhrase(), word.regexOptions());
+          }
+          break;
+      }
+    } catch(e) {
+      throw new Error('Failed to create RegExp for "' + word.value + '" - ' + e.name + ' ' + e.message);
+    }
+  }
+
+  hasEdgePunctuation() { return !!(this.value.match(Word._edgePunctuationRegExp)); }
+
+  // This will escape the word and optionally include repeating characters
+  processedPhrase(): string {
+    if (this.matchRepeated) {
+      return this.repeatingCharacterRegexp();
+    } else {
+      return Word.escapeRegExp(this.value);
+    }
+  }
+
+  regexOptions() {
+    let options = 'gi';
+    if (this.unicode) { options += 'u'; }
+    return options;
+  }
+
   // Word: /w+o+r+d+/gi
-  static repeatingCharacterRegexp(str: string): string {
-    if (str.includes('\\')) {
-      var repeat = '';
-      for (var i= 0; i < str.length; i++) {
-        if (str[i] === '\\') {
-          repeat += (str[i] + str[i + 1] + '+');
+  repeatingCharacterRegexp(): string {
+    let word = this;
+    let escaped = Word.escapeRegExp(word.value);
+    if (escaped.includes('\\')) {
+      let repeat = '';
+      for (let i= 0; i < escaped.length; i++) {
+        if (escaped[i] === '\\') {
+          repeat += (escaped[i] + escaped[i + 1] + '+');
           i++;
         } else {
-          repeat += str[i] + '+';
+          repeat += escaped[i] + '+';
         }
       }
       return repeat;
     } else {
-      return str.split('').map(letter => letter + '+').join('');
+      return word.value.split('').map(letter => letter + '+').join('');
     }
   }
 }
