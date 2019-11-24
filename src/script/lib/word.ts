@@ -5,7 +5,7 @@ export default class Word {
   unicode: boolean;
   value: string;
 
-  private static readonly _defaultFilterOptions = { zfilterMethod: 0, zglobalMatchMethod: 3 }
+  private static readonly _defaultFilterOptions = { filterMethod: 1, globalMatchMethod: 3 }
   private static readonly _defaultWordOptions = { sub: 'censored', matchMethod: 0, repeat: false, capitalized: true };
   private static readonly _edgePunctuationRegExp = /(^[,.'"!?%$]|[,.'"!?%$]$)/;
   private static readonly _escapeRegExp = /[\/\\^$*+?.()|[\]{}]/g;
@@ -15,8 +15,8 @@ export default class Word {
   static readonly whitespaceRegExp = /^\s+$/;
 
   static defaultWordOptions = Word._defaultWordOptions;
-  static filterMethod = Word._defaultFilterOptions.zfilterMethod;
-  static globalMatchMethod = Word._defaultFilterOptions.zglobalMatchMethod;
+  static filterMethod = Word._defaultFilterOptions.filterMethod;
+  static globalMatchMethod = Word._defaultFilterOptions.globalMatchMethod;
   static list = [];
   static regExps = [];
 
