@@ -1,5 +1,4 @@
 const expect = require('chai').expect;
-// import * as bundle from '../built/filter.bundle';
 import Config from '../built/lib/config';
 import {Filter} from '../built/lib/filter';
 
@@ -8,14 +7,21 @@ const testWords = {
   'placeholder': { matchMethod: 0, repeat: false, sub: 'variable' },
   'sample': { matchMethod: 1, repeat: false, sub: 'piece' },
   'word': { matchMethod: 2, repeat: true, sub: 'idea' }
-}
+};
 
 describe('Filter', function() {
   describe('generateWordList()', function() {
     it('should generate a sorted word list RegExp list', function() {
       let filter = new Filter;
-      filter.cfg = new Config({ words: Object.assign({}, testWords) });
-      filter.generateWordList();
+      filter.cfg = new Config({
+        words: Object.assign({}, testWords),
+        filterMethod: 0,
+        globalMatchMethod: 3,
+        defaultSubstitution: 'censored',
+        defaultWordMatchMethod: 0,
+        defaultWordRepeat: false
+      });
+      filter.init();
       expect(filter.wordList.length).to.equal(4);
       expect(filter.wordList).to.eql(['placeholder', 'example', 'sample', 'word']);
     });
@@ -25,9 +31,15 @@ describe('Filter', function() {
     describe('Global matching', function() {
       it('should return RegExp list for global exact match', function() {
         let filter = new Filter;
-        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 0 });
-        filter.generateWordList();
-        filter.generateRegexpList();
+        filter.cfg = new Config({
+          words: Object.assign({}, testWords),
+          filterMethod: 0,
+          globalMatchMethod: 0,
+          defaultSubstitution: 'censored',
+          defaultWordMatchMethod: 0,
+          defaultWordRepeat: false
+        });
+        filter.init();
         expect(filter.wordRegExps.length).to.equal(4);
         expect(filter.wordRegExps).to.eql([/\bplaceholder\b/gi, /\be+x+a+m+p+l+e+\b/gi, /\bsample\b/gi, /\bw+o+r+d+\b/gi]);
       });
@@ -112,7 +124,6 @@ describe('Filter', function() {
 
       it('Should filter a partial word ending with punctuation', function() {
         let filter = new Filter;
-        debugger;
         filter.cfg = new Config({ words: {'this!': { matchMethod: 1 }}, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3 });
         filter.init();
         expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love all_____ Do you?');
@@ -130,7 +141,6 @@ describe('Filter', function() {
 
       it('Should filter a whole word ending with punctuation', function() {
         let filter = new Filter;
-        debugger;
         filter.cfg = new Config({ words: {'this!': { matchMethod: 2 }}, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3 });
         filter.init();
         expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love ________ Do you?');
@@ -175,7 +185,6 @@ describe('Filter', function() {
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: false, preserveLast: false });
           filter.cfg.words['словен'] = { matchMethod: 2, repeat: false };
           filter.init();
-          debugger;
           expect(filter.replaceText('За пределами Словении этнические словенцы компактно')).to.equal('За пределами ******** этнические ******** компактно');
         });
       });
@@ -198,19 +207,17 @@ describe('Filter', function() {
 
       it('Should filter an exact word ending with punctuation', function() {
         let filter = new Filter;
-        filter.cfg = new Config(
-          {
-            filterMethod: 1,
-            globalMatchMethod: 3,
-            substitutionMark: false,
-            preserveCase: true,
-            words: {
-              'this!': { matchMethod: 0, repeat: false, sub: 'that!' },
-              '!bang': { matchMethod: 0, repeat: true, sub: '!poof' },
-              '!another!': { matchMethod: 0, repeat: false, sub: '$znother#' }
-            },
-          }
-        );
+        filter.cfg = new Config({
+          filterMethod: 1,
+          globalMatchMethod: 3,
+          substitutionMark: false,
+          preserveCase: true,
+          words: {
+            'this!': { matchMethod: 0, repeat: false, sub: 'that!' },
+            '!bang': { matchMethod: 0, repeat: true, sub: '!poof' },
+            '!another!': { matchMethod: 0, repeat: false, sub: '$znother#' }
+          },
+        });
         filter.init();
         expect(filter.replaceText('I love This! Do you?')).to.equal('I love That! Do you?');
         expect(filter.replaceText('I love this!')).to.equal('I love that!');
