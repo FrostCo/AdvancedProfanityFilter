@@ -1,4 +1,5 @@
 export default class Word {
+  matchCapitalized: boolean;
   matchMethod: number;
   matchRepeated: boolean;
   sub: string;
@@ -68,10 +69,11 @@ export default class Word {
     });
   }
 
-  constructor(word: string, options) {
+  constructor(word: string, options: WordOptions) {
     this.value = word;
     this.sub = options.sub == null ? Word.defaultWordOptions.sub : options.sub;
     this.matchRepeated = options.repeat === undefined ? Word.defaultWordOptions.repeat : options.repeat;
+    this.matchCapitalized = options.capitalized === undefined ? Word.defaultWordOptions.capitalized : options.capitalized;
     this.unicode = Word.containsDoubleByte(word);
     this.matchMethod = Word.globalMatchMethod === 3 ? options.matchMethod : Word.globalMatchMethod;
     if (this.matchMethod === undefined) { Word.defaultWordOptions.matchMethod };
@@ -150,20 +152,38 @@ export default class Word {
     }
   }
 
+  excludeCapitalized() {
+    let word = this;
+    let val = word.value[0];
+    for (let i = 1; i < word.value.length; i++) {
+      if (word.value[i].toUpperCase() == word.value[i]) {
+        val += word.value[i];
+      } else {
+        val += `[${word.value[i].toUpperCase()}${word.value[i]}]`;
+      }
+      if (word.matchRepeated) { val += '+'; }
+    }
+    return val;
+  }
+
   hasEdgePunctuation() { return !!(this.value.match(Word._edgePunctuationRegExp)); }
 
-  // This will escape the word and optionally include repeating characters
   processedPhrase(): string {
-    if (this.matchRepeated) {
-      return this.repeatingCharacterRegexp();
+    if (this.matchCapitalized) {
+      if (this.matchRepeated) {
+        return this.repeatingCharacterRegexp();
+      } else {
+        return Word.escapeRegExp(this.value);
+      }
     } else {
-      return Word.escapeRegExp(this.value);
+      return this.excludeCapitalized();
     }
   }
 
   regexOptions() {
-    let options = 'gi';
+    let options = 'g';
     if (this.unicode) { options += 'u'; }
+    if (this.matchCapitalized) { options += 'i'; }
     return options;
   }
 

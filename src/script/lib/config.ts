@@ -128,7 +128,12 @@ export default class Config {
       this.words[str] = options;
       return true;
     } else {
-      this.words[str] = {matchMethod: this.defaultWordMatchMethod, repeat: this.defaultWordRepeat, sub: ''};
+      this.words[str] = {
+        capitalized: true,
+        matchMethod: this.defaultWordMatchMethod,
+        repeat: this.defaultWordRepeat,
+        sub: ''
+      };
       return true;
     }
   }

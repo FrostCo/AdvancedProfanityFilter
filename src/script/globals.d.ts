@@ -49,6 +49,7 @@ interface Version {
 }
 
 interface WordOptions {
+  capitalized: boolean;
   matchMethod: number;
   repeat: boolean;
   sub: string;

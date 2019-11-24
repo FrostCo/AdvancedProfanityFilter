@@ -431,6 +431,7 @@ export default class OptionPage {
   populateWord() {
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     let wordText = document.getElementById('wordText') as HTMLInputElement;
+    let wordMatchCapitalized = document.getElementById('wordMatchCapitalized') as HTMLInputElement;
     let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
     let wordRemove = document.getElementById('wordRemove') as HTMLInputElement;
@@ -441,6 +442,7 @@ export default class OptionPage {
       OptionPage.disableBtn(wordRemove);
       let selectedMatchMethod = document.getElementById(`wordMatch${WebConfig._matchMethodNames[option.cfg.defaultWordMatchMethod]}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
+      wordMatchCapitalized.checked = true;
       wordMatchRepeated.checked = option.cfg.defaultWordRepeat;
       substitutionText.value = '';
     } else { // Existing word
@@ -449,6 +451,7 @@ export default class OptionPage {
       wordText.value = word;
       let selectedMatchMethod = document.getElementById(`wordMatch${WebConfig._matchMethodNames[wordCfg.matchMethod]}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
+      wordMatchCapitalized.checked = wordCfg.capitalized === undefined ? true : wordCfg.capitalized; // Default to true
       wordMatchRepeated.checked = wordCfg.repeat;
       substitutionText.value = wordCfg.sub;
     }
@@ -607,6 +610,7 @@ export default class OptionPage {
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     let wordText = document.getElementById('wordText') as HTMLInputElement;
     let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
+    let wordMatchCapitalized = document.getElementById('wordMatchCapitalized') as HTMLInputElement;
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
     let selectedMatchMethod = document.querySelector('input[name="wordMatchMethod"]:checked') as HTMLInputElement;
     let word = wordText.value.trim().toLowerCase();
@@ -627,6 +631,7 @@ export default class OptionPage {
 
     if (wordText.checkValidity()) {
       let wordOptions: WordOptions = {
+        capitalized: wordMatchCapitalized.checked,
         matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
         repeat: wordMatchRepeated.checked,
         sub: sub
