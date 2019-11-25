@@ -16,6 +16,30 @@ describe('Word', function() {
         expect(wordRegExps[0]).to.eql(/\bw+o+r+d+\b/gi);
       });
 
+      it('should build RegExp without capitalized', function() {
+        Word.initWords({'word': {matchMethod: 0, capitalized: false}});
+        let wordRegExps = Word.regExps;
+        expect(wordRegExps[0]).to.eql(/\bw[Oo][Rr][Dd]\b/g);
+      });
+
+      it('should build RegExp without capitalized and be escaped', function() {
+        Word.initWords({'ke$ha': {matchMethod: 0, capitalized: false}});
+        let wordRegExps = Word.regExps;
+        expect(wordRegExps[0]).to.eql(/\bk[Ee]\$[Hh][Aa]\b/g);
+      });
+
+      it('should build RegExp and ignore capitalized when not possible', function() {
+        Word.initWords({'5chool': {matchMethod: 0, capitalized: false}});
+        let wordRegExps = Word.regExps;
+        expect(wordRegExps[0]).to.eql(/\b5chool\b/gi);
+      });
+
+      it('should build RegExp without capitalized with matchRepeated', function() {
+        Word.initWords({'word': {matchMethod: 0, capitalized: false, repeat: true}});
+        let wordRegExps = Word.regExps;
+        expect(wordRegExps[0]).to.eql(/\bw+[Oo]+[Rr]+[Dd]+\b/g);
+      });
+
       it('should throw exception for invalid RegExp', function() {
         expect(() => {
           let word = new Word(null, {});
@@ -28,6 +52,12 @@ describe('Word', function() {
         let wordRegExps = Word.regExps;
         expect(wordRegExps[0].unicode).to.eql(false);
         expect(wordRegExps[0]).to.eql(/(^|\s)(word!)(\s|$)/gi);
+      });
+
+      it('should build RegExp with ending punctuation and ignore capitalized', function() {
+        Word.initWords({'$chool': {matchMethod: 0, capitalized: false}});
+        let wordRegExps = Word.regExps;
+        expect(wordRegExps[0]).to.eql(/(^|\s)(\$chool)(\s|$)/gi);
       });
 
       // Work around for lack of word boundary support for unicode characters
@@ -63,6 +93,18 @@ describe('Word', function() {
         Word.initWords({word: {matchMethod: 1, repeat: true}});
         let wordRegExps = Word.regExps;
         expect(wordRegExps[0]).to.eql(/w+o+r+d+/gi);
+      });
+
+      it('should build RegExp without capitalized', function() {
+        Word.initWords({'word': {matchMethod: 1, capitalized: false}});
+        let wordRegExps = Word.regExps;
+        expect(wordRegExps[0]).to.eql(/w[Oo][Rr][Dd]/g);
+      });
+
+      it('should build RegExp without capitalized with matchRepeated', function() {
+        Word.initWords({'word': {matchMethod: 1, capitalized: false, repeat: true}});
+        let wordRegExps = Word.regExps;
+        expect(wordRegExps[0]).to.eql(/w+[Oo]+[Rr]+[Dd]+/g);
       });
     });
 

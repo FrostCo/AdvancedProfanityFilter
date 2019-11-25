@@ -1,4 +1,5 @@
 export default class Word {
+  escaped: string;
   matchCapitalized: boolean;
   matchMethod: number;
   matchRepeated: boolean;
@@ -52,7 +53,7 @@ export default class Word {
 
   static initWords(words, filterOptions: any = {}, wordDefaults = {}) {
     // Sort the words array by longest (most-specific) first
-    Word.list = []; // TODO: Was null
+    Word.list = [];
     Word.regExps = [];
     filterOptions = Object.assign(Word._defaultFilterOptions, filterOptions);
     Word.filterMethod = filterOptions.filterMethod;
@@ -77,6 +78,7 @@ export default class Word {
     this.unicode = Word.containsDoubleByte(word);
     this.matchMethod = Word.globalMatchMethod === 3 ? options.matchMethod : Word.globalMatchMethod;
     if (this.matchMethod === undefined) { Word.defaultWordOptions.matchMethod };
+    this.escaped = Word.escapeRegExp(this.value);
   }
 
   // Word must match exactly (not sub-string)
@@ -152,53 +154,64 @@ export default class Word {
     }
   }
 
+  canBeCapitalized(): boolean { return (!this.matchCapitalized && this.escaped[0].toUpperCase() != this.escaped[0]) }
+
   excludeCapitalized() {
     let word = this;
-    let val = word.value[0];
-    for (let i = 1; i < word.value.length; i++) {
-      if (word.value[i].toUpperCase() == word.value[i]) {
-        val += word.value[i];
+    let val = word.escaped[0];
+    if (word.matchRepeated) { val += '+'; }
+
+    for (let i = 1; i < word.escaped.length; i++) {
+      if (word.escaped[i] === '\\') {
+        // Character had to be escaped
+        val += word.escaped[i] + word.escaped[i + 1];
+        i++;
+      } else if (word.escaped[i].toUpperCase() == word.escaped[i]) {
+        // Character doesn't have an upper/lower case
+        val += word.escaped[i];
+        if (word.matchRepeated) { val += '+'; }
       } else {
-        val += `[${word.value[i].toUpperCase()}${word.value[i]}]`;
+        // Character should match upper and lower case variants
+        val += `[${word.escaped[i].toUpperCase()}${word.escaped[i]}]`;
       }
       if (word.matchRepeated) { val += '+'; }
     }
+
     return val;
   }
 
-  hasEdgePunctuation() { return !!(this.value.match(Word._edgePunctuationRegExp)); }
+  hasEdgePunctuation(): boolean { return !!(this.value.match(Word._edgePunctuationRegExp)); }
 
   processedPhrase(): string {
-    if (this.matchCapitalized) {
+    if (this.canBeCapitalized()) {
+      return this.excludeCapitalized();
+    } else {
       if (this.matchRepeated) {
         return this.repeatingCharacterRegexp();
       } else {
-        return Word.escapeRegExp(this.value);
+        return this.escaped;
       }
-    } else {
-      return this.excludeCapitalized();
     }
   }
 
   regexOptions() {
     let options = 'g';
     if (this.unicode) { options += 'u'; }
-    if (this.matchCapitalized) { options += 'i'; }
+    if (!this.canBeCapitalized()) { options += 'i'; }
     return options;
   }
 
   // Word: /w+o+r+d+/gi
   repeatingCharacterRegexp(): string {
     let word = this;
-    let escaped = Word.escapeRegExp(word.value);
-    if (escaped.includes('\\')) {
+    if (word.escaped.includes('\\')) {
       let repeat = '';
-      for (let i= 0; i < escaped.length; i++) {
-        if (escaped[i] === '\\') {
-          repeat += (escaped[i] + escaped[i + 1] + '+');
+      for (let i = 0; i < word.escaped.length; i++) {
+        if (word.escaped[i] === '\\') {
+          repeat += word.escaped[i] + word.escaped[i + 1] + '+';
           i++;
         } else {
-          repeat += escaped[i] + '+';
+          repeat += word.escaped[i] + '+';
         }
       }
       return repeat;
