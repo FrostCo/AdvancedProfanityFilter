@@ -141,7 +141,7 @@ export default class WebFilter extends Filter {
 
   cleanNodeText(node) {
     // console.log('[APF] New node to filter', node); // Debug: Filter
-    if (filter.advanced && node.parentNode || node == document) {
+    if (filter.advanced && (node.parentNode || node === document)) {
       filter.advancedReplaceText(node);
     } else {
       filter.cleanNode(node);

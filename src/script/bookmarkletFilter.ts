@@ -135,7 +135,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   cleanNodeText(node) {
-    if (filter.advanced && node.parentNode || node == document) {
+    if (filter.advanced && (node.parentNode || node == document)) {
       filter.advancedReplaceText(node);
     } else {
       filter.cleanNode(node);
