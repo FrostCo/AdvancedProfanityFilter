@@ -10,9 +10,12 @@ export default class Page {
     if (node.isContentEditable) { return true; }
 
     // Check if parentNode is a forbidden tag
-    if (node.parentNode && (
-      node.parentNode.isContentEditable ||
-      Page.forbiddenTags.includes(node.parentNode.nodeName))
+    if (
+      node.parentNode
+      && (
+        node.parentNode.isContentEditable
+        || Page.forbiddenTags.includes(node.parentNode.nodeName)
+      )
     ) { return true; }
 
     // Check if node is a forbidden tag

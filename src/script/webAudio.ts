@@ -309,9 +309,9 @@ export default class WebAudio {
                 // Some sites don't care if textTrack.mode = 'hidden' and will continue showing.
                 // This is a fallback (not preferred) method that can be used for hiding the cues.
                 if (
-                  instance.showSubtitles === 1 && !filtered ||
-                  instance.showSubtitles === 2 && filtered ||
-                  instance.showSubtitles === 3
+                  (instance.showSubtitles === 1 && !filtered)
+                  || (instance.showSubtitles === 2 && filtered)
+                  || instance.showSubtitles === 3
                 ) {
                   for (let i = 0; i < textTrack.activeCues.length; i++) {
                     let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
