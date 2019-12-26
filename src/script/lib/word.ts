@@ -8,7 +8,7 @@ export default class Word {
   value: string;
 
   private static readonly _defaultFilterOptions = { filterMethod: 1, globalMatchMethod: 3 }
-  private static readonly _defaultWordOptions = { sub: 'censored', matchMethod: 0, repeat: false, capitalized: true };
+  private static readonly _defaultWordOptions = { sub: 'censored', matchMethod: 0, repeat: false, capital: true };
   private static readonly _edgePunctuationRegExp = /(^[,.'"!?%$]|[,.'"!?%$]$)/;
   private static readonly _escapeRegExp = /[\/\\^$*+?.()|[\]{}]/g;
   private static readonly _unicodeRegExp = /[^\u0000-\u00ff]/;
@@ -74,7 +74,7 @@ export default class Word {
     this.value = word;
     this.sub = options.sub == null ? Word.defaultWordOptions.sub : options.sub;
     this.matchRepeated = options.repeat === undefined ? Word.defaultWordOptions.repeat : options.repeat;
-    this.matchCapitalized = options.capitalized === undefined ? Word.defaultWordOptions.capitalized : options.capitalized;
+    this.matchCapitalized = options.capital === undefined ? Word.defaultWordOptions.capital : options.capital;
     this.unicode = Word.containsDoubleByte(word);
     this.matchMethod = Word.globalMatchMethod === 3 ? options.matchMethod : Word.globalMatchMethod;
     if (this.matchMethod === undefined) { Word.defaultWordOptions.matchMethod };

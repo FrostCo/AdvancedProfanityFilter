@@ -451,7 +451,7 @@ export default class OptionPage {
       wordText.value = word;
       let selectedMatchMethod = document.getElementById(`wordMatch${WebConfig._matchMethodNames[wordCfg.matchMethod]}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
-      wordMatchCapitalized.checked = wordCfg.capitalized === undefined ? true : wordCfg.capitalized; // Default to true
+      wordMatchCapitalized.checked = wordCfg.capital === undefined ? true : wordCfg.capital; // Default to true
       wordMatchRepeated.checked = wordCfg.repeat;
       substitutionText.value = wordCfg.sub;
     }
@@ -631,7 +631,7 @@ export default class OptionPage {
 
     if (wordText.checkValidity()) {
       let wordOptions: WordOptions = {
-        capitalized: wordMatchCapitalized.checked,
+        capital: wordMatchCapitalized.checked,
         matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
         repeat: wordMatchRepeated.checked,
         sub: sub
