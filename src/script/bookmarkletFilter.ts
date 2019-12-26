@@ -6,12 +6,12 @@ import Config from './lib/config';
 import './vendor/findAndReplaceDOMText';
 
 // NO-OP for chrome.* API
-var chrome = {} as any;
+let chrome = {} as any;
 chrome.runtime = {};
 chrome.runtime.sendMessage = function(obj){};
 
 /* @preserve - Start User Config */
-var config = Config._defaults as any;
+let config = Config._defaults as any;
 config.words = Config._defaultWords;
 /* @preserve - End User Config */
 

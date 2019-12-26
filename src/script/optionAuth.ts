@@ -21,7 +21,7 @@ export default class OptionAuth {
   }
 
   setPassword(optionPage: OptionPage) {
-    var password = document.getElementById('setPassword') as HTMLInputElement;
+    let password = document.getElementById('setPassword') as HTMLInputElement;
     optionPage.cfg.password = password.value;
     optionPage.saveProp('password');
     password.value = '';
