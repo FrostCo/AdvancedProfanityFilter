@@ -42,7 +42,11 @@ export default class BookmarkletFilter extends Filter {
     filter.wordRegExps.forEach((regExp) => {
       // @ts-ignore - External library function
       findAndReplaceDOMText(node, {preset: 'prose', find: regExp, replace: function(portion, match) {
-        return filter.replaceText(match[0]);
+        if (portion.index === 0) { // Replace the whole match on the first portion and skip the rest
+          return filter.replaceText(match[0]);
+        } else {
+          return '';
+        }
       }});
     });
   }
