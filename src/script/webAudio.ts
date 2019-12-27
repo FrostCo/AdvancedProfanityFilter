@@ -110,11 +110,11 @@ export default class WebAudio {
           block += `
           if (node.nodeName == '${rule.tagName.toUpperCase()}') {
             let failed = false;
-            ${rule.className ? `if (!node.className || !node.className.includes('${rule.className}')) { failed = true; }` : ''}
-            ${rule.dataPropPresent ? `if (!failed && !node.dataset || !node.dataset.hasOwnProperty('${rule.dataPropPresent}')) { failed = true; }` : ''}
-            ${rule.hasChildrenElements ? 'if (!failed && typeof node.childElementCount !== "number" || node.childElementCount < 1) { failed = true; }' : ''}
-            ${rule.subtitleSelector ? `if (!failed && typeof node.querySelector !== 'function' || !node.querySelector('${rule.subtitleSelector}')) { failed = true; }` : ''}
-            ${rule.containsSelector ? `if (!failed && typeof node.querySelector !== 'function' || !node.querySelector('${rule.containsSelector}')) { failed = true; }` : ''}
+            ${rule.className ? `if (!failed && (!node.className || !node.className.includes('${rule.className}'))) { failed = true; }` : ''}
+            ${rule.dataPropPresent ? `if (!failed && (!node.dataset || !node.dataset.hasOwnProperty('${rule.dataPropPresent}'))) { failed = true; }` : ''}
+            ${rule.hasChildrenElements ? 'if (!failed && (typeof node.childElementCount !== "number" || node.childElementCount < 1)) { failed = true; }' : ''}
+            ${rule.subtitleSelector ? `if (!failed && (typeof node.querySelector !== 'function' || !node.querySelector('${rule.subtitleSelector}'))) { failed = true; }` : ''}
+            ${rule.containsSelector ? `if (!failed && (typeof node.querySelector !== 'function' || !node.querySelector('${rule.containsSelector}'))) { failed = true; }` : ''}
             if (!failed) {
               return ${index};
             }
@@ -309,9 +309,9 @@ export default class WebAudio {
                 // Some sites don't care if textTrack.mode = 'hidden' and will continue showing.
                 // This is a fallback (not preferred) method that can be used for hiding the cues.
                 if (
-                  instance.showSubtitles === 1 && !filtered ||
-                  instance.showSubtitles === 2 && filtered ||
-                  instance.showSubtitles === 3
+                  (instance.showSubtitles === 1 && !filtered)
+                  || (instance.showSubtitles === 2 && filtered)
+                  || instance.showSubtitles === 3
                 ) {
                   for (let i = 0; i < textTrack.activeCues.length; i++) {
                     let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;

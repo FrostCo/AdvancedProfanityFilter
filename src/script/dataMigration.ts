@@ -54,7 +54,8 @@ export default class DataMigration {
       twats: { matchMethod: 0, repeat: true, sub: 'dumbos' }
     };
 
-    if (cfg.words[originalWord]
+    if (
+      cfg.words[originalWord]
       && cfg.words[originalWord].matchMethod == originalWordConf.matchMethod
       && cfg.words[originalWord].sub == originalWordConf.sub
     ) {

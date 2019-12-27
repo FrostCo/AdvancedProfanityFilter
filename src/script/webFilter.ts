@@ -33,7 +33,11 @@ export default class WebFilter extends Filter {
       // @ts-ignore - External library function
       findAndReplaceDOMText(node, {preset: 'prose', find: regExp, replace: function(portion, match) {
         // console.log('[APF] Advanced node match:', node.textContent); // Debug: Filter - Advanced match
-        return filter.replaceText(match[0]);
+        if (portion.index === 0) { // Replace the whole match on the first portion and skip the rest
+          return filter.replaceText(match[0]);
+        } else {
+          return '';
+        }
       }});
     });
   }
@@ -141,7 +145,7 @@ export default class WebFilter extends Filter {
 
   cleanNodeText(node) {
     // console.log('[APF] New node to filter', node); // Debug: Filter
-    if (filter.advanced && node.parentNode || node == document) {
+    if (filter.advanced && (node.parentNode || node === document)) {
       filter.advancedReplaceText(node);
     } else {
       filter.cleanNode(node);
