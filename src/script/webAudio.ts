@@ -98,13 +98,8 @@ export default class WebAudio {
         return;
       }
 
-      if (!rule.mode) {
-        rule.mode = 'element';
-      }
-
-      if (rule.textParentSelector) {
-        rule.mode = 'text';
-      }
+      if (rule.mode === undefined) { rule.mode = 'element'; }
+      if (rule.textParentSelector) { rule.mode = 'text'; }
 
       // Allow rules to override global showSubtitles
       if (rule.showSubtitles === undefined) {
@@ -117,20 +112,7 @@ export default class WebAudio {
           this.cueRuleIds.push(index); // Save list of cue rule ids
           this.initCueRule(rule);
           break;
-        case 'text':
-          block += `
-            if (node.nodeName === '#text') {
-              let textParent = document.querySelector('${rule.textParentSelector}');
-              if (textParent && textParent.contains(node)) { return ${index}; }
-            }`;
-          break;
-        case 'watcher':
-          // NO-OP for supportedNode()
-          if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
-          this.watcherRuleIds.push(index);
-          break;
         case 'element':
-        default:
           if (!rule.tagName) { throw('tagName is required.'); }
           block += `
           if (node.nodeName == '${rule.tagName.toUpperCase()}') {
@@ -144,6 +126,18 @@ export default class WebAudio {
               return ${index};
             }
           }`;
+          break;
+        case 'text':
+          block += `
+            if (node.nodeName === '#text') {
+              let textParent = document.querySelector('${rule.textParentSelector}');
+              if (textParent && textParent.contains(node)) { return ${index}; }
+            }`;
+          break;
+        case 'watcher':
+          // NO-OP for supportedNode()
+          if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
+          this.watcherRuleIds.push(index);
           break;
       }
     });
