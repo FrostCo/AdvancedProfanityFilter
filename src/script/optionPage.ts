@@ -538,7 +538,7 @@ export default class OptionPage {
         OptionPage.showStatusModal('Custom Audio Sites saved.');
       }
     } catch(e) {
-      OptionPage.showErrorModal('Invalid custom audio sites');
+      OptionPage.showErrorModal('Failed to save custom audio sites. Please make sure it is valid JSON.');
     }
   }
 
