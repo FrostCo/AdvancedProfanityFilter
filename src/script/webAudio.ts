@@ -316,6 +316,12 @@ export default class WebAudio {
         } else {
           instance.unmute();
         }
+
+        switch (rule.showSubtitles) {
+          case 1: captions.style.display = result.modified ? '' : 'none'; break;
+          case 2: captions.style.display = result.modified ? 'none' : ''; break;
+          case 3: captions.style.display = 'none'; break;
+        }
       }
     }
   }
