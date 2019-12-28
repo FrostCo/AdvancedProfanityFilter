@@ -305,7 +305,8 @@ export default class WebAudio {
 
     if (captions && captions.textContent) {
       let combinedText = captions.textContent.trim();
-      if (combinedText) {
+      // Checking minimum length due to live-style captions ('#')
+      if (combinedText && combinedText.length > 2) {
         let result = instance.filter.replaceTextResult(combinedText);
         if (result.modified) {
           instance.mute();
