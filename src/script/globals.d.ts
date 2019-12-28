@@ -5,7 +5,7 @@ interface AudioRules {
   containsSelector?: string;        // [Element] node.querySelector() [Not commonly used]
   dataPropPresent?: string;         // [Element] node.dataset.hasOwnProperty()
   hasChildrenElements?: boolean;    // [Element] node.childElementCount > 0 [Not commonly used]
-  iframe?: boolean | undefined;     // [Watcher] pages to run on (true: only iframes, false: no iframes, undefined: all)
+  iframe?: boolean | undefined;     // [All] pages to run on (true: only iframes, false: no iframes, undefined: all)
   removeSubtitleSpacing?: boolean;  // [Element] Remove subtitle padding/margin when hiding
   subtitleSelector?: string;        // [Element,Watcher] *Used for Filtering*: node.querySelector()
   tagName?: string;                 // [Element] *REQUIRED*: node.nodeName

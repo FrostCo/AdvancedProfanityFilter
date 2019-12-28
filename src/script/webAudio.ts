@@ -92,6 +92,14 @@ export default class WebAudio {
     let block = '';
 
     this.rules.forEach((rule, index) => {
+      // Skip this rule if it doesn't apply to the current page
+      if (
+        (rule.iframe === true && this.filter.iframe == null)
+        || (rule.iframe === false && this.filter.iframe != null)
+      ) {
+        return;
+      }
+
       if (!rule.mode) {
         rule.mode = 'element';
       }
@@ -115,16 +123,8 @@ export default class WebAudio {
           break;
         case 'watcher':
           // NO-OP for supportedNode()
-          // Only run on appropriate pages
-          if (
-            rule.iframe === undefined
-            || (rule.iframe === true && this.filter.iframe != null)
-            || (rule.iframe === false && this.filter.iframe == null)
-          ) {
-            // Set defaults
-            if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
-            this.watcherRuleIds.push(index);
-          }
+          if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
+          this.watcherRuleIds.push(index);
           break;
         case 'element':
         default:
