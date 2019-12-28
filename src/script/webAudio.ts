@@ -14,11 +14,13 @@ export default class WebAudio {
   supportedPage: boolean;
   unmuteDelay: number;
   volume: number;
+  watcherRuleIds: number[];
   youTube: boolean;
   youTubeAutoSubsMin: number;
 
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.cueRuleIds = [];
+    this.watcherRuleIds = [];
     this.filter = filter;
     this.lastFilteredNode = null;
     this.muted = false;
@@ -48,7 +50,14 @@ export default class WebAudio {
 
       this.supportedNode = this.buildSupportedNodeFunction();
 
-      // Watch for videos when there are cue rules
+      // Mode: watcher
+      if (this.watcherRuleIds.length > 0) {
+        this.watcherRuleIds.forEach(ruleId => {
+          setInterval(this.watcher, this.rules[ruleId].checkInterval, this, ruleId);
+        });
+      }
+
+      // Mode: cue (check for videos)
       if (this.cueRuleIds.length > 0) { setInterval(this.watchForVideo, 250, this); }
     }
   }
@@ -103,6 +112,19 @@ export default class WebAudio {
               let textParent = document.querySelector('${rule.textParentSelector}');
               if (textParent && textParent.contains(node)) { return ${index}; }
             }`;
+          break;
+        case 'watcher':
+          // NO-OP for supportedNode()
+          // Only run on appropriate pages
+          if (
+            rule.iframe === undefined
+            || (rule.iframe === true && this.filter.iframe != null)
+            || (rule.iframe === false && this.filter.iframe == null)
+          ) {
+            // Set defaults
+            if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
+            this.watcherRuleIds.push(index);
+          }
           break;
         case 'element':
         default:
@@ -272,6 +294,23 @@ export default class WebAudio {
             video.volume = this.volume;
           }
           break;
+        }
+      }
+    }
+  }
+
+  watcher(instance: WebAudio, ruleId = 0) {
+    let rule = instance.rules[ruleId];
+    let captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
+
+    if (captions && captions.textContent) {
+      let combinedText = captions.textContent.trim();
+      if (combinedText) {
+        let result = instance.filter.replaceTextResult(combinedText);
+        if (result.modified) {
+          instance.mute();
+        } else {
+          instance.unmute();
         }
       }
     }
