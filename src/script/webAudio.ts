@@ -8,7 +8,6 @@ export default class WebAudio {
   muted: boolean;
   muteMethod: number;
   rules: AudioRules[];
-  showSubtitles: number;
   sites: { [site: string]: AudioRules[] };
   supportedNode: Function;
   supportedPage: boolean;
@@ -25,7 +24,6 @@ export default class WebAudio {
     this.lastFilteredNode = null;
     this.muted = false;
     this.muteMethod = filter.cfg.muteMethod;
-    this.showSubtitles = filter.cfg.showSubtitles;
     if (
       filter.cfg.customAudioSites
       && typeof filter.cfg.customAudioSites == 'object'
@@ -108,6 +106,11 @@ export default class WebAudio {
         rule.mode = 'text';
       }
 
+      // Allow rules to override global showSubtitles
+      if (rule.showSubtitles === undefined) {
+        rule.showSubtitles = this.filter.cfg.showSubtitles;
+      }
+
       switch(rule.mode) {
         case 'cue':
           // NO-OP for supportedNode()
@@ -167,7 +170,7 @@ export default class WebAudio {
     });
 
     // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
-    switch (this.showSubtitles) {
+    switch (rule.showSubtitles) {
       case 1: if (!filtered) { this.hideElementSubtitles(subtitles, rule); } break;
       case 2: if (filtered) { this.hideElementSubtitles(subtitles, rule); } break;
       case 3: this.hideElementSubtitles(subtitles, rule); break;
@@ -325,7 +328,7 @@ export default class WebAudio {
         let textTrack = instance.getVideoTextTrack(video, rule.videoCueLanguage, rule.videoCueRequireShowing);
 
         if (textTrack && !textTrack.oncuechange) {
-          if (!rule.videoCueHideCues && instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }
+          if (!rule.videoCueHideCues && rule.showSubtitles == 3) { textTrack.mode = 'hidden'; }
 
           textTrack.oncuechange = () => {
             if (textTrack.activeCues && textTrack.activeCues.length > 0) {
@@ -349,9 +352,9 @@ export default class WebAudio {
                 // Some sites don't care if textTrack.mode = 'hidden' and will continue showing.
                 // This is a fallback (not preferred) method that can be used for hiding the cues.
                 if (
-                  (instance.showSubtitles === 1 && !filtered)
-                  || (instance.showSubtitles === 2 && filtered)
-                  || instance.showSubtitles === 3
+                  (rule.showSubtitles === 1 && !filtered)
+                  || (rule.showSubtitles === 2 && filtered)
+                  || rule.showSubtitles === 3
                 ) {
                   for (let i = 0; i < textTrack.activeCues.length; i++) {
                     let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
@@ -362,12 +365,12 @@ export default class WebAudio {
                 }
               } else {
                 if (filtered) {
-                  switch (instance.showSubtitles) {
+                  switch (rule.showSubtitles) {
                     case 1: textTrack.mode = 'showing'; break;
                     case 2: textTrack.mode = 'hidden'; break;
                   }
                 } else {
-                  switch (instance.showSubtitles) {
+                  switch (rule.showSubtitles) {
                     case 1: textTrack.mode = 'hidden'; break;
                     case 2: textTrack.mode = 'showing'; break;
                   }
