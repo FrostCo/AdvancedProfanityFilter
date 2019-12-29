@@ -147,6 +147,15 @@ describe('Filter', function() {
         expect(filter.replaceText('The best things are always the best.')).to.equal('____e best things are always the best.');
       });
 
+      it('Should not filter a whitelisted word', function() {
+        let filter = new Filter;
+        let words = { master: { matchMethod: 1, repeat: true, sub: 'padawan' } };
+        filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 0, wordWhitelist: ['Master'] });
+        filter.init();
+        expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the m***** outsmart the Master?');
+        expect(filter.counter).to.equal(1);
+      });
+
       describe('Unicode characters', function() {
         it('Should filter an exact word and preserveFirst', function() {
           let filter = new Filter;
@@ -188,6 +197,15 @@ describe('Filter', function() {
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: true });
         filter.init();
         expect(filter.replaceText('I love having good examples as an Example.')).to.equal('I love having good examples as an [Demo].');
+      });
+
+      it('Should not filter a whitelisted word', function() {
+        let filter = new Filter;
+        let words = { master: { matchMethod: 2, repeat: true, sub: 'padawan' } };
+        filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 1, globalMatchMethod: 3, substitutionMark: false, preserveCase: true, wordWhitelist: ['Master'] });
+        filter.init();
+        expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the padawan outsmart the Master?');
+        expect(filter.counter).to.equal(1);
       });
 
       it('Should filter an exact word with substitions marked and preserveCase with repeated characters', function() {
@@ -303,6 +321,15 @@ describe('Filter', function() {
         filter.init();
         expect(filter.replaceText('I love This! Do you?')).to.equal('I love Do you?');
         expect(filter.replaceText('I love this!')).to.equal('I love');
+      });
+
+      it('Should not filter a whitelisted word', function() {
+        let filter = new Filter;
+        let words = { master: { matchMethod: 1, repeat: true, sub: 'padawan' } };
+        filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 2, wordWhitelist: ['Master'] });
+        filter.init();
+        expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the outsmart the Master?');
+        expect(filter.counter).to.equal(1);
       });
 
       describe('Unicode characters', function() {

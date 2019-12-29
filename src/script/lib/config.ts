@@ -26,6 +26,7 @@ export default class Config {
   showUpdateNotification: boolean;
   substitutionMark: boolean;
   words: { [key: string]: WordOptions };
+  wordWhitelist: string[];
   youTubeAutoSubsMin: number;
 
   static readonly filterMethods = {
@@ -69,6 +70,7 @@ export default class Config {
     showSummary: true,
     showUpdateNotification: true,
     substitutionMark: false,
+    wordWhitelist: [],
     youTubeAutoSubsMin: 0
   };
 

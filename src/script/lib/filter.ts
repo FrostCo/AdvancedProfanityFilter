@@ -6,11 +6,13 @@ export class Filter {
   counter: number;
   wordList: string[];
   wordRegExps: RegExp[];
+  wordWhitelist: string[];
 
   constructor() {
     this.counter = 0;
     this.wordList = [];
     this.wordRegExps = [];
+    this.wordWhitelist = [];
   }
 
   foundMatch(word) {
@@ -27,6 +29,7 @@ export class Filter {
     Word.initWords(this.cfg.words, filterOptions, wordDefaults);
     this.wordList = Word.list;
     this.wordRegExps = Word.regExps;
+    this.wordWhitelist = this.cfg.wordWhitelist;
   }
 
   // Config Dependencies: filterMethod, wordList,
@@ -39,6 +42,7 @@ export class Filter {
       case 0: // Censor
         self.wordRegExps.forEach((regExp, index) => {
           str = str.replace(regExp, function(match, ...args): string {
+            if (self.wordWhitelist.includes(match)) { return match; }
             if (stats) { self.foundMatch(self.wordList[index]); }
             let useCaptureGroups = (args.length > 2);
             // let string = args.pop();
@@ -69,7 +73,9 @@ export class Filter {
       case 1: // Substitute
         self.wordRegExps.forEach((regExp, index) => {
           str = str.replace(regExp, function(match, ...args): string {
+            if (self.wordWhitelist.includes(match)) { return match; }
             if (stats) { self.foundMatch(self.wordList[index]); }
+
             // Workaround for unicode word boundaries and regexp that use capture groups
             let useCaptureGroups = (args.length > 2);
             if (useCaptureGroups) { match = args[1]; }
@@ -97,12 +103,14 @@ export class Filter {
       case 2: // Remove
         self.wordRegExps.forEach((regExp, index) => {
           str = str.replace(regExp, function(match, ...args): string {
-            if (stats) { self.foundMatch(self.wordList[index]); }
+            if (self.wordWhitelist.includes(match.trim())) { return match; }
+
             // Workaround for unicode word boundaries and regexp that use capture groups
             let useCaptureGroups = (args.length > 2);
-            if (useCaptureGroups) { match = args[1]; }
+            if (stats) { self.foundMatch(self.wordList[index]); }
 
             if (useCaptureGroups) {
+              match = args[1];
               // Workaround for unicode word boundaries
               if (Word.whitespaceRegExp.test(args[0]) && Word.whitespaceRegExp.test(args[2])) { // If both surrounds are whitespace (only need 1)
                 return args[0];
