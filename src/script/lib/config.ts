@@ -112,11 +112,8 @@ export default class Config {
   static readonly _maxWords = 100;
   static readonly _wordsPattern = /^_words\d+/;
 
-  constructor(config) {
-    if (typeof config === 'undefined') {
-      throw new Error('Cannot be called directly. call build()');
-    }
-    for(let k in config) this[k]=config[k];
+  constructor(data: object = {}) {
+    Object.assign(this, Config._defaults, data);
   }
 
   addWord(str: string, options?: WordOptions) {

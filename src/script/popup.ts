@@ -8,8 +8,10 @@ class Popup {
   protected: boolean;
   filterMethodContainer: Element;
 
+  static readonly _requiredConfig =  ['advancedDomains', 'disabledDomains', 'enabledDomains', 'enabledDomainsOnly', 'filterMethod', 'password'];
+
   static async load(instance: Popup) {
-    instance.cfg = await WebConfig.build(['advancedDomains', 'disabledDomains', 'enabledDomains', 'enabledDomainsOnly', 'filterMethod', 'password']);
+    instance.cfg = await WebConfig.build(Popup._requiredConfig);
     instance.domain = new Domain();
     await instance.domain.load();
     return instance;
@@ -36,7 +38,7 @@ class Popup {
     let popup = this;
     if (!popup.cfg[key].includes(popup.domain.hostname)) {
       popup.cfg[key].push(popup.domain.hostname);
-      let error = await popup.cfg.save();
+      let error = await popup.cfg.save(key);
       if (!error) {
         switch(key) {
           case 'enabledDomains':
@@ -53,13 +55,13 @@ class Popup {
     }
   }
 
-  filterMethodSelect() {
+  async filterMethodSelect() {
     let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
-    chrome.storage.sync.set({filterMethod: filterMethodSelect.selectedIndex}, function() {
-      if (!chrome.runtime.lastError) {
-        chrome.tabs.reload();
-      }
-    });
+    popup.cfg.filterMethod = filterMethodSelect.selectedIndex;
+    let error = await popup.cfg.save('filterMethod');
+    if (!error) {
+      chrome.tabs.reload();
+    }
   }
 
   async populateOptions(event?: Event) {
@@ -131,7 +133,7 @@ class Popup {
 
     if (newDomainList.length < popup.cfg[key].length) {
       popup.cfg[key] = newDomainList;
-      let error = await popup.cfg.save();
+      let error = await popup.cfg.save(key);
       if (!error) {
         switch(key) {
           case 'enabledDomains':

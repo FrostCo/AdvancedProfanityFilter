@@ -63,14 +63,6 @@ describe('Filter', function() {
         expect(filter.wordRegExps).to.eql([/placeholder/gi, /e+x+a+m+p+l+e+/gi, /sample/gi, /w+o+r+d+/gi]);
       });
 
-      it('should return RegExp list for global part match (default)', function() {
-        let filter = new Filter;
-        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0 });
-        filter.init();
-        expect(filter.wordRegExps.length).to.equal(4);
-        expect(filter.wordRegExps).to.eql([/placeholder/gi, /e+x+a+m+p+l+e+/gi, /sample/gi, /w+o+r+d+/gi]);
-      });
-
       it('should return RegExp list for global whole match (substitution filter)', function() {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 2 });
@@ -124,7 +116,7 @@ describe('Filter', function() {
 
       it('Should filter a partial word ending with punctuation', function() {
         let filter = new Filter;
-        filter.cfg = new Config({ words: {'this!': { matchMethod: 1 }}, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3 });
+        filter.cfg = new Config({ words: {'this!': { matchMethod: 1 }}, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3, preserveFirst: false });
         filter.init();
         expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love all_____ Do you?');
         expect(filter.replaceText('I love this! Do you?')).to.equal('I love _____ Do you?');
@@ -141,7 +133,7 @@ describe('Filter', function() {
 
       it('Should filter a whole word ending with punctuation', function() {
         let filter = new Filter;
-        filter.cfg = new Config({ words: {'this!': { matchMethod: 2 }}, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3 });
+        filter.cfg = new Config({ words: {'this!': { matchMethod: 2 }}, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3, preserveFirst: false });
         filter.init();
         expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love ________ Do you?');
         expect(filter.replaceText('I love this! Do you?')).to.equal('I love _____ Do you?');
