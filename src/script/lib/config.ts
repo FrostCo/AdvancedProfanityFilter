@@ -25,7 +25,7 @@ export default class Config {
   showSummary: boolean;
   showUpdateNotification: boolean;
   substitutionMark: boolean;
-  words: { [key: string]: WordOptions; };
+  words: { [key: string]: WordOptions };
   youTubeAutoSubsMin: number;
 
   static readonly filterMethods = {
