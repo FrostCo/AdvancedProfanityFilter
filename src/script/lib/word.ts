@@ -16,6 +16,7 @@ export default class Word {
   static readonly nonWordRegExp = new RegExp('^\\s*[^\\w]+\\s*$', 'g');
   static readonly whitespaceRegExp = /^\s+$/;
 
+  static all = [];
   static defaultWordOptions = Word._defaultWordOptions;
   static filterMethod = Word._defaultFilterOptions.filterMethod;
   static globalMatchMethod = Word._defaultFilterOptions.globalMatchMethod;
@@ -51,8 +52,17 @@ export default class Word {
     return str.replace(Word._escapeRegExp, '\\$&');
   }
 
+  static find(value: string|number): Word {
+    if (typeof value === 'string') {
+      return Word.all[Word.list.indexOf(value)];
+    } else if (typeof value === 'number') {
+      return Word.all[value];
+    }
+  }
+
   static initWords(words, filterOptions: any = {}, wordDefaults = {}) {
     // Sort the words array by longest (most-specific) first
+    Word.all = [];
     Word.list = [];
     Word.regExps = [];
     filterOptions = Object.assign(Word._defaultFilterOptions, filterOptions);
@@ -66,7 +76,9 @@ export default class Word {
     });
 
     Word.list.forEach(word => {
-      Word.regExps.push(new Word(word, words[word]).buildRegexp());
+      let instance = new Word(word, words[word]);
+      Word.all.push(instance);
+      Word.regExps.push(instance.buildRegexp());
     });
   }
 
@@ -77,7 +89,7 @@ export default class Word {
     this.matchCapitalized = options.capital === undefined ? Word.defaultWordOptions.capital : options.capital;
     this.unicode = Word.containsDoubleByte(word);
     this.matchMethod = Word.globalMatchMethod === 3 ? options.matchMethod : Word.globalMatchMethod;
-    if (this.matchMethod === undefined) { Word.defaultWordOptions.matchMethod };
+    if (this.matchMethod === undefined) { Word.defaultWordOptions.matchMethod; }
     this.escaped = Word.escapeRegExp(this.value);
   }
 

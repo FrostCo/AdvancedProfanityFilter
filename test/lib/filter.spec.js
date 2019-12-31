@@ -156,6 +156,15 @@ describe('Filter', function() {
         expect(filter.counter).to.equal(1);
       });
 
+      it('Should not filter a whitelisted word (partial match)', function() {
+        let filter = new Filter;
+        let words = { more: { matchMethod: 1, repeat: true } };
+        filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 0, wordWhitelist: ['smores'] });
+        filter.init();
+        expect(filter.replaceText('Would you like smore smores?')).to.equal('Would you like sm*** smores?');
+        expect(filter.counter).to.equal(1);
+      });
+
       describe('Unicode characters', function() {
         it('Should filter an exact word and preserveFirst', function() {
           let filter = new Filter;
@@ -187,6 +196,15 @@ describe('Filter', function() {
           filter.cfg.words['словен'] = { matchMethod: 2, repeat: false };
           filter.init();
           expect(filter.replaceText('За пределами Словении этнические словенцы компактно')).to.equal('За пределами ******** этнические ******** компактно');
+        });
+
+        it('Should not filter a whitelisted word (partial match)', function() {
+          let filter = new Filter;
+          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', preserveFirst: false, preserveLast: false, wordWhitelist: ['словенцы'] });
+          filter.cfg.words['ловен'] = { matchMethod: 1, repeat: false };
+          filter.init();
+          expect(filter.replaceText('За пределами Словении этнические словенцы компактно')).to.equal('За пределами С*****ии этнические словенцы компактно');
+          expect(filter.counter).to.equal(1);
         });
       });
     });
@@ -323,9 +341,18 @@ describe('Filter', function() {
         expect(filter.replaceText('I love this!')).to.equal('I love');
       });
 
-      it('Should not filter a whitelisted word', function() {
+      it('Should not filter a whitelisted word (partial match)', function() {
         let filter = new Filter;
-        let words = { master: { matchMethod: 1, repeat: true, sub: 'padawan' } };
+        let words = { more: { matchMethod: 1, repeat: true } };
+        filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 2, wordWhitelist: ['smores'] });
+        filter.init();
+        expect(filter.replaceText('Would you like smore smores?')).to.equal('Would you like smores?');
+        expect(filter.counter).to.equal(1);
+      });
+
+      it('Should not filter a whitelisted word (exact match)', function() {
+        let filter = new Filter;
+        let words = { master: { matchMethod: 0, repeat: true, sub: 'padawan' } };
         filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 2, wordWhitelist: ['Master'] });
         filter.init();
         expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the outsmart the Master?');

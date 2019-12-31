@@ -15,6 +15,43 @@ export class Filter {
     this.wordWhitelist = [];
   }
 
+  checkWhitelist(match, string, matchStartIndex, index): boolean {
+    let self = this;
+    if (self.wordWhitelist.length > 0) {
+      if (self.wordWhitelist.includes(match)) { return true; }
+      let word = Word.find(index);
+      let partialWhiteList = true; // TODO: Expose this as an option?
+      if (partialWhiteList) {
+        if (word.matchMethod === 1) {
+          let wordOptions: WordOptions = {
+            matchMethod: 2,
+            sub: word.sub,
+            capital: word.matchCapitalized,
+            repeat: word.matchRepeated
+          };
+          let wholeWordRegExp = new Word(match, wordOptions).buildRegexp();
+
+          // let found = false;
+          let result = wholeWordRegExp.exec(string);
+          while (result) {
+            let resultMatch = result.length == 4 ? result[2]: result[0];
+            let resultIndex = result.length == 4 ? result.index + result[1].length: result.index;
+            // Make sure this is the correct match
+            if (
+              resultIndex <= matchStartIndex
+              && (resultIndex + resultMatch.length) >= (matchStartIndex + match.length)
+            ) {
+              if (self.wordWhitelist.includes(resultMatch)) { return true; }
+            }
+            result = wholeWordRegExp.exec(string);
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
   foundMatch(word) {
     this.counter++;
   }
@@ -42,15 +79,20 @@ export class Filter {
       case 0: // Censor
         self.wordRegExps.forEach((regExp, index) => {
           str = str.replace(regExp, function(match, ...args): string {
-            if (self.wordWhitelist.includes(match)) { return match; }
-            if (stats) { self.foundMatch(self.wordList[index]); }
-            let useCaptureGroups = (args.length > 2);
-            // let string = args.pop();
-            // let offset = args.pop();
-            // let captureGroups = args;
+            let string = args.pop();
+            let matchStartIndex = args.pop();
+            let captureGroups = args;
+            let useCaptureGroups = captureGroups.length > 0;
             // Workaround for unicode word boundaries and regexp that use capture groups
-            if (useCaptureGroups) { match = args[1]; }
+            if (useCaptureGroups) { match = captureGroups[1]; }
 
+            // Check for whitelisted match
+            if (self.checkWhitelist(match, string, matchStartIndex, index)) {
+              return match;
+            }
+
+            // Filter
+            if (stats) { self.foundMatch(self.wordList[index]); }
             let censoredString = '';
             let censorLength = self.cfg.censorFixedLength > 0 ? self.cfg.censorFixedLength : match.length;
 
@@ -64,7 +106,7 @@ export class Filter {
               censoredString = self.cfg.censorCharacter.repeat(censorLength);
             }
 
-            if (useCaptureGroups) { censoredString = args[0] + censoredString + args[2]; } // Workaround for unicode word boundaries
+            if (useCaptureGroups) { censoredString = captureGroups[0] + censoredString + captureGroups[2]; } // Workaround for unicode word boundaries
             // console.log('Censor match:', match, censoredString); // DEBUG
             return censoredString;
           });
@@ -73,12 +115,20 @@ export class Filter {
       case 1: // Substitute
         self.wordRegExps.forEach((regExp, index) => {
           str = str.replace(regExp, function(match, ...args): string {
-            if (self.wordWhitelist.includes(match)) { return match; }
-            if (stats) { self.foundMatch(self.wordList[index]); }
-
+            let string = args.pop();
+            let matchStartIndex = args.pop();
+            let captureGroups = args;
+            let useCaptureGroups = captureGroups.length > 0;
             // Workaround for unicode word boundaries and regexp that use capture groups
-            let useCaptureGroups = (args.length > 2);
-            if (useCaptureGroups) { match = args[1]; }
+            if (useCaptureGroups) { match = captureGroups[1]; }
+
+            // Check for whitelisted match
+            if (self.checkWhitelist(match, string, matchStartIndex, index)) {
+              return match;
+            }
+
+            // Filter
+            if (stats) { self.foundMatch(self.wordList[index]); }
             let sub = self.cfg.words[self.wordList[index]].sub || self.cfg.defaultSubstitution;
 
             // Make substitution match case of original match
@@ -94,7 +144,7 @@ export class Filter {
               sub = '[' + sub + ']';
             }
 
-            if (useCaptureGroups) { sub = args[0] + sub + args[2]; } // Workaround for unicode word boundaries
+            if (useCaptureGroups) { sub = captureGroups[0] + sub + captureGroups[2]; } // Workaround for unicode word boundaries
             // console.log('Substitute match:', match, sub); // DEBUG
             return sub;
           });
@@ -103,19 +153,27 @@ export class Filter {
       case 2: // Remove
         self.wordRegExps.forEach((regExp, index) => {
           str = str.replace(regExp, function(match, ...args): string {
-            if (self.wordWhitelist.includes(match.trim())) { return match; }
-
+            let string = args.pop();
+            let matchStartIndex = args.pop();
+            let captureGroups = args;
+            let useCaptureGroups = captureGroups.length > 0;
             // Workaround for unicode word boundaries and regexp that use capture groups
-            let useCaptureGroups = (args.length > 2);
-            if (stats) { self.foundMatch(self.wordList[index]); }
+            if (useCaptureGroups) { match = captureGroups[1]; }
 
+            // Check for whitelisted match
+            if (self.checkWhitelist(match.trim(), string, matchStartIndex, index)) {
+              return match;
+            }
+
+            // Filter
+            if (stats) { self.foundMatch(self.wordList[index]); }
             if (useCaptureGroups) {
-              match = args[1];
+              match = captureGroups[1];
               // Workaround for unicode word boundaries
-              if (Word.whitespaceRegExp.test(args[0]) && Word.whitespaceRegExp.test(args[2])) { // If both surrounds are whitespace (only need 1)
-                return args[0];
-              } else if (Word.nonWordRegExp.test(args[0]) || Word.nonWordRegExp.test(args[2])) { // If there is more than just whitesapce (ex. ',')
-                return (args[0] + args[2]).trim();
+              if (Word.whitespaceRegExp.test(captureGroups[0]) && Word.whitespaceRegExp.test(captureGroups[2])) { // If both surrounds are whitespace (only need 1)
+                return captureGroups[0];
+              } else if (Word.nonWordRegExp.test(captureGroups[0]) || Word.nonWordRegExp.test(captureGroups[2])) { // If there is more than just whitesapce (ex. ',')
+                return (captureGroups[0] + captureGroups[2]).trim();
               } else {
                 return '';
               }
