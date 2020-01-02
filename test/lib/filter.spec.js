@@ -159,9 +159,9 @@ describe('Filter', function() {
       it('Should not filter a whitelisted word (partial match)', function() {
         let filter = new Filter;
         let words = { more: { matchMethod: 1, repeat: true } };
-        filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 0, wordWhitelist: ['smores'] });
+        filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 0, wordWhitelist: ['smore'] });
         filter.init();
-        expect(filter.replaceText('Would you like smore smores?')).to.equal('Would you like sm*** smores?');
+        expect(filter.replaceText('Would you like smore smores?')).to.equal('Would you like smore sm***s?');
         expect(filter.counter).to.equal(1);
       });
 

@@ -32,8 +32,8 @@ export class Filter {
           let wholeWordRegExp = new Word(match, wordOptions).buildRegexp();
 
           // let found = false;
-          let result = wholeWordRegExp.exec(string);
-          while (result) {
+          let result;
+          while ((result = wholeWordRegExp.exec(string)) !== null) {
             let resultMatch = result.length == 4 ? result[2]: result[0];
             let resultIndex = result.length == 4 ? result.index + result[1].length: result.index;
             // Make sure this is the correct match
@@ -41,9 +41,8 @@ export class Filter {
               resultIndex <= matchStartIndex
               && (resultIndex + resultMatch.length) >= (matchStartIndex + match.length)
             ) {
-              if (self.wordWhitelist.includes(resultMatch)) { return true; }
+              return self.wordWhitelist.includes(resultMatch);
             }
-            result = wholeWordRegExp.exec(string);
           }
         }
       }
