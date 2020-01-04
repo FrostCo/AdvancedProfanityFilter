@@ -6,24 +6,22 @@ export default class WebAudio {
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement;
   muted: boolean;
-  muteMethod: number;
   rules: AudioRules[];
-  showSubtitles: number;
   sites: { [site: string]: AudioRules[] };
   supportedNode: Function;
   supportedPage: boolean;
   unmuteDelay: number;
   volume: number;
+  watcherRuleIds: number[];
   youTube: boolean;
   youTubeAutoSubsMin: number;
 
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.cueRuleIds = [];
+    this.watcherRuleIds = [];
     this.filter = filter;
     this.lastFilteredNode = null;
     this.muted = false;
-    this.muteMethod = filter.cfg.muteMethod;
-    this.showSubtitles = filter.cfg.showSubtitles;
     if (
       filter.cfg.customAudioSites
       && typeof filter.cfg.customAudioSites == 'object'
@@ -48,7 +46,14 @@ export default class WebAudio {
 
       this.supportedNode = this.buildSupportedNodeFunction();
 
-      // Watch for videos when there are cue rules
+      // Mode: watcher
+      if (this.watcherRuleIds.length > 0) {
+        this.watcherRuleIds.forEach(ruleId => {
+          setInterval(this.watcher, this.rules[ruleId].checkInterval, this, ruleId);
+        });
+      }
+
+      // Mode: cue (check for videos)
       if (this.cueRuleIds.length > 0) { setInterval(this.watchForVideo, 250, this); }
     }
   }
@@ -83,13 +88,21 @@ export default class WebAudio {
     let block = '';
 
     this.rules.forEach((rule, index) => {
-      if (!rule.mode) {
-        rule.mode = 'element';
+      // Skip this rule if it doesn't apply to the current page
+      if (
+        (rule.iframe === true && this.filter.iframe == null)
+        || (rule.iframe === false && this.filter.iframe != null)
+      ) {
+        return;
       }
 
-      if (rule.textParentSelector) {
-        rule.mode = 'text';
-      }
+      // Setup rule defaults
+      if (rule.mode === undefined) { rule.mode = 'element'; }
+      if (rule.textParentSelector) { rule.mode = 'text'; }
+
+      // Allow rules to override global settings
+      if (rule.muteMethod === undefined) { rule.muteMethod = this.filter.cfg.muteMethod; }
+      if (rule.showSubtitles === undefined) { rule.showSubtitles = this.filter.cfg.showSubtitles; }
 
       switch(rule.mode) {
         case 'cue':
@@ -97,15 +110,7 @@ export default class WebAudio {
           this.cueRuleIds.push(index); // Save list of cue rule ids
           this.initCueRule(rule);
           break;
-        case 'text':
-          block += `
-            if (node.nodeName === '#text') {
-              let textParent = document.querySelector('${rule.textParentSelector}');
-              if (textParent && textParent.contains(node)) { return ${index}; }
-            }`;
-          break;
         case 'element':
-        default:
           if (!rule.tagName) { throw('tagName is required.'); }
           block += `
           if (node.nodeName == '${rule.tagName.toUpperCase()}') {
@@ -119,6 +124,18 @@ export default class WebAudio {
               return ${index};
             }
           }`;
+          break;
+        case 'text':
+          block += `
+            if (node.nodeName === '#text') {
+              let textParent = document.querySelector('${rule.textParentSelector}');
+              if (textParent && textParent.contains(node)) { return ${index}; }
+            }`;
+          break;
+        case 'watcher':
+          // NO-OP for supportedNode()
+          if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
+          this.watcherRuleIds.push(index);
           break;
       }
     });
@@ -139,13 +156,13 @@ export default class WebAudio {
       if (result.modified) {
         filtered = true;
         subtitle[textMethod] = result.filtered;
-        this.mute(); // Mute the audio if we haven't already
+        this.mute(rule.muteMethod); // Mute the audio if we haven't already
         if (subtitle.nodeName === '#text') { this.lastFilteredNode = subtitle; }
       }
     });
 
     // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
-    switch (this.showSubtitles) {
+    switch (rule.showSubtitles) {
       case 1: if (!filtered) { this.hideElementSubtitles(subtitles, rule); } break;
       case 2: if (filtered) { this.hideElementSubtitles(subtitles, rule); } break;
       case 3: this.hideElementSubtitles(subtitles, rule); break;
@@ -213,11 +230,11 @@ export default class WebAudio {
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
   }
 
-  mute(video?: HTMLVideoElement): void {
+  mute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
     if (!this.muted) {
       this.muted = true;
 
-      switch(this.muteMethod) {
+      switch(muteMethod) {
         case 0: // Mute tab
           chrome.runtime.sendMessage({ mute: true });
           break;
@@ -258,11 +275,11 @@ export default class WebAudio {
     }
   }
 
-  unmute(video?: HTMLVideoElement): void {
+  unmute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
     if (this.muted) {
       this.muted = false;
 
-      switch(this.muteMethod) {
+      switch(muteMethod) {
         case 0: // Mute tab
           chrome.runtime.sendMessage({ mute: false });
           break;
@@ -277,6 +294,30 @@ export default class WebAudio {
     }
   }
 
+  watcher(instance: WebAudio, ruleId = 0) {
+    let rule = instance.rules[ruleId];
+    let captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
+
+    if (captions && captions.textContent) {
+      let combinedText = captions.textContent.trim();
+      // Checking minimum length due to live-style captions ('#')
+      if (combinedText && combinedText.length > 2) {
+        let result = instance.filter.replaceTextResult(combinedText);
+        if (result.modified) {
+          instance.mute(rule.muteMethod);
+        } else {
+          instance.unmute(rule.muteMethod);
+        }
+
+        switch (rule.showSubtitles) {
+          case 1: captions.style.display = result.modified ? '' : 'none'; break;
+          case 2: captions.style.display = result.modified ? 'none' : ''; break;
+          case 3: captions.style.display = 'none'; break;
+        }
+      }
+    }
+  }
+
   watchForVideo(instance: WebAudio) {
     instance.cueRuleIds.forEach(cueRuleId => {
       let rule = instance.rules[cueRuleId] as AudioRules;
@@ -285,7 +326,7 @@ export default class WebAudio {
         let textTrack = instance.getVideoTextTrack(video, rule.videoCueLanguage, rule.videoCueRequireShowing);
 
         if (textTrack && !textTrack.oncuechange) {
-          if (!rule.videoCueHideCues && instance.showSubtitles == 3) { textTrack.mode = 'hidden'; }
+          if (!rule.videoCueHideCues && rule.showSubtitles == 3) { textTrack.mode = 'hidden'; }
 
           textTrack.oncuechange = () => {
             if (textTrack.activeCues && textTrack.activeCues.length > 0) {
@@ -299,19 +340,19 @@ export default class WebAudio {
                 }
                 if (activeCue.filtered) {
                   filtered = true;
-                  instance.mute(video);
+                  instance.mute(rule.muteMethod, video);
                 }
               }
 
-              if (!filtered) { instance.unmute(video); }
+              if (!filtered) { instance.unmute(rule.muteMethod, video); }
 
               if (rule.videoCueHideCues) {
                 // Some sites don't care if textTrack.mode = 'hidden' and will continue showing.
                 // This is a fallback (not preferred) method that can be used for hiding the cues.
                 if (
-                  (instance.showSubtitles === 1 && !filtered)
-                  || (instance.showSubtitles === 2 && filtered)
-                  || instance.showSubtitles === 3
+                  (rule.showSubtitles === 1 && !filtered)
+                  || (rule.showSubtitles === 2 && filtered)
+                  || rule.showSubtitles === 3
                 ) {
                   for (let i = 0; i < textTrack.activeCues.length; i++) {
                     let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
@@ -322,19 +363,19 @@ export default class WebAudio {
                 }
               } else {
                 if (filtered) {
-                  switch (instance.showSubtitles) {
+                  switch (rule.showSubtitles) {
                     case 1: textTrack.mode = 'showing'; break;
                     case 2: textTrack.mode = 'hidden'; break;
                   }
                 } else {
-                  switch (instance.showSubtitles) {
+                  switch (rule.showSubtitles) {
                     case 1: textTrack.mode = 'hidden'; break;
                     case 2: textTrack.mode = 'showing'; break;
                   }
                 }
               }
             } else { // No active cues
-              instance.unmute(video);
+              instance.unmute(rule.muteMethod, video);
             }
           };
         }
