@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 import Config from '../built/lib/config';
-import {Filter} from '../built/lib/filter';
+import Filter from '../built/lib/filter';
 
 const testWords = {
   'example': { matchMethod: 0, repeat: true, sub: 'demo' },

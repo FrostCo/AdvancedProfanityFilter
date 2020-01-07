@@ -1,7 +1,7 @@
 import Word from './word';
 import Config from './config';
 
-export class Filter {
+export default class Filter {
   cfg: Config;
   counter: number;
   wordList: string[];

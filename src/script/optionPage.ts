@@ -1,6 +1,6 @@
 import { dynamicList, escapeHTML, exportToFile, readFile } from './lib/helper';
 import WebConfig from './webConfig';
-import { Filter } from './lib/filter';
+import Filter from './lib/filter';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
