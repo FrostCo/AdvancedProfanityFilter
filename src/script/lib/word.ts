@@ -69,7 +69,7 @@ export default class Word {
     Word.filterMethod = filterOptions.filterMethod;
     // Special regexp for "Remove" filter, uses per-word matchMethods
     Word.globalMatchMethod = Word.filterMethod === 2 ? Word.globalMatchMethod = 3 : filterOptions.globalMatchMethod;
-    Word.defaultWordOptions = Object.assign(Word._defaultWordOptions, wordDefaults)
+    Word.defaultWordOptions = Object.assign(Word._defaultWordOptions, wordDefaults);
 
     Word.list = Object.keys(words).sort((a, b) => {
       return b.length - a.length;
@@ -125,7 +125,6 @@ export default class Word {
               return new RegExp('\\b' + word.processedPhrase() + '\\b', word.regexOptions());
             }
           }
-          break;
         case 2: // Whole: Match entire word that contains sub-string
           // /\b[\w-]*word[\w-]*\b/gi
           if (word.unicode) {
@@ -137,10 +136,8 @@ export default class Word {
           } else {
             return new RegExp('\\b[\\w-]*' + word.processedPhrase() + '[\\w-]*\\b', word.regexOptions());
           }
-          break;
         case 4: // Regular Expression (Advanced)
           return new RegExp(word.value, word.regexOptions());
-          break;
         case 1: // Partial: Match any part of a word (sub-string)
         default:
           if (Word.filterMethod === 2) { // Filter Method: Remove
@@ -159,14 +156,13 @@ export default class Word {
             // /word/gi
             return new RegExp(word.processedPhrase(), word.regexOptions());
           }
-          break;
       }
     } catch(e) {
       throw new Error('Failed to create RegExp for "' + word.value + '" - ' + e.name + ' ' + e.message);
     }
   }
 
-  canBeCapitalized(): boolean { return (!this.matchCapitalized && this.escaped[0].toUpperCase() != this.escaped[0]) }
+  canBeCapitalized(): boolean { return (!this.matchCapitalized && this.escaped[0].toUpperCase() != this.escaped[0]); }
 
   excludeCapitalized() {
     let word = this;
