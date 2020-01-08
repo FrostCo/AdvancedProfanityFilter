@@ -30,7 +30,7 @@
     "package": "npm run build && npm run package:bookmarklet && npm run package:extension",
     "test:cov": "npm run build:test && nyc --reporter=lcov --reporter=text node_modules/mocha/bin/_mocha",
     "test:debug": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
-    "test:lint": "eslint src/**/*.ts",
+    "test:lint": "eslint \"src/**/*.ts\"",
     "test:nocov": "node_modules/mocha/bin/_mocha",
     "test:types": "tsc --noEmit",
     "test": "npm run test:lint && npm run test:types && npm run test:cov",
@@ -114,7 +114,8 @@
       ],
       "quotes": [
         "error",
-        "single"
+        "single",
+        "avoid-escape"
       ],
       "semi": [
         "error",
