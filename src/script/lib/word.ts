@@ -93,6 +93,9 @@ export default class Word {
     this.escaped = Word.escapeRegExp(this.value);
   }
 
+  // True when capital = true, or the first character can't be upper cased
+  allowCapitalized(): boolean { return (this.matchCapitalized || (this.escaped[0].toUpperCase() === this.escaped[0])); }
+
   // Word must match exactly (not sub-string)
   // /\bword\b/gi
   buildRegexp(): RegExp {
@@ -162,69 +165,51 @@ export default class Word {
     }
   }
 
-  canBeCapitalized(): boolean { return (!this.matchCapitalized && this.escaped[0].toUpperCase() != this.escaped[0]); }
+  hasEdgePunctuation(): boolean { return !!(this.value.match(Word._edgePunctuationRegExp)); }
 
-  excludeCapitalized() {
+  processedPhrase(): string {
     let word = this;
-    let val = word.escaped[0];
-    if (word.matchRepeated) { val += '+'; }
+    let allowCapitalized = word.allowCapitalized();
+    let isEscaped = word.escaped.includes('\\');
 
-    for (let i = 1; i < word.escaped.length; i++) {
-      if (word.escaped[i] === '\\') {
-        // Character had to be escaped
-        val += word.escaped[i] + word.escaped[i + 1];
-        i++;
-      } else if (word.escaped[i].toUpperCase() == word.escaped[i]) {
-        // Character doesn't have an upper/lower case
+    let val = '';
+    for (let i = 0; i < word.escaped.length; i++) {
+      // If the current character is a '\', add it and then move to next character
+      if (isEscaped && word.escaped[i] === '\\') {
         val += word.escaped[i];
-        if (word.matchRepeated) { val += '+'; }
-      } else {
-        // Character should match upper and lower case variants
-        val += `[${word.escaped[i].toUpperCase()}${word.escaped[i]}]`;
+        i++;
       }
-      if (word.matchRepeated) { val += '+'; }
+
+      // Add the current character
+      val += word.escaped[i];
+
+      // 1. Capitalized
+      // Word: /w[oO][rR][dD]/g
+      if (!allowCapitalized) {
+        // If this isn't the first charcter, allow any case
+        if (i > 1 || (i === 1 && word.escaped[0] !== '\\')) {
+          let char = val[val.length - 1];
+          let charUpper = char.toUpperCase();
+          if (char !== charUpper) {
+            val = val.slice(0, val.length - 1) + '[' + charUpper + char + ']';
+          }
+        }
+      }
+
+      // 2. Repeating characters
+      // Word: /w+o+r+d+/g
+      if (word.matchRepeated) {
+        val += '+';
+      }
     }
 
     return val;
   }
 
-  hasEdgePunctuation(): boolean { return !!(this.value.match(Word._edgePunctuationRegExp)); }
-
-  processedPhrase(): string {
-    if (this.canBeCapitalized()) {
-      return this.excludeCapitalized();
-    } else {
-      if (this.matchRepeated) {
-        return this.repeatingCharacterRegexp();
-      } else {
-        return this.escaped;
-      }
-    }
-  }
-
   regexOptions() {
     let options = 'g';
     if (this.unicode) { options += 'u'; }
-    if (!this.canBeCapitalized()) { options += 'i'; }
+    if (this.allowCapitalized()) { options += 'i'; }
     return options;
-  }
-
-  // Word: /w+o+r+d+/gi
-  repeatingCharacterRegexp(): string {
-    let word = this;
-    if (word.escaped.includes('\\')) {
-      let repeat = '';
-      for (let i = 0; i < word.escaped.length; i++) {
-        if (word.escaped[i] === '\\') {
-          repeat += word.escaped[i] + word.escaped[i + 1] + '+';
-          i++;
-        } else {
-          repeat += word.escaped[i] + '+';
-        }
-      }
-      return repeat;
-    } else {
-      return word.value.split('').map(letter => letter + '+').join('');
-    }
   }
 }
