@@ -18,31 +18,30 @@ export default class Filter {
   checkWhitelist(match, string, matchStartIndex, index): boolean {
     let self = this;
     if (self.wordWhitelist.length > 0) {
+      // Check for exact/whole match
       if (self.wordWhitelist.includes(match)) { return true; }
-      let word = Word.find(index);
-      let partialWhiteList = true; // TODO: Expose this as an option?
-      if (partialWhiteList) {
-        if (word.matchMethod === 1) {
-          let wordOptions: WordOptions = {
-            matchMethod: 2,
-            sub: word.sub,
-            capital: word.matchCapitalized,
-            repeat: word.matchRepeated
-          };
-          let wholeWordRegExp = new Word(match, wordOptions).buildRegexp();
 
-          // let found = false;
-          let result;
-          while ((result = wholeWordRegExp.exec(string)) !== null) {
-            let resultMatch = result.length == 4 ? result[2]: result[0];
-            let resultIndex = result.length == 4 ? result.index + result[1].length: result.index;
-            // Make sure this is the correct match
-            if (
-              resultIndex <= matchStartIndex
-              && (resultIndex + resultMatch.length) >= (matchStartIndex + match.length)
-            ) {
-              return self.wordWhitelist.includes(resultMatch);
-            }
+      // Check for partial match
+      let word = Word.find(index);
+      if (word.matchMethod === 1) {
+        let wordOptions: WordOptions = {
+          matchMethod: 2,
+          sub: word.sub,
+          capital: word.matchCapitalized,
+          repeat: word.matchRepeated
+        };
+        let wholeWordRegExp = new Word(match, wordOptions).buildRegexp();
+
+        let result;
+        while ((result = wholeWordRegExp.exec(string)) !== null) {
+          let resultMatch = result.length == 4 ? result[2]: result[0];
+          let resultIndex = result.length == 4 ? result.index + result[1].length: result.index;
+          // Make sure this is the match we want to check
+          if (
+            resultIndex <= matchStartIndex
+            && (resultIndex + resultMatch.length) >= (matchStartIndex + match.length)
+          ) {
+            return self.wordWhitelist.includes(resultMatch);
           }
         }
       }
