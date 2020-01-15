@@ -27,7 +27,6 @@ export default class Filter {
         let wordOptions: WordOptions = {
           matchMethod: 2,
           sub: word.sub,
-          capital: word.matchCapitalized,
           repeat: word.matchRepeated
         };
         let wholeWordRegExp = new Word(match, wordOptions).buildRegexp();
@@ -56,8 +55,8 @@ export default class Filter {
 
   init() {
     let filterOptions = { filterMethod: this.cfg.filterMethod, globalMatchMethod: this.cfg.globalMatchMethod };
+    // TODO: This is getting repeated
     let wordDefaults = {
-      capital: true,
       matchMethod: this.cfg.defaultWordMatchMethod,
       repeat: this.cfg.defaultWordRepeat,
       separators: this.cfg.defaultWordSeparators,
@@ -79,6 +78,7 @@ export default class Filter {
       case 0: // Censor
         self.wordRegExps.forEach((regExp, index) => {
           str = str.replace(regExp, function(match, ...args): string {
+            // TODO: This is getting repeated too much
             let string = args.pop();
             let matchStartIndex = args.pop();
             let captureGroups = args;

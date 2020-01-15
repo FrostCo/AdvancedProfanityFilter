@@ -1,6 +1,5 @@
 export default class Word {
   escaped: string;
-  matchCapitalized: boolean;
   matchMethod: number;
   matchRepeated: boolean;
   matchSeparators: boolean;
@@ -9,7 +8,7 @@ export default class Word {
   value: string;
 
   private static readonly _defaultFilterOptions = { filterMethod: 1, globalMatchMethod: 3 }
-  private static readonly _defaultWordOptions = { capital: true, matchMethod: 0, repeat: false, separators: false, sub: 'censored' };
+  private static readonly _defaultWordOptions = { matchMethod: 0, repeat: false, separators: false, sub: 'censored' };
   private static readonly _edgePunctuationRegExp = /(^[,.'"!?%$]|[,.'"!?%$]$)/;
   private static readonly _escapeRegExp = /[\/\\^$*+?.()|[\]{}]/g;
   private static readonly _unicodeRegExp = /[^\u0000-\u00ff]/;
@@ -86,7 +85,6 @@ export default class Word {
 
   constructor(word: string, options: WordOptions) {
     this.value = word;
-    this.matchCapitalized = options.capital === undefined ? Word.defaultWordOptions.capital : options.capital;
     this.matchMethod = Word.globalMatchMethod === 3 ? options.matchMethod : Word.globalMatchMethod;
     this.matchRepeated = options.repeat === undefined ? Word.defaultWordOptions.repeat : options.repeat;
     this.matchSeparators = options.separators === undefined ? Word.defaultWordOptions.separators : options.separators;
@@ -95,9 +93,6 @@ export default class Word {
     if (this.matchMethod === undefined) { Word.defaultWordOptions.matchMethod; }
     this.escaped = Word.escapeRegExp(this.value);
   }
-
-  // True when capital = true, or the first character can't be upper cased
-  allowCapitalized(): boolean { return (this.matchCapitalized || (this.escaped[0].toUpperCase() === this.escaped[0])); }
 
   // Word must match exactly (not sub-string)
   // /\bword\b/gi
@@ -172,7 +167,6 @@ export default class Word {
 
   processedPhrase(): string {
     let word = this;
-    let allowCapitalized = word.allowCapitalized();
     let isEscaped = word.escaped.includes('\\');
 
     let val = '';
@@ -187,26 +181,13 @@ export default class Word {
       // Add the current character
       val += word.escaped[i];
 
-      // 1. Capitalized
-      // Word: /w[oO][rR][dD]/g
-      if (!allowCapitalized) {
-        // If this isn't the first charcter, allow any case
-        if (i > 1 || (i === 1 && word.escaped[0] !== '\\')) {
-          let char = val[val.length - 1];
-          let charUpper = char.toUpperCase();
-          if (char !== charUpper) {
-            val = val.slice(0, val.length - 1) + '[' + charUpper + char + ']';
-          }
-        }
-      }
-
-      // 2. Repeating characters
+      // Repeating characters
       // Word: /w+o+r+d+/g
       if (word.matchRepeated) {
         val += '+';
       }
 
-      // 3. Character separators
+      // Character separators
       // Word: /w[-_]*o[-_]*r[-_]*d*/g
       if (word.matchSeparators) {
         if (i != lastCharIndex) {
@@ -219,9 +200,8 @@ export default class Word {
   }
 
   regexOptions() {
-    let options = 'g';
+    let options = 'gi';
     if (this.unicode) { options += 'u'; }
-    if (this.allowCapitalized()) { options += 'i'; }
     return options;
   }
 }
