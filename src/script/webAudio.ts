@@ -1,5 +1,4 @@
 import WebFilter from './webFilter';
-import Filter from './lib/filter';
 import BookmarkletFilter from './bookmarkletFilter';
 
 export default class WebAudio {
