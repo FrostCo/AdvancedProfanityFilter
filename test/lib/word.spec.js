@@ -33,7 +33,7 @@ describe('Word', function() {
       it('should build RegExp with matchSeparators and matchRepeated', function() {
         Word.initWords({word: {matchMethod: 0, repeat: true, separators: true}});
         let wordRegExps = Word.regExps;
-        expect(wordRegExps[0]).to.eql(/\bw+[-_]*o+[-_]*r+[-_]*d+\b/gi);
+        expect(wordRegExps[0]).to.eql(/\bw+[-_ ]*o+[-_ ]*r+[-_ ]*d+\b/gi);
       });
 
       // Work around for lack of word boundary support for unicode characters
@@ -74,13 +74,13 @@ describe('Word', function() {
       it('should build RegExp with matchSeparators', function() {
         Word.initWords({word: {matchMethod: 1, separators: true}});
         let wordRegExps = Word.regExps;
-        expect(wordRegExps[0]).to.eql(/w[-_]*o[-_]*r[-_]*d/gi);
+        expect(wordRegExps[0]).to.eql(/w[-_ ]*o[-_ ]*r[-_ ]*d/gi);
       });
 
       it('should build RegExp with matchSeparators and matchRepeated', function() {
         Word.initWords({word: {matchMethod: 1, repeat: true, separators: true}});
         let wordRegExps = Word.regExps;
-        expect(wordRegExps[0]).to.eql(/w+[-_]*o+[-_]*r+[-_]*d+/gi);
+        expect(wordRegExps[0]).to.eql(/w+[-_ ]*o+[-_ ]*r+[-_ ]*d+/gi);
       });
     });
 
@@ -210,7 +210,7 @@ describe('Word', function() {
           let wordRegExps = Word.regExps;
           expect(wordRegExps[0].unicode).to.eql(true);
           expect(wordRegExps[0]).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*к+[-_]*у+[-_]*ч+[-_]*е+[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
+            new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*к+[-_ ]*у+[-_ ]*ч+[-_ ]*е+[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
           );
         });
       });

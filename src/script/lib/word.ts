@@ -14,7 +14,7 @@ export default class Word {
   private static readonly _unicodeRegExp = /[^\u0000-\u00ff]/;
   private static readonly _unicodeWordBoundary = '[\\s.,\'"+!?|-]';
   static readonly nonWordRegExp = new RegExp('^\\s*[^\\w]+\\s*$', 'g');
-  static readonly separatorsRegExp = '[-_]*';
+  static readonly separatorsRegExp = '[-_ ]*';
   static readonly whitespaceRegExp = /^\s+$/;
 
   static all = [];

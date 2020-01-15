@@ -120,6 +120,7 @@ describe('Filter', function() {
         filter.cfg = new Config({ words: words, filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
         filter.init();
         expect(filter.replaceText('I love to eat P-I-Z-___Z---A!')).to.equal('I love to eat P************A!');
+        expect(filter.replaceText('I love to eat P-I-Z-   Z---A!')).to.equal('I love to eat P************A!');
       });
 
       it('Should filter a partial word ending with punctuation', function() {
@@ -300,7 +301,9 @@ describe('Filter', function() {
         let words = { pizza: { matchMethod: 1, repeat: true, separators: true, sub: 'pie' } };
         filter.cfg = new Config({ words: words, filterMethod: 1, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
         filter.init();
+        expect(filter.replaceText('I love to eat P-I-Z-Z-A!')).to.equal('I love to eat PIE!');
         expect(filter.replaceText('I love to eat P-I-Z-___Z---A!')).to.equal('I love to eat PIE!');
+        expect(filter.replaceText('I love to eat P-I-Z_   Z---A!')).to.equal('I love to eat PIE!');
       });
 
       describe('Unicode characters', function() {
