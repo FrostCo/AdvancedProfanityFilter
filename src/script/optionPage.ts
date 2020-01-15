@@ -404,9 +404,11 @@ export default class OptionPage {
     substitutionMark.checked = this.cfg.substitutionMark;
 
     // Default Settings
-    let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
     let defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
+    let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
+    let defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
     defaultWordRepeat.checked = this.cfg.defaultWordRepeat;
+    defaultWordSeparators.checked = this.cfg.defaultWordSeparators;
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     defaultWordSubstitution.value = this.cfg.defaultSubstitution;
     let defaultWordMatchMethodSelectHTML = '';
@@ -433,6 +435,7 @@ export default class OptionPage {
     let wordText = document.getElementById('wordText') as HTMLInputElement;
     let wordMatchCapitalized = document.getElementById('wordMatchCapitalized') as HTMLInputElement;
     let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
+    let wordMatchSeparators = document.getElementById('wordMatchSeparators') as HTMLInputElement;
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
     let wordRemove = document.getElementById('wordRemove') as HTMLInputElement;
     let word = wordList.value;
@@ -444,6 +447,7 @@ export default class OptionPage {
       selectedMatchMethod.checked = true;
       wordMatchCapitalized.checked = true;
       wordMatchRepeated.checked = option.cfg.defaultWordRepeat;
+      wordMatchSeparators.checked = option.cfg.defaultWordSeparators;
       substitutionText.value = '';
     } else { // Existing word
       OptionPage.enableBtn(wordRemove);
@@ -453,6 +457,7 @@ export default class OptionPage {
       selectedMatchMethod.checked = true;
       wordMatchCapitalized.checked = wordCfg.capital === undefined ? true : wordCfg.capital; // Default to true
       wordMatchRepeated.checked = wordCfg.repeat;
+      wordMatchSeparators.checked = wordCfg.separators === undefined ? option.cfg.defaultWordSeparators : wordCfg.separators;
       substitutionText.value = wordCfg.sub;
     }
   }
@@ -549,6 +554,7 @@ export default class OptionPage {
     let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
     let defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
     let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
+    let defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
     let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
     let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
@@ -569,6 +575,7 @@ export default class OptionPage {
     self.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
     self.cfg.defaultWordRepeat = defaultWordRepeat.checked;
+    self.cfg.defaultWordSeparators = defaultWordSeparators.checked;
     self.cfg.globalMatchMethod = globalMatchMethodSelect.selectedIndex;
     self.cfg.preserveCase = preserveCase.checked;
     self.cfg.preserveFirst = preserveFirst.checked;
@@ -611,6 +618,7 @@ export default class OptionPage {
     let wordText = document.getElementById('wordText') as HTMLInputElement;
     let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
     let wordMatchCapitalized = document.getElementById('wordMatchCapitalized') as HTMLInputElement;
+    let wordMatchSeparators = document.getElementById('wordMatchSeparators') as HTMLInputElement;
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
     let selectedMatchMethod = document.querySelector('input[name="wordMatchMethod"]:checked') as HTMLInputElement;
     let word = wordText.value.trim().toLowerCase();
@@ -634,6 +642,7 @@ export default class OptionPage {
         capital: wordMatchCapitalized.checked,
         matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
         repeat: wordMatchRepeated.checked,
+        separators: wordMatchSeparators.checked,
         sub: sub
       };
 
@@ -808,6 +817,7 @@ document.getElementById('censorCharacterSelect').addEventListener('change', e =>
 document.getElementById('censorFixedLengthSelect').addEventListener('change', e => { option.saveOptions(e); });
 document.getElementById('defaultWordMatchMethodSelect').addEventListener('change', e => { option.saveOptions(e); });
 document.getElementById('defaultWordRepeat').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('defaultWordSeparators').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('globalMatchMethodSelect').addEventListener('change', e => { option.saveOptions(e); });
 document.getElementById('preserveCase').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('preserveFirst').addEventListener('click', e => { option.saveOptions(e); });

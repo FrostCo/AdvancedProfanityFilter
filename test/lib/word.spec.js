@@ -60,6 +60,12 @@ describe('Word', function() {
         expect(wordRegExps[0]).to.eql(/(^|\s)(\$chool)(\s|$)/gi);
       });
 
+      it('should build RegExp with matchSeparators and matchRepeated', function() {
+        Word.initWords({word: {matchMethod: 0, repeat: true, separators: true}});
+        let wordRegExps = Word.regExps;
+        expect(wordRegExps[0]).to.eql(/\bw+[-_]*o+[-_]*r+[-_]*d+\b/gi);
+      });
+
       // Work around for lack of word boundary support for unicode characters
       describe('Unicode', function() {
         it('should use workaround for UTF word boundaries', function() {
@@ -105,6 +111,18 @@ describe('Word', function() {
         Word.initWords({'word': {matchMethod: 1, capital: false, repeat: true}});
         let wordRegExps = Word.regExps;
         expect(wordRegExps[0]).to.eql(/w+[Oo]+[Rr]+[Dd]+/g);
+      });
+
+      it('should build RegExp with matchSeparators', function() {
+        Word.initWords({word: {matchMethod: 1, separators: true}});
+        let wordRegExps = Word.regExps;
+        expect(wordRegExps[0]).to.eql(/w[-_]*o[-_]*r[-_]*d/gi);
+      });
+
+      it('should build RegExp with matchSeparators and matchRepeated', function() {
+        Word.initWords({word: {matchMethod: 1, repeat: true, separators: true}});
+        let wordRegExps = Word.regExps;
+        expect(wordRegExps[0]).to.eql(/w+[-_]*o+[-_]*r+[-_]*d+/gi);
       });
     });
 
@@ -226,6 +244,15 @@ describe('Word', function() {
           expect(wordRegExps[0].unicode).to.eql(true);
           expect(wordRegExps[0]).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*к+у+ч+е+[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
+          );
+        });
+
+        it('should build RegExp with matchSeparators and matchRepeated', function() {
+          Word.initWords({'куче': {matchMethod: 2, repeat: true, separators: true}});
+          let wordRegExps = Word.regExps;
+          expect(wordRegExps[0].unicode).to.eql(true);
+          expect(wordRegExps[0]).to.eql(
+            new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*к+[-_]*у+[-_]*ч+[-_]*е+[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
           );
         });
       });

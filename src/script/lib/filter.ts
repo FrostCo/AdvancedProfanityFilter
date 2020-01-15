@@ -57,9 +57,11 @@ export default class Filter {
   init() {
     let filterOptions = { filterMethod: this.cfg.filterMethod, globalMatchMethod: this.cfg.globalMatchMethod };
     let wordDefaults = {
-      sub: this.cfg.defaultSubstitution,
+      capital: true,
       matchMethod: this.cfg.defaultWordMatchMethod,
-      repeat: this.cfg.defaultWordRepeat
+      repeat: this.cfg.defaultWordRepeat,
+      separators: this.cfg.defaultWordSeparators,
+      sub: this.cfg.defaultSubstitution
     };
     Word.initWords(this.cfg.words, filterOptions, wordDefaults);
     this.wordList = Word.list;

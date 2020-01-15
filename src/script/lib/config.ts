@@ -6,6 +6,7 @@ export default class Config {
   defaultSubstitution: string;
   defaultWordMatchMethod: number;
   defaultWordRepeat: boolean;
+  defaultWordSeparators: boolean;
   disabledDomains: string[];
   enabledDomains: string[];
   enabledDomainsOnly: boolean;
@@ -51,6 +52,7 @@ export default class Config {
     defaultSubstitution: 'censored',
     defaultWordMatchMethod: 0,
     defaultWordRepeat: false,
+    defaultWordSeparators: false,
     disabledDomains: [],
     enabledDomains: [],
     enabledDomainsOnly: false,
@@ -89,9 +91,9 @@ export default class Config {
     'fag': { capital: true, matchMethod: 0, repeat: true, sub: 'gay' },
     'faggot': { capital: true, matchMethod: 1, repeat: true, sub: 'gay' },
     'fags': { capital: true, matchMethod: 0, repeat: true, sub: 'gays' },
-    'fuck': { capital: true, matchMethod: 1, repeat: true, sub: 'freak' },
+    'fuck': { capital: true, matchMethod: 1, repeat: true, separators: true, sub: 'freak' },
     'goddammit': { capital: true, matchMethod: 1, repeat: true, sub: 'dangit' },
-    'hell': { capital: true, matchMethod: 0, repeat: true, sub: 'heck' },
+    'hell': { capital: true, matchMethod: 0, repeat: false, sub: 'heck' },
     'jackass': { capital: true, matchMethod: 1, repeat: true, sub: 'jerk' },
     'nigga': { capital: true, matchMethod: 0, repeat: true, sub: 'bruh' },
     'nigger': { capital: true, matchMethod: 0, repeat: true, sub: 'man' },
@@ -131,6 +133,7 @@ export default class Config {
         capital: true,
         matchMethod: this.defaultWordMatchMethod,
         repeat: this.defaultWordRepeat,
+        separators: this.defaultWordSeparators,
         sub: ''
       };
       return true;

@@ -114,6 +114,14 @@ describe('Filter', function() {
         expect(filter.counter).to.be.above(0);
       });
 
+      it('Should filter an partial word with separators', function() {
+        let filter = new Filter;
+        let words = { pizza: { matchMethod: 1, repeat: true, separators: true } };
+        filter.cfg = new Config({ words: words, filterMethod: 0, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
+        filter.init();
+        expect(filter.replaceText('I love to eat P-I-Z-___Z---A!')).to.equal('I love to eat P************A!');
+      });
+
       it('Should filter a partial word ending with punctuation', function() {
         let filter = new Filter;
         filter.cfg = new Config({ words: {'this!': { matchMethod: 1 }}, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3, preserveFirst: false });
@@ -287,6 +295,14 @@ describe('Filter', function() {
         expect(filter.counter).to.equal(0);
       });
 
+      it('Should filter an partial word with separators', function() {
+        let filter = new Filter;
+        let words = { pizza: { matchMethod: 1, repeat: true, separators: true, sub: 'pie' } };
+        filter.cfg = new Config({ words: words, filterMethod: 1, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
+        filter.init();
+        expect(filter.replaceText('I love to eat P-I-Z-___Z---A!')).to.equal('I love to eat PIE!');
+      });
+
       describe('Unicode characters', function() {
         it('Should filter an exact word with substitions marked and preserveCase with repeated characters', function() {
           let filter = new Filter;
@@ -357,6 +373,14 @@ describe('Filter', function() {
         filter.init();
         expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the outsmart the Master?');
         expect(filter.counter).to.equal(1);
+      });
+
+      it('Should filter an exact word with separators', function() {
+        let filter = new Filter;
+        let words = { pizza: { matchMethod: 0, repeat: true, separators: true } };
+        filter.cfg = new Config({ words: words, filterMethod: 2, globalMatchMethod: 3, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
+        filter.init();
+        expect(filter.replaceText('I love to eat PPPPPP-I-----ZZZZZZZZZZZ__A!')).to.equal('I love to eat!');
       });
 
       describe('Unicode characters', function() {

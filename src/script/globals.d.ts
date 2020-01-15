@@ -52,5 +52,6 @@ interface WordOptions {
   capital: boolean;
   matchMethod: number;
   repeat: boolean;
+  separators?: boolean;
   sub: string;
 }

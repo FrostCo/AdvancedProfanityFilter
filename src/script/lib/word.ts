@@ -3,17 +3,19 @@ export default class Word {
   matchCapitalized: boolean;
   matchMethod: number;
   matchRepeated: boolean;
+  matchSeparators: boolean;
   sub: string;
   unicode: boolean;
   value: string;
 
   private static readonly _defaultFilterOptions = { filterMethod: 1, globalMatchMethod: 3 }
-  private static readonly _defaultWordOptions = { sub: 'censored', matchMethod: 0, repeat: false, capital: true };
+  private static readonly _defaultWordOptions = { capital: true, matchMethod: 0, repeat: false, separators: false, sub: 'censored' };
   private static readonly _edgePunctuationRegExp = /(^[,.'"!?%$]|[,.'"!?%$]$)/;
   private static readonly _escapeRegExp = /[\/\\^$*+?.()|[\]{}]/g;
   private static readonly _unicodeRegExp = /[^\u0000-\u00ff]/;
   private static readonly _unicodeWordBoundary = '[\\s.,\'"+!?|-]';
   static readonly nonWordRegExp = new RegExp('^\\s*[^\\w]+\\s*$', 'g');
+  static readonly separatorsRegExp = '[-_]*';
   static readonly whitespaceRegExp = /^\s+$/;
 
   static all = [];
@@ -84,11 +86,12 @@ export default class Word {
 
   constructor(word: string, options: WordOptions) {
     this.value = word;
-    this.sub = options.sub == null ? Word.defaultWordOptions.sub : options.sub;
-    this.matchRepeated = options.repeat === undefined ? Word.defaultWordOptions.repeat : options.repeat;
     this.matchCapitalized = options.capital === undefined ? Word.defaultWordOptions.capital : options.capital;
-    this.unicode = Word.containsDoubleByte(word);
     this.matchMethod = Word.globalMatchMethod === 3 ? options.matchMethod : Word.globalMatchMethod;
+    this.matchRepeated = options.repeat === undefined ? Word.defaultWordOptions.repeat : options.repeat;
+    this.matchSeparators = options.separators === undefined ? Word.defaultWordOptions.separators : options.separators;
+    this.sub = options.sub == null ? Word.defaultWordOptions.sub : options.sub;
+    this.unicode = Word.containsDoubleByte(word);
     if (this.matchMethod === undefined) { Word.defaultWordOptions.matchMethod; }
     this.escaped = Word.escapeRegExp(this.value);
   }
@@ -173,6 +176,7 @@ export default class Word {
     let isEscaped = word.escaped.includes('\\');
 
     let val = '';
+    let lastCharIndex = word.escaped.length - 1;
     for (let i = 0; i < word.escaped.length; i++) {
       // If the current character is a '\', add it and then move to next character
       if (isEscaped && word.escaped[i] === '\\') {
@@ -200,6 +204,14 @@ export default class Word {
       // Word: /w+o+r+d+/g
       if (word.matchRepeated) {
         val += '+';
+      }
+
+      // 3. Character separators
+      // Word: /w[-_]*o[-_]*r[-_]*d*/g
+      if (word.matchSeparators) {
+        if (i != lastCharIndex) {
+          val += Word.separatorsRegExp;
+        }
       }
     }
 
