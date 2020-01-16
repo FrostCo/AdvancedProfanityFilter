@@ -1,3 +1,4 @@
+/* eslint-disable no-console, @typescript-eslint/no-var-requires */
 'use strict';
 const fse = require('fs-extra');
 const path = require('path');
@@ -20,11 +21,12 @@ function buildEdge(manifest, zip) {
   if (!fse.existsSync('./store/edge')) { return false; }
   console.log('Building ./extension-edge.zip');
   let msPreload = {
-    backgroundScript: "backgroundScriptsAPIBridge.js",
-    contentScript: "contentScriptsAPIBridge.js"
-  }
+    backgroundScript: 'backgroundScriptsAPIBridge.js',
+    contentScript: 'contentScriptsAPIBridge.js'
+  };
 
   // Fix options_page
+  // eslint-disable-next-line @typescript-eslint/camelcase
   manifest.options_page = manifest.options_ui.page;
   delete manifest.options_ui;
 
@@ -40,9 +42,9 @@ function buildEdge(manifest, zip) {
 function buildFirefox(manifest, zip) {
   console.log('Building ./extension-firefox.zip');
   let firefoxManifest = {
-    "applications": {
-      "gecko": {
-        "id": "{853d1586-e2ab-4387-a7fd-1f7f894d2651}"
+    applications: {
+      gecko: {
+        id: '{853d1586-e2ab-4387-a7fd-1f7f894d2651}'
       }
     }
   };
@@ -80,7 +82,7 @@ function packageSource() {
   sourceZip.addLocalFolder('./bin', 'bin');
   sourceZip.addLocalFolder('./src', 'src');
   sourceZip.addLocalFolder('./test', 'test');
-  files.forEach(file => { sourceZip.addLocalFile(path.join('./', file), null)});
+  files.forEach(file => { sourceZip.addLocalFile(path.join('./', file), null); });
   sourceZip.writeZip('./extension-source.zip');
 }
 
@@ -102,15 +104,15 @@ function updateManifestFileInZip(zip, obj) {
 
 function updateManifestVersion(manifestPath, manifest) {
   if (manifest.version != process.env.npm_package_version) {
-    console.log('Version number is being updated: ' + manifest.version + ' -> ' + process.env.npm_package_version)
+    console.log('Version number is being updated: ' + manifest.version + ' -> ' + process.env.npm_package_version);
     manifest.version = process.env.npm_package_version || manifest.version;
     updateManifestFile(manifestPath, manifest);
     fse.copyFileSync(manifestPath, path.join(dist, 'manifest.json'));
   }
 }
 
-const dist = './dist/'
-const staticDir = './src/static/'
+const dist = './dist/';
+const staticDir = './src/static/';
 let manifestPath = path.join(staticDir, 'manifest.json');
 updateManifestVersion(manifestPath, getManifestJSON());
 buildAll();
