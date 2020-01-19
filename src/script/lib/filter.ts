@@ -4,24 +4,33 @@ import Config from './config';
 export default class Filter {
   cfg: Config;
   counter: number;
+  iWhitelist: string[];
+  whitelist: string[];
   wordList: string[];
   wordRegExps: RegExp[];
   wordWhitelist: string[];
 
   constructor() {
     this.counter = 0;
+    this.iWhitelist = [];
+    this.whitelist = [];
     this.wordList = [];
     this.wordRegExps = [];
-    this.wordWhitelist = [];
   }
 
   checkWhitelist(match, string, matchStartIndex, index): boolean {
     let self = this;
-    if (self.wordWhitelist.length > 0) {
-      // Check for exact/whole match
-      if (self.wordWhitelist.includes(match)) { return true; }
+    let whitelistLength = self.whitelist.length;
+    let iWhitelistLength = self.iWhitelist.length;
 
-      // Check for partial match
+    if (whitelistLength || iWhitelistLength) {
+      // Check for exact/whole match (match case)
+      if (whitelistLength && self.whitelist.includes(match)) { return true; }
+
+      // Check for exact/whole match (case insensitive)
+      if (iWhitelistLength && self.iWhitelist.includes(match.toLowerCase())) { return true; }
+
+      // Check for partial match (match may not contain the full whitelisted word)
       let word = Word.find(index);
       if (word.matchMethod === 1) {
         let wordOptions: WordOptions = {
@@ -40,7 +49,8 @@ export default class Filter {
             resultIndex <= matchStartIndex
             && (resultIndex + resultMatch.length) >= (matchStartIndex + match.length)
           ) {
-            return self.wordWhitelist.includes(resultMatch);
+            if (whitelistLength && self.whitelist.includes(resultMatch)) { return true; }
+            if (iWhitelistLength && self.iWhitelist.includes(resultMatch.toLowerCase())) { return true; }
           }
         }
       }
@@ -65,7 +75,8 @@ export default class Filter {
     Word.initWords(this.cfg.words, filterOptions, wordDefaults);
     this.wordList = Word.list;
     this.wordRegExps = Word.regExps;
-    this.wordWhitelist = this.cfg.wordWhitelist;
+    this.whitelist = this.cfg.wordWhitelist;
+    this.iWhitelist = this.cfg.iWordWhitelist;
   }
 
   // Config Dependencies: filterMethod, wordList,

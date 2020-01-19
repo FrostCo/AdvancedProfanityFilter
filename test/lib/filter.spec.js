@@ -174,6 +174,29 @@ describe('Filter', function() {
         expect(filter.counter).to.equal(1);
       });
 
+      describe('whitelist', () => {
+        it('case insensitive exact match', function() {
+          let filter = new Filter;
+          let words = {
+            master: { matchMethod: 1, repeat: true, sub: 'padawan' },
+            the: { matchMethod: 1, repeat: true, sub: 'teh' }
+          };
+          filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 0, iWordWhitelist: ['master'] });
+          filter.init();
+          expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can t** master outsmart t** Master?');
+          expect(filter.counter).to.equal(2);
+        });
+
+        it('case insensitive partial match', function() {
+          let filter = new Filter;
+          let words = { more: { matchMethod: 1, repeat: true } };
+          filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 0, iWordWhitelist: ['smore'] });
+          filter.init();
+          expect(filter.replaceText('Would you like sMorE smores?')).to.equal('Would you like sMorE sm***s?');
+          expect(filter.counter).to.equal(1);
+        });
+      });
+
       describe('Unicode characters', function() {
         it('Should filter an exact word and preserveFirst', function() {
           let filter = new Filter;
@@ -233,6 +256,29 @@ describe('Filter', function() {
         filter.init();
         expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the padawan outsmart the Master?');
         expect(filter.counter).to.equal(1);
+      });
+
+      describe('whitelist', () => {
+        it('case insensitive exact match', function() {
+          let filter = new Filter;
+          let words = {
+            master: { matchMethod: 0, repeat: true, sub: 'padawan' },
+            the: { matchMethod: 1, repeat: true, sub: 'teh' }
+          };
+          filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 1, iWordWhitelist: ['master'] });
+          filter.init();
+          expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can teh master outsmart teh Master?');
+          expect(filter.counter).to.equal(2);
+        });
+
+        it('case insensitive partial match', function() {
+          let filter = new Filter;
+          let words = { more: { matchMethod: 1, repeat: true, sub: 'less' } };
+          filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 1, iWordWhitelist: ['smore'] });
+          filter.init();
+          expect(filter.replaceText('Would you like sMorE smores?')).to.equal('Would you like sMorE slesss?');
+          expect(filter.counter).to.equal(1);
+        });
       });
 
       it('Should filter an exact word with substitions marked and preserveCase with repeated characters', function() {
@@ -376,6 +422,17 @@ describe('Filter', function() {
         filter.init();
         expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the outsmart the Master?');
         expect(filter.counter).to.equal(1);
+      });
+
+      describe('whitelist', () => {
+        it('case-insensitive exact match)', function() {
+          let filter = new Filter;
+          let words = { pie: { matchMethod: 0, repeat: true, sub: 'cake' } };
+          filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: 2, iWordWhitelist: ['pie'] });
+          filter.init();
+          expect(filter.replaceText('Apple pie is the best PIE!')).to.equal('Apple pie is the best PIE!');
+          expect(filter.counter).to.equal(0);
+        });
       });
 
       it('Should filter an exact word with separators', function() {

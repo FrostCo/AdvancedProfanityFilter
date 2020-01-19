@@ -13,6 +13,7 @@ export default class Config {
   filterMethod: number;
   filterWordList: boolean;
   globalMatchMethod: number;
+  iWordWhitelist: string[];
   muteAudio: boolean;
   muteAudioOnly: boolean;
   muteMethod: number;
@@ -59,6 +60,7 @@ export default class Config {
     filterMethod: 1, // ['Censor', 'Substitute', 'Remove'];
     filterWordList: true,
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
+    iWordWhitelist: [],
     muteAudio: false, // Filter audio
     muteAudioOnly: false,
     muteMethod: 0, // 0: Mute Tab, 1: Video Volume
