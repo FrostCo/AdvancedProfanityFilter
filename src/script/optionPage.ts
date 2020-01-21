@@ -1,4 +1,4 @@
-import { dynamicList, escapeHTML, exportToFile, readFile } from './lib/helper';
+import { dynamicList, escapeHTML, exportToFile, readFile, removeFromArray } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
 import OptionAuth from './optionAuth';
@@ -362,6 +362,7 @@ export default class OptionPage {
     filter.init();
     this.populateSettings();
     this.populateWordsList();
+    this.populateWhitelist();
     this.advancedDomainList();
     this.domainList();
     this.populateAudio();
@@ -427,6 +428,41 @@ export default class OptionPage {
       filteredTestText.innerText = 'Enter some text above to test the filter...';
     } else {
       filteredTestText.innerText = filter.replaceText(testText.value);
+    }
+  }
+
+  populateWhitelist() {
+    let regExp = RegExp(' [*]$');
+    let sensitiveList = filter.cfg.wordWhitelist.map((item) => { return item + ' *'; });
+    let list = [].concat(sensitiveList, filter.cfg.iWordWhitelist).sort();
+    let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
+    let whitelistHTML = '<option selected value="">Add...</option>';
+    list.forEach((item) => {
+      whitelistHTML += `<option value="${item.replace(regExp, '')}" data-sensitive="${regExp.test(item)}">${escapeHTML(item)}</option>`;
+    });
+    whitelist.innerHTML = whitelistHTML;
+    this.populateWhitelistWord();
+  }
+
+  populateWhitelistWord() {
+    let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
+    let whitelistRemove = document.getElementById('whitelistRemove') as HTMLInputElement;
+    let whitelistText = document.getElementById('whitelistText') as HTMLInputElement;
+    let selected = whitelist.selectedOptions[0];
+
+    if (selected.value == '') { // New word
+      whitelistText.value = '';
+      OptionPage.disableBtn(whitelistRemove);
+
+      // Default to case-insensitive
+      let whitelistCase = document.getElementById('whitelistInsensitive') as HTMLInputElement;
+      whitelistCase.checked = true;
+    } else {
+      whitelistText.value = selected.value;
+      let caseId = selected.dataset.sensitive === 'true' ? 'whitelistSensitive' : 'whitelistInsensitive';
+      let whitelistCase = document.getElementById(caseId) as HTMLInputElement;
+      whitelistCase.checked = true;
+      OptionPage.enableBtn(whitelistRemove);
     }
   }
 
@@ -499,6 +535,25 @@ export default class OptionPage {
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     wordList.selectedIndex = 0;
     this.populateWordsList();
+  }
+
+  async removeWhitelist(evt) {
+    let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
+    let selected = whitelist.selectedOptions[0];
+    let originalWord = selected.value;
+    let originalCase = selected.dataset.sensitive === 'true' ? 'sensitive': 'insensitive';
+    let originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
+    option.cfg[originalListName] = removeFromArray(option.cfg[originalListName], originalWord);
+
+    let error = await option.cfg.save(originalListName);
+    if (error) {
+      OptionPage.showErrorModal();
+      return false;
+    } else {
+      filter.init();
+      whitelist.selectedIndex = 0;
+      this.populateWhitelist();
+    }
   }
 
   async removeWord(evt) {
@@ -608,6 +663,62 @@ export default class OptionPage {
       return false;
     }
     return true;
+  }
+
+  async saveWhitelist(evt) {
+    let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
+    let selected = whitelist.selectedOptions[0];
+    let selectedCase = document.querySelector('input[name="whitelistCase"]:checked') as HTMLInputElement;
+    let whitelistText = document.getElementById('whitelistText') as HTMLInputElement;
+
+    let propsToSave = [];
+    let newCase = selectedCase.value;
+    let newWord = newCase === 'sensitive' ? whitelistText.value : whitelistText.value.toLowerCase();
+    let newListName = newCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
+
+    if (whitelistText.value === '') {
+      OptionPage.showInputError(whitelistText, 'Please enter a valid word/phrase.');
+      return false;
+    }
+
+    if (option.cfg[newListName].indexOf(newWord) > -1) {
+      OptionPage.showInputError(whitelistText, 'Already whitelisted.');
+      return false;
+    }
+
+    if (whitelistText.checkValidity()) {
+      if (selected.value === '') { // New word
+        option.cfg[newListName].push(newWord);
+        propsToSave.push(newListName);
+      } else { // Modifying existing word
+        let originalWord = selected.value;
+        let originalCase = selected.dataset.sensitive === 'true' ? 'sensitive': 'insensitive';
+        let originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
+
+        if ((originalWord != newWord) || (originalCase != newCase)) {
+          option.cfg[originalListName] = removeFromArray(option.cfg[originalListName], originalWord);
+          option.cfg[newListName].push(newWord);
+          originalListName === newListName ? propsToSave.push(newListName) : propsToSave.push(originalListName, newListName);
+        }
+      }
+
+      if (propsToSave.length) {
+        propsToSave.forEach(prop => {
+          option.cfg[prop] = option.cfg[prop].sort();
+        });
+        let error = await option.cfg.save(propsToSave);
+        if (error) {
+          OptionPage.showErrorModal();
+          return false;
+        } else {
+          filter.init();
+          whitelist.selectedIndex = 0;
+          this.populateWhitelist();
+        }
+      }
+    } else {
+      OptionPage.showInputError(whitelistText, 'Please enter a valid word/phrase.');
+    }
   }
 
   async saveWord(evt) {
@@ -829,6 +940,10 @@ document.getElementById('wordText').addEventListener('input', e => { OptionPage.
 document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
 document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
 document.getElementById('wordRemoveAll').addEventListener('click', e => { option.confirm(e, 'removeAllWords'); });
+document.getElementById('whitelist').addEventListener('change', e => { option.populateWhitelistWord(); });
+document.getElementById('whitelistText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
+document.getElementById('whitelistSave').addEventListener('click', e => { option.saveWhitelist(e); });
+document.getElementById('whitelistRemove').addEventListener('click', e => { option.removeWhitelist(e); });
 // Domains
 document.getElementById('advDomainSelect').addEventListener('change', e => { option.advancedDomainPopulate(); });
 document.getElementById('advDomainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
