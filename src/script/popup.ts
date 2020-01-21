@@ -10,6 +10,8 @@ class Popup {
 
   static readonly _requiredConfig =  ['advancedDomains', 'disabledDomains', 'enabledDomains', 'enabledDomainsOnly', 'filterMethod', 'password'];
 
+  static readonly _disabledPages = new RegExp('(^chrome:|^about:|^[a-zA-Z]*-extension:)', 'i');
+
   static async load(instance: Popup) {
     instance.cfg = await WebConfig.build(Popup._requiredConfig);
     instance.domain = new Domain();
@@ -84,7 +86,7 @@ class Popup {
     }
 
     // Restricted pages
-    if (popup.domain.url.protocol.match(/(^chrome:|^about:|^[a-zA-Z]*-extension:)/i) || popup.domain.hostname == 'chrome.google.com') {
+    if (Popup._disabledPages.test(popup.domain.url.protocol) || popup.domain.hostname == 'chrome.google.com') {
       domainFilter.checked = false;
       Popup.disable(domainFilter);
       Popup.disable(domainToggle);

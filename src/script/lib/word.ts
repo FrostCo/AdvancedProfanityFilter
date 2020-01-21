@@ -163,7 +163,7 @@ export default class Word {
     }
   }
 
-  hasEdgePunctuation(): boolean { return !!(this.value.match(Word._edgePunctuationRegExp)); }
+  hasEdgePunctuation(): boolean { return Word._edgePunctuationRegExp.test(this.value); }
 
   processedPhrase(): string {
     let word = this;
