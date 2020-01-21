@@ -6,12 +6,14 @@ export default class Config {
   defaultSubstitution: string;
   defaultWordMatchMethod: number;
   defaultWordRepeat: boolean;
+  defaultWordSeparators: boolean;
   disabledDomains: string[];
   enabledDomains: string[];
   enabledDomainsOnly: boolean;
   filterMethod: number;
   filterWordList: boolean;
   globalMatchMethod: number;
+  iWordWhitelist: string[];
   muteAudio: boolean;
   muteAudioOnly: boolean;
   muteMethod: number;
@@ -25,7 +27,8 @@ export default class Config {
   showSummary: boolean;
   showUpdateNotification: boolean;
   substitutionMark: boolean;
-  words: { [key: string]: WordOptions; };
+  words: { [key: string]: WordOptions };
+  wordWhitelist: string[];
   youTubeAutoSubsMin: number;
 
   static readonly filterMethods = {
@@ -50,12 +53,14 @@ export default class Config {
     defaultSubstitution: 'censored',
     defaultWordMatchMethod: 0,
     defaultWordRepeat: false,
+    defaultWordSeparators: false,
     disabledDomains: [],
     enabledDomains: [],
     enabledDomainsOnly: false,
     filterMethod: 1, // ['Censor', 'Substitute', 'Remove'];
     filterWordList: true,
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
+    iWordWhitelist: [],
     muteAudio: false, // Filter audio
     muteAudioOnly: false,
     muteMethod: 0, // 0: Mute Tab, 1: Video Volume
@@ -69,41 +74,42 @@ export default class Config {
     showSummary: true,
     showUpdateNotification: true,
     substitutionMark: false,
+    wordWhitelist: [],
     youTubeAutoSubsMin: 0
   };
 
   static readonly _defaultWords = {
-    'ass': { capital: true, matchMethod: 0, repeat: true, sub: 'butt' },
-    'asses': { capital: true, matchMethod: 0, repeat: false, sub: 'butts' },
-    'asshole': { capital: true, matchMethod: 1, repeat: true, sub: 'jerk' },
-    'badass': { capital: true, matchMethod: 1, repeat: true, sub: 'cool' },
-    'bastard': { capital: true, matchMethod: 1, repeat: true, sub: 'idiot' },
-    'bitch': { capital: true, matchMethod: 1, repeat: true, sub: 'bench' },
-    'cocksucker': { capital: true, matchMethod: 1, repeat: true, sub: 'suckup' },
-    'cunt': { capital: true, matchMethod: 1, repeat: true, sub: 'expletive' },
-    'dammit': { capital: true, matchMethod: 1, repeat: false, sub: 'dangit' },
-    'damn': { capital: true, matchMethod: 1, repeat: false, sub: 'dang' },
-    'dumbass': { capital: true, matchMethod: 1, repeat: true, sub: 'idiot' },
-    'fag': { capital: true, matchMethod: 0, repeat: true, sub: 'gay' },
-    'faggot': { capital: true, matchMethod: 1, repeat: true, sub: 'gay' },
-    'fags': { capital: true, matchMethod: 0, repeat: true, sub: 'gays' },
-    'fuck': { capital: true, matchMethod: 1, repeat: true, sub: 'freak' },
-    'goddammit': { capital: true, matchMethod: 1, repeat: true, sub: 'dangit' },
-    'hell': { capital: true, matchMethod: 0, repeat: true, sub: 'heck' },
-    'jackass': { capital: true, matchMethod: 1, repeat: true, sub: 'jerk' },
-    'nigga': { capital: true, matchMethod: 0, repeat: true, sub: 'bruh' },
-    'nigger': { capital: true, matchMethod: 0, repeat: true, sub: 'man' },
-    'niggers': { capital: true, matchMethod: 0, repeat: true, sub: 'people' },
-    'piss': { capital: true, matchMethod: 1, repeat: true, sub: 'pee' },
-    'pissed': { capital: true, matchMethod: 1, repeat: true, sub: 'ticked' },
-    'pussies': { capital: true, matchMethod: 0, repeat: true, sub: 'softies' },
-    'pussy': { capital: true, matchMethod: 0, repeat: true, sub: 'softie' },
-    'shit': { capital: true, matchMethod: 1, repeat: true, sub: 'crap' },
-    'slut': { capital: true, matchMethod: 1, repeat: true, sub: 'tramp' },
-    'tits': { capital: true, matchMethod: 1, repeat: true, sub: 'chest' },
-    'twat': { capital: true, matchMethod: 0, repeat: true, sub: 'dumbo' },
-    'twats': { capital: true, matchMethod: 0, repeat: true, sub: 'dumbos' },
-    'whore': { capital: true, matchMethod: 1, repeat: true, sub: 'tramp' }
+    'ass': { matchMethod: 0, repeat: true, separators: false, sub: 'butt' },
+    'asses': { matchMethod: 0, repeat: false, separators: false, sub: 'butts' },
+    'asshole': { matchMethod: 1, repeat: true, separators: false, sub: 'jerk' },
+    'badass': { matchMethod: 1, repeat: true, separators: true, sub: 'cool' },
+    'bastard': { matchMethod: 1, repeat: true, separators: false, sub: 'idiot' },
+    'bitch': { matchMethod: 1, repeat: true, separators: false, sub: 'bench' },
+    'cocksucker': { matchMethod: 1, repeat: true, separators: true, sub: 'suckup' },
+    'cunt': { matchMethod: 1, repeat: true, separators: false, sub: 'expletive' },
+    'dammit': { matchMethod: 1, repeat: false, separators: true, sub: 'dangit' },
+    'damn': { matchMethod: 1, repeat: false, separators: false, sub: 'dang' },
+    'dumbass': { matchMethod: 1, repeat: true, separators: false, sub: 'idiot' },
+    'fag': { matchMethod: 0, repeat: true, separators: false, sub: 'gay' },
+    'faggot': { matchMethod: 1, repeat: true, separators: false, sub: 'gay' },
+    'fags': { matchMethod: 0, repeat: true, separators: false, sub: 'gays' },
+    'fuck': { matchMethod: 1, repeat: true, separators: true, sub: 'freak' },
+    'goddammit': { matchMethod: 1, repeat: true, separators: true, sub: 'dangit' },
+    'hell': { matchMethod: 0, repeat: false, separators: false, sub: 'heck' },
+    'jackass': { matchMethod: 1, repeat: true, separators: true, sub: 'jerk' },
+    'nigga': { matchMethod: 0, repeat: true, separators: false, sub: 'bruh' },
+    'nigger': { matchMethod: 0, repeat: true, separators: false, sub: 'man' },
+    'niggers': { matchMethod: 0, repeat: true, separators: false, sub: 'people' },
+    'piss': { matchMethod: 1, repeat: true, separators: false, sub: 'pee' },
+    'pissed': { matchMethod: 1, repeat: true, separators: false, sub: 'ticked' },
+    'pussies': { matchMethod: 0, repeat: true, separators: false, sub: 'softies' },
+    'pussy': { matchMethod: 0, repeat: true, separators: false, sub: 'softie' },
+    'shit': { matchMethod: 1, repeat: true, separators: false, sub: 'crap' },
+    'slut': { matchMethod: 1, repeat: true, separators: false, sub: 'tramp' },
+    'tits': { matchMethod: 1, repeat: true, separators: false, sub: 'chest' },
+    'twat': { matchMethod: 0, repeat: true, separators: false, sub: 'dumbo' },
+    'twats': { matchMethod: 0, repeat: true, separators: false, sub: 'dumbos' },
+    'whore': { matchMethod: 1, repeat: true, separators: false, sub: 'tramp' }
   };
 
   static readonly _filterMethodNames = ['Censor', 'Substitute', 'Remove'];
@@ -112,11 +118,8 @@ export default class Config {
   static readonly _maxWords = 100;
   static readonly _wordsPattern = /^_words\d+/;
 
-  constructor(config) {
-    if (typeof config === 'undefined') {
-      throw new Error('Cannot be called directly. call build()');
-    }
-    for(let k in config) this[k]=config[k];
+  constructor(data: object = {}) {
+    Object.assign(this, Config._defaults, data);
   }
 
   addWord(str: string, options?: WordOptions) {
@@ -129,9 +132,9 @@ export default class Config {
       return true;
     } else {
       this.words[str] = {
-        capital: true,
         matchMethod: this.defaultWordMatchMethod,
         repeat: this.defaultWordRepeat,
+        separators: this.defaultWordSeparators,
         sub: ''
       };
       return true;

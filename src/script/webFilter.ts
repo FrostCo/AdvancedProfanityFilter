@@ -1,5 +1,5 @@
 import Domain from './domain';
-import {Filter} from './lib/filter';
+import Filter from './lib/filter';
 import Page from './page';
 import WebAudio from './webAudio';
 import WebConfig from './webConfig';

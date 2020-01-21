@@ -4,6 +4,8 @@ const chokidar = require('chokidar');
 const execSync = require('child_process').execSync;
 const path = require('path');
 const fse = require('fs-extra');
+let scriptRegExp = new RegExp('\/script\/');
+let staticRegExp = new RegExp('\/static\/');
 
 function copyStatic(file) {
   let basename = path.basename(file);
@@ -47,6 +49,6 @@ watcher.on('ready', () => log('Initial scan complete. Watching for changes...\n\
 
 watcher.on('change', (filePath, stats) => {
   // console.log(filePath, stats);
-  if (filePath.match(/[\/\\]static[\/\\]/)) { copyStatic(filePath); }
-  if (filePath.match(/[\/\\]script[\/\\]/)) { compileScript(filePath); }
+  if (scriptRegExp.test(filePath)) { compileScript(filePath); }
+  if (staticRegExp.test(filePath)) { copyStatic(filePath); }
 });

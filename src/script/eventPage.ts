@@ -92,7 +92,7 @@ async function processSelection(action: string, selection: string) {
 async function disableDomain(cfg: WebConfig, domain: string, key: string) {
   if (!cfg[key].includes(domain)) {
     cfg[key].push(domain);
-    let result = await cfg.save();
+    let result = await cfg.save(key);
     if (!result) { chrome.tabs.reload(); }
   }
 }
@@ -103,7 +103,7 @@ async function enableDomain(cfg: WebConfig, domain: string, key: string) {
 
   if (newDomainList.length < cfg[key].length) {
     cfg[key] = newDomainList;
-    let result = await cfg.save();
+    let result = await cfg.save(key);
     if (!result) { chrome.tabs.reload(); }
   }
 }

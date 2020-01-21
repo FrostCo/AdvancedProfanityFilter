@@ -3,13 +3,18 @@ import Config from '../built/lib/config';
 
 describe('Config', function() {
   describe('constructor()', function() {
-    it('should create a new Config instance with the provided async_params', function() {
-      let config = new Config(Config._defaults);
+    it('should create a new Config instance with defaults', function() {
+      let config = new Config();
       expect(config instanceof Config).to.equal(true);
+      expect(config.censorCharacter).to.equal('*');
+      expect(config.censorFixedLength).to.equal(0);
     });
 
-    it('should throw when no async_params provided', function() {
-      expect(() => (new Config)).to.throw();
+    it('should create a new Config instance with the provided data', function() {
+      let config = new Config({censorCharacter: '-'});
+      expect(config instanceof Config).to.equal(true);
+      expect(config.censorCharacter).to.equal('-');
+      expect(config.censorFixedLength).to.equal(0);
     });
   });
 

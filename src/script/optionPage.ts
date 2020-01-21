@@ -1,6 +1,6 @@
-import { dynamicList, escapeHTML, exportToFile, readFile } from './lib/helper';
+import { dynamicList, escapeHTML, exportToFile, readFile, removeFromArray } from './lib/helper';
 import WebConfig from './webConfig';
-import { Filter } from './lib/filter';
+import Filter from './lib/filter';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
@@ -362,6 +362,7 @@ export default class OptionPage {
     filter.init();
     this.populateSettings();
     this.populateWordsList();
+    this.populateWhitelist();
     this.advancedDomainList();
     this.domainList();
     this.populateAudio();
@@ -404,9 +405,11 @@ export default class OptionPage {
     substitutionMark.checked = this.cfg.substitutionMark;
 
     // Default Settings
-    let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
     let defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
+    let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
+    let defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
     defaultWordRepeat.checked = this.cfg.defaultWordRepeat;
+    defaultWordSeparators.checked = this.cfg.defaultWordSeparators;
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     defaultWordSubstitution.value = this.cfg.defaultSubstitution;
     let defaultWordMatchMethodSelectHTML = '';
@@ -428,11 +431,46 @@ export default class OptionPage {
     }
   }
 
+  populateWhitelist() {
+    let regExp = RegExp(' [*]$');
+    let sensitiveList = filter.cfg.wordWhitelist.map((item) => { return item + ' *'; });
+    let list = [].concat(sensitiveList, filter.cfg.iWordWhitelist).sort();
+    let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
+    let whitelistHTML = '<option selected value="">Add...</option>';
+    list.forEach((item) => {
+      whitelistHTML += `<option value="${item.replace(regExp, '')}" data-sensitive="${regExp.test(item)}">${escapeHTML(item)}</option>`;
+    });
+    whitelist.innerHTML = whitelistHTML;
+    this.populateWhitelistWord();
+  }
+
+  populateWhitelistWord() {
+    let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
+    let whitelistRemove = document.getElementById('whitelistRemove') as HTMLInputElement;
+    let whitelistText = document.getElementById('whitelistText') as HTMLInputElement;
+    let selected = whitelist.selectedOptions[0];
+
+    if (selected.value == '') { // New word
+      whitelistText.value = '';
+      OptionPage.disableBtn(whitelistRemove);
+
+      // Default to case-insensitive
+      let whitelistCase = document.getElementById('whitelistInsensitive') as HTMLInputElement;
+      whitelistCase.checked = true;
+    } else {
+      whitelistText.value = selected.value;
+      let caseId = selected.dataset.sensitive === 'true' ? 'whitelistSensitive' : 'whitelistInsensitive';
+      let whitelistCase = document.getElementById(caseId) as HTMLInputElement;
+      whitelistCase.checked = true;
+      OptionPage.enableBtn(whitelistRemove);
+    }
+  }
+
   populateWord() {
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     let wordText = document.getElementById('wordText') as HTMLInputElement;
-    let wordMatchCapitalized = document.getElementById('wordMatchCapitalized') as HTMLInputElement;
     let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
+    let wordMatchSeparators = document.getElementById('wordMatchSeparators') as HTMLInputElement;
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
     let wordRemove = document.getElementById('wordRemove') as HTMLInputElement;
     let word = wordList.value;
@@ -442,8 +480,8 @@ export default class OptionPage {
       OptionPage.disableBtn(wordRemove);
       let selectedMatchMethod = document.getElementById(`wordMatch${WebConfig._matchMethodNames[option.cfg.defaultWordMatchMethod]}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
-      wordMatchCapitalized.checked = true;
       wordMatchRepeated.checked = option.cfg.defaultWordRepeat;
+      wordMatchSeparators.checked = option.cfg.defaultWordSeparators;
       substitutionText.value = '';
     } else { // Existing word
       OptionPage.enableBtn(wordRemove);
@@ -451,8 +489,8 @@ export default class OptionPage {
       wordText.value = word;
       let selectedMatchMethod = document.getElementById(`wordMatch${WebConfig._matchMethodNames[wordCfg.matchMethod]}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
-      wordMatchCapitalized.checked = wordCfg.capital === undefined ? true : wordCfg.capital; // Default to true
       wordMatchRepeated.checked = wordCfg.repeat;
+      wordMatchSeparators.checked = wordCfg.separators === undefined ? option.cfg.defaultWordSeparators : wordCfg.separators;
       substitutionText.value = wordCfg.sub;
     }
   }
@@ -497,6 +535,25 @@ export default class OptionPage {
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     wordList.selectedIndex = 0;
     this.populateWordsList();
+  }
+
+  async removeWhitelist(evt) {
+    let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
+    let selected = whitelist.selectedOptions[0];
+    let originalWord = selected.value;
+    let originalCase = selected.dataset.sensitive === 'true' ? 'sensitive': 'insensitive';
+    let originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
+    option.cfg[originalListName] = removeFromArray(option.cfg[originalListName], originalWord);
+
+    let error = await option.cfg.save(originalListName);
+    if (error) {
+      OptionPage.showErrorModal();
+      return false;
+    } else {
+      filter.init();
+      whitelist.selectedIndex = 0;
+      this.populateWhitelist();
+    }
   }
 
   async removeWord(evt) {
@@ -549,6 +606,7 @@ export default class OptionPage {
     let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
     let defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
     let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
+    let defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
     let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
     let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
@@ -569,6 +627,7 @@ export default class OptionPage {
     self.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
     self.cfg.defaultWordRepeat = defaultWordRepeat.checked;
+    self.cfg.defaultWordSeparators = defaultWordSeparators.checked;
     self.cfg.globalMatchMethod = globalMatchMethodSelect.selectedIndex;
     self.cfg.preserveCase = preserveCase.checked;
     self.cfg.preserveFirst = preserveFirst.checked;
@@ -606,11 +665,67 @@ export default class OptionPage {
     return true;
   }
 
+  async saveWhitelist(evt) {
+    let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
+    let selected = whitelist.selectedOptions[0];
+    let selectedCase = document.querySelector('input[name="whitelistCase"]:checked') as HTMLInputElement;
+    let whitelistText = document.getElementById('whitelistText') as HTMLInputElement;
+
+    let propsToSave = [];
+    let newCase = selectedCase.value;
+    let newWord = newCase === 'sensitive' ? whitelistText.value : whitelistText.value.toLowerCase();
+    let newListName = newCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
+
+    if (whitelistText.value === '') {
+      OptionPage.showInputError(whitelistText, 'Please enter a valid word/phrase.');
+      return false;
+    }
+
+    if (option.cfg[newListName].indexOf(newWord) > -1) {
+      OptionPage.showInputError(whitelistText, 'Already whitelisted.');
+      return false;
+    }
+
+    if (whitelistText.checkValidity()) {
+      if (selected.value === '') { // New word
+        option.cfg[newListName].push(newWord);
+        propsToSave.push(newListName);
+      } else { // Modifying existing word
+        let originalWord = selected.value;
+        let originalCase = selected.dataset.sensitive === 'true' ? 'sensitive': 'insensitive';
+        let originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
+
+        if ((originalWord != newWord) || (originalCase != newCase)) {
+          option.cfg[originalListName] = removeFromArray(option.cfg[originalListName], originalWord);
+          option.cfg[newListName].push(newWord);
+          originalListName === newListName ? propsToSave.push(newListName) : propsToSave.push(originalListName, newListName);
+        }
+      }
+
+      if (propsToSave.length) {
+        propsToSave.forEach(prop => {
+          option.cfg[prop] = option.cfg[prop].sort();
+        });
+        let error = await option.cfg.save(propsToSave);
+        if (error) {
+          OptionPage.showErrorModal();
+          return false;
+        } else {
+          filter.init();
+          whitelist.selectedIndex = 0;
+          this.populateWhitelist();
+        }
+      }
+    } else {
+      OptionPage.showInputError(whitelistText, 'Please enter a valid word/phrase.');
+    }
+  }
+
   async saveWord(evt) {
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     let wordText = document.getElementById('wordText') as HTMLInputElement;
     let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
-    let wordMatchCapitalized = document.getElementById('wordMatchCapitalized') as HTMLInputElement;
+    let wordMatchSeparators = document.getElementById('wordMatchSeparators') as HTMLInputElement;
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
     let selectedMatchMethod = document.querySelector('input[name="wordMatchMethod"]:checked') as HTMLInputElement;
     let word = wordText.value.trim().toLowerCase();
@@ -631,9 +746,9 @@ export default class OptionPage {
 
     if (wordText.checkValidity()) {
       let wordOptions: WordOptions = {
-        capital: wordMatchCapitalized.checked,
         matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
         repeat: wordMatchRepeated.checked,
+        separators: wordMatchSeparators.checked,
         sub: sub
       };
 
@@ -808,6 +923,7 @@ document.getElementById('censorCharacterSelect').addEventListener('change', e =>
 document.getElementById('censorFixedLengthSelect').addEventListener('change', e => { option.saveOptions(e); });
 document.getElementById('defaultWordMatchMethodSelect').addEventListener('change', e => { option.saveOptions(e); });
 document.getElementById('defaultWordRepeat').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('defaultWordSeparators').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('globalMatchMethodSelect').addEventListener('change', e => { option.saveOptions(e); });
 document.getElementById('preserveCase').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('preserveFirst').addEventListener('click', e => { option.saveOptions(e); });
@@ -824,6 +940,10 @@ document.getElementById('wordText').addEventListener('input', e => { OptionPage.
 document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
 document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
 document.getElementById('wordRemoveAll').addEventListener('click', e => { option.confirm(e, 'removeAllWords'); });
+document.getElementById('whitelist').addEventListener('change', e => { option.populateWhitelistWord(); });
+document.getElementById('whitelistText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
+document.getElementById('whitelistSave').addEventListener('click', e => { option.saveWhitelist(e); });
+document.getElementById('whitelistRemove').addEventListener('click', e => { option.removeWhitelist(e); });
 // Domains
 document.getElementById('advDomainSelect').addEventListener('change', e => { option.advancedDomainPopulate(); });
 document.getElementById('advDomainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });

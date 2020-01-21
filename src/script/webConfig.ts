@@ -9,6 +9,10 @@ export default class WebConfig extends Config {
 
   // Call build() to create a new instance
   constructor(asyncParam) {
+    if (typeof asyncParam === 'undefined') {
+      throw new Error('Cannot be called directly. call build()');
+    }
+
     super(asyncParam);
   }
 
@@ -70,7 +74,7 @@ export default class WebConfig extends Config {
       let request = null;
       if (keys !== undefined) {
         request = {};
-        for(let k of keys) { request[k] = Config._defaults[k]; }
+        for (let k of keys) { request[k] = Config._defaults[k]; }
       }
 
       chrome.storage.sync.get(request, function(items) {
@@ -110,10 +114,19 @@ export default class WebConfig extends Config {
     });
   }
 
-  // Pass a key to save only that key, otherwise it will save everything
-  save(prop?: string) {
+  // Pass a key or array of keys to save, or save everything
+  // Note: To save words you'll need to leave props undefined
+  save(props?: string | string[]) {
     let data = {};
-    prop ? data[prop] = this[prop] : data = this.dataToPersist();
+    if (props === undefined) {
+      data = this.dataToPersist();
+    } else if (typeof props === 'string') {
+      data[props] = this[props];
+    } else if (Array.isArray(props)) {
+      for (let prop of props) {
+        data[prop] = this[prop];
+      }
+    }
 
     return new Promise(function(resolve, reject) {
       chrome.storage.sync.set(data, function() {
