@@ -468,6 +468,7 @@
     <h3 id="default-settings-for-new-wordphrases">Default Settings (for new word/phrases)</h3>
     <ul>
     <li><strong>Match repeated characters</strong> - This option will match repeated characters in words. They must still appear in the same order. This should be managed per-word to help avoid false-positives.</li>
+    <li><strong>Match separators</strong> - Control the default setting used with new words for matching separators (<code>&#39;-&#39;, &#39;_&#39; &amp; &#39; &#39;</code>). When enabled, words/phrases that contain those characters inside them will still be filtered. This should be managed per-word to help avoid false-positives.</li>
     <li><strong>Match Method</strong> - When new words are added they will automatically be assigned this match method.</li>
     </ul>
     <h1 id="words">Words</h1>
@@ -479,7 +480,11 @@
     <li>Configure <code>match repeated characters</code> in words.</li>
     <li>Set the substitution (replacement) for a word/phrase (Only when filter in <code>Substitution</code> mode).</li>
     <li>Words/phrases can also be added by selecting them on a web page and then choosing the <code>Add selection to filter</code> option from the context (right-click) menu. New words will use the settings found in the &quot;Default Settings (for new word/phrases)&quot; section.</li>
+    <li>Match repeated characters - Match words with repeated characters (must still be in same order).</li>
+    <li>Match separators - Words/phrases that contain (<code>&#39;-&#39;, &#39;_&#39; &amp; &#39; &#39;</code>) inside them will be filtered.</li>
     </ul>
+    <h3 id="whitelist">Whitelist</h3>
+    <p>The Word Whitelist provides a mechanism to list words/phrases that should NOT be filtered. Whitelist entries can be case sensitive (case matters). For example, if you added the word &quot;dog&quot; to the filter, but don&#39;t want &quot;Dog&quot; (capitalized) to be filtered, you could add &quot;Dog&quot; as a case-sensitive whitelisted word and it will no longer be filtered.</p>
     <h1 id="domains">Domains</h1>
     <p>This tab allows you to control which domains will be filtered, or which domains to use the Advanced mode on.</p>
     <h3 id="domain-mode">Domain Mode:</h3>
