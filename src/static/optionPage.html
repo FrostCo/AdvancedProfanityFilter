@@ -149,7 +149,7 @@
     <label>
       <input id="defaultWordSeparators" type="checkbox" class="w3-check">
       Match separator characters
-      <span class="notes">('-' & '_')</span>
+      <span class="notes">([-_ ] dog matches: D-o _g)</span>
     </label>
     <div id="defaultMatchMethod" style="padding-top:8px;">
       <label>Match Method
@@ -200,14 +200,14 @@
 
       <h4 class="sectionHeader">Other</h4>
       <label>
-        <input id="wordMatchSeparators" type="checkbox" class="w3-check" name="matchSeparators"/>
-        Match separators<span class="notes">([-_] dog: D-o_g)</span>
+        <input id="wordMatchRepeated" type="checkbox" class="w3-check" name="matchRepeat"/>
+        Match repeated characters<span class="notes">(dog: dddoooggg)</span>
       </label>
 
       <br>
       <label>
-        <input id="wordMatchRepeated" type="checkbox" class="w3-check" name="matchRepeat"/>
-        Match repeated characters<span class="notes">(dog: dddoooggg)</span>
+        <input id="wordMatchSeparators" type="checkbox" class="w3-check" name="matchSeparators"/>
+        Match separators<span class="notes">([-_ ] dog matches: D-o _g)</span>
       </label>
     </div>
     <br>
