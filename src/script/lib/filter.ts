@@ -8,7 +8,6 @@ export default class Filter {
   whitelist: string[];
   wordList: string[];
   wordRegExps: RegExp[];
-  wordWhitelist: string[];
 
   constructor() {
     this.counter = 0;

@@ -8,9 +8,8 @@ class Popup {
   protected: boolean;
   filterMethodContainer: Element;
 
-  static readonly _requiredConfig =  ['advancedDomains', 'disabledDomains', 'enabledDomains', 'enabledDomainsOnly', 'filterMethod', 'password'];
-
   static readonly _disabledPages = new RegExp('(^chrome:|^about:|^[a-zA-Z]*-extension:)', 'i');
+  static readonly _requiredConfig =  ['advancedDomains', 'disabledDomains', 'enabledDomains', 'enabledDomainsOnly', 'filterMethod', 'password'];
 
   static async load(instance: Popup) {
     instance.cfg = await WebConfig.build(Popup._requiredConfig);
