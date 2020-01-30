@@ -257,7 +257,7 @@ export default class WebFilter extends Filter {
     if (this.cfg.muteAudio && this.cfg.muteMethod == 0) { message.clearMute = true; }
 
     // Send page state to color icon badge
-    message.setBadgeColor = true;
+    if (!this.iframe) { message.setBadgeColor = true; }
     message.advanced = this.advanced;
     message.mutePage = this.mutePage;
     if (this.mutePage && this.cfg.showCounter) { message.counter = this.counter; } // Always show counter when muting audio
