@@ -65,6 +65,8 @@ export default class WebAudio {
       { mode: 'element', className: 'ttr-container', tagName: 'DIV', subtitleSelector: 'span.ttr-cue' },
       { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video' }
     ],
+    'www.att.tv': [ { mode: 'cue', videoSelector: 'video#quickplayPlayer' } ],
+    'www.cbs.com': [ { mode: 'cue', videoCueLanguage: 'en' } ],
     'www.dishanywhere.com': [
       { mode: 'element', className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' },
       { mode: 'element', className: 'bmpui-subtitle-region-container', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' }
@@ -74,6 +76,7 @@ export default class WebAudio {
     'www.hulu.com': [ { mode: 'element', className: 'caption-text-box', subtitleSelector: 'p', tagName: 'DIV' } ],
     'www.nbc.com': [ { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' } ],
     'www.netflix.com': [ { mode: 'element', className: 'player-timedtext-text-container', subtitleSelector: 'span', tagName: 'DIV' } ],
+    'www.philo.com': [ { mode: 'cue' } ],
     'app.plex.tv': [ { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' } ],
     'www.sonycrackle.com': [ { mode: 'text', textParentSelector: 'div.clpp-subtitles-container' } ],
     'www.syfy.com': [ { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' } ],
