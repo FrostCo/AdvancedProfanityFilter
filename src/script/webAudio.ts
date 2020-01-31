@@ -261,7 +261,7 @@ export default class WebAudio {
   }
 
   playing(video: HTMLMediaElement): boolean {
-    return !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
+    return !!(video && video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
 
   processCues(cues: FilteredTextTrackCue[], rule: AudioRules) {
