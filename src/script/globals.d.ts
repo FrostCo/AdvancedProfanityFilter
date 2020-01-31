@@ -4,6 +4,7 @@ interface AudioRules {
   checkInterval?: number;           // [Watcher] Set a custom watch interval (in ms)
   containsSelector?: string;        // [Element] node.querySelector() [Not commonly used]
   dataPropPresent?: string;         // [Element] node.dataset.hasOwnProperty()
+  filterSubtitles?: boolean;        // [All] Filter subtitle text [Default: true]
   hasChildrenElements?: boolean;    // [Element] node.childElementCount > 0 [Not commonly used]
   iframe?: boolean | undefined;     // [All] pages to run on (true: only iframes, false: no iframes, undefined: all)
   muteMethod?: number;              // [All] Override global muteMthod (0: tab, 1: video)

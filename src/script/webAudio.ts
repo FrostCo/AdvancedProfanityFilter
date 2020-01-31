@@ -108,6 +108,7 @@ export default class WebAudio {
       // Setup rule defaults
       if (rule.mode === undefined) { rule.mode = 'element'; }
       if (rule.textParentSelector) { rule.mode = 'text'; }
+      if (rule.filterSubtitles === undefined) { rule.filterSubtitles = true; }
 
       // Allow rules to override global settings
       if (rule.muteMethod === undefined) { rule.muteMethod = this.filter.cfg.muteMethod; }
@@ -164,7 +165,7 @@ export default class WebAudio {
       let result = this.filter.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
         filtered = true;
-        subtitle[textMethod] = result.filtered;
+        if (rule.filterSubtitles) { subtitle[textMethod] = result.filtered; }
         this.mute(rule.muteMethod); // Mute the audio if we haven't already
         if (subtitle.nodeName === '#text') { this.lastFilteredNode = subtitle; }
       }
