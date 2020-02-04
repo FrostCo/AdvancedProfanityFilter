@@ -67,7 +67,7 @@ export default class WebFilter extends Filter {
             node == filter.audio.lastFilteredNode
             || (
               filter.audio.lastFilteredText
-              && filter.audio.lastFilteredText.includes(node.innerText)
+              && filter.audio.lastFilteredText.includes(node.textContent)
             )
           )
         ) {
