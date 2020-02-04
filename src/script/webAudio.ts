@@ -4,7 +4,9 @@ import BookmarkletFilter from './bookmarkletFilter';
 export default class WebAudio {
   cueRuleIds: number[];
   filter: WebFilter | BookmarkletFilter;
-  lastFilteredNode: HTMLElement;
+  lastFilteredNode: HTMLElement | ChildNode;
+  lastFilteredText: string;
+  lastProcessed: string[];
   muted: boolean;
   rules: AudioRules[];
   sites: { [site: string]: AudioRules[] };
@@ -21,6 +23,8 @@ export default class WebAudio {
     this.watcherRuleIds = [];
     this.filter = filter;
     this.lastFilteredNode = null;
+    this.lastFilteredText = '';
+    this.lastProcessed = [];
     this.muted = false;
     if (
       filter.cfg.customAudioSites
@@ -60,11 +64,15 @@ export default class WebAudio {
 
   static readonly sites: { [site: string]: AudioRules[] } = {
     'abc.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
-    'www.amazon.com': [ { mode: 'element', removeSubtitleSpacing: true, subtitleSelector: 'span.timedTextBackground', tagName: 'P' } ],
+    'www.amazon.com': [
+      { mode: 'watcher', iframe: false, parentSelector: 'div.webPlayer div.persistentPanel', showSubtitles: 0, subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span' }
+    ],
     'www.amc.com': [
-      { mode: 'element', className: 'ttr-container', tagName: 'DIV', subtitleSelector: 'span.ttr-cue' },
+      { mode: 'element', className: 'ttr-container', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
       { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video' }
     ],
+    'www.att.tv': [ { mode: 'cue', videoSelector: 'video#quickplayPlayer' } ],
+    'www.cbs.com': [ { mode: 'cue', videoCueLanguage: 'en' } ],
     'www.dishanywhere.com': [
       { mode: 'element', className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' },
       { mode: 'element', className: 'bmpui-subtitle-region-container', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' }
@@ -72,10 +80,17 @@ export default class WebAudio {
     'www.disneyplus.com': [ { mode: 'cue', videoSelector: 'video.btm-media-client-element' } ],
     'www.fox.com': [ { mode: 'element', className: 'jw-text-track-container', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' } ],
     'www.hulu.com': [ { mode: 'element', className: 'caption-text-box', subtitleSelector: 'p', tagName: 'DIV' } ],
-    'www.nbc.com': [ { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' } ],
+    'www.nbc.com': [
+      { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
+      { mode: 'cue', videoCueLanguage: 'en' }
+    ],
     'www.netflix.com': [ { mode: 'element', className: 'player-timedtext-text-container', subtitleSelector: 'span', tagName: 'DIV' } ],
-    'app.plex.tv': [ { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' } ],
-    'www.sonycrackle.com': [ { mode: 'text', textParentSelector: 'div.clpp-subtitles-container' } ],
+    'www.philo.com': [ { mode: 'cue' } ],
+    'app.plex.tv': [
+      { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' },
+      { mode: 'element', containsSelector: 'div[data-dialogue-id]', subtitleSelector: 'span > span', tagName: 'DIV' }
+    ],
+    'www.sonycrackle.com': [ { mode: 'text', parentSelector: 'div.clpp-subtitles-container' } ],
     'www.syfy.com': [ { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' } ],
     'www.tntdrama.com': [ { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video.top-media-element' } ],
     'www.universalkids.com': [ { mode: 'element', subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' } ],
@@ -98,7 +113,7 @@ export default class WebAudio {
 
       // Setup rule defaults
       if (rule.mode === undefined) { rule.mode = 'element'; }
-      if (rule.textParentSelector) { rule.mode = 'text'; }
+      if (rule.filterSubtitles === undefined) { rule.filterSubtitles = true; }
 
       // Allow rules to override global settings
       if (rule.muteMethod === undefined) { rule.muteMethod = this.filter.cfg.muteMethod; }
@@ -128,14 +143,17 @@ export default class WebAudio {
         case 'text':
           block += `
             if (node.nodeName === '#text') {
-              let textParent = document.querySelector('${rule.textParentSelector}');
-              if (textParent && textParent.contains(node)) { return ${index}; }
+              let parent = document.querySelector('${rule.parentSelector}');
+              if (parent && parent.contains(node)) { return ${index}; }
             }`;
           break;
         case 'watcher':
-          // NO-OP for supportedNode()
-          if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
           this.watcherRuleIds.push(index);
+          this.initWatcherRule(rule);
+          block += `
+            if (node.parentElement && node.parentElement == document.querySelector('${rule.subtitleSelector}')) { return ${index}; }
+            ${rule.parentSelector ? `let parent = document.querySelector('${rule.parentSelector}'); if (parent && parent.contains(node)) { return ${index}; }` : ''}
+          `;
           break;
       }
     });
@@ -145,8 +163,13 @@ export default class WebAudio {
 
   clean(subtitleContainer, ruleIndex = 0): void {
     let rule = this.rules[ruleIndex];
+    if (rule.mode === 'watcher') { return null; } // If this is for a watcher rule, leave the text alone
     let filtered = false;
-    let subtitles = rule.subtitleSelector ? subtitleContainer.querySelectorAll(rule.subtitleSelector) : [subtitleContainer];
+
+    if (subtitleContainer.nodeName && subtitleContainer.nodeName === '#text' && subtitleContainer.parentElement) {
+      subtitleContainer = subtitleContainer.parentElement;
+    }
+    let subtitles = rule.subtitleSelector && subtitleContainer.querySelectorAll ? subtitleContainer.querySelectorAll(rule.subtitleSelector) : [subtitleContainer];
 
     // Process subtitles
     subtitles.forEach(subtitle => {
@@ -155,9 +178,10 @@ export default class WebAudio {
       let result = this.filter.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
         filtered = true;
-        subtitle[textMethod] = result.filtered;
         this.mute(rule.muteMethod); // Mute the audio if we haven't already
-        if (subtitle.nodeName === '#text') { this.lastFilteredNode = subtitle; }
+        if (rule.filterSubtitles) { subtitle[textMethod] = result.filtered; }
+        this.lastFilteredNode = subtitle;
+        this.lastFilteredText = subtitle[textMethod];
       }
     });
 
@@ -230,6 +254,12 @@ export default class WebAudio {
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
   }
 
+  initWatcherRule(rule) {
+    if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
+    if (rule.trackProcessed === undefined) { rule.trackProcessed = true; }
+    if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
+  }
+
   mute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
     if (!this.muted) {
       this.muted = true;
@@ -251,7 +281,7 @@ export default class WebAudio {
   }
 
   playing(video: HTMLMediaElement): boolean {
-    return !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
+    return !!(video && video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
 
   processCues(cues: FilteredTextTrackCue[], rule: AudioRules) {
@@ -296,24 +326,82 @@ export default class WebAudio {
 
   watcher(instance: WebAudio, ruleId = 0) {
     let rule = instance.rules[ruleId];
-    let captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
+    let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
 
-    if (captions && captions.textContent) {
-      let combinedText = captions.textContent.trim();
-      // Checking minimum length due to live-style captions ('#')
-      if (combinedText && combinedText.length > 2) {
-        let result = instance.filter.replaceTextResult(combinedText);
-        if (result.modified) {
-          instance.mute(rule.muteMethod);
+    if (video && instance.playing(video)) {
+      let captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
+
+      if (captions && captions.textContent) {
+        let filtered = false;
+        let newCaptions = !rule.trackProcessed;
+
+        if (captions.hasChildNodes()) {
+          captions.childNodes.forEach((child, index) => {
+            // innerText handles line feeds/spacing better, but is not available to #text nodes
+            let textMethod = (child && child.nodeName)  === '#text' ? 'textContent' : 'innerText';
+
+            // Skip captions/subtitles that have already been processed
+            if (!newCaptions) {
+              if (captions.childNodes.length === instance.lastProcessed.length) {
+                if (instance.lastProcessed[index] === child[textMethod]) {
+                  return false;
+                } else {
+                  newCaptions = true;
+                  instance.lastProcessed.slice(0, index);
+                }
+              } else {
+                newCaptions = true;
+                instance.lastProcessed = [];
+              }
+            }
+
+            // Filter the captions/subtitles
+            if (child[textMethod]) {
+              let result = instance.filter.replaceTextResult(child[textMethod]);
+              if (result.modified) {
+                instance.mute(rule.muteMethod);
+                filtered = true;
+                if (rule.filterSubtitles) { child[textMethod] = result.filtered; }
+                instance.lastFilteredNode = child;
+                instance.lastFilteredText = child[textMethod];
+              }
+            }
+            if (rule.trackProcessed) { instance.lastProcessed.push(child[textMethod]); }
+          });
+          if (!newCaptions) { return false; } // Skip captions/subtitles that have already been processed
         } else {
-          instance.unmute(rule.muteMethod);
+          // innerText handles line feeds/spacing better, but is not available to #text nodes
+          let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
+
+          // Skip captions/subtitles that have already been processed
+          if (!newCaptions && instance.lastProcessed.includes(captions[textMethod])) { return false; }
+
+          if (captions[textMethod] && (instance.lastFilteredText && !captions[textMethod].contains(instance.lastFilteredText))) {
+            let result = instance.filter.replaceTextResult(captions[textMethod]);
+            if (result.modified) {
+              instance.mute(rule.muteMethod);
+              filtered = true;
+              if (rule.filterSubtitles) { captions[textMethod] = result.filtered; }
+              instance.lastFilteredNode = captions;
+              instance.lastFilteredText = captions[textMethod];
+            }
+          }
+          if (rule.trackProcessed) { instance.lastProcessed = [captions[textMethod]]; }
         }
 
-        switch (rule.showSubtitles) {
-          case 1: captions.style.display = result.modified ? '' : 'none'; break;
-          case 2: captions.style.display = result.modified ? 'none' : ''; break;
-          case 3: captions.style.display = 'none'; break;
+        // Unmute if nothing was filtered and the text doesn't match the last filtered
+        let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
+        if (!filtered && !captions[textMethod].includes(instance.lastFilteredText)) { instance.unmute(rule.muteMethod); }
+
+        if (captions.nodeName !== '#text') {
+          switch (rule.showSubtitles) {
+            case 1: captions.style.display = filtered ? '' : 'none'; break;
+            case 2: captions.style.display = filtered ? 'none' : ''; break;
+            case 3: captions.style.display = 'none'; break;
+          }
         }
+
+        if (filtered) { instance.filter.updateCounterBadge(); } // Update if modified
       }
     }
   }
