@@ -2,7 +2,6 @@ interface AudioRules {
   mode: string;                     // 'cue', 'element', 'text', 'watcher'
   className?: string;               // [Element] node.className.includes()
   checkInterval?: number;           // [Watcher] Set a custom watch interval (in ms)
-  combineText?: boolean;            // [Watcher] Combines subtitle text together [Rarely needed]
   containsSelector?: string;        // [Element] node.querySelector() [Not commonly used]
   dataPropPresent?: string;         // [Element] node.dataset.hasOwnProperty()
   filterSubtitles?: boolean;        // [All] Filter subtitle text [Default: true]
@@ -14,6 +13,7 @@ interface AudioRules {
   subtitleSelector?: string;        // [Element,Watcher] *Used for Filtering*: node.querySelector()
   tagName?: string;                 // [Element] *REQUIRED*: node.nodeName
   textParentSelector?: string;      // [Text] parent.contains(node)
+  trackProcessed?: boolean;         // [Watcher] Attempt to only process text once
   videoCueHideCues?: boolean;       // [Cue] Hide activeCues instead of textTrack.mode = 'hidden'
   videoCueLanguage?: string;        // [Cue] Language for video TextTrack
   videoCueRequireShowing?: boolean; // [Cue] Override global setting for muteCueRequireShowing

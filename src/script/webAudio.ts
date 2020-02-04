@@ -6,6 +6,7 @@ export default class WebAudio {
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
+  lastProcessed: string[];
   muted: boolean;
   rules: AudioRules[];
   sites: { [site: string]: AudioRules[] };
@@ -22,6 +23,8 @@ export default class WebAudio {
     this.watcherRuleIds = [];
     this.filter = filter;
     this.lastFilteredNode = null;
+    this.lastFilteredText = '';
+    this.lastProcessed = [];
     this.muted = false;
     if (
       filter.cfg.customAudioSites
@@ -61,7 +64,9 @@ export default class WebAudio {
 
   static readonly sites: { [site: string]: AudioRules[] } = {
     'abc.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
-    'www.amazon.com': [ { mode: 'element', removeSubtitleSpacing: true, subtitleSelector: 'span.timedTextBackground', tagName: 'P' } ],
+    'www.amazon.com': [
+      { mode: 'watcher', iframe: false, subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span', textParentSelector: 'div.webPlayer div.persistentPanel' }
+    ],
     'www.amc.com': [
       { mode: 'element', className: 'ttr-container', tagName: 'DIV', subtitleSelector: 'span.ttr-cue' },
       { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video' }
@@ -108,7 +113,6 @@ export default class WebAudio {
 
       // Setup rule defaults
       if (rule.mode === undefined) { rule.mode = 'element'; }
-      if (rule.textParentSelector) { rule.mode = 'text'; }
       if (rule.filterSubtitles === undefined) { rule.filterSubtitles = true; }
 
       // Allow rules to override global settings
@@ -148,6 +152,7 @@ export default class WebAudio {
           this.initWatcherRule(rule);
           block += `
             if (node.parentElement && node.parentElement == document.querySelector('${rule.subtitleSelector}')) { return ${index}; }
+            ${rule.textParentSelector ? `let parent = document.querySelector('${rule.textParentSelector}'); if (parent && parent.contains(node)) { return ${index}; }` : ''}
           `;
           break;
       }
@@ -246,8 +251,9 @@ export default class WebAudio {
   }
 
   initWatcherRule(rule) {
-    if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
+    if (rule.trackProcessed === undefined) { rule.trackProcessed = true; }
+    if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
   }
 
   mute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
@@ -324,35 +330,47 @@ export default class WebAudio {
       if (captions && captions.textContent) {
         let filtered = false;
 
-        if (rule.combineText) {
-          let combinedText = captions.textContent.trim();
-          // Checking minimum length due to live-style captions ('#')
-          if (combinedText && combinedText.length > 2) {
-            let result = instance.filter.replaceTextResult(combinedText);
-            if (result.modified) {
-              instance.mute(rule.muteMethod);
-            } else {
-              instance.unmute(rule.muteMethod);
-            }
-          }
-        } else if (captions.hasChildNodes()) {
-          captions.childNodes.forEach(child => {
+        if (captions.hasChildNodes()) {
+          let newCaptions = !rule.trackProcessed;
+          captions.childNodes.forEach((child, index) => {
             // innerText handles line feeds/spacing better, but is not available to #text nodes
             let textMethod = (child && child.nodeName)  === '#text' ? 'textContent' : 'innerText';
+
+            // Skip captions/subtitles that have already been processed
+            if (!newCaptions) {
+              if (captions.childNodes.length === instance.lastProcessed.length) {
+                if (instance.lastProcessed[index] === child[textMethod]) {
+                  return false;
+                } else {
+                  instance.lastProcessed.slice(0, index);
+                }
+              } else {
+                newCaptions = true;
+                instance.lastProcessed = [];
+              }
+            }
+            if (rule.trackProcessed) { instance.lastProcessed.push(child[textMethod]); }
+
+            // Filter the captions/subtitles
             if (child[textMethod]) {
               let result = instance.filter.replaceTextResult(child[textMethod]);
               if (result.modified) {
                 instance.mute(rule.muteMethod);
                 filtered = true;
                 if (rule.filterSubtitles) { child[textMethod] = result.filtered; }
-                this.lastFilteredNode = child;
-                this.lastFilteredText = child[textMethod];
+                instance.lastFilteredNode = child;
+                instance.lastFilteredText = child[textMethod];
               }
             }
           });
         } else {
           // innerText handles line feeds/spacing better, but is not available to #text nodes
           let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
+
+          // Skip captions/subtitles that have already been processed
+          if (instance.lastProcessed.includes(captions[textMethod])) { return false; }
+          instance.lastProcessed = [captions[textMethod]];
+
           if (captions[textMethod] && (instance.lastFilteredText && !captions[textMethod].contains(instance.lastFilteredText))) {
             let result = instance.filter.replaceTextResult(captions[textMethod]);
             if (result.modified) {
