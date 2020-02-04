@@ -164,9 +164,12 @@ export default class WebAudio {
   clean(subtitleContainer, ruleIndex = 0): void {
     let rule = this.rules[ruleIndex];
     if (rule.mode === 'watcher') { return null; } // If this is for a watcher rule, leave the text alone
-
     let filtered = false;
-    let subtitles = rule.subtitleSelector ? subtitleContainer.querySelectorAll(rule.subtitleSelector) : [subtitleContainer];
+
+    if (subtitleContainer.nodeName && subtitleContainer.nodeName === '#text' && subtitleContainer.parentElement) {
+      subtitleContainer = subtitleContainer.parentElement;
+    }
+    let subtitles = rule.subtitleSelector && subtitleContainer.querySelectorAll ? subtitleContainer.querySelectorAll(rule.subtitleSelector) : [subtitleContainer];
 
     // Process subtitles
     subtitles.forEach(subtitle => {
@@ -175,9 +178,10 @@ export default class WebAudio {
       let result = this.filter.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
         filtered = true;
-        if (rule.filterSubtitles) { subtitle[textMethod] = result.filtered; }
         this.mute(rule.muteMethod); // Mute the audio if we haven't already
-        if (subtitle.nodeName === '#text') { this.lastFilteredNode = subtitle; }
+        if (rule.filterSubtitles) { subtitle[textMethod] = result.filtered; }
+        this.lastFilteredNode = subtitle;
+        this.lastFilteredText = subtitle[textMethod];
       }
     });
 
