@@ -65,10 +65,10 @@ export default class WebAudio {
   static readonly sites: { [site: string]: AudioRules[] } = {
     'abc.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
     'www.amazon.com': [
-      { mode: 'watcher', iframe: false, subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span', parentSelector: 'div.webPlayer div.persistentPanel' }
+      { mode: 'watcher', iframe: false, parentSelector: 'div.webPlayer div.persistentPanel', subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span' }
     ],
     'www.amc.com': [
-      { mode: 'element', className: 'ttr-container', tagName: 'DIV', subtitleSelector: 'span.ttr-cue' },
+      { mode: 'element', className: 'ttr-container', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
       { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video' }
     ],
     'www.att.tv': [ { mode: 'cue', videoSelector: 'video#quickplayPlayer' } ],
@@ -88,7 +88,7 @@ export default class WebAudio {
     'www.philo.com': [ { mode: 'cue' } ],
     'app.plex.tv': [
       { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' },
-      { containsSelector: 'div[data-dialogue-id]', mode: 'element', subtitleSelector: 'span > span', tagName: 'DIV' }
+      { mode: 'element', containsSelector: 'div[data-dialogue-id]', subtitleSelector: 'span > span', tagName: 'DIV' }
     ],
     'www.sonycrackle.com': [ { mode: 'text', parentSelector: 'div.clpp-subtitles-container' } ],
     'www.syfy.com': [ { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' } ],
