@@ -329,9 +329,9 @@ export default class WebAudio {
 
       if (captions && captions.textContent) {
         let filtered = false;
+        let newCaptions = !rule.trackProcessed;
 
         if (captions.hasChildNodes()) {
-          let newCaptions = !rule.trackProcessed;
           captions.childNodes.forEach((child, index) => {
             // innerText handles line feeds/spacing better, but is not available to #text nodes
             let textMethod = (child && child.nodeName)  === '#text' ? 'textContent' : 'innerText';
@@ -342,6 +342,7 @@ export default class WebAudio {
                 if (instance.lastProcessed[index] === child[textMethod]) {
                   return false;
                 } else {
+                  newCaptions = true;
                   instance.lastProcessed.slice(0, index);
                 }
               } else {
@@ -349,7 +350,6 @@ export default class WebAudio {
                 instance.lastProcessed = [];
               }
             }
-            if (rule.trackProcessed) { instance.lastProcessed.push(child[textMethod]); }
 
             // Filter the captions/subtitles
             if (child[textMethod]) {
@@ -362,14 +362,15 @@ export default class WebAudio {
                 instance.lastFilteredText = child[textMethod];
               }
             }
+            if (rule.trackProcessed) { instance.lastProcessed.push(child[textMethod]); }
           });
+          if (!newCaptions) { return false; } // Skip captions/subtitles that have already been processed
         } else {
           // innerText handles line feeds/spacing better, but is not available to #text nodes
           let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
 
           // Skip captions/subtitles that have already been processed
-          if (instance.lastProcessed.includes(captions[textMethod])) { return false; }
-          instance.lastProcessed = [captions[textMethod]];
+          if (!newCaptions && instance.lastProcessed.includes(captions[textMethod])) { return false; }
 
           if (captions[textMethod] && (instance.lastFilteredText && !captions[textMethod].contains(instance.lastFilteredText))) {
             let result = instance.filter.replaceTextResult(captions[textMethod]);
@@ -381,10 +382,12 @@ export default class WebAudio {
               instance.lastFilteredText = captions[textMethod];
             }
           }
+          if (rule.trackProcessed) { instance.lastProcessed = [captions[textMethod]]; }
         }
 
-        // Unmute if nothing was filtered and the text doesn't match teh last filtered
-        if (!filtered && !captions.innerText.includes(instance.lastFilteredText)) { instance.unmute(rule.muteMethod); }
+        // Unmute if nothing was filtered and the text doesn't match the last filtered
+        let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
+        if (!filtered && !captions[textMethod].includes(instance.lastFilteredText)) { instance.unmute(rule.muteMethod); }
 
         if (captions.nodeName !== '#text') {
           switch (rule.showSubtitles) {
