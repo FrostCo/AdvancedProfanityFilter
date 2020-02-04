@@ -65,7 +65,7 @@ export default class WebAudio {
   static readonly sites: { [site: string]: AudioRules[] } = {
     'abc.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
     'www.amazon.com': [
-      { mode: 'watcher', iframe: false, subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span', textParentSelector: 'div.webPlayer div.persistentPanel' }
+      { mode: 'watcher', iframe: false, subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span', parentSelector: 'div.webPlayer div.persistentPanel' }
     ],
     'www.amc.com': [
       { mode: 'element', className: 'ttr-container', tagName: 'DIV', subtitleSelector: 'span.ttr-cue' },
@@ -90,7 +90,7 @@ export default class WebAudio {
       { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' },
       { containsSelector: 'div[data-dialogue-id]', mode: 'element', subtitleSelector: 'span > span', tagName: 'DIV' }
     ],
-    'www.sonycrackle.com': [ { mode: 'text', textParentSelector: 'div.clpp-subtitles-container' } ],
+    'www.sonycrackle.com': [ { mode: 'text', parentSelector: 'div.clpp-subtitles-container' } ],
     'www.syfy.com': [ { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' } ],
     'www.tntdrama.com': [ { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video.top-media-element' } ],
     'www.universalkids.com': [ { mode: 'element', subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' } ],
@@ -143,8 +143,8 @@ export default class WebAudio {
         case 'text':
           block += `
             if (node.nodeName === '#text') {
-              let textParent = document.querySelector('${rule.textParentSelector}');
-              if (textParent && textParent.contains(node)) { return ${index}; }
+              let parent = document.querySelector('${rule.parentSelector}');
+              if (parent && parent.contains(node)) { return ${index}; }
             }`;
           break;
         case 'watcher':
@@ -152,7 +152,7 @@ export default class WebAudio {
           this.initWatcherRule(rule);
           block += `
             if (node.parentElement && node.parentElement == document.querySelector('${rule.subtitleSelector}')) { return ${index}; }
-            ${rule.textParentSelector ? `let parent = document.querySelector('${rule.textParentSelector}'); if (parent && parent.contains(node)) { return ${index}; }` : ''}
+            ${rule.parentSelector ? `let parent = document.querySelector('${rule.parentSelector}'); if (parent && parent.contains(node)) { return ${index}; }` : ''}
           `;
           break;
       }
