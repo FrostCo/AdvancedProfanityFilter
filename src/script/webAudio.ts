@@ -65,7 +65,7 @@ export default class WebAudio {
   static readonly sites: { [site: string]: AudioRules[] } = {
     'abc.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
     'www.amazon.com': [
-      { mode: 'watcher', iframe: false, parentSelector: 'div.webPlayer div.persistentPanel', subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span' }
+      { mode: 'watcher', iframe: false, parentSelector: 'div.webPlayer div.persistentPanel', showSubtitles: 0, subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span' }
     ],
     'www.amc.com': [
       { mode: 'element', className: 'ttr-container', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
