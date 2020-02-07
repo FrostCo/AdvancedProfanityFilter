@@ -191,8 +191,6 @@ export default class WebAudio {
       case 2: if (filtered) { this.hideElementSubtitles(subtitles, rule); } break;
       case 3: this.hideElementSubtitles(subtitles, rule); break;
     }
-
-    if (filtered) { this.filter.updateCounterBadge(); } // Update if modified
   }
 
   cleanYouTubeAutoSubs(node): void {
