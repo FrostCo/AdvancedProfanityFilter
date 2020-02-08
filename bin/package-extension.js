@@ -6,20 +6,35 @@ const AdmZip = require('adm-zip');
 
 function buildAll() {
   buildChrome(prepareZip());
-  buildEdge(getManifestJSON(), prepareZip());
+  buildEdge(prepareZip());
+  buildEdgeLegacy(getManifestJSON(), prepareZip());
   buildFirefox(getManifestJSON(), prepareZip());
   buildOpera(prepareZip());
 }
 
 function buildChrome(zip) {
-  console.log('Building ./extension-chrome.zip');
-  fse.removeSync('./extension-chrome.zip');
-  zip.writeZip('./extension-chrome.zip');
+  let packagePath = './extension-chrome.zip';
+  console.log(`Building ${packagePath}`);
+  fse.removeSync(packagePath);
+  zip.writeZip(packagePath);
 }
 
-function buildEdge(manifest, zip) {
-  if (!fse.existsSync('./store/edge')) { return false; }
-  console.log('Building ./extension-edge.zip');
+function buildEdge(zip) {
+  let packagePath = './extension-edge.zip';
+  console.log(`Building ${packagePath}`);
+  fse.removeSync(packagePath);
+  zip.writeZip(packagePath);
+}
+
+function buildEdgeLegacy(manifest, zip) {
+  let packagePath = './extension-edge-legacy.zip';
+  console.log(`Building ${packagePath}`);
+
+  if (!fse.existsSync('./store/edge')) {
+    console.log('Error! Missing Edge legacy polyfills.');
+    return false;
+  }
+
   let msPreload = {
     backgroundScript: 'backgroundScriptsAPIBridge.js',
     contentScript: 'contentScriptsAPIBridge.js'
@@ -35,12 +50,13 @@ function buildEdge(manifest, zip) {
   updateManifestFileInZip(zip, manifest);
   zip.addLocalFile('./store/edge/src/backgroundScriptsAPIBridge.js', null);
   zip.addLocalFile('./store/edge/src/contentScriptsAPIBridge.js', null);
-  fse.removeSync('./extension-edge.zip');
-  zip.writeZip('./extension-edge.zip');
+  fse.removeSync(packagePath);
+  zip.writeZip(packagePath);
 }
 
 function buildFirefox(manifest, zip) {
-  console.log('Building ./extension-firefox.zip');
+  let packagePath = './extension-firefox.zip';
+  console.log(`Building ${packagePath}`);
   let firefoxManifest = {
     applications: {
       gecko: {
@@ -50,16 +66,17 @@ function buildFirefox(manifest, zip) {
   };
   manifest.applications = firefoxManifest.applications;
   updateManifestFileInZip(zip, manifest);
-  fse.removeSync('./extension-firefox.zip');
-  zip.writeZip('./extension-firefox.zip');
+  fse.removeSync(packagePath);
+  zip.writeZip(packagePath);
 
   packageSource(); // Required due to bundled code
 }
 
 function buildOpera(zip) {
-  console.log('Building ./extension-opera.zip');
-  fse.removeSync('./extension-opera.zip');
-  zip.writeZip('./extension-opera.zip');
+  let packagePath = './extension-opera.zip';
+  console.log(`Building ${packagePath}`);
+  fse.removeSync(packagePath);
+  zip.writeZip(packagePath);
 }
 
 function getManifestJSON() {
