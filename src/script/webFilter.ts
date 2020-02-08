@@ -63,12 +63,11 @@ export default class WebFilter extends Filter {
         let supported = filter.audio.supportedNode(node);
         if (
           supported !== false
+          || node == filter.audio.lastFilteredNode
           || (
-            node == filter.audio.lastFilteredNode
-            || (
-              filter.audio.lastFilteredText
-              && filter.audio.lastFilteredText.includes(node.textContent)
-            )
+            filter.audio.simpleUnmute
+            && filter.audio.lastFilteredText
+            && filter.audio.lastFilteredText.includes(node.textContent)
           )
         ) {
           filter.audio.unmute();
@@ -87,8 +86,8 @@ export default class WebFilter extends Filter {
     // console.log('[APF] Process mutation.target:', mutation.target, mutation.target.data); // Debug: Filter - Mutation text
     if (!Page.isForbiddenNode(mutation.target)) {
       let supported = filter.mutePage ? filter.audio.supportedNode(mutation.target) : false;
-      if (supported !== false) {
-        // Check if a previously filtered node is being removed
+      if (supported !== false && filter.audio.simpleUnmute) {
+        // Supported node. Check if a previously filtered node is being removed
         if (
           filter.audio.muted
           && mutation.oldValue
@@ -98,7 +97,8 @@ export default class WebFilter extends Filter {
           filter.audio.unmute();
         }
         filter.audio.clean(mutation.target, supported);
-      } else if (filter.mutePage && filter.audio.muted && !mutation.target.parentElement) { // Check for removing a filtered subtitle
+      } else if (filter.mutePage && filter.audio.simpleUnmute && filter.audio.muted && !mutation.target.parentElement) {
+        // Check for removing a filtered subtitle (no parent)
         if (filter.audio.lastFilteredText && filter.audio.lastFilteredText.includes(mutation.target.textContent)) {
           filter.audio.unmute();
         }

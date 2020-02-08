@@ -9,6 +9,7 @@ export default class WebAudio {
   lastProcessed: string[];
   muted: boolean;
   rules: AudioRules[];
+  simpleUnmute: boolean;
   sites: { [site: string]: AudioRules[] };
   supportedNode: Function;
   supportedPage: boolean;
@@ -65,7 +66,7 @@ export default class WebAudio {
   static readonly sites: { [site: string]: AudioRules[] } = {
     'abc.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
     'www.amazon.com': [
-      { mode: 'watcher', iframe: false, parentSelector: 'div.webPlayer div.persistentPanel', showSubtitles: 0, subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span' }
+      { mode: 'watcher', iframe: false, parentSelector: 'div.webPlayer div.persistentPanel', showSubtitles: 0, simpleUnmute: true, subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span' }
     ],
     'www.amc.com': [
       { mode: 'element', className: 'ttr-container', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
@@ -114,6 +115,7 @@ export default class WebAudio {
       // Setup rule defaults
       if (rule.mode === undefined) { rule.mode = 'element'; }
       if (rule.filterSubtitles === undefined) { rule.filterSubtitles = true; }
+      if (rule.simpleUnmute) { this.simpleUnmute = true; }
 
       // Allow rules to override global settings
       if (rule.muteMethod === undefined) { rule.muteMethod = this.filter.cfg.muteMethod; }
