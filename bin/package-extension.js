@@ -5,22 +5,14 @@ const path = require('path');
 const AdmZip = require('adm-zip');
 
 function buildAll() {
-  buildChrome(prepareZip());
-  buildEdge(prepareZip());
+  build(prepareZip());
   buildEdgeLegacy(getManifestJSON(), prepareZip());
   buildFirefox(getManifestJSON(), prepareZip());
-  buildOpera(prepareZip());
 }
 
-function buildChrome(zip) {
-  let packagePath = './extension-chrome.zip';
-  console.log(`Building ${packagePath}`);
-  fse.removeSync(packagePath);
-  zip.writeZip(packagePath);
-}
-
-function buildEdge(zip) {
-  let packagePath = './extension-edge.zip';
+function build(zip, name = '') {
+  if (name) { name = '-' + name; }
+  let packagePath = `./extension${name}.zip`;
   console.log(`Building ${packagePath}`);
   fse.removeSync(packagePath);
   zip.writeZip(packagePath);
@@ -70,13 +62,6 @@ function buildFirefox(manifest, zip) {
   zip.writeZip(packagePath);
 
   packageSource(); // Required due to bundled code
-}
-
-function buildOpera(zip) {
-  let packagePath = './extension-opera.zip';
-  console.log(`Building ${packagePath}`);
-  fse.removeSync(packagePath);
-  zip.writeZip(packagePath);
 }
 
 function getManifestJSON() {
