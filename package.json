@@ -1,6 +1,6 @@
 {
   "name": "advancedprofanityfilter",
-  "version": "2.5.4",
+  "version": "2.6.0",
   "description": "A browser extension to filter profanity from webpages.",
   "main": "filter.js",
   "repository": {
