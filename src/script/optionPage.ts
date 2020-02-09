@@ -592,7 +592,7 @@ export default class OptionPage {
       let text = customAudioSitesTextArea.value;
       self.cfg.customAudioSites = text == '' ? null : JSON.parse(text);
       if (await option.saveProp('customAudioSites')) {
-        customAudioSitesTextArea.value = JSON.stringify(self.cfg.customAudioSites, null, 2);
+        customAudioSitesTextArea.value = self.cfg.customAudioSites ? JSON.stringify(self.cfg.customAudioSites, null, 2) : '';
         OptionPage.showStatusModal('Custom Audio Sites saved.');
       }
     } catch(e) {

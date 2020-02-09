@@ -11,6 +11,7 @@ interface AudioRules {
   parentSelector?: string;          // [Text,Watcher] parent.contains(node)
   removeSubtitleSpacing?: boolean;  // [Element] Remove subtitle padding/margin when hiding
   showSubtitles?: number;           // [All] Override global showSubtitles (0: all, 1: filtered, 2: unfiltered, 3: none)
+  simpleUnmute?: boolean;           // [All] Simplify requirements for unmuting [Not commonly used]
   subtitleSelector?: string;        // [Element,Watcher] *Used for Filtering*: node.querySelector()
   tagName?: string;                 // [Element] *REQUIRED*: node.nodeName
   trackProcessed?: boolean;         // [Watcher] Attempt to only process text once (Default: true)

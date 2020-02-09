@@ -65,23 +65,50 @@ export default class BookmarkletFilter extends Filter {
     if (filter.mutePage && filter.audio.muted) {
       mutation.removedNodes.forEach(node => {
         let supported = filter.audio.supportedNode(node);
-        if (supported !== false || node == filter.audio.lastFilteredNode) {
+        if (
+          supported !== false
+          || node == filter.audio.lastFilteredNode
+          || (
+            filter.audio.simpleUnmute
+            && filter.audio.lastFilteredText
+            && filter.audio.lastFilteredText.includes(node.textContent)
+          )
+        ) {
           filter.audio.unmute();
         }
       });
     }
 
     // Only process mutation change if target is text
-    if (!filter.audioOnly && mutation.target && mutation.target.nodeName == '#text') {
+    if (mutation.target && mutation.target.nodeName === '#text') {
       filter.checkMutationTargetTextForProfanity(mutation);
     }
   }
 
   checkMutationTargetTextForProfanity(mutation) {
     if (!Page.isForbiddenNode(mutation.target)) {
-      let result = this.replaceTextResult(mutation.target.data);
-      if (result.modified) {
-        mutation.target.data = result.filtered;
+      let supported = filter.mutePage ? filter.audio.supportedNode(mutation.target) : false;
+      if (supported !== false && filter.audio.simpleUnmute) {
+        // Supported node. Check if a previously filtered node is being removed
+        if (
+          filter.audio.muted
+          && mutation.oldValue
+          && filter.audio.lastFilteredText
+          && filter.audio.lastFilteredText.includes(mutation.oldValue)
+        ) {
+          filter.audio.unmute();
+        }
+        filter.audio.clean(mutation.target, supported);
+      } else if (filter.mutePage && filter.audio.simpleUnmute && filter.audio.muted && !mutation.target.parentElement) {
+        // Check for removing a filtered subtitle (no parent)
+        if (filter.audio.lastFilteredText && filter.audio.lastFilteredText.includes(mutation.target.textContent)) {
+          filter.audio.unmute();
+        }
+      } else if (!filter.audioOnly) { // Filter regular text
+        let result = this.replaceTextResult(mutation.target.data);
+        if (result.modified) {
+          mutation.target.data = result.filtered;
+        }
       }
     }
   }
@@ -139,7 +166,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   cleanNodeText(node) {
-    if (filter.advanced && (node.parentNode || node == document)) {
+    if (filter.advanced && (node.parentNode || node === document)) {
       filter.advancedReplaceText(node);
     } else {
       filter.cleanNode(node);
@@ -202,7 +229,7 @@ export default class BookmarkletFilter extends Filter {
 let filter = new BookmarkletFilter;
 let observer;
 let shadowObserver;
-let observerConfig = {
+let observerConfig: MutationObserverInit = {
   characterData: true,
   characterDataOldValue: true,
   childList: true,
