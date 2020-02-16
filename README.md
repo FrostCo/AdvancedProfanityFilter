@@ -12,9 +12,11 @@ For an overview of features and options, please head to the [wiki](https://githu
 | Browser | Download |
 |---------|----------|
 | Chrome  | [Chrome Web Store](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh) |
-| Firefox | [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/advanced_profanity_filter)|
-| Opera   | [Opera addons](https://addons.opera.com/en/extensions/details/advanced-profanity-filter/)
-| Edge    | [More Info](https://github.com/richardfrost/AdvancedProfanityFilter/issues/102) |
+| Firefox | [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/advanced_profanity_filter) |
+| Edge    | [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/lhnbdlbhcokmgpjenkjolnhdnkphnkam) |
+| Edge (Legacy) | [More Info](https://github.com/richardfrost/AdvancedProfanityFilter/issues/102) |
+| Opera   | [Opera addons](https://addons.opera.com/en/extensions/details/advanced-profanity-filter/) |
+| Android | [Kiwi](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser) or [Firefox](https://play.google.com/store/apps/details?id=org.mozilla.firefox) |
 
 ### Features
 * Filter modes
