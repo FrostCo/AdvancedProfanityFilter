@@ -6,11 +6,11 @@ export default class DataMigration {
 
   // Only append so the order stays the same (oldest first).
   static readonly migrations = new Map([
-    ['1.0.13', 'moveToNewWordsStorage'],
-    ['1.1.0', 'sanitizeWords'],
-    ['1.2.0', 'singleWordSubstitution'],
-    ['2.1.4', 'updateDefaultSubs'],
-    ['2.3.0', 'fixSmartWatch'],
+    ['1.0.13', { name: 'moveToNewWordsStorage', runOnImport: false }],
+    ['1.1.0', { name: 'sanitizeWords', runOnImport: true} ],
+    ['1.2.0', { name: 'singleWordSubstitution', runOnImport: true} ],
+    ['2.1.4', { name: 'updateDefaultSubs', runOnImport: false} ],
+    ['2.3.0', { name: 'fixSmartWatch', runOnImport: false} ],
   ]);
 
   constructor(config) {
@@ -34,10 +34,10 @@ export default class DataMigration {
   byVersion(oldVersion: string) {
     let version = getVersion(oldVersion) as Version;
     let migrated = false;
-    for (let [migrationVersion, migrationName] of DataMigration.migrations) {
+    for (let [migrationVersion, migration] of DataMigration.migrations) {
       if (isVersionOlder(version, getVersion(migrationVersion))) {
         migrated = true;
-        this[migrationName]();
+        this[migration.name]();
       }
     }
 
@@ -81,9 +81,16 @@ export default class DataMigration {
   }
 
   runImportMigrations() {
-    this.sanitizeWords(); // 1.1.0
-    this.singleWordSubstitution(); // 1.2.0
-    this.updateDefaultSubs(); // 2.1.4
+    let migrated = false;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (let [migrationVersion, migration] of DataMigration.migrations) {
+      if (migration.runOnImport) {
+        migrated = true;
+        this[migration.name]();
+      }
+    }
+
+    return migrated;
   }
 
   // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)
