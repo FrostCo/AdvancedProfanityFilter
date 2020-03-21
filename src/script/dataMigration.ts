@@ -5,13 +5,13 @@ export default class DataMigration {
   cfg: WebConfig;
 
   // Only append so the order stays the same (oldest first).
-  static readonly migrations = new Map([
-    ['1.0.13', 'moveToNewWordsStorage'],
-    ['1.1.0', 'sanitizeWords'],
-    ['1.2.0', 'singleWordSubstitution'],
-    ['2.1.4', 'updateDefaultSubs'],
-    ['2.3.0', 'fixSmartWatch'],
-  ]);
+  static readonly migrations: Migration[] = [
+    { version: '1.0.13', name: 'moveToNewWordsStorage', runOnImport: false },
+    { version: '1.1.0', name: 'sanitizeWords', runOnImport: true },
+    { version: '1.2.0', name: 'singleWordSubstitution', runOnImport: true },
+    { version: '2.1.4', name: 'updateDefaultSubs', runOnImport: false },
+    { version: '2.3.0', name: 'fixSmartWatch', runOnImport: false }
+  ];
 
   constructor(config) {
     this.cfg = config;
@@ -22,24 +22,25 @@ export default class DataMigration {
     return new DataMigration(cfg);
   }
 
-  static latestMigration(): string {
-    return Array.from(DataMigration.migrations)[DataMigration.migrations.size - 1][0];
+  static latestMigration(): Migration {
+    return DataMigration.migrations[DataMigration.migrations.length - 1];
   }
 
   static migrationNeeded(oldVersion: string): boolean {
-    return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.latestMigration()));
+    return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.latestMigration().version));
   }
 
   // This will look at the version (from before the update) and perform data migrations if necessary
   byVersion(oldVersion: string) {
+    let self = this;
     let version = getVersion(oldVersion) as Version;
     let migrated = false;
-    for (let [migrationVersion, migrationName] of DataMigration.migrations) {
-      if (isVersionOlder(version, getVersion(migrationVersion))) {
+    DataMigration.migrations.forEach(function(migration) {
+      if (isVersionOlder(version, getVersion(migration.version))) {
         migrated = true;
-        this[migrationName]();
+        self[migration.name]();
       }
-    }
+    });
 
     return migrated;
   }
@@ -81,9 +82,16 @@ export default class DataMigration {
   }
 
   runImportMigrations() {
-    this.sanitizeWords(); // 1.1.0
-    this.singleWordSubstitution(); // 1.2.0
-    this.updateDefaultSubs(); // 2.1.4
+    let self = this;
+    let migrated = false;
+    DataMigration.migrations.forEach(function(migration) {
+      if (migration.runOnImport) {
+        migrated = true;
+        self[migration.name]();
+      }
+    });
+
+    return migrated;
   }
 
   // [1.1.0] - Downcase and trim each word in the list (NOTE: This MAY result in losing some words)

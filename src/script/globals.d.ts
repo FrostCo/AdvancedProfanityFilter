@@ -41,6 +41,12 @@ interface Message {
   summary?: Summary;
 }
 
+interface Migration {
+  version: string;
+  name: string;
+  runOnImport: boolean;
+}
+
 interface Summary {
   [word: string]: {
     filtered: string;
