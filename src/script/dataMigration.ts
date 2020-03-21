@@ -5,13 +5,13 @@ export default class DataMigration {
   cfg: WebConfig;
 
   // Only append so the order stays the same (oldest first).
-  static readonly migrations = new Map([
-    ['1.0.13', { name: 'moveToNewWordsStorage', runOnImport: false }],
-    ['1.1.0', { name: 'sanitizeWords', runOnImport: true} ],
-    ['1.2.0', { name: 'singleWordSubstitution', runOnImport: true} ],
-    ['2.1.4', { name: 'updateDefaultSubs', runOnImport: false} ],
-    ['2.3.0', { name: 'fixSmartWatch', runOnImport: false} ],
-  ]);
+  static readonly migrations: Migration[] = [
+    { version: '1.0.13', name: 'moveToNewWordsStorage', runOnImport: false },
+    { version: '1.1.0', name: 'sanitizeWords', runOnImport: true },
+    { version: '1.2.0', name: 'singleWordSubstitution', runOnImport: true },
+    { version: '2.1.4', name: 'updateDefaultSubs', runOnImport: false },
+    { version: '2.3.0', name: 'fixSmartWatch', runOnImport: false }
+  ];
 
   constructor(config) {
     this.cfg = config;
@@ -22,24 +22,25 @@ export default class DataMigration {
     return new DataMigration(cfg);
   }
 
-  static latestMigration(): string {
-    return Array.from(DataMigration.migrations)[DataMigration.migrations.size - 1][0];
+  static latestMigration(): Migration {
+    return DataMigration.migrations[DataMigration.migrations.length - 1];
   }
 
   static migrationNeeded(oldVersion: string): boolean {
-    return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.latestMigration()));
+    return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.latestMigration().version));
   }
 
   // This will look at the version (from before the update) and perform data migrations if necessary
   byVersion(oldVersion: string) {
+    let self = this;
     let version = getVersion(oldVersion) as Version;
     let migrated = false;
-    for (let [migrationVersion, migration] of DataMigration.migrations) {
-      if (isVersionOlder(version, getVersion(migrationVersion))) {
+    DataMigration.migrations.forEach(function(migration) {
+      if (isVersionOlder(version, getVersion(migration.version))) {
         migrated = true;
-        this[migration.name]();
+        self[migration.name]();
       }
-    }
+    });
 
     return migrated;
   }
@@ -81,14 +82,14 @@ export default class DataMigration {
   }
 
   runImportMigrations() {
+    let self = this;
     let migrated = false;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (let [migrationVersion, migration] of DataMigration.migrations) {
+    DataMigration.migrations.forEach(function(migration) {
       if (migration.runOnImport) {
         migrated = true;
-        this[migration.name]();
+        self[migration.name]();
       }
-    }
+    });
 
     return migrated;
   }
