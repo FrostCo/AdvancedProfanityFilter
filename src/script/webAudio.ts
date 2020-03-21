@@ -73,7 +73,7 @@ export default class WebAudio {
       { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video' }
     ],
     'www.att.tv': [ { mode: 'cue', videoSelector: 'video#quickplayPlayer' } ],
-    'www.cbs.com': [ { mode: 'cue', videoCueLanguage: 'en' } ],
+    'www.cbs.com': [ { mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false } ],
     'www.dishanywhere.com': [
       { mode: 'element', className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' },
       { mode: 'element', className: 'bmpui-subtitle-region-container', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' }
