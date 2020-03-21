@@ -219,6 +219,14 @@ export default class WebAudio {
         }
       }
     }
+
+    // Hide YouTube auto text unless show all subtitles is set
+    if (this.filter.cfg.showSubtitles != 0) {
+      let container = document.querySelector('div.ytp-caption-window-rollup span.captions-text') as HTMLElement;
+      if (container.style.display == 'block') {
+        container.style.display = 'none';
+      }
+    }
   }
 
   getVideoTextTrack(video: HTMLVideoElement, language: string, requireShowing: boolean = true) {
