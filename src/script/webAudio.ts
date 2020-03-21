@@ -92,6 +92,7 @@ export default class WebAudio {
       { mode: 'element', containsSelector: 'div[data-dialogue-id]', subtitleSelector: 'span > span', tagName: 'DIV' }
     ],
     'www.sonycrackle.com': [ { mode: 'text', parentSelector: 'div.clpp-subtitles-container' } ],
+    'play.stan.com.au': [ { mode: 'text', parentSelector: 'div.clpp-subtitles-container' } ],
     'www.syfy.com': [ { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' } ],
     'www.tntdrama.com': [ { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video.top-media-element' } ],
     'www.universalkids.com': [ { mode: 'element', subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' } ],
