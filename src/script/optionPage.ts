@@ -813,7 +813,7 @@ export default class OptionPage {
     contentLeft.innerHTML = `<ul>${sites.join('\n')}</ul>`;
     contentRight.innerHTML = `
       <h4 class="sectionHeader">Site Config</h4>
-      <textarea class="w3-input w3-border w3-card" style="width:375px;height:400px;font-size:11px;" spellcheck="false">${JSON.stringify(WebAudio.sites, null, 2)}</textarea>
+      <textarea class="w3-input w3-border w3-card" style="width:375px;height:400px;font-size:11px;" spellcheck="false" readonly>${JSON.stringify(WebAudio.sites, null, 2)}</textarea>
     `;
     OptionPage.openModal('supportedAudioSitesModal');
   }
