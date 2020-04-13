@@ -61,6 +61,8 @@ interface Version {
 }
 
 interface WordOptions {
+  _filterMethod?: number;  // This should not be stored in the config. Only there for new Word
+  lists?: number[]; // []: disabled, 1: default/text, 2: audio
   matchMethod: number;
   repeat: boolean;
   separators?: boolean;
