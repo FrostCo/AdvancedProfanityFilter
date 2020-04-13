@@ -13,17 +13,11 @@ describe('Filter', () => {
   describe('generateWordList()', () => {
     it('should generate a sorted word list RegExp list', () => {
       let filter = new Filter;
-      filter.cfg = new Config({
-        words: Object.assign({}, testWords),
-        filterMethod: 0,
-        globalMatchMethod: 3,
-        defaultSubstitution: 'censored',
-        defaultWordMatchMethod: 0,
-        defaultWordRepeat: false
-      });
+      filter.cfg = new Config({ words: testWords });
       filter.init();
-      expect(filter.wordList.length).to.equal(4);
-      expect(filter.wordList).to.eql(['placeholder', 'example', 'sample', 'word']);
+      expect(filter.wordlists[filter.wordlistId].list.length).to.equal(4);
+      expect(filter.wordlists[filter.wordlistId].list).to.eql(['placeholder', 'example', 'sample', 'word']);
+      expect(filter.wordlists[filter.wordlistId].regExps.length).to.equal(4);
     });
   });
 
@@ -31,44 +25,33 @@ describe('Filter', () => {
     describe('Global matching', () => {
       it('should return RegExp list for global exact match', () => {
         let filter = new Filter;
-        filter.cfg = new Config({
-          words: Object.assign({}, testWords),
-          filterMethod: 0,
-          globalMatchMethod: 0,
-          defaultSubstitution: 'censored',
-          defaultWordMatchMethod: 0,
-          defaultWordRepeat: false
-        });
+        filter.cfg = new Config({ words: testWords, globalMatchMethod: 0 });
         filter.init();
-        expect(filter.wordRegExps.length).to.equal(4);
-        expect(filter.wordRegExps).to.eql([/\bplaceholder\b/gi, /\be+x+a+m+p+l+e+\b/gi, /\bsample\b/gi, /\bw+o+r+d+\b/gi]);
+        expect(filter.wordlists[filter.wordlistId].regExps).to.eql([/\bplaceholder\b/gi, /\be+x+a+m+p+l+e+\b/gi, /\bsample\b/gi, /\bw+o+r+d+\b/gi]);
       });
 
       it('should return RegExp list for global exact match and be idempotent', () => {
         let filter = new Filter;
-        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 0 });
+        filter.cfg = new Config({ words: testWords, filterMethod: 0, globalMatchMethod: 0 });
         filter.init();
-        expect(filter.wordRegExps.length).to.equal(4);
-        expect(filter.wordRegExps).to.eql([/\bplaceholder\b/gi, /\be+x+a+m+p+l+e+\b/gi, /\bsample\b/gi, /\bw+o+r+d+\b/gi]);
+        expect(filter.wordlists[filter.wordlistId].regExps).to.eql([/\bplaceholder\b/gi, /\be+x+a+m+p+l+e+\b/gi, /\bsample\b/gi, /\bw+o+r+d+\b/gi]);
         filter.init();
-        expect(filter.wordRegExps.length).to.equal(4);
-        expect(filter.wordRegExps).to.eql([/\bplaceholder\b/gi, /\be+x+a+m+p+l+e+\b/gi, /\bsample\b/gi, /\bw+o+r+d+\b/gi]);
+        expect(filter.wordlists[filter.wordlistId].regExps).to.eql([/\bplaceholder\b/gi, /\be+x+a+m+p+l+e+\b/gi, /\bsample\b/gi, /\bw+o+r+d+\b/gi]);
       });
 
       it('should return RegExp list for global part match', () => {
         let filter = new Filter;
-        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 1 });
+        filter.cfg = new Config({ words: testWords, filterMethod: 0, globalMatchMethod: 1 });
         filter.init();
-        expect(filter.wordRegExps.length).to.equal(4);
-        expect(filter.wordRegExps).to.eql([/placeholder/gi, /e+x+a+m+p+l+e+/gi, /sample/gi, /w+o+r+d+/gi]);
+        expect(filter.wordlists[filter.wordlistId].regExps).to.eql([/placeholder/gi, /e+x+a+m+p+l+e+/gi, /sample/gi, /w+o+r+d+/gi]);
       });
 
       it('should return RegExp list for global whole match (substitution filter)', () => {
         let filter = new Filter;
-        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 2 });
+        filter.cfg = new Config({ words: testWords, filterMethod: 1, globalMatchMethod: 2 });
         filter.init();
-        expect(filter.wordRegExps.length).to.equal(4);
-        expect(filter.wordRegExps).to.eql([
+        expect(filter.wordlists[filter.wordlistId].list.length).to.equal(4);
+        expect(filter.wordlists[filter.wordlistId].regExps).to.eql([
           /\b[\w-]*placeholder[\w-]*\b/gi,
           /\b[\w-]*e+x+a+m+p+l+e+[\w-]*\b/gi,
           /\b[\w-]*sample[\w-]*\b/gi,
@@ -80,11 +63,19 @@ describe('Filter', () => {
     describe('Per-word matching', () => {
       it('should return RegExp list for per-word matching', () => {
         let filter = new Filter;
-        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3 });
-        filter.cfg.words['^regexp.*?$'] = { matchMethod: 4, repeat: false, words: ['substitute'] };
+        filter.cfg = new Config({
+          words: Object.assign(testWords, { '^regexp.*?$': { matchMethod: 4, repeat: false, words: ['substitute'] } }),
+          filterMethod: 0, globalMatchMethod: 3
+        });
         filter.init();
-        expect(filter.wordRegExps.length).to.equal(5);
-        expect(filter.wordRegExps).to.eql([/\bplaceholder\b/gi, /^regexp.*?$/gi, /\be+x+a+m+p+l+e+\b/gi, /sample/gi, /\b[\w-]*w+o+r+d+[\w-]*\b/gi]);
+        expect(filter.wordlists[filter.wordlistId].list.length).to.equal(5);
+        expect(filter.wordlists[filter.wordlistId].regExps).to.eql([
+          /\bplaceholder\b/gi,
+          /^regexp.*?$/gi,
+          /\be+x+a+m+p+l+e+\b/gi,
+          /sample/gi,
+          /\b[\w-]*w+o+r+d+[\w-]*\b/gi
+        ]);
       });
     });
   });
@@ -138,10 +129,10 @@ describe('Filter', () => {
       describe('Whole', () => {
         it('With (_) characters and fixed length (3) and not update stats', () => {
           let filter = new Filter;
-          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, globalMatchMethod: 3, censorCharacter: '_', censorFixedLength: 3, preserveFirst: false, preserveLast: false });
+          filter.cfg = new Config({ words: testWords, filterMethod: 0, globalMatchMethod: 3, censorCharacter: '_', censorFixedLength: 3, preserveFirst: false, preserveLast: false });
           filter.init();
           expect(filter.counter).to.equal(0);
-          expect(filter.replaceText('Words used to be okay, but now even a word is bad.', false)).to.equal('___ used to be okay, but now even a ___ is bad.');
+          expect(filter.replaceText('Words used to be okay, but now even a word is bad.', filter.wordlistId, false)).to.equal('___ used to be okay, but now even a ___ is bad.');
           expect(filter.counter).to.equal(0);
         });
 
@@ -315,7 +306,7 @@ describe('Filter', () => {
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1, globalMatchMethod: 3, substitutionMark: true, preserveCase: false });
           filter.init();
           expect(filter.counter).to.equal(0);
-          expect(filter.replaceText('This Sample is a pretty good sampler to sample.', false)).to.equal('This [piece] is a pretty good [piece]r to [piece].');
+          expect(filter.replaceText('This Sample is a pretty good sampler to sample.', filter.wordlistId, false)).to.equal('This [piece] is a pretty good [piece]r to [piece].');
           expect(filter.counter).to.equal(0);
         });
 
@@ -407,7 +398,7 @@ describe('Filter', () => {
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2, globalMatchMethod: 3 });
           filter.init();
           expect(filter.counter).to.equal(0);
-          expect(filter.replaceText('This Sample is a pretty good sampler to sample.', false)).to.equal('This is a pretty good to.');
+          expect(filter.replaceText('This Sample is a pretty good sampler to sample.', filter.wordlistId, false)).to.equal('This is a pretty good to.');
           expect(filter.counter).to.equal(0);
         });
 
