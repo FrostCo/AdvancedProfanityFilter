@@ -1,6 +1,13 @@
 import Config from './lib/config';
 
 export default class WebConfig extends Config {
+  audioWordlistId: number;
+
+  static readonly _webConfigDefaults = {
+    audioWordlistId: 0
+  }
+  static readonly _defaults = Object.assign(Config._defaults, WebConfig._webConfigDefaults);
+
   static async build(keys?: string[]) {
     let asyncResult = await WebConfig.getConfig(keys);
     let instance = new WebConfig(asyncResult);
@@ -13,7 +20,8 @@ export default class WebConfig extends Config {
       throw new Error('Cannot be called directly. call build()');
     }
 
-    super(asyncParam);
+    super(); // Get the Config defaults
+    Object.assign(this, WebConfig._webConfigDefaults, asyncParam); // Separate due to _defineProperty()
   }
 
   // Compile words
@@ -40,7 +48,7 @@ export default class WebConfig extends Config {
     let data = {};
 
     // Save all settings using keys from _defaults
-    Object.keys(Config._defaults).forEach(function(key) {
+    Object.keys(WebConfig._defaults).forEach(function(key) {
       if (self[key] !== undefined) {
         data[key] = self[key];
       }
@@ -74,15 +82,15 @@ export default class WebConfig extends Config {
       let request = null;
       if (keys !== undefined) {
         request = {};
-        for (let k of keys) { request[k] = Config._defaults[k]; }
+        for (let k of keys) { request[k] = WebConfig._defaults[k]; }
       }
 
       chrome.storage.sync.get(request, function(items) {
         // Ensure defaults for undefined settings
-        Object.keys(Config._defaults).forEach(function(defaultKey){
+        Object.keys(WebConfig._defaults).forEach(function(defaultKey){
           if (request == null || Object.keys(request).includes(defaultKey)) {
             if (items[defaultKey] === undefined) {
-              items[defaultKey] = Config._defaults[defaultKey];
+              items[defaultKey] = WebConfig._defaults[defaultKey];
             }
           }
         });

@@ -3,12 +3,14 @@ import Filter from './lib/filter';
 import Page from './page';
 import WebAudio from './webAudio';
 import WebConfig from './webConfig';
+import Wordlist from './lib/wordlist';
 import './vendor/findAndReplaceDOMText';
 
 export default class WebFilter extends Filter {
   advanced: boolean;
   audio: WebAudio;
   audioOnly: boolean;
+  audioWordlistId: number;
   cfg: WebConfig;
   hostname: string;
   iframe: Location;
@@ -19,6 +21,7 @@ export default class WebFilter extends Filter {
   constructor() {
     super();
     this.advanced = false;
+    this.audioWordlistId = 0;
     this.mutePage = false;
     this.summary = {};
   }
@@ -28,13 +31,13 @@ export default class WebFilter extends Filter {
     return Domain.domainMatch(this.hostname, this.cfg.advancedDomains);
   }
 
-  advancedReplaceText(node) {
-    filter.wordRegExps.forEach((regExp) => {
+  advancedReplaceText(node, wordlistId: number, stats = true) {
+    filter.wordlists[wordlistId].regExps.forEach((regExp) => {
       // @ts-ignore - External library function
       findAndReplaceDOMText(node, {preset: 'prose', find: regExp, replace: function(portion, match) {
         // console.log('[APF] Advanced node match:', node.textContent); // Debug: Filter - Advanced match
         if (portion.index === 0) { // Replace the whole match on the first portion and skip the rest
-          return filter.replaceText(match[0]);
+          return filter.replaceText(match[0], wordlistId, stats);
         } else {
           return '';
         }
@@ -103,7 +106,7 @@ export default class WebFilter extends Filter {
           filter.audio.unmute();
         }
       } else if (!filter.audioOnly) { // Filter regular text
-        let result = this.replaceTextResult(mutation.target.data);
+        let result = this.replaceTextResult(mutation.target.data, this.wordlistId);
         if (result.modified) {
           // console.log('[APF] Text target changed:', result.original, result.filtered); // Debug: Filter - Mutation text
           mutation.target.data = result.filtered;
@@ -154,14 +157,14 @@ export default class WebFilter extends Filter {
     } else { // Leaf node
       if (node.nodeName) {
         if (node.textContent && node.textContent.trim() != '') {
-          let result = this.replaceTextResult(node.textContent, stats);
+          let result = this.replaceTextResult(node.textContent, this.wordlistId, stats);
           if (result.modified) {
             // console.log('[APF] Normal node changed:', result.original, result.filtered); // Debug: Filter - Mutation node filtered
             node.textContent = result.filtered;
           }
         } else if (node.nodeName == 'IMG') {
-          if (node.alt != '') { node.alt = this.replaceText(node.alt, stats); }
-          if (node.title != '') { node.title = this.replaceText(node.title, stats); }
+          if (node.alt != '') { node.alt = this.replaceText(node.alt, this.wordlistId, stats); }
+          if (node.title != '') { node.title = this.replaceText(node.title, this.wordlistId, stats); }
         } else if (node.shadowRoot != undefined) {
           shadowObserver.observe(node.shadowRoot, observerConfig);
         }
@@ -173,7 +176,7 @@ export default class WebFilter extends Filter {
   cleanNodeText(node) {
     // console.log('[APF] New node to filter', node); // Debug: Filter
     if (filter.advanced && (node.parentNode || node === document)) {
-      filter.advancedReplaceText(node);
+      filter.advancedReplaceText(node, this.wordlistId, true);
     } else {
       filter.cleanNode(node);
     }
@@ -200,8 +203,13 @@ export default class WebFilter extends Filter {
     if (this.cfg.muteAudio) {
       this.audio = new WebAudio(this);
       this.mutePage = this.audio.supportedPage;
-      // if (this.mutePage) { console.log(`[APF] Enabling audio muting on ${this.hostname}`); } // Debug: Audio
-      this.youTubeMutePage = this.audio.youTube;
+      if (this.mutePage) {
+        // console.log(`[APF] Enabling audio muting on ${this.hostname}`); // Debug: Audio
+        // Prebuild audio wordlist
+        if (this.cfg.wordlistsEnabled && this.wordlistId != this.audio.wordlistId) {
+          this.wordlists[this.audio.wordlistId] = new Wordlist(this.cfg, this.audio.wordlistId);
+        }
+      }
     }
 
     // Disable if muteAudioOnly mode is active and this is not a suported page
@@ -246,7 +254,7 @@ export default class WebFilter extends Filter {
         if (this.cfg.words[word].matchMethod == 4) { // Regexp
           result = this.cfg.words[word].sub || this.cfg.defaultSubstitution;
         } else {
-          result = filter.replaceText(word, false);
+          result = filter.replaceText(word, 0, false); // We can use 0 (All) here because we are just filtering a word
         }
 
         this.summary[word] = { filtered: result, count: 1 };

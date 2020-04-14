@@ -16,6 +16,7 @@ export default class WebAudio {
   unmuteDelay: number;
   volume: number;
   watcherRuleIds: number[];
+  wordlistId: number;
   youTube: boolean;
   youTubeAutoSubsMin: number;
 
@@ -38,6 +39,7 @@ export default class WebAudio {
     }
     this.unmuteDelay = 0;
     this.volume = 1;
+    this.wordlistId = filter.audioWordlistId;
     this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;
 
     // Setup rules for current site
@@ -179,7 +181,7 @@ export default class WebAudio {
     subtitles.forEach(subtitle => {
       // innerText handles line feeds/spacing better, but is not available to #text nodes
       let textMethod = subtitle.nodeName === '#text' ? 'textContent' : 'innerText';
-      let result = this.filter.replaceTextResult(subtitle[textMethod]);
+      let result = this.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
         filtered = true;
         this.mute(rule.muteMethod); // Mute the audio if we haven't already
@@ -198,7 +200,7 @@ export default class WebAudio {
   }
 
   cleanYouTubeAutoSubs(node): void {
-    let result = this.filter.replaceTextResult(node.textContent);
+    let result = this.replaceTextResult(node.textContent);
     if (result.modified) {
       node.textContent = result.filtered;
       this.mute();
@@ -304,7 +306,7 @@ export default class WebAudio {
         cue.endTime += rule.videoCueSync;
       }
 
-      let result = this.filter.replaceTextResult(cue.text);
+      let result = this.replaceTextResult(cue.text);
       if (result.modified) {
         cue.filtered = true;
         cue.originalText = cue.text;
@@ -313,6 +315,10 @@ export default class WebAudio {
         cue.filtered = false;
       }
     }
+  }
+
+  replaceTextResult(string: string, stats: boolean = true) {
+    return this.filter.replaceTextResult(string, this.wordlistId, stats);
   }
 
   unmute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
@@ -367,7 +373,7 @@ export default class WebAudio {
 
             // Filter the captions/subtitles
             if (child[textMethod]) {
-              let result = instance.filter.replaceTextResult(child[textMethod]);
+              let result = instance.replaceTextResult(child[textMethod]);
               if (result.modified) {
                 instance.mute(rule.muteMethod);
                 filtered = true;
@@ -387,7 +393,7 @@ export default class WebAudio {
           if (!newCaptions && instance.lastProcessed.includes(captions[textMethod])) { return false; }
 
           if (captions[textMethod] && (instance.lastFilteredText && !captions[textMethod].contains(instance.lastFilteredText))) {
-            let result = instance.filter.replaceTextResult(captions[textMethod]);
+            let result = instance.replaceTextResult(captions[textMethod]);
             if (result.modified) {
               instance.mute(rule.muteMethod);
               filtered = true;
