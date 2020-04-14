@@ -271,14 +271,6 @@ export default class WebFilter extends Filter {
     filter.updateCounterBadge();
   }
 
-  replaceTextResult(string: string, stats: boolean = true) {
-    let result = {} as any;
-    result.original = string;
-    result.filtered = filter.replaceText(string, stats);
-    result.modified = (result.filtered != string);
-    return result;
-  }
-
   sendInitState(message: Message) {
     // Reset muted state on page load if we muted the tab audio
     if (this.cfg.muteAudio && this.cfg.muteMethod == 0) { message.clearMute = true; }

@@ -47,6 +47,12 @@ interface Migration {
   runOnImport: boolean;
 }
 
+interface ReplaceTextResult {
+  original: string;
+  filtered: string;
+  modified: boolean;
+}
+
 interface Summary {
   [word: string]: {
     filtered: string;

@@ -214,4 +214,14 @@ export default class Filter {
 
     return str;
   }
+
+  replaceTextResult(str: string, wordlistId: (number | false) = false, stats: boolean = true): ReplaceTextResult {
+    let result: ReplaceTextResult = {
+      original: str,
+      filtered: this.replaceText(str, wordlistId, stats),
+      modified: false
+    };
+    result.modified = (result.filtered != str);
+    return result;
+  }
 }
