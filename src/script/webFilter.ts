@@ -16,7 +16,6 @@ export default class WebFilter extends Filter {
   iframe: Location;
   mutePage: boolean;
   summary: Summary;
-  youTubeMutePage: boolean;
 
   constructor() {
     super();

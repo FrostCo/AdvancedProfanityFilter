@@ -26,7 +26,6 @@ export default class BookmarkletFilter extends Filter {
   iframe: Location;
   mutePage: boolean;
   summary: Summary;
-  youTubeMutePage: boolean;
 
   constructor() {
     super();
