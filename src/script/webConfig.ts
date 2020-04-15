@@ -109,6 +109,14 @@ export default class WebConfig extends Config {
     });
   }
 
+  ordered() {
+    let self = this;
+    return Object.keys(self).sort().reduce((obj, key) => {
+      obj[key] = self[key];
+      return obj;
+    }, {});
+  }
+
   removeProp(prop: string) {
     chrome.storage.sync.remove(prop);
     delete this[prop];

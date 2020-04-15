@@ -63,10 +63,6 @@ export default class OptionPage {
     OptionPage.hide(notificationPanel);
   }
 
-  static async load(instance: OptionPage) {
-    instance.cfg = await WebConfig.build();
-  }
-
   static openModal(id: string) {
     OptionPage.show(document.getElementById(id));
   }
@@ -265,11 +261,11 @@ export default class OptionPage {
 
     if (input.checked) { // inline editor
       let configText = document.getElementById('configText') as HTMLTextAreaElement;
-      configText.value = JSON.stringify(this.cfg, null, 2);
+      configText.value = JSON.stringify(option.cfg.ordered(), null, 2);
     } else {
       let date = new Date;
       let today = `${date.getUTCFullYear()}-${('0'+(date.getUTCMonth()+1)).slice(-2)}-${('0'+(date.getUTCDate()+1)).slice(-2)}`;
-      exportToFile(JSON.stringify(this.cfg, null, 2), `apf-backup-${today}.json`);
+      exportToFile(JSON.stringify(option.cfg.ordered(), null, 2), `apf-backup-${today}.json`);
     }
   }
 
@@ -318,10 +314,10 @@ export default class OptionPage {
 
   async init() {
     let self = this;
-    await OptionPage.load(self);
+    self.cfg = await WebConfig.build();
     if (!self.auth) self.auth = new OptionAuth(self.cfg.password);
     // @ts-ignore: Type WebConfig is not assignable to type Config
-    filter.cfg = option.cfg;
+    filter.cfg = self.cfg;
 
     // console.log('Password:', cfg.password, 'Authenticated:', authenticated); // DEBUG Password
     if (self.cfg.password && !self.auth.authenticated) {
@@ -363,6 +359,7 @@ export default class OptionPage {
     this.populateSettings();
     this.populateWordsList();
     this.populateWhitelist();
+    this.populateWordlists();
     this.advancedDomainList();
     this.domainList();
     this.populateAudio();
@@ -427,7 +424,7 @@ export default class OptionPage {
     if (testText.value === '') {
       filteredTestText.innerText = 'Enter some text above to test the filter...';
     } else {
-      filteredTestText.innerText = filter.replaceText(testText.value);
+      filteredTestText.innerText = filter.replaceText(testText.value, filter.cfg.wordlistId, false);
     }
   }
 
@@ -474,6 +471,8 @@ export default class OptionPage {
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
     let wordRemove = document.getElementById('wordRemove') as HTMLInputElement;
     let word = wordList.value;
+    let wordWordlistDiv = document.getElementById('wordWordlistDiv') as HTMLSelectElement;
+    let wordlistSelections = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
 
     if (word == '') { // New word
       wordText.value = '';
@@ -483,6 +482,15 @@ export default class OptionPage {
       wordMatchRepeated.checked = option.cfg.defaultWordRepeat;
       wordMatchSeparators.checked = option.cfg.defaultWordSeparators;
       substitutionText.value = '';
+      wordlistSelections.forEach(function(wordlist, index) {
+        wordlist.checked = (
+          index == (option.cfg.wordlistId - 1)
+          || (
+            option.cfg.muteAudio
+            && index == (option.cfg.audioWordlistId - 1)
+          )
+        );
+      });
     } else { // Existing word
       OptionPage.enableBtn(wordRemove);
       let wordCfg = option.cfg.words[word];
@@ -492,6 +500,51 @@ export default class OptionPage {
       wordMatchRepeated.checked = wordCfg.repeat;
       wordMatchSeparators.checked = wordCfg.separators === undefined ? option.cfg.defaultWordSeparators : wordCfg.separators;
       substitutionText.value = wordCfg.sub;
+      wordlistSelections.forEach(function(wordlist, index) {
+        wordlist.checked = wordCfg.lists.includes(index + 1);
+      });
+    }
+
+    if (option.cfg.wordlistsEnabled) {
+      OptionPage.show(wordWordlistDiv);
+    } else {
+      OptionPage.hide(wordWordlistDiv);
+    }
+  }
+
+  populateWordlist() {
+    let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    let wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
+    wordlistText.value = wordlistSelect.value;
+  }
+
+  populateWordlists(selectedIndex: number = 0) {
+    let wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
+    let wordlistContainer = document.getElementById('wordlistContainer') as HTMLElement;
+    wordlistsEnabledInput.checked = this.cfg.wordlistsEnabled;
+
+    if (this.cfg.wordlistsEnabled) {
+      let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+      let textWordlistSelect = document.getElementById('textWordlistSelect') as HTMLSelectElement;
+      let audioWordlistDiv = document.getElementById('audioWordlistDiv') as HTMLElement;
+      let audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
+      dynamicList(this.cfg.wordlists, wordlistSelect.id);
+      dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), textWordlistSelect.id);
+      wordlistSelect.selectedIndex = selectedIndex;
+      textWordlistSelect.selectedIndex = this.cfg.wordlistId;
+
+      if (this.cfg.muteAudio) {
+        dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), audioWordlistSelect.id);
+        audioWordlistSelect.selectedIndex = this.cfg.audioWordlistId;
+        OptionPage.show(audioWordlistDiv);
+      } else {
+        OptionPage.hide(audioWordlistDiv);
+      }
+
+      OptionPage.show(wordlistContainer);
+      this.populateWordlist();
+    } else {
+      OptionPage.hide(wordlistContainer);
     }
   }
 
@@ -513,7 +566,7 @@ export default class OptionPage {
         if (filter.cfg.words[word].matchMethod == 4) { // Regexp
           filteredWord = filter.cfg.words[word].sub || filter.cfg.defaultSubstitution;
         } else {
-          filteredWord = filter.replaceText(word, false);
+          filteredWord = filter.replaceText(word, 0, false); // Using 0 (All) here to filter all words
         }
       }
 
@@ -526,6 +579,13 @@ export default class OptionPage {
       filter.init();
     }
 
+    // Populate the wordlist selections for a word
+    let wordlistSelectionHTML = '';
+    option.cfg.wordlists.forEach(function(list, index) {
+      wordlistSelectionHTML += `<label><input id="" type="checkbox" class="w3-check" name="wordlistSelection" value="${index}"/> ${list}</label><br>`;
+    });
+    let selections = document.getElementById('wordlistSelections') as HTMLInputElement;
+    selections.innerHTML = wordlistSelectionHTML;
     wordList.innerHTML = wordListHTML;
     this.populateWord();
   }
@@ -569,6 +629,31 @@ export default class OptionPage {
         wordList.selectedIndex = 0;
         this.populateWordsList();
       }
+    }
+  }
+
+  async renameWordlist() {
+    let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    let wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
+    let name = wordlistText.value.trim();
+    let index = wordlistSelect.selectedIndex;
+
+    if (wordlistText.checkValidity()) {
+      // Make sure there are no duplicates
+      if (this.cfg.wordlists.includes(name)) {
+        OptionPage.showInputError(wordlistText, 'Please enter a unique name.');
+        return false;
+      }
+
+      this.cfg.wordlists[index] = name;
+      if (await this.saveProp('wordlists')) {
+        this.populateWordlists(index);
+        this.populateWordsList();
+      } else {
+        OptionPage.showErrorModal('Failed to save name.');
+      }
+    } else {
+      OptionPage.showInputError(wordlistText, 'Please enter a valid name.');
     }
   }
 
@@ -624,6 +709,7 @@ export default class OptionPage {
     let muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
     let muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
     let showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
+    let wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
     self.cfg.censorCharacter = censorCharacterSelect.value;
     self.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
@@ -645,6 +731,7 @@ export default class OptionPage {
     self.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
     self.cfg.muteMethod = parseInt(muteMethodInput.value);
     self.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
+    self.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
 
     // Save settings
     let error = await self.cfg.save();
@@ -732,6 +819,7 @@ export default class OptionPage {
     let word = wordText.value.trim().toLowerCase();
     let sub = substitutionText.value.trim().toLowerCase();
     let added = true;
+    let wordlistSelectionsInput = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
 
     if (word == '') {
       OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
@@ -746,7 +834,11 @@ export default class OptionPage {
     }
 
     if (wordText.checkValidity()) {
+      let lists = [];
+      wordlistSelectionsInput.forEach((wordlist, index) => { if (wordlist.checked) { lists.push(index + 1); } });
+
       let wordOptions: WordOptions = {
+        lists: lists,
         matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
         repeat: wordMatchRepeated.checked,
         separators: wordMatchSeparators.checked,
@@ -792,6 +884,18 @@ export default class OptionPage {
   async selectFilterMethod(evt) {
     option.cfg.filterMethod = WebConfig._filterMethodNames.indexOf(evt.target.value);
     if (await option.saveProp('filterMethod')) this.init();
+  }
+
+  async setActiveWordlist(element: HTMLSelectElement) {
+    let prop = element.id === 'textWordlistSelect' ? 'wordlistId' : 'audioWordlistId';
+    this.cfg[prop] = element.selectedIndex;
+
+    if (!await this.saveProp(prop)) {
+      OptionPage.showErrorModal('Failed to update active list.');
+      return false;
+    }
+
+    this.populateWordsList();
   }
 
   showSupportedAudioSites() {
@@ -941,10 +1045,17 @@ document.getElementById('wordText').addEventListener('input', e => { OptionPage.
 document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
 document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
 document.getElementById('wordRemoveAll').addEventListener('click', e => { option.confirm(e, 'removeAllWords'); });
+// Lists
 document.getElementById('whitelist').addEventListener('change', e => { option.populateWhitelistWord(); });
 document.getElementById('whitelistText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
 document.getElementById('whitelistSave').addEventListener('click', e => { option.saveWhitelist(e); });
 document.getElementById('whitelistRemove').addEventListener('click', e => { option.removeWhitelist(e); });
+document.getElementById('wordlistsEnabled').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('wordlistRename').addEventListener('click', e => { option.renameWordlist(); });
+document.getElementById('wordlistSelect').addEventListener('change', e => { option.populateWordlist(); });
+document.getElementById('wordlistText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
+document.getElementById('textWordlistSelect').addEventListener('change', e => { option.setActiveWordlist(e.target as HTMLSelectElement); });
+document.getElementById('audioWordlistSelect').addEventListener('change', e => { option.setActiveWordlist(e.target as HTMLSelectElement); });
 // Domains
 document.getElementById('advDomainSelect').addEventListener('change', e => { option.advancedDomainPopulate(); });
 document.getElementById('advDomainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
