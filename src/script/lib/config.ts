@@ -30,6 +30,7 @@ export default class Config {
   words: { [key: string]: WordOptions };
   wordWhitelist: string[];
   youTubeAutoSubsMin: number;
+  youTubeAutoSubsMax: number;
 
   static readonly filterMethods = {
     censor: 0,
@@ -75,7 +76,8 @@ export default class Config {
     showUpdateNotification: true,
     substitutionMark: false,
     wordWhitelist: [],
-    youTubeAutoSubsMin: 0
+    youTubeAutoSubsMin: 0,
+    youTubeAutoSubsMax: 0,
   };
 
   static readonly _defaultWords = {

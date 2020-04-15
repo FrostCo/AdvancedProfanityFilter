@@ -358,10 +358,13 @@
         </label>
 
         <br>
-        <label>YouTube Minimum Muting
-          <input id="audioYouTubeAutoSubsMin" class="w3-input w3-border small" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
+        <label>YouTube muting min:
+          <input id="audioYouTubeAutoSubsMin" class="w3-input w3-border updateYouTubeAutoLimits" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
         </label>
-        <span class="notes">For Auto-Generated Subtitles (0.5 = half a second)</span>
+        <label>max:
+          <input id="audioYouTubeAutoSubsMax" class="w3-input w3-border updateYouTubeAutoLimits" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
+        </label>
+        <span class="notes">(Only for auto captions; 0.5 = half second)</span>
       </div>
     </div>
     <div class="w3-third w3-right">
