@@ -339,6 +339,7 @@ export default class OptionPage {
     let selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
     let muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
     let audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
+    let audioYouTubeAutoSubsMax = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
     let customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
     muteAudioInput.checked = this.cfg.muteAudio;
     muteAudioOnlyInput.checked = this.cfg.muteAudioOnly;
@@ -347,6 +348,7 @@ export default class OptionPage {
     selectedMuteMethod.checked = true;
     selectedshowSubtitle.checked = true;
     audioYouTubeAutoSubsMin.value = this.cfg.youTubeAutoSubsMin.toString();
+    audioYouTubeAutoSubsMax.value = this.cfg.youTubeAutoSubsMax.toString();
     customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
   }
 
@@ -915,7 +917,7 @@ export default class OptionPage {
     contentLeft.innerHTML = `<ul>${sites.join('\n')}</ul>`;
     contentRight.innerHTML = `
       <h4 class="sectionHeader">Site Config</h4>
-      <textarea class="w3-input w3-border w3-card" style="width:375px;height:400px;font-size:11px;" spellcheck="false">${JSON.stringify(WebAudio.sites, null, 2)}</textarea>
+      <textarea class="w3-input w3-border w3-card" style="width:375px;height:400px;font-size:11px;" spellcheck="false" readonly>${JSON.stringify(WebAudio.sites, null, 2)}</textarea>
     `;
     OptionPage.openModal('supportedAudioSitesModal');
   }
@@ -992,11 +994,19 @@ export default class OptionPage {
     }
   }
 
-  async updateYouTubeAutoMin(target) {
+  async updateYouTubeAutoLimits(target) {
     OptionPage.hideInputError(target);
     if (target.checkValidity()) {
-      this.cfg.youTubeAutoSubsMin = parseFloat(target.value);
-      await option.saveProp('youTubeAutoSubsMin');
+      let updateMin = target.id === 'audioYouTubeAutoSubsMin';
+      let min = parseFloat(updateMin ? target.value : (document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement).value);
+      let max = parseFloat(updateMin ? (document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement).value : target.value);
+      if (min != 0 && max != 0 && min > max) {
+        OptionPage.showInputError(target, 'Min must be less than max.');
+      } else {
+        let prop = updateMin ? 'youTubeAutoSubsMin' : 'youTubeAutoSubsMax';
+        this.cfg[prop] = parseFloat(target.value);
+        await option.saveProp(prop);
+      }
     } else {
       OptionPage.showInputError(target, 'Please enter a valid number of seconds.');
     }
@@ -1073,7 +1083,7 @@ document.getElementById('muteAudioOnly').addEventListener('click', e => { option
 document.getElementById('muteCueRequireShowing').addEventListener('click', e => { option.saveOptions(e); });
 document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
-document.getElementById('audioYouTubeAutoSubsMin').addEventListener('input', e => { option.updateYouTubeAutoMin(e.target); });
+document.querySelectorAll('input.updateYouTubeAutoLimits').forEach(el => { el.addEventListener('input', e => { option.updateYouTubeAutoLimits(e.target); }); });
 document.getElementById('customAudioSitesSave').addEventListener('click', e => { option.saveCustomAudioSites(); });
 // Bookmarklet
 document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });

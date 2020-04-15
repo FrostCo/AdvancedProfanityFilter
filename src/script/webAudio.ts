@@ -19,6 +19,8 @@ export default class WebAudio {
   wordlistId: number;
   youTube: boolean;
   youTubeAutoSubsMin: number;
+  youTubeAutoSubsMax: number;
+  youTubeAutoSubsTimeout: number;
 
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.cueRuleIds = [];
@@ -41,6 +43,7 @@ export default class WebAudio {
     this.volume = 1;
     this.wordlistId = filter.audioWordlistId;
     this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;
+    this.youTubeAutoSubsMax = filter.cfg.youTubeAutoSubsMax * 1000;
 
     // Setup rules for current site
     this.rules = this.sites[filter.hostname];
@@ -68,7 +71,15 @@ export default class WebAudio {
   static readonly sites: { [site: string]: AudioRules[] } = {
     'abc.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
     'www.amazon.com': [
-      { mode: 'watcher', iframe: false, parentSelector: 'div.webPlayer div.persistentPanel', showSubtitles: 0, simpleUnmute: true, subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span' }
+      {
+        mode: 'watcher',
+        iframe: false,
+        parentSelector: 'div.webPlayer div.persistentPanel',
+        showSubtitles: 0,
+        simpleUnmute: true,
+        subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span',
+        videoSelector: 'div.webPlayerElement video[src]'
+      }
     ],
     'www.amc.com': [
       { mode: 'element', className: 'ttr-container', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
@@ -200,12 +211,23 @@ export default class WebAudio {
   }
 
   cleanYouTubeAutoSubs(node): void {
+    // Found a new word, clear the max timeout
+    if (this.youTubeAutoSubsTimeout != null) {
+      clearTimeout(this.youTubeAutoSubsTimeout);
+      this.youTubeAutoSubsTimeout = null;
+    }
+
     let result = this.replaceTextResult(node.textContent);
     if (result.modified) {
       node.textContent = result.filtered;
       this.mute();
       this.unmuteDelay = null;
       this.filter.updateCounterBadge();
+
+      // Set a timer to unmute if a max time was specified
+      if (this.youTubeAutoSubsMax) {
+        this.youTubeAutoSubsTimeout = setTimeout(this.youTubeAutoSubsMuteTimeout, this.youTubeAutoSubsMax, this);
+      }
     } else {
       if (this.muted) {
         if (this.youTubeAutoSubsMin > 0) {
@@ -489,6 +511,14 @@ export default class WebAudio {
 
   youTubeAutoSubsCurrentRow(node): boolean {
     return !!(node.parentElement.parentElement == node.parentElement.parentElement.parentElement.lastChild);
+  }
+
+  youTubeAutoSubsMuteTimeout(instance) {
+    let video = window.document.querySelector('video');
+    if (video && instance.playing(video)) {
+      instance.unmute();
+    }
+    instance.youTubeAutoSubsTimeout = null;
   }
 
   youTubeAutoSubsNodeIsSubtitleText(node): boolean {
