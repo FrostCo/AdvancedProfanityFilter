@@ -9,7 +9,19 @@ class Popup {
   filterMethodContainer: Element;
 
   static readonly _disabledPages = new RegExp('(^chrome:|^about:|^[a-zA-Z]*-extension:)', 'i');
-  static readonly _requiredConfig =  ['advancedDomains', 'disabledDomains', 'enabledDomains', 'enabledDomainsOnly', 'filterMethod', 'password'];
+  static readonly _requiredConfig =  [
+    'advancedDomains',
+    'audioWordlistId',
+    'disabledDomains',
+    'enabledDomains',
+    'enabledDomainsOnly',
+    'filterMethod',
+    'muteAudio',
+    'password',
+    'wordlists',
+    'wordlistsEnabled',
+    'wordlistId'
+  ];
 
   static async load(instance: Popup) {
     instance.cfg = await WebConfig.build(Popup._requiredConfig);
@@ -33,6 +45,16 @@ class Popup {
   static enable(element) {
     element.disabled = false;
     element.classList.remove('disabled');
+  }
+
+  static hide(element: HTMLElement) {
+    element.classList.remove('w3-show');
+    element.classList.add('w3-hide');
+  }
+
+  static show(element: HTMLElement) {
+    element.classList.remove('w3-hide');
+    element.classList.add('w3-show');
   }
 
   async addDomain(key: string) {
@@ -73,8 +95,23 @@ class Popup {
     let domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
     let advancedMode = document.getElementById('advancedMode') as HTMLInputElement;
     let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    let wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
+    let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    let audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
     dynamicList(WebConfig._filterMethodNames, 'filterMethodSelect');
     filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
+
+    if (popup.cfg.wordlistsEnabled) {
+      dynamicList(WebConfig._allWordlists.concat(popup.cfg.wordlists), wordlistSelect.id);
+      wordlistSelect.selectedIndex = popup.cfg.wordlistId;
+      if (popup.cfg.muteAudio) {
+        dynamicList(WebConfig._allWordlists.concat(popup.cfg.wordlists), audioWordlistSelect.id);
+        audioWordlistSelect.selectedIndex = popup.cfg.audioWordlistId;
+        let audioWordlistContainer = document.getElementById('audioWordlistContainer') as HTMLElement;
+        Popup.show(audioWordlistContainer);
+      }
+      Popup.show(wordListContainer);
+    }
 
     if (popup.cfg.password && popup.cfg.password != '') {
       popup.protected = true;
@@ -82,6 +119,8 @@ class Popup {
       Popup.disable(domainToggle);
       Popup.disable(advancedMode);
       Popup.disable(filterMethodSelect);
+      Popup.disable(wordlistSelect);
+      Popup.disable(audioWordlistSelect);
     }
 
     // Restricted pages
@@ -91,6 +130,8 @@ class Popup {
       Popup.disable(domainToggle);
       Popup.disable(advancedMode);
       Popup.disable(filterMethodSelect);
+      Popup.disable(wordlistSelect);
+      Popup.disable(audioWordlistSelect);
       return false;
     }
 
@@ -105,6 +146,8 @@ class Popup {
       domainFilter.checked = false;
       Popup.disable(advancedMode);
       Popup.disable(filterMethodSelect);
+      Popup.disable(wordlistSelect);
+      Popup.disable(audioWordlistSelect);
     }
 
     // Set initial value for advanced mode
@@ -183,6 +226,15 @@ class Popup {
       }
     }
   }
+
+  async wordlistSelect(event) {
+    let element = event.target;
+    let type = element.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
+    popup.cfg[type] = element.selectedIndex;
+    if (!await popup.cfg.save(type)) {
+      chrome.tabs.reload();
+    }
+  }
 }
 
 // Listen for data updates from filter
@@ -207,4 +259,6 @@ window.addEventListener('load', function(event) { popup.populateOptions(); });
 document.getElementById('domainFilter').addEventListener('change', function(event) { popup.toggleFilter(); });
 document.getElementById('advancedMode').addEventListener('change', function(event) { popup.toggleAdvancedMode(); });
 document.getElementById('filterMethodSelect').addEventListener('change', function(event) { popup.filterMethodSelect(); });
+document.getElementById('wordlistSelect').addEventListener('change', function(event) { popup.wordlistSelect(event); });
+document.getElementById('audioWordlistSelect').addEventListener('change', function(event) { popup.wordlistSelect(event); });
 document.getElementById('options').addEventListener('click', function() { chrome.runtime.openOptionsPage(); });

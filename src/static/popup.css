@@ -53,15 +53,12 @@ input:checked + .slider:before {
   color: #DA291C;
 }
 
-#filterMethodSelect {
-  width: 150px;
-}
-
 #footer {
   width: 100%;
   padding: 15px 0;
   background: #ccc;
   text-align: center;
+  margin-top: 8px;
 }
 
 #gettingStarted {
@@ -90,6 +87,14 @@ input:checked + .slider:before {
   background-color: #ddd;
 }
 
+.checkbox {
+  margin-left: 8px;
+}
+
+.checkboxLabel {
+  line-height: 34px;
+}
+
 .container {
   margin-top:8px;
   margin-bottom:8px;
@@ -108,6 +113,24 @@ input:checked + .slider:before {
 .options {
   width: 200px;
   margin-left: 25px;
+}
+
+.selectLabel {
+  line-height: 39px;
+  padding-left: 15px;
+}
+
+.smallHeader {
+  color: var(--blue);
+  padding-top: 4px;
+  padding-right: 8px;
+}
+
+.smallSelect {
+  width: 150px;
+  float: right;
+  display:inline;
+  margin-right:25px;
 }
 
 .unselectable {
