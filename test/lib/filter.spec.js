@@ -119,7 +119,7 @@ describe('Filter', () => {
 
         it('Ending with punctuation', () => {
           let filter = new Filter;
-          filter.cfg = new Config({ words: {'this!': { matchMethod: 1 }}, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3, preserveFirst: false });
+          filter.cfg = new Config({ words: { 'this!': { matchMethod: 1 } }, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3, preserveFirst: false });
           filter.init();
           expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love all_____ Do you?');
           expect(filter.replaceText('I love this! Do you?')).to.equal('I love _____ Do you?');
@@ -138,7 +138,7 @@ describe('Filter', () => {
 
         it('Ending with punctuation', () => {
           let filter = new Filter;
-          filter.cfg = new Config({ words: {'this!': { matchMethod: 2 }}, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3, preserveFirst: false });
+          filter.cfg = new Config({ words: { 'this!': { matchMethod: 2 } }, filterMethod: 0, censorCharacter: '_', globalMatchMethod: 3, preserveFirst: false });
           filter.init();
           expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love ________ Do you?');
           expect(filter.replaceText('I love this! Do you?')).to.equal('I love _____ Do you?');
@@ -377,7 +377,7 @@ describe('Filter', () => {
 
         it('Ending with punctuation', () => {
           let filter = new Filter;
-          filter.cfg = new Config({filterMethod: 2, globalMatchMethod: 3, words: {'this!': { matchMethod: 0, repeat: false }}});
+          filter.cfg = new Config({ filterMethod: 2, globalMatchMethod: 3, words: { 'this!': { matchMethod: 0, repeat: false } } });
           filter.init();
           expect(filter.replaceText('I love This! Do you?')).to.equal('I love Do you?');
           expect(filter.replaceText('I love this!')).to.equal('I love');
@@ -404,7 +404,7 @@ describe('Filter', () => {
 
         it('Ending with punctuation', () => {
           let filter = new Filter;
-          filter.cfg = new Config({filterMethod: 2, globalMatchMethod: 3, words: {'this!': { matchMethod: 1, repeat: false }}});
+          filter.cfg = new Config({ filterMethod: 2, globalMatchMethod: 3, words: { 'this!': { matchMethod: 1, repeat: false } } });
           filter.init();
           expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love Do you?');
           expect(filter.replaceText('I love this! Do you?')).to.equal('I love Do you?');

@@ -43,13 +43,13 @@ export default class BookmarkletFilter extends Filter {
   advancedReplaceText(node, wordlistId: number, stats = true) {
     filter.wordlists[wordlistId].regExps.forEach((regExp) => {
       // @ts-ignore - External library function
-      findAndReplaceDOMText(node, {preset: 'prose', find: regExp, replace: function(portion, match) {
+      findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: function(portion, match) {
         if (portion.index === 0) { // Replace the whole match on the first portion and skip the rest
           return filter.replaceText(match[0], wordlistId, stats);
         } else {
           return '';
         }
-      }});
+      } });
     });
   }
 

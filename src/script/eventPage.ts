@@ -20,7 +20,7 @@ chrome.runtime.onInstalled.addListener(function(details){
     updateMigrations(details.previousVersion);
 
     // Display update notification
-    chrome.storage.sync.get({showUpdateNotification: true}, function(data) {
+    chrome.storage.sync.get({ showUpdateNotification: true }, function(data) {
       if (data.showUpdateNotification) {
         chrome.notifications.create('extensionUpdate', {
           'type': 'basic',
@@ -65,7 +65,7 @@ chrome.runtime.onMessage.addListener(
 
       // Unmute on page reload
       if (request.clearMute === true && sender.tab != undefined) {
-        let {muted, reason, extensionId} = sender.tab.mutedInfo;
+        let { muted, reason, extensionId } = sender.tab.mutedInfo;
         if (muted && reason == 'extension' && extensionId == chrome.runtime.id) {
           chrome.tabs.update(sender.tab.id, { muted: false });
         }
@@ -185,7 +185,7 @@ chrome.notifications.onClicked.addListener(function(notificationId) {
   switch(notificationId) {
     case 'extensionUpdate':
       chrome.notifications.clear('extensionUpdate');
-      chrome.tabs.create({url: 'https://github.com/richardfrost/AdvancedProfanityFilter/releases'});
+      chrome.tabs.create({ url: 'https://github.com/richardfrost/AdvancedProfanityFilter/releases' });
       break;
   }
 });

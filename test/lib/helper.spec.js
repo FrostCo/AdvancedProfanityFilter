@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-import { dynamicList, escapeHTML, getVersion, isVersionOlder, removeFromArray } from '../built/lib/helper';
+import { escapeHTML, getVersion, isVersionOlder, removeFromArray } from '../built/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 

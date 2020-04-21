@@ -68,9 +68,9 @@ export default class DataMigration {
 
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
   moveToNewWordsStorage() {
-    chrome.storage.sync.get({'words': null}, function(oldWords) {
+    chrome.storage.sync.get({ 'words': null }, function(oldWords) {
       if (oldWords.words) {
-        chrome.storage.sync.set({'_words0': oldWords.words}, function() {
+        chrome.storage.sync.set({ '_words0': oldWords.words }, function() {
           if (!chrome.runtime.lastError) {
             chrome.storage.sync.remove('words', function() {
               // Removed old words
@@ -120,21 +120,21 @@ export default class DataMigration {
   updateDefaultSubs() {
     let cfg = this.cfg;
     let updatedWords = {
-      bastard: {original: 'jerk', update: 'idiot'},
-      bitch: {original: 'jerk', update: 'bench'},
-      cocksucker: {original: 'idiot', update: 'suckup'},
-      cunt: {original: 'explative', update: 'expletive' },
-      fag: {original: 'slur', update: 'gay'},
-      faggot: {original: 'slur', update: 'gay'},
-      fags: {original: 'slur', update: 'gays'},
+      bastard: { original: 'jerk', update: 'idiot' },
+      bitch: { original: 'jerk', update: 'bench' },
+      cocksucker: { original: 'idiot', update: 'suckup' },
+      cunt: { original: 'explative', update: 'expletive' },
+      fag: { original: 'slur', update: 'gay' },
+      faggot: { original: 'slur', update: 'gay' },
+      fags: { original: 'slur', update: 'gays' },
       fuck: { original: 'fudge', update: 'freak' },
-      goddammit: {original: 'goshdangit', update: 'dangit'},
-      jackass: {original: 'idiot', update: 'jerk'},
-      nigga: {original: 'ethnic slur', update: 'bruh'},
-      nigger: {original: 'ethnic slur', update: 'man'},
-      niggers: {original: 'ethnic slurs', update: 'people'},
-      tits: {original: 'explative', update: 'chest'},
-      twat: {original: 'explative', update: 'dumbo'},
+      goddammit: { original: 'goshdangit', update: 'dangit' },
+      jackass: { original: 'idiot', update: 'jerk' },
+      nigga: { original: 'ethnic slur', update: 'bruh' },
+      nigger: { original: 'ethnic slur', update: 'man' },
+      niggers: { original: 'ethnic slurs', update: 'people' },
+      tits: { original: 'explative', update: 'chest' },
+      twat: { original: 'explative', update: 'dumbo' },
     };
 
     Object.keys(updatedWords).forEach(updatedWord => {
