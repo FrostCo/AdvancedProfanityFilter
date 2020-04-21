@@ -77,7 +77,7 @@ export default class WebAudio {
         parentSelector: 'div.webPlayer div.persistentPanel',
         showSubtitles: 0,
         simpleUnmute: true,
-        subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span',
+        subtitleSelector: 'div.webPlayerContainer div span > span',
         videoSelector: 'div.webPlayerElement video[src]'
       }
     ],
