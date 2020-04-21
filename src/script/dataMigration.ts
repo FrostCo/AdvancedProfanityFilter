@@ -10,7 +10,8 @@ export default class DataMigration {
     { version: '1.1.0', name: 'sanitizeWords', runOnImport: true },
     { version: '1.2.0', name: 'singleWordSubstitution', runOnImport: true },
     { version: '2.1.4', name: 'updateDefaultSubs', runOnImport: false },
-    { version: '2.3.0', name: 'fixSmartWatch', runOnImport: false }
+    { version: '2.3.0', name: 'fixSmartWatch', runOnImport: false },
+    { version: '2.7.0', name: 'addWordlistsToWords', runOnImport: true },
   ];
 
   constructor(config) {
@@ -28,6 +29,17 @@ export default class DataMigration {
 
   static migrationNeeded(oldVersion: string): boolean {
     return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.latestMigration().version));
+  }
+
+  // [2.7.0]
+  addWordlistsToWords() {
+    let cfg = this.cfg as WebConfig;
+    Object.keys(cfg.words).forEach(key => {
+      let word = cfg.words[key];
+      if (!Array.isArray(word.lists)) {
+        word.lists = [];
+      }
+    });
   }
 
   // This will look at the version (from before the update) and perform data migrations if necessary
