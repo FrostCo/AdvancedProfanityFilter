@@ -897,7 +897,7 @@ export default class OptionPage {
       return false;
     }
 
-    this.populateWordsList();
+    this.populateOptions();
   }
 
   showSupportedAudioSites() {
