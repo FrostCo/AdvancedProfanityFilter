@@ -20,11 +20,7 @@ export default class Config {
   words: { [key: string]: WordOptions };
   wordWhitelist: string[];
 
-  static readonly filterMethods = {
-    censor: 0,
-    substitute: 1,
-    remove: 2
-  };
+  static readonly _allWordlists = ['All Words'];
 
   static readonly _defaults = {
     censorCharacter: '*',
@@ -79,10 +75,9 @@ export default class Config {
     'tits': { lists: [], matchMethod: 1, repeat: true, separators: false, sub: 'chest' },
     'twat': { lists: [], matchMethod: 0, repeat: true, separators: false, sub: 'dumbo' },
     'twats': { lists: [], matchMethod: 0, repeat: true, separators: false, sub: 'dumbos' },
-    'whore': { lists: [], matchMethod: 1, repeat: true, separators: false, sub: 'tramp' }
+    'whore': { lists: [], matchMethod: 1, repeat: true, separators: false, sub: 'tramp' },
   };
 
-  static readonly _allWordlists = ['All Words'];
   static readonly _filterMethodNames = ['Censor', 'Substitute', 'Remove'];
   static readonly _matchMethodNames = ['Exact', 'Partial', 'Whole', 'Regular-Expression'];
   static readonly _maxBytes = 6500;

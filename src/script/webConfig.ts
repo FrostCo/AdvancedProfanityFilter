@@ -17,7 +17,7 @@ export default class WebConfig extends Config {
   youTubeAutoSubsMax: number;
   youTubeAutoSubsMin: number;
 
-  static readonly _webConfigDefaults = {
+  static readonly _classDefaults = {
     advancedDomains: [],
     audioWordlistId: 0,
     customAudioSites: null,
@@ -35,7 +35,7 @@ export default class WebConfig extends Config {
     youTubeAutoSubsMin: 0,
   }
 
-  static readonly _defaults = Object.assign(Config._defaults, WebConfig._webConfigDefaults);
+  static readonly _defaults = Object.assign(Config._defaults, WebConfig._classDefaults);
 
   static async build(keys?: string[]) {
     let asyncResult = await WebConfig.getConfig(keys);
@@ -50,7 +50,7 @@ export default class WebConfig extends Config {
     }
 
     super(); // Get the Config defaults
-    Object.assign(this, WebConfig._webConfigDefaults, asyncParam); // Separate due to _defineProperty()
+    Object.assign(this, WebConfig._classDefaults, asyncParam); // Separate due to _defineProperty()
   }
 
   // Compile words
