@@ -1,11 +1,40 @@
 import Config from './lib/config';
 
 export default class WebConfig extends Config {
+  advancedDomains: string[];
   audioWordlistId: number;
+  customAudioSites: { [site: string]: AudioRules[] };
+  disabledDomains: string[];
+  enabledDomains: string[];
+  enabledDomainsOnly: boolean;
+  muteAudio: boolean;
+  muteAudioOnly: boolean;
+  muteCueRequireShowing: boolean;
+  muteMethod: number;
+  password: string;
+  showSubtitles: number;
+  showUpdateNotification: boolean;
+  youTubeAutoSubsMax: number;
+  youTubeAutoSubsMin: number;
 
   static readonly _webConfigDefaults = {
-    audioWordlistId: 0
+    advancedDomains: [],
+    audioWordlistId: 0,
+    customAudioSites: null,
+    disabledDomains: [],
+    enabledDomains: [],
+    enabledDomainsOnly: false,
+    muteAudio: false,
+    muteAudioOnly: false,
+    muteCueRequireShowing: true,
+    muteMethod: 0, // 0: Mute Tab, 1: Video Volume
+    password: null,
+    showSubtitles: 0,
+    showUpdateNotification: true,
+    youTubeAutoSubsMax: 0,
+    youTubeAutoSubsMin: 0,
   }
+
   static readonly _defaults = Object.assign(Config._defaults, WebConfig._webConfigDefaults);
 
   static async build(keys?: string[]) {

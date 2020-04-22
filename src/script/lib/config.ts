@@ -1,39 +1,25 @@
 export default class Config {
-  advancedDomains: string[];
   censorCharacter: string;
   censorFixedLength: number;
-  customAudioSites: { [site: string]: AudioRules[] };
   defaultSubstitution: string;
   defaultWordMatchMethod: number;
   defaultWordRepeat: boolean;
   defaultWordSeparators: boolean;
-  disabledDomains: string[];
-  enabledDomains: string[];
-  enabledDomainsOnly: boolean;
   filterMethod: number;
   filterWordList: boolean;
   globalMatchMethod: number;
   iWordWhitelist: string[];
-  muteAudio: boolean;
-  muteAudioOnly: boolean;
-  muteMethod: number;
-  muteCueRequireShowing: boolean;
-  password: string;
   preserveCase: boolean;
   preserveFirst: boolean;
   preserveLast: boolean;
   showCounter: boolean;
-  showSubtitles: number;
   showSummary: boolean;
-  showUpdateNotification: boolean;
   substitutionMark: boolean;
   wordlistId: number;
   wordlists: string[];
   wordlistsEnabled: boolean;
   words: { [key: string]: WordOptions };
   wordWhitelist: string[];
-  youTubeAutoSubsMin: number;
-  youTubeAutoSubsMax: number;
 
   static readonly filterMethods = {
     censor: 0,
@@ -50,40 +36,26 @@ export default class Config {
   };
 
   static readonly _defaults = {
-    advancedDomains: [],
     censorCharacter: '*',
     censorFixedLength: 0,
-    customAudioSites: null,
     defaultSubstitution: 'censored',
     defaultWordMatchMethod: 0,
     defaultWordRepeat: false,
     defaultWordSeparators: false,
-    disabledDomains: [],
-    enabledDomains: [],
-    enabledDomainsOnly: false,
     filterMethod: 1, // ['Censor', 'Substitute', 'Remove'];
     filterWordList: true,
     globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
     iWordWhitelist: [],
-    muteAudio: false, // Filter audio
-    muteAudioOnly: false,
-    muteMethod: 0, // 0: Mute Tab, 1: Video Volume
-    muteCueRequireShowing: true,
-    password: null,
     preserveCase: true,
     preserveFirst: true,
     preserveLast: false,
     showCounter: true,
-    showSubtitles: 0,
     showSummary: true,
-    showUpdateNotification: true,
     substitutionMark: false,
     wordlistId: 0,
     wordlists: ['Custom 1', 'Custom 2', 'Custom 3', 'Custom 4', 'Custom 5', 'Custom 6'],
     wordlistsEnabled: false,
     wordWhitelist: [],
-    youTubeAutoSubsMin: 0,
-    youTubeAutoSubsMax: 0,
   };
 
   static readonly _defaultWords: { [key: string]: WordOptions } = {
