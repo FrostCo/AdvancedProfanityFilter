@@ -7,7 +7,6 @@ export default class Config {
   defaultWordSeparators: boolean;
   filterMethod: number;
   filterWordList: boolean;
-  globalMatchMethod: number;
   iWordWhitelist: string[];
   preserveCase: boolean;
   preserveFirst: boolean;
@@ -27,14 +26,6 @@ export default class Config {
     remove: 2
   };
 
-  static readonly matchMethods = {
-    exact: 0,
-    partial: 1,
-    whole: 2,
-    'Per-Word': 3,
-    'RegExp': 4
-  };
-
   static readonly _defaults = {
     censorCharacter: '*',
     censorFixedLength: 0,
@@ -44,7 +35,6 @@ export default class Config {
     defaultWordSeparators: false,
     filterMethod: 1, // ['Censor', 'Substitute', 'Remove'];
     filterWordList: true,
-    globalMatchMethod: 3, // ['Exact', 'Partial', 'Whole', 'Per-Word', 'RegExp']
     iWordWhitelist: [],
     preserveCase: true,
     preserveFirst: true,
@@ -94,7 +84,7 @@ export default class Config {
 
   static readonly _allWordlists = ['All Words'];
   static readonly _filterMethodNames = ['Censor', 'Substitute', 'Remove'];
-  static readonly _matchMethodNames = ['Exact', 'Partial', 'Whole', 'Per-Word', 'Regular-Expression'];
+  static readonly _matchMethodNames = ['Exact', 'Partial', 'Whole', 'Regular-Expression'];
   static readonly _maxBytes = 6500;
   static readonly _maxWords = 100;
   static readonly _wordsPattern = /^_words\d+/;

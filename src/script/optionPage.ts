@@ -377,11 +377,8 @@ export default class OptionPage {
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
     let showSummary = document.getElementById('showSummary') as HTMLInputElement;
     let showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
-    let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
     let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     selectedFilter.checked = true;
-    dynamicList(WebConfig._matchMethodNames.slice(0, -1), 'globalMatchMethodSelect');
-    globalMatchMethodSelect.selectedIndex = this.cfg.globalMatchMethod;
     showCounter.checked = this.cfg.showCounter;
     showSummary.checked = this.cfg.showSummary;
     showUpdateNotification.checked = this.cfg.showUpdateNotification;
@@ -412,7 +409,7 @@ export default class OptionPage {
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     defaultWordSubstitution.value = this.cfg.defaultSubstitution;
     let defaultWordMatchMethodSelectHTML = '';
-    for(let i = 0; i < WebConfig._matchMethodNames.slice(0,-2).length; i++) {
+    for(let i = 0; i < WebConfig._matchMethodNames.slice(0,-1).length; i++) {
       defaultWordMatchMethodSelectHTML += '<option value="'+WebConfig._matchMethodNames[i]+'">'+WebConfig._matchMethodNames[i]+'</option>';
     }
     defaultWordMatchMethodSelect.innerHTML = defaultWordMatchMethodSelectHTML;
@@ -695,7 +692,6 @@ export default class OptionPage {
     let defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
     let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
     let defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
-    let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
     let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
@@ -717,7 +713,6 @@ export default class OptionPage {
     self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
     self.cfg.defaultWordRepeat = defaultWordRepeat.checked;
     self.cfg.defaultWordSeparators = defaultWordSeparators.checked;
-    self.cfg.globalMatchMethod = globalMatchMethodSelect.selectedIndex;
     self.cfg.preserveCase = preserveCase.checked;
     self.cfg.preserveFirst = preserveFirst.checked;
     self.cfg.preserveLast = preserveLast.checked;
@@ -948,19 +943,16 @@ export default class OptionPage {
       case 0: // Censor
         OptionPage.show(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
-        OptionPage.show(document.getElementById('globalMatchMethod'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
       case 1: // Substitution
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.show(document.getElementById('substitutionSettings'));
-        OptionPage.show(document.getElementById('globalMatchMethod'));
         OptionPage.show(document.getElementById('wordSubstitution'));
         break;
       case 2: // Remove
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
-        OptionPage.hide(document.getElementById('globalMatchMethod'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
     }
@@ -1039,7 +1031,6 @@ document.getElementById('censorFixedLengthSelect').addEventListener('change', e 
 document.getElementById('defaultWordMatchMethodSelect').addEventListener('change', e => { option.saveOptions(e); });
 document.getElementById('defaultWordRepeat').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('defaultWordSeparators').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('globalMatchMethodSelect').addEventListener('change', e => { option.saveOptions(e); });
 document.getElementById('preserveCase').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('preserveFirst').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('preserveLast').addEventListener('click', e => { option.saveOptions(e); });

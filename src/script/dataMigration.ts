@@ -12,6 +12,7 @@ export default class DataMigration {
     { version: '2.1.4', name: 'updateDefaultSubs', runOnImport: false },
     { version: '2.3.0', name: 'fixSmartWatch', runOnImport: false },
     { version: '2.7.0', name: 'addWordlistsToWords', runOnImport: true },
+    { version: '2.7.0', name: 'removeGlobalMatchMethod', runOnImport: true },
   ];
 
   constructor(config) {
@@ -91,6 +92,20 @@ export default class DataMigration {
         });
       }
     });
+  }
+
+  removeGlobalMatchMethod() {
+    let cfg = this.cfg;
+    if ((cfg as any).globalMatchMethod !== undefined) {
+      Object.keys(cfg.words).forEach(name => {
+        let word = cfg.words[name];
+        // Move RegExp from 4 to 3
+        if (word.matchMethod === 4) {
+          word.matchMethod = 3;
+        }
+      });
+      cfg.removeProp('globalMatchMethod');
+    }
   }
 
   runImportMigrations() {
