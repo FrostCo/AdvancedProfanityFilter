@@ -85,9 +85,8 @@ export default class DataMigration {
       if (oldWords.words) {
         chrome.storage.sync.set({ '_words0': oldWords.words }, function() {
           if (!chrome.runtime.lastError) {
-            chrome.storage.sync.remove('words', function() {
-              // Removed old words
-            });
+            // Remove old words
+            chrome.storage.sync.remove('words');
           }
         });
       }
@@ -104,7 +103,7 @@ export default class DataMigration {
           word.matchMethod = 3;
         }
       });
-      cfg.removeProp('globalMatchMethod');
+      cfg.remove('globalMatchMethod');
     }
   }
 

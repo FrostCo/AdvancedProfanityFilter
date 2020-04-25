@@ -7,6 +7,7 @@ export default class WebConfig extends Config {
   disabledDomains: string[];
   enabledDomains: string[];
   enabledDomainsOnly: boolean;
+  wordContainerKeys: string[]; // Internal use - not persisted
   muteAudio: boolean;
   muteAudioOnly: boolean;
   muteCueRequireShowing: boolean;
@@ -38,6 +39,8 @@ export default class WebConfig extends Config {
   static readonly QUOTA_BYTES_PER_ITEM = 8192; // https://developer.chrome.com/apps/storage chrome.storage.sync.QUOTA_BYTES_PER_ITEM
   static readonly _defaults = Object.assign(Config._defaults, WebConfig._classDefaults);
   static readonly _maxBytes = 8000;
+  static readonly _wordsContainerPrefix = '_words'
+  static readonly _wordsPattern = /^_words\d+/;
 
   static async build(keys: string | string[] = []) {
     if (typeof keys === 'string') { keys = [keys]; }
@@ -53,25 +56,23 @@ export default class WebConfig extends Config {
     }
 
     super(); // Get the Config defaults
+    this.wordContainerKeys = [];
     Object.assign(this, WebConfig._classDefaults, asyncParam); // Separate due to _defineProperty()
   }
 
   // Combine all ._words* into .words
-  static combineWords(items): void {
+  static combineWords(items): string[] {
     items.words = {};
     if (items._words0 !== undefined) {
-      // Find all _words* to combine
-      let wordKeys = Object.keys(items).filter(function(key) {
-        return Config._wordsPattern.test(key);
-      });
+      let wordKeys = WebConfig.getWordContainerKeys(items);
 
       // Add all _words* to words and remove _words*
       wordKeys.forEach(function(key) {
         Object.assign(items.words, items[key]);
         delete items[key];
       });
+      return wordKeys;
     }
-    // console.log('combineWords', items); // DEBUG
   }
 
   // Async call to get provided keys (or default keys) from chrome storage
@@ -98,7 +99,7 @@ export default class WebConfig extends Config {
           if (items._words0 === undefined || Object.keys(items._words0).length == 0) {
             items._words0 = Config._defaultWords;
           }
-          WebConfig.combineWords(items);
+          items.wordContainerKeys = WebConfig.combineWords(items);
         }
 
         // Remove keys we didn't request (needed for _words*)
@@ -115,6 +116,15 @@ export default class WebConfig extends Config {
     });
   }
 
+  // Find all _words* to combine
+  static getWordContainerKeys(items) {
+    let containerKeys = Object.keys(items).filter(function(key) {
+      return WebConfig._wordsPattern.test(key);
+    });
+
+    return containerKeys;
+  }
+
   ordered() {
     let self = this;
     return Object.keys(self).sort().reduce((obj, key) => {
@@ -123,9 +133,13 @@ export default class WebConfig extends Config {
     }, {});
   }
 
-  removeProp(prop: string) {
-    chrome.storage.sync.remove(prop);
-    delete this[prop];
+  remove(props: string | string[]) {
+    let self = this;
+    if (typeof props === 'string') { props = [props]; }
+    chrome.storage.sync.remove(props);
+    props.forEach(function(prop) {
+      delete self[prop];
+    });
   }
 
   reset() {
@@ -156,6 +170,16 @@ export default class WebConfig extends Config {
       }
     });
 
+    // If we have more containers in storage than are needed, remove them
+    if (props.length === 0 || props.includes('words')) {
+      let newWordKeys = WebConfig.getWordContainerKeys(data);
+      let containersToRemove = self.wordContainerKeys.filter(oldKey => !newWordKeys.includes(oldKey));
+      if (containersToRemove.length !== 0) {
+        self.remove(containersToRemove);
+        self.wordContainerKeys = newWordKeys;
+      }
+    }
+
     return new Promise(function(resolve, reject) {
       chrome.storage.sync.set(data, function() {
         resolve(chrome.runtime.lastError ? 1 : 0);
@@ -166,16 +190,13 @@ export default class WebConfig extends Config {
   splitWords() {
     let self = this;
     const encoder = new TextEncoder();
-    const containerPrefix = '_words';
     let currentContainerNum = 0;
     let currentBytes = 2; // For double-quotes around entire stringified JSON
     let words = {};
 
-    let currentContainer = `${containerPrefix}${currentContainerNum}`;
+    let currentContainer = `${WebConfig._wordsContainerPrefix}${currentContainerNum}`;
     words[currentContainer] = {};
     currentBytes += encoder.encode(`{"${currentContainer}":{}}`).length;
-    // let debugString = '"{}"'; // DEBUG
-    // debugString += `"${currentContainer}":{}`; // DEBUG
 
     Object.keys(self.words).sort().forEach(function(word) {
       let newBytes = encoder.encode(`",${word}":`).length; // This leads to an extra ',' for the last entry
@@ -184,14 +205,12 @@ export default class WebConfig extends Config {
       // Next word would be too big, setup next container
       if ((currentBytes + newBytes) >= WebConfig._maxBytes) {
         currentContainerNum++;
-        currentContainer = `${containerPrefix}${currentContainerNum}`;
+        currentContainer = `${WebConfig._wordsContainerPrefix}${currentContainerNum}`;
         words[currentContainer] = {};
         currentBytes = encoder.encode(`"${currentContainer}":{}`).length;
       }
 
       // Adding a word
-      // debugString += `"${word}":,`; // DEBUG
-      // debugString += JSON.stringify(self.words[word]); // DEBUG
       currentBytes += newBytes;
       words[currentContainer][word] = self.words[word];
     });
