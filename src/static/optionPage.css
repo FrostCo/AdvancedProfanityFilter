@@ -1,7 +1,11 @@
+html {
+  --blue: #2980b9; /* belize-hole */
+  --silver: #bdc3c7;
+}
 a:hover
-{color:#2980b9}
+{color:var(--blue)}
 h4.sectionHeader
-{color:#3498db}
+{color:var(--blue)}
 #header img
 {margin-bottom:8px}
 /* #helpPage
@@ -9,7 +13,7 @@ h4.sectionHeader
 #main
 {padding-bottom:16px}
 #menu > a:hover
-{color:#fff!important;background-color:#2980b9!important}
+{color:#fff!important;background-color:var(--blue)!important}
 .updateYouTubeAutoLimits
 {width:70px;text-align:right;}
 .disabled
