@@ -7,6 +7,7 @@ import Bookmarklet from './bookmarklet';
 import WebAudio from './webAudio';
 
 export default class OptionPage {
+  _bulkWordMatchMethodHTML: string;
   cfg: WebConfig;
   auth: OptionAuth;
 
@@ -139,6 +140,135 @@ export default class OptionPage {
     }
   }
 
+  bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
+    let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+    let wordlistCells = [];
+    if (data === undefined) {
+      data = {
+        lists: [],
+        matchMethod: option.cfg.defaultWordMatchMethod,
+        repeat: option.cfg.defaultWordRepeat,
+        separators: option.cfg.defaultWordSeparators,
+        sub: '',
+      };
+    }
+
+    // Build row
+    let row = table.insertRow();
+    row.classList.add('bulkWordRow');
+    let cellDeleteWord = row.insertCell(0);
+    let cellWord = row.insertCell(1);
+    let cellSub = row.insertCell(2);
+    let cellMatchMethod = row.insertCell(3);
+    let cellRepeat = row.insertCell(4);
+    let cellSeparators = row.insertCell(5);
+    option.cfg.wordlists.forEach((wordlist, index) => { wordlistCells.push(row.insertCell(index + 6)); });
+    cellDeleteWord.innerHTML = '<button>X</button>';
+    cellWord.innerHTML = '<input type="text" class="bulkAddWordText">';
+    cellSub.innerHTML = '<input type="text">';
+    cellMatchMethod.innerHTML = option._bulkWordMatchMethodHTML;
+    cellRepeat.innerHTML = '<input type="checkbox" name="repeat">';
+    cellSeparators.innerHTML = '<input type="checkbox" name="separators">';
+    wordlistCells.forEach((cell, index) => {
+      cell.innerHTML = `<input type="checkbox" name="wordlists" class="wordlistData" data-col="${index + 1}">`;
+    });
+
+    // Populate data
+    (cellWord.querySelector('input') as HTMLInputElement).value = word;
+    (cellSub.querySelector('input') as HTMLInputElement).value = data.sub;
+    (cellMatchMethod.querySelector('select') as HTMLSelectElement).selectedIndex = data.matchMethod;
+    (cellRepeat.querySelector('input') as HTMLInputElement).checked = data.repeat;
+    (cellSeparators.querySelector('input') as HTMLInputElement).checked = data.separators;
+    wordlistCells.forEach((cell, index) => {
+      (cell.querySelector('input') as HTMLInputElement).checked = data.lists.includes(index + 1);
+    });
+
+    // Scroll to the bottom if this is a new word row
+    if (word === '') {
+      table.parentElement.scrollTop = table.parentElement.scrollHeight - table.parentElement.clientHeight;
+      cellWord.querySelector('input').focus();
+    }
+  }
+
+  bulkEditorAddWords() {
+    let bulkAddWordsText = document.querySelector('#bulkWordEditorModal textarea#bulkAddWordsText') as HTMLTextAreaElement;
+    let text = bulkAddWordsText.value;
+    if (text != '') {
+      let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+      let lines = text.toLowerCase().split('\n');
+      let words = lines.map(line => line.trim());
+      let uniqueWords = words.filter((word, index) => words.indexOf(word) === index);
+
+      // Remove any words that already exist in the current table
+      let currentWords = option.bulkEditorCurrentWords();
+      let wordsToAdd = uniqueWords.filter(newWord => !currentWords.includes(newWord));
+
+      // Add the new words to the table
+      wordsToAdd.forEach(function(word) {
+        if (word != '') { option.bulkEditorAddRow(word); }
+      });
+
+      // Scroll to the bottom
+      table.parentElement.scrollTop = table.parentElement.scrollHeight - table.parentElement.clientHeight;
+
+      // Clear textarea after adding to the table
+      bulkAddWordsText.value = '';
+    }
+  }
+
+  bulkEditorCurrentWords() {
+    let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+    let words = [];
+    table.querySelectorAll('tr > td > input.bulkAddWordText').forEach((wordText: HTMLInputElement, index) => {
+      words.push(wordText.value);
+    });
+    return words;
+  }
+
+  bulkEditorRemoveRow(event) {
+    let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+    let row = event.target.parentElement.parentElement;
+    table.deleteRow(row.rowIndex);
+  }
+
+  async bulkEditorSave() {
+    let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+    let failed = {};
+    option.cfg.words = {};
+
+    table.querySelectorAll('tr.bulkWordRow').forEach((tr, index) => {
+      let cells = tr.querySelectorAll('td');
+      let lists = [];
+      let wordlistSelectionsInput = tr.querySelectorAll('input[name="wordlists"]') as NodeListOf<HTMLInputElement>;
+      wordlistSelectionsInput.forEach((wordlist, index) => { if (wordlist.checked) { lists.push(index + 1); } });
+
+      let name = (cells[1].querySelector('input') as HTMLInputElement).value;
+      if (name != '') {
+        let wordOptions: WordOptions = {
+          lists: lists,
+          matchMethod: (cells[3].querySelector('select') as HTMLSelectElement).selectedIndex,
+          repeat: (cells[4].querySelector('input') as HTMLInputElement).checked,
+          separators: (cells[5].querySelector('input') as HTMLInputElement).checked,
+          sub: (cells[2].querySelector('input') as HTMLInputElement).value
+        };
+        let success = option.cfg.addWord(name, wordOptions);
+        if (!success) {
+          failed[name] = wordOptions;
+        }
+      }
+    });
+
+    let error = await option.cfg.save('words');
+    error ? OptionPage.showErrorModal('Failed to save.') : OptionPage.showStatusModal('Words saved successfully.');
+  }
+
+  bulkEditorWordlistCheckbox(event) {
+    let checked = (event.target as HTMLInputElement).checked;
+    document.querySelectorAll(`#bulkWordEditorModal table td input.wordlistData[data-col="${event.target.dataset.col}"]`).forEach((box: HTMLInputElement) => {
+      box.checked = checked;
+    });
+  }
+
   configInlineToggle() {
     let input = document.getElementById('configInlineInput') as HTMLInputElement;
     let configText = document.getElementById('configText') as HTMLTextAreaElement;
@@ -153,12 +283,17 @@ export default class OptionPage {
 
   confirm(evt, action) {
     let ok = document.getElementById('confirmModalOK');
+    ok.removeEventListener('click', bulkEditorSave);
     ok.removeEventListener('click', importConfig);
     ok.removeEventListener('click', removeAllWords);
     ok.removeEventListener('click', restoreDefaults);
     ok.removeEventListener('click', setPassword);
 
     switch(action) {
+      case 'bulkEditorSave':
+        OptionPage.configureConfirmModal('Are you sure you want to save these changes?');
+        ok.addEventListener('click', bulkEditorSave);
+        break;
       case 'importConfig': {
         OptionPage.configureConfirmModal('Are you sure you want to overwrite your existing settings?');
         ok.addEventListener('click', importConfig);
@@ -895,6 +1030,33 @@ export default class OptionPage {
     this.populateOptions();
   }
 
+  showBulkWordEditor() {
+    let modalId = 'bulkWordEditorModal';
+    let title = document.querySelector(`#${modalId} h5.modalTitle`) as HTMLHeadingElement;
+    let tableContainer = document.querySelector(`#${modalId} div.tableContainer`) as HTMLDivElement;
+    let thead = '<thead><tr><th><span>Remove</span></th><th><span>Word</span></th><th><span>Substitution</span></th><th><span>Match Method</span></th><th><span>Repeated</span></th><th><span>Separators</span></th>';
+    this.cfg.wordlists.forEach((wordlist, i) => { thead += `<th><label><input type="checkbox" class="wordlistHeader" data-col="${i + 1}"><span> ${wordlist}</span></label></th>`; });
+    thead += '</tr></thead>';
+    title.textContent = 'Bulk Word Editor';
+    tableContainer.innerHTML = `<table id="bulkEditorTable" class="w3-table-all w3-tiny">${thead}</table>`;
+
+    // Store the select list for match method (used in each row)
+    option._bulkWordMatchMethodHTML = '<select>';
+    WebConfig._matchMethodNames.forEach((name, index) => {
+      option._bulkWordMatchMethodHTML += `<option value="${index}" class="bulkMatchMethod${index}">${name}</option>`;
+    });
+    option._bulkWordMatchMethodHTML += '</select>';
+
+    // Add current words to the table
+    Object.keys(option.cfg.words).forEach((key, index) => {
+      option.bulkEditorAddRow(key, option.cfg.words[key]);
+    });
+
+    document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click', e => { option.switchPage(e); }); });
+    tableContainer.querySelectorAll('th input.wordlistHeader').forEach(el => { el.addEventListener('click', e => { option.bulkEditorWordlistCheckbox(e); }); });
+    OptionPage.openModal(modalId);
+  }
+
   showSupportedAudioSites() {
     let title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
     let contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
@@ -1011,6 +1173,7 @@ let option = new OptionPage;
 ////
 // Events
 // Functions
+function bulkEditorSave(e) { option.bulkEditorSave(); }
 function importConfig(e) { option.importConfig(e); }
 function removeAllWords(e) { option.removeAllWords(e); }
 function restoreDefaults(e) { option.restoreDefaults(e); }
@@ -1024,6 +1187,10 @@ document.getElementById('confirmModalOK').addEventListener('click', e => { Optio
 document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('statusModalOK').addEventListener('click', e => { OptionPage.closeModal('statusModal'); });
 document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', e => { OptionPage.closeModal('supportedAudioSitesModal'); });
+document.querySelector('#bulkWordEditorModal button.modalAddWord').addEventListener('click', e => { option.bulkEditorAddRow(); });
+document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEventListener('click', e => { option.bulkEditorAddWords(); });
+document.querySelector('#bulkWordEditorModal button.modalCancel').addEventListener('click', e => { OptionPage.closeModal('bulkWordEditorModal'); });
+document.querySelector('#bulkWordEditorModal button.modalSave').addEventListener('click', e => { option.confirm(e, 'bulkEditorSave'); });
 // Settings
 document.querySelectorAll('#filterMethod input').forEach(el => { el.addEventListener('click', e => { option.selectFilterMethod(e); }); });
 document.getElementById('censorCharacterSelect').addEventListener('change', e => { option.saveOptions(e); });
@@ -1046,6 +1213,7 @@ document.getElementById('wordText').addEventListener('input', e => { OptionPage.
 document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
 document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
 document.getElementById('wordRemoveAll').addEventListener('click', e => { option.confirm(e, 'removeAllWords'); });
+document.getElementById('bulkWordEditorButton').addEventListener('click', e => { option.showBulkWordEditor(); });
 // Lists
 document.getElementById('whitelist').addEventListener('change', e => { option.populateWhitelistWord(); });
 document.getElementById('whitelistText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });

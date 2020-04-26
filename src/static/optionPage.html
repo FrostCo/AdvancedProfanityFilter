@@ -217,6 +217,7 @@
     <button id="wordSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
     <button id="wordRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
     <button id="wordRemoveAll" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE ALL</button>
+    <button id="bulkWordEditorButton" class="w3-btn w3-right w3-round-large w3-flat-peter-river">BULK EDITOR</button>
   </div>
 </div>
 
@@ -592,6 +593,24 @@
   </div>
 </div>
 </div> <!-- /div#main -->
+
+<div id="bulkWordEditorModal" class="w3-modal">
+  <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="width: 98%;">
+    <header class="w3-container w3-flat-peter-river"><h5 class="modalTitle"></h5></header>
+    <div class="w3-container w3-margin w3-padding">
+      <div class="tableContainer  w3-card" style="overflow: auto; height: 600px;"></div>
+      <div class="w3-margin-top">
+        <textarea id="bulkAddWordsText" class="batchAddWord w3-left w3-margin-right" style="width:300px;height:50px;font-size:11px;" spellcheck="false" placeholder="Bulk add words (one word/phrase per line)"></textarea>
+        <button class="modalBulkAddWords w3-btn w3-round-large w3-flat-peter-river">BULK ADD WORDS</button>
+        <div class="w3-right">
+          <button class="modalAddWord w3-btn w3-round-large w3-flat-peter-river">ADD WORD</button>
+          <button class="modalCancel w3-btn w3-round-large w3-flat-peter-river">CANCEL</button>
+          <button class="modalSave w3-btn w3-round-large w3-flat-pomegranate">SAVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="confirmModal" class="w3-modal">
   <div class="w3-modal-content w3-card-4 w3-animate-zoom">

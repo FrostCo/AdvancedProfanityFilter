@@ -25,5 +25,17 @@ h4.sectionHeader
 /* Bookmarklet Link */
 a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited
 {color: #fff}
+/* Modals */
+#confirmModal,#passwordModal,#statusModal
+{z-index:900}
+#bulkWordEditorModal,#supportedAudioSitesModal
+{z-index:500}
+/* Bulk Word Editor */
+#bulkWordEditorModal table
+{border:none;} /* Fix small gap on sticky header from .w3-table-all */
+#bulkWordEditorModal table th
+{background-color:var(--silver);position:sticky;top:0;z-index:10;vertical-align:middle;}
+#bulkWordEditorModal table th input,span
+{vertical-align:middle;}
 #supportedAudioSitesModal textarea
 {width:420px;height:400px;font-size:11px;}
