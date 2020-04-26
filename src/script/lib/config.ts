@@ -39,7 +39,7 @@ export default class Config {
     showSummary: true,
     substitutionMark: false,
     wordlistId: 0,
-    wordlists: ['Custom 1', 'Custom 2', 'Custom 3', 'Custom 4', 'Custom 5', 'Custom 6'],
+    wordlists: ['Wordlist 1', 'Wordlist 2', 'Wordlist 3', 'Wordlist 4', 'Wordlist 5', 'Wordlist 6'],
     wordlistsEnabled: false,
     wordWhitelist: [],
   };
