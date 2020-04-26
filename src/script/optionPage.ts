@@ -156,14 +156,14 @@ export default class OptionPage {
     // Build row
     let row = table.insertRow();
     row.classList.add('bulkWordRow');
-    let cellDeleteWord = row.insertCell(0);
+    let cellRemoveRow = row.insertCell(0);
     let cellWord = row.insertCell(1);
     let cellSub = row.insertCell(2);
     let cellMatchMethod = row.insertCell(3);
     let cellRepeat = row.insertCell(4);
     let cellSeparators = row.insertCell(5);
     option.cfg.wordlists.forEach((wordlist, index) => { wordlistCells.push(row.insertCell(index + 6)); });
-    cellDeleteWord.innerHTML = '<button>X</button>';
+    cellRemoveRow.innerHTML = '<button>X</button>';
     cellWord.innerHTML = '<input type="text" class="bulkAddWordText">';
     cellSub.innerHTML = '<input type="text">';
     cellMatchMethod.innerHTML = option._bulkWordMatchMethodHTML;
@@ -174,6 +174,7 @@ export default class OptionPage {
     });
 
     // Populate data
+    cellRemoveRow.querySelector('button').addEventListener('click', e => { option.bulkEditorRemoveRow(e); });
     (cellWord.querySelector('input') as HTMLInputElement).value = word;
     (cellSub.querySelector('input') as HTMLInputElement).value = data.sub;
     (cellMatchMethod.querySelector('select') as HTMLSelectElement).selectedIndex = data.matchMethod;
