@@ -25,3 +25,5 @@ h4.sectionHeader
 /* Bookmarklet Link */
 a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited
 {color: #fff}
+#supportedAudioSitesModal textarea
+{width:420px;height:400px;font-size:11px;}
