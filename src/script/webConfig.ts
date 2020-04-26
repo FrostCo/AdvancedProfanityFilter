@@ -1,13 +1,13 @@
 import Config from './lib/config';
 
 export default class WebConfig extends Config {
+  _wordContainerKeys: string[];
   advancedDomains: string[];
   audioWordlistId: number;
   customAudioSites: { [site: string]: AudioRules[] };
   disabledDomains: string[];
   enabledDomains: string[];
   enabledDomainsOnly: boolean;
-  wordContainerKeys: string[]; // Internal use - not persisted
   muteAudio: boolean;
   muteAudioOnly: boolean;
   muteCueRequireShowing: boolean;
@@ -56,7 +56,7 @@ export default class WebConfig extends Config {
     }
 
     super(); // Get the Config defaults
-    this.wordContainerKeys = [];
+    this._wordContainerKeys = [];
     Object.assign(this, WebConfig._classDefaults, asyncParam); // Separate due to _defineProperty()
   }
 
@@ -99,7 +99,7 @@ export default class WebConfig extends Config {
           if (items._words0 === undefined || Object.keys(items._words0).length == 0) {
             items._words0 = Config._defaultWords;
           }
-          items.wordContainerKeys = WebConfig.combineWords(items);
+          items._wordContainerKeys = WebConfig.combineWords(items);
         }
 
         // Remove keys we didn't request (needed for _words*)
@@ -173,10 +173,10 @@ export default class WebConfig extends Config {
     // If we have more containers in storage than are needed, remove them
     if (props.length === 0 || props.includes('words')) {
       let newWordKeys = WebConfig.getWordContainerKeys(data);
-      let containersToRemove = self.wordContainerKeys.filter(oldKey => !newWordKeys.includes(oldKey));
+      let containersToRemove = self._wordContainerKeys.filter(oldKey => !newWordKeys.includes(oldKey));
       if (containersToRemove.length !== 0) {
         self.remove(containersToRemove);
-        self.wordContainerKeys = newWordKeys;
+        self._wordContainerKeys = newWordKeys;
       }
     }
 
