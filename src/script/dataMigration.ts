@@ -13,6 +13,7 @@ export default class DataMigration {
     { version: '2.3.0', name: 'fixSmartWatch', runOnImport: false },
     { version: '2.7.0', name: 'addWordlistsToWords', runOnImport: true },
     { version: '2.7.0', name: 'removeGlobalMatchMethod', runOnImport: true },
+    { version: '2.7.0', name: 'removeOldDomainArrays', runOnImport: true },
   ];
 
   constructor(config) {
@@ -105,6 +106,23 @@ export default class DataMigration {
       });
       cfg.remove('globalMatchMethod');
     }
+  }
+
+  removeOldDomainArrays() {
+    let cfg = this.cfg as any;
+    if (!cfg.domains) { cfg.domains = {}; }
+    let propsToDelete = { advancedDomains: 'adv', disabledDomains: 'disabled', enabledDomains: 'enabled' };
+    Object.keys(propsToDelete).forEach(function(propToDelete) {
+      if (cfg[propToDelete] && Array.isArray(cfg[propToDelete])) {
+        if (cfg[propToDelete].length > 0) {
+          cfg[propToDelete].forEach(function(domain) {
+            if (cfg.domains[domain] == undefined) { cfg.domains[domain] = {}; }
+            cfg.domains[domain][propsToDelete[propToDelete]] = true;
+          });
+        }
+      }
+      delete cfg[propToDelete];
+    });
   }
 
   runImportMigrations() {
