@@ -220,8 +220,12 @@ export default class OptionPage {
       }
     });
 
-    let error = await option.cfg.save('words');
-    error ? OptionPage.showErrorModal('Failed to save.') : OptionPage.showStatusModal('Words saved successfully.');
+    if (await option.cfg.save('words')) {
+      OptionPage.showErrorModal('Failed to save.');
+    } else {
+      OptionPage.closeModal('bulkWordEditorModal');
+      OptionPage.showStatusModal('Words saved successfully.');
+    }
   }
 
   bulkEditorWordlistCheckbox(event) {
