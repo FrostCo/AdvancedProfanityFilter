@@ -1,6 +1,7 @@
 import { dynamicList, escapeHTML, exportToFile, readFile, removeFromArray } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
+import Domain from './domain';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
@@ -98,46 +99,6 @@ export default class OptionPage {
   static showWarningModal(content = 'Invalid input.', title = 'Warning', titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
     OptionPage.openModal('statusModal');
-  }
-
-  advancedDomainList() {
-    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
-    let domainListHTML = '<option selected value="">Add...</option>';
-    this.cfg.advancedDomains.forEach(domain => { domainListHTML += `<option value="${domain}">${domain}</option>`; });
-    advDomains.innerHTML = domainListHTML;
-    this.advancedDomainPopulate();
-  }
-
-  advancedDomainPopulate() {
-    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
-    let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
-    let advDomainRemove = document.getElementById('advDomainRemove') as HTMLInputElement;
-    OptionPage.hideInputError(advDomainText);
-    advDomains.value !== '' ? OptionPage.enableBtn(advDomainRemove) : OptionPage.disableBtn(advDomainRemove);
-    advDomainText.value = advDomains.value;
-  }
-
-  async advancedDomainRemove(evt) {
-    if (evt.target.classList.contains('disabled')) return false;
-    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
-    option.cfg['advancedDomains'].splice(option.cfg['advancedDomains'].indexOf(advDomains.value), 1);
-    if (await option.saveProp('advancedDomains')) this.advancedDomainList();
-  }
-
-  async advancedDomainSave(evt) {
-    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
-    let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
-    let invalidMessage = 'Valid domain example: google.com or www.google.com';
-    let success;
-    if (advDomains.value == '') { // New record
-      success = option.updateItemList(evt, advDomainText, 'advancedDomains', invalidMessage);
-    } else { // Updating existing record
-      success = option.updateItemList(evt, advDomainText, 'advancedDomains', invalidMessage, advDomains.value);
-    }
-
-    if (success) {
-      if (await option.saveProp('advancedDomains')) this.advancedDomainList();
-    }
   }
 
   bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
@@ -341,52 +302,6 @@ export default class OptionPage {
     }
   }
 
-  domainList() {
-    let mode = this.cfg.enabledDomainsOnly ? 'enabledDomains' : 'disabledDomains';
-    let domainMode = document.querySelector(`input[name=domainMode][value='${mode}']`) as HTMLInputElement;
-    let domains = document.getElementById('domainSelect') as HTMLInputElement;
-    domainMode.checked = true;
-
-    let domainListHTML = '<option selected value="">Add...</option>';
-    this.cfg[domainMode.value].forEach(domain => { domainListHTML += `<option value="${domain}">${domain}</option>`; });
-    domains.innerHTML = domainListHTML;
-    this.domainPopulate();
-  }
-
-  domainPopulate() {
-    let domains = document.getElementById('domainSelect') as HTMLInputElement;
-    let domainText = document.getElementById('domainText') as HTMLInputElement;
-    let disabledDomainRemove = document.getElementById('domainRemove') as HTMLInputElement;
-    OptionPage.hideInputError(domainText);
-    domains.value !== '' ? OptionPage.enableBtn(disabledDomainRemove) : OptionPage.disableBtn(disabledDomainRemove);
-    domainText.value = domains.value;
-  }
-
-  async domainRemove(evt) {
-    if (evt.target.classList.contains('disabled')) return false;
-    let domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
-    let domains = document.getElementById('domainSelect') as HTMLInputElement;
-    option.cfg[domainMode.value].splice(option.cfg['disabledDomains'].indexOf(domains.value), 1);
-    if (await option.saveProp(domainMode.value)) this.domainList();
-  }
-
-  async domainSave(evt) {
-    let domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
-    let domains = document.getElementById('domainSelect') as HTMLInputElement;
-    let domainText = document.getElementById('domainText') as HTMLInputElement;
-    let invalidMessage = 'Valid domain example: google.com or www.google.com';
-    let success;
-    if (domains.value == '') { // New record
-      success = option.updateItemList(evt, domainText, domainMode.value, invalidMessage);
-    } else { // Updating existing record
-      success = option.updateItemList(evt, domainText, domainMode.value, invalidMessage, domains.value);
-    }
-
-    if (success) {
-      if (await option.saveProp(domainMode.value)) this.domainList();
-    }
-  }
-
   async exportBookmarkletFile() {
     let code = await Bookmarklet.injectConfig(option.cfg);
     exportToFile(code, 'apfBookmarklet.js');
@@ -492,14 +407,87 @@ export default class OptionPage {
     this.auth.setPasswordButton(option);
   }
 
+  populateDomain() {
+    let domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
+    let domainText = document.getElementById('domainText') as HTMLInputElement;
+    let domainAdvancedCheck = document.getElementById('domainAdvancedCheck') as HTMLInputElement;
+    let domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
+    let domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
+    let domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
+    let domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
+
+    let key = domainsSelect.value;
+    domainText.value = key;
+
+    let domainCfg;
+    if (!key) { // New record
+      domainCfg = Object.assign(Domain._domainCfgDefaults);
+    } else { // Existing record
+      domainCfg = this.cfg.domains[domainsSelect.value];
+    }
+
+    domainAdvancedCheck.checked = domainCfg.adv;
+    domainDisabledCheck.checked = domainCfg.disabled;
+    domainEnabledCheck.checked = domainCfg.enabled;
+    let wordlist = domainCfg.wordlist >= 0 ? domainCfg.wordlist + 1 : 0;
+    let audioList = domainCfg.audioList >= 0 ? domainCfg.audioList + 1 : 0;
+    domainWordlistSelect.selectedIndex = wordlist;
+    domainAudioWordlistSelect.selectedIndex = audioList;
+  }
+
+  populateDomainPage() {
+    let domainsSelect = document.getElementById('domainSelect') as HTMLSelectElement;
+    let domainText = document.getElementById('domainText') as HTMLInputElement;
+    let mode = this.cfg.enabledDomainsOnly ? 'whitelist' : 'blacklist';
+    let domainMode = document.querySelector(`input[name=domainMode][value='${mode}']`) as HTMLInputElement;
+    let wordlistContainer = document.getElementById('domainWordlistContainer') as HTMLInputElement;
+    let audioWordlistContainer = document.getElementById('domainAudioWordlistContainer') as HTMLInputElement;
+    domainMode.checked = true;
+    let domainDisabledLabel = document.getElementById('domainDisabledLabel') as HTMLLabelElement;
+    let domainEnabledLabel = document.getElementById('domainEnabledLabel') as HTMLLabelElement;
+    OptionPage.hideInputError(domainText);
+
+    let domains = Domain.sortedKeys(this.cfg.domains);
+    let domainHTML = '<option selected value="">Add, or update existing...</option>';
+    domains.forEach(domain => { domainHTML += `<option value="${domain}">${domain}</option>`; });
+    domainsSelect.innerHTML = domainHTML;
+
+    if (mode === 'whitelist') {
+      OptionPage.hide(domainDisabledLabel);
+      OptionPage.show(domainEnabledLabel);
+    } else {
+      OptionPage.hide(domainEnabledLabel);
+      OptionPage.show(domainDisabledLabel);
+    }
+
+    if (this.cfg.wordlistsEnabled) {
+      OptionPage.show(wordlistContainer);
+      let domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
+      let domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
+
+      let wordlists = ['Default'].concat(WebConfig._allWordlists, this.cfg.wordlists);
+      dynamicList(wordlists, domainWordlistSelect.id);
+      if (this.cfg.muteAudio) {
+        OptionPage.show(audioWordlistContainer);
+        dynamicList(wordlists, domainAudioWordlistSelect.id);
+      } else {
+        OptionPage.hide(audioWordlistContainer);
+      }
+    } else {
+      OptionPage.hide(wordlistContainer);
+      OptionPage.hide(audioWordlistContainer);
+    }
+
+    this.populateDomain();
+  }
+
   async populateOptions() {
     filter.init();
     this.populateSettings();
     this.populateWordsList();
     this.populateWhitelist();
     this.populateWordlists();
-    this.advancedDomainList();
-    this.domainList();
+    this.populateDomainPage();
     this.populateAudio();
     this.populateConfig();
     this.populateTest();
@@ -732,6 +720,21 @@ export default class OptionPage {
     this.populateWordsList();
   }
 
+  async removeDomain(event) {
+    let domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
+    if (domainsSelect.value) {
+      delete this.cfg.domains[domainsSelect.value];
+
+      let error = await this.cfg.save('domains');
+      if (error) {
+        OptionPage.showErrorModal();
+        return false;
+      } else {
+        this.populateDomainPage();
+      }
+    }
+  }
+
   async removeWhitelist(evt) {
     let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
     let selected = whitelist.selectedOptions[0];
@@ -820,6 +823,51 @@ export default class OptionPage {
     }
   }
 
+  async saveDomain(event) {
+    let domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
+    let domainText = document.getElementById('domainText') as HTMLInputElement;
+    let domainAdvancedCheck = document.getElementById('domainAdvancedCheck') as HTMLInputElement;
+    let domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
+    let domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
+    let domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
+    let domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
+
+    let originalKey = domainsSelect.value;
+    let newKey = domainText.value.trim().toLowerCase();
+
+    if (newKey == '') { // No data
+      OptionPage.showInputError(domainText, 'Please enter a value.');
+      return false;
+    }
+
+    if (domainText.checkValidity()) {
+      OptionPage.hideInputError(domainText);
+      if (newKey != originalKey) { delete this.cfg.domains[originalKey]; } // URL changed: remove old entry
+
+      let wordlist = domainWordlistSelect.selectedIndex > 0 ? domainWordlistSelect.selectedIndex - 1 : undefined;
+      let audioList = domainAudioWordlistSelect.selectedIndex > 0 ? domainAudioWordlistSelect.selectedIndex - 1 : undefined;
+      let newDomainCfg: DomainCfg = {
+        adv: domainAdvancedCheck.checked,
+        audioList: audioList,
+        disabled: domainDisabledCheck.checked,
+        enabled: domainEnabledCheck.checked,
+        wordlist: wordlist,
+      };
+      let domain = new Domain(newKey, newDomainCfg, false);
+      let error = await domain.save(this.cfg);
+
+      if (error) {
+        OptionPage.showErrorModal();
+        return false;
+      } else {
+        this.populateDomainPage();
+      }
+    } else {
+      OptionPage.showInputError(domainText, 'Valid domain example: google.com or www.google.com');
+      return false;
+    }
+  }
+
   async saveOptions(evt) {
     let self = this;
     // Gather current settings
@@ -858,7 +906,7 @@ export default class OptionPage {
     self.cfg.filterWordList = filterWordList.checked;
     self.cfg.substitutionMark = substitutionMark.checked;
     self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
-    self.cfg.enabledDomainsOnly = (domainMode.value == 'enabledDomains');
+    self.cfg.enabledDomainsOnly = (domainMode.value === 'whitelist');
     self.cfg.muteAudio = muteAudioInput.checked;
     self.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
     self.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
@@ -1227,15 +1275,11 @@ document.getElementById('wordlistText').addEventListener('input', e => { OptionP
 document.getElementById('textWordlistSelect').addEventListener('change', e => { option.setActiveWordlist(e.target as HTMLSelectElement); });
 document.getElementById('audioWordlistSelect').addEventListener('change', e => { option.setActiveWordlist(e.target as HTMLSelectElement); });
 // Domains
-document.getElementById('advDomainSelect').addEventListener('change', e => { option.advancedDomainPopulate(); });
-document.getElementById('advDomainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
-document.getElementById('advDomainSave').addEventListener('click', e => { option.advancedDomainSave(e); });
-document.getElementById('advDomainRemove').addEventListener('click', e => { option.advancedDomainRemove(e); });
 document.querySelectorAll('#domainMode input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
-document.getElementById('domainSelect').addEventListener('change', e => { option.domainPopulate(); });
+document.getElementById('domainSelect').addEventListener('change', e => { option.populateDomain(); });
 document.getElementById('domainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
-document.getElementById('domainSave').addEventListener('click', e => { option.domainSave(e); });
-document.getElementById('domainRemove').addEventListener('click', e => { option.domainRemove(e); });
+document.getElementById('domainSave').addEventListener('click', e => { option.saveDomain(e); });
+document.getElementById('domainRemove').addEventListener('click', e => { option.removeDomain(e); });
 // Audio
 document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('supportedAudioSites').addEventListener('click', e => { option.showSupportedAudioSites(); });

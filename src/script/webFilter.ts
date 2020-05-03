@@ -12,10 +12,13 @@ export default class WebFilter extends Filter {
   audioOnly: boolean;
   audioWordlistId: number;
   cfg: WebConfig;
+  domain: Domain;
   hostname: string;
   iframe: Location;
+  location: Location | URL;
   mutePage: boolean;
   summary: Summary;
+  wordlistId: number;
 
   constructor() {
     super();
@@ -23,11 +26,6 @@ export default class WebFilter extends Filter {
     this.audioWordlistId = 0;
     this.mutePage = false;
     this.summary = {};
-  }
-
-  // Always use the top frame for page check
-  advancedPage(): boolean {
-    return Domain.domainMatch(this.hostname, this.cfg.advancedDomains);
   }
 
   advancedReplaceText(node, wordlistId: number, stats = true) {
@@ -184,19 +182,19 @@ export default class WebFilter extends Filter {
   async cleanPage() {
     // @ts-ignore: Type WebConfig is not assignable to type Config
     this.cfg = await WebConfig.build();
+    this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
     // console.log('[APF] Config loaded', this.cfg); // Debug: General
 
-    // Exit if the topmost frame is a disabled domain
-    let message: Message = { disabled: this.disabledPage() };
+    // Use domain-specific settings
+    let message: Message = { disabled: (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
     if (message.disabled) {
       // console.log(`[APF] Disabled page: ${this.hostname} - exiting`); // Debug: General
       chrome.runtime.sendMessage(message);
       return false;
     }
-
-    // Check for advanced mode on current domain
-    this.advanced = this.advancedPage();
-    // if (this.advanced) { console.log(`[APF] Enabling advanced match mode on ${this.hostname}`); } // Debug: General
+    if (this.domain.advanced) { this.advanced = this.domain.advanced; }
+    if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
+    if (this.domain.audioWordlistId !== undefined) { this.audioWordlistId = this.domain.audioWordlistId; }
 
     // Detect if we should mute audio for the current page
     if (this.cfg.muteAudio) {
@@ -232,15 +230,6 @@ export default class WebFilter extends Filter {
     if (!this.audioOnly) { this.cleanNodeText(document); }
     this.updateCounterBadge();
     observer.observe(document, observerConfig);
-  }
-
-  // Always use the top frame for page check
-  disabledPage(): boolean {
-    if (this.cfg.enabledDomainsOnly) {
-      return !(Domain.domainMatch(this.hostname, this.cfg.enabledDomains));
-    } else {
-      return Domain.domainMatch(this.hostname, this.cfg.disabledDomains);
-    }
   }
 
   foundMatch(word) {

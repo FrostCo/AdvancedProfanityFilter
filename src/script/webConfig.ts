@@ -2,11 +2,9 @@ import Config from './lib/config';
 
 export default class WebConfig extends Config {
   _splitContainerKeys: { [key: string]: string[] };
-  advancedDomains: string[];
   audioWordlistId: number;
   customAudioSites: { [site: string]: AudioRules[] };
-  disabledDomains: string[];
-  enabledDomains: string[];
+  domains: { [site: string]: DomainCfg };
   enabledDomainsOnly: boolean;
   muteAudio: boolean;
   muteAudioOnly: boolean;
@@ -19,11 +17,9 @@ export default class WebConfig extends Config {
   youTubeAutoSubsMin: number;
 
   static readonly _classDefaults = {
-    advancedDomains: [],
+    domains: {},
     audioWordlistId: 0,
     customAudioSites: null,
-    disabledDomains: [],
-    enabledDomains: [],
     enabledDomainsOnly: false,
     muteAudio: false,
     muteAudioOnly: false,
@@ -38,7 +34,7 @@ export default class WebConfig extends Config {
 
   static readonly QUOTA_BYTES_PER_ITEM = 8192; // https://developer.chrome.com/apps/storage chrome.storage.sync.QUOTA_BYTES_PER_ITEM
   static readonly _defaults = Object.assign(Config._defaults, WebConfig._classDefaults);
-  static readonly _splittingKeys = ['words'];
+  static readonly _splittingKeys = ['domains', 'words'];
   static readonly _maxBytes = 8000;
 
   static async build(keys: string | string[] = []) {

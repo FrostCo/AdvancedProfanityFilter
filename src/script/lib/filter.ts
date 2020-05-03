@@ -14,7 +14,6 @@ export default class Filter {
     this.counter = 0;
     this.iWhitelist = [];
     this.whitelist = [];
-    this.wordlistId = 0;
     this.wordlists = {};
   }
 
@@ -79,8 +78,8 @@ export default class Filter {
 
   init(wordlistId: number | false = false) {
     this.iWhitelist = this.cfg.iWordWhitelist;
-    this.wordlistId = this.cfg.wordlistId;
     this.whitelist = this.cfg.wordWhitelist;
+    if (this.wordlistId === undefined) { this.wordlistId = this.cfg.wordlistId || 0; }
     this.buildWordlist(wordlistId);
   }
 

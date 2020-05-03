@@ -22,6 +22,14 @@ interface AudioRules {
   videoSelector?: string;           // [Cue,Watcher] Video selector: (Default: 'video')
 }
 
+interface DomainCfg {
+  adv?: boolean;
+  audioList: number;
+  disabled: boolean;
+  enabled: boolean;
+  wordlist: number;
+}
+
 interface FilteredTextTrackCue extends TextTrackCue {
   filtered: boolean;
   originalText: string;

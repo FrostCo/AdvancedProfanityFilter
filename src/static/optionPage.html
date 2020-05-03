@@ -274,44 +274,64 @@
 
 <div id="domainsPage" class="w3-container w3-hide">
   <div id="disabledDomainContainer" class="w3-half">
-      <h4 class="sectionHeader">Domain Mode</h4>
+    <h4 class="sectionHeader">Domain Mode</h4>
 
-      <div id="domainMode">
-        <label>
-          <input id="domainModeWhitelist" type="radio" class="w3-radio" name="domainMode" value="disabledDomains">
-          Whitelist
-          <span class="notes">Filter all but these domains</span>
-        </label>
+    <div id="domainMode">
+      <label>
+        <input id="domainModeWhitelist" type="radio" class="w3-radio" name="domainMode" value="whitelist">
+        Whitelist
+        <span class="notes">Filter all but these domains</span>
+      </label>
 
-        <br>
-        <label>
-          <input id="domainModeBlacklist" type="radio" class="w3-radio" name="domainMode" value="enabledDomains">
-          Blacklist
-          <span class="notes">Only filter these domains</span>
-        </label>
-      </div>
+      <br>
+      <label>
+        <input id="domainModeBlacklist" type="radio" class="w3-radio" name="domainMode" value="blacklist">
+        Blacklist
+        <span class="notes">Only filter these domains</span>
+      </label>
+    </div>
+  </div>
 
-      <h4 class="sectionHeader">Domains</h4>
-      <select id="domainSelect" class="w3-select w3-border small" style="display:block"></select>
-      <h4 class="sectionHeader">Domain</h4>
-      <input id="domainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
-      <span class="notes">Example: "google.com" or "mail.google.com"</span>
-      <div style="padding-top: 16px;">
-        <button id="domainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
-        <button id="domainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
+  <div id="domainRightContainer" class="w3-half w3-right">
+    <h4 class="sectionHeader">Domains</h4>
+    <select id="domainSelect" class="w3-select w3-border small" style="display:block"></select>
+    <h4 class="sectionHeader">Domain</h4>
+    <input id="domainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
+    <span class="notes">Example: "google.com" or "mail.google.com"</span>
+
+    <br>
+    <br>
+    <label id="domainDisabledLabel" class="w3-hide">
+      <input id="domainDisabledCheck" type="checkbox" class="w3-check">
+      Disabled
+      <span class="notes">Don't filter pages on this domain</span>
+    </label>
+
+    <label id="domainEnabledLabel" class="w3-hide">
+      <input id="domainEnabledCheck" type="checkbox" class="w3-check">
+      Enabled
+      <span class="notes">Filter pages on this domain</span>
+    </label>
+
+    <label>
+      <input id="domainAdvancedCheck" type="checkbox" class="w3-check">
+      Advanced
+      <span class="notes">Match across HTML Elements (Only use when necessary)</span>
+    </label>
+
+    <div id="domainWordlistContainer" class="w3-hide">
+      <h4 class="sectionHeader">Text Wordlist</h4>
+      <select id="domainWordlistSelect" class="w3-select w3-border small"></select><span class="notes"></span>
+
+      <div id="domainAudioWordlistContainer" class="w3-hide">
+        <h4 class="sectionHeader">Audio Wordlist</h4>
+        <select id="domainAudioWordlistSelect" class="w3-select w3-border small"></select><span class="notes"></span>
       </div>
     </div>
 
-  <div id="advDomainContainer" class="w3-half w3-right">
-    <h4 class="sectionHeader">Advanced Domains</h4>
-    <select id="advDomainSelect" class="w3-select w3-border small" style="display:block"></select>
-    <span class="notes">Only use when the filter isn't working.</span>
-    <h4 class="sectionHeader">Domain</h4>
-    <input id="advDomainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
-    <span class="notes">Example: "google.com" or "mail.google.com"</span>
     <div style="padding-top: 16px;">
-      <button id="advDomainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
-      <button id="advDomainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
+      <button id="domainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
+      <button id="domainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
     </div>
   </div>
 </div>
