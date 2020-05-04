@@ -419,14 +419,17 @@ export default class OptionPage {
     let domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
     let domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
     let domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
+    let domainRemoveBtn = document.getElementById('domainRemove') as HTMLButtonElement;
 
     let key = domainsSelect.value;
     domainText.value = key;
 
     let domainCfg;
     if (!key) { // New record
+      OptionPage.disableBtn(domainRemoveBtn);
       domainCfg = Object.assign(Domain._domainCfgDefaults);
     } else { // Existing record
+      OptionPage.enableBtn(domainRemoveBtn);
       domainCfg = this.cfg.domains[domainsSelect.value];
     }
 
