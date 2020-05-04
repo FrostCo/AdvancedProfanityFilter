@@ -1,9 +1,11 @@
 import { dynamicList, escapeHTML } from './lib/helper';
+import WebAudio from './webAudio';
 import WebConfig from './webConfig';
 import Domain from './domain';
 
 class Popup {
   cfg: WebConfig;
+  audioSiteKeys: string[];
   domain: Domain;
   filterMethodContainer: Element;
   filterToggleProp: string;
@@ -14,6 +16,7 @@ class Popup {
   static readonly _disabledPages = new RegExp('(^chrome:|^about:|^[a-zA-Z]*-extension:)', 'i');
   static readonly _requiredConfig =  [
     'audioWordlistId',
+    'customAudioSites',
     'domains',
     'enabledDomainsOnly',
     'filterMethod',
@@ -89,11 +92,14 @@ class Popup {
       dynamicList(wordlists, wordlistSelect.id);
       wordlistSelect.selectedIndex = wordlistIndex;
       if (popup.cfg.muteAudio) {
-        let audioWordlistIndex = popup.domain.audioWordlistId >= 0 ? popup.domain.audioWordlistId + 1 : 0;
-        dynamicList(wordlists, audioWordlistSelect.id);
-        audioWordlistSelect.selectedIndex = audioWordlistIndex;
-        let audioWordlistContainer = document.getElementById('audioWordlistContainer') as HTMLElement;
-        Popup.show(audioWordlistContainer);
+        popup.audioSiteKeys = Object.keys(Object.assign({}, WebAudio.sites, popup.cfg.customAudioSites));
+        if (popup.audioSiteKeys.includes(popup.domain.cfgKey)) {
+          let audioWordlistIndex = popup.domain.audioWordlistId >= 0 ? popup.domain.audioWordlistId + 1 : 0;
+          dynamicList(wordlists, audioWordlistSelect.id);
+          audioWordlistSelect.selectedIndex = audioWordlistIndex;
+          let audioWordlistContainer = document.getElementById('audioWordlistContainer') as HTMLElement;
+          Popup.show(audioWordlistContainer);
+        }
       }
       Popup.show(wordListContainer);
     }
