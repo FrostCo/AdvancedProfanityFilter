@@ -33,7 +33,7 @@ export default class WebConfig extends Config {
   }
 
   static readonly QUOTA_BYTES_PER_ITEM = 8192; // https://developer.chrome.com/apps/storage chrome.storage.sync.QUOTA_BYTES_PER_ITEM
-  static readonly _defaults = Object.assign(Config._defaults, WebConfig._classDefaults);
+  static readonly _defaults = Object.assign({}, Config._defaults, WebConfig._classDefaults);
   static readonly _splittingKeys = ['domains', 'words'];
   static readonly _maxBytes = 8000;
 

@@ -31,14 +31,12 @@ export default class WebAudio {
     this.lastProcessed = [];
     this.muted = false;
     if (
-      filter.cfg.customAudioSites
-      && typeof filter.cfg.customAudioSites == 'object'
-      && Object.keys(filter.cfg.customAudioSites).length > 0
+      !filter.cfg.customAudioSites
+      || typeof filter.cfg.customAudioSites !== 'object'
     ) {
-      this.sites = Object.assign(WebAudio.sites, filter.cfg.customAudioSites);
-    } else {
-      this.sites = WebAudio.sites;
+      filter.cfg.customAudioSites = {};
     }
+    this.sites = Object.assign({}, WebAudio.sites, filter.cfg.customAudioSites);
     this.unmuteDelay = 0;
     this.volume = 1;
     this.wordlistId = filter.audioWordlistId;
