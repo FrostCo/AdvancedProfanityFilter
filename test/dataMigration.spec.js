@@ -1,7 +1,48 @@
 const expect = require('chai').expect;
 import DataMigration from './built/dataMigration';
+import WebConfig from './built/WebConfig';
 
 describe('DataMigration', function() {
+  describe('addWordlistsToWords()', function() {
+    it('should add wordlist to all words', function() {
+      let cfg = {
+        words: {
+          'test': { matchMethod: 0, repeat: true, separators: false, sub: 'tset' },
+          'another': { matchMethod: 0, repeat: true, separators: false, sub: 'tset' },
+          'testWithList': { lists: [1,3,5], matchMethod: 0, repeat: true, separators: false, sub: 'tset' },
+        }
+      };
+      let dataMigration = new DataMigration(cfg);
+      dataMigration.addWordlistsToWords();
+      expect(cfg.words['test'].lists).to.eql([]);
+      expect(cfg.words['another'].lists).to.eql([]);
+      expect(cfg.words['testWithList'].lists).to.eql([1,3,5]);
+    });
+  });
+
+  describe('removeGlobalMatchMethod()', function() {
+    it('should remove global match method and adjust RegExp method', function() {
+      let data = {
+        words: {
+          'test': { matchMethod: 0, repeat: true, separators: false, sub: 'tset' },
+          'another': { matchMethod: 1, repeat: true, separators: false, sub: 'tset' },
+          'testWithList': { lists: [1,3,5], matchMethod: 0, repeat: true, separators: false, sub: 'tset' },
+          '^myRegexp$': { lists: [1,3,5], matchMethod: 4, repeat: true, separators: false, sub: 'tset' },
+        },
+        globalMatchMethod: 3,
+      };
+      let cfg = new WebConfig(data);
+      cfg.remove = (prop) => { delete cfg[prop]; return true; }; // TODO: Find a good way to mock chrome.*
+      let dataMigration = new DataMigration(cfg);
+      dataMigration.removeGlobalMatchMethod();
+      expect(cfg.words['test'].matchMethod).to.eql(0);
+      expect(cfg.words['another'].matchMethod).to.eql(1);
+      expect(cfg.words['testWithList'].matchMethod).to.eql(0);
+      expect(cfg.words['^myRegexp$'].matchMethod).to.eql(3);
+      expect(cfg.globalMatchMethod).to.not.exist;
+    });
+  });
+
   describe('removeOldDomainArrays()', function() {
     it('should migrate all old domain arrays', function() {
       let cfg = {
