@@ -103,6 +103,7 @@ export default class OptionPage {
 
   bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
     let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+    let tbody = table.querySelector('tbody') as HTMLTableSectionElement;
     let wordlistCells = [];
     if (data === undefined) {
       data = {
@@ -115,7 +116,7 @@ export default class OptionPage {
     }
 
     // Build row
-    let row = table.insertRow();
+    let row = tbody.insertRow();
     row.classList.add('bulkWordRow');
     let cellRemoveRow = row.insertCell(0);
     let cellWord = row.insertCell(1);
@@ -1094,7 +1095,7 @@ export default class OptionPage {
     this.cfg.wordlists.forEach((wordlist, i) => { thead += `<th><label><input type="checkbox" class="wordlistHeader" data-col="${i + 1}"><span> ${wordlist}</span></label></th>`; });
     thead += '</tr></thead>';
     title.textContent = 'Bulk Word Editor';
-    tableContainer.innerHTML = `<table id="bulkEditorTable" class="w3-table-all w3-tiny">${thead}</table>`;
+    tableContainer.innerHTML = `<table id="bulkEditorTable" class="w3-table-all w3-tiny w3-hoverable">${thead}<tbody></tbody></table>`;
 
     // Store the select list for match method (used in each row)
     option._bulkWordMatchMethodHTML = '<select>';
