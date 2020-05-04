@@ -427,7 +427,7 @@ export default class OptionPage {
     let domainCfg;
     if (!key) { // New record
       OptionPage.disableBtn(domainRemoveBtn);
-      domainCfg = Object.assign(Domain._domainCfgDefaults);
+      domainCfg = Object.assign({}, Domain._domainCfgDefaults);
     } else { // Existing record
       OptionPage.enableBtn(domainRemoveBtn);
       domainCfg = this.cfg.domains[domainsSelect.value];
@@ -860,7 +860,7 @@ export default class OptionPage {
         enabled: domainEnabledCheck.checked,
         wordlist: wordlist,
       };
-      let domain = new Domain(newKey, newDomainCfg, false);
+      let domain = new Domain(newKey, newDomainCfg);
       let error = await domain.save(this.cfg);
 
       if (error) {

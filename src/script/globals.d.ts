@@ -24,10 +24,10 @@ interface AudioRules {
 
 interface DomainCfg {
   adv?: boolean;
-  audioList: number;
-  disabled: boolean;
-  enabled: boolean;
-  wordlist: number;
+  audioList?: number;
+  disabled?: boolean;
+  enabled?: boolean;
+  wordlist?: number;
 }
 
 interface FilteredTextTrackCue extends TextTrackCue {

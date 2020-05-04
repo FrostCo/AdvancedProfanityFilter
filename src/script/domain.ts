@@ -11,20 +11,12 @@ export default class Domain {
   tab?: any;
   wordlistId: number;
 
-  static readonly _defaults = {
-    advanced: undefined,
-    audioWordlistId: undefined,
-    disabled: undefined,
-    enabled: undefined,
-    wordlistId: undefined,
-  }
-
   static readonly _domainCfgDefaults: DomainCfg = {
-    audioList: undefined,
-    wordlist: undefined,
     adv: undefined,
-    enabled: undefined,
+    audioList: undefined,
     disabled: undefined,
+    enabled: undefined,
+    wordlist: undefined,
   }
 
   static byHostname(hostname: string, domains: { [domain: string]: DomainCfg }): Domain {
@@ -36,20 +28,6 @@ export default class Domain {
 
   static byKey(key: string, domains: { [domain: string]: DomainCfg }): Domain {
     return new Domain(key, domains[key]);
-  }
-
-  static domainMatch(domain: string, domains: string[]): boolean {
-    let result = false;
-
-    for (let x = 0; x < domains.length; x++) {
-      let domainRegex = new RegExp('(^|\.)' + domains[x], 'i');
-      if (domainRegex.test(domain)) {
-        result = true;
-        break;
-      }
-    }
-
-    return result;
   }
 
   static findDomainKey(hostname: string, domains: { [domain: string]: DomainCfg }): string {
@@ -74,10 +52,11 @@ export default class Domain {
     });
   }
 
-  constructor(key: string, domainCfg: DomainCfg, saved: boolean = false) {
+  constructor(key: string, domainCfg?: DomainCfg) {
     this.cfgKey = key;
+    this.cfg = {};
     if (!domainCfg) {
-      this.cfg = Object.assign(Domain._domainCfgDefaults);
+      Object.assign(this.cfg, Domain._domainCfgDefaults);
     } else {
       this.cfg = domainCfg;
     }
