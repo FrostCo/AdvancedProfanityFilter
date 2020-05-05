@@ -22,6 +22,14 @@ interface AudioRules {
   videoSelector?: string;           // [Cue,Watcher] Video selector: (Default: 'video')
 }
 
+interface DomainCfg {
+  adv?: boolean;
+  audioList?: number;
+  disabled?: boolean;
+  enabled?: boolean;
+  wordlist?: number;
+}
+
 interface FilteredTextTrackCue extends TextTrackCue {
   filtered: boolean;
   originalText: string;
@@ -47,6 +55,12 @@ interface Migration {
   runOnImport: boolean;
 }
 
+interface ReplaceTextResult {
+  original: string;
+  filtered: string;
+  modified: boolean;
+}
+
 interface Summary {
   [word: string]: {
     filtered: string;
@@ -61,6 +75,8 @@ interface Version {
 }
 
 interface WordOptions {
+  _filterMethod?: number;  // This should not be stored in the config. Only there for new Word
+  lists?: number[];
   matchMethod: number;
   repeat: boolean;
   separators?: boolean;

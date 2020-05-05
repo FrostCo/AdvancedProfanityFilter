@@ -10,7 +10,10 @@ export default class DataMigration {
     { version: '1.1.0', name: 'sanitizeWords', runOnImport: true },
     { version: '1.2.0', name: 'singleWordSubstitution', runOnImport: true },
     { version: '2.1.4', name: 'updateDefaultSubs', runOnImport: false },
-    { version: '2.3.0', name: 'fixSmartWatch', runOnImport: false }
+    { version: '2.3.0', name: 'fixSmartWatch', runOnImport: false },
+    { version: '2.7.0', name: 'addWordlistsToWords', runOnImport: true },
+    { version: '2.7.0', name: 'removeGlobalMatchMethod', runOnImport: true },
+    { version: '2.7.0', name: 'removeOldDomainArrays', runOnImport: true },
   ];
 
   constructor(config) {
@@ -28,6 +31,17 @@ export default class DataMigration {
 
   static migrationNeeded(oldVersion: string): boolean {
     return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.latestMigration().version));
+  }
+
+  // [2.7.0]
+  addWordlistsToWords() {
+    let cfg = this.cfg as WebConfig;
+    Object.keys(cfg.words).forEach(key => {
+      let word = cfg.words[key];
+      if (!Array.isArray(word.lists)) {
+        word.lists = [];
+      }
+    });
   }
 
   // This will look at the version (from before the update) and perform data migrations if necessary
@@ -68,16 +82,46 @@ export default class DataMigration {
 
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
   moveToNewWordsStorage() {
-    chrome.storage.sync.get({'words': null}, function(oldWords) {
+    chrome.storage.sync.get({ 'words': null }, function(oldWords) {
       if (oldWords.words) {
-        chrome.storage.sync.set({'_words0': oldWords.words}, function() {
+        chrome.storage.sync.set({ '_words0': oldWords.words }, function() {
           if (!chrome.runtime.lastError) {
-            chrome.storage.sync.remove('words', function() {
-              // Removed old words
-            });
+            // Remove old words
+            chrome.storage.sync.remove('words');
           }
         });
       }
+    });
+  }
+
+  removeGlobalMatchMethod() {
+    let cfg = this.cfg;
+    if ((cfg as any).globalMatchMethod !== undefined) {
+      Object.keys(cfg.words).forEach(name => {
+        let word = cfg.words[name];
+        // Move RegExp from 4 to 3
+        if (word.matchMethod === 4) {
+          word.matchMethod = 3;
+        }
+      });
+      cfg.remove('globalMatchMethod');
+    }
+  }
+
+  removeOldDomainArrays() {
+    let cfg = this.cfg as any;
+    if (!cfg.domains) { cfg.domains = {}; }
+    let propsToDelete = { advancedDomains: 'adv', disabledDomains: 'disabled', enabledDomains: 'enabled' };
+    Object.keys(propsToDelete).forEach(function(propToDelete) {
+      if (cfg[propToDelete] && Array.isArray(cfg[propToDelete])) {
+        if (cfg[propToDelete].length > 0) {
+          cfg[propToDelete].forEach(function(domain) {
+            if (cfg.domains[domain] == undefined) { cfg.domains[domain] = {}; }
+            cfg.domains[domain][propsToDelete[propToDelete]] = true;
+          });
+        }
+      }
+      delete cfg[propToDelete];
     });
   }
 
@@ -120,21 +164,21 @@ export default class DataMigration {
   updateDefaultSubs() {
     let cfg = this.cfg;
     let updatedWords = {
-      bastard: {original: 'jerk', update: 'idiot'},
-      bitch: {original: 'jerk', update: 'bench'},
-      cocksucker: {original: 'idiot', update: 'suckup'},
-      cunt: {original: 'explative', update: 'expletive' },
-      fag: {original: 'slur', update: 'gay'},
-      faggot: {original: 'slur', update: 'gay'},
-      fags: {original: 'slur', update: 'gays'},
+      bastard: { original: 'jerk', update: 'idiot' },
+      bitch: { original: 'jerk', update: 'bench' },
+      cocksucker: { original: 'idiot', update: 'suckup' },
+      cunt: { original: 'explative', update: 'expletive' },
+      fag: { original: 'slur', update: 'gay' },
+      faggot: { original: 'slur', update: 'gay' },
+      fags: { original: 'slur', update: 'gays' },
       fuck: { original: 'fudge', update: 'freak' },
-      goddammit: {original: 'goshdangit', update: 'dangit'},
-      jackass: {original: 'idiot', update: 'jerk'},
-      nigga: {original: 'ethnic slur', update: 'bruh'},
-      nigger: {original: 'ethnic slur', update: 'man'},
-      niggers: {original: 'ethnic slurs', update: 'people'},
-      tits: {original: 'explative', update: 'chest'},
-      twat: {original: 'explative', update: 'dumbo'},
+      goddammit: { original: 'goshdangit', update: 'dangit' },
+      jackass: { original: 'idiot', update: 'jerk' },
+      nigga: { original: 'ethnic slur', update: 'bruh' },
+      nigger: { original: 'ethnic slur', update: 'man' },
+      niggers: { original: 'ethnic slurs', update: 'people' },
+      tits: { original: 'explative', update: 'chest' },
+      twat: { original: 'explative', update: 'dumbo' },
     };
 
     Object.keys(updatedWords).forEach(updatedWord => {

@@ -2,7 +2,8 @@ import Domain from './domain';
 import Filter from './lib/filter';
 import Page from './page';
 import WebAudio from './webAudio';
-import Config from './lib/config';
+import WebConfig from './webConfig';
+import Wordlist from './lib/wordlist';
 import './vendor/findAndReplaceDOMText';
 
 // NO-OP for chrome.* API
@@ -11,43 +12,42 @@ chrome.runtime = {};
 chrome.runtime.sendMessage = function(obj){};
 
 /* @preserve - Start User Config */
-let config = Config._defaults as any;
-config.words = Config._defaultWords;
+let config = WebConfig._defaults as any;
+config.words = WebConfig._defaultWords;
 /* @preserve - End User Config */
 
 export default class BookmarkletFilter extends Filter {
   advanced: boolean;
   audio: WebAudio;
   audioOnly: boolean;
-  cfg: Config;
+  audioWordlistId: number;
+  cfg: WebConfig;
+  domain: Domain;
   hostname: string;
   iframe: Location;
+  location: Location | URL;
   mutePage: boolean;
   summary: Summary;
-  youTubeMutePage: boolean;
+  wordlistId: number;
 
   constructor() {
     super();
     this.advanced = false;
+    this.audioWordlistId = 0;
     this.mutePage = false;
     this.summary = {};
   }
 
-  // Always use the top frame for page check
-  advancedPage(): boolean {
-    return Domain.domainMatch(this.hostname, this.cfg.advancedDomains);
-  }
-
-  advancedReplaceText(node) {
-    filter.wordRegExps.forEach((regExp) => {
+  advancedReplaceText(node, wordlistId: number, stats = true) {
+    filter.wordlists[wordlistId].regExps.forEach((regExp) => {
       // @ts-ignore - External library function
-      findAndReplaceDOMText(node, {preset: 'prose', find: regExp, replace: function(portion, match) {
+      findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: function(portion, match) {
         if (portion.index === 0) { // Replace the whole match on the first portion and skip the rest
-          return filter.replaceText(match[0]);
+          return filter.replaceText(match[0], wordlistId, stats);
         } else {
           return '';
         }
-      }});
+      } });
     });
   }
 
@@ -105,7 +105,7 @@ export default class BookmarkletFilter extends Filter {
           filter.audio.unmute();
         }
       } else if (!filter.audioOnly) { // Filter regular text
-        let result = this.replaceTextResult(mutation.target.data);
+        let result = this.replaceTextResult(mutation.target.data, this.wordlistId);
         if (result.modified) {
           mutation.target.data = result.filtered;
         }
@@ -151,13 +151,13 @@ export default class BookmarkletFilter extends Filter {
     } else { // Leaf node
       if (node.nodeName) {
         if (node.textContent && node.textContent.trim() != '') {
-          let result = this.replaceTextResult(node.textContent, stats);
+          let result = this.replaceTextResult(node.textContent, this.wordlistId, stats);
           if (result.modified) {
             node.textContent = result.filtered;
           }
         } else if (node.nodeName == 'IMG') {
-          if (node.alt != '') { node.alt = this.replaceText(node.alt, stats); }
-          if (node.title != '') { node.title = this.replaceText(node.title, stats); }
+          if (node.alt != '') { node.alt = this.replaceText(node.alt, this.wordlistId, stats); }
+          if (node.title != '') { node.title = this.replaceText(node.title, this.wordlistId, stats); }
         } else if (node.shadowRoot != undefined) {
           shadowObserver.observe(node.shadowRoot, observerConfig);
         }
@@ -167,31 +167,36 @@ export default class BookmarkletFilter extends Filter {
 
   cleanNodeText(node) {
     if (filter.advanced && (node.parentNode || node === document)) {
-      filter.advancedReplaceText(node);
+      filter.advancedReplaceText(node, this.wordlistId, true);
     } else {
       filter.cleanNode(node);
     }
   }
 
   cleanPage() {
-    this.cfg = new Config(config);
+    this.cfg = new WebConfig(config);
+    this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
     this.cfg.muteMethod = 1; // Bookmarklet: Force audio muteMethod = 1 (Volume)
 
-    // Exit if the topmost frame is a disabled domain
-    let message: Message = { disabled: this.disabledPage() };
+    // Use domain-specific settings
+    let message: Message = { disabled: (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
     if (message.disabled) {
       chrome.runtime.sendMessage(message);
       return false;
     }
-
-    // Check for advanced mode on current domain
-    this.advanced = this.advancedPage();
+    if (this.domain.advanced) { this.advanced = this.domain.advanced; }
+    if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
+    if (this.domain.audioWordlistId !== undefined) { this.audioWordlistId = this.domain.audioWordlistId; }
 
     // Detect if we should mute audio for the current page
     if (this.cfg.muteAudio) {
       this.audio = new WebAudio(this);
       this.mutePage = this.audio.supportedPage;
-      this.youTubeMutePage = this.audio.youTube;
+      if (this.mutePage) {
+        if (this.cfg.wordlistsEnabled && this.wordlistId != this.audio.wordlistId) {
+          this.wordlists[this.audio.wordlistId] = new Wordlist(this.cfg, this.audio.wordlistId);
+        }
+      }
     }
 
     // Remove profanity from the main document and watch for new nodes
@@ -200,27 +205,10 @@ export default class BookmarkletFilter extends Filter {
     observer.observe(document, observerConfig);
   }
 
-  // Always use the top frame for page check
-  disabledPage(): boolean {
-    if (this.cfg.enabledDomainsOnly) {
-      return !(Domain.domainMatch(this.hostname, this.cfg.enabledDomains));
-    } else {
-      return Domain.domainMatch(this.hostname, this.cfg.disabledDomains);
-    }
-  }
-
   processMutations(mutations) {
     mutations.forEach(function(mutation) {
       filter.checkMutationForProfanity(mutation);
     });
-  }
-
-  replaceTextResult(string: string, stats: boolean = true) {
-    let result = {} as any;
-    result.original = string;
-    result.filtered = filter.replaceText(string, stats);
-    result.modified = (result.filtered != string);
-    return result;
   }
 
   updateCounterBadge() {} // NO-OP

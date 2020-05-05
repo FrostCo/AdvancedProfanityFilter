@@ -31,6 +31,7 @@
     "test:cov": "npm run build:test && nyc --reporter=lcov --reporter=text node_modules/mocha/bin/_mocha",
     "test:debug": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
     "test:lint": "eslint \"src/**/*.ts\"",
+    "test:lint:tests": "eslint \"test/**/*.spec.js\"",
     "test:nocov": "node_modules/mocha/bin/_mocha",
     "test:types": "tsc --noEmit",
     "test": "npm run test:lint && npm run test:types && npm run test:cov",
@@ -100,6 +101,14 @@
     "rules": {
       "indent": "off",
       "no-console": "warn",
+      "array-bracket-spacing": [
+        "warn",
+        "never"
+      ],
+      "object-curly-spacing": [
+        "warn",
+        "always"
+      ],
       "no-control-regex": [
         "off"
       ],

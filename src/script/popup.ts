@@ -1,20 +1,38 @@
 import { dynamicList, escapeHTML } from './lib/helper';
+import WebAudio from './webAudio';
 import WebConfig from './webConfig';
 import Domain from './domain';
 
 class Popup {
   cfg: WebConfig;
+  audioSiteKeys: string[];
   domain: Domain;
-  protected: boolean;
   filterMethodContainer: Element;
+  filterToggleProp: string;
+  protected: boolean;
+  tab: chrome.tabs.Tab;
+  url: URL;
 
   static readonly _disabledPages = new RegExp('(^chrome:|^about:|^[a-zA-Z]*-extension:)', 'i');
-  static readonly _requiredConfig =  ['advancedDomains', 'disabledDomains', 'enabledDomains', 'enabledDomainsOnly', 'filterMethod', 'password'];
+  static readonly _requiredConfig =  [
+    'audioWordlistId',
+    'customAudioSites',
+    'domains',
+    'enabledDomainsOnly',
+    'filterMethod',
+    'muteAudio',
+    'password',
+    'wordlists',
+    'wordlistsEnabled',
+    'wordlistId'
+  ];
 
   static async load(instance: Popup) {
     instance.cfg = await WebConfig.build(Popup._requiredConfig);
-    instance.domain = new Domain();
-    await instance.domain.load();
+    instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
+    instance.url = new URL(instance.tab.url);
+    instance.domain = Domain.byHostname(instance.url.hostname, instance.cfg.domains);
+    instance.filterToggleProp = instance.cfg.enabledDomainsOnly ? 'enabled' : 'disabled';
     return instance;
   }
 
@@ -35,25 +53,14 @@ class Popup {
     element.classList.remove('disabled');
   }
 
-  async addDomain(key: string) {
-    let popup = this;
-    if (!popup.cfg[key].includes(popup.domain.hostname)) {
-      popup.cfg[key].push(popup.domain.hostname);
-      let error = await popup.cfg.save(key);
-      if (!error) {
-        switch(key) {
-          case 'enabledDomains':
-            Popup.enable(document.getElementById('advancedMode'));
-            Popup.enable(document.getElementById('filterMethodSelect'));
-            break;
-          case 'disabledDomains':
-            Popup.disable(document.getElementById('advancedMode'));
-            Popup.disable(document.getElementById('filterMethodSelect'));
-            break;
-        }
-        chrome.tabs.reload();
-      }
-    }
+  static hide(element: HTMLElement) {
+    element.classList.remove('w3-show');
+    element.classList.add('w3-hide');
+  }
+
+  static show(element: HTMLElement) {
+    element.classList.remove('w3-hide');
+    element.classList.add('w3-show');
   }
 
   async filterMethodSelect() {
@@ -73,8 +80,29 @@ class Popup {
     let domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
     let advancedMode = document.getElementById('advancedMode') as HTMLInputElement;
     let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    let wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
+    let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    let audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
     dynamicList(WebConfig._filterMethodNames, 'filterMethodSelect');
     filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
+
+    if (popup.cfg.wordlistsEnabled) {
+      let wordlists = ['Default'].concat(WebConfig._allWordlists, popup.cfg.wordlists);
+      let wordlistIndex = popup.domain.wordlistId >= 0 ? popup.domain.wordlistId + 1 : 0;
+      dynamicList(wordlists, wordlistSelect.id);
+      wordlistSelect.selectedIndex = wordlistIndex;
+      if (popup.cfg.muteAudio) {
+        popup.audioSiteKeys = Object.keys(Object.assign({}, WebAudio.sites, popup.cfg.customAudioSites));
+        if (popup.audioSiteKeys.includes(popup.domain.cfgKey)) {
+          let audioWordlistIndex = popup.domain.audioWordlistId >= 0 ? popup.domain.audioWordlistId + 1 : 0;
+          dynamicList(wordlists, audioWordlistSelect.id);
+          audioWordlistSelect.selectedIndex = audioWordlistIndex;
+          let audioWordlistContainer = document.getElementById('audioWordlistContainer') as HTMLElement;
+          Popup.show(audioWordlistContainer);
+        }
+      }
+      Popup.show(wordListContainer);
+    }
 
     if (popup.cfg.password && popup.cfg.password != '') {
       popup.protected = true;
@@ -82,33 +110,33 @@ class Popup {
       Popup.disable(domainToggle);
       Popup.disable(advancedMode);
       Popup.disable(filterMethodSelect);
+      Popup.disable(wordlistSelect);
+      Popup.disable(audioWordlistSelect);
     }
 
     // Restricted pages
-    if (Popup._disabledPages.test(popup.domain.url.protocol) || popup.domain.hostname == 'chrome.google.com') {
+    if (Popup._disabledPages.test(popup.url.protocol) || popup.domain.hostname == 'chrome.google.com') {
       domainFilter.checked = false;
       Popup.disable(domainFilter);
       Popup.disable(domainToggle);
       Popup.disable(advancedMode);
       Popup.disable(filterMethodSelect);
+      Popup.disable(wordlistSelect);
+      Popup.disable(audioWordlistSelect);
       return false;
     }
 
     // Set initial value for domain filter and disable options if they are not applicable
-    if (
-      (
-        popup.cfg.enabledDomainsOnly
-        && !Domain.domainMatch(popup.domain.hostname, popup.cfg.enabledDomains)
-      )
-      || Domain.domainMatch(popup.domain.hostname, popup.cfg.disabledDomains)
-    ) {
+    if (popup.domain.disabled || (popup.cfg.enabledDomainsOnly && !popup.domain.enabled)) {
       domainFilter.checked = false;
       Popup.disable(advancedMode);
       Popup.disable(filterMethodSelect);
+      Popup.disable(wordlistSelect);
+      Popup.disable(audioWordlistSelect);
     }
 
     // Set initial value for advanced mode
-    if (Domain.domainMatch(popup.domain.hostname, popup.cfg['advancedDomains'])) {
+    if (popup.domain.advanced) {
       advancedMode.checked = true;
     }
   }
@@ -128,29 +156,6 @@ class Popup {
     }
   }
 
-  async removeDomain(key: string) {
-    let popup = this;
-    let newDomainList = Domain.removeFromList(popup.domain.hostname, popup.cfg[key]);
-
-    if (newDomainList.length < popup.cfg[key].length) {
-      popup.cfg[key] = newDomainList;
-      let error = await popup.cfg.save(key);
-      if (!error) {
-        switch(key) {
-          case 'enabledDomains':
-            Popup.disable(document.getElementById('advancedMode'));
-            Popup.disable(document.getElementById('filterMethodSelect'));
-            break;
-          case 'disabledDomains':
-            Popup.enable(document.getElementById('advancedMode'));
-            Popup.enable(document.getElementById('filterMethodSelect'));
-            break;
-        }
-        chrome.tabs.reload();
-      }
-    }
-  }
-
   summaryTableHTML(summary: Summary): string {
     let tableInnerHTML = '';
     if (Object.keys(summary).length > 0) {
@@ -164,23 +169,20 @@ class Popup {
     return tableInnerHTML;
   }
 
-  toggleAdvancedMode() {
-    let popup = this;
+  async toggle(prop: string) {
     if (!popup.protected) {
-      let advancedMode = document.getElementById('advancedMode') as HTMLInputElement;
-      advancedMode.checked ? popup.addDomain('advancedDomains') : popup.removeDomain('advancedDomains');
+      popup.domain[prop] = !popup.domain[prop];
+      let error = await popup.domain.save(popup.cfg);
+      if (!error) { chrome.tabs.reload(); }
     }
   }
 
-  toggleFilter() {
-    let popup = this;
-    if (!popup.protected) {
-      let domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
-      if (popup.cfg.enabledDomainsOnly) {
-        domainFilter.checked ? popup.addDomain('enabledDomains') : popup.removeDomain('enabledDomains');
-      } else {
-        domainFilter.checked ? popup.removeDomain('disabledDomains') : popup.addDomain('disabledDomains');
-      }
+  async wordlistSelect(event) {
+    let element = event.target;
+    let type = element.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
+    popup.domain[type] = element.selectedIndex > 0 ? element.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
+    if (!await popup.domain.save(popup.cfg)) {
+      chrome.tabs.reload();
     }
   }
 }
@@ -188,15 +190,15 @@ class Popup {
 // Listen for data updates from filter
 chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) => {
   if (request.summary) {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       if (sender.tab.id == tabs[0].id) popup.populateSummary(request);
     });
   }
 });
 
 // Initial data request
-chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-  chrome.tabs.sendMessage(tabs[0].id, {popup: true});
+chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+  chrome.tabs.sendMessage(tabs[0].id, { popup: true });
 });
 
 let popup = new Popup;
@@ -204,7 +206,9 @@ let popup = new Popup;
 ////
 // Listeners
 window.addEventListener('load', function(event) { popup.populateOptions(); });
-document.getElementById('domainFilter').addEventListener('change', function(event) { popup.toggleFilter(); });
-document.getElementById('advancedMode').addEventListener('change', function(event) { popup.toggleAdvancedMode(); });
+document.getElementById('domainFilter').addEventListener('change', function(event) { popup.toggle(popup.filterToggleProp); });
+document.getElementById('advancedMode').addEventListener('change', function(event) { popup.toggle('advanced'); });
 document.getElementById('filterMethodSelect').addEventListener('change', function(event) { popup.filterMethodSelect(); });
+document.getElementById('wordlistSelect').addEventListener('change', function(event) { popup.wordlistSelect(event); });
+document.getElementById('audioWordlistSelect').addEventListener('change', function(event) { popup.wordlistSelect(event); });
 document.getElementById('options').addEventListener('click', function() { chrome.runtime.openOptionsPage(); });

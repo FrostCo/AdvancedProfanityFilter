@@ -16,6 +16,7 @@ export default class WebAudio {
   unmuteDelay: number;
   volume: number;
   watcherRuleIds: number[];
+  wordlistId: number;
   youTube: boolean;
   youTubeAutoSubsMin: number;
   youTubeAutoSubsMax: number;
@@ -30,16 +31,15 @@ export default class WebAudio {
     this.lastProcessed = [];
     this.muted = false;
     if (
-      filter.cfg.customAudioSites
-      && typeof filter.cfg.customAudioSites == 'object'
-      && Object.keys(filter.cfg.customAudioSites).length > 0
+      !filter.cfg.customAudioSites
+      || typeof filter.cfg.customAudioSites !== 'object'
     ) {
-      this.sites = Object.assign(WebAudio.sites, filter.cfg.customAudioSites);
-    } else {
-      this.sites = WebAudio.sites;
+      filter.cfg.customAudioSites = {};
     }
+    this.sites = Object.assign({}, WebAudio.sites, filter.cfg.customAudioSites);
     this.unmuteDelay = 0;
     this.volume = 1;
+    this.wordlistId = filter.audioWordlistId;
     this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;
     this.youTubeAutoSubsMax = filter.cfg.youTubeAutoSubsMax * 1000;
 
@@ -49,7 +49,7 @@ export default class WebAudio {
       this.supportedPage = true;
       if (filter.hostname == 'www.youtube.com') { this.youTube = true; }
       if (!Array.isArray(this.rules)) {
-        this.rules = [ this.rules ];
+        this.rules = [this.rules];
       }
 
       this.supportedNode = this.buildSupportedNodeFunction();
@@ -67,7 +67,7 @@ export default class WebAudio {
   }
 
   static readonly sites: { [site: string]: AudioRules[] } = {
-    'abc.com': [ { mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' } ],
+    'abc.com': [{ mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' }],
     'www.amazon.com': [
       {
         mode: 'watcher',
@@ -75,7 +75,7 @@ export default class WebAudio {
         parentSelector: 'div.webPlayer div.persistentPanel',
         showSubtitles: 0,
         simpleUnmute: true,
-        subtitleSelector: 'div.webPlayer div.persistentPanel > div > div > div > p > span > span',
+        subtitleSelector: 'div.webPlayerContainer div span > span',
         videoSelector: 'div.webPlayerElement video[src]'
       }
     ],
@@ -83,34 +83,34 @@ export default class WebAudio {
       { mode: 'element', className: 'ttr-container', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
       { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video' }
     ],
-    'www.att.tv': [ { mode: 'cue', videoSelector: 'video#quickplayPlayer' } ],
-    'www.attwatchtv.com': [ { mode: 'cue', videoSelector: 'video#quickplayPlayer' } ],
-    'www.cbs.com': [ { mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false } ],
+    'www.att.tv': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
+    'www.attwatchtv.com': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
+    'www.cbs.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'www.dishanywhere.com': [
       { mode: 'element', className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' },
       { mode: 'element', className: 'bmpui-subtitle-region-container', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' }
     ],
-    'www.disneyplus.com': [ { mode: 'cue', videoSelector: 'video.btm-media-client-element' } ],
-    'www.fox.com': [ { mode: 'element', className: 'jw-text-track-container', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' } ],
-    'www.hulu.com': [ { mode: 'element', className: 'caption-text-box', subtitleSelector: 'p', tagName: 'DIV' } ],
+    'www.disneyplus.com': [{ mode: 'cue', videoSelector: 'video.btm-media-client-element' }],
+    'www.fox.com': [{ mode: 'element', className: 'jw-text-track-container', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
+    'www.hulu.com': [{ mode: 'element', className: 'caption-text-box', subtitleSelector: 'p', tagName: 'DIV' }],
     'www.nbc.com': [
       { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
       { mode: 'cue', videoCueLanguage: 'en' }
     ],
-    'www.netflix.com': [ { mode: 'element', className: 'player-timedtext-text-container', subtitleSelector: 'span', tagName: 'DIV' } ],
-    'www.philo.com': [ { mode: 'cue' } ],
+    'www.netflix.com': [{ mode: 'element', className: 'player-timedtext-text-container', subtitleSelector: 'span', tagName: 'DIV' }],
+    'www.philo.com': [{ mode: 'cue' }],
     'app.plex.tv': [
       { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' },
       { mode: 'element', containsSelector: 'div[data-dialogue-id]', subtitleSelector: 'span > span', tagName: 'DIV' }
     ],
-    'www.sonycrackle.com': [ { mode: 'text', parentSelector: 'div.clpp-subtitles-container' } ],
-    'play.stan.com.au': [ { mode: 'text', parentSelector: 'div.clpp-subtitles-container' } ],
-    'www.syfy.com': [ { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' } ],
-    'www.tntdrama.com': [ { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video.top-media-element' } ],
-    'www.universalkids.com': [ { mode: 'element', subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' } ],
-    'www.usanetwork.com': [ { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' } ],
-    'www.vudu.com': [ { mode: 'element', subtitleSelector: 'span.subtitles', tagName: 'DIV' } ],
-    'www.youtube.com': [ { mode: 'element', className: 'caption-window', subtitleSelector: 'span.ytp-caption-segment', tagName: 'DIV' } ]
+    'www.sonycrackle.com': [{ mode: 'text', parentSelector: 'div.clpp-subtitles-container' }],
+    'play.stan.com.au': [{ mode: 'text', parentSelector: 'div.clpp-subtitles-container' }],
+    'www.syfy.com': [{ mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
+    'www.tntdrama.com': [{ mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video.top-media-element' }],
+    'www.universalkids.com': [{ mode: 'element', subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' }],
+    'www.usanetwork.com': [{ mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
+    'www.vudu.com': [{ mode: 'element', subtitleSelector: 'span.subtitles', tagName: 'DIV' }],
+    'www.youtube.com': [{ mode: 'element', className: 'caption-window', subtitleSelector: 'span.ytp-caption-segment', tagName: 'DIV' }]
   };
 
   buildSupportedNodeFunction(): Function {
@@ -190,7 +190,7 @@ export default class WebAudio {
     subtitles.forEach(subtitle => {
       // innerText handles line feeds/spacing better, but is not available to #text nodes
       let textMethod = subtitle.nodeName === '#text' ? 'textContent' : 'innerText';
-      let result = this.filter.replaceTextResult(subtitle[textMethod]);
+      let result = this.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
         filtered = true;
         this.mute(rule.muteMethod); // Mute the audio if we haven't already
@@ -215,7 +215,7 @@ export default class WebAudio {
       this.youTubeAutoSubsTimeout = null;
     }
 
-    let result = this.filter.replaceTextResult(node.textContent);
+    let result = this.replaceTextResult(node.textContent);
     if (result.modified) {
       node.textContent = result.filtered;
       this.mute();
@@ -326,7 +326,7 @@ export default class WebAudio {
         cue.endTime += rule.videoCueSync;
       }
 
-      let result = this.filter.replaceTextResult(cue.text);
+      let result = this.replaceTextResult(cue.text);
       if (result.modified) {
         cue.filtered = true;
         cue.originalText = cue.text;
@@ -335,6 +335,10 @@ export default class WebAudio {
         cue.filtered = false;
       }
     }
+  }
+
+  replaceTextResult(string: string, stats: boolean = true) {
+    return this.filter.replaceTextResult(string, this.wordlistId, stats);
   }
 
   unmute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
@@ -389,7 +393,7 @@ export default class WebAudio {
 
             // Filter the captions/subtitles
             if (child[textMethod]) {
-              let result = instance.filter.replaceTextResult(child[textMethod]);
+              let result = instance.replaceTextResult(child[textMethod]);
               if (result.modified) {
                 instance.mute(rule.muteMethod);
                 filtered = true;
@@ -409,7 +413,7 @@ export default class WebAudio {
           if (!newCaptions && instance.lastProcessed.includes(captions[textMethod])) { return false; }
 
           if (captions[textMethod] && (instance.lastFilteredText && !captions[textMethod].contains(instance.lastFilteredText))) {
-            let result = instance.filter.replaceTextResult(captions[textMethod]);
+            let result = instance.replaceTextResult(captions[textMethod]);
             if (result.modified) {
               instance.mute(rule.muteMethod);
               filtered = true;

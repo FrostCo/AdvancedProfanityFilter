@@ -1,7 +1,44 @@
 import Config from './lib/config';
 
 export default class WebConfig extends Config {
-  static async build(keys?: string[]) {
+  _splitContainerKeys: { [key: string]: string[] };
+  audioWordlistId: number;
+  customAudioSites: { [site: string]: AudioRules[] };
+  domains: { [site: string]: DomainCfg };
+  enabledDomainsOnly: boolean;
+  muteAudio: boolean;
+  muteAudioOnly: boolean;
+  muteCueRequireShowing: boolean;
+  muteMethod: number;
+  password: string;
+  showSubtitles: number;
+  showUpdateNotification: boolean;
+  youTubeAutoSubsMax: number;
+  youTubeAutoSubsMin: number;
+
+  static readonly _classDefaults = {
+    domains: {},
+    audioWordlistId: 0,
+    customAudioSites: null,
+    enabledDomainsOnly: false,
+    muteAudio: false,
+    muteAudioOnly: false,
+    muteCueRequireShowing: true,
+    muteMethod: 0, // 0: Mute Tab, 1: Video Volume
+    password: null,
+    showSubtitles: 0,
+    showUpdateNotification: true,
+    youTubeAutoSubsMax: 0,
+    youTubeAutoSubsMin: 0,
+  }
+
+  static readonly QUOTA_BYTES_PER_ITEM = 8192; // https://developer.chrome.com/apps/storage chrome.storage.sync.QUOTA_BYTES_PER_ITEM
+  static readonly _defaults = Object.assign({}, Config._defaults, WebConfig._classDefaults);
+  static readonly _splittingKeys = ['domains', 'words'];
+  static readonly _maxBytes = 8000;
+
+  static async build(keys: string | string[] = []) {
+    if (typeof keys === 'string') { keys = [keys]; }
     let asyncResult = await WebConfig.getConfig(keys);
     let instance = new WebConfig(asyncResult);
     return instance;
@@ -13,87 +50,66 @@ export default class WebConfig extends Config {
       throw new Error('Cannot be called directly. call build()');
     }
 
-    super(asyncParam);
+    super(); // Get the Config defaults
+    this._splitContainerKeys = {};
+    Object.assign(this, WebConfig._classDefaults, asyncParam); // Separate due to _defineProperty()
   }
 
-  // Compile words
-  static combineWords(items) {
-    items.words = {};
-    if (items._words0 !== undefined) {
-      // Find all _words* to combine
-      let wordKeys = Object.keys(items).filter(function(key) {
-        return Config._wordsPattern.test(key);
-      });
+  // Combine all ._[prop]* into .[prop]
+  static combineData(data, prop: string): string[] {
+    data[prop] = {};
+    if (data[`_${prop}0`] !== undefined) {
+      let dataKeys = WebConfig.getDataContainerKeys(data, prop);
 
-      // Add all _words* to words and remove _words*
-      wordKeys.forEach(function(key) {
-        Object.assign(items.words, items[key]);
-        delete items[key];
+      // Add all _[prop]* to .[prop] and remove _[prop]*
+      dataKeys.forEach(function(key) {
+        Object.assign(data[prop], data[key]);
+        delete data[key];
       });
+      return dataKeys;
     }
-    // console.log('combineWords', items); // DEBUG
-  }
-
-  // Persist all configs from defaults and split _words*
-  dataToPersist() {
-    let self = this;
-    let data = {};
-
-    // Save all settings using keys from _defaults
-    Object.keys(Config._defaults).forEach(function(key) {
-      if (self[key] !== undefined) {
-        data[key] = self[key];
-      }
-    });
-
-    if (self.words) {
-      // Split words back into _words* for storage
-      let splitWords = self.splitWords();
-      Object.keys(splitWords).forEach(function(key) {
-        data[key] = splitWords[key];
-      });
-
-      let wordKeys = Object.keys(self).filter(function(key) {
-        return Config._wordsPattern.test(key);
-      });
-
-      wordKeys.forEach(function(key){
-        data[key] = self[key];
-      });
-    }
-
-    // console.log('dataToPersist', data); // DEBUG - Config
-    return data;
   }
 
   // Async call to get provided keys (or default keys) from chrome storage
-  // TODO: Keys: Doesn't support getting words
-  static getConfig(keys?: string[]) {
+  static getConfig(keys: string[]) {
     return new Promise(function(resolve, reject) {
-      // Generate a request to use with chrome.storage
-      let request = null;
-      if (keys !== undefined) {
+      let request = null; // Get all data from storage
+
+      if (keys.length > 0 && ! keys.some(key => WebConfig._splittingKeys.includes(key))) {
         request = {};
-        for (let k of keys) { request[k] = Config._defaults[k]; }
+        keys.forEach(key => { request[key] = WebConfig._defaults[key]; });
       }
 
       chrome.storage.sync.get(request, function(items) {
+        // Add internal tracker for split keys
+        items._splitContainerKeys = {};
+
         // Ensure defaults for undefined settings
-        Object.keys(Config._defaults).forEach(function(defaultKey){
-          if (request == null || Object.keys(request).includes(defaultKey)) {
-            if (items[defaultKey] === undefined) {
-              items[defaultKey] = Config._defaults[defaultKey];
-            }
+        Object.keys(WebConfig._defaults).forEach(function(defaultKey) {
+          if ((request == null || keys.includes(defaultKey)) && items[defaultKey] === undefined) {
+            items[defaultKey] = WebConfig._defaults[defaultKey];
           }
         });
 
         // Add words if requested, and provide _defaultWords if needed
-        if (keys === undefined || keys.includes('words')) {
+        if (keys.length === 0 || keys.includes('words')) {
           // Use default words if none were provided
           if (items._words0 === undefined || Object.keys(items._words0).length == 0) {
             items._words0 = Config._defaultWords;
           }
-          WebConfig.combineWords(items);
+        }
+
+        WebConfig._splittingKeys.forEach(function(largKey) {
+          items._splitContainerKeys[largKey] = WebConfig.combineData(items, largKey);
+        });
+
+        // Remove keys we didn't request (Required when requests for specific keys include ones that supports splitting)
+        if (request !== null && keys.length > 0) {
+          Object.keys(items).forEach(function(item) {
+            if (!keys.includes(item)) {
+              delete items[item];
+            }
+          });
         }
 
         resolve(items);
@@ -101,9 +117,32 @@ export default class WebConfig extends Config {
     });
   }
 
-  removeProp(prop: string) {
-    chrome.storage.sync.remove(prop);
-    delete this[prop];
+  // Find all _[prop]* to combine
+  static getDataContainerKeys(data, prop) {
+    let pattern = new RegExp(`^_${prop}\\d+`);
+    let containerKeys = Object.keys(data).filter(function(key) {
+      return pattern.test(key);
+    });
+
+    return containerKeys;
+  }
+
+  // Order and remove `_` prefixed values
+  ordered() {
+    let self = this;
+    return Object.keys(self).sort().reduce((obj, key) => {
+      if (key[0] != '_') { obj[key] = self[key]; }
+      return obj;
+    }, {});
+  }
+
+  remove(props: string | string[]) {
+    let self = this;
+    if (typeof props === 'string') { props = [props]; }
+    chrome.storage.sync.remove(props);
+    props.forEach(function(prop) {
+      delete self[prop];
+    });
   }
 
   reset() {
@@ -115,17 +154,37 @@ export default class WebConfig extends Config {
   }
 
   // Pass a key or array of keys to save, or save everything
-  // Note: To save words you'll need to leave props undefined
-  save(props?: string | string[]) {
+  save(props: string | string[] = []) {
+    let self = this;
+    if (typeof props === 'string') { props = [props]; }
     let data = {};
-    if (props === undefined) {
-      data = this.dataToPersist();
-    } else if (typeof props === 'string') {
-      data[props] = this[props];
-    } else if (Array.isArray(props)) {
-      for (let prop of props) {
-        data[prop] = this[prop];
+
+    // Save everything
+    if (props.length === 0) {
+      props = Object.keys(WebConfig._defaults);
+      props.push('words'); // words is not part of _defaults
+    }
+
+    props.forEach(function(prop) {
+      if (WebConfig._splittingKeys.includes(prop)) {
+        Object.assign(data, self.splitData(prop));
+      } else {
+        data[prop] = self[prop];
       }
+    });
+
+    // If we have more containers in storage than are needed, remove them
+    if (Object.keys(self._splitContainerKeys).length !== 0 && props.some(prop => WebConfig._splittingKeys.includes(prop))) {
+      WebConfig._splittingKeys.forEach(function(key) {
+        if (props.includes(key)) {
+          let newContainerKeys = WebConfig.getDataContainerKeys(data, key);
+          let containersToRemove = self._splitContainerKeys[key].filter(oldKey => !newContainerKeys.includes(oldKey));
+          if (containersToRemove.length !== 0) {
+            self.remove(containersToRemove);
+            self._splitContainerKeys[key] = newContainerKeys;
+          }
+        }
+      });
     }
 
     return new Promise(function(resolve, reject) {
@@ -135,26 +194,34 @@ export default class WebConfig extends Config {
     });
   }
 
-  splitWords() {
+  splitData(key: string) {
     let self = this;
+    const encoder = new TextEncoder();
     let currentContainerNum = 0;
-    let currentWordNum = 0;
-    // let wordsLength = JSON.stringify(self.words).length;
-    // let wordContainers = Math.ceil(wordsLength/Config._maxBytes);
-    // let wordsNum = Object.keys(self.words).length;
-    let words = {};
-    words[`_words${currentContainerNum}`] = {};
+    let currentBytes = 2; // For double-quotes around entire stringified JSON
+    let data = {};
 
-    Object.keys(self.words).sort().forEach(function(word) {
-      if (currentWordNum == Config._maxWords) {
+    let currentContainer = `_${key}${currentContainerNum}`;
+    data[currentContainer] = {};
+    currentBytes += encoder.encode(`{"${currentContainer}":{}}`).length;
+
+    Object.keys(self[key]).sort().forEach(function(item) {
+      let newBytes = encoder.encode(`",${item}":`).length; // This leads to an extra ',' for the last entry
+      newBytes += encoder.encode(JSON.stringify(self[key][item])).length;
+
+      // Next word would be too big, setup next container
+      if ((currentBytes + newBytes) >= WebConfig._maxBytes) {
         currentContainerNum++;
-        currentWordNum = 0;
-        words[`_words${currentContainerNum}`] = {};
+        currentContainer = `_${key}${currentContainerNum}`;
+        data[currentContainer] = {};
+        currentBytes = encoder.encode(`"${currentContainer}":{}`).length;
       }
-      words[`_words${currentContainerNum}`][word] = self.words[word];
-      currentWordNum++;
+
+      // Adding a word
+      currentBytes += newBytes;
+      data[currentContainer][item] = self[key][item];
     });
 
-    return words;
+    return data;
   }
 }

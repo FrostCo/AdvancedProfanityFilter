@@ -1,14 +1,17 @@
+import Config from './config';
+
 export default class Word {
+  _filterMethod: number;
   escaped: string;
+  lists: number[];
   matchMethod: number;
   matchRepeated: boolean;
   matchSeparators: boolean;
+  regExp: RegExp;
   sub: string;
   unicode: boolean;
   value: string;
 
-  private static readonly _defaultFilterOptions = { filterMethod: 1, globalMatchMethod: 3 }
-  private static readonly _defaultWordOptions = { matchMethod: 0, repeat: false, separators: false, sub: 'censored' };
   private static readonly _edgePunctuationRegExp = /(^[,.'"!?%$]|[,.'"!?%$]$)/;
   private static readonly _escapeRegExp = /[\/\\^$*+?.()|[\]{}]/g;
   private static readonly _unicodeRegExp = /[^\u0000-\u00ff]/;
@@ -16,13 +19,6 @@ export default class Word {
   static readonly nonWordRegExp = new RegExp('^\\s*[^\\w]+\\s*$', 'g');
   static readonly separatorsRegExp = '[-_ ]*';
   static readonly whitespaceRegExp = /^\s+$/;
-
-  static all = [];
-  static defaultWordOptions = Word._defaultWordOptions;
-  static filterMethod = Word._defaultFilterOptions.filterMethod;
-  static globalMatchMethod = Word._defaultFilterOptions.globalMatchMethod;
-  static list = [];
-  static regExps = [];
 
   static allLowerCase(string: string): boolean {
     return string.toLowerCase() === string;
@@ -53,50 +49,22 @@ export default class Word {
     return str.replace(Word._escapeRegExp, '\\$&');
   }
 
-  static find(value: string|number): Word {
-    if (typeof value === 'string') {
-      return Word.all[Word.list.indexOf(value)];
-    } else if (typeof value === 'number') {
-      return Word.all[value];
-    }
-  }
-
-  static initWords(words, filterOptions: any = {}, wordDefaults = {}) {
-    // Sort the words array by longest (most-specific) first
-    Word.all = [];
-    Word.list = [];
-    Word.regExps = [];
-    filterOptions = Object.assign(Word._defaultFilterOptions, filterOptions);
-    Word.filterMethod = filterOptions.filterMethod;
-    // Special regexp for "Remove" filter, uses per-word matchMethods
-    Word.globalMatchMethod = Word.filterMethod === 2 ? Word.globalMatchMethod = 3 : filterOptions.globalMatchMethod;
-    Word.defaultWordOptions = Object.assign(Word._defaultWordOptions, wordDefaults);
-
-    Word.list = Object.keys(words).sort((a, b) => {
-      return b.length - a.length;
-    });
-
-    Word.list.forEach(word => {
-      let instance = new Word(word, words[word]);
-      Word.all.push(instance);
-      Word.regExps.push(instance.buildRegexp());
-    });
-  }
-
-  constructor(word: string, options: WordOptions) {
+  constructor(word: string, options: WordOptions, cfg: Config) {
     this.value = word;
-    this.matchMethod = Word.globalMatchMethod === 3 ? options.matchMethod : Word.globalMatchMethod;
-    this.matchRepeated = options.repeat === undefined ? Word.defaultWordOptions.repeat : options.repeat;
-    this.matchSeparators = options.separators === undefined ? Word.defaultWordOptions.separators : options.separators;
-    this.sub = options.sub == null ? Word.defaultWordOptions.sub : options.sub;
+    this.lists = options.lists || [];
+    this.matchMethod = options.matchMethod || cfg.defaultWordMatchMethod;
+    this.matchRepeated = options.repeat === undefined ? cfg.defaultWordRepeat : options.repeat;
+    this.matchSeparators = options.separators === undefined ? cfg.defaultWordSeparators : options.separators;
+    this.sub = options.sub === undefined ? cfg.defaultSubstitution : options.sub;
+    this._filterMethod = options._filterMethod === undefined ? cfg.filterMethod : options._filterMethod;
     this.unicode = Word.containsDoubleByte(word);
-    if (this.matchMethod === undefined) { Word.defaultWordOptions.matchMethod; }
     this.escaped = Word.escapeRegExp(this.value);
+    this.regExp = this.buildRegExp();
   }
 
   // Word must match exactly (not sub-string)
   // /\bword\b/gi
-  buildRegexp(): RegExp {
+  buildRegExp(): RegExp {
     let word = this;
     try {
       switch(word.matchMethod) {
@@ -104,7 +72,7 @@ export default class Word {
           // Filter Method: Remove
           // Match entire word that contains sub-string and surrounding whitespace
           // /\s?\bword\b\s?/gi
-          if (Word.filterMethod === 2) { // Remove method
+          if (word._filterMethod === 2) { // Remove method
             if (word.unicode) {
               // Work around for lack of word boundary support for unicode characters
               // /(^|[\s.,'"+!?|-])(word)([\s.,'"+!?|-]+|$)/giu
@@ -141,7 +109,7 @@ export default class Word {
           return new RegExp(word.value, word.regexOptions());
         case 1: // Partial: Match any part of a word (sub-string)
         default:
-          if (Word.filterMethod === 2) { // Filter Method: Remove
+          if (word._filterMethod === 2) { // Filter Method: Remove
             // Match entire word that contains sub-string and surrounding whitespace
             // /\s?\b[\w-]*word[\w-]*\b\s?/gi
             if (word.unicode) {

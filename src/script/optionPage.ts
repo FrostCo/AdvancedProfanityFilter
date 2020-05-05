@@ -1,12 +1,14 @@
 import { dynamicList, escapeHTML, exportToFile, readFile, removeFromArray } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
+import Domain from './domain';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
 import WebAudio from './webAudio';
 
 export default class OptionPage {
+  _bulkWordMatchMethodHTML: string;
   cfg: WebConfig;
   auth: OptionAuth;
 
@@ -63,10 +65,6 @@ export default class OptionPage {
     OptionPage.hide(notificationPanel);
   }
 
-  static async load(instance: OptionPage) {
-    instance.cfg = await WebConfig.build();
-  }
-
   static openModal(id: string) {
     OptionPage.show(document.getElementById(id));
   }
@@ -103,44 +101,139 @@ export default class OptionPage {
     OptionPage.openModal('statusModal');
   }
 
-  advancedDomainList() {
-    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
-    let domainListHTML = '<option selected value="">Add...</option>';
-    this.cfg.advancedDomains.forEach(domain => { domainListHTML += `<option value="${domain}">${domain}</option>`; });
-    advDomains.innerHTML = domainListHTML;
-    this.advancedDomainPopulate();
-  }
-
-  advancedDomainPopulate() {
-    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
-    let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
-    let advDomainRemove = document.getElementById('advDomainRemove') as HTMLInputElement;
-    OptionPage.hideInputError(advDomainText);
-    advDomains.value !== '' ? OptionPage.enableBtn(advDomainRemove) : OptionPage.disableBtn(advDomainRemove);
-    advDomainText.value = advDomains.value;
-  }
-
-  async advancedDomainRemove(evt) {
-    if (evt.target.classList.contains('disabled')) return false;
-    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
-    option.cfg['advancedDomains'].splice(option.cfg['advancedDomains'].indexOf(advDomains.value), 1);
-    if (await option.saveProp('advancedDomains')) this.advancedDomainList();
-  }
-
-  async advancedDomainSave(evt) {
-    let advDomains = document.getElementById('advDomainSelect') as HTMLInputElement;
-    let advDomainText = document.getElementById('advDomainText') as HTMLInputElement;
-    let invalidMessage = 'Valid domain example: google.com or www.google.com';
-    let success;
-    if (advDomains.value == '') { // New record
-      success = option.updateItemList(evt, advDomainText, 'advancedDomains', invalidMessage);
-    } else { // Updating existing record
-      success = option.updateItemList(evt, advDomainText, 'advancedDomains', invalidMessage, advDomains.value);
+  bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
+    let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+    let tbody = table.querySelector('tbody') as HTMLTableSectionElement;
+    let wordlistCells = [];
+    if (data === undefined) {
+      data = {
+        lists: [],
+        matchMethod: option.cfg.defaultWordMatchMethod,
+        repeat: option.cfg.defaultWordRepeat,
+        separators: option.cfg.defaultWordSeparators,
+        sub: '',
+      };
     }
 
-    if (success) {
-      if (await option.saveProp('advancedDomains')) this.advancedDomainList();
+    // Build row
+    let row = tbody.insertRow();
+    row.classList.add('bulkWordRow');
+    let cellRemoveRow = row.insertCell(0);
+    let cellWord = row.insertCell(1);
+    let cellSub = row.insertCell(2);
+    let cellMatchMethod = row.insertCell(3);
+    let cellRepeat = row.insertCell(4);
+    let cellSeparators = row.insertCell(5);
+    option.cfg.wordlists.forEach((wordlist, index) => { wordlistCells.push(row.insertCell(index + 6)); });
+    cellRemoveRow.innerHTML = '<button>X</button>';
+    cellWord.innerHTML = '<input type="text" class="bulkAddWordText">';
+    cellSub.innerHTML = '<input type="text">';
+    cellMatchMethod.innerHTML = option._bulkWordMatchMethodHTML;
+    cellRepeat.innerHTML = '<input type="checkbox" name="repeat">';
+    cellSeparators.innerHTML = '<input type="checkbox" name="separators">';
+    wordlistCells.forEach((cell, index) => {
+      cell.innerHTML = `<input type="checkbox" name="wordlists" class="wordlistData" data-col="${index + 1}">`;
+    });
+
+    // Populate data
+    cellRemoveRow.querySelector('button').addEventListener('click', e => { option.bulkEditorRemoveRow(e); });
+    (cellWord.querySelector('input') as HTMLInputElement).value = word;
+    (cellSub.querySelector('input') as HTMLInputElement).value = data.sub;
+    (cellMatchMethod.querySelector('select') as HTMLSelectElement).selectedIndex = data.matchMethod;
+    (cellRepeat.querySelector('input') as HTMLInputElement).checked = data.repeat;
+    (cellSeparators.querySelector('input') as HTMLInputElement).checked = data.separators;
+    wordlistCells.forEach((cell, index) => {
+      (cell.querySelector('input') as HTMLInputElement).checked = data.lists.includes(index + 1);
+    });
+
+    // Scroll to the bottom if this is a new word row
+    if (word === '') {
+      table.parentElement.scrollTop = table.parentElement.scrollHeight - table.parentElement.clientHeight;
+      cellWord.querySelector('input').focus();
     }
+  }
+
+  bulkEditorAddWords() {
+    let bulkAddWordsText = document.querySelector('#bulkWordEditorModal textarea#bulkAddWordsText') as HTMLTextAreaElement;
+    let text = bulkAddWordsText.value;
+    if (text != '') {
+      let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+      let lines = text.toLowerCase().split('\n');
+      let words = lines.map(line => line.trim());
+      let uniqueWords = words.filter((word, index) => words.indexOf(word) === index);
+
+      // Remove any words that already exist in the current table
+      let currentWords = option.bulkEditorCurrentWords();
+      let wordsToAdd = uniqueWords.filter(newWord => !currentWords.includes(newWord));
+
+      // Add the new words to the table
+      wordsToAdd.forEach(function(word) {
+        if (word != '') { option.bulkEditorAddRow(word); }
+      });
+
+      // Scroll to the bottom
+      table.parentElement.scrollTop = table.parentElement.scrollHeight - table.parentElement.clientHeight;
+
+      // Clear textarea after adding to the table
+      bulkAddWordsText.value = '';
+    }
+  }
+
+  bulkEditorCurrentWords() {
+    let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+    let words = [];
+    table.querySelectorAll('tr > td > input.bulkAddWordText').forEach((wordText: HTMLInputElement, index) => {
+      words.push(wordText.value);
+    });
+    return words;
+  }
+
+  bulkEditorRemoveRow(event) {
+    let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+    let row = event.target.parentElement.parentElement;
+    table.deleteRow(row.rowIndex);
+  }
+
+  async bulkEditorSave() {
+    let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+    let failed = {};
+    option.cfg.words = {};
+
+    table.querySelectorAll('tr.bulkWordRow').forEach((tr, index) => {
+      let cells = tr.querySelectorAll('td');
+      let lists = [];
+      let wordlistSelectionsInput = tr.querySelectorAll('input[name="wordlists"]') as NodeListOf<HTMLInputElement>;
+      wordlistSelectionsInput.forEach((wordlist, index) => { if (wordlist.checked) { lists.push(index + 1); } });
+
+      let name = (cells[1].querySelector('input') as HTMLInputElement).value;
+      if (name != '') {
+        let wordOptions: WordOptions = {
+          lists: lists,
+          matchMethod: (cells[3].querySelector('select') as HTMLSelectElement).selectedIndex,
+          repeat: (cells[4].querySelector('input') as HTMLInputElement).checked,
+          separators: (cells[5].querySelector('input') as HTMLInputElement).checked,
+          sub: (cells[2].querySelector('input') as HTMLInputElement).value
+        };
+        let success = option.cfg.addWord(name, wordOptions);
+        if (!success) {
+          failed[name] = wordOptions;
+        }
+      }
+    });
+
+    if (await option.cfg.save('words')) {
+      OptionPage.showErrorModal('Failed to save.');
+    } else {
+      OptionPage.closeModal('bulkWordEditorModal');
+      OptionPage.showStatusModal('Words saved successfully.');
+    }
+  }
+
+  bulkEditorWordlistCheckbox(event) {
+    let checked = (event.target as HTMLInputElement).checked;
+    document.querySelectorAll(`#bulkWordEditorModal table td input.wordlistData[data-col="${event.target.dataset.col}"]`).forEach((box: HTMLInputElement) => {
+      box.checked = checked;
+    });
   }
 
   configInlineToggle() {
@@ -157,12 +250,17 @@ export default class OptionPage {
 
   confirm(evt, action) {
     let ok = document.getElementById('confirmModalOK');
+    ok.removeEventListener('click', bulkEditorSave);
     ok.removeEventListener('click', importConfig);
     ok.removeEventListener('click', removeAllWords);
     ok.removeEventListener('click', restoreDefaults);
     ok.removeEventListener('click', setPassword);
 
     switch(action) {
+      case 'bulkEditorSave':
+        OptionPage.configureConfirmModal('Are you sure you want to save these changes?');
+        ok.addEventListener('click', bulkEditorSave);
+        break;
       case 'importConfig': {
         OptionPage.configureConfirmModal('Are you sure you want to overwrite your existing settings?');
         ok.addEventListener('click', importConfig);
@@ -209,52 +307,6 @@ export default class OptionPage {
     }
   }
 
-  domainList() {
-    let mode = this.cfg.enabledDomainsOnly ? 'enabledDomains' : 'disabledDomains';
-    let domainMode = document.querySelector(`input[name=domainMode][value='${mode}']`) as HTMLInputElement;
-    let domains = document.getElementById('domainSelect') as HTMLInputElement;
-    domainMode.checked = true;
-
-    let domainListHTML = '<option selected value="">Add...</option>';
-    this.cfg[domainMode.value].forEach(domain => { domainListHTML += `<option value="${domain}">${domain}</option>`; });
-    domains.innerHTML = domainListHTML;
-    this.domainPopulate();
-  }
-
-  domainPopulate() {
-    let domains = document.getElementById('domainSelect') as HTMLInputElement;
-    let domainText = document.getElementById('domainText') as HTMLInputElement;
-    let disabledDomainRemove = document.getElementById('domainRemove') as HTMLInputElement;
-    OptionPage.hideInputError(domainText);
-    domains.value !== '' ? OptionPage.enableBtn(disabledDomainRemove) : OptionPage.disableBtn(disabledDomainRemove);
-    domainText.value = domains.value;
-  }
-
-  async domainRemove(evt) {
-    if (evt.target.classList.contains('disabled')) return false;
-    let domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
-    let domains = document.getElementById('domainSelect') as HTMLInputElement;
-    option.cfg[domainMode.value].splice(option.cfg['disabledDomains'].indexOf(domains.value), 1);
-    if (await option.saveProp(domainMode.value)) this.domainList();
-  }
-
-  async domainSave(evt) {
-    let domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
-    let domains = document.getElementById('domainSelect') as HTMLInputElement;
-    let domainText = document.getElementById('domainText') as HTMLInputElement;
-    let invalidMessage = 'Valid domain example: google.com or www.google.com';
-    let success;
-    if (domains.value == '') { // New record
-      success = option.updateItemList(evt, domainText, domainMode.value, invalidMessage);
-    } else { // Updating existing record
-      success = option.updateItemList(evt, domainText, domainMode.value, invalidMessage, domains.value);
-    }
-
-    if (success) {
-      if (await option.saveProp(domainMode.value)) this.domainList();
-    }
-  }
-
   async exportBookmarkletFile() {
     let code = await Bookmarklet.injectConfig(option.cfg);
     exportToFile(code, 'apfBookmarklet.js');
@@ -265,11 +317,11 @@ export default class OptionPage {
 
     if (input.checked) { // inline editor
       let configText = document.getElementById('configText') as HTMLTextAreaElement;
-      configText.value = JSON.stringify(this.cfg, null, 2);
+      configText.value = JSON.stringify(option.cfg.ordered(), null, 2);
     } else {
       let date = new Date;
       let today = `${date.getUTCFullYear()}-${('0'+(date.getUTCMonth()+1)).slice(-2)}-${('0'+(date.getUTCDate()+1)).slice(-2)}`;
-      exportToFile(JSON.stringify(this.cfg, null, 2), `apf-backup-${today}.json`);
+      exportToFile(JSON.stringify(option.cfg.ordered(), null, 2), `apf-backup-${today}.json`);
     }
   }
 
@@ -318,10 +370,10 @@ export default class OptionPage {
 
   async init() {
     let self = this;
-    await OptionPage.load(self);
+    self.cfg = await WebConfig.build();
     if (!self.auth) self.auth = new OptionAuth(self.cfg.password);
     // @ts-ignore: Type WebConfig is not assignable to type Config
-    filter.cfg = option.cfg;
+    filter.cfg = self.cfg;
 
     // console.log('Password:', cfg.password, 'Authenticated:', authenticated); // DEBUG Password
     if (self.cfg.password && !self.auth.authenticated) {
@@ -360,13 +412,90 @@ export default class OptionPage {
     this.auth.setPasswordButton(option);
   }
 
+  populateDomain() {
+    let domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
+    let domainText = document.getElementById('domainText') as HTMLInputElement;
+    let domainAdvancedCheck = document.getElementById('domainAdvancedCheck') as HTMLInputElement;
+    let domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
+    let domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
+    let domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
+    let domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
+    let domainRemoveBtn = document.getElementById('domainRemove') as HTMLButtonElement;
+
+    let key = domainsSelect.value;
+    domainText.value = key;
+
+    let domainCfg;
+    if (!key) { // New record
+      OptionPage.disableBtn(domainRemoveBtn);
+      domainCfg = Object.assign({}, Domain._domainCfgDefaults);
+    } else { // Existing record
+      OptionPage.enableBtn(domainRemoveBtn);
+      domainCfg = this.cfg.domains[domainsSelect.value];
+    }
+
+    domainAdvancedCheck.checked = domainCfg.adv;
+    domainDisabledCheck.checked = domainCfg.disabled;
+    domainEnabledCheck.checked = domainCfg.enabled;
+    let wordlist = domainCfg.wordlist >= 0 ? domainCfg.wordlist + 1 : 0;
+    let audioList = domainCfg.audioList >= 0 ? domainCfg.audioList + 1 : 0;
+    domainWordlistSelect.selectedIndex = wordlist;
+    domainAudioWordlistSelect.selectedIndex = audioList;
+  }
+
+  populateDomainPage() {
+    let domainsSelect = document.getElementById('domainSelect') as HTMLSelectElement;
+    let domainText = document.getElementById('domainText') as HTMLInputElement;
+    let mode = this.cfg.enabledDomainsOnly ? 'whitelist' : 'blacklist';
+    let domainMode = document.querySelector(`input[name=domainMode][value='${mode}']`) as HTMLInputElement;
+    let wordlistContainer = document.getElementById('domainWordlistContainer') as HTMLInputElement;
+    let audioWordlistContainer = document.getElementById('domainAudioWordlistContainer') as HTMLInputElement;
+    domainMode.checked = true;
+    let domainDisabledLabel = document.getElementById('domainDisabledLabel') as HTMLLabelElement;
+    let domainEnabledLabel = document.getElementById('domainEnabledLabel') as HTMLLabelElement;
+    OptionPage.hideInputError(domainText);
+
+    let domains = Domain.sortedKeys(this.cfg.domains);
+    let domainHTML = '<option selected value="">Add, or update existing...</option>';
+    domains.forEach(domain => { domainHTML += `<option value="${domain}">${domain}</option>`; });
+    domainsSelect.innerHTML = domainHTML;
+
+    if (mode === 'whitelist') {
+      OptionPage.hide(domainDisabledLabel);
+      OptionPage.show(domainEnabledLabel);
+    } else {
+      OptionPage.hide(domainEnabledLabel);
+      OptionPage.show(domainDisabledLabel);
+    }
+
+    if (this.cfg.wordlistsEnabled) {
+      OptionPage.show(wordlistContainer);
+      let domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
+      let domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
+
+      let wordlists = ['Default'].concat(WebConfig._allWordlists, this.cfg.wordlists);
+      dynamicList(wordlists, domainWordlistSelect.id);
+      if (this.cfg.muteAudio) {
+        OptionPage.show(audioWordlistContainer);
+        dynamicList(wordlists, domainAudioWordlistSelect.id);
+      } else {
+        OptionPage.hide(audioWordlistContainer);
+      }
+    } else {
+      OptionPage.hide(wordlistContainer);
+      OptionPage.hide(audioWordlistContainer);
+    }
+
+    this.populateDomain();
+  }
+
   async populateOptions() {
     filter.init();
     this.populateSettings();
     this.populateWordsList();
     this.populateWhitelist();
-    this.advancedDomainList();
-    this.domainList();
+    this.populateWordlists();
+    this.populateDomainPage();
     this.populateAudio();
     this.populateConfig();
     this.populateTest();
@@ -380,11 +509,8 @@ export default class OptionPage {
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
     let showSummary = document.getElementById('showSummary') as HTMLInputElement;
     let showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
-    let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
     let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     selectedFilter.checked = true;
-    dynamicList(WebConfig._matchMethodNames.slice(0, -1), 'globalMatchMethodSelect');
-    globalMatchMethodSelect.selectedIndex = this.cfg.globalMatchMethod;
     showCounter.checked = this.cfg.showCounter;
     showSummary.checked = this.cfg.showSummary;
     showUpdateNotification.checked = this.cfg.showUpdateNotification;
@@ -415,7 +541,7 @@ export default class OptionPage {
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     defaultWordSubstitution.value = this.cfg.defaultSubstitution;
     let defaultWordMatchMethodSelectHTML = '';
-    for(let i = 0; i < WebConfig._matchMethodNames.slice(0,-2).length; i++) {
+    for(let i = 0; i < WebConfig._matchMethodNames.slice(0,-1).length; i++) {
       defaultWordMatchMethodSelectHTML += '<option value="'+WebConfig._matchMethodNames[i]+'">'+WebConfig._matchMethodNames[i]+'</option>';
     }
     defaultWordMatchMethodSelect.innerHTML = defaultWordMatchMethodSelectHTML;
@@ -429,7 +555,7 @@ export default class OptionPage {
     if (testText.value === '') {
       filteredTestText.innerText = 'Enter some text above to test the filter...';
     } else {
-      filteredTestText.innerText = filter.replaceText(testText.value);
+      filteredTestText.innerText = filter.replaceText(testText.value, filter.cfg.wordlistId, false);
     }
   }
 
@@ -476,6 +602,8 @@ export default class OptionPage {
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
     let wordRemove = document.getElementById('wordRemove') as HTMLInputElement;
     let word = wordList.value;
+    let wordWordlistDiv = document.getElementById('wordWordlistDiv') as HTMLSelectElement;
+    let wordlistSelections = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
 
     if (word == '') { // New word
       wordText.value = '';
@@ -485,6 +613,15 @@ export default class OptionPage {
       wordMatchRepeated.checked = option.cfg.defaultWordRepeat;
       wordMatchSeparators.checked = option.cfg.defaultWordSeparators;
       substitutionText.value = '';
+      wordlistSelections.forEach(function(wordlist, index) {
+        wordlist.checked = (
+          index == (option.cfg.wordlistId - 1)
+          || (
+            option.cfg.muteAudio
+            && index == (option.cfg.audioWordlistId - 1)
+          )
+        );
+      });
     } else { // Existing word
       OptionPage.enableBtn(wordRemove);
       let wordCfg = option.cfg.words[word];
@@ -494,6 +631,51 @@ export default class OptionPage {
       wordMatchRepeated.checked = wordCfg.repeat;
       wordMatchSeparators.checked = wordCfg.separators === undefined ? option.cfg.defaultWordSeparators : wordCfg.separators;
       substitutionText.value = wordCfg.sub;
+      wordlistSelections.forEach(function(wordlist, index) {
+        wordlist.checked = wordCfg.lists.includes(index + 1);
+      });
+    }
+
+    if (option.cfg.wordlistsEnabled) {
+      OptionPage.show(wordWordlistDiv);
+    } else {
+      OptionPage.hide(wordWordlistDiv);
+    }
+  }
+
+  populateWordlist() {
+    let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    let wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
+    wordlistText.value = wordlistSelect.value;
+  }
+
+  populateWordlists(selectedIndex: number = 0) {
+    let wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
+    let wordlistContainer = document.getElementById('wordlistContainer') as HTMLElement;
+    wordlistsEnabledInput.checked = this.cfg.wordlistsEnabled;
+
+    if (this.cfg.wordlistsEnabled) {
+      let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+      let textWordlistSelect = document.getElementById('textWordlistSelect') as HTMLSelectElement;
+      let audioWordlistDiv = document.getElementById('audioWordlistDiv') as HTMLElement;
+      let audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
+      dynamicList(this.cfg.wordlists, wordlistSelect.id);
+      dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), textWordlistSelect.id);
+      wordlistSelect.selectedIndex = selectedIndex;
+      textWordlistSelect.selectedIndex = this.cfg.wordlistId;
+
+      if (this.cfg.muteAudio) {
+        dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), audioWordlistSelect.id);
+        audioWordlistSelect.selectedIndex = this.cfg.audioWordlistId;
+        OptionPage.show(audioWordlistDiv);
+      } else {
+        OptionPage.hide(audioWordlistDiv);
+      }
+
+      OptionPage.show(wordlistContainer);
+      this.populateWordlist();
+    } else {
+      OptionPage.hide(wordlistContainer);
     }
   }
 
@@ -515,7 +697,7 @@ export default class OptionPage {
         if (filter.cfg.words[word].matchMethod == 4) { // Regexp
           filteredWord = filter.cfg.words[word].sub || filter.cfg.defaultSubstitution;
         } else {
-          filteredWord = filter.replaceText(word, false);
+          filteredWord = filter.replaceText(word, 0, false); // Using 0 (All) here to filter all words
         }
       }
 
@@ -528,6 +710,13 @@ export default class OptionPage {
       filter.init();
     }
 
+    // Populate the wordlist selections for a word
+    let wordlistSelectionHTML = '';
+    option.cfg.wordlists.forEach(function(list, index) {
+      wordlistSelectionHTML += `<label><input id="" type="checkbox" class="w3-check" name="wordlistSelection" value="${index}"/> ${list}</label><br>`;
+    });
+    let selections = document.getElementById('wordlistSelections') as HTMLInputElement;
+    selections.innerHTML = wordlistSelectionHTML;
     wordList.innerHTML = wordListHTML;
     this.populateWord();
   }
@@ -537,6 +726,21 @@ export default class OptionPage {
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     wordList.selectedIndex = 0;
     this.populateWordsList();
+  }
+
+  async removeDomain(event) {
+    let domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
+    if (domainsSelect.value) {
+      delete this.cfg.domains[domainsSelect.value];
+
+      let error = await this.cfg.save('domains');
+      if (error) {
+        OptionPage.showErrorModal();
+        return false;
+      } else {
+        this.populateDomainPage();
+      }
+    }
   }
 
   async removeWhitelist(evt) {
@@ -574,6 +778,31 @@ export default class OptionPage {
     }
   }
 
+  async renameWordlist() {
+    let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    let wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
+    let name = wordlistText.value.trim();
+    let index = wordlistSelect.selectedIndex;
+
+    if (wordlistText.checkValidity()) {
+      // Make sure there are no duplicates
+      if (this.cfg.wordlists.includes(name)) {
+        OptionPage.showInputError(wordlistText, 'Please enter a unique name.');
+        return false;
+      }
+
+      this.cfg.wordlists[index] = name;
+      if (await this.saveProp('wordlists')) {
+        this.populateWordlists(index);
+        this.populateWordsList();
+      } else {
+        OptionPage.showErrorModal('Failed to save name.');
+      }
+    } else {
+      OptionPage.showInputError(wordlistText, 'Please enter a valid name.');
+    }
+  }
+
   async restoreDefaults(evt, silent = false) {
     this.exportConfig();
     let error = await this.cfg.reset();
@@ -602,6 +831,51 @@ export default class OptionPage {
     }
   }
 
+  async saveDomain(event) {
+    let domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
+    let domainText = document.getElementById('domainText') as HTMLInputElement;
+    let domainAdvancedCheck = document.getElementById('domainAdvancedCheck') as HTMLInputElement;
+    let domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
+    let domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
+    let domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
+    let domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
+
+    let originalKey = domainsSelect.value;
+    let newKey = domainText.value.trim().toLowerCase();
+
+    if (newKey == '') { // No data
+      OptionPage.showInputError(domainText, 'Please enter a value.');
+      return false;
+    }
+
+    if (domainText.checkValidity()) {
+      OptionPage.hideInputError(domainText);
+      if (newKey != originalKey) { delete this.cfg.domains[originalKey]; } // URL changed: remove old entry
+
+      let wordlist = domainWordlistSelect.selectedIndex > 0 ? domainWordlistSelect.selectedIndex - 1 : undefined;
+      let audioList = domainAudioWordlistSelect.selectedIndex > 0 ? domainAudioWordlistSelect.selectedIndex - 1 : undefined;
+      let newDomainCfg: DomainCfg = {
+        adv: domainAdvancedCheck.checked,
+        audioList: audioList,
+        disabled: domainDisabledCheck.checked,
+        enabled: domainEnabledCheck.checked,
+        wordlist: wordlist,
+      };
+      let domain = new Domain(newKey, newDomainCfg);
+      let error = await domain.save(this.cfg);
+
+      if (error) {
+        OptionPage.showErrorModal();
+        return false;
+      } else {
+        this.populateDomainPage();
+      }
+    } else {
+      OptionPage.showInputError(domainText, 'Valid domain example: google.com or www.google.com');
+      return false;
+    }
+  }
+
   async saveOptions(evt) {
     let self = this;
     // Gather current settings
@@ -610,7 +884,6 @@ export default class OptionPage {
     let defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
     let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
     let defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
-    let globalMatchMethodSelect = document.getElementById('globalMatchMethodSelect') as HTMLSelectElement;
     let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
     let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
     let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
@@ -626,12 +899,12 @@ export default class OptionPage {
     let muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
     let muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
     let showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
+    let wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
     self.cfg.censorCharacter = censorCharacterSelect.value;
     self.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
     self.cfg.defaultWordRepeat = defaultWordRepeat.checked;
     self.cfg.defaultWordSeparators = defaultWordSeparators.checked;
-    self.cfg.globalMatchMethod = globalMatchMethodSelect.selectedIndex;
     self.cfg.preserveCase = preserveCase.checked;
     self.cfg.preserveFirst = preserveFirst.checked;
     self.cfg.preserveLast = preserveLast.checked;
@@ -641,12 +914,13 @@ export default class OptionPage {
     self.cfg.filterWordList = filterWordList.checked;
     self.cfg.substitutionMark = substitutionMark.checked;
     self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
-    self.cfg.enabledDomainsOnly = (domainMode.value == 'enabledDomains');
+    self.cfg.enabledDomainsOnly = (domainMode.value === 'whitelist');
     self.cfg.muteAudio = muteAudioInput.checked;
     self.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
     self.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
     self.cfg.muteMethod = parseInt(muteMethodInput.value);
     self.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
+    self.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
 
     // Save settings
     let error = await self.cfg.save();
@@ -734,6 +1008,7 @@ export default class OptionPage {
     let word = wordText.value.trim().toLowerCase();
     let sub = substitutionText.value.trim().toLowerCase();
     let added = true;
+    let wordlistSelectionsInput = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
 
     if (word == '') {
       OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
@@ -748,7 +1023,11 @@ export default class OptionPage {
     }
 
     if (wordText.checkValidity()) {
+      let lists = [];
+      wordlistSelectionsInput.forEach((wordlist, index) => { if (wordlist.checked) { lists.push(index + 1); } });
+
       let wordOptions: WordOptions = {
+        lists: lists,
         matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
         repeat: wordMatchRepeated.checked,
         separators: wordMatchSeparators.checked,
@@ -796,6 +1075,45 @@ export default class OptionPage {
     if (await option.saveProp('filterMethod')) this.init();
   }
 
+  async setActiveWordlist(element: HTMLSelectElement) {
+    let prop = element.id === 'textWordlistSelect' ? 'wordlistId' : 'audioWordlistId';
+    this.cfg[prop] = element.selectedIndex;
+
+    if (!await this.saveProp(prop)) {
+      OptionPage.showErrorModal('Failed to update active list.');
+      return false;
+    }
+
+    this.populateOptions();
+  }
+
+  showBulkWordEditor() {
+    let modalId = 'bulkWordEditorModal';
+    let title = document.querySelector(`#${modalId} h5.modalTitle`) as HTMLHeadingElement;
+    let tableContainer = document.querySelector(`#${modalId} div.tableContainer`) as HTMLDivElement;
+    let thead = '<thead><tr><th><span>Remove</span></th><th><span>Word</span></th><th><span>Substitution</span></th><th><span>Match Method</span></th><th><span>Repeated</span></th><th><span>Separators</span></th>';
+    this.cfg.wordlists.forEach((wordlist, i) => { thead += `<th><label><input type="checkbox" class="wordlistHeader" data-col="${i + 1}"><span> ${wordlist}</span></label></th>`; });
+    thead += '</tr></thead>';
+    title.textContent = 'Bulk Word Editor';
+    tableContainer.innerHTML = `<table id="bulkEditorTable" class="w3-table-all w3-tiny w3-hoverable">${thead}<tbody></tbody></table>`;
+
+    // Store the select list for match method (used in each row)
+    option._bulkWordMatchMethodHTML = '<select>';
+    WebConfig._matchMethodNames.forEach((name, index) => {
+      option._bulkWordMatchMethodHTML += `<option value="${index}" class="bulkMatchMethod${index}">${name}</option>`;
+    });
+    option._bulkWordMatchMethodHTML += '</select>';
+
+    // Add current words to the table
+    Object.keys(option.cfg.words).forEach((key, index) => {
+      option.bulkEditorAddRow(key, option.cfg.words[key]);
+    });
+
+    document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click', e => { option.switchPage(e); }); });
+    tableContainer.querySelectorAll('th input.wordlistHeader').forEach(el => { el.addEventListener('click', e => { option.bulkEditorWordlistCheckbox(e); }); });
+    OptionPage.openModal(modalId);
+  }
+
   showSupportedAudioSites() {
     let title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
     let contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
@@ -813,7 +1131,7 @@ export default class OptionPage {
     contentLeft.innerHTML = `<ul>${sites.join('\n')}</ul>`;
     contentRight.innerHTML = `
       <h4 class="sectionHeader">Site Config</h4>
-      <textarea class="w3-input w3-border w3-card" style="width:375px;height:400px;font-size:11px;" spellcheck="false" readonly>${JSON.stringify(WebAudio.sites, null, 2)}</textarea>
+      <textarea class="w3-input w3-border w3-card" spellcheck="false" readonly>${JSON.stringify(WebAudio.sites, null, 2)}</textarea>
     `;
     OptionPage.openModal('supportedAudioSitesModal');
   }
@@ -844,19 +1162,16 @@ export default class OptionPage {
       case 0: // Censor
         OptionPage.show(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
-        OptionPage.show(document.getElementById('globalMatchMethod'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
       case 1: // Substitution
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.show(document.getElementById('substitutionSettings'));
-        OptionPage.show(document.getElementById('globalMatchMethod'));
         OptionPage.show(document.getElementById('wordSubstitution'));
         break;
       case 2: // Remove
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
-        OptionPage.hide(document.getElementById('globalMatchMethod'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
     }
@@ -915,6 +1230,7 @@ let option = new OptionPage;
 ////
 // Events
 // Functions
+function bulkEditorSave(e) { option.bulkEditorSave(); }
 function importConfig(e) { option.importConfig(e); }
 function removeAllWords(e) { option.removeAllWords(e); }
 function restoreDefaults(e) { option.restoreDefaults(e); }
@@ -928,6 +1244,10 @@ document.getElementById('confirmModalOK').addEventListener('click', e => { Optio
 document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('statusModalOK').addEventListener('click', e => { OptionPage.closeModal('statusModal'); });
 document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', e => { OptionPage.closeModal('supportedAudioSitesModal'); });
+document.querySelector('#bulkWordEditorModal button.modalAddWord').addEventListener('click', e => { option.bulkEditorAddRow(); });
+document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEventListener('click', e => { option.bulkEditorAddWords(); });
+document.querySelector('#bulkWordEditorModal button.modalCancel').addEventListener('click', e => { OptionPage.closeModal('bulkWordEditorModal'); });
+document.querySelector('#bulkWordEditorModal button.modalSave').addEventListener('click', e => { option.confirm(e, 'bulkEditorSave'); });
 // Settings
 document.querySelectorAll('#filterMethod input').forEach(el => { el.addEventListener('click', e => { option.selectFilterMethod(e); }); });
 document.getElementById('censorCharacterSelect').addEventListener('change', e => { option.saveOptions(e); });
@@ -935,7 +1255,6 @@ document.getElementById('censorFixedLengthSelect').addEventListener('change', e 
 document.getElementById('defaultWordMatchMethodSelect').addEventListener('change', e => { option.saveOptions(e); });
 document.getElementById('defaultWordRepeat').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('defaultWordSeparators').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('globalMatchMethodSelect').addEventListener('change', e => { option.saveOptions(e); });
 document.getElementById('preserveCase').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('preserveFirst').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('preserveLast').addEventListener('click', e => { option.saveOptions(e); });
@@ -951,20 +1270,24 @@ document.getElementById('wordText').addEventListener('input', e => { OptionPage.
 document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
 document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
 document.getElementById('wordRemoveAll').addEventListener('click', e => { option.confirm(e, 'removeAllWords'); });
+document.getElementById('bulkWordEditorButton').addEventListener('click', e => { option.showBulkWordEditor(); });
+// Lists
 document.getElementById('whitelist').addEventListener('change', e => { option.populateWhitelistWord(); });
 document.getElementById('whitelistText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
 document.getElementById('whitelistSave').addEventListener('click', e => { option.saveWhitelist(e); });
 document.getElementById('whitelistRemove').addEventListener('click', e => { option.removeWhitelist(e); });
+document.getElementById('wordlistsEnabled').addEventListener('click', e => { option.saveOptions(e); });
+document.getElementById('wordlistRename').addEventListener('click', e => { option.renameWordlist(); });
+document.getElementById('wordlistSelect').addEventListener('change', e => { option.populateWordlist(); });
+document.getElementById('wordlistText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
+document.getElementById('textWordlistSelect').addEventListener('change', e => { option.setActiveWordlist(e.target as HTMLSelectElement); });
+document.getElementById('audioWordlistSelect').addEventListener('change', e => { option.setActiveWordlist(e.target as HTMLSelectElement); });
 // Domains
-document.getElementById('advDomainSelect').addEventListener('change', e => { option.advancedDomainPopulate(); });
-document.getElementById('advDomainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
-document.getElementById('advDomainSave').addEventListener('click', e => { option.advancedDomainSave(e); });
-document.getElementById('advDomainRemove').addEventListener('click', e => { option.advancedDomainRemove(e); });
 document.querySelectorAll('#domainMode input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
-document.getElementById('domainSelect').addEventListener('change', e => { option.domainPopulate(); });
+document.getElementById('domainSelect').addEventListener('change', e => { option.populateDomain(); });
 document.getElementById('domainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
-document.getElementById('domainSave').addEventListener('click', e => { option.domainSave(e); });
-document.getElementById('domainRemove').addEventListener('click', e => { option.domainRemove(e); });
+document.getElementById('domainSave').addEventListener('click', e => { option.saveDomain(e); });
+document.getElementById('domainRemove').addEventListener('click', e => { option.removeDomain(e); });
 // Audio
 document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
 document.getElementById('supportedAudioSites').addEventListener('click', e => { option.showSupportedAudioSites(); });

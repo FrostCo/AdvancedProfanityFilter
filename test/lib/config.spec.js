@@ -11,7 +11,7 @@ describe('Config', function() {
     });
 
     it('should create a new Config instance with the provided data', function() {
-      let config = new Config({censorCharacter: '-'});
+      let config = new Config({ censorCharacter: '-' });
       expect(config instanceof Config).to.equal(true);
       expect(config.censorCharacter).to.equal('-');
       expect(config.censorFixedLength).to.equal(0);
@@ -31,7 +31,7 @@ describe('Config', function() {
     });
 
     it('should add a new word to the config with provided options', function() {
-      let wordOptions = {matchMethod: 1, repeat: true, sub: 'Older-word'};
+      let wordOptions = { matchMethod: 1, repeat: true, sub: 'Older-word' };
       expect(config.addWord('newer-word', wordOptions)).to.equal(true);
       expect(Object.keys(config.words)).to.include('newer-word');
       expect(config.words['newer-word'].matchMethod).to.equal(wordOptions.matchMethod);
@@ -58,14 +58,14 @@ describe('Config', function() {
     config.words = Object.assign({}, Config._defaultWords);
 
     it('should return the repeat option for a word', function() {
-      config.words['newWord'] = {matchMethod: config.defaultWordMatchMethod, repeat: true, words: []};
+      config.words['newWord'] = { matchMethod: config.defaultWordMatchMethod, repeat: true, words: [] };
       expect(config.repeatForWord('newWord')).to.eql(true);
-      config.words['anotherNewWord'] = {matchMethod: config.defaultWordMatchMethod, repeat: false, words: []};
+      config.words['anotherNewWord'] = { matchMethod: config.defaultWordMatchMethod, repeat: false, words: [] };
       expect(config.repeatForWord('anotherNewWord')).to.eql(false);
     });
 
     it('should return the default word repeat when not present on word', function() {
-      config.words['evenAnotherWord'] = {matchMethod: config.defaultWordMatchMethod, words: []};
+      config.words['evenAnotherWord'] = { matchMethod: config.defaultWordMatchMethod, words: [] };
       expect(config.repeatForWord('evenAnotherWord')).to.eql(config.defaultWordRepeat);
     });
   });
@@ -75,7 +75,7 @@ describe('Config', function() {
     config.words = Object.assign({}, Config._defaultWords);
 
     it('should sanitize words', function() {
-      config.words['newWord '] = {matchMethod: config.defaultWordMatchMethod, repeat: config.defaultWordRepeat, words: []};
+      config.words['newWord '] = { matchMethod: config.defaultWordMatchMethod, repeat: config.defaultWordRepeat, words: [] };
       expect(Object.keys(config.words)).to.include('newWord ');
       expect(Object.keys(config.words)).to.not.include('newword');
       config.sanitizeWords();

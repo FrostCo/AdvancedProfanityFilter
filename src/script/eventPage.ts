@@ -1,6 +1,6 @@
-import WebConfig from './webConfig';
-import Domain from './domain';
 import DataMigration from './dataMigration';
+import Domain from './domain';
+import WebConfig from './webConfig';
 
 ////
 // Actions and messaging
@@ -20,7 +20,7 @@ chrome.runtime.onInstalled.addListener(function(details){
     updateMigrations(details.previousVersion);
 
     // Display update notification
-    chrome.storage.sync.get({showUpdateNotification: true}, function(data) {
+    chrome.storage.sync.get({ showUpdateNotification: true }, function(data) {
       if (data.showUpdateNotification) {
         chrome.notifications.create('extensionUpdate', {
           'type': 'basic',
@@ -65,7 +65,7 @@ chrome.runtime.onMessage.addListener(
 
       // Unmute on page reload
       if (request.clearMute === true && sender.tab != undefined) {
-        let {muted, reason, extensionId} = sender.tab.mutedInfo;
+        let { muted, reason, extensionId } = sender.tab.mutedInfo;
         if (muted && reason == 'extension' && extensionId == chrome.runtime.id) {
           chrome.tabs.update(sender.tab.id, { muted: false });
         }
@@ -79,7 +79,7 @@ chrome.runtime.onMessage.addListener(
 //
 // Add selected word/phrase and reload page (unless already present)
 async function processSelection(action: string, selection: string) {
-  let cfg = await WebConfig.build(); // TODO: Only need words here
+  let cfg = await WebConfig.build('words');
   let result = cfg[action](selection);
 
   if (result) {
@@ -88,29 +88,19 @@ async function processSelection(action: string, selection: string) {
   }
 }
 
-// Disable domain and reload page (unless already disabled)
-async function disableDomain(cfg: WebConfig, domain: string, key: string) {
-  if (!cfg[key].includes(domain)) {
-    cfg[key].push(domain);
-    let result = await cfg.save(key);
-    if (!result) { chrome.tabs.reload(); }
+async function toggleDomain(hostname: string, action: string) {
+  let cfg = await WebConfig.build(['domains', 'enabledDomainsOnly']);
+  let domain = Domain.byHostname(hostname, cfg.domains);
+
+  switch(action) {
+    case 'disable':
+      cfg.enabledDomainsOnly ? domain.enabled = !domain.enabled : domain.disabled = !domain.disabled; break;
+    case 'advanced':
+      domain.advanced = !domain.advanced; break;
   }
-}
 
-// Remove all entries that disable the filter for domain
-async function enableDomain(cfg: WebConfig, domain: string, key: string) {
-  let newDomainList = Domain.removeFromList(domain, cfg[key]);
-
-  if (newDomainList.length < cfg[key].length) {
-    cfg[key] = newDomainList;
-    let result = await cfg.save(key);
-    if (!result) { chrome.tabs.reload(); }
-  }
-}
-
-async function toggleDomain(domain: string, key: string) {
-  let cfg = await WebConfig.build([key]);
-  Domain.domainMatch(domain, cfg[key]) ? enableDomain(cfg, domain, key) : disableDomain(cfg, domain, key);
+  let error = await domain.save(cfg);
+  if (!error) { chrome.tabs.reload(); }
 }
 
 async function updateMigrations(previousVersion) {
@@ -170,11 +160,11 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
       processSelection('removeWord', info.selectionText); break;
     case 'toggleFilterForDomain': {
       let url = new URL(tab.url);
-      toggleDomain(url.hostname, 'disabledDomains'); break;
+      toggleDomain(url.hostname, 'disable'); break;
     }
     case 'toggleAdvancedModeForDomain': {
       let url = new URL(tab.url);
-      toggleDomain(url.hostname, 'advancedDomains'); break;
+      toggleDomain(url.hostname, 'advanced'); break;
     }
     case 'options':
       chrome.runtime.openOptionsPage(); break;
@@ -185,7 +175,7 @@ chrome.notifications.onClicked.addListener(function(notificationId) {
   switch(notificationId) {
     case 'extensionUpdate':
       chrome.notifications.clear('extensionUpdate');
-      chrome.tabs.create({url: 'https://github.com/richardfrost/AdvancedProfanityFilter/releases'});
+      chrome.tabs.create({ url: 'https://github.com/richardfrost/AdvancedProfanityFilter/releases' });
       break;
   }
 });
