@@ -3,6 +3,7 @@
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/d/piajkpdbaniagacofgklljacgjhefjeh.svg?style=flat-square)](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/stars/piajkpdbaniagacofgklljacgjhefjeh.svg?style=flat-square)](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XFL36QJY752R6&source=url)
+[![Patreon](src/img/patreon-small.png)](https://www.patreon.com/richardfrost)
 
 A browser extension to filter profanity from webpages.
 
