@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 import DataMigration from './built/dataMigration';
-import WebConfig from './built/WebConfig';
+import WebConfig from './built/webConfig';
 
 describe('DataMigration', function() {
   describe('addWordlistsToWords()', function() {
