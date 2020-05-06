@@ -302,25 +302,23 @@
     <input id="domainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
     <span class="notes">Example: "google.com" or "mail.google.com"</span>
 
-    <br>
-    <br>
-    <label id="domainDisabledLabel" class="w3-hide">
-      <input id="domainDisabledCheck" type="checkbox" class="w3-check">
-      Disabled
-      <span class="notes">Don't filter pages on this domain</span>
-    </label>
-
-    <label id="domainEnabledLabel" class="w3-hide">
-      <input id="domainEnabledCheck" type="checkbox" class="w3-check">
-      Enabled
-      <span class="notes">Filter pages on this domain</span>
-    </label>
-
-    <label>
-      <input id="domainAdvancedCheck" type="checkbox" class="w3-check">
-      Advanced
-      <span class="notes">Match across HTML Elements (Only use when necessary)</span>
-    </label>
+    <div style="padding-top: 8px;">
+      <label id="domainDisabledLabel" class="w3-hide">
+        <input id="domainDisabledCheck" type="checkbox" class="w3-check">
+        Disabled
+        <span class="notes">Don't filter pages on this domain</span>
+      </label>
+      <label id="domainEnabledLabel" class="w3-hide">
+        <input id="domainEnabledCheck" type="checkbox" class="w3-check">
+        Enabled
+        <span class="notes">Filter pages on this domain</span>
+      </label>
+      <label>
+        <input id="domainAdvancedCheck" type="checkbox" class="w3-check">
+        Advanced
+        <span class="notes">Match across HTML Elements (Only use when necessary)</span>
+      </label>
+    </div>
 
     <div id="domainWordlistContainer" class="w3-hide">
       <h4 class="sectionHeader">Text Wordlist</h4>
