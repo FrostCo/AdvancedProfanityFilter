@@ -22,6 +22,13 @@ interface AudioRules {
   videoSelector?: string;           // [Cue,Watcher] Video selector: (Default: 'video')
 }
 
+interface ConfirmModalSettings {
+  backup?: boolean;
+  content?: string;
+  title?: string;
+  titleClass?: string;
+}
+
 interface DomainCfg {
   adv?: boolean;
   audioList?: number;

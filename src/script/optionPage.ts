@@ -18,13 +18,31 @@ export default class OptionPage {
     OptionPage.hide(document.getElementById(id));
   }
 
-  static configureConfirmModal(content = 'Are you sure?', title = 'Please Confirm', titleColor = 'w3-flat-peter-river') {
+  static configureConfirmModal(settings: ConfirmModalSettings = {}) {
     let modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
     let modalContent = document.getElementById('confirmModalContent') as HTMLElement;
     let modalHeader = document.querySelector('#confirmModal header') as HTMLElement;
-    modalTitle.innerText = title;
-    modalContent.innerHTML = content;
-    modalHeader.className = `w3-container ${titleColor}`;
+    let backupButtonContainer = document.querySelector('#confirmModal span.confirmBackupButton') as HTMLElement;
+    let backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
+
+    let defaults = {
+      backup: false,
+      content: 'Are you sure?',
+      title: 'Please Confirm',
+      titleClass: 'w3-flat-peter-river',
+    };
+    settings = Object.assign(defaults, settings);
+
+    modalTitle.innerText = settings.title;
+    modalContent.innerHTML = settings.content;
+    modalHeader.className = `w3-container ${settings.titleClass}`;
+    if (settings.backup) {
+      OptionPage.show(backupButtonContainer);
+      OptionPage.enableBtn(backupButton);
+    } else {
+      OptionPage.hide(backupButtonContainer);
+      OptionPage.disableBtn(backupButton);
+    }
   }
 
   static configureStatusModal(content: string, title: string, titleColor: string) {
@@ -99,6 +117,14 @@ export default class OptionPage {
   static showWarningModal(content = 'Invalid input.', title = 'Warning', titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
     OptionPage.openModal('statusModal');
+  }
+
+  backupConfig() {
+    const padded = (num: number) => { return ('0' + num).slice(-2); };
+    let date = new Date;
+    let today = `${date.getFullYear()}-${padded(date.getMonth()+1)}-${padded(date.getDate())}`;
+    let time = `${padded(date.getHours())}${padded(date.getMinutes())}${padded(date.getSeconds())}`;
+    exportToFile(JSON.stringify(option.cfg.ordered(), null, 2), `apf-backup-${today}_${time}.json`);
   }
 
   bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
@@ -258,20 +284,25 @@ export default class OptionPage {
 
     switch(action) {
       case 'bulkEditorSave':
-        OptionPage.configureConfirmModal('Are you sure you want to save these changes?');
+        OptionPage.configureConfirmModal({
+          content: 'Are you sure you want to save these changes?<br><br><i>Remember to take a backup first!</i>',
+          backup: true,
+        });
         ok.addEventListener('click', bulkEditorSave);
         break;
       case 'importConfig': {
-        OptionPage.configureConfirmModal('Are you sure you want to overwrite your existing settings?');
+        OptionPage.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?' });
         ok.addEventListener('click', importConfig);
         break;
       }
       case 'removeAllWords':
-        OptionPage.configureConfirmModal('Are you sure you want to remove all words?<br><br><i>(Note: The default words will return if no words are added.)</i>');
+        OptionPage.configureConfirmModal({
+          content: 'Are you sure you want to remove all words?<br><br><i>(Note: The default words will return if no words are added.)</i>',
+        });
         ok.addEventListener('click', removeAllWords);
         break;
       case 'restoreDefaults':
-        OptionPage.configureConfirmModal('Are you sure you want to restore defaults?');
+        OptionPage.configureConfirmModal({ content: 'Are you sure you want to restore defaults?' });
         ok.addEventListener('click', restoreDefaults);
         break;
       case 'setPassword': {
@@ -280,13 +311,21 @@ export default class OptionPage {
         if (passwordBtn.classList.contains('disabled')) return false;
 
         let message = passwordText.value == '' ? 'Are you sure you want to remove the password?' : `Are you sure you want to set the password to '${passwordText.value}'?`;
-        OptionPage.configureConfirmModal(message);
+        OptionPage.configureConfirmModal({ content: message });
         ok.addEventListener('click', setPassword);
         break;
       }
     }
 
     OptionPage.openModal('confirmModal');
+  }
+
+  confirmModalBackup() {
+    let backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
+    if (!backupButton.classList.contains('disabled')) {
+      option.backupConfig();
+      OptionPage.disableBtn(backupButton);
+    }
   }
 
   createBookmarklet() {
@@ -319,9 +358,7 @@ export default class OptionPage {
       let configText = document.getElementById('configText') as HTMLTextAreaElement;
       configText.value = JSON.stringify(option.cfg.ordered(), null, 2);
     } else {
-      let date = new Date;
-      let today = `${date.getUTCFullYear()}-${('0'+(date.getUTCMonth()+1)).slice(-2)}-${('0'+(date.getUTCDate()+1)).slice(-2)}`;
-      exportToFile(JSON.stringify(option.cfg.ordered(), null, 2), `apf-backup-${today}.json`);
+      option.backupConfig();
     }
   }
 
@@ -1239,6 +1276,7 @@ window.addEventListener('load', e => { option.init(); });
 document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click', e => { option.switchPage(e); }); });
 // Modals
 document.getElementById('submitPassword').addEventListener('click', e => { option.auth.authenticate(e); });
+document.getElementById('confirmModalBackup').addEventListener('click', e => { option.confirmModalBackup(); });
 document.getElementById('confirmModalOK').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('statusModalOK').addEventListener('click', e => { OptionPage.closeModal('statusModal'); });
