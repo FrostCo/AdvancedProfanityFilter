@@ -99,8 +99,9 @@ export default class WebConfig extends Config {
           }
         }
 
-        WebConfig._splittingKeys.forEach(function(largKey) {
-          items._splitContainerKeys[largKey] = WebConfig.combineData(items, largKey);
+        WebConfig._splittingKeys.forEach(function(splittingKey) {
+          let keys = WebConfig.combineData(items, splittingKey);
+          if (keys) { items._splitContainerKeys[splittingKey] = keys; }
         });
 
         // Remove keys we didn't request (Required when requests for specific keys include ones that supports splitting)
@@ -175,13 +176,15 @@ export default class WebConfig extends Config {
 
     // If we have more containers in storage than are needed, remove them
     if (Object.keys(self._splitContainerKeys).length !== 0 && props.some(prop => WebConfig._splittingKeys.includes(prop))) {
-      WebConfig._splittingKeys.forEach(function(key) {
-        if (props.includes(key)) {
-          let newContainerKeys = WebConfig.getDataContainerKeys(data, key);
-          let containersToRemove = self._splitContainerKeys[key].filter(oldKey => !newContainerKeys.includes(oldKey));
-          if (containersToRemove.length !== 0) {
-            self.remove(containersToRemove);
-            self._splitContainerKeys[key] = newContainerKeys;
+      WebConfig._splittingKeys.forEach(function(splittingKey) {
+        if (props.includes(splittingKey)) {
+          let newContainerKeys = WebConfig.getDataContainerKeys(data, splittingKey);
+          if (self._splitContainerKeys[splittingKey]) {
+            let containersToRemove = self._splitContainerKeys[splittingKey].filter(oldKey => !newContainerKeys.includes(oldKey));
+            if (containersToRemove.length !== 0) {
+              self.remove(containersToRemove);
+              self._splitContainerKeys[splittingKey] = newContainerKeys;
+            }
           }
         }
       });
