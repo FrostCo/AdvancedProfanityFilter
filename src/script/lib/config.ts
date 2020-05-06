@@ -20,7 +20,7 @@ export default class Config {
   words: { [key: string]: WordOptions };
   wordWhitelist: string[];
 
-  static readonly _allWordlists = ['All Words'];
+  static readonly _allWordlists = ['All words'];
 
   static readonly _defaults = {
     censorCharacter: '*',
