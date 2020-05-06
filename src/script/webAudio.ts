@@ -47,7 +47,7 @@ export default class WebAudio {
     this.rules = this.sites[filter.hostname];
     if (this.rules) {
       this.supportedPage = true;
-      if (filter.hostname == 'www.youtube.com') { this.youTube = true; }
+      if (['tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) { this.youTube = true; }
       if (!Array.isArray(this.rules)) {
         this.rules = [this.rules];
       }
@@ -110,7 +110,8 @@ export default class WebAudio {
     'www.universalkids.com': [{ mode: 'element', subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' }],
     'www.usanetwork.com': [{ mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
     'www.vudu.com': [{ mode: 'element', subtitleSelector: 'span.subtitles', tagName: 'DIV' }],
-    'www.youtube.com': [{ mode: 'element', className: 'caption-window', subtitleSelector: 'span.ytp-caption-segment', tagName: 'DIV' }]
+    'tv.youtube.com': [{ mode: 'element', className: 'caption-window', subtitleSelector: 'span.ytp-caption-segment', tagName: 'DIV' }],
+    'www.youtube.com': [{ mode: 'element', className: 'caption-window', subtitleSelector: 'span.ytp-caption-segment', tagName: 'DIV' }],
   };
 
   buildSupportedNodeFunction(): Function {
