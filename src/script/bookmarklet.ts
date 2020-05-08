@@ -48,9 +48,9 @@ export default class Bookmarklet {
     let code = await response.text();
     let cfgCode = code.match(configRegExp).toString();
     try {
-      let variable = cfgCode.match(/^var ([a-z])=/m)[1];
+      let variable = cfgCode.match(/^let ([a-z])=/m)[1];
       if (lowerCaseLettersRegExp.test(variable)) {
-        return code.replace(configRegExp, `${prefix}\nvar ${variable}=${JSON.stringify(config)}\n${postfix}`);
+        return code.replace(configRegExp, `${prefix}\nlet ${variable}=${JSON.stringify(config)}\n${postfix}`);
       } else {
         throw('Unable to set user config - using defaults');
       }

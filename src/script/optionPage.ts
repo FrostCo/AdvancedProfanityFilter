@@ -347,7 +347,7 @@ export default class OptionPage {
   }
 
   async exportBookmarkletFile() {
-    let code = await Bookmarklet.injectConfig(option.cfg);
+    let code = await Bookmarklet.injectConfig(option.cfg.ordered());
     exportToFile(code, 'apfBookmarklet.js');
   }
 
