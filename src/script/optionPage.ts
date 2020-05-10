@@ -214,6 +214,12 @@ export default class OptionPage {
     return words;
   }
 
+  bulkEditorRemoveAll() {
+    let tbody = document.querySelector('#bulkWordEditorModal table tbody') as HTMLTableSectionElement;
+    tbody.innerHTML = '';
+    this.bulkEditorAddRow();
+  }
+
   bulkEditorRemoveRow(event) {
     let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
     let row = event.target.parentElement.parentElement;
@@ -1127,7 +1133,7 @@ export default class OptionPage {
     let modalId = 'bulkWordEditorModal';
     let title = document.querySelector(`#${modalId} h5.modalTitle`) as HTMLHeadingElement;
     let tableContainer = document.querySelector(`#${modalId} div.tableContainer`) as HTMLDivElement;
-    let thead = '<thead><tr><th><span>Remove</span></th><th><span>Word</span></th><th><span>Substitution</span></th><th><span>Match Method</span></th><th><span>Repeated</span></th><th><span>Separators</span></th>';
+    let thead = '<thead><tr><th><span><button id="bulkEditorRemoveAll">X</button> Remove</span></th><th><span>Word</span></th><th><span>Substitution</span></th><th><span>Match Method</span></th><th><span>Repeated</span></th><th><span>Separators</span></th>';
     this.cfg.wordlists.forEach((wordlist, i) => { thead += `<th><label><input type="checkbox" class="wordlistHeader" data-col="${i + 1}"><span> ${wordlist}</span></label></th>`; });
     thead += '</tr></thead>';
     title.textContent = 'Bulk Word Editor';
@@ -1141,11 +1147,16 @@ export default class OptionPage {
     option._bulkWordMatchMethodHTML += '</select>';
 
     // Add current words to the table
-    Object.keys(option.cfg.words).forEach((key, index) => {
-      option.bulkEditorAddRow(key, option.cfg.words[key]);
-    });
+    let wordKeys = Object.keys(option.cfg.words);
+    if (wordKeys.length === 0) {
+      option.bulkEditorAddRow();
+    } else {
+      wordKeys.forEach(key => {
+        option.bulkEditorAddRow(key, option.cfg.words[key]);
+      });
+    }
 
-    document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click', e => { option.switchPage(e); }); });
+    tableContainer.querySelector('button#bulkEditorRemoveAll').addEventListener('click', e => { option.bulkEditorRemoveAll(); });
     tableContainer.querySelectorAll('th input.wordlistHeader').forEach(el => { el.addEventListener('click', e => { option.bulkEditorWordlistCheckbox(e); }); });
     OptionPage.openModal(modalId);
   }
