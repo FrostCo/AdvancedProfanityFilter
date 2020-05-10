@@ -285,13 +285,13 @@ export default class OptionPage {
     switch(action) {
       case 'bulkEditorSave':
         OptionPage.configureConfirmModal({
-          content: 'Are you sure you want to save these changes?<br><br><i>Remember to take a backup first!</i>',
+          content: 'Are you sure you want to save these changes?<br><br><i>Make sure you have a backup first!</i>',
           backup: true,
         });
         ok.addEventListener('click', bulkEditorSave);
         break;
       case 'importConfig': {
-        OptionPage.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?' });
+        OptionPage.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
         ok.addEventListener('click', importConfig);
         break;
       }
@@ -302,7 +302,7 @@ export default class OptionPage {
         ok.addEventListener('click', removeAllWords);
         break;
       case 'restoreDefaults':
-        OptionPage.configureConfirmModal({ content: 'Are you sure you want to restore defaults?' });
+        OptionPage.configureConfirmModal({ content: 'Are you sure you want to restore defaults?', backup: true });
         ok.addEventListener('click', restoreDefaults);
         break;
       case 'setPassword': {
@@ -841,7 +841,6 @@ export default class OptionPage {
   }
 
   async restoreDefaults(evt, silent = false) {
-    this.exportConfig();
     let error = await this.cfg.reset();
     if (error) {
       OptionPage.showErrorModal('Error restoring defaults!');
@@ -1112,12 +1111,12 @@ export default class OptionPage {
     if (await option.saveProp('filterMethod')) this.init();
   }
 
-  async setActiveWordlist(element: HTMLSelectElement) {
+  async setDefaultWordlist(element: HTMLSelectElement) {
     let prop = element.id === 'textWordlistSelect' ? 'wordlistId' : 'audioWordlistId';
     this.cfg[prop] = element.selectedIndex;
 
     if (!await this.saveProp(prop)) {
-      OptionPage.showErrorModal('Failed to update active list.');
+      OptionPage.showErrorModal('Failed to update defult wordlist.');
       return false;
     }
 
@@ -1317,8 +1316,8 @@ document.getElementById('wordlistsEnabled').addEventListener('click', e => { opt
 document.getElementById('wordlistRename').addEventListener('click', e => { option.renameWordlist(); });
 document.getElementById('wordlistSelect').addEventListener('change', e => { option.populateWordlist(); });
 document.getElementById('wordlistText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
-document.getElementById('textWordlistSelect').addEventListener('change', e => { option.setActiveWordlist(e.target as HTMLSelectElement); });
-document.getElementById('audioWordlistSelect').addEventListener('change', e => { option.setActiveWordlist(e.target as HTMLSelectElement); });
+document.getElementById('textWordlistSelect').addEventListener('change', e => { option.setDefaultWordlist(e.target as HTMLSelectElement); });
+document.getElementById('audioWordlistSelect').addEventListener('change', e => { option.setDefaultWordlist(e.target as HTMLSelectElement); });
 // Domains
 document.querySelectorAll('#domainMode input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.getElementById('domainSelect').addEventListener('change', e => { option.populateDomain(); });

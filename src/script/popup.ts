@@ -87,7 +87,7 @@ class Popup {
     filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
 
     if (popup.cfg.wordlistsEnabled) {
-      let wordlists = ['Default'].concat(WebConfig._allWordlists, popup.cfg.wordlists);
+      let wordlists = ['Default Wordlist'].concat(WebConfig._allWordlists, popup.cfg.wordlists);
       let wordlistIndex = popup.domain.wordlistId >= 0 ? popup.domain.wordlistId + 1 : 0;
       dynamicList(wordlists, wordlistSelect.id);
       wordlistSelect.selectedIndex = wordlistIndex;
