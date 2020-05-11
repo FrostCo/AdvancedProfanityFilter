@@ -40,7 +40,7 @@ export default class Config {
     substitutionMark: false,
     wordlistId: 0,
     wordlists: ['Wordlist 1', 'Wordlist 2', 'Wordlist 3', 'Wordlist 4', 'Wordlist 5', 'Wordlist 6'],
-    wordlistsEnabled: false,
+    wordlistsEnabled: true,
     wordWhitelist: [],
   };
 
