@@ -66,6 +66,7 @@ export default class WebAudio {
     }
   }
 
+  static readonly brTagRegExp = new RegExp('<br>', 'i');
   static readonly sites: { [site: string]: AudioRules[] } = {
     'abc.com': [{ mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' }],
     'www.amazon.com': [
@@ -151,9 +152,15 @@ export default class WebAudio {
             ${rule.hasChildrenElements ? 'if (!failed && (typeof node.childElementCount !== "number" || node.childElementCount < 1)) { failed = true; }' : ''}
             ${rule.subtitleSelector ? `if (!failed && (typeof node.querySelector !== 'function' || !node.querySelector('${rule.subtitleSelector}'))) { failed = true; }` : ''}
             ${rule.containsSelector ? `if (!failed && (typeof node.querySelector !== 'function' || !node.querySelector('${rule.containsSelector}'))) { failed = true; }` : ''}
-            if (!failed) {
-              return ${index};
-            }
+            if (!failed) { return ${index}; }
+          }`;
+          break;
+        case 'elementChild':
+          this.initElementChildRule(rule);
+          block += `
+          if (node.nodeName === '${rule.tagName.toUpperCase()}') {
+            let parent = document.querySelector('${rule.parentSelector}');
+            if (parent && parent.contains(node)) { return ${index}; }
           }`;
           break;
         case 'text':
@@ -191,6 +198,14 @@ export default class WebAudio {
     subtitles.forEach(subtitle => {
       // innerText handles line feeds/spacing better, but is not available to #text nodes
       let textMethod = subtitle.nodeName === '#text' ? 'textContent' : 'innerText';
+      if (
+        rule.convertBreaks === true
+        && subtitle.nodeName !== '#text'
+        && !WebAudio.brTagRegExp.test(subtitle[textMethod])
+        && WebAudio.brTagRegExp.test(subtitle.innerHTML)
+      ) {
+        subtitle.innerHTML = subtitle.innerHTML.replace(WebAudio.brTagRegExp, '\n');
+      }
       let result = this.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
         filtered = true;
@@ -203,9 +218,9 @@ export default class WebAudio {
 
     // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
     switch (rule.showSubtitles) {
-      case 1: if (!filtered) { this.hideElementSubtitles(subtitles, rule); } break;
-      case 2: if (filtered) { this.hideElementSubtitles(subtitles, rule); } break;
-      case 3: this.hideElementSubtitles(subtitles, rule); break;
+      case 1: if (!filtered) { this.hideSubtitles(subtitles, rule); } else { this.showSubtitles(rule); } break;
+      case 2: if (filtered) { this.hideSubtitles(subtitles, rule); } else { this.showSubtitles(rule); } break;
+      case 3: this.hideSubtitles(subtitles, rule); break;
     }
   }
 
@@ -272,19 +287,30 @@ export default class WebAudio {
     }
   }
 
-  hideElementSubtitles(subtitles, rule) {
-    subtitles.forEach(subtitle => {
-      subtitle.innerText = '';
-      if (rule.removeSubtitleSpacing && subtitle.style) {
-        if (subtitle.style.padding) { subtitle.style.padding = 0; }
-        if (subtitle.style.margin) { subtitle.style.margin = 0; }
-      }
-    });
+  hideSubtitles(subtitles, rule) {
+    if (rule.displaySelector) {
+      let container = document.querySelector(rule.displaySelector);
+      if (container) { container.style.display = rule.displayHide; }
+    } else {
+      subtitles.forEach(subtitle => {
+        subtitle.innerText = '';
+        if (rule.removeSubtitleSpacing && subtitle.style) {
+          if (subtitle.style.padding) { subtitle.style.padding = 0; }
+          if (subtitle.style.margin) { subtitle.style.margin = 0; }
+        }
+      });
+    }
   }
 
   initCueRule(rule) {
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
+  }
+
+  initElementChildRule(rule) {
+    if (rule.displaySelector === undefined) { rule.displaySelector = rule.parentSelector; }
+    if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
+    if (rule.displayShow === undefined) { rule.displayShow = ''; }
   }
 
   initWatcherRule(rule) {
@@ -340,6 +366,13 @@ export default class WebAudio {
 
   replaceTextResult(string: string, stats: boolean = true) {
     return this.filter.replaceTextResult(string, this.wordlistId, stats);
+  }
+
+  showSubtitles(rule) {
+    if (rule.displaySelector) {
+      let container = document.querySelector(rule.displaySelector);
+      if (container) { container.style.display = rule.displayShow; }
+    }
   }
 
   unmute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
