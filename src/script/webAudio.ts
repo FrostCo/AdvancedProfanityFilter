@@ -104,6 +104,7 @@ export default class WebAudio {
       { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' },
       { mode: 'element', containsSelector: 'div[data-dialogue-id]', subtitleSelector: 'span > span', tagName: 'DIV' }
     ],
+    'watch.redeemtv.com': [{ mode: 'elementChild', convertBreaks: true, parentSelector: 'div.vp-captions', tagName: 'SPAN' }],
     'www.sonycrackle.com': [{ mode: 'text', parentSelector: 'div.clpp-subtitles-container' }],
     'play.stan.com.au': [{ mode: 'text', parentSelector: 'div.clpp-subtitles-container' }],
     'www.syfy.com': [{ mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
