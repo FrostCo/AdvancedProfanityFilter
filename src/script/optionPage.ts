@@ -9,8 +9,8 @@ import WebAudio from './webAudio';
 
 export default class OptionPage {
   _bulkWordMatchMethodHTML: string;
-  cfg: WebConfig;
   auth: OptionAuth;
+  cfg: WebConfig;
 
   static readonly activeClass = 'w3-flat-belize-hole';
 
@@ -370,7 +370,7 @@ export default class OptionPage {
     }
   }
 
-  async importConfig(e) {
+  importConfig(e) {
     let input = document.getElementById('configInlineInput') as HTMLInputElement;
     if (input.checked) { // inline editor
       let configText = document.getElementById('configText') as HTMLTextAreaElement;
@@ -724,35 +724,31 @@ export default class OptionPage {
   }
 
   populateWordsList() {
-    filter.init();
+    let wordlistFilter = filter;
+
+    // Workaround for remove filter method
+    if (filter.cfg.filterWordList && filter.cfg.filterMethod === 2) {
+      wordlistFilter = new Filter;
+      // Works because we are only changing a native value (filterMethod: number)
+      wordlistFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: 0 }));
+      wordlistFilter.init();
+    }
+
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     let wordListHTML = '<option selected value="">Add...</option>';
 
-    // Workaround for Remove filter (use censor)
-    let filterMethod = filter.cfg.filterMethod;
-    if (filterMethod === 2) {
-      filter.cfg.filterMethod = 0;
-      filter.init();
-    }
-
     Object.keys(option.cfg.words).sort().forEach(word => {
       let filteredWord = word;
-      if (filter.cfg.filterWordList) {
-        if (filter.cfg.words[word].matchMethod == 4) { // Regexp
-          filteredWord = filter.cfg.words[word].sub || filter.cfg.defaultSubstitution;
+      if (wordlistFilter.cfg.filterWordList) {
+        if (wordlistFilter.cfg.words[word].matchMethod == 4) { // Regexp
+          filteredWord = wordlistFilter.cfg.words[word].sub || wordlistFilter.cfg.defaultSubstitution;
         } else {
-          filteredWord = filter.replaceText(word, 0, false); // Using 0 (All) here to filter all words
+          filteredWord = wordlistFilter.replaceText(word, 0, false); // Using 0 (All) here to filter all words
         }
       }
 
       wordListHTML += `<option value="${word}" data-filtered="${filteredWord}">${escapeHTML(filteredWord)}</option>`;
     });
-
-    // Workaround for Remove filter (use censor)
-    if (filterMethod === 2) {
-      filter.cfg.filterMethod = filterMethod;
-      filter.init();
-    }
 
     // Populate the wordlist selections for a word
     let wordlistSelectionHTML = '';
