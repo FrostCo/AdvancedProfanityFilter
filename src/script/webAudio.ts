@@ -104,7 +104,7 @@ export default class WebAudio {
       { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' },
       { mode: 'element', containsSelector: 'div[data-dialogue-id]', subtitleSelector: 'span > span', tagName: 'DIV' }
     ],
-    'watch.redeemtv.com': [{ mode: 'elementChild', convertBreaks: true, parentSelector: 'div.vp-captions', tagName: 'SPAN' }],
+    'watch.redeemtv.com': [{ mode: 'elementChild', convertBreaks: true, displaySelector: 'div.vp-captions', parentSelector: 'div.vp-captions', tagName: 'SPAN' }],
     'www.sonycrackle.com': [{ mode: 'text', parentSelector: 'div.clpp-subtitles-container' }],
     'play.stan.com.au': [{ mode: 'text', parentSelector: 'div.clpp-subtitles-container' }],
     'www.syfy.com': [{ mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
@@ -187,13 +187,14 @@ export default class WebAudio {
 
   clean(subtitleContainer, ruleIndex = 0): void {
     let rule = this.rules[ruleIndex];
-    if (rule.mode === 'watcher') { return null; } // If this is for a watcher rule, leave the text alone
+    if (rule.mode === 'watcher') { return; } // If this is for a watcher rule, leave the text alone
     let filtered = false;
 
     if (subtitleContainer.nodeName && subtitleContainer.nodeName === '#text' && subtitleContainer.parentElement) {
       subtitleContainer = subtitleContainer.parentElement;
     }
     let subtitles = rule.subtitleSelector && subtitleContainer.querySelectorAll ? subtitleContainer.querySelectorAll(rule.subtitleSelector) : [subtitleContainer];
+    if (subtitles.length === 0) { return; }
 
     // Process subtitles
     subtitles.forEach(subtitle => {
@@ -219,7 +220,7 @@ export default class WebAudio {
 
     // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
     switch (rule.showSubtitles) {
-      case 1: if (!filtered) { this.hideSubtitles(subtitles, rule); } else { this.showSubtitles(rule); } break;
+      case 1: if (filtered) { this.showSubtitles(rule); } else { this.hideSubtitles(subtitles, rule); } break;
       case 2: if (filtered) { this.hideSubtitles(subtitles, rule); } else { this.showSubtitles(rule); } break;
       case 3: this.hideSubtitles(subtitles, rule); break;
     }
@@ -288,9 +289,9 @@ export default class WebAudio {
     }
   }
 
-  hideSubtitles(subtitles, rule) {
+  hideSubtitles(subtitles, rule: AudioRules) {
     if (rule.displaySelector) {
-      let container = document.querySelector(rule.displaySelector);
+      let container = document.querySelector(rule.displaySelector) as HTMLElement;
       if (container) { container.style.display = rule.displayHide; }
     } else {
       subtitles.forEach(subtitle => {
@@ -309,9 +310,10 @@ export default class WebAudio {
   }
 
   initElementChildRule(rule) {
-    if (rule.displaySelector === undefined) { rule.displaySelector = rule.parentSelector; }
-    if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
-    if (rule.displayShow === undefined) { rule.displayShow = ''; }
+    if (rule.displaySelector !== undefined) {
+      if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
+      if (rule.displayShow === undefined) { rule.displayShow = ''; }
+    }
   }
 
   initWatcherRule(rule) {
