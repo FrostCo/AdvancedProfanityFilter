@@ -258,6 +258,8 @@ export default class OptionPage {
     } else {
       OptionPage.closeModal('bulkWordEditorModal');
       OptionPage.showStatusModal('Words saved successfully.');
+      filter.rebuildWordlists();
+      option.populateOptions();
     }
   }
 
@@ -415,8 +417,8 @@ export default class OptionPage {
     let self = this;
     self.cfg = await WebConfig.build();
     if (!self.auth) self.auth = new OptionAuth(self.cfg.password);
-    // @ts-ignore: Type WebConfig is not assignable to type Config
     filter.cfg = self.cfg;
+    filter.init();
 
     // console.log('Password:', cfg.password, 'Authenticated:', authenticated); // DEBUG Password
     if (self.cfg.password && !self.auth.authenticated) {
@@ -532,8 +534,7 @@ export default class OptionPage {
     this.populateDomain();
   }
 
-  async populateOptions() {
-    filter.init();
+  populateOptions() {
     this.populateSettings();
     this.populateWordsList();
     this.populateWhitelist();
@@ -768,7 +769,8 @@ export default class OptionPage {
     this.cfg.words = {};
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     wordList.selectedIndex = 0;
-    this.populateWordsList();
+    filter.rebuildWordlists();
+    this.populateOptions();
   }
 
   async removeDomain(event) {
@@ -800,8 +802,7 @@ export default class OptionPage {
       return false;
     } else {
       filter.init();
-      whitelist.selectedIndex = 0;
-      this.populateWhitelist();
+      this.populateOptions();
     }
   }
 
@@ -816,7 +817,8 @@ export default class OptionPage {
       if (result) {
         // Update states and Reset word form
         wordList.selectedIndex = 0;
-        this.populateWordsList();
+        filter.rebuildWordlists();
+        this.populateOptions();
       }
     }
   }
@@ -1031,8 +1033,7 @@ export default class OptionPage {
           return false;
         } else {
           filter.init();
-          whitelist.selectedIndex = 0;
-          this.populateWhitelist();
+          this.populateOptions();
         }
       }
     } else {
@@ -1103,9 +1104,8 @@ export default class OptionPage {
         }
 
         // Update states and Reset word form
-        filter.init();
-        wordList.selectedIndex = 0;
-        this.populateWordsList();
+        filter.rebuildWordlists();
+        this.populateOptions();
       }
     } else {
       OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
@@ -1114,7 +1114,10 @@ export default class OptionPage {
 
   async selectFilterMethod(evt) {
     option.cfg.filterMethod = WebConfig._filterMethodNames.indexOf(evt.target.value);
-    if (await option.saveProp('filterMethod')) this.init();
+    if (await option.saveProp('filterMethod')) {
+      filter.rebuildWordlists();
+      this.populateOptions();
+    }
   }
 
   async setDefaultWordlist(element: HTMLSelectElement) {

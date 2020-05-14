@@ -17,13 +17,11 @@ export default class Filter {
     this.wordlists = {};
   }
 
-  buildWordlist(wordlistId: number | false): number {
-    if (wordlistId === false) {
-      wordlistId = this.wordlistId;
-    }
+  buildWordlist(wordlistId: number | false, rebuild: boolean = false): number {
+    if (wordlistId === false) { wordlistId = this.wordlistId; }
 
     // Generate a new wordlist if required
-    if (!this.wordlists[wordlistId]) {
+    if (rebuild || !this.wordlists[wordlistId]) {
       this.wordlists[wordlistId] = new Wordlist(this.cfg, wordlistId);
     }
 
@@ -81,6 +79,13 @@ export default class Filter {
     this.whitelist = this.cfg.wordWhitelist;
     if (this.wordlistId === undefined) { this.wordlistId = this.cfg.wordlistId || 0; }
     this.buildWordlist(wordlistId);
+  }
+
+  rebuildWordlists() {
+    let self = this;
+    Object.keys(this.wordlists).forEach(function(key) {
+      self.buildWordlist(parseInt(key), true);
+    });
   }
 
   // Config Dependencies: filterMethod, wordlists,
