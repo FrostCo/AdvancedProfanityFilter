@@ -2,6 +2,7 @@ import { dynamicList, escapeHTML } from './lib/helper';
 import WebAudio from './webAudio';
 import WebConfig from './webConfig';
 import Domain from './domain';
+import Page from './page';
 
 class Popup {
   cfg: WebConfig;
@@ -13,7 +14,6 @@ class Popup {
   tab: chrome.tabs.Tab;
   url: URL;
 
-  static readonly _disabledPages = new RegExp('(^chrome:|^about:|^[a-zA-Z]*-extension:)', 'i');
   static readonly _requiredConfig =  [
     'audioWordlistId',
     'customAudioSites',
@@ -115,7 +115,7 @@ class Popup {
     }
 
     // Restricted pages
-    if (Popup._disabledPages.test(popup.url.protocol) || popup.domain.hostname == 'chrome.google.com') {
+    if (Page.disabledProtocols.test(popup.url.protocol) || popup.domain.hostname == 'chrome.google.com') {
       domainFilter.checked = false;
       Popup.disable(domainFilter);
       Popup.disable(domainToggle);
