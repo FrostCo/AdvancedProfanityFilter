@@ -141,18 +141,14 @@ class Popup {
     }
   }
 
-  populateSummary(message: Message) {
-    if (message && message.summary) {
-      let summaryEl = document.getElementById('summary') as HTMLElement;
-      summaryEl.innerHTML = this.summaryTableHTML(message.summary);
+  populateSummary(summary: Summary) {
+    let summaryEl = document.getElementById('summary') as HTMLElement;
+    summaryEl.innerHTML = this.summaryTableHTML(summary);
 
-      if (summaryEl.classList.contains('w3-hide')) {
-        summaryEl.classList.remove('w3-hide');
-        summaryEl.classList.add('w3-show');
-        document.getElementById('summaryDivider').classList.remove('w3-hide');
-      }
-    } else {
-      // console.log('Unahndled message: ', message); // DEBUG
+    if (summaryEl.classList.contains('w3-hide')) {
+      summaryEl.classList.remove('w3-hide');
+      summaryEl.classList.add('w3-show');
+      document.getElementById('summaryDivider').classList.remove('w3-hide');
     }
   }
 
@@ -191,7 +187,7 @@ class Popup {
 chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) => {
   if (request.summary) {
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      if (sender.tab.id == tabs[0].id) popup.populateSummary(request);
+      if (sender.tab.id == tabs[0].id) { popup.populateSummary(request.summary); }
     });
   }
 });
