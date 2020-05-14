@@ -93,6 +93,16 @@ export default class WebAudio {
     ],
     'www.disneyplus.com': [{ mode: 'cue', videoSelector: 'video.btm-media-client-element' }],
     'www.fox.com': [{ mode: 'element', className: 'jw-text-track-container', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
+    'www.funimation.com': [
+      {
+        mode: 'elementChild',
+        iframe: true,
+        parentSelector: 'div.vjs-text-track-display',
+        simpleUnmute: true,
+        subtitleSelector: ':scope div > div',
+        tagName: 'DIV',
+      }
+    ],
     'www.hulu.com': [{ mode: 'element', className: 'caption-text-box', subtitleSelector: 'p', tagName: 'DIV' }],
     'www.nbc.com': [
       { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
