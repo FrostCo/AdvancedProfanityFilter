@@ -2,6 +2,7 @@
 [![Build Status](https://img.shields.io/travis/com/richardfrost/AdvancedProfanityFilter/master.svg?style=flat-square)](https://travis-ci.com/richardfrost/AdvancedProfanityFilter)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/d/piajkpdbaniagacofgklljacgjhefjeh.svg?style=flat-square)](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/stars/piajkpdbaniagacofgklljacgjhefjeh.svg?style=flat-square)](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
+[![Discord](https://img.shields.io/discord/563929263779086340?style=flat-square)](https://discord.gg/MpE5Z3f)
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XFL36QJY752R6&source=url)
 [![Patreon](src/img/patreon-small.png)](https://www.patreon.com/richardfrost)
 
