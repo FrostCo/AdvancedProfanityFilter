@@ -4,7 +4,7 @@ export const WebAudioSites: { [site: string]: AudioRules[] } = {
     {
       mode: 'watcher',
       iframe: false,
-      parentSelector: 'div.webPlayer div.persistentPanel',
+      parentSelector: 'div.webPlayerContainer div p > span',
       showSubtitles: 0,
       simpleUnmute: true,
       subtitleSelector: 'div.webPlayerContainer div span > span',
