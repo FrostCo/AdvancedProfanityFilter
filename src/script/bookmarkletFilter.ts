@@ -28,7 +28,6 @@ export default class BookmarkletFilter extends Filter {
   location: Location | URL;
   mutePage: boolean;
   summary: Summary;
-  wordlistId: number;
 
   constructor() {
     super();

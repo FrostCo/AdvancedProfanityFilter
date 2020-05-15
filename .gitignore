@@ -6,7 +6,7 @@
 /*.zip
 
 # Dev extensions for debugging
-/extension-*/*
+/extension*/*
 
 # Testing
 /test/built/*

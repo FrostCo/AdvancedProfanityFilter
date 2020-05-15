@@ -12,8 +12,9 @@
 <div id="header" class="w3-container">
   <h2><img class="logo" src="img/icon38.png"/> Advanced Profanity Filter</h2>
   <div class="w3-right donations">
-    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XFL36QJY752R6&source=url" target="_blank"><image class="donation" src="./img/donate.gif"></image></a>
-    <a href="https://www.patreon.com/richardfrost" target="_blank"><image class="patreon" src="./img/patreon-small.png"></image></a>
+    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XFL36QJY752R6&source=url" target="_blank"><img class="donation" src="./img/donate.gif"></a>
+    <a href="https://www.patreon.com/richardfrost" target="_blank"><img class="patreon" src="./img/patreon-small.png"></a>
+    <a href="https://discord.gg/MpE5Z3f" target="_blank"><img class="discord" src="./img/discord.png"></a>
   </div>
 </div>
 
@@ -42,7 +43,7 @@
     <br/>
     <label>
       <input id="filterSubstitute" class="w3-radio" type="radio" name="filterMethod" value="Substitute">
-      Substitute<span class="notes">(dog > Cat: dog = cat)</span>
+      Substitute<span class="notes">(dog > cat: dog = cat)</span>
     </label>
 
     <br/>
@@ -253,7 +254,7 @@
 
   <div class="w3-half w3-right">
     <label style="display: block;">
-      <h4 class="sectionHeader" style="display: inline-block; height: 30px;">Word Lists</h4>
+      <h4 class="sectionHeader" style="display: inline-block; height: 30px;">Wordlists</h4>
       <input id="wordlistsEnabled" type="checkbox" class="w3-check">
     </label>
 
@@ -264,11 +265,11 @@
       <input id="wordlistText" class="w3-input w3-border small" type="text" pattern="^\S.*" required style="display: inline; margin-right: 8px;">
       <button id="wordlistRename" class="w3-btn w3-round-large w3-flat-peter-river">RENAME</button>
 
-      <h4 class="sectionHeader">Active Word List (Text)</h4>
+      <h4 class="sectionHeader">Default Text Wordlist</h4>
       <select id="textWordlistSelect" class="w3-select w3-border small"></select><span class="notes"></span>
 
       <div id="audioWordlistDiv" class="w3-hide">
-        <h4 class="sectionHeader">Active Word List (Audio)</h4>
+        <h4 class="sectionHeader">Default Audio Wordlist</h4>
         <select id="audioWordlistSelect" class="w3-select w3-border small"></select><span class="notes"></span>
       </div>
     </div>
@@ -302,25 +303,23 @@
     <input id="domainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
     <span class="notes">Example: "google.com" or "mail.google.com"</span>
 
-    <br>
-    <br>
-    <label id="domainDisabledLabel" class="w3-hide">
-      <input id="domainDisabledCheck" type="checkbox" class="w3-check">
-      Disabled
-      <span class="notes">Don't filter pages on this domain</span>
-    </label>
-
-    <label id="domainEnabledLabel" class="w3-hide">
-      <input id="domainEnabledCheck" type="checkbox" class="w3-check">
-      Enabled
-      <span class="notes">Filter pages on this domain</span>
-    </label>
-
-    <label>
-      <input id="domainAdvancedCheck" type="checkbox" class="w3-check">
-      Advanced
-      <span class="notes">Match across HTML Elements (Only use when necessary)</span>
-    </label>
+    <div style="padding-top: 8px;">
+      <label id="domainDisabledLabel" class="w3-hide">
+        <input id="domainDisabledCheck" type="checkbox" class="w3-check">
+        Disabled
+        <span class="notes">Don't filter pages on this domain</span>
+      </label>
+      <label id="domainEnabledLabel" class="w3-hide">
+        <input id="domainEnabledCheck" type="checkbox" class="w3-check">
+        Enabled
+        <span class="notes">Filter pages on this domain</span>
+      </label>
+      <label>
+        <input id="domainAdvancedCheck" type="checkbox" class="w3-check">
+        Advanced
+        <span class="notes">Match across HTML Elements (Only use when necessary)</span>
+      </label>
+    </div>
 
     <div id="domainWordlistContainer" class="w3-hide">
       <h4 class="sectionHeader">Text Wordlist</h4>
@@ -640,10 +639,13 @@
     <header class="w3-container w3-flat-peter-river"><h5 id="confirmModalTitle"></h5></header>
     <div class="w3-container w3-padding w3-margin">
       <div id="confirmModalContent"></div>
-      <div class="w3-right">
-        <button id="confirmModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
+      <span class="confirmBackupButton w3-left w3-hide">
+        <button id="confirmModalBackup" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">BACKUP</button>
+      </span>
+      <span class="w3-right">
         <button id="confirmModalCancel" class="w3-btn w3-round-large w3-flat-silver" style="margin-top:16px">CANCEL</button>
-      </div>
+        <button id="confirmModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
+      </span>
     </div>
   </div>
 </div>

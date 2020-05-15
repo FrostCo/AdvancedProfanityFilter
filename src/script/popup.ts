@@ -2,6 +2,7 @@ import { dynamicList, escapeHTML } from './lib/helper';
 import WebAudio from './webAudio';
 import WebConfig from './webConfig';
 import Domain from './domain';
+import Page from './page';
 
 class Popup {
   cfg: WebConfig;
@@ -13,7 +14,6 @@ class Popup {
   tab: chrome.tabs.Tab;
   url: URL;
 
-  static readonly _disabledPages = new RegExp('(^chrome:|^about:|^[a-zA-Z]*-extension:)', 'i');
   static readonly _requiredConfig =  [
     'audioWordlistId',
     'customAudioSites',
@@ -87,12 +87,12 @@ class Popup {
     filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
 
     if (popup.cfg.wordlistsEnabled) {
-      let wordlists = ['Default'].concat(WebConfig._allWordlists, popup.cfg.wordlists);
+      let wordlists = ['Default Wordlist'].concat(WebConfig._allWordlists, popup.cfg.wordlists);
       let wordlistIndex = popup.domain.wordlistId >= 0 ? popup.domain.wordlistId + 1 : 0;
       dynamicList(wordlists, wordlistSelect.id);
       wordlistSelect.selectedIndex = wordlistIndex;
       if (popup.cfg.muteAudio) {
-        popup.audioSiteKeys = Object.keys(Object.assign({}, WebAudio.sites, popup.cfg.customAudioSites));
+        popup.audioSiteKeys = Object.keys(WebAudio.combineSites(popup.cfg.customAudioSites));
         if (popup.audioSiteKeys.includes(popup.domain.cfgKey)) {
           let audioWordlistIndex = popup.domain.audioWordlistId >= 0 ? popup.domain.audioWordlistId + 1 : 0;
           dynamicList(wordlists, audioWordlistSelect.id);
@@ -115,7 +115,7 @@ class Popup {
     }
 
     // Restricted pages
-    if (Popup._disabledPages.test(popup.url.protocol) || popup.domain.hostname == 'chrome.google.com') {
+    if (Page.disabledProtocols.test(popup.url.protocol) || popup.domain.hostname == 'chrome.google.com') {
       domainFilter.checked = false;
       Popup.disable(domainFilter);
       Popup.disable(domainToggle);
@@ -141,18 +141,14 @@ class Popup {
     }
   }
 
-  populateSummary(message: Message) {
-    if (message && message.summary) {
-      let summaryEl = document.getElementById('summary') as HTMLElement;
-      summaryEl.innerHTML = this.summaryTableHTML(message.summary);
+  populateSummary(summary: Summary) {
+    let summaryEl = document.getElementById('summary') as HTMLElement;
+    summaryEl.innerHTML = this.summaryTableHTML(summary);
 
-      if (summaryEl.classList.contains('w3-hide')) {
-        summaryEl.classList.remove('w3-hide');
-        summaryEl.classList.add('w3-show');
-        document.getElementById('summaryDivider').classList.remove('w3-hide');
-      }
-    } else {
-      // console.log('Unahndled message: ', message); // DEBUG
+    if (summaryEl.classList.contains('w3-hide')) {
+      summaryEl.classList.remove('w3-hide');
+      summaryEl.classList.add('w3-show');
+      document.getElementById('summaryDivider').classList.remove('w3-hide');
     }
   }
 
@@ -191,7 +187,7 @@ class Popup {
 chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) => {
   if (request.summary) {
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      if (sender.tab.id == tabs[0].id) popup.populateSummary(request);
+      if (sender.tab.id == tabs[0].id) { popup.populateSummary(request.summary); }
     });
   }
 });

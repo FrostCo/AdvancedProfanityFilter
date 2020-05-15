@@ -8,12 +8,14 @@ h4.sectionHeader
 {color:var(--blue)}
 #header h2
 {display:inline;line-height:50px;}
-#header img.donation
-{margin-top:14.5px;margin-bottom:14.5px;}
 #header img.logo
 {margin-bottom:8px}
+#header img.donation
+{margin-top:14.5px;margin-bottom:14.5px;}
 #header img.patreon
 {margin-top:9.5px;margin-bottom:9.5px;}
+#header img.discord
+{height:31px;}
 /* #helpPage
 {overflow-y:scroll;height:800px} */
 #main

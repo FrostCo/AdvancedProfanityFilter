@@ -1,5 +1,6 @@
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
+import { WebAudioSites } from './webAudioSites';
 
 export default class WebAudio {
   cueRuleIds: number[];
@@ -22,6 +23,12 @@ export default class WebAudio {
   youTubeAutoSubsMax: number;
   youTubeAutoSubsTimeout: number;
 
+  static readonly brTagRegExp = new RegExp('<br>', 'i');
+
+  static combineSites(sites: { [site: string]: AudioRules[] } = {}): { [site: string]: AudioRules[] } {
+    return Object.assign({}, WebAudioSites, sites);
+  }
+
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.cueRuleIds = [];
     this.watcherRuleIds = [];
@@ -36,7 +43,7 @@ export default class WebAudio {
     ) {
       filter.cfg.customAudioSites = {};
     }
-    this.sites = Object.assign({}, WebAudio.sites, filter.cfg.customAudioSites);
+    this.sites = WebAudio.combineSites(filter.cfg.customAudioSites);
     this.unmuteDelay = 0;
     this.volume = 1;
     this.wordlistId = filter.audioWordlistId;
@@ -47,7 +54,7 @@ export default class WebAudio {
     this.rules = this.sites[filter.hostname];
     if (this.rules) {
       this.supportedPage = true;
-      if (filter.hostname == 'www.youtube.com') { this.youTube = true; }
+      if (['tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) { this.youTube = true; }
       if (!Array.isArray(this.rules)) {
         this.rules = [this.rules];
       }
@@ -65,53 +72,6 @@ export default class WebAudio {
       if (this.cueRuleIds.length > 0) { setInterval(this.watchForVideo, 250, this); }
     }
   }
-
-  static readonly sites: { [site: string]: AudioRules[] } = {
-    'abc.com': [{ mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' }],
-    'www.amazon.com': [
-      {
-        mode: 'watcher',
-        iframe: false,
-        parentSelector: 'div.webPlayer div.persistentPanel',
-        showSubtitles: 0,
-        simpleUnmute: true,
-        subtitleSelector: 'div.webPlayerContainer div span > span',
-        videoSelector: 'div.webPlayerElement video[src]'
-      }
-    ],
-    'www.amc.com': [
-      { mode: 'element', className: 'ttr-container', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
-      { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video' }
-    ],
-    'www.att.tv': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
-    'www.attwatchtv.com': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
-    'www.cbs.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
-    'www.dishanywhere.com': [
-      { mode: 'element', className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' },
-      { mode: 'element', className: 'bmpui-subtitle-region-container', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' }
-    ],
-    'www.disneyplus.com': [{ mode: 'cue', videoSelector: 'video.btm-media-client-element' }],
-    'www.fox.com': [{ mode: 'element', className: 'jw-text-track-container', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
-    'www.hulu.com': [{ mode: 'element', className: 'caption-text-box', subtitleSelector: 'p', tagName: 'DIV' }],
-    'www.nbc.com': [
-      { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
-      { mode: 'cue', videoCueLanguage: 'en' }
-    ],
-    'www.netflix.com': [{ mode: 'element', className: 'player-timedtext-text-container', subtitleSelector: 'span', tagName: 'DIV' }],
-    'www.philo.com': [{ mode: 'cue' }],
-    'app.plex.tv': [
-      { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' },
-      { mode: 'element', containsSelector: 'div[data-dialogue-id]', subtitleSelector: 'span > span', tagName: 'DIV' }
-    ],
-    'www.sonycrackle.com': [{ mode: 'text', parentSelector: 'div.clpp-subtitles-container' }],
-    'play.stan.com.au': [{ mode: 'text', parentSelector: 'div.clpp-subtitles-container' }],
-    'www.syfy.com': [{ mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
-    'www.tntdrama.com': [{ mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video.top-media-element' }],
-    'www.universalkids.com': [{ mode: 'element', subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' }],
-    'www.usanetwork.com': [{ mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
-    'www.vudu.com': [{ mode: 'element', subtitleSelector: 'span.subtitles', tagName: 'DIV' }],
-    'www.youtube.com': [{ mode: 'element', className: 'caption-window', subtitleSelector: 'span.ytp-caption-segment', tagName: 'DIV' }]
-  };
 
   buildSupportedNodeFunction(): Function {
     let block = '';
@@ -150,9 +110,15 @@ export default class WebAudio {
             ${rule.hasChildrenElements ? 'if (!failed && (typeof node.childElementCount !== "number" || node.childElementCount < 1)) { failed = true; }' : ''}
             ${rule.subtitleSelector ? `if (!failed && (typeof node.querySelector !== 'function' || !node.querySelector('${rule.subtitleSelector}'))) { failed = true; }` : ''}
             ${rule.containsSelector ? `if (!failed && (typeof node.querySelector !== 'function' || !node.querySelector('${rule.containsSelector}'))) { failed = true; }` : ''}
-            if (!failed) {
-              return ${index};
-            }
+            if (!failed) { return ${index}; }
+          }`;
+          break;
+        case 'elementChild':
+          this.initElementChildRule(rule);
+          block += `
+          if (node.nodeName === '${rule.tagName.toUpperCase()}') {
+            let parent = document.querySelector('${rule.parentSelector}');
+            if (parent && parent.contains(node)) { return ${index}; }
           }`;
           break;
         case 'text':
@@ -178,18 +144,27 @@ export default class WebAudio {
 
   clean(subtitleContainer, ruleIndex = 0): void {
     let rule = this.rules[ruleIndex];
-    if (rule.mode === 'watcher') { return null; } // If this is for a watcher rule, leave the text alone
+    if (rule.mode === 'watcher') { return; } // If this is for a watcher rule, leave the text alone
     let filtered = false;
 
     if (subtitleContainer.nodeName && subtitleContainer.nodeName === '#text' && subtitleContainer.parentElement) {
       subtitleContainer = subtitleContainer.parentElement;
     }
     let subtitles = rule.subtitleSelector && subtitleContainer.querySelectorAll ? subtitleContainer.querySelectorAll(rule.subtitleSelector) : [subtitleContainer];
+    if (subtitles.length === 0) { return; }
 
     // Process subtitles
     subtitles.forEach(subtitle => {
       // innerText handles line feeds/spacing better, but is not available to #text nodes
       let textMethod = subtitle.nodeName === '#text' ? 'textContent' : 'innerText';
+      if (
+        rule.convertBreaks === true
+        && subtitle.nodeName !== '#text'
+        && !WebAudio.brTagRegExp.test(subtitle[textMethod])
+        && WebAudio.brTagRegExp.test(subtitle.innerHTML)
+      ) {
+        subtitle.innerHTML = subtitle.innerHTML.replace(WebAudio.brTagRegExp, '\n');
+      }
       let result = this.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
         filtered = true;
@@ -202,9 +177,9 @@ export default class WebAudio {
 
     // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
     switch (rule.showSubtitles) {
-      case 1: if (!filtered) { this.hideElementSubtitles(subtitles, rule); } break;
-      case 2: if (filtered) { this.hideElementSubtitles(subtitles, rule); } break;
-      case 3: this.hideElementSubtitles(subtitles, rule); break;
+      case 1: if (filtered) { this.showSubtitles(rule); } else { this.hideSubtitles(subtitles, rule); } break;
+      case 2: if (filtered) { this.hideSubtitles(subtitles, rule); } else { this.showSubtitles(rule); } break;
+      case 3: this.hideSubtitles(subtitles, rule); break;
     }
   }
 
@@ -271,19 +246,31 @@ export default class WebAudio {
     }
   }
 
-  hideElementSubtitles(subtitles, rule) {
-    subtitles.forEach(subtitle => {
-      subtitle.innerText = '';
-      if (rule.removeSubtitleSpacing && subtitle.style) {
-        if (subtitle.style.padding) { subtitle.style.padding = 0; }
-        if (subtitle.style.margin) { subtitle.style.margin = 0; }
-      }
-    });
+  hideSubtitles(subtitles, rule: AudioRules) {
+    if (rule.displaySelector) {
+      let container = document.querySelector(rule.displaySelector) as HTMLElement;
+      if (container) { container.style.display = rule.displayHide; }
+    } else {
+      subtitles.forEach(subtitle => {
+        subtitle.innerText = '';
+        if (rule.removeSubtitleSpacing && subtitle.style) {
+          if (subtitle.style.padding) { subtitle.style.padding = 0; }
+          if (subtitle.style.margin) { subtitle.style.margin = 0; }
+        }
+      });
+    }
   }
 
   initCueRule(rule) {
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
+  }
+
+  initElementChildRule(rule) {
+    if (rule.displaySelector !== undefined) {
+      if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
+      if (rule.displayShow === undefined) { rule.displayShow = ''; }
+    }
   }
 
   initWatcherRule(rule) {
@@ -339,6 +326,13 @@ export default class WebAudio {
 
   replaceTextResult(string: string, stats: boolean = true) {
     return this.filter.replaceTextResult(string, this.wordlistId, stats);
+  }
+
+  showSubtitles(rule) {
+    if (rule.displaySelector) {
+      let container = document.querySelector(rule.displaySelector);
+      if (container) { container.style.display = rule.displayShow; }
+    }
   }
 
   unmute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {

@@ -1,10 +1,15 @@
 export default class Bookmarklet {
   hostedUrl: string
 
+  static readonly _defaultFilename = 'apfBookmarklet.js';
   static readonly dropboxRegExp = /^https:\/\/www\.dropbox\.com\/[a-z]\/\w+?\/[\w\-\.]+?\?dl=0$/;
-  static readonly gitHubGistRegExp = /^https:\/\/gist\.github\.com\/([\w\-]+?)\/([\w\-]+?)$/;
+  static readonly gitHubGistLinkRegExp = /^https:\/\/gist\.github\.com\/([\w\-]+?)\/([\w\-]+?)$/;
+  static readonly gitHubGistRawRegExp = /^https:\/\/gist\.githubusercontent\.com\/([\w\-]+?)\/([\w\-]+?)\/raw\/[\w\-]+?\/([\w\-.]+?)$/;
+  static readonly githubRawRegExp = /^https:\/\/raw\.githubusercontent\.com\/([\w-]+?)\/([\w-]+?)\/([\w-]+?)\/([\w-.]+?)$/;
   static readonly googleDriveRegExp = /^https:\/\/drive\.google\.com\/file\/[a-z]\/(.+?)\/view/;
 
+  // Input (share link): https://www.dropbox.com/s/id/apfBookmarklet.js?dl=0
+  // Output: https://dl.dropbox.com/s/id/apfBookmarklet.js?raw=1
   static dropboxDownloadURL(url: string): string {
     let match = url.match(Bookmarklet.dropboxRegExp);
     if (match) {
@@ -13,15 +18,44 @@ export default class Bookmarklet {
     return url;
   }
 
-  static gitHubGistDownloadURL(url: string): string {
-    let match = url.match(Bookmarklet.gitHubGistRegExp);
-    if (match && match[1] && match[2]) {
-      // return `https://gist.githubusercontent.com/${match[1]}/${match[2]}/raw`; // Have to use a CDN
-      return `https://cdn.statically.com/gist/${match[1]}/${match[2]}/raw/apfBookmarklet.js?env=dev`;
+  // Input: https://raw.githubusercontent.com/user/project/branch/apfBookmarklet.js
+  // Output: https://cdn.jsdelivr.net/gh/user/project@branch/apfBookmarklet.js
+  static githubDownloadURL(url: string): string {
+    let match = url.match(Bookmarklet.githubRawRegExp);
+    if (match && match[1] && match[2] && match[3] && match[4]) {
+      let user = match[1];
+      let project = match[2];
+      let branch = match[3];
+      let filename = match[4];
+      return `https://cdn.jsdelivr.net/gh/${user}/${project}@${branch}/${filename}`;
     }
     return url;
   }
 
+  // Input (raw): https://gist.githubusercontent.com/user/gist_id/raw/revision_id/apfBookmarklet.js
+  // Input (uses default filename): https://gist.github.com/user/gist_id
+  // Output: https://cdn.statically.io/gist/user/gist_id/raw/apfBookmarklet.js?env=dev
+  static gitHubGistDownloadURL(url: string): string {
+    let match = url.match(Bookmarklet.gitHubGistRawRegExp);
+    if (match && match[1] && match[2]) {
+      let user = match[1];
+      let gistId = match[2];
+      let filename = match[3];
+      return `https://cdn.statically.io/gist/${user}/${gistId}/raw/${filename}?env=dev`;
+    } else {
+      match = url.match(Bookmarklet.gitHubGistLinkRegExp);
+      if (match && match[1] && match[2]) {
+        let user = match[1];
+        let gistId = match[2];
+        return `https://cdn.statically.io/gist/${user}/${gistId}/raw/${Bookmarklet._defaultFilename}?env=dev`;
+      }
+    }
+
+    return url;
+  }
+
+  // Input (share link): https://drive.google.com/file/d/id/view?usp=sharing
+  // Output: https://drive.google.com/uc?export=view&id=id
   static googleDriveDownloadURL(url: string): string {
     let match = url.match(Bookmarklet.googleDriveRegExp);
     if (match && match[1]) {
@@ -31,9 +65,11 @@ export default class Bookmarklet {
   }
 
   static processDownloadURL(url: string): string {
-    url = Bookmarklet.gitHubGistDownloadURL(url);
-    url = Bookmarklet.googleDriveDownloadURL(url);
-    url = Bookmarklet.dropboxDownloadURL(url);
+    let originalUrl = url;
+    if (originalUrl === url) { url = Bookmarklet.dropboxDownloadURL(url); }
+    if (originalUrl === url) { url = Bookmarklet.githubDownloadURL(url); }
+    if (originalUrl === url) { url = Bookmarklet.gitHubGistDownloadURL(url); }
+    if (originalUrl === url) { url = Bookmarklet.googleDriveDownloadURL(url); }
     return url;
   }
 
@@ -48,9 +84,9 @@ export default class Bookmarklet {
     let code = await response.text();
     let cfgCode = code.match(configRegExp).toString();
     try {
-      let variable = cfgCode.match(/^var ([a-z])=/m)[1];
+      let variable = cfgCode.match(/^let ([a-z])=/m)[1];
       if (lowerCaseLettersRegExp.test(variable)) {
-        return code.replace(configRegExp, `${prefix}\nvar ${variable}=${JSON.stringify(config)}\n${postfix}`);
+        return code.replace(configRegExp, `${prefix}\nlet ${variable}=${JSON.stringify(config)}\n${postfix}`);
       } else {
         throw('Unable to set user config - using defaults');
       }
@@ -65,7 +101,7 @@ export default class Bookmarklet {
   }
 
   destination(): string {
-    let prefix = '(function(){if(!document.querySelector("script.apfBookmarklet")){let apfScriptEl=document.body.appendChild(document.createElement("script"));apfScriptEl.src="';
+    let prefix = '(function(){if(!document.querySelector("script.apfBookmarklet")){let apfScriptEl=document.body.appendChild(document.createElement("script"));apfScriptEl.type="text/javascript";apfScriptEl.src="';
     let postfix = '";apfScriptEl.className="apfBookmarklet";}})()';
     return 'javascript:' + encodeURIComponent(prefix + this.hostedUrl + postfix);
   }

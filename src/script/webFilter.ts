@@ -18,7 +18,6 @@ export default class WebFilter extends Filter {
   location: Location | URL;
   mutePage: boolean;
   summary: Summary;
-  wordlistId: number;
 
   constructor() {
     super();

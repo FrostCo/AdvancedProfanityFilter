@@ -5,12 +5,12 @@ import Domain from './domain';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
-import WebAudio from './webAudio';
+import { WebAudioSites } from './webAudioSites';
 
 export default class OptionPage {
   _bulkWordMatchMethodHTML: string;
-  cfg: WebConfig;
   auth: OptionAuth;
+  cfg: WebConfig;
 
   static readonly activeClass = 'w3-flat-belize-hole';
 
@@ -18,13 +18,31 @@ export default class OptionPage {
     OptionPage.hide(document.getElementById(id));
   }
 
-  static configureConfirmModal(content = 'Are you sure?', title = 'Please Confirm', titleColor = 'w3-flat-peter-river') {
+  static configureConfirmModal(settings: ConfirmModalSettings = {}) {
     let modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
     let modalContent = document.getElementById('confirmModalContent') as HTMLElement;
     let modalHeader = document.querySelector('#confirmModal header') as HTMLElement;
-    modalTitle.innerText = title;
-    modalContent.innerHTML = content;
-    modalHeader.className = `w3-container ${titleColor}`;
+    let backupButtonContainer = document.querySelector('#confirmModal span.confirmBackupButton') as HTMLElement;
+    let backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
+
+    let defaults = {
+      backup: false,
+      content: 'Are you sure?',
+      title: 'Please Confirm',
+      titleClass: 'w3-flat-peter-river',
+    };
+    settings = Object.assign(defaults, settings);
+
+    modalTitle.innerText = settings.title;
+    modalContent.innerHTML = settings.content;
+    modalHeader.className = `w3-container ${settings.titleClass}`;
+    if (settings.backup) {
+      OptionPage.show(backupButtonContainer);
+      OptionPage.enableBtn(backupButton);
+    } else {
+      OptionPage.hide(backupButtonContainer);
+      OptionPage.disableBtn(backupButton);
+    }
   }
 
   static configureStatusModal(content: string, title: string, titleColor: string) {
@@ -99,6 +117,14 @@ export default class OptionPage {
   static showWarningModal(content = 'Invalid input.', title = 'Warning', titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
     OptionPage.openModal('statusModal');
+  }
+
+  backupConfig() {
+    const padded = (num: number) => { return ('0' + num).slice(-2); };
+    let date = new Date;
+    let today = `${date.getFullYear()}-${padded(date.getMonth()+1)}-${padded(date.getDate())}`;
+    let time = `${padded(date.getHours())}${padded(date.getMinutes())}${padded(date.getSeconds())}`;
+    exportToFile(JSON.stringify(option.cfg.ordered(), null, 2), `apf-backup-${today}_${time}.json`);
   }
 
   bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
@@ -188,6 +214,12 @@ export default class OptionPage {
     return words;
   }
 
+  bulkEditorRemoveAll() {
+    let tbody = document.querySelector('#bulkWordEditorModal table tbody') as HTMLTableSectionElement;
+    tbody.innerHTML = '';
+    this.bulkEditorAddRow();
+  }
+
   bulkEditorRemoveRow(event) {
     let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
     let row = event.target.parentElement.parentElement;
@@ -226,6 +258,8 @@ export default class OptionPage {
     } else {
       OptionPage.closeModal('bulkWordEditorModal');
       OptionPage.showStatusModal('Words saved successfully.');
+      filter.rebuildWordlists();
+      option.populateOptions();
     }
   }
 
@@ -258,20 +292,25 @@ export default class OptionPage {
 
     switch(action) {
       case 'bulkEditorSave':
-        OptionPage.configureConfirmModal('Are you sure you want to save these changes?');
+        OptionPage.configureConfirmModal({
+          content: 'Are you sure you want to save these changes?<br><br><i>Make sure you have a backup first!</i>',
+          backup: true,
+        });
         ok.addEventListener('click', bulkEditorSave);
         break;
       case 'importConfig': {
-        OptionPage.configureConfirmModal('Are you sure you want to overwrite your existing settings?');
+        OptionPage.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
         ok.addEventListener('click', importConfig);
         break;
       }
       case 'removeAllWords':
-        OptionPage.configureConfirmModal('Are you sure you want to remove all words?<br><br><i>(Note: The default words will return if no words are added.)</i>');
+        OptionPage.configureConfirmModal({
+          content: 'Are you sure you want to remove all words?<br><br><i>(Note: The default words will return if no words are added.)</i>',
+        });
         ok.addEventListener('click', removeAllWords);
         break;
       case 'restoreDefaults':
-        OptionPage.configureConfirmModal('Are you sure you want to restore defaults?');
+        OptionPage.configureConfirmModal({ content: 'Are you sure you want to restore defaults?', backup: true });
         ok.addEventListener('click', restoreDefaults);
         break;
       case 'setPassword': {
@@ -280,13 +319,21 @@ export default class OptionPage {
         if (passwordBtn.classList.contains('disabled')) return false;
 
         let message = passwordText.value == '' ? 'Are you sure you want to remove the password?' : `Are you sure you want to set the password to '${passwordText.value}'?`;
-        OptionPage.configureConfirmModal(message);
+        OptionPage.configureConfirmModal({ content: message });
         ok.addEventListener('click', setPassword);
         break;
       }
     }
 
     OptionPage.openModal('confirmModal');
+  }
+
+  confirmModalBackup() {
+    let backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
+    if (!backupButton.classList.contains('disabled')) {
+      option.backupConfig();
+      OptionPage.disableBtn(backupButton);
+    }
   }
 
   createBookmarklet() {
@@ -308,7 +355,7 @@ export default class OptionPage {
   }
 
   async exportBookmarkletFile() {
-    let code = await Bookmarklet.injectConfig(option.cfg);
+    let code = await Bookmarklet.injectConfig(option.cfg.ordered());
     exportToFile(code, 'apfBookmarklet.js');
   }
 
@@ -319,13 +366,11 @@ export default class OptionPage {
       let configText = document.getElementById('configText') as HTMLTextAreaElement;
       configText.value = JSON.stringify(option.cfg.ordered(), null, 2);
     } else {
-      let date = new Date;
-      let today = `${date.getUTCFullYear()}-${('0'+(date.getUTCMonth()+1)).slice(-2)}-${('0'+(date.getUTCDate()+1)).slice(-2)}`;
-      exportToFile(JSON.stringify(option.cfg.ordered(), null, 2), `apf-backup-${today}.json`);
+      option.backupConfig();
     }
   }
 
-  async importConfig(e) {
+  importConfig(e) {
     let input = document.getElementById('configInlineInput') as HTMLInputElement;
     if (input.checked) { // inline editor
       let configText = document.getElementById('configText') as HTMLTextAreaElement;
@@ -372,8 +417,8 @@ export default class OptionPage {
     let self = this;
     self.cfg = await WebConfig.build();
     if (!self.auth) self.auth = new OptionAuth(self.cfg.password);
-    // @ts-ignore: Type WebConfig is not assignable to type Config
     filter.cfg = self.cfg;
+    filter.init();
 
     // console.log('Password:', cfg.password, 'Authenticated:', authenticated); // DEBUG Password
     if (self.cfg.password && !self.auth.authenticated) {
@@ -489,8 +534,7 @@ export default class OptionPage {
     this.populateDomain();
   }
 
-  async populateOptions() {
-    filter.init();
+  populateOptions() {
     this.populateSettings();
     this.populateWordsList();
     this.populateWhitelist();
@@ -680,35 +724,31 @@ export default class OptionPage {
   }
 
   populateWordsList() {
-    filter.init();
+    let wordlistFilter = filter;
+
+    // Workaround for remove filter method
+    if (filter.cfg.filterWordList && filter.cfg.filterMethod === 2) {
+      wordlistFilter = new Filter;
+      // Works because we are only changing a native value (filterMethod: number)
+      wordlistFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: 0 }));
+      wordlistFilter.init();
+    }
+
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     let wordListHTML = '<option selected value="">Add...</option>';
 
-    // Workaround for Remove filter (use censor)
-    let filterMethod = filter.cfg.filterMethod;
-    if (filterMethod === 2) {
-      filter.cfg.filterMethod = 0;
-      filter.init();
-    }
-
     Object.keys(option.cfg.words).sort().forEach(word => {
       let filteredWord = word;
-      if (filter.cfg.filterWordList) {
-        if (filter.cfg.words[word].matchMethod == 4) { // Regexp
-          filteredWord = filter.cfg.words[word].sub || filter.cfg.defaultSubstitution;
+      if (wordlistFilter.cfg.filterWordList) {
+        if (wordlistFilter.cfg.words[word].matchMethod == 4) { // Regexp
+          filteredWord = wordlistFilter.cfg.words[word].sub || wordlistFilter.cfg.defaultSubstitution;
         } else {
-          filteredWord = filter.replaceText(word, 0, false); // Using 0 (All) here to filter all words
+          filteredWord = wordlistFilter.replaceText(word, 0, false); // Using 0 (All) here to filter all words
         }
       }
 
       wordListHTML += `<option value="${word}" data-filtered="${filteredWord}">${escapeHTML(filteredWord)}</option>`;
     });
-
-    // Workaround for Remove filter (use censor)
-    if (filterMethod === 2) {
-      filter.cfg.filterMethod = filterMethod;
-      filter.init();
-    }
 
     // Populate the wordlist selections for a word
     let wordlistSelectionHTML = '';
@@ -725,7 +765,8 @@ export default class OptionPage {
     this.cfg.words = {};
     let wordList = document.getElementById('wordList') as HTMLSelectElement;
     wordList.selectedIndex = 0;
-    this.populateWordsList();
+    filter.rebuildWordlists();
+    this.populateOptions();
   }
 
   async removeDomain(event) {
@@ -757,8 +798,7 @@ export default class OptionPage {
       return false;
     } else {
       filter.init();
-      whitelist.selectedIndex = 0;
-      this.populateWhitelist();
+      this.populateOptions();
     }
   }
 
@@ -773,7 +813,8 @@ export default class OptionPage {
       if (result) {
         // Update states and Reset word form
         wordList.selectedIndex = 0;
-        this.populateWordsList();
+        filter.rebuildWordlists();
+        this.populateOptions();
       }
     }
   }
@@ -804,7 +845,6 @@ export default class OptionPage {
   }
 
   async restoreDefaults(evt, silent = false) {
-    this.exportConfig();
     let error = await this.cfg.reset();
     if (error) {
       OptionPage.showErrorModal('Error restoring defaults!');
@@ -989,8 +1029,7 @@ export default class OptionPage {
           return false;
         } else {
           filter.init();
-          whitelist.selectedIndex = 0;
-          this.populateWhitelist();
+          this.populateOptions();
         }
       }
     } else {
@@ -1061,9 +1100,8 @@ export default class OptionPage {
         }
 
         // Update states and Reset word form
-        filter.init();
-        wordList.selectedIndex = 0;
-        this.populateWordsList();
+        filter.rebuildWordlists();
+        this.populateOptions();
       }
     } else {
       OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
@@ -1072,15 +1110,18 @@ export default class OptionPage {
 
   async selectFilterMethod(evt) {
     option.cfg.filterMethod = WebConfig._filterMethodNames.indexOf(evt.target.value);
-    if (await option.saveProp('filterMethod')) this.init();
+    if (await option.saveProp('filterMethod')) {
+      filter.rebuildWordlists();
+      this.populateOptions();
+    }
   }
 
-  async setActiveWordlist(element: HTMLSelectElement) {
+  async setDefaultWordlist(element: HTMLSelectElement) {
     let prop = element.id === 'textWordlistSelect' ? 'wordlistId' : 'audioWordlistId';
     this.cfg[prop] = element.selectedIndex;
 
     if (!await this.saveProp(prop)) {
-      OptionPage.showErrorModal('Failed to update active list.');
+      OptionPage.showErrorModal('Failed to update defult wordlist.');
       return false;
     }
 
@@ -1091,7 +1132,7 @@ export default class OptionPage {
     let modalId = 'bulkWordEditorModal';
     let title = document.querySelector(`#${modalId} h5.modalTitle`) as HTMLHeadingElement;
     let tableContainer = document.querySelector(`#${modalId} div.tableContainer`) as HTMLDivElement;
-    let thead = '<thead><tr><th><span>Remove</span></th><th><span>Word</span></th><th><span>Substitution</span></th><th><span>Match Method</span></th><th><span>Repeated</span></th><th><span>Separators</span></th>';
+    let thead = '<thead><tr><th><span><button id="bulkEditorRemoveAll">X</button> Remove</span></th><th><span>Word</span></th><th><span>Substitution</span></th><th><span>Match Method</span></th><th><span>Repeated</span></th><th><span>Separators</span></th>';
     this.cfg.wordlists.forEach((wordlist, i) => { thead += `<th><label><input type="checkbox" class="wordlistHeader" data-col="${i + 1}"><span> ${wordlist}</span></label></th>`; });
     thead += '</tr></thead>';
     title.textContent = 'Bulk Word Editor';
@@ -1105,11 +1146,16 @@ export default class OptionPage {
     option._bulkWordMatchMethodHTML += '</select>';
 
     // Add current words to the table
-    Object.keys(option.cfg.words).forEach((key, index) => {
-      option.bulkEditorAddRow(key, option.cfg.words[key]);
-    });
+    let wordKeys = Object.keys(option.cfg.words);
+    if (wordKeys.length === 0) {
+      option.bulkEditorAddRow();
+    } else {
+      wordKeys.forEach(key => {
+        option.bulkEditorAddRow(key, option.cfg.words[key]);
+      });
+    }
 
-    document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click', e => { option.switchPage(e); }); });
+    tableContainer.querySelector('button#bulkEditorRemoveAll').addEventListener('click', e => { option.bulkEditorRemoveAll(); });
     tableContainer.querySelectorAll('th input.wordlistHeader').forEach(el => { el.addEventListener('click', e => { option.bulkEditorWordlistCheckbox(e); }); });
     OptionPage.openModal(modalId);
   }
@@ -1119,7 +1165,7 @@ export default class OptionPage {
     let contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
     let contentRight = document.querySelector('#supportedAudioSitesModal div#modalContentRight') as HTMLDivElement;
     let sites = [];
-    let sortedSites = Object.keys(WebAudio.sites).sort(function(a,b) {
+    let sortedSites = Object.keys(WebAudioSites).sort(function(a,b) {
       let domainA = a.match(/\w*\.\w*$/)[0];
       let domainB = b.match(/\w*\.\w*$/)[0];
       return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
@@ -1131,7 +1177,7 @@ export default class OptionPage {
     contentLeft.innerHTML = `<ul>${sites.join('\n')}</ul>`;
     contentRight.innerHTML = `
       <h4 class="sectionHeader">Site Config</h4>
-      <textarea class="w3-input w3-border w3-card" spellcheck="false" readonly>${JSON.stringify(WebAudio.sites, null, 2)}</textarea>
+      <textarea class="w3-input w3-border w3-card" spellcheck="false" readonly>${JSON.stringify(WebAudioSites, null, 2)}</textarea>
     `;
     OptionPage.openModal('supportedAudioSitesModal');
   }
@@ -1239,6 +1285,7 @@ window.addEventListener('load', e => { option.init(); });
 document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click', e => { option.switchPage(e); }); });
 // Modals
 document.getElementById('submitPassword').addEventListener('click', e => { option.auth.authenticate(e); });
+document.getElementById('confirmModalBackup').addEventListener('click', e => { option.confirmModalBackup(); });
 document.getElementById('confirmModalOK').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('statusModalOK').addEventListener('click', e => { OptionPage.closeModal('statusModal'); });
@@ -1279,8 +1326,8 @@ document.getElementById('wordlistsEnabled').addEventListener('click', e => { opt
 document.getElementById('wordlistRename').addEventListener('click', e => { option.renameWordlist(); });
 document.getElementById('wordlistSelect').addEventListener('change', e => { option.populateWordlist(); });
 document.getElementById('wordlistText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
-document.getElementById('textWordlistSelect').addEventListener('change', e => { option.setActiveWordlist(e.target as HTMLSelectElement); });
-document.getElementById('audioWordlistSelect').addEventListener('change', e => { option.setActiveWordlist(e.target as HTMLSelectElement); });
+document.getElementById('textWordlistSelect').addEventListener('change', e => { option.setDefaultWordlist(e.target as HTMLSelectElement); });
+document.getElementById('audioWordlistSelect').addEventListener('change', e => { option.setDefaultWordlist(e.target as HTMLSelectElement); });
 // Domains
 document.querySelectorAll('#domainMode input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
 document.getElementById('domainSelect').addEventListener('change', e => { option.populateDomain(); });
