@@ -5,7 +5,7 @@ import Domain from './domain';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
-import WebAudio from './webAudio';
+import { WebAudioSites } from './webAudioSites';
 
 export default class OptionPage {
   _bulkWordMatchMethodHTML: string;
@@ -1165,7 +1165,7 @@ export default class OptionPage {
     let contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
     let contentRight = document.querySelector('#supportedAudioSitesModal div#modalContentRight') as HTMLDivElement;
     let sites = [];
-    let sortedSites = Object.keys(WebAudio.sites).sort(function(a,b) {
+    let sortedSites = Object.keys(WebAudioSites).sort(function(a,b) {
       let domainA = a.match(/\w*\.\w*$/)[0];
       let domainB = b.match(/\w*\.\w*$/)[0];
       return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
@@ -1177,7 +1177,7 @@ export default class OptionPage {
     contentLeft.innerHTML = `<ul>${sites.join('\n')}</ul>`;
     contentRight.innerHTML = `
       <h4 class="sectionHeader">Site Config</h4>
-      <textarea class="w3-input w3-border w3-card" spellcheck="false" readonly>${JSON.stringify(WebAudio.sites, null, 2)}</textarea>
+      <textarea class="w3-input w3-border w3-card" spellcheck="false" readonly>${JSON.stringify(WebAudioSites, null, 2)}</textarea>
     `;
     OptionPage.openModal('supportedAudioSitesModal');
   }

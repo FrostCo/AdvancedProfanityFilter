@@ -92,7 +92,7 @@ class Popup {
       dynamicList(wordlists, wordlistSelect.id);
       wordlistSelect.selectedIndex = wordlistIndex;
       if (popup.cfg.muteAudio) {
-        popup.audioSiteKeys = Object.keys(Object.assign({}, WebAudio.sites, popup.cfg.customAudioSites));
+        popup.audioSiteKeys = Object.keys(WebAudio.combineSites(popup.cfg.customAudioSites));
         if (popup.audioSiteKeys.includes(popup.domain.cfgKey)) {
           let audioWordlistIndex = popup.domain.audioWordlistId >= 0 ? popup.domain.audioWordlistId + 1 : 0;
           dynamicList(wordlists, audioWordlistSelect.id);
