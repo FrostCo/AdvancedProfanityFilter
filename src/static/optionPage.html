@@ -534,17 +534,25 @@
     <li>Match repeated characters - Match words with repeated characters (must still be in same order).</li>
     <li>Match separators - Words/phrases that contain (<code>&#39;-&#39;, &#39;_&#39; &amp; &#39; &#39;</code>) inside them will be filtered.</li>
     </ul>
+    <h3 id="bulk-editor">Bulk Editor</h3>
+    <p>The bulk editor lets you see all your words and their options in a table format, and make multiple changes at once. This is also the easiest way to assign words to wordlists. In this view you can remove words, add words, or adjust the options for words. If you have several words you would like to add to the Filter, there is a box in the bottom-left corner that you can put one word/phrase per line to import. Once you have made your desired modifications, click the save button. A prompt will appear asking to confirm the action. When you click OK, all of words will be replaced with what is in the bulk editor. Because this is a big operation, the prompt also includes a &quot;Backup&quot; button, which will create a backup of your settings before any changes are made. Its recommended to have a backup, just in case. Once you have confirmed that everything looks right, and you&#39;re happy with the changes feel free to delete the backup file.</p>
+    <h1 id="lists">Lists</h1>
     <h3 id="whitelist">Whitelist</h3>
     <p>The Word Whitelist provides a mechanism to list words/phrases that should NOT be filtered. Whitelist entries can be case sensitive (case matters). For example, if you added the word &quot;dog&quot; to the filter, but don&#39;t want &quot;Dog&quot; (capitalized) to be filtered, you could add &quot;Dog&quot; as a case-sensitive whitelisted word and it will no longer be filtered.</p>
+    <h3 id="wordlists">Wordlists</h3>
+    <p>Wordlists allow you to create collections of words for specific purposes. For instance, you could have a &quot;Parent&quot; list, where some words are not filtered, or you could create a &quot;Muting&quot; list which is used for audio muting. Another example could be a wordlist that excludes (or includes) religious references. Wordlists could even be used for different languages (English, Spanish, etc) if you don&#39;t want to mix them.</p>
+    <p>On this page, you can rename wordlists and set which wordlist should be used for text and audio muting by default. You can set which wordlists are used per-domain by using the Popup window while visiting the desired page, or by going to the Domain tab in the options page.</p>
+    <p>The fastest way to adjust which words are included in a wordlist is by using the Bulk Editor found in the Words tab.</p>
+    <p><em>Currently only 6 wordlists are supported.</em></p>
     <h1 id="domains">Domains</h1>
-    <p>This tab allows you to control which domains will be filtered, or which domains to use the Advanced mode on.</p>
+    <p>This tab allows you to adjust the filter&#39;s settings on specific domains.</p>
     <h3 id="domain-mode">Domain Mode:</h3>
     <ul>
     <li><strong>Whitelist: <em>(default)</em></strong> - Filter all pages unless they are specifically added to the whitelist. </li>
     <li><strong>Blacklist:</strong> - Only filter pages that are specifically added to the blacklist.</li>
     </ul>
     <h3 id="domains-1">Domains:</h3>
-    <p>Adjust the domain list for the currently selected mode. To match Google.com and all its sub-domains, simply add <code>google.com</code>. If you want to just match Gmail, you can add <code>mail.google.com</code>.</p>
+    <p>Adjust the domain list for the currently selected mode. To match google.com and all its sub-domains, simply add <code>google.com</code>. If you want to just match Gmail, you can add <code>mail.google.com</code>.</p>
     <p>When browsing a web page, you can also toggle the filter for the current domain from the context (right-click) menu, or using the extension&#39;s Popup menu.</p>
     <p><em>Note: Do not include the protocol (ex. <code>http://</code>), or anything after the domain name.</em></p>
     <h3 id="advanced-mode">Advanced Mode:</h3>
@@ -553,6 +561,9 @@
     <p><em>Example:</em></p>
     <pre><code class="language-html">&lt;span&gt;some text to fil&lt;/span&gt;&lt;span&gt;ter&lt;/span&gt;</code></pre>
     <p>On the page, this would look like: &quot;some text to filter&quot;, but the extension (without advanced mode) would see <code>some text to fil</code>, and <code>ter</code>. If you were trying to filter the word <code>text</code>, it would work as expected (because &quot;text&quot; isn&#39;t split across elements). If you were trying to filter the word <code>filter</code>, it would fail without Advanced mode being turned on, because it doesn&#39;t match on <code>some text to fil</code>, or <code>ter</code>. This is not a common practice, and is only needed in a very small number of websites.</p>
+    <h3 id="wordlists-1">Wordlists</h3>
+    <p>Adjust which wordlist should be used for text and audio muting on the selected domain.</p>
+    <p><em>Tip: You can choose <code>Default</code>, which will set it to the default set in the Lists page.</em></p>
     <h1 id="audio">Audio</h1>
     <p>Mute audio during video playback when a filtered word is detected in the subtitles/captions (which must be enabled) on a supported site. The effectiveness of this feature is completely dependent on the quality and timing of the subtitles accompanying the video. For more information, please see the <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio">Audio wiki</a>.</p>
     <p><em>Note: If the &quot;Show number of filtered words&quot; option is enabled, the badge will be green when audio muting is enabled on a supported site.</em></p>
@@ -600,7 +611,9 @@
     <ul>
     <li><strong>Domain Toggle</strong> - Switch to turn the filter on/off for the current domain.</li>
     <li><strong>Advanced Mode</strong> - Switch Advanced Mode on/off for the current domain.</li>
-    <li><strong>Filter</strong> - Change the filter mode. This is a global setting and affects all pages.</li>
+    <li><strong>Filter</strong> - Change the filter mode. <strong>This is a global setting and affects all pages.</strong></li>
+    <li><strong>Text Wordlist</strong> - Change the active wordlist for text for the current domain (Only when wordlists are enabled)</li>
+    <li><strong>Audio Wordlist</strong> - Change the active wordlist for audio for the current domain (Only when both wordlists and audio muting are enabled, and this is an audio page).</li>
     <li><strong>Summary</strong> - A summary will appear when words have been filtered on the current page detailing what was filtered. The words are censored, but the original word can be seen by hovering over a word.</li>
     </ul>
     <p>In addition to the above, there are links to the Options page and support pages.</p>
