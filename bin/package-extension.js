@@ -8,6 +8,7 @@ function buildAll() {
   build(prepareZip());
   buildEdgeLegacy(getManifestJSON(), prepareZip());
   buildFirefox(getManifestJSON(), prepareZip());
+  buildBookmarklet();
 }
 
 function build(zip, name = '') {
@@ -16,6 +17,10 @@ function build(zip, name = '') {
   console.log(`Building ${packagePath}`);
   fse.removeSync(packagePath);
   zip.writeZip(packagePath);
+}
+
+function buildBookmarklet() {
+  fse.copyFileSync(path.join(dist, 'bookmarkletFilter.js'), './bookmarklet.js');
 }
 
 function buildEdgeLegacy(manifest, zip) {

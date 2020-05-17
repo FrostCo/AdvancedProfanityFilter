@@ -19,6 +19,7 @@ For an overview of features and options, please head to the [wiki](https://githu
 | Edge (Legacy) | [More Info](https://github.com/richardfrost/AdvancedProfanityFilter/issues/102) |
 | Opera   | [Opera addons](https://addons.opera.com/en/extensions/details/advanced-profanity-filter/) |
 | Android | [Kiwi](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser) or [Firefox](https://play.google.com/store/apps/details?id=org.mozilla.firefox) |
+| iOS/Other | [Bookmarklet Info](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Bookmarklet) |
 
 ### Features
 * Filter modes
