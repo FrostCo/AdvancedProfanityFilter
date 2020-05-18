@@ -453,6 +453,21 @@ export default class OptionPage {
     customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
   }
 
+  populateBookmarkletPage() {
+    let bookmarkletConfig = document.querySelector('input[name="bookmarkletConfig"]:checked') as HTMLInputElement;
+    let bookmarkletCustomConfig = document.getElementById('bookmarkletCustomConfig') as HTMLDivElement;
+    let bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
+    if (bookmarkletConfig.value == 'default') {
+      OptionPage.hide(bookmarkletCustomConfig);
+      bookmarkletLink.href = Bookmarklet._defaultBookmarklet;
+      OptionPage.enableBtn(bookmarkletLink);
+    } else {
+      bookmarkletLink.href = '#0';
+      OptionPage.show(bookmarkletCustomConfig);
+      this.createBookmarklet();
+    }
+  }
+
   populateConfig() {
     this.auth.setPasswordButton(option);
   }
@@ -1344,8 +1359,10 @@ document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.ad
 document.querySelectorAll('input.updateYouTubeAutoLimits').forEach(el => { el.addEventListener('input', e => { option.updateYouTubeAutoLimits(e.target); }); });
 document.getElementById('customAudioSitesSave').addEventListener('click', e => { option.saveCustomAudioSites(); });
 // Bookmarklet
+document.querySelectorAll('#bookmarkletConfigInputs input').forEach(el => { el.addEventListener('click', e => { option.populateBookmarkletPage(); }); });
 document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });
 document.getElementById('bookmarkletHostedURL').addEventListener('input', e => { option.createBookmarklet(); });
+document.getElementById('bookmarkletLink').addEventListener('click', e => { e.preventDefault(); });
 // Config
 document.getElementById('configInlineInput').addEventListener('click', e => { option.configInlineToggle(); });
 document.getElementById('importFileInput').addEventListener('change', e => { option.importConfigFile(e); });
