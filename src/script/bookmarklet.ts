@@ -1,7 +1,7 @@
 export default class Bookmarklet {
   hostedUrl: string
 
-  static readonly _defaultBookmarklet = 'javascript:(function()%7Bif(!document.querySelector(%22script.apfBookmarklet%22))%7Blet%20apfScriptEl%3Ddocument.body.appendChild(document.createElement(%22script%22))%3BapfScriptEl.type%3D%22text%2Fjavascript%22%3BapfScriptEl.src%3D%22https%3A%2F%2Fcdn.jsdelivr.net%2Fgh%2Frichardfrost%2FAdvancedProfanityFilter%40master%2Fbookmarklet.js%22%3BapfScriptEl.className%3D%22apfBookmarklet%22%3B%7D%7D)()'
+  static readonly _defaultBookmarklet = 'https://raw.githubusercontent.com/richardfrost/AdvancedProfanityFilter/master/bookmarklet.js';
   static readonly _defaultFilename = 'apfBookmarklet.js';
   static readonly dropboxRegExp = /^https:\/\/www\.dropbox\.com\/[a-z]\/\w+?\/[\w\-\.]+?\?dl=0$/;
   static readonly gitHubGistLinkRegExp = /^https:\/\/gist\.github\.com\/([\w\-]+?)\/([\w\-]+?)$/;

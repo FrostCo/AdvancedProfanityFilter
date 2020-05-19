@@ -336,24 +336,6 @@ export default class OptionPage {
     }
   }
 
-  createBookmarklet() {
-    let bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
-    let bookmarkletHostedURLInput = document.getElementById('bookmarkletHostedURL') as HTMLInputElement;
-    OptionPage.hideInputError(bookmarkletHostedURLInput);
-
-    if (bookmarkletHostedURLInput.checkValidity()) {
-      let bookmarkletHostedURL = bookmarkletHostedURLInput.value;
-      let bookmarklet = new Bookmarklet(bookmarkletHostedURL);
-      bookmarkletLink.href = bookmarklet.destination();
-      OptionPage.enableBtn(bookmarkletLink);
-    } else {
-      OptionPage.showInputError(bookmarkletHostedURLInput, 'Please enter a valid URL.');
-      bookmarkletLink.href = '#';
-      OptionPage.disableBtn(bookmarkletLink);
-      return false;
-    }
-  }
-
   async exportBookmarkletFile() {
     let code = await Bookmarklet.injectConfig(option.cfg.ordered());
     exportToFile(code, 'apfBookmarklet.js');
@@ -456,15 +438,12 @@ export default class OptionPage {
   populateBookmarkletPage() {
     let bookmarkletConfig = document.querySelector('input[name="bookmarkletConfig"]:checked') as HTMLInputElement;
     let bookmarkletCustomConfig = document.getElementById('bookmarkletCustomConfig') as HTMLDivElement;
-    let bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
     if (bookmarkletConfig.value == 'default') {
       OptionPage.hide(bookmarkletCustomConfig);
-      bookmarkletLink.href = Bookmarklet._defaultBookmarklet;
-      OptionPage.enableBtn(bookmarkletLink);
+      this.updateBookmarklet(Bookmarklet._defaultBookmarklet);
     } else {
-      bookmarkletLink.href = '#0';
       OptionPage.show(bookmarkletCustomConfig);
-      this.createBookmarklet();
+      this.updateHostedBookmarklet();
     }
   }
 
@@ -1216,6 +1195,29 @@ export default class OptionPage {
     }
   }
 
+  updateBookmarklet(url: string) {
+    let bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
+    let bookmarklet = new Bookmarklet(url);
+    bookmarkletLink.href = bookmarklet.destination();
+    OptionPage.enableBtn(bookmarkletLink);
+  }
+
+  updateHostedBookmarklet() {
+    let bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
+    let bookmarkletHostedURLInput = document.getElementById('bookmarkletHostedURL') as HTMLInputElement;
+    OptionPage.hideInputError(bookmarkletHostedURLInput);
+
+    if (bookmarkletHostedURLInput.checkValidity()) {
+      this.updateBookmarklet(bookmarkletHostedURLInput.value);
+    } else {
+      if (bookmarkletHostedURLInput.value !== '') {
+        OptionPage.showInputError(bookmarkletHostedURLInput, 'Please enter a valid URL.');
+      }
+      bookmarkletLink.href = '#0';
+      OptionPage.disableBtn(bookmarkletLink);
+    }
+  }
+
   updateFilterOptions() {
     // Show/hide options as needed
     switch(this.cfg.filterMethod) {
@@ -1361,7 +1363,7 @@ document.getElementById('customAudioSitesSave').addEventListener('click', e => {
 // Bookmarklet
 document.querySelectorAll('#bookmarkletConfigInputs input').forEach(el => { el.addEventListener('click', e => { option.populateBookmarkletPage(); }); });
 document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });
-document.getElementById('bookmarkletHostedURL').addEventListener('input', e => { option.createBookmarklet(); });
+document.getElementById('bookmarkletHostedURL').addEventListener('input', e => { option.updateHostedBookmarklet(); });
 document.getElementById('bookmarkletLink').addEventListener('click', e => { e.preventDefault(); });
 // Config
 document.getElementById('configInlineInput').addEventListener('click', e => { option.configInlineToggle(); });
