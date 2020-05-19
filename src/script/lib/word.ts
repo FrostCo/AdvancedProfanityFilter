@@ -51,8 +51,8 @@ export default class Word {
 
   constructor(word: string, options: WordOptions, cfg: Config) {
     this.value = word;
-    this.lists = options.lists || [];
-    this.matchMethod = options.matchMethod || cfg.defaultWordMatchMethod;
+    this.lists = options.lists === undefined ? [] : options.lists;
+    this.matchMethod = options.matchMethod === undefined ? cfg.defaultWordMatchMethod : options.matchMethod;
     this.matchRepeated = options.repeat === undefined ? cfg.defaultWordRepeat : options.repeat;
     this.matchSeparators = options.separators === undefined ? cfg.defaultWordSeparators : options.separators;
     this.sub = options.sub === undefined ? cfg.defaultSubstitution : options.sub;

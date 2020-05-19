@@ -231,6 +231,38 @@ describe('Word', function() {
     });
   });
 
+  describe('constructor()', function() {
+    it('should use all provided defaults', function() {
+      let cfg = Object.assign({}, Config._defaults, { defaultWordMatchMethod: 2 });
+      let options = {};
+      let word = new Word('train', options, cfg);
+      expect(word.matchMethod).to.eql(2);
+      expect(word.matchRepeated).to.eql(cfg.defaultWordRepeat);
+      expect(word.lists).to.eql([]);
+      expect(word.matchSeparators).to.eql(cfg.defaultWordSeparators);
+    });
+
+    it('should use provided matchMethod = 0 and fill in defaults', function() {
+      let cfg = Object.assign({}, Config._defaults, { defaultWordMatchMethod: 2 });
+      let options = { lists: [1,5], matchMethod: 0, repeat: true };
+      let word = new Word('again', options, cfg);
+      expect(word.matchMethod).to.eql(options.matchMethod);
+      expect(word.matchRepeated).to.eql(options.repeat);
+      expect(word.lists).to.eq(options.lists);
+      expect(word.matchSeparators).to.eql(cfg.defaultWordSeparators);
+    });
+
+    it('should use provided matchMethod = 2 and fill in defaults', function() {
+      let cfg = Config._defaults;
+      let options = { matchMethod: 2, separators: true };
+      let word = new Word('testing', options, cfg);
+      expect(word.matchMethod).to.eql(options.matchMethod);
+      expect(word.matchRepeated).to.eql(cfg.defaultWordRepeat);
+      expect(word.lists).to.eql([]);
+      expect(word.matchSeparators).to.eql(options.separators);
+    });
+  });
+
   describe('containsDoubleByte()', function() {
     it('should return true when string includes a double-byte UTF character', function() {
       expect(Word.containsDoubleByte('врата')).to.equal(true);
