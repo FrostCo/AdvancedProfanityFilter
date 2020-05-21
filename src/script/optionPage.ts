@@ -5,7 +5,7 @@ import Domain from './domain';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
-import { WebAudioSites } from './webAudioSites';
+import WebAudioSites from './webAudioSites';
 
 export default class OptionPage {
   auth: OptionAuth;

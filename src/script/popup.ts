@@ -1,5 +1,5 @@
 import { dynamicList, escapeHTML } from './lib/helper';
-import WebAudio from './webAudio';
+import WebAudioSites from './webAudioSites';
 import WebConfig from './webConfig';
 import Domain from './domain';
 import Page from './page';
@@ -92,7 +92,7 @@ class Popup {
       dynamicList(wordlists, wordlistSelect);
       wordlistSelect.selectedIndex = wordlistIndex;
       if (popup.cfg.muteAudio) {
-        popup.audioSiteKeys = Object.keys(WebAudio.combineSites(popup.cfg.customAudioSites));
+        popup.audioSiteKeys = Object.keys(WebAudioSites.combineSites(popup.cfg.customAudioSites));
         if (popup.audioSiteKeys.includes(popup.domain.cfgKey)) {
           let audioWordlistIndex = popup.domain.audioWordlistId >= 0 ? popup.domain.audioWordlistId + 1 : 0;
           dynamicList(wordlists, audioWordlistSelect);
