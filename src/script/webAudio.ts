@@ -200,7 +200,7 @@ export default class WebAudio {
 
       // Set a timer to unmute if a max time was specified
       if (this.youTubeAutoSubsMax) {
-        this.youTubeAutoSubsTimeout = setTimeout(this.youTubeAutoSubsMuteTimeout, this.youTubeAutoSubsMax, this);
+        this.youTubeAutoSubsTimeout = window.setTimeout(this.youTubeAutoSubsMuteTimeout, this.youTubeAutoSubsMax, this);
       }
     } else {
       if (this.muted) {
