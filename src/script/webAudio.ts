@@ -163,7 +163,8 @@ export default class WebAudio {
         && !WebAudio.brTagRegExp.test(subtitle[textMethod])
         && WebAudio.brTagRegExp.test(subtitle.innerHTML)
       ) {
-        subtitle.innerHTML = subtitle.innerHTML.replace(WebAudio.brTagRegExp, '\n');
+        if (subtitle.style.whiteSpace !== 'pre') { subtitle.style.whiteSpace = 'pre'; }
+        subtitle.textContent = subtitle.innerHTML.replace(WebAudio.brTagRegExp, '\n');
       }
       let result = this.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {

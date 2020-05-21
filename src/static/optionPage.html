@@ -650,7 +650,12 @@
   <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="width: 98%;">
     <header class="w3-container w3-flat-peter-river"><h5 class="modalTitle"></h5></header>
     <div class="w3-container w3-margin w3-padding">
-      <div class="tableContainer  w3-card" style="overflow: auto; height: 600px;"></div>
+      <div class="tableContainer w3-card">
+        <table id="bulkWordEditorTable" class="w3-table-all w3-tiny w3-hoverable">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
       <div class="w3-margin-top">
         <textarea id="bulkAddWordsText" class="batchAddWord w3-left w3-margin-right" style="width:300px;height:50px;font-size:11px;" spellcheck="false" placeholder="Bulk add words (one word/phrase per line)"></textarea>
         <button class="modalBulkAddWords w3-btn w3-round-large w3-flat-peter-river">BULK ADD WORDS</button>
@@ -708,7 +713,10 @@
     <div class="w3-container w3-padding w3-margin">
       <div class="w3-container">
         <div id="modalContentLeft" class="w3-half"></div>
-        <div id="modalContentRight" class="w3-half w3-right"></div>
+        <div id="modalContentRight" class="w3-half w3-right">
+          <h4 class="sectionHeader">Site Config</h4>
+          <textarea class="w3-input w3-border w3-card" spellcheck="false" readonly></textarea>
+        </div>
       </div>
       <div class="w3-right">
         <button class="modalOK w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>

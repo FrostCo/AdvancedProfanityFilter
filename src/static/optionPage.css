@@ -39,6 +39,8 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 #bulkWordEditorModal,#supportedAudioSitesModal
 {z-index:500}
 /* Bulk Word Editor */
+#bulkWordEditorModal div.tableContainer
+{overflow: auto; height: 600px;}
 #bulkWordEditorModal table
 {border:none;} /* Fix small gap on sticky header from .w3-table-all */
 #bulkWordEditorModal table th
@@ -47,3 +49,7 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 {vertical-align:middle;}
 #supportedAudioSitesModal textarea
 {width:420px;height:400px;font-size:11px;}
+div#wordsPage #wordlistSelections label input
+{margin-left:8px;}
+#confirmModal div#confirmModalContent
+{white-space: pre;}
