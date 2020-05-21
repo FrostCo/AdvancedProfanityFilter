@@ -487,15 +487,17 @@
     getPortionReplacementNode: function(portion, match) {
 
       var replacement = this.options.replace || '$&';
-      var wrapper = this.options.wrap;
-      var wrapperClass = this.options.wrapClass;
+      // APF: Disable replacement wrapper (not used)
+      // var wrapper = this.options.wrap;
+      // var wrapperClass = this.options.wrapClass;
 
-      if (wrapper && wrapper.nodeType) {
-        // Wrapper has been provided as a stencil-node for us to clone:
-        var clone = doc.createElement('div');
-        clone.innerHTML = wrapper.outerHTML || new XMLSerializer().serializeToString(wrapper);
-        wrapper = clone.firstChild;
-      }
+      // This is causing warnings due to unsafe innerHTML assignment
+      // if (wrapper && wrapper.nodeType) {
+      //   // Wrapper has been provided as a stencil-node for us to clone:
+      //   var clone = doc.createElement('div');
+      //   clone.innerHTML = wrapper.outerHTML || new XMLSerializer().serializeToString(wrapper);
+      //   wrapper = clone.firstChild;
+      // }
 
       if (typeof replacement == 'function') {
         replacement = replacement(portion, match);
@@ -505,29 +507,30 @@
         return doc.createTextNode(String(replacement));
       }
 
-      var el = typeof wrapper == 'string' ? doc.createElement(wrapper) : wrapper;
+      // APF: Disable replacement wrapper (not used)
+      // var el = typeof wrapper == 'string' ? doc.createElement(wrapper) : wrapper;
 
-      if (el && wrapperClass) {
-        el.className = wrapperClass;
-      }
+      // if (el && wrapperClass) {
+      //   el.className = wrapperClass;
+      // }
 
-      replacement = doc.createTextNode(
-        this.prepareReplacementString(
-          replacement, portion, match
-        )
-      );
+      // replacement = doc.createTextNode(
+      //   this.prepareReplacementString(
+      //     replacement, portion, match
+      //   )
+      // );
 
-      if (!replacement.data) {
-        return replacement;
-      }
+      // if (!replacement.data) {
+      //   return replacement;
+      // }
 
-      if (!el) {
-        return replacement;
-      }
+      // if (!el) {
+      //   return replacement;
+      // }
 
-      el.appendChild(replacement);
+      // el.appendChild(replacement);
 
-      return el;
+      // return el;
     },
 
     replaceMatch: function(match, startPortion, innerPortions, endPortion) {
