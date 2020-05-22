@@ -4,6 +4,7 @@ import WebAudioSites from './webAudioSites';
 
 export default class WebAudio {
   cueRuleIds: number[];
+  enabledRuleIds: number[];
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
@@ -12,7 +13,6 @@ export default class WebAudio {
   rules: AudioRules[];
   simpleUnmute: boolean;
   sites: { [site: string]: AudioRules[] };
-  supportedNode: Function;
   supportedPage: boolean;
   unmuteDelay: number;
   volume: number;
@@ -27,6 +27,7 @@ export default class WebAudio {
 
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.cueRuleIds = [];
+    this.enabledRuleIds = [];
     this.watcherRuleIds = [];
     this.filter = filter;
     this.lastFilteredNode = null;
@@ -49,93 +50,21 @@ export default class WebAudio {
     // Setup rules for current site
     this.rules = this.sites[filter.hostname];
     if (this.rules) {
-      this.supportedPage = true;
-      if (['tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) { this.youTube = true; }
-      if (!Array.isArray(this.rules)) {
-        this.rules = [this.rules];
+      if (!Array.isArray(this.rules)) { this.rules = [this.rules]; }
+      this.initRules();
+      if (this.enabledRuleIds.length > 0) {
+        this.supportedPage = true;
+        if(['tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) { this.youTube = true; }
+
+        if (this.watcherRuleIds.length > 0) {
+          this.watcherRuleIds.forEach(ruleId => {
+            setInterval(this.watcher, this.rules[ruleId].checkInterval, this, ruleId);
+          });
+        }
+
+        if (this.cueRuleIds.length > 0) { setInterval(this.watchForVideo, 250, this); }
       }
-
-      this.supportedNode = this.buildSupportedNodeFunction();
-
-      // Mode: watcher
-      if (this.watcherRuleIds.length > 0) {
-        this.watcherRuleIds.forEach(ruleId => {
-          setInterval(this.watcher, this.rules[ruleId].checkInterval, this, ruleId);
-        });
-      }
-
-      // Mode: cue (check for videos)
-      if (this.cueRuleIds.length > 0) { setInterval(this.watchForVideo, 250, this); }
     }
-  }
-
-  buildSupportedNodeFunction(): Function {
-    let block = '';
-
-    this.rules.forEach((rule, index) => {
-      // Skip this rule if it doesn't apply to the current page
-      if (
-        (rule.iframe === true && this.filter.iframe == null)
-        || (rule.iframe === false && this.filter.iframe != null)
-      ) {
-        return;
-      }
-
-      // Setup rule defaults
-      if (rule.mode === undefined) { rule.mode = 'element'; }
-      if (rule.filterSubtitles === undefined) { rule.filterSubtitles = true; }
-      if (rule.simpleUnmute) { this.simpleUnmute = true; }
-
-      // Allow rules to override global settings
-      if (rule.muteMethod === undefined) { rule.muteMethod = this.filter.cfg.muteMethod; }
-      if (rule.showSubtitles === undefined) { rule.showSubtitles = this.filter.cfg.showSubtitles; }
-
-      switch(rule.mode) {
-        case 'cue':
-          // NO-OP for supportedNode()
-          this.cueRuleIds.push(index); // Save list of cue rule ids
-          this.initCueRule(rule);
-          break;
-        case 'element':
-          if (!rule.tagName) { throw('tagName is required.'); }
-          block += `
-          if (node.nodeName == '${rule.tagName.toUpperCase()}') {
-            let failed = false;
-            ${rule.className ? `if (!failed && (!node.className || !node.className.includes('${rule.className}'))) { failed = true; }` : ''}
-            ${rule.dataPropPresent ? `if (!failed && (!node.dataset || !node.dataset.hasOwnProperty('${rule.dataPropPresent}'))) { failed = true; }` : ''}
-            ${rule.hasChildrenElements ? 'if (!failed && (typeof node.childElementCount !== "number" || node.childElementCount < 1)) { failed = true; }' : ''}
-            ${rule.subtitleSelector ? `if (!failed && (typeof node.querySelector !== 'function' || !node.querySelector('${rule.subtitleSelector}'))) { failed = true; }` : ''}
-            ${rule.containsSelector ? `if (!failed && (typeof node.querySelector !== 'function' || !node.querySelector('${rule.containsSelector}'))) { failed = true; }` : ''}
-            if (!failed) { return ${index}; }
-          }`;
-          break;
-        case 'elementChild':
-          this.initElementChildRule(rule);
-          block += `
-          if (node.nodeName === '${rule.tagName.toUpperCase()}') {
-            let parent = document.querySelector('${rule.parentSelector}');
-            if (parent && parent.contains(node)) { return ${index}; }
-          }`;
-          break;
-        case 'text':
-          block += `
-            if (node.nodeName === '#text') {
-              let parent = document.querySelector('${rule.parentSelector}');
-              if (parent && parent.contains(node)) { return ${index}; }
-            }`;
-          break;
-        case 'watcher':
-          this.watcherRuleIds.push(index);
-          this.initWatcherRule(rule);
-          block += `
-            if (node.parentElement && node.parentElement == document.querySelector('${rule.subtitleSelector}')) { return ${index}; }
-            ${rule.parentSelector ? `let parent = document.querySelector('${rule.parentSelector}'); if (parent && parent.contains(node)) { return ${index}; }` : ''}
-          `;
-          break;
-      }
-    });
-
-    return new Function('node', `${block} return false;`.replace(/^\s*\n/gm, ''));
   }
 
   clean(subtitleContainer, ruleIndex = 0): void {
@@ -270,6 +199,56 @@ export default class WebAudio {
     }
   }
 
+  initRules() {
+    this.rules.forEach((rule, index) => {
+      if (
+        rule.mode === undefined
+        || ((rule.mode == 'element' || rule.mode == 'elementChild') && !rule.tagName)
+        // Skip this rule if it doesn't apply to the current page
+        || (rule.iframe === true && this.filter.iframe == null)
+        || (rule.iframe === false && this.filter.iframe != null)
+      ) {
+        rule.disabled = true;
+      }
+
+      if (!rule.disabled) {
+        this.enabledRuleIds.push(index);
+
+        // Setup rule defaults
+        if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
+        if (rule.simpleUnmute != null) { this.simpleUnmute = true; }
+
+        // Allow rules to override global settings
+        if (rule.muteMethod == null) { rule.muteMethod = this.filter.cfg.muteMethod; }
+        if (rule.showSubtitles == null) { rule.showSubtitles = this.filter.cfg.showSubtitles; }
+
+        // Ensure proper rule values
+        if (rule.tagName != null && rule.tagName != '#text') { rule.tagName = rule.tagName.toUpperCase(); }
+
+        switch(rule.mode) {
+          case 'cue':
+            this.initCueRule(rule);
+            this.cueRuleIds.push(index);
+            break;
+          case 'text':
+            this.initTextRule(rule);
+            break;
+          case 'elementChild':
+            this.initElementChildRule(rule);
+            break;
+          case 'watcher':
+            this.initWatcherRule(rule);
+            this.watcherRuleIds.push(index);
+            break;
+        }
+      }
+    });
+  }
+
+  initTextRule(rule) {
+    rule.tagName = '#text';
+  }
+
   initWatcherRule(rule) {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
     if (rule.trackProcessed === undefined) { rule.trackProcessed = true; }
@@ -330,6 +309,51 @@ export default class WebAudio {
       let container = document.querySelector(rule.displaySelector);
       if (container) { container.style.display = rule.displayShow; }
     }
+  }
+
+  // Checks if a node is a supported audio node.
+  // Returns rule id upon first match, otherwise returns false
+  supportedNode(node) {
+    for (let i = 0; i < this.enabledRuleIds.length; i++) {
+      let ruleId = this.enabledRuleIds[i];
+      let rule = this.rules[ruleId];
+
+      switch(rule.mode) {
+        case 'element':
+          if (node.nodeName == rule.tagName) {
+            let failed = false;
+            if (!failed && rule.className && (!node.className || !node.classList.contains(rule.className))) { failed = true; }
+            if (!failed && rule.dataPropPresent && (!node.dataset || !node.dataset.hasOwnProperty(rule.dataPropPresent))) { failed = true; }
+            if (!failed && rule.hasChildrenElements && (typeof node.childElementCount !== 'number' || node.childElementCount == 0)) { failed = true; }
+            if (!failed && rule.subtitleSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.subtitleSelector))) { failed = true; }
+            if (!failed && rule.containsSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.containsSelector))) { failed = true; }
+            if (!failed) { return ruleId; }
+          }
+          break;
+        case 'elementChild':
+          if (node.nodeName === rule.tagName) {
+            let parent = document.querySelector(rule.parentSelector);
+            if (parent && parent.contains(node)) { return ruleId; }
+          }
+          break;
+        case 'text':
+          if (node.nodeName === rule.tagName) {
+            let parent = document.querySelector(rule.parentSelector);
+            if (parent && parent.contains(node)) { return ruleId; }
+          }
+          break;
+        case 'watcher':
+          if (node.parentElement && node.parentElement == document.querySelector(rule.subtitleSelector)) { return ruleId; }
+          if (rule.parentSelector != null) {
+            let parent = document.querySelector(rule.parentSelector);
+            if (parent && parent.contains(node)) { return ruleId; }
+          }
+          break;
+      }
+    }
+
+    // No matching rule was found
+    return false;
   }
 
   unmute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
