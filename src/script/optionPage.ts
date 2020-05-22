@@ -1240,6 +1240,8 @@ export default class OptionPage {
     let table = tableContainer.querySelector('table') as HTMLTableElement;
     title.textContent = 'Bulk Word Editor';
     if (table.tHead.rows.length === 0) { table.tHead.appendChild(option.bulkWordEditorHeaderRow()); }
+    let tBody = table.querySelector('tbody') as HTMLTableSectionElement;
+    removeChildren(tBody);
 
     // Add current words to the table
     let wordKeys = Object.keys(option.cfg.words);
