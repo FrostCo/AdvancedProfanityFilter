@@ -1259,7 +1259,7 @@ export default class OptionPage {
     let title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
     let contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
     removeChildren(contentLeft);
-    let sortedSites = Object.keys(WebAudioSites).sort(function(a,b) {
+    let sortedSites = Object.keys(WebAudioSites.sites).sort(function(a,b) {
       let domainA = a.match(/\w*\.\w*$/)[0];
       let domainB = b.match(/\w*\.\w*$/)[0];
       return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
@@ -1278,7 +1278,7 @@ export default class OptionPage {
     contentLeft.appendChild(ul);
 
     let textArea = document.querySelector('#supportedAudioSitesModal div#modalContentRight textarea') as HTMLTextAreaElement;
-    textArea.textContent = JSON.stringify(WebAudioSites, null, 2);
+    textArea.textContent = JSON.stringify(WebAudioSites.sites, null, 2);
     OptionPage.openModal('supportedAudioSitesModal');
   }
 

@@ -1,9 +1,9 @@
 export default class WebAudioSites {
   static combineSites(sites: { [site: string]: AudioRules[] } = {}): { [site: string]: AudioRules[] } {
-    return Object.assign({}, WebAudioSites, sites);
+    return Object.assign({}, WebAudioSites.sites, sites);
   }
 
-  static Sites: { [site: string]: AudioRules[] } = {
+  static sites: { [site: string]: AudioRules[] } = {
     'abc.com': [{ mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' }],
     'www.amazon.com': [
       {
