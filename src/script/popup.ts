@@ -1,5 +1,5 @@
 import { dynamicList, escapeHTML } from './lib/helper';
-import WebAudio from './webAudio';
+import WebAudioSites from './webAudioSites';
 import WebConfig from './webConfig';
 import Domain from './domain';
 import Page from './page';
@@ -83,19 +83,19 @@ class Popup {
     let wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     let audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
-    dynamicList(WebConfig._filterMethodNames, 'filterMethodSelect');
+    dynamicList(WebConfig._filterMethodNames, filterMethodSelect);
     filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
 
     if (popup.cfg.wordlistsEnabled) {
       let wordlists = ['Default Wordlist'].concat(WebConfig._allWordlists, popup.cfg.wordlists);
       let wordlistIndex = popup.domain.wordlistId >= 0 ? popup.domain.wordlistId + 1 : 0;
-      dynamicList(wordlists, wordlistSelect.id);
+      dynamicList(wordlists, wordlistSelect);
       wordlistSelect.selectedIndex = wordlistIndex;
       if (popup.cfg.muteAudio) {
-        popup.audioSiteKeys = Object.keys(WebAudio.combineSites(popup.cfg.customAudioSites));
+        popup.audioSiteKeys = Object.keys(WebAudioSites.combineSites(popup.cfg.customAudioSites));
         if (popup.audioSiteKeys.includes(popup.domain.cfgKey)) {
           let audioWordlistIndex = popup.domain.audioWordlistId >= 0 ? popup.domain.audioWordlistId + 1 : 0;
-          dynamicList(wordlists, audioWordlistSelect.id);
+          dynamicList(wordlists, audioWordlistSelect);
           audioWordlistSelect.selectedIndex = audioWordlistIndex;
           let audioWordlistContainer = document.getElementById('audioWordlistContainer') as HTMLElement;
           Popup.show(audioWordlistContainer);
@@ -142,27 +142,37 @@ class Popup {
   }
 
   populateSummary(summary: Summary) {
-    let summaryEl = document.getElementById('summary') as HTMLElement;
-    summaryEl.innerHTML = this.summaryTableHTML(summary);
+    let summaryContainer = document.getElementById('summary') as HTMLDivElement;
+    let table = summaryContainer.querySelector('table') as HTMLTableElement;
+    let oldTBody = table.tBodies[0];
+    let tBody = document.createElement('tbody');
 
-    if (summaryEl.classList.contains('w3-hide')) {
-      summaryEl.classList.remove('w3-hide');
-      summaryEl.classList.add('w3-show');
-      document.getElementById('summaryDivider').classList.remove('w3-hide');
-    }
-  }
-
-  summaryTableHTML(summary: Summary): string {
-    let tableInnerHTML = '';
     if (Object.keys(summary).length > 0) {
-      tableInnerHTML = '<table class="w3-table w3-striped w3-border w3-bordered w3-card w3-small"><tr class="w3-flat-peter-river"><th colspan="2" class="w3-center">Filtered Words</th></tr>';
-      Object.keys(summary).sort((a,b) => summary[b].count - summary[a].count).forEach(key => {
-        tableInnerHTML += `<tr><td class="w3-tooltip"><span style="position:absolute;left:0;bottom:18px" class="w3-text w3-tag">${escapeHTML(key)}</span>${escapeHTML(summary[key].filtered)}</td><td class="w3-right">${summary[key].count}</td></tr>`;
-      });
-      tableInnerHTML += '</table>';
-    }
+      let sortedKeys = Object.keys(summary).sort((a,b) => summary[b].count - summary[a].count);
+      sortedKeys.forEach(key => {
+        let row = tBody.insertRow();
+        let wordCell = row.insertCell(0);
+        wordCell.classList.add('w3-tooltip');
+        let tooltipSpan = document.createElement('span');
+        tooltipSpan.classList.add('summaryTooltip');
+        tooltipSpan.classList.add('w3-tag');
+        tooltipSpan.classList.add('w3-text');
+        tooltipSpan.textContent = escapeHTML(key);
+        let wordSpan = document.createElement('span');
+        wordSpan.textContent = escapeHTML(summary[key].filtered);
+        wordCell.appendChild(tooltipSpan);
+        wordCell.appendChild(wordSpan);
 
-    return tableInnerHTML;
+        let countCell = row.insertCell(1);
+        countCell.classList.add('w3-right');
+        countCell.textContent = summary[key].count.toString();
+      });
+
+      summaryContainer.classList.remove('w3-hide');
+    } else {
+      summaryContainer.classList.add('w3-hide');
+    }
+    table.replaceChild(tBody, oldTBody);
   }
 
   async toggle(prop: string) {

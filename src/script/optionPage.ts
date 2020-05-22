@@ -1,14 +1,13 @@
-import { dynamicList, escapeHTML, exportToFile, readFile, removeFromArray } from './lib/helper';
+import { dynamicList, escapeHTML, exportToFile, readFile, removeChildren, removeFromArray } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
 import Domain from './domain';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
-import { WebAudioSites } from './webAudioSites';
+import WebAudioSites from './webAudioSites';
 
 export default class OptionPage {
-  _bulkWordMatchMethodHTML: string;
   auth: OptionAuth;
   cfg: WebConfig;
 
@@ -18,12 +17,13 @@ export default class OptionPage {
     OptionPage.hide(document.getElementById(id));
   }
 
-  static configureConfirmModal(settings: ConfirmModalSettings = {}) {
+  static configureConfirmModal(settings: ConfirmModalSettings = {}, contentElement?: HTMLElement) {
     let modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
     let modalContent = document.getElementById('confirmModalContent') as HTMLElement;
     let modalHeader = document.querySelector('#confirmModal header') as HTMLElement;
     let backupButtonContainer = document.querySelector('#confirmModal span.confirmBackupButton') as HTMLElement;
     let backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
+    removeChildren(modalContent);
 
     let defaults = {
       backup: false,
@@ -33,8 +33,13 @@ export default class OptionPage {
     };
     settings = Object.assign(defaults, settings);
 
-    modalTitle.innerText = settings.title;
-    modalContent.innerHTML = settings.content;
+    if (!contentElement) {
+      contentElement = document.createElement('span');
+      contentElement.textContent = settings.content;
+    }
+
+    modalTitle.textContent = settings.title;
+    modalContent.appendChild(contentElement);
     modalHeader.className = `w3-container ${settings.titleClass}`;
     if (settings.backup) {
       OptionPage.show(backupButtonContainer);
@@ -49,8 +54,12 @@ export default class OptionPage {
     let modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
     let modalContent = document.getElementById('statusModalContent') as HTMLElement;
     let modalHeader = document.querySelector('#statusModal header') as HTMLElement;
-    modalTitle.innerText = title;
-    modalContent.innerHTML = content;
+    let contentElement = document.createElement('span');
+    removeChildren(modalContent);
+
+    modalTitle.textContent = title;
+    contentElement.textContent = content;
+    modalContent.appendChild(contentElement);
     modalHeader.className = `w3-container ${titleColor}`;
   }
 
@@ -128,9 +137,7 @@ export default class OptionPage {
   }
 
   bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
-    let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
-    let tbody = table.querySelector('tbody') as HTMLTableSectionElement;
-    let wordlistCells = [];
+    let table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
     if (data === undefined) {
       data = {
         lists: [],
@@ -142,40 +149,71 @@ export default class OptionPage {
     }
 
     // Build row
-    let row = tbody.insertRow();
+    let row = table.tBodies[0].insertRow();
     row.classList.add('bulkWordRow');
+
+    // Add data
     let cellRemoveRow = row.insertCell(0);
     let cellWord = row.insertCell(1);
     let cellSub = row.insertCell(2);
     let cellMatchMethod = row.insertCell(3);
     let cellRepeat = row.insertCell(4);
     let cellSeparators = row.insertCell(5);
-    option.cfg.wordlists.forEach((wordlist, index) => { wordlistCells.push(row.insertCell(index + 6)); });
-    cellRemoveRow.innerHTML = '<button>X</button>';
-    cellWord.innerHTML = '<input type="text" class="bulkAddWordText">';
-    cellSub.innerHTML = '<input type="text">';
-    cellMatchMethod.innerHTML = option._bulkWordMatchMethodHTML;
-    cellRepeat.innerHTML = '<input type="checkbox" name="repeat">';
-    cellSeparators.innerHTML = '<input type="checkbox" name="separators">';
-    wordlistCells.forEach((cell, index) => {
-      cell.innerHTML = `<input type="checkbox" name="wordlists" class="wordlistData" data-col="${index + 1}">`;
-    });
 
-    // Populate data
-    cellRemoveRow.querySelector('button').addEventListener('click', e => { option.bulkEditorRemoveRow(e); });
-    (cellWord.querySelector('input') as HTMLInputElement).value = word;
-    (cellSub.querySelector('input') as HTMLInputElement).value = data.sub;
-    (cellMatchMethod.querySelector('select') as HTMLSelectElement).selectedIndex = data.matchMethod;
-    (cellRepeat.querySelector('input') as HTMLInputElement).checked = data.repeat;
-    (cellSeparators.querySelector('input') as HTMLInputElement).checked = data.separators;
-    wordlistCells.forEach((cell, index) => {
-      (cell.querySelector('input') as HTMLInputElement).checked = data.lists.includes(index + 1);
+    let removeButton = document.createElement('button');
+    removeButton.textContent = 'X';
+    removeButton.addEventListener('click', e => { option.bulkEditorRemoveRow(e); });
+    cellRemoveRow.appendChild(removeButton);
+
+    let wordInput = document.createElement('input');
+    wordInput.type = 'text';
+    wordInput.classList.add('bulkAddWordText');
+    wordInput.value = word;
+    cellWord.appendChild(wordInput);
+
+    let subInput = document.createElement('input');
+    subInput.type = 'text';
+    cellSub.appendChild(subInput);
+    subInput.value = data.sub;
+
+    let matchMethodSelect = document.createElement('select');
+    WebConfig._matchMethodNames.forEach((name, index) => {
+      let optionElement = document.createElement('option');
+      optionElement.value = index.toString();
+      optionElement.classList.add(`bulkMatchMethod${index}`);
+      optionElement.textContent = name;
+      matchMethodSelect.appendChild(optionElement);
+    });
+    matchMethodSelect.selectedIndex = data.matchMethod;
+    cellMatchMethod.appendChild(matchMethodSelect);
+
+    let repeatInput = document.createElement('input');
+    repeatInput.type = 'checkbox';
+    repeatInput.name = 'repeat';
+    repeatInput.checked = data.repeat;
+    cellRepeat.appendChild(repeatInput);
+
+    let separatorsInput = document.createElement('input');
+    separatorsInput.type = 'checkbox';
+    separatorsInput.name = 'separators';
+    separatorsInput.checked = data.separators;
+    cellSeparators.appendChild(separatorsInput);
+
+    option.cfg.wordlists.forEach((wordlist, index) => {
+      let cell = row.insertCell(index + 6);
+      let wordlistInput = document.createElement('input');
+      wordlistInput.type = 'checkbox';
+      wordlistInput.name = 'wordlists';
+      wordlistInput.classList.add('wordlistData');
+      wordlistInput.dataset.col = (index + 1).toString();
+      wordlistInput.checked = data.lists.includes(index + 1);
+      cell.appendChild(wordlistInput);
     });
 
     // Scroll to the bottom if this is a new word row
     if (word === '') {
       table.parentElement.scrollTop = table.parentElement.scrollHeight - table.parentElement.clientHeight;
-      cellWord.querySelector('input').focus();
+      wordInput.focus();
     }
   }
 
@@ -183,7 +221,7 @@ export default class OptionPage {
     let bulkAddWordsText = document.querySelector('#bulkWordEditorModal textarea#bulkAddWordsText') as HTMLTextAreaElement;
     let text = bulkAddWordsText.value;
     if (text != '') {
-      let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+      let table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
       let lines = text.toLowerCase().split('\n');
       let words = lines.map(line => line.trim());
       let uniqueWords = words.filter((word, index) => words.indexOf(word) === index);
@@ -205,29 +243,20 @@ export default class OptionPage {
     }
   }
 
-  bulkEditorCurrentWords() {
-    let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
-    let words = [];
-    table.querySelectorAll('tr > td > input.bulkAddWordText').forEach((wordText: HTMLInputElement, index) => {
-      words.push(wordText.value);
-    });
-    return words;
-  }
-
   bulkEditorRemoveAll() {
-    let tbody = document.querySelector('#bulkWordEditorModal table tbody') as HTMLTableSectionElement;
-    tbody.innerHTML = '';
+    let tBody = document.querySelector('#bulkWordEditorModal table tbody') as HTMLTableSectionElement;
+    removeChildren(tBody);
     this.bulkEditorAddRow();
   }
 
   bulkEditorRemoveRow(event) {
-    let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+    let table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
     let row = event.target.parentElement.parentElement;
     table.deleteRow(row.rowIndex);
   }
 
   async bulkEditorSave() {
-    let table = document.querySelector('#bulkWordEditorModal table#bulkEditorTable') as HTMLTableElement;
+    let table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
     let failed = {};
     option.cfg.words = {};
 
@@ -270,6 +299,55 @@ export default class OptionPage {
     });
   }
 
+  bulkEditorCurrentWords() {
+    let table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
+    let words = [];
+    table.querySelectorAll('tr > td > input.bulkAddWordText').forEach((wordText: HTMLInputElement, index) => {
+      words.push(wordText.value);
+    });
+    return words;
+  }
+
+  bulkWordEditorHeaderRow(): HTMLTableRowElement {
+    let row = document.createElement('tr');
+    let removeCell = document.createElement('th');
+    let removeButton = document.createElement('button');
+    removeButton.textContent = 'X';
+    removeButton.id = 'bulkEditorRemoveAll';
+    removeButton.addEventListener('click', e => { option.bulkEditorRemoveAll(); });
+    let removeSpan = document.createElement('span');
+    removeSpan.textContent = ' Remove';
+    removeCell.appendChild(removeButton);
+    removeCell.appendChild(removeSpan);
+    row.appendChild(removeCell);
+
+    let normalHeaders = ['Word', 'Substitution', 'Match Method', 'Repeated', 'Separators'];
+    normalHeaders.forEach(item => {
+      let cell = document.createElement('th');
+      let cellSpan = document.createElement('span');
+      cellSpan.textContent = item;
+      cell.appendChild(cellSpan);
+      row.appendChild(cell);
+    });
+
+    this.cfg.wordlists.forEach((wordlist, i) => {
+      let cell = document.createElement('th');
+      let inputLabel = document.createElement('label');
+      let input = document.createElement('input');
+      let span = document.createElement('span');
+      input.type = 'checkbox';
+      input.classList.add('wordlistHeader');
+      input.dataset.col = (i + 1).toString();
+      span.textContent = ` ${wordlist}`; // TODO: Fix spacing
+      inputLabel.appendChild(input);
+      inputLabel.appendChild(span);
+      cell.appendChild(inputLabel);
+      row.appendChild(cell);
+    });
+
+    return row;
+  }
+
   configInlineToggle() {
     let input = document.getElementById('configInlineInput') as HTMLInputElement;
     let configText = document.getElementById('configText') as HTMLTextAreaElement;
@@ -289,13 +367,17 @@ export default class OptionPage {
     ok.removeEventListener('click', removeAllWords);
     ok.removeEventListener('click', restoreDefaults);
     ok.removeEventListener('click', setPassword);
+    let content;
+    let italics;
 
     switch(action) {
       case 'bulkEditorSave':
-        OptionPage.configureConfirmModal({
-          content: 'Are you sure you want to save these changes?<br><br><i>Make sure you have a backup first!</i>',
-          backup: true,
-        });
+        content = document.createElement('span');
+        italics = document.createElement('i');
+        content.textContent = 'Are you sure you want to save these changes?\n\n';
+        italics.textContent = 'Make sure you have a backup first!';
+        content.appendChild(italics);
+        OptionPage.configureConfirmModal({ backup: true }, content);
         ok.addEventListener('click', bulkEditorSave);
         break;
       case 'importConfig': {
@@ -304,9 +386,12 @@ export default class OptionPage {
         break;
       }
       case 'removeAllWords':
-        OptionPage.configureConfirmModal({
-          content: 'Are you sure you want to remove all words?<br><br><i>(Note: The default words will return if no words are added.)</i>',
-        });
+        content = document.createElement('span');
+        italics = document.createElement('i');
+        content.textContent = 'Are you sure you want to remove all words?\n\n';
+        italics.textContent = '(Note: The default words will return if no words are added)';
+        content.appendChild(italics);
+        OptionPage.configureConfirmModal({ }, content);
         ok.addEventListener('click', removeAllWords);
         break;
       case 'restoreDefaults':
@@ -493,11 +578,16 @@ export default class OptionPage {
     let domainDisabledLabel = document.getElementById('domainDisabledLabel') as HTMLLabelElement;
     let domainEnabledLabel = document.getElementById('domainEnabledLabel') as HTMLLabelElement;
     OptionPage.hideInputError(domainText);
+    removeChildren(domainsSelect);
 
     let domains = Domain.sortedKeys(this.cfg.domains);
-    let domainHTML = '<option selected value="">Add, or update existing...</option>';
-    domains.forEach(domain => { domainHTML += `<option value="${domain}">${domain}</option>`; });
-    domainsSelect.innerHTML = domainHTML;
+    domains.unshift('Add, or update existing...');
+    domains.forEach((domain) => {
+      let optionElement = document.createElement('option');
+      optionElement.textContent = domain;
+      optionElement.value = domain === domains[0] ? '' : domain;
+      domainsSelect.appendChild(optionElement);
+    });
 
     if (mode === 'whitelist') {
       OptionPage.hide(domainDisabledLabel);
@@ -513,10 +603,10 @@ export default class OptionPage {
       let domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
 
       let wordlists = ['Default'].concat(WebConfig._allWordlists, this.cfg.wordlists);
-      dynamicList(wordlists, domainWordlistSelect.id);
+      dynamicList(wordlists, domainWordlistSelect);
       if (this.cfg.muteAudio) {
         OptionPage.show(audioWordlistContainer);
-        dynamicList(wordlists, domainAudioWordlistSelect.id);
+        dynamicList(wordlists, domainAudioWordlistSelect);
       } else {
         OptionPage.hide(audioWordlistContainer);
       }
@@ -530,7 +620,7 @@ export default class OptionPage {
 
   populateOptions() {
     this.populateSettings();
-    this.populateWordsList();
+    this.populateWordPage();
     this.populateWhitelist();
     this.populateWordlists();
     this.populateDomainPage();
@@ -578,11 +668,13 @@ export default class OptionPage {
     defaultWordSeparators.checked = this.cfg.defaultWordSeparators;
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     defaultWordSubstitution.value = this.cfg.defaultSubstitution;
-    let defaultWordMatchMethodSelectHTML = '';
-    for(let i = 0; i < WebConfig._matchMethodNames.slice(0,-1).length; i++) {
-      defaultWordMatchMethodSelectHTML += '<option value="'+WebConfig._matchMethodNames[i]+'">'+WebConfig._matchMethodNames[i]+'</option>';
+    removeChildren(defaultWordMatchMethodSelect);
+    for (let i = 0; i < WebConfig._matchMethodNames.slice(0,-1).length; i++) {
+      let optionElement = document.createElement('option');
+      optionElement.value = WebConfig._matchMethodNames[i].toString();
+      optionElement.textContent= WebConfig._matchMethodNames[i];
+      defaultWordMatchMethodSelect.appendChild(optionElement);
     }
-    defaultWordMatchMethodSelect.innerHTML = defaultWordMatchMethodSelectHTML;
     defaultWordMatchMethodSelect.selectedIndex = this.cfg.defaultWordMatchMethod;
   }
 
@@ -591,9 +683,9 @@ export default class OptionPage {
     let filteredTestText = document.getElementById('filteredTestText') as HTMLElement;
 
     if (testText.value === '') {
-      filteredTestText.innerText = 'Enter some text above to test the filter...';
+      filteredTestText.textContent = 'Enter some text above to test the filter...';
     } else {
-      filteredTestText.innerText = filter.replaceText(testText.value, filter.cfg.wordlistId, false);
+      filteredTestText.textContent = filter.replaceText(testText.value, filter.cfg.wordlistId, false);
     }
   }
 
@@ -602,11 +694,15 @@ export default class OptionPage {
     let sensitiveList = filter.cfg.wordWhitelist.map((item) => { return item + ' *'; });
     let list = [].concat(sensitiveList, filter.cfg.iWordWhitelist).sort();
     let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
-    let whitelistHTML = '<option selected value="">Add...</option>';
+    removeChildren(whitelist);
+    list.unshift('Add, or update existing...');
     list.forEach((item) => {
-      whitelistHTML += `<option value="${item.replace(regExp, '')}" data-sensitive="${regExp.test(item)}">${escapeHTML(item)}</option>`;
+      let optionElement = document.createElement('option');
+      optionElement.value = item === list[0] ? '' : item.replace(regExp, '');
+      optionElement.dataset.sensitive = regExp.test(item).toString();
+      optionElement.textContent = escapeHTML(item);
+      whitelist.appendChild(optionElement);
     });
-    whitelist.innerHTML = whitelistHTML;
     this.populateWhitelistWord();
   }
 
@@ -697,13 +793,13 @@ export default class OptionPage {
       let textWordlistSelect = document.getElementById('textWordlistSelect') as HTMLSelectElement;
       let audioWordlistDiv = document.getElementById('audioWordlistDiv') as HTMLElement;
       let audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
-      dynamicList(this.cfg.wordlists, wordlistSelect.id);
-      dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), textWordlistSelect.id);
+      dynamicList(this.cfg.wordlists, wordlistSelect);
+      dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), textWordlistSelect);
       wordlistSelect.selectedIndex = selectedIndex;
       textWordlistSelect.selectedIndex = this.cfg.wordlistId;
 
       if (this.cfg.muteAudio) {
-        dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), audioWordlistSelect.id);
+        dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), audioWordlistSelect);
         audioWordlistSelect.selectedIndex = this.cfg.audioWordlistId;
         OptionPage.show(audioWordlistDiv);
       } else {
@@ -717,8 +813,11 @@ export default class OptionPage {
     }
   }
 
-  populateWordsList() {
+  populateWordPage() {
     let wordlistFilter = filter;
+    let selections = document.getElementById('wordlistSelections') as HTMLInputElement;
+    let wordsSelect = document.getElementById('wordList') as HTMLSelectElement;
+    removeChildren(wordsSelect);
 
     // Workaround for remove filter method
     if (filter.cfg.filterWordList && filter.cfg.filterMethod === 2) {
@@ -728,12 +827,11 @@ export default class OptionPage {
       wordlistFilter.init();
     }
 
-    let wordList = document.getElementById('wordList') as HTMLSelectElement;
-    let wordListHTML = '<option selected value="">Add...</option>';
-
-    Object.keys(option.cfg.words).sort().forEach(word => {
+    let words = Object.keys(option.cfg.words).sort();
+    words.unshift('Add, or update existing...');
+    words.forEach(word => {
       let filteredWord = word;
-      if (wordlistFilter.cfg.filterWordList) {
+      if (word != words[0] && wordlistFilter.cfg.filterWordList) {
         if (wordlistFilter.cfg.words[word].matchMethod == 4) { // Regexp
           filteredWord = wordlistFilter.cfg.words[word].sub || wordlistFilter.cfg.defaultSubstitution;
         } else {
@@ -741,17 +839,30 @@ export default class OptionPage {
         }
       }
 
-      wordListHTML += `<option value="${word}" data-filtered="${filteredWord}">${escapeHTML(filteredWord)}</option>`;
+      let optionElement = document.createElement('option');
+      optionElement.value = word === words[0] ? '' : word;
+      optionElement.dataset.filtered = filteredWord;
+      optionElement.textContent = escapeHTML(filteredWord);
+      wordsSelect.appendChild(optionElement);
     });
 
-    // Populate the wordlist selections for a word
-    let wordlistSelectionHTML = '';
-    option.cfg.wordlists.forEach(function(list, index) {
-      wordlistSelectionHTML += `<label><input id="" type="checkbox" class="w3-check" name="wordlistSelection" value="${index}"/> ${list}</label><br>`;
-    });
-    let selections = document.getElementById('wordlistSelections') as HTMLInputElement;
-    selections.innerHTML = wordlistSelectionHTML;
-    wordList.innerHTML = wordListHTML;
+    // Dynamically create the wordlist selection checkboxes
+    if (!selections.hasChildNodes()) {
+      option.cfg.wordlists.forEach(function(list, index) {
+        let div = document.createElement('div');
+        let label = document.createElement('label');
+        let input = document.createElement('input');
+        label.textContent = list;
+        input.type = 'checkbox';
+        input.classList.add('w3-check');
+        input.name = 'wordlistSelection';
+        input.value = index.toString();
+        label.appendChild(input);
+        div.appendChild(label);
+        selections.appendChild(div);
+      });
+    }
+
     this.populateWord();
   }
 
@@ -829,7 +940,7 @@ export default class OptionPage {
       this.cfg.wordlists[index] = name;
       if (await this.saveProp('wordlists')) {
         this.populateWordlists(index);
-        this.populateWordsList();
+        this.populateWordPage();
       } else {
         OptionPage.showErrorModal('Failed to save name.');
       }
@@ -1126,18 +1237,9 @@ export default class OptionPage {
     let modalId = 'bulkWordEditorModal';
     let title = document.querySelector(`#${modalId} h5.modalTitle`) as HTMLHeadingElement;
     let tableContainer = document.querySelector(`#${modalId} div.tableContainer`) as HTMLDivElement;
-    let thead = '<thead><tr><th><span><button id="bulkEditorRemoveAll">X</button> Remove</span></th><th><span>Word</span></th><th><span>Substitution</span></th><th><span>Match Method</span></th><th><span>Repeated</span></th><th><span>Separators</span></th>';
-    this.cfg.wordlists.forEach((wordlist, i) => { thead += `<th><label><input type="checkbox" class="wordlistHeader" data-col="${i + 1}"><span> ${wordlist}</span></label></th>`; });
-    thead += '</tr></thead>';
+    let table = tableContainer.querySelector('table') as HTMLTableElement;
     title.textContent = 'Bulk Word Editor';
-    tableContainer.innerHTML = `<table id="bulkEditorTable" class="w3-table-all w3-tiny w3-hoverable">${thead}<tbody></tbody></table>`;
-
-    // Store the select list for match method (used in each row)
-    option._bulkWordMatchMethodHTML = '<select>';
-    WebConfig._matchMethodNames.forEach((name, index) => {
-      option._bulkWordMatchMethodHTML += `<option value="${index}" class="bulkMatchMethod${index}">${name}</option>`;
-    });
-    option._bulkWordMatchMethodHTML += '</select>';
+    if (table.tHead.rows.length === 0) { table.tHead.appendChild(option.bulkWordEditorHeaderRow()); }
 
     // Add current words to the table
     let wordKeys = Object.keys(option.cfg.words);
@@ -1149,7 +1251,6 @@ export default class OptionPage {
       });
     }
 
-    tableContainer.querySelector('button#bulkEditorRemoveAll').addEventListener('click', e => { option.bulkEditorRemoveAll(); });
     tableContainer.querySelectorAll('th input.wordlistHeader').forEach(el => { el.addEventListener('click', e => { option.bulkEditorWordlistCheckbox(e); }); });
     OptionPage.openModal(modalId);
   }
@@ -1157,22 +1258,27 @@ export default class OptionPage {
   showSupportedAudioSites() {
     let title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
     let contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
-    let contentRight = document.querySelector('#supportedAudioSitesModal div#modalContentRight') as HTMLDivElement;
-    let sites = [];
+    removeChildren(contentLeft);
     let sortedSites = Object.keys(WebAudioSites).sort(function(a,b) {
       let domainA = a.match(/\w*\.\w*$/)[0];
       let domainB = b.match(/\w*\.\w*$/)[0];
       return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
     });
+    let ul = document.createElement('ul');
     sortedSites.forEach(site => {
-      sites.push(`<li><a href="https://${site}" target="_blank">${site}</a></li>`);
+      let li = document.createElement('li');
+      let a = document.createElement('a');
+      a.href = `https://${site}`;
+      a.target = '_blank';
+      a.textContent = site;
+      li.appendChild(a);
+      ul.appendChild(li);
     });
     title.textContent = 'Supported Audio Sites';
-    contentLeft.innerHTML = `<ul>${sites.join('\n')}</ul>`;
-    contentRight.innerHTML = `
-      <h4 class="sectionHeader">Site Config</h4>
-      <textarea class="w3-input w3-border w3-card" spellcheck="false" readonly>${JSON.stringify(WebAudioSites, null, 2)}</textarea>
-    `;
+    contentLeft.appendChild(ul);
+
+    let textArea = document.querySelector('#supportedAudioSitesModal div#modalContentRight textarea') as HTMLTextAreaElement;
+    textArea.textContent = JSON.stringify(WebAudioSites, null, 2);
     OptionPage.openModal('supportedAudioSitesModal');
   }
 
@@ -1183,12 +1289,12 @@ export default class OptionPage {
     currentTab.classList.remove(OptionPage.activeClass);
     newTab.classList.add(OptionPage.activeClass);
 
-    let currentPage = document.getElementById(currentTab.innerText.toLowerCase() + 'Page') as HTMLElement;
-    let newPage = document.getElementById(newTab.innerText.toLowerCase() + 'Page') as HTMLElement;
+    let currentPage = document.getElementById(currentTab.textContent.toLowerCase() + 'Page') as HTMLElement;
+    let newPage = document.getElementById(newTab.textContent.toLowerCase() + 'Page') as HTMLElement;
     OptionPage.hide(currentPage);
     OptionPage.show(newPage);
 
-    switch (newTab.innerText.toLowerCase()) {
+    switch (newTab.textContent.toLowerCase()) {
       case 'test':
         document.getElementById('testText').focus();
         break;

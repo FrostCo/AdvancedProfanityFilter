@@ -1,6 +1,6 @@
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
-import { WebAudioSites } from './webAudioSites';
+import WebAudioSites from './webAudioSites';
 
 export default class WebAudio {
   cueRuleIds: number[];
@@ -25,10 +25,6 @@ export default class WebAudio {
 
   static readonly brTagRegExp = new RegExp('<br>', 'i');
 
-  static combineSites(sites: { [site: string]: AudioRules[] } = {}): { [site: string]: AudioRules[] } {
-    return Object.assign({}, WebAudioSites, sites);
-  }
-
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.cueRuleIds = [];
     this.watcherRuleIds = [];
@@ -43,7 +39,7 @@ export default class WebAudio {
     ) {
       filter.cfg.customAudioSites = {};
     }
-    this.sites = WebAudio.combineSites(filter.cfg.customAudioSites);
+    this.sites = WebAudioSites.combineSites(filter.cfg.customAudioSites);
     this.unmuteDelay = 0;
     this.volume = 1;
     this.wordlistId = filter.audioWordlistId;
@@ -163,7 +159,8 @@ export default class WebAudio {
         && !WebAudio.brTagRegExp.test(subtitle[textMethod])
         && WebAudio.brTagRegExp.test(subtitle.innerHTML)
       ) {
-        subtitle.innerHTML = subtitle.innerHTML.replace(WebAudio.brTagRegExp, '\n');
+        if (subtitle.style.whiteSpace !== 'pre') { subtitle.style.whiteSpace = 'pre'; }
+        subtitle.textContent = subtitle.innerHTML.replace(WebAudio.brTagRegExp, '\n');
       }
       let result = this.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
@@ -199,7 +196,7 @@ export default class WebAudio {
 
       // Set a timer to unmute if a max time was specified
       if (this.youTubeAutoSubsMax) {
-        this.youTubeAutoSubsTimeout = setTimeout(this.youTubeAutoSubsMuteTimeout, this.youTubeAutoSubsMax, this);
+        this.youTubeAutoSubsTimeout = window.setTimeout(this.youTubeAutoSubsMuteTimeout, this.youTubeAutoSubsMax, this);
       }
     } else {
       if (this.muted) {

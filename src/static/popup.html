@@ -27,9 +27,6 @@
     </div>
   </div>
 
-  <!-- <div class="divider"></div>
-
-  <div class="w3-center smallHeader">Active Wordlist</div> -->
   <div id="wordListContainer" class="w3-center container w3-hide">
     <label class="selectLabel">Text</label><select id="wordlistSelect" class="w3-select w3-border smallSelect"></select>
   </div>
@@ -39,9 +36,16 @@
 
   <div class="divider"></div>
 
-  <div id="summary" class="w3-hide w3-margin-left w3-margin-right container"></div>
-
-  <div id="summaryDivider" class="divider w3-hide"></div>
+  <div id="summary" class="w3-hide w3-margin-left w3-margin-right container w3-border">
+    <table class="w3-table w3-striped w3-border w3-bordered w3-card w3-small">
+      <thead>
+        <tr class="w3-flat-peter-river">
+          <th colspan="2" class="w3-center">Filtered Words</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <div class="options unselectable w3-center container">
     <button id="options" class="w3-button w3-border w3-border-blue">Options</button>

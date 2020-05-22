@@ -4,6 +4,7 @@ body {
   font-family: Arial;
   width: 250px;
   height: 100%;
+  max-height: 600px;
   background-color: #eee;
   padding: 0;
   margin: 0;
@@ -85,6 +86,18 @@ input:checked + .slider:before {
 
 #options:hover {
   background-color: #ddd;
+}
+
+#summary {
+  overflow: auto;
+  max-height: 180px;
+  margin-bottom: 8px;
+}
+
+#summary table tbody .summaryTooltip {
+  position: absolute;
+  left: 0;
+  bottom: 18px
 }
 
 .checkbox {

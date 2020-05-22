@@ -1,14 +1,14 @@
 /* istanbul ignore next */
-export function dynamicList(list, selectEm, title?: string) {
-  let options = '';
-  if (title !== undefined) {
-    options = '<option value="" disabled selected>' + title + '</option>';
-  }
+export function dynamicList(list: string[], select: HTMLSelectElement, title?: string) {
+  removeChildren(select);
+  let array = title !== undefined ? [title].concat(list) : list;
 
-  for(let i = 0; i < list.length; i++) {
-    options += '<option value="'+list[i]+'">'+list[i]+'</option>';
-  }
-  document.getElementById(selectEm).innerHTML = options;
+  array.forEach(item => {
+    let option = document.createElement('option');
+    option.value = (title && item === title) ? '' : item;
+    option.textContent = item;
+    select.appendChild(option);
+  });
 }
 
 export function escapeHTML(str: string): string {
@@ -61,6 +61,14 @@ export function readFile(file) {
     fr.onload = () => { resolve(fr.result); };
     fr.readAsText(file);
   });
+}
+
+export function removeChildren(element) {
+  if (element.hasChildNodes) {
+    while (element.firstChild) {
+      element.firstChild.remove();
+    }
+  }
 }
 
 export function removeFromArray(array: string[], element: string) {
