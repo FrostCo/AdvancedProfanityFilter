@@ -1,6 +1,10 @@
+/* || HTML Elements */
+
+html {
+  --blue: #3498db; /* .w3-flat-peter-river */
+}
+
 body {
-  /* .w3-flat-peter-river */
-  --blue: #3498db;
   font-family: Arial;
   width: 250px;
   height: 100%;
@@ -30,6 +34,111 @@ h4 {
   margin-bottom: 5px;
 }
 
+/* || Page */
+
+#logo {
+  width: 64px;
+  height: 64px;
+  margin: 1rem;
+  margin-left: 45px;
+  text-align: center;
+}
+
+.container {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+/* Advanced checkbox */
+.checkbox {
+  margin-left: 8px;
+}
+
+.checkboxLabel {
+  line-height: 34px;
+}
+
+/* Filter and Wordlist select dropboowns */
+.selectLabel {
+  line-height: 39px;
+  padding-left: 15px;
+}
+
+.smallSelect {
+  width: 150px;
+  float: right;
+  margin-right: 25px;
+}
+
+/* Summary table */
+#summary {
+  overflow: auto;
+  max-height: 180px;
+  margin-bottom: 8px;
+}
+
+#summary table tbody .summaryTooltip {
+  position: absolute;
+  left: 0;
+  bottom: 18px
+}
+
+.options {
+  width: 200px;
+  margin-left: 25px;
+}
+
+/* Options button */
+#options {
+  margin: 0;
+  transition: 0.2s;
+  text-align: center;
+  cursor: pointer;
+  font-weight: normal;
+  width: 80%;
+}
+
+#options:hover {
+  background-color: #ddd;
+}
+
+/* Footer */
+#footer {
+  width: 100%;
+  padding: 15px 0;
+  background: #ccc;
+  text-align: center;
+  margin-top: 8px;
+}
+
+#gettingStarted {
+  color: var(--blue);
+  font-weight: bold;
+}
+
+.divider {
+  border-bottom: solid #ccc 1px;
+  width: 200px;
+  margin: auto;
+}
+
+/* || Slider (enabled/disabled) */
+
+/* Hide default HTML checkbox */
+.switch input {
+  display: none;
+}
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  width: 60px;
+  height: 34px;
+  float: right;
+  right: 45px;
+  top: 35px;
+}
+
 input:checked + .slider {
   background-color: var(--blue);
 }
@@ -44,132 +153,6 @@ input:checked + .slider:before {
   transform: translateX(26px);
 }
 
-#banner {
-  padding: 0px;
-  margin: 0px;
-  width: 100%;
-  height: 45px;
-  font-size: 18;
-  background-color: rgb(1,174,240);
-  color: #DA291C;
-}
-
-#footer {
-  width: 100%;
-  padding: 15px 0;
-  background: #ccc;
-  text-align: center;
-  margin-top: 8px;
-}
-
-#gettingStarted {
-  color: var(--blue);
-  font-weight: bold;
-}
-
-#logo {
-  width: 64px;
-  height: 64px;
-  margin: 1rem;
-  margin-left: 45px;
-  text-align: center;
-}
-
-#options {
-  margin: 0;
-  transition: 0.2s;
-  text-align: center;
-  cursor: pointer;
-  font-weight: normal;
-  width: 80%;
-}
-
-#options:hover {
-  background-color: #ddd;
-}
-
-#summary {
-  overflow: auto;
-  max-height: 180px;
-  margin-bottom: 8px;
-}
-
-#summary table tbody .summaryTooltip {
-  position: absolute;
-  left: 0;
-  bottom: 18px
-}
-
-.checkbox {
-  margin-left: 8px;
-}
-
-.checkboxLabel {
-  line-height: 34px;
-}
-
-.container {
-  margin-top:8px;
-  margin-bottom:8px;
-}
-
-.disabled {
-  cursor: not-allowed !important;
-}
-
-.divider {
-  border-bottom: solid #ccc 1px;
-  width: 200px;
-  margin: auto;
-}
-
-.options {
-  width: 200px;
-  margin-left: 25px;
-}
-
-.selectLabel {
-  line-height: 39px;
-  padding-left: 15px;
-}
-
-.smallHeader {
-  color: var(--blue);
-  padding-top: 4px;
-  padding-right: 8px;
-}
-
-.smallSelect {
-  width: 150px;
-  float: right;
-  display:inline;
-  margin-right:25px;
-}
-
-.unselectable {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-/* --------------The Switch------------- */
-/* The switch - the box around the slider */
-.switch {
-  position: relative;
-  width: 60px;
-  height: 34px;
-  float: right;
-  right: 45px;
-  top: 35px;
-}
-
-/* Hide default HTML checkbox */
-.switch input {display: none;}
-
-/* The slider */
 .slider {
   position: absolute;
   cursor: pointer;
@@ -190,11 +173,26 @@ input:checked + .slider:before {
   background-color: white;
 }
 
-/* Rounded sliders */
+/* Rounded slider */
 .slider.round {
   border-radius: 34px;
 }
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+/* || Utility */
+
+.disabled {
+  cursor: not-allowed !important;
+}
+
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
