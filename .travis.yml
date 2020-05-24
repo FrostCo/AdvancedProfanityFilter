@@ -6,6 +6,7 @@ node_js:
 
 before_script:
   - npm install
+  - npm run package
 
 script:
-  - npm run test
+  - npm run test:all
