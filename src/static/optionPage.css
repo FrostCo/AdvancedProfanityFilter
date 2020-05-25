@@ -1,55 +1,131 @@
+/* || HTML Elements */
+
 html {
   --blue: #2980b9; /* belize-hole */
   --silver: #bdc3c7;
 }
-a:hover
-{color:var(--blue)}
-h4.sectionHeader
-{color:var(--blue)}
-#header h2
-{display:inline;line-height:50px;}
-#header img.logo
-{margin-bottom:8px}
-#header img.donation
-{margin-top:14.5px;margin-bottom:14.5px;}
-#header img.patreon
-{margin-top:9.5px;margin-bottom:9.5px;}
-#header img.discord
-{height:31px;}
-/* #helpPage
-{overflow-y:scroll;height:800px} */
-#main
-{padding-bottom:16px}
-#menu > a:hover
-{color:#fff!important;background-color:var(--blue)!important}
-.updateYouTubeAutoLimits
-{width:70px;text-align:right;}
-.disabled
-{cursor:not-allowed!important;}
-.notes
-{margin-left:16px;padding-top:5px;font-size:10px;color:gray}
-.small
-{width:300px}
-/* Bookmarklet Link */
-a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited
-{color: #fff}
-/* Modals */
-#confirmModal,#passwordModal,#statusModal
-{z-index:900}
-#bulkWordEditorModal,#supportedAudioSitesModal
-{z-index:500}
+
+a:hover {
+  color: var(--blue);
+}
+
+h4.sectionHeader {
+  color: var(--blue);
+}
+
+/* || Header & Navigation */
+
+#header h2 {
+  display: inline;
+  line-height: 50px;
+}
+
+#header img.logo {
+  margin-bottom: 8px;
+}
+
+#header img.donation {
+  margin-top: 14.5px;
+  margin-bottom: 14.5px;
+}
+
+#header img.patreon {
+  margin-top: 9.5px;
+  margin-bottom: 9.5px;
+}
+
+#header img.discord {
+  height: 31px;
+}
+
+#menu > a:hover {
+  color: #fff !important;
+  background-color: var(--blue) !important;
+}
+
+/* || Pages */
+
+#main {
+  padding-bottom: 16px;
+}
+
+/* Words */
+div#wordsPage #wordlistSelections label input {
+  margin-left: 8px;
+}
+
+/* Audio */
+.updateYouTubeAutoLimits {
+  width: 70px;
+  text-align: right;
+}
+
+/* Bookmarklet */
+a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited {
+  color: #fff;
+}
+
+/* Help */
+/* #helpPage {
+  overflow-y: scroll;
+  height: 800px;
+} */
+
+/* || Modals */
+
+#confirmModal, #passwordModal, #statusModal {
+  z-index: 900;
+}
+
+#bulkWordEditorModal, #supportedAudioSitesModal {
+  z-index: 500;
+}
+
+#confirmModal div#confirmModalContent {
+  white-space: pre;
+}
+
+#supportedAudioSitesModal textarea {
+  width: 420px;
+  height: 400px;
+  font-size: 11px;
+}
+
 /* Bulk Word Editor */
-#bulkWordEditorModal div.tableContainer
-{overflow: auto; height: 600px;}
-#bulkWordEditorModal table
-{border:none;} /* Fix small gap on sticky header from .w3-table-all */
-#bulkWordEditorModal table th
-{background-color:var(--silver);position:sticky;top:0;z-index:10;vertical-align:middle;}
-#bulkWordEditorModal table th input,span
-{vertical-align:middle;}
-#supportedAudioSitesModal textarea
-{width:420px;height:400px;font-size:11px;}
-div#wordsPage #wordlistSelections label input
-{margin-left:8px;}
-#confirmModal div#confirmModalContent
-{white-space: pre;}
+#bulkWordEditorModal div.tableContainer {
+  overflow: auto;
+  height: 600px;
+}
+
+#bulkWordEditorModal table {
+  border: none; /* Fix small gap on sticky header from .w3-table-all */
+}
+
+#bulkWordEditorModal table th input,span {
+  vertical-align: middle;
+}
+
+#bulkWordEditorModal table th {
+  background-color: var(--silver);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  vertical-align: middle;
+}
+
+/* || Utility */
+
+.disabled {
+  cursor: not-allowed !important;
+}
+
+.notes {
+  margin-left: 16px;
+  padding-top: 5px;
+  font-size: 10px;
+  color: gray;
+}
+
+.small {
+  width: 300px;
+}

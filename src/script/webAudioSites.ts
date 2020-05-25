@@ -1,9 +1,9 @@
 export default class WebAudioSites {
   static combineSites(sites: { [site: string]: AudioRules[] } = {}): { [site: string]: AudioRules[] } {
-    return Object.assign({}, WebAudioSites, sites);
+    return Object.assign({}, WebAudioSites.sites, sites);
   }
 
-  static Sites: { [site: string]: AudioRules[] } = {
+  static sites: { [site: string]: AudioRules[] } = {
     'abc.com': [{ mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' }],
     'www.amazon.com': [
       {
@@ -22,6 +22,7 @@ export default class WebAudioSites {
     ],
     'www.att.tv': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
     'www.attwatchtv.com': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
+    'gem.cbc.ca': [{ className: 'jw-text-track-container', mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
     'www.cbs.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'www.dishanywhere.com': [
       { mode: 'element', className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' },

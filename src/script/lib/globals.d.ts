@@ -1,10 +1,11 @@
 interface AudioRules {
-  mode: string;                     // 'cue', 'element', 'elementChild', 'text', 'watcher'
+  mode: string;                     // [All*] 'cue', 'element', 'elementChild', 'text', 'watcher'
   checkInterval?: number;           // [Watcher] Set a custom watch interval (in ms, Default: 20)
   className?: string;               // [Element] node.className.includes()
   containsSelector?: string;        // [Element] node.querySelector() [Not commonly used]
   convertBreaks?: boolean;          // [Element,ElementChild] Convert <br> to '\n'
   dataPropPresent?: string;         // [Element] node.dataset.hasOwnProperty()
+  disabled?: boolean;               // [All] Set automatically based on iframe status or missing a required property
   displayHide?: string;             // [Element,ElementChild] Display style for hiding captions (Default: 'none')
   displaySelector?: string;         // [Element,ElementChild] Alternate selector to hide/show captions
   displayShow?: string;             // [Element,ElementChild] Display style for showing captions (Default: '')
@@ -16,7 +17,7 @@ interface AudioRules {
   removeSubtitleSpacing?: boolean;  // [Element] Remove subtitle padding/margin when hiding
   showSubtitles?: number;           // [All] Override global showSubtitles (0: all, 1: filtered, 2: unfiltered, 3: none)
   simpleUnmute?: boolean;           // [All] Simplify requirements for unmuting (Only require text match)
-  subtitleSelector?: string;        // [Element,Watcher] *Used for Filtering*: node.querySelector()
+  subtitleSelector?: string;        // [Element,ElementChild,Watcher] *Used for Filtering*: node.querySelector()
   tagName?: string;                 // [Element*,ElementChild*] node.nodeName
   trackProcessed?: boolean;         // [Watcher] Attempt to only process text once (Default: true)
   videoCueHideCues?: boolean;       // [Cue] Hide activeCues instead of textTrack.mode = 'hidden'

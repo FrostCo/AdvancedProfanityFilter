@@ -109,17 +109,45 @@ function updateManifestFileInZip(zip, obj) {
   zip.updateFile('manifest.json', Buffer.alloc(content.length, content));
 }
 
-function updateManifestVersion(manifestPath, manifest) {
+function updateManifestVersion(manifest, newVersion) {
+  console.log('Updating manifest.json version...');
+  manifest.version = newVersion;
+  updateManifestFile(manifestPath, manifest);
+  fse.copyFileSync(manifestPath, path.join(dist, 'manifest.json'));
+}
+
+function updateOptionPageVersion(newVersion) {
+  let filename = 'optionPage.html';
+  let optionPage = path.join(staticDir, filename);
+  let optionPageHTML = fse.readFileSync(optionPage).toString();
+  let foundMatch = false;
+
+  let newOptionPageHTML = optionPageHTML.replace(/id="helpVersion">.*?<\/a>/, function(match) {
+    foundMatch = true;
+    return `id="helpVersion">${newVersion}</a>`;
+  });
+
+  if (foundMatch) {
+    console.log(`Updating ${filename} version...`);
+    fse.writeFileSync(optionPage, newOptionPageHTML); // Update src version
+    fse.copyFileSync(optionPage, path.join(dist, filename)); // Copy src to dist
+  } else {
+    throw `Failed to update ${optionPage}`;
+  }
+}
+
+function updateVersions() {
+  let manifest = getManifestJSON();
   if (manifest.version != process.env.npm_package_version) {
-    console.log('Version number is being updated: ' + manifest.version + ' -> ' + process.env.npm_package_version);
-    manifest.version = process.env.npm_package_version || manifest.version;
-    updateManifestFile(manifestPath, manifest);
-    fse.copyFileSync(manifestPath, path.join(dist, 'manifest.json'));
+    let newVersion = process.env.npm_package_version;
+    console.log('Version number is being updated: ' + manifest.version + ' -> ' + newVersion);
+    updateManifestVersion(manifest, newVersion);
+    updateOptionPageVersion(newVersion);
   }
 }
 
 const dist = './dist/';
 const staticDir = './src/static/';
 let manifestPath = path.join(staticDir, 'manifest.json');
-updateManifestVersion(manifestPath, getManifestJSON());
+updateVersions();
 buildAll();
