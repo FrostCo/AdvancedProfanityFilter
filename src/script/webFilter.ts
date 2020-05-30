@@ -238,7 +238,7 @@ export default class WebFilter extends Filter {
         this.summary[word].count += 1;
       } else {
         let result;
-        if (this.cfg.words[word].matchMethod == 4) { // Regexp
+        if (this.cfg.words[word].matchMethod === 3) { // Regexp
           result = this.cfg.words[word].sub || this.cfg.defaultSubstitution;
         } else {
           result = filter.replaceText(word, 0, false); // We can use 0 (All) here because we are just filtering a word

@@ -832,7 +832,7 @@ export default class OptionPage {
     words.forEach(word => {
       let filteredWord = word;
       if (word != words[0] && wordlistFilter.cfg.filterWordList) {
-        if (wordlistFilter.cfg.words[word].matchMethod == 4) { // Regexp
+        if (wordlistFilter.cfg.words[word].matchMethod === 3) { // Regexp
           filteredWord = wordlistFilter.cfg.words[word].sub || wordlistFilter.cfg.defaultSubstitution;
         } else {
           filteredWord = wordlistFilter.replaceText(word, 0, false); // Using 0 (All) here to filter all words

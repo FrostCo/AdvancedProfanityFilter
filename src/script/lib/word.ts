@@ -105,7 +105,7 @@ export default class Word {
           } else {
             return new RegExp('\\b[\\w-]*' + word.processedPhrase() + '[\\w-]*\\b', word.regexOptions());
           }
-        case 4: // Regular Expression (Advanced)
+        case 3: // Regular Expression (Advanced)
           return new RegExp(word.value, word.regexOptions());
         case 1: // Partial: Match any part of a word (sub-string)
         default:

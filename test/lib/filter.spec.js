@@ -27,7 +27,7 @@ describe('Filter', () => {
       filter.cfg = new Config({ words: testWords, filterMethod: 0 });
       filter.cfg = new Config({
         filterMethod: 0,
-        words: Object.assign(testWords, { '^regexp.*?$': { matchMethod: 4, repeat: false, words: ['substitute'] } })
+        words: Object.assign(testWords, { '^regexp.*?$': { matchMethod: 3, repeat: false, words: ['substitute'] } })
       });
       filter.init();
       expect(filter.wordlists[filter.wordlistId].regExps).to.eql([
@@ -116,7 +116,7 @@ describe('Filter', () => {
       it('Should filter an RegExp and fixed length (5) with preserveLast', () => {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, censorCharacter: '_', censorFixedLength: 5, preserveFirst: false, preserveLast: true });
-        filter.cfg.words['^The'] = { matchMethod: 4, repeat: false, words: ['substitute'] };
+        filter.cfg.words['^The'] = { matchMethod: 3, repeat: false, words: ['substitute'] };
         filter.init();
         expect(filter.replaceText('The best things are always the best.')).to.equal('____e best things are always the best.');
       });
@@ -381,7 +381,7 @@ describe('Filter', () => {
       it('Should filter a RegExp', () => {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2 });
-        filter.cfg.words['this and everything after.*$'] = { matchMethod: 4, repeat: false, words: ['substitute'] };
+        filter.cfg.words['this and everything after.*$'] = { matchMethod: 3, repeat: false, words: ['substitute'] };
         filter.init();
         expect(filter.replaceText('Have you ever done this and everything after it?')).to.equal('Have you ever done ');
       });
