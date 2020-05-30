@@ -68,7 +68,38 @@ export default class Word {
     let word = this;
     try {
       switch(word.matchMethod) {
+        case 1: // Partial: Match any part of a word (sub-string)
+          if (word._filterMethod === 2) { // Filter Method: Remove
+            // Match entire word that contains sub-string and surrounding whitespace
+            // /\s?\b[\w-]*word[\w-]*\b\s?/gi
+            if (word.unicode) {
+              // Work around for lack of word boundary support for unicode characters
+              // /(^|[\s.,'"+!?|-]?)[\w-]*(word)[\w-]*([\s.,'"+!?|-]?|$)/giu
+              return new RegExp('(^|' + Word._unicodeWordBoundary + '?)([\\w-]*' +  word.processedPhrase() + '[\\w-]*)(' + Word._unicodeWordBoundary + '?|$)', word.regexOptions());
+            } else if (word.hasEdgePunctuation()) { // Begin or end with punctuation (not \w))
+              return new RegExp('(^|\\s)([\\w-]*' +  word.processedPhrase() + '[\\w-]*)(\\s|$)', word.regexOptions());
+            } else {
+              return new RegExp('\\s?\\b[\\w-]*' +  word.processedPhrase() + '[\\w-]*\\b\\s?', word.regexOptions());
+            }
+          } else {
+            // /word/gi
+            return new RegExp(word.processedPhrase(), word.regexOptions());
+          }
+        case 2: // Whole: Match entire word that contains sub-string
+          // /\b[\w-]*word[\w-]*\b/gi
+          if (word.unicode) {
+            // Work around for lack of word boundary support for unicode characters
+            // (^|[\s.,'"+!?|-]*)([\S]*куче[\S]*)([\s.,'"+!?|-]*|$)/giu
+            return new RegExp('(^|' + Word._unicodeWordBoundary + '*)([\\S]*' + word.processedPhrase() + '[\\S]*)(' + Word._unicodeWordBoundary + '*|$)', word.regexOptions());
+          } else if (word.hasEdgePunctuation()) { // Begin or end with punctuation (not \w))
+            return new RegExp('(^|\\s)([\\S]*' + word.processedPhrase() + '[\\S]*)(\\s|$)', word.regexOptions());
+          } else {
+            return new RegExp('\\b[\\w-]*' + word.processedPhrase() + '[\\w-]*\\b', word.regexOptions());
+          }
+        case 3: // Regular Expression (Advanced)
+          return new RegExp(word.value, word.regexOptions());
         case 0: // Exact: Word must match exactly (not sub-string)
+        default:
           // Filter Method: Remove
           // Match entire word that contains sub-string and surrounding whitespace
           // /\s?\bword\b\s?/gi
@@ -93,37 +124,6 @@ export default class Word {
             } else {
               return new RegExp('\\b' + word.processedPhrase() + '\\b', word.regexOptions());
             }
-          }
-        case 2: // Whole: Match entire word that contains sub-string
-          // /\b[\w-]*word[\w-]*\b/gi
-          if (word.unicode) {
-            // Work around for lack of word boundary support for unicode characters
-            // (^|[\s.,'"+!?|-]*)([\S]*куче[\S]*)([\s.,'"+!?|-]*|$)/giu
-            return new RegExp('(^|' + Word._unicodeWordBoundary + '*)([\\S]*' + word.processedPhrase() + '[\\S]*)(' + Word._unicodeWordBoundary + '*|$)', word.regexOptions());
-          } else if (word.hasEdgePunctuation()) { // Begin or end with punctuation (not \w))
-            return new RegExp('(^|\\s)([\\S]*' + word.processedPhrase() + '[\\S]*)(\\s|$)', word.regexOptions());
-          } else {
-            return new RegExp('\\b[\\w-]*' + word.processedPhrase() + '[\\w-]*\\b', word.regexOptions());
-          }
-        case 3: // Regular Expression (Advanced)
-          return new RegExp(word.value, word.regexOptions());
-        case 1: // Partial: Match any part of a word (sub-string)
-        default:
-          if (word._filterMethod === 2) { // Filter Method: Remove
-            // Match entire word that contains sub-string and surrounding whitespace
-            // /\s?\b[\w-]*word[\w-]*\b\s?/gi
-            if (word.unicode) {
-              // Work around for lack of word boundary support for unicode characters
-              // /(^|[\s.,'"+!?|-]?)[\w-]*(word)[\w-]*([\s.,'"+!?|-]?|$)/giu
-              return new RegExp('(^|' + Word._unicodeWordBoundary + '?)([\\w-]*' +  word.processedPhrase() + '[\\w-]*)(' + Word._unicodeWordBoundary + '?|$)', word.regexOptions());
-            } else if (word.hasEdgePunctuation()) { // Begin or end with punctuation (not \w))
-              return new RegExp('(^|\\s)([\\w-]*' +  word.processedPhrase() + '[\\w-]*)(\\s|$)', word.regexOptions());
-            } else {
-              return new RegExp('\\s?\\b[\\w-]*' +  word.processedPhrase() + '[\\w-]*\\b\\s?', word.regexOptions());
-            }
-          } else {
-            // /word/gi
-            return new RegExp(word.processedPhrase(), word.regexOptions());
           }
       }
     } catch(e) {
