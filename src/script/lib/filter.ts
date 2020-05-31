@@ -28,7 +28,7 @@ export default class Filter {
     return wordlistId;
   }
 
-  checkWhitelist(match, string, matchStartIndex, wordIndex, wordlistId): boolean {
+  checkWhitelist(match: string, string: string, matchStartIndex: number, word: Word): boolean {
     let self = this;
     let whitelistLength = self.whitelist.length;
     let iWhitelistLength = self.iWhitelist.length;
@@ -41,7 +41,6 @@ export default class Filter {
       if (iWhitelistLength && self.iWhitelist.includes(match.toLowerCase())) { return true; }
 
       // Check for partial match (match may not contain the full whitelisted word)
-      let word = this.wordlists[wordlistId].find(wordIndex);
       if (word.matchMethod === 1) {
         let wordOptions: WordOptions = {
           matchMethod: 2,
@@ -70,7 +69,7 @@ export default class Filter {
     return false;
   }
 
-  foundMatch(word) {
+  foundMatch(word: Word) {
     this.counter++;
   }
 
@@ -81,6 +80,22 @@ export default class Filter {
     this.buildWordlist(wordlistId);
   }
 
+  matchData(wordlist: Wordlist, index: number, match: string, args: any[]) {
+    let word = wordlist.find(index);
+    let string = args.pop();
+    let matchStartIndex = args.pop();
+    let captureGroups = args;
+
+    // (boundary)(match)(boundary): Used internally for several types of matches:
+    // - Remove Filter
+    // - Unicode word boundaries (workaround)
+    // - Edge punctuation
+    let internalCaptureGroups = (captureGroups.length > 0 && word.matchMethod !== 3);
+    if (internalCaptureGroups) { match = captureGroups[1]; }
+
+    return { word: word, string: string, match: match, matchStartIndex: matchStartIndex, captureGroups: captureGroups, internalCaptureGroups: internalCaptureGroups };
+  }
+
   rebuildWordlists() {
     let self = this;
     Object.keys(this.wordlists).forEach(function(key) {
@@ -88,36 +103,20 @@ export default class Filter {
     });
   }
 
-  // Config Dependencies: filterMethod, wordlists,
-  // censorFixedLength, preserveFirst, preserveLast, censorCharacter
-  // words, defaultSubstitution, preserveCase
   replaceText(str: string, wordlistId: number | false = false, stats: boolean = true): string {
-    // console.count('replaceText'); // Benchmarking - Executaion Count
     let self = this;
-
     wordlistId = self.buildWordlist(wordlistId);
-    let regExps = self.wordlists[wordlistId].regExps;
-    let wordlist = self.wordlists[wordlistId].list;
+    let wordlist = self.wordlists[wordlistId];
 
     switch(self.cfg.filterMethod) {
       case 0: // Censor
-        regExps.forEach((regExp, index) => {
-          str = str.replace(regExp, function(match, ...args): string {
-            // TODO: This is getting repeated too much
-            let string = args.pop();
-            let matchStartIndex = args.pop();
-            let captureGroups = args;
-            let useCaptureGroups = captureGroups.length > 0;
-            // Workaround for unicode word boundaries and regexp that use capture groups
-            if (useCaptureGroups) { match = captureGroups[1]; }
-
-            // Check for whitelisted match
-            if (self.checkWhitelist(match, string, matchStartIndex, index, wordlistId)) {
-              return match;
-            }
+        wordlist.regExps.forEach((regExp, index) => {
+          str = str.replace(regExp, function(originalMatch, ...args): string {
+            let { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = self.matchData(wordlist, index, originalMatch, args);
+            if (self.checkWhitelist(match, string, matchStartIndex, word)) { return match; } // Check for whitelisted match
+            if (stats) { self.foundMatch(word); }
 
             // Filter
-            if (stats) { self.foundMatch(wordlist[index]); }
             let censoredString = '';
             let censorLength = self.cfg.censorFixedLength > 0 ? self.cfg.censorFixedLength : match.length;
 
@@ -131,30 +130,20 @@ export default class Filter {
               censoredString = self.cfg.censorCharacter.repeat(censorLength);
             }
 
-            if (useCaptureGroups) { censoredString = captureGroups[0] + censoredString + captureGroups[2]; } // Workaround for unicode word boundaries
-            // console.log('Censor match:', match, censoredString); // DEBUG
+            if (internalCaptureGroups) { censoredString = captureGroups[0] + censoredString + captureGroups[2]; }
             return censoredString;
           });
         });
         break;
       case 1: // Substitute
-        regExps.forEach((regExp, index) => {
-          str = str.replace(regExp, function(match, ...args): string {
-            let string = args.pop();
-            let matchStartIndex = args.pop();
-            let captureGroups = args;
-            let useCaptureGroups = captureGroups.length > 0;
-            // Workaround for unicode word boundaries and regexp that use capture groups
-            if (useCaptureGroups) { match = captureGroups[1]; }
-
-            // Check for whitelisted match
-            if (self.checkWhitelist(match, string, matchStartIndex, index, wordlistId)) {
-              return match;
-            }
+        wordlist.regExps.forEach((regExp, index) => {
+          str = str.replace(regExp, function(originalMatch, ...args): string {
+            let { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = self.matchData(wordlist, index, originalMatch, args);
+            if (self.checkWhitelist(match, string, matchStartIndex, word)) { return match; } // Check for whitelisted match
+            if (stats) { self.foundMatch(word); }
 
             // Filter
-            if (stats) { self.foundMatch(wordlist[index]); }
-            let sub = self.cfg.words[wordlist[index]].sub || self.cfg.defaultSubstitution;
+            let sub = word.sub || self.cfg.defaultSubstitution;
 
             // Make substitution match case of original match
             if (self.cfg.preserveCase) {
@@ -169,32 +158,21 @@ export default class Filter {
               sub = '[' + sub + ']';
             }
 
-            if (useCaptureGroups) { sub = captureGroups[0] + sub + captureGroups[2]; } // Workaround for unicode word boundaries
-            // console.log('Substitute match:', match, sub); // DEBUG
+            if (internalCaptureGroups) { sub = captureGroups[0] + sub + captureGroups[2]; }
             return sub;
           });
         });
         break;
       case 2: // Remove
-        regExps.forEach((regExp, index) => {
-          str = str.replace(regExp, function(match, ...args): string {
-            let string = args.pop();
-            let matchStartIndex = args.pop();
-            let captureGroups = args;
-            let useCaptureGroups = captureGroups.length > 0;
-            // Workaround for unicode word boundaries and regexp that use capture groups
-            if (useCaptureGroups) { match = captureGroups[1]; }
-
-            // Check for whitelisted match
-            if (self.checkWhitelist(match.trim(), string, matchStartIndex, index, wordlistId)) {
-              return match;
-            }
+        wordlist.regExps.forEach((regExp, index) => {
+          str = str.replace(regExp, function(originalMatch, ...args): string {
+            let { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = self.matchData(wordlist, index, originalMatch, args);
+            if (self.checkWhitelist(match.trim(), string, matchStartIndex, word)) { return match; } // Check for whitelisted match
+            if (stats) { self.foundMatch(word); }
 
             // Filter
-            if (stats) { self.foundMatch(wordlist[index]); }
-            if (useCaptureGroups) {
+            if (internalCaptureGroups) {
               match = captureGroups[1];
-              // Workaround for unicode word boundaries
               if (Word.whitespaceRegExp.test(captureGroups[0]) && Word.whitespaceRegExp.test(captureGroups[2])) { // If both surrounds are whitespace (only need 1)
                 return captureGroups[0];
               } else if (Word.nonWordRegExp.test(captureGroups[0]) || Word.nonWordRegExp.test(captureGroups[2])) { // If there is more than just whitesapce (ex. ',')
@@ -207,7 +185,6 @@ export default class Filter {
               if (Word.whitespaceRegExp.test(match[0]) && Word.whitespaceRegExp.test(match[match.length - 1])) {
                 return match[0];
               } else {
-                // console.log('Remove match:', match); // DEBUG
                 return '';
               }
             }

@@ -234,17 +234,17 @@ export default class WebFilter extends Filter {
   foundMatch(word) {
     super.foundMatch(word);
     if (this.cfg.showSummary) {
-      if (this.summary[word]) {
-        this.summary[word].count += 1;
+      if (this.summary[word.value]) {
+        this.summary[word.value].count += 1;
       } else {
         let result;
-        if (this.cfg.words[word].matchMethod === 3) { // Regexp
-          result = this.cfg.words[word].sub || this.cfg.defaultSubstitution;
+        if (word.matchMethod === 3) { // Regexp
+          result = word.sub || this.cfg.defaultSubstitution;
         } else {
-          result = filter.replaceText(word, 0, false); // We can use 0 (All) here because we are just filtering a word
+          result = filter.replaceText(word.value, 0, false); // We can use 0 (All) here because we are just filtering a word
         }
 
-        this.summary[word] = { filtered: result, count: 1 };
+        this.summary[word.value] = { filtered: result, count: 1 };
       }
     }
   }

@@ -58,12 +58,10 @@ export default class Word {
     this.sub = options.sub === undefined ? cfg.defaultSubstitution : options.sub;
     this._filterMethod = options._filterMethod === undefined ? cfg.filterMethod : options._filterMethod;
     this.unicode = Word.containsDoubleByte(word);
-    this.escaped = Word.escapeRegExp(this.value);
+    this.escaped = this.matchMethod === 3 ? this.value : Word.escapeRegExp(this.value); // Don't escape a RegExp
     this.regExp = this.buildRegExp();
   }
 
-  // Word must match exactly (not sub-string)
-  // /\bword\b/gi
   buildRegExp(): RegExp {
     let word = this;
     try {
@@ -122,6 +120,7 @@ export default class Word {
               // Begin or end with punctuation (not \w))
               return new RegExp('(^|\\s)(' + word.processedPhrase() + ')(\\s|$)', word.regexOptions());
             } else {
+              // /\bword\b/gi
               return new RegExp('\\b' + word.processedPhrase() + '\\b', word.regexOptions());
             }
           }
