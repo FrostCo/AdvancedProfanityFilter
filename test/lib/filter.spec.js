@@ -27,7 +27,7 @@ describe('Filter', () => {
       filter.cfg = new Config({ words: testWords, filterMethod: 0 });
       filter.cfg = new Config({
         filterMethod: 0,
-        words: Object.assign(testWords, { '^regexp.*?$': { matchMethod: 3, repeat: false, words: ['substitute'] } })
+        words: Object.assign(testWords, { '^regexp.*?$': { matchMethod: 3, repeat: false, sub: 'substitute' } })
       });
       filter.init();
       expect(filter.wordlists[filter.wordlistId].regExps).to.eql([
@@ -113,10 +113,10 @@ describe('Filter', () => {
         });
       });
 
-      it('Should filter an RegExp and fixed length (5) with preserveLast', () => {
+      it('Should filter a RegExp and fixed length (5) with preserveLast', () => {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, censorCharacter: '_', censorFixedLength: 5, preserveFirst: false, preserveLast: true });
-        filter.cfg.words['^The'] = { matchMethod: 3, repeat: false, words: ['substitute'] };
+        filter.cfg.words['^The'] = { matchMethod: 3, repeat: false, sub: 'substitute' };
         filter.init();
         expect(filter.replaceText('The best things are always the best.')).to.equal('____e best things are always the best.');
       });
@@ -166,7 +166,7 @@ describe('Filter', () => {
         it('preserveFirst', () => {
           let filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: false });
-          filter.cfg.words['врата'] = { matchMethod: 0, repeat: true, words: ['door'] };
+          filter.cfg.words['врата'] = { matchMethod: 0, repeat: true, sub: 'door' };
           filter.init();
           expect(filter.replaceText('this even works on unicode words like врата, cool huh?')).to.equal('this even works on unicode w**** like в****, cool huh?');
         });
@@ -174,7 +174,7 @@ describe('Filter', () => {
         it('preserveFirst and preserveLast', () => {
           let filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
-          filter.cfg.words['котка'] = { matchMethod: 1, repeat: true, words: ['cat'] };
+          filter.cfg.words['котка'] = { matchMethod: 1, repeat: true, sub: 'cat' };
           filter.init();
           expect(filter.replaceText('The коткаs in the hat')).to.equal('The к***аs in the hat');
         });
@@ -182,7 +182,7 @@ describe('Filter', () => {
         it('With (_) characters and preserveFirst', () => {
           let filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, censorCharacter: '_', censorFixedLength: 0, preserveFirst: true, preserveLast: false });
-          filter.cfg.words['куче'] = { matchMethod: 2, repeat: true, words: ['dog'] };
+          filter.cfg.words['куче'] = { matchMethod: 2, repeat: true, sub: 'dog' };
           filter.init();
           expect(filter.replaceText('The bigкучеs ran around the yard.')).to.equal('The b_______ ran around the yard.');
         });
@@ -381,7 +381,7 @@ describe('Filter', () => {
       it('Should filter a RegExp', () => {
         let filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2 });
-        filter.cfg.words['this and everything after.*$'] = { matchMethod: 3, repeat: false, words: ['substitute'] };
+        filter.cfg.words['this and everything after.*$'] = { matchMethod: 3, repeat: false, sub: 'substitute' };
         filter.init();
         expect(filter.replaceText('Have you ever done this and everything after it?')).to.equal('Have you ever done ');
       });
@@ -419,7 +419,7 @@ describe('Filter', () => {
         it('Exact word', () => {
           let filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2 });
-          filter.cfg.words['врата'] = { matchMethod: 0, repeat: true, words: ['door'] };
+          filter.cfg.words['врата'] = { matchMethod: 0, repeat: true, sub: 'door' };
           filter.init();
           expect(filter.replaceText('This even works on врата. cool huh?')).to.equal('This even works on. cool huh?');
           expect(filter.replaceText('This even works on врата, cool huh?')).to.equal('This even works on, cool huh?');
@@ -429,7 +429,7 @@ describe('Filter', () => {
         it('Partial word', () => {
           let filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 2 });
-          filter.cfg.words['врата'] = { matchMethod: 1, repeat: true, words: ['door'] };
+          filter.cfg.words['врата'] = { matchMethod: 1, repeat: true, sub: 'door' };
           filter.init();
           expect(filter.replaceText('This even works on with-врата. Cool huh?')).to.equal('This even works on. Cool huh?');
           expect(filter.replaceText('The вратаs in the hat')).to.equal('The in the hat');
