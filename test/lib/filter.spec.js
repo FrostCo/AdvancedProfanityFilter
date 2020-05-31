@@ -3,17 +3,17 @@ import Config from '../built/lib/config';
 import Filter from '../built/lib/filter';
 
 const testWords = {
-  'example': { matchMethod: 0, repeat: true, sub: 'demo' },
-  'placeholder': { matchMethod: 0, repeat: false, sub: 'variable' },
-  'sample': { matchMethod: 1, repeat: false, sub: 'piece' },
-  'word': { matchMethod: 2, repeat: true, sub: 'idea' }
+  'example': { matchMethod: 0, repeat: true, sub: 'demo', lists: [] },
+  'placeholder': { matchMethod: 0, repeat: false, sub: 'variable', lists: [] },
+  'sample': { matchMethod: 1, repeat: false, sub: 'piece', lists: [] },
+  'word': { matchMethod: 2, repeat: true, sub: 'idea', lists: [] }
 };
 
 describe('Filter', () => {
-  describe('generateWordList()', () => {
+  describe('buildWordlist()', () => {
     it('should generate a sorted word list RegExp list', () => {
       let filter = new Filter;
-      filter.cfg = new Config({ words: testWords });
+      filter.cfg = new Config({ words: Object.assign({}, testWords) });
       filter.init();
       expect(filter.wordlists[filter.wordlistId].list.length).to.equal(4);
       expect(filter.wordlists[filter.wordlistId].list).to.eql(['placeholder', 'example', 'sample', 'word']);
@@ -21,13 +21,13 @@ describe('Filter', () => {
     });
   });
 
-  describe('generateRegexpList()', () => {
+  describe('init()', () => {
     it('should return RegExp list and be idempotent', () => {
       let filter = new Filter;
-      filter.cfg = new Config({ words: testWords, filterMethod: 0 });
+      filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0 });
       filter.cfg = new Config({
         filterMethod: 0,
-        words: Object.assign(testWords, { '^regexp.*?$': { matchMethod: 3, repeat: false, sub: 'substitute' } })
+        words: Object.assign({}, testWords, { '^regexp.*?$': { matchMethod: 3, repeat: false, sub: 'substitute' } })
       });
       filter.init();
       expect(filter.wordlists[filter.wordlistId].regExps).to.eql([
@@ -45,6 +45,37 @@ describe('Filter', () => {
         /sample/gi,
         /\b[\w-]*w+o+r+d+[\w-]*\b/gi
       ]);
+    });
+
+    it('should default to wordlist 0 when none configured', () => {
+      let filter = new Filter;
+      filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0 });
+      filter.wordlistId = undefined;
+      expect(filter.wordlistId).to.be.undefined;
+      filter.cfg.wordlistId = undefined;
+      expect(filter.cfg.wordlistId).to.be.undefined;
+      filter.init(undefined);
+      expect(filter.wordlistId).to.equal(0);
+    });
+  });
+
+  describe('rebuildWordlists()', () => {
+    it('should rebuild all wordlists', () => {
+      let filter = new Filter;
+      filter.cfg = new Config({ words: Object.assign({}, testWords) });
+      filter.cfg.words['book'] = { matchMethod: 2, repeat: true, sub: 'journal', lists: [1] };
+      filter.init();
+      expect(Object.keys(filter.wordlists).length).to.equal(1);
+      filter.buildWordlist(1);
+      expect(Object.keys(filter.wordlists).length).to.equal(2);
+      expect(Object.keys(filter.wordlists[1].all).length).to.equal(1);
+      filter.cfg.words['food'] = { matchMethod: 2, repeat: true, sub: 'sustenance', lists: [1] };
+      expect(Object.keys(filter.wordlists[0].all).length).to.equal(5);
+      expect(Object.keys(filter.wordlists[1].all).length).to.equal(1);
+      filter.rebuildWordlists();
+      expect(Object.keys(filter.wordlists[0].all).length).to.equal(6);
+      expect(Object.keys(filter.wordlists[1].all).length).to.equal(2);
+      expect(filter.wordlists[1].find('food')).to.exist;
     });
   });
 
@@ -97,7 +128,7 @@ describe('Filter', () => {
       describe('Whole', () => {
         it('With (_) characters and fixed length (3) and not update stats', () => {
           let filter = new Filter;
-          filter.cfg = new Config({ words: testWords, filterMethod: 0, censorCharacter: '_', censorFixedLength: 3, preserveFirst: false, preserveLast: false });
+          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, censorCharacter: '_', censorFixedLength: 3, preserveFirst: false, preserveLast: false });
           filter.init();
           expect(filter.counter).to.equal(0);
           expect(filter.replaceText('Words used to be okay, but now even a word is bad.', filter.wordlistId, false)).to.equal('___ used to be okay, but now even a ___ is bad.');
@@ -113,12 +144,14 @@ describe('Filter', () => {
         });
       });
 
-      it('Should filter a RegExp and fixed length (5) with preserveLast', () => {
-        let filter = new Filter;
-        filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, censorCharacter: '_', censorFixedLength: 5, preserveFirst: false, preserveLast: true });
-        filter.cfg.words['^The'] = { matchMethod: 3, repeat: false, sub: 'substitute' };
-        filter.init();
-        expect(filter.replaceText('The best things are always the best.')).to.equal('____e best things are always the best.');
+      describe('RegExp', () => {
+        it('Should filter a RegExp and fixed length (5) with preserveLast', () => {
+          let filter = new Filter;
+          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 0, censorCharacter: '_', censorFixedLength: 5, preserveFirst: false, preserveLast: true });
+          filter.cfg.words['^The'] = { matchMethod: 3, repeat: false, sub: 'substitute' };
+          filter.init();
+          expect(filter.replaceText('The best things are always the best.')).to.equal('____e best things are always the best.');
+        });
       });
 
       describe('whitelist', () => {
@@ -288,6 +321,16 @@ describe('Filter', () => {
         });
       });
 
+      describe('RegExp', () => {
+        it('Should filter a RegExp with capture groups', () => {
+          let filter = new Filter;
+          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: 1 });
+          filter.cfg.words['c(a|u)t'] = { matchMethod: 3, repeat: false, sub: 'bit' };
+          filter.init();
+          expect(filter.replaceText('Have you ever been cut by a Cat?')).to.equal('Have you ever been bit by a Bit?');
+        });
+      });
+
       describe('whitelist', () => {
         it('case-sensitive exact match', () => {
           let filter = new Filter;
@@ -437,6 +480,30 @@ describe('Filter', () => {
           expect(filter.replaceText('вратаs')).to.equal('');
         });
       });
+    });
+  });
+
+  describe('replaceTextResult()', () => {
+    it('should generate a result object when filtering', () => {
+      let filter = new Filter;
+      filter.cfg = new Config({ words: Object.assign({}, testWords) });
+      filter.init();
+      let string = 'this is my example';
+      let result = filter.replaceTextResult(string);
+      expect(result.filtered).to.equal('this is my demo');
+      expect(result.original).to.equal(string);
+      expect(result.modified).to.equal(true);
+    });
+
+    it('should generate a result object when not filtering', () => {
+      let filter = new Filter;
+      filter.cfg = new Config({ words: Object.assign({}, testWords) });
+      filter.init();
+      let string = 'this is my story';
+      let result = filter.replaceTextResult(string);
+      expect(result.filtered).to.equal(string);
+      expect(result.original).to.equal(string);
+      expect(result.modified).to.equal(false);
     });
   });
 });
