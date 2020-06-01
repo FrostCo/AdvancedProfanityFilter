@@ -6,6 +6,7 @@ interface AudioRules {
   convertBreaks?: boolean;          // [Element,ElementChild] Convert <br> to '\n'
   dataPropPresent?: string;         // [Element] node.dataset.hasOwnProperty()
   disabled?: boolean;               // [All] Set automatically based on iframe status or missing a required property
+  displayMode?: string;             // [All] 'style', 'empty'
   displayHide?: string;             // [Element,ElementChild] Display style for hiding captions (Default: 'none')
   displaySelector?: string;         // [Element,ElementChild] Alternate selector to hide/show captions
   displayShow?: string;             // [Element,ElementChild] Display style for showing captions (Default: '')

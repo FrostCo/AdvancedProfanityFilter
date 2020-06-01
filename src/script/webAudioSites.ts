@@ -1,3 +1,5 @@
+import Constants from './lib/constants';
+
 export default class WebAudioSites {
   static combineSites(sites: { [site: string]: AudioRules[] } = {}): { [site: string]: AudioRules[] } {
     return Object.assign({}, WebAudioSites.sites, sites);
@@ -10,7 +12,7 @@ export default class WebAudioSites {
         mode: 'watcher',
         iframe: false,
         parentSelector: 'div.webPlayerContainer div p > span',
-        showSubtitles: 0,
+        showSubtitles: Constants.ShowSubtitles.All,
         simpleUnmute: true,
         subtitleSelector: 'div.webPlayerContainer div span > span',
         videoSelector: 'div.webPlayerElement video[src]'

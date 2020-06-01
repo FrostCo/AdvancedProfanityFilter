@@ -1,3 +1,4 @@
+import Constants from './constants';
 import Word from './word';
 import Wordlist from './wordlist';
 import Config from './config';
@@ -41,9 +42,9 @@ export default class Filter {
       if (iWhitelistLength && self.iWhitelist.includes(match.toLowerCase())) { return true; }
 
       // Check for partial match (match may not contain the full whitelisted word)
-      if (word.matchMethod === 1) {
+      if (word.matchMethod === Constants.MatchMethods.Partial) {
         let wordOptions: WordOptions = {
-          matchMethod: 2,
+          matchMethod: Constants.MatchMethods.Whole,
           repeat: false,
           separators: false,
           sub: ''
@@ -90,7 +91,7 @@ export default class Filter {
     // - Remove Filter
     // - Unicode word boundaries (workaround)
     // - Edge punctuation
-    let internalCaptureGroups = (captureGroups.length > 0 && word.matchMethod !== 3);
+    let internalCaptureGroups = (captureGroups.length > 0 && word.matchMethod !== Constants.MatchMethods.Regex);
     if (internalCaptureGroups) { match = captureGroups[1]; }
 
     return { word: word, string: string, match: match, matchStartIndex: matchStartIndex, captureGroups: captureGroups, internalCaptureGroups: internalCaptureGroups };
@@ -109,7 +110,7 @@ export default class Filter {
     let wordlist = self.wordlists[wordlistId];
 
     switch(self.cfg.filterMethod) {
-      case 0: // Censor
+      case Constants.FilterMethods.Censor:
         wordlist.regExps.forEach((regExp, index) => {
           str = str.replace(regExp, function(originalMatch, ...args): string {
             let { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = self.matchData(wordlist, index, originalMatch, args);
@@ -135,7 +136,7 @@ export default class Filter {
           });
         });
         break;
-      case 1: // Substitute
+      case Constants.FilterMethods.Substitute:
         wordlist.regExps.forEach((regExp, index) => {
           str = str.replace(regExp, function(originalMatch, ...args): string {
             let { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = self.matchData(wordlist, index, originalMatch, args);
@@ -163,7 +164,7 @@ export default class Filter {
           });
         });
         break;
-      case 2: // Remove
+      case Constants.FilterMethods.Remove:
         wordlist.regExps.forEach((regExp, index) => {
           str = str.replace(regExp, function(originalMatch, ...args): string {
             let { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = self.matchData(wordlist, index, originalMatch, args);
@@ -172,7 +173,6 @@ export default class Filter {
 
             // Filter
             if (internalCaptureGroups) {
-              match = captureGroups[1];
               if (Word.whitespaceRegExp.test(captureGroups[0]) && Word.whitespaceRegExp.test(captureGroups[2])) { // If both surrounds are whitespace (only need 1)
                 return captureGroups[0];
               } else if (Word.nonWordRegExp.test(captureGroups[0]) || Word.nonWordRegExp.test(captureGroups[2])) { // If there is more than just whitesapce (ex. ',')

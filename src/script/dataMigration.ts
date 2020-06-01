@@ -1,3 +1,4 @@
+import Constants from './lib/constants';
 import { getVersion, isVersionOlder } from './lib/helper';
 import WebConfig from './webConfig';
 
@@ -63,10 +64,10 @@ export default class DataMigration {
   fixSmartWatch() {
     let cfg = this.cfg;
     let originalWord = 'twat';
-    let originalWordConf = { matchMethod: 1, repeat: true, sub: 'dumbo' };
+    let originalWordConf = { matchMethod: Constants.MatchMethods.Partial, repeat: true, sub: 'dumbo' };
     let update = {
-      twat: { matchMethod: 0, repeat: true, sub: 'dumbo' },
-      twats: { matchMethod: 0, repeat: true, sub: 'dumbos' }
+      twat: { matchMethod: Constants.MatchMethods.Exact, repeat: true, sub: 'dumbo' },
+      twats: { matchMethod: Constants.MatchMethods.Exact, repeat: true, sub: 'dumbos' }
     };
 
     if (
@@ -101,7 +102,7 @@ export default class DataMigration {
         let word = cfg.words[name];
         // Move RegExp from 4 to 3
         if (word.matchMethod === 4) {
-          word.matchMethod = 3;
+          word.matchMethod = Constants.MatchMethods.Regex;
         }
       });
       cfg.remove('globalMatchMethod');

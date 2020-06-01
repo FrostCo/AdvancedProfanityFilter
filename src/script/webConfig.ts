@@ -1,3 +1,4 @@
+import Constants from './lib/constants';
 import Config from './lib/config';
 
 export default class WebConfig extends Config {
@@ -24,9 +25,9 @@ export default class WebConfig extends Config {
     muteAudio: false,
     muteAudioOnly: false,
     muteCueRequireShowing: true,
-    muteMethod: 0, // 0: Mute Tab, 1: Video Volume
+    muteMethod: Constants.MuteMethods.Tab,
     password: null,
-    showSubtitles: 0,
+    showSubtitles: Constants.ShowSubtitles.All,
     showUpdateNotification: true,
     youTubeAutoSubsMax: 0,
     youTubeAutoSubsMin: 0,

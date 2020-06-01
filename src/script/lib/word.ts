@@ -1,3 +1,4 @@
+import Constants from './constants';
 import Config from './config';
 
 export default class Word {
@@ -58,7 +59,7 @@ export default class Word {
     this.sub = options.sub === undefined ? cfg.defaultSubstitution : options.sub;
     this._filterMethod = options._filterMethod === undefined ? cfg.filterMethod : options._filterMethod;
     this.unicode = Word.containsDoubleByte(word);
-    this.escaped = this.matchMethod === 3 ? this.value : Word.escapeRegExp(this.value); // Don't escape a RegExp
+    this.escaped = this.matchMethod === Constants.MatchMethods.Regex ? this.value : Word.escapeRegExp(this.value); // Don't escape a RegExp
     this.regExp = this.buildRegExp();
   }
 
@@ -66,8 +67,8 @@ export default class Word {
     let word = this;
     try {
       switch(word.matchMethod) {
-        case 1: // Partial: Match any part of a word (sub-string)
-          if (word._filterMethod === 2) { // Filter Method: Remove
+        case Constants.MatchMethods.Partial:
+          if (word._filterMethod === Constants.FilterMethods.Remove) {
             // Match entire word that contains sub-string and surrounding whitespace
             // /\s?\b[\w-]*word[\w-]*\b\s?/gi
             if (word.unicode) {
@@ -83,7 +84,7 @@ export default class Word {
             // /word/gi
             return new RegExp(word.processedPhrase(), word.regexOptions());
           }
-        case 2: // Whole: Match entire word that contains sub-string
+        case Constants.MatchMethods.Whole:
           // /\b[\w-]*word[\w-]*\b/gi
           if (word.unicode) {
             // Work around for lack of word boundary support for unicode characters
@@ -94,14 +95,13 @@ export default class Word {
           } else {
             return new RegExp('\\b[\\w-]*' + word.processedPhrase() + '[\\w-]*\\b', word.regexOptions());
           }
-        case 3: // Regular Expression (Advanced)
+        case Constants.MatchMethods.Regex:
           return new RegExp(word.value, word.regexOptions());
-        case 0: // Exact: Word must match exactly (not sub-string)
+        case Constants.MatchMethods.Exact:
         default:
-          // Filter Method: Remove
           // Match entire word that contains sub-string and surrounding whitespace
           // /\s?\bword\b\s?/gi
-          if (word._filterMethod === 2) { // Remove method
+          if (word._filterMethod === Constants.FilterMethods.Remove) {
             if (word.unicode) {
               // Work around for lack of word boundary support for unicode characters
               // /(^|[\s.,'"+!?|-])(word)([\s.,'"+!?|-]+|$)/giu
