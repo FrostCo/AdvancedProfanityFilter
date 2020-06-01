@@ -1,4 +1,5 @@
 const expect = require('chai').expect;
+import Constants from '../built/lib/constants';
 import Config from '../built/lib/config';
 
 describe('Config', function() {
@@ -31,7 +32,7 @@ describe('Config', function() {
     });
 
     it('should add a new word to the config with provided options', function() {
-      let wordOptions = { matchMethod: 1, repeat: true, sub: 'Older-word' };
+      let wordOptions = { matchMethod: Constants.MatchMethods.Partial , repeat: true, sub: 'Older-word' };
       expect(config.addWord('newer-word', wordOptions)).to.equal(true);
       expect(Object.keys(config.words)).to.include('newer-word');
       expect(config.words['newer-word'].matchMethod).to.equal(wordOptions.matchMethod);

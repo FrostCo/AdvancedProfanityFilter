@@ -1,4 +1,5 @@
 const expect = require('chai').expect;
+import Constants from './built/lib/constants';
 import WebConfig from './built/webConfig';
 
 describe('WebConfig', function() {
@@ -25,12 +26,12 @@ describe('WebConfig', function() {
     it('should combine _words# data', function() {
       let config = new WebConfig(WebConfig._defaults);
       config._words0 = WebConfig._defaultWords;
-      config._words1 = { 'test': { lists: [], matchMethod: 0, repeat: true, separators: false, sub: 'tset' } };
+      config._words1 = { 'test': { lists: [], matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: false, sub: 'tset' } };
       config._splitContainerKeys = ['words'];
       expect(config.words).to.not.exist;
       let combinedKeys = WebConfig.combineData(config, 'words');
       expect(combinedKeys).to.eql(['_words0', '_words1']);
-      expect(config.words['test'].matchMethod).to.eq(0);
+      expect(config.words['test'].matchMethod).to.eq(Constants.MatchMethods.Exact);
       expect(config.words[Object.keys(WebConfig._defaultWords)[0]]).to.exist;
       expect(config.words['undefined']).to.not.exist;
       expect(config._words0).to.not.exist;

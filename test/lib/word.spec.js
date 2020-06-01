@@ -1,4 +1,5 @@
 const expect = require('chai').expect;
+import Constants from '../built/lib/constants';
 import Config from '../built/lib/config';
 import Word from '../built/lib/word';
 
@@ -6,12 +7,12 @@ describe('Word', function() {
   describe('Regular Expressions', function() {
     describe('Exact Matching', function() {
       it('should build RegExp', function() {
-        let word = new Word('word', { matchMethod: 0 }, Config._defaults);
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Exact }, Config._defaults);
         expect(word.regExp).to.eql(/\bword\b/gi);
       });
 
       it('should build RegExp with matchRepeated', function() {
-        let word = new Word('word', { matchMethod: 0, repeat: true }, Config._defaults);
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Exact, repeat: true }, Config._defaults);
         expect(word.regExp).to.eql(/\bw+o+r+d+\b/gi);
       });
 
@@ -22,20 +23,20 @@ describe('Word', function() {
       });
 
       it('should build RegExp with ending punctuation', function() {
-        let word = new Word('word!', { matchMethod: 0 }, Config._defaults);
+        let word = new Word('word!', { matchMethod: Constants.MatchMethods.Exact }, Config._defaults);
         expect(word.unicode).to.eql(false);
         expect(word.regExp).to.eql(/(^|\s)(word!)(\s|$)/gi);
       });
 
       it('should build RegExp with matchSeparators and matchRepeated', function() {
-        let word = new Word('word', { matchMethod: 0, repeat: true, separators: true }, Config._defaults);
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: true }, Config._defaults);
         expect(word.regExp).to.eql(/\bw+[-_ ]*o+[-_ ]*r+[-_ ]*d+\b/gi);
       });
 
       // Work around for lack of word boundary support for unicode characters
       describe('Unicode', function() {
         it('should use workaround for UTF word boundaries', function() {
-          let word = new Word('врата', { matchMethod: 0 }, Config._defaults);
+          let word = new Word('врата', { matchMethod: Constants.MatchMethods.Exact }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-]+)(врата)([\\s.,\'"+!?|-]+|$)', 'giu')
@@ -43,7 +44,7 @@ describe('Word', function() {
         });
 
         it('should use workaround for UTF word boundaries with matchRepeated', function() {
-          let word = new Word('врата', { matchMethod: 0, repeat: true }, Config._defaults);
+          let word = new Word('врата', { matchMethod: Constants.MatchMethods.Exact, repeat: true }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-]+)(в+р+а+т+а+)([\\s.,\'"+!?|-]+|$)', 'giu')
@@ -54,46 +55,46 @@ describe('Word', function() {
 
     describe('Partial Match', function() {
       it('should build RegExp', function() {
-        let word = new Word('word', { matchMethod: 1 }, Config._defaults);
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Partial }, Config._defaults);
         expect(word.regExp).to.eql(/word/gi);
       });
 
       it('should build RegExp with matchRepeated', function() {
-        let word = new Word('word', { matchMethod: 1, repeat: true }, Config._defaults);
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Partial, repeat: true }, Config._defaults);
         expect(word.regExp).to.eql(/w+o+r+d+/gi);
       });
 
       it('should build RegExp with matchSeparators', function() {
-        let word = new Word('word', { matchMethod: 1, separators: true }, Config._defaults);
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Partial, separators: true }, Config._defaults);
         expect(word.regExp).to.eql(/w[-_ ]*o[-_ ]*r[-_ ]*d/gi);
       });
 
       it('should build RegExp with matchSeparators and matchRepeated', function() {
-        let word = new Word('word', { matchMethod: 1, repeat: true, separators: true }, Config._defaults);
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Partial, repeat: true, separators: true }, Config._defaults);
         expect(word.regExp).to.eql(/w+[-_ ]*o+[-_ ]*r+[-_ ]*d+/gi);
       });
     });
 
     describe('Remove Exact', function() {
       it('should build RegExp', function() {
-        let word = new Word('word', { matchMethod: 0, _filterMethod: 2 }, Config._defaults);
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Exact, _filterMethod: Constants.FilterMethods.Remove }, Config._defaults);
         expect(word.regExp).to.eql(/\s?\bword\b\s?/gi);
       });
 
       it('should build RegExp with matchRepeated', function() {
-        let word = new Word('word', { matchMethod: 0, repeat: true, _filterMethod: 2 }, Config._defaults);
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Exact, repeat: true, _filterMethod: Constants.FilterMethods.Remove }, Config._defaults);
         expect(word.regExp).to.eql(/\s?\bw+o+r+d+\b\s?/gi);
       });
 
       it('should build RegExp with ending punctuation', function() {
-        let word = new Word('word!', { matchMethod: 0, _filterMethod: 2 }, Config._defaults);
+        let word = new Word('word!', { matchMethod: Constants.MatchMethods.Exact, _filterMethod: Constants.FilterMethods.Remove }, Config._defaults);
         expect(word.regExp).to.eql(/(^|\s)(word!)(\s|$)/gi);
       });
 
       // Work around for lack of word boundary support for unicode characters
       describe('Unicode', function() {
         it('should build RegExp', function() {
-          let word = new Word('куче', { matchMethod: 0, _filterMethod: 2 }, Config._defaults);
+          let word = new Word('куче', { matchMethod: Constants.MatchMethods.Exact, _filterMethod: Constants.FilterMethods.Remove }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-])(куче)([\\s.,\'"+!?|-]|$)', 'giu')
@@ -101,7 +102,7 @@ describe('Word', function() {
         });
 
         it('should build RegExp with matchRepeated', function() {
-          let word = new Word('куче', { matchMethod: 0, repeat: true, _filterMethod: 2 }, Config._defaults);
+          let word = new Word('куче', { matchMethod: Constants.MatchMethods.Exact, repeat: true, _filterMethod: Constants.FilterMethods.Remove }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-])(к+у+ч+е+)([\\s.,\'"+!?|-]|$)', 'giu')
@@ -112,24 +113,24 @@ describe('Word', function() {
 
     describe('Remove Partial Match', function() {
       it('should build RegExp', function() {
-        let word = new Word('word', { matchMethod: 1 }, Object.assign(Config._defaults, { filterMethod: 2 }));
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Partial }, Object.assign(Config._defaults, { filterMethod: Constants.FilterMethods.Remove }));
         expect(word.regExp).to.eql(/\s?\b[\w-]*word[\w-]*\b\s?/gi);
       });
 
       it('should build RegExp with matchRepeated', function() {
-        let word = new Word('word', { matchMethod: 1, repeat: true }, Object.assign(Config._defaults, { filterMethod: 2 }));
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Partial, repeat: true }, Object.assign(Config._defaults, { filterMethod: Constants.FilterMethods.Remove }));
         expect(word.regExp).to.eql(/\s?\b[\w-]*w+o+r+d+[\w-]*\b\s?/gi);
       });
 
       it('should build RegExp with ending punctuation', function() {
-        let word = new Word('word!', { matchMethod: 1 }, Object.assign(Config._defaults, { filterMethod: 2 }));
+        let word = new Word('word!', { matchMethod: Constants.MatchMethods.Partial }, Object.assign(Config._defaults, { filterMethod: Constants.FilterMethods.Remove }));
         expect(word.regExp).to.eql(/(^|\s)([\w-]*word![\w-]*)(\s|$)/gi);
       });
 
       // Work around for lack of word boundary support for unicode characters
       describe('Unicode', function() {
         it('should build RegExp', function() {
-          let word = new Word('куче', { matchMethod: 1 }, Object.assign(Config._defaults, { filterMethod: 2 }));
+          let word = new Word('куче', { matchMethod: Constants.MatchMethods.Partial }, Object.assign(Config._defaults, { filterMethod: Constants.FilterMethods.Remove }));
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-]?)([\\w-]*куче[\\w-]*)([\\s.,\'"+!?|-]?|$)', 'giu')
@@ -137,7 +138,7 @@ describe('Word', function() {
         });
 
         it('should build RegExp with matchRepeated', function() {
-          let word = new Word('куче', { matchMethod: 1, repeat: true }, Object.assign(Config._defaults, { filterMethod: 2 }));
+          let word = new Word('куче', { matchMethod: Constants.MatchMethods.Partial, repeat: true }, Object.assign(Config._defaults, { filterMethod: Constants.FilterMethods.Remove }));
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-]?)([\\w-]*к+у+ч+е+[\\w-]*)([\\s.,\'"+!?|-]?|$)', 'giu')
@@ -148,24 +149,24 @@ describe('Word', function() {
 
     describe('Whole Match', function() {
       it('should build RegExp', function() {
-        let word = new Word('word', { matchMethod: 2 }, Config._defaults);
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Whole }, Config._defaults);
         expect(word.regExp).to.eql(/\b[\w-]*word[\w-]*\b/gi);
       });
 
       it('should build RegExp with matchRepeated', function() {
-        let word = new Word('word', { matchMethod: 2, repeat: true }, Config._defaults);
+        let word = new Word('word', { matchMethod: Constants.MatchMethods.Whole, repeat: true }, Config._defaults);
         expect(word.regExp).to.eql(/\b[\w-]*w+o+r+d+[\w-]*\b/gi);
       });
 
       it('should build RegExp with ending punctuation', function() {
-        let word = new Word('word!', { matchMethod: 2 }, Config._defaults);
+        let word = new Word('word!', { matchMethod: Constants.MatchMethods.Whole }, Config._defaults);
         expect(word.regExp).to.eql(/(^|\s)([\S]*word![\S]*)(\s|$)/gi);
       });
 
       // Work around for lack of word boundary support for unicode characters
       describe('Unicode', function() {
         it('should build RegExp', function() {
-          let word = new Word('куче', { matchMethod: 2 }, Config._defaults);
+          let word = new Word('куче', { matchMethod: Constants.MatchMethods.Whole }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*куче[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
@@ -173,7 +174,7 @@ describe('Word', function() {
         });
 
         it('should build RegExp with matchRepeated', function() {
-          let word = new Word('куче', { matchMethod: 2, repeat: true }, Config._defaults);
+          let word = new Word('куче', { matchMethod: Constants.MatchMethods.Whole, repeat: true }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*к+у+ч+е+[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
@@ -181,7 +182,7 @@ describe('Word', function() {
         });
 
         it('should build RegExp with matchRepeated and matchSeparators', function() {
-          let word = new Word('куче', { matchMethod: 2, repeat: true, separators: true }, Config._defaults);
+          let word = new Word('куче', { matchMethod: Constants.MatchMethods.Whole, repeat: true, separators: true }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*к+[-_ ]*у+[-_ ]*ч+[-_ ]*е+[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
@@ -233,18 +234,18 @@ describe('Word', function() {
 
   describe('constructor()', function() {
     it('should use all provided defaults', function() {
-      let cfg = Object.assign({}, Config._defaults, { defaultWordMatchMethod: 2 });
+      let cfg = Object.assign({}, Config._defaults, { defaultWordMatchMethod: Constants.MatchMethods.Whole });
       let options = {};
       let word = new Word('train', options, cfg);
-      expect(word.matchMethod).to.eql(2);
+      expect(word.matchMethod).to.eql(Constants.MatchMethods.Whole);
       expect(word.matchRepeated).to.eql(cfg.defaultWordRepeat);
       expect(word.lists).to.eql([]);
       expect(word.matchSeparators).to.eql(cfg.defaultWordSeparators);
     });
 
-    it('should use provided matchMethod = 0 and fill in defaults', function() {
-      let cfg = Object.assign({}, Config._defaults, { defaultWordMatchMethod: 2 });
-      let options = { lists: [1,5], matchMethod: 0, repeat: true };
+    it('should use provided matchMethod (Exact) and fill in defaults', function() {
+      let cfg = Object.assign({}, Config._defaults, { defaultWordMatchMethod: Constants.MatchMethods.Whole });
+      let options = { lists: [1,5], matchMethod: Constants.MatchMethods.Exact, repeat: true };
       let word = new Word('again', options, cfg);
       expect(word.matchMethod).to.eql(options.matchMethod);
       expect(word.matchRepeated).to.eql(options.repeat);
@@ -252,9 +253,9 @@ describe('Word', function() {
       expect(word.matchSeparators).to.eql(cfg.defaultWordSeparators);
     });
 
-    it('should use provided matchMethod = 2 and fill in defaults', function() {
+    it('should use provided matchMethod (Whole) and fill in defaults', function() {
       let cfg = Config._defaults;
-      let options = { matchMethod: 2, separators: true };
+      let options = { matchMethod: Constants.MatchMethods.Whole, separators: true };
       let word = new Word('testing', options, cfg);
       expect(word.matchMethod).to.eql(options.matchMethod);
       expect(word.matchRepeated).to.eql(cfg.defaultWordRepeat);
