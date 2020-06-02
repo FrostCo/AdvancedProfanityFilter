@@ -103,9 +103,9 @@ export default class WebAudio {
     });
 
     switch (rule.showSubtitles) {
-      case Constants.ShowSubtitles.Filtered: if (filtered) { this.showSubtitles(rule); } else { this.hideSubtitles(subtitles, rule); } break;
-      case Constants.ShowSubtitles.Unfiltered: if (filtered) { this.hideSubtitles(subtitles, rule); } else { this.showSubtitles(rule); } break;
-      case Constants.ShowSubtitles.None: this.hideSubtitles(subtitles, rule); break;
+      case Constants.ShowSubtitles.Filtered: if (filtered) { this.showSubtitles(rule); } else { this.hideSubtitles(rule, subtitles); } break;
+      case Constants.ShowSubtitles.Unfiltered: if (filtered) { this.hideSubtitles(rule, subtitles); } else { this.showSubtitles(rule); } break;
+      case Constants.ShowSubtitles.None: this.hideSubtitles(rule, subtitles); break;
     }
   }
 
@@ -172,7 +172,7 @@ export default class WebAudio {
     }
   }
 
-  hideSubtitles(subtitles, rule: AudioRules) {
+  hideSubtitles(rule: AudioRules, subtitles) {
     if (rule.displaySelector) {
       let container = document.querySelector(rule.displaySelector) as HTMLElement;
       if (container) { container.style.display = rule.displayHide; }
@@ -230,11 +230,11 @@ export default class WebAudio {
             this.initCueRule(rule);
             this.cueRuleIds.push(index);
             break;
-          case 'text':
-            this.initTextRule(rule);
-            break;
           case 'elementChild':
             this.initElementChildRule(rule);
+            break;
+          case 'text':
+            this.initTextRule(rule);
             break;
           case 'watcher':
             this.initWatcherRule(rule);
