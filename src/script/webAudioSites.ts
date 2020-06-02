@@ -42,7 +42,7 @@ export default class WebAudioSites {
         tagName: 'DIV',
       }
     ],
-    'www.hulu.com': [{ mode: 'element', className: 'caption-text-box', subtitleSelector: 'p', tagName: 'DIV' }],
+    'www.hulu.com': [{ mode: 'element', className: 'caption-text-box', displaySelector: 'div.caption-text-box', subtitleSelector: 'p', tagName: 'DIV' }],
     'www.nbc.com': [
       { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
       { mode: 'cue', videoCueLanguage: 'en' }
