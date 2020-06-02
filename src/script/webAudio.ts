@@ -175,7 +175,18 @@ export default class WebAudio {
   hideSubtitles(rule: AudioRules, subtitles) {
     if (rule.displaySelector) {
       let container = document.querySelector(rule.displaySelector) as HTMLElement;
-      if (container) { container.style.display = rule.displayHide; }
+      if (container) {
+        // Save the original display style if none was included in the rule
+        if (
+          rule.displayShow === ''
+          && container.style.display !== ''
+          && container.style.display !== rule.displayHide
+        ) {
+          rule.displayShow = container.style.display;
+        }
+
+        container.style.display = rule.displayHide;
+      }
     } else {
       subtitles.forEach(subtitle => {
         subtitle.innerText = '';
@@ -193,6 +204,13 @@ export default class WebAudio {
   }
 
   initElementChildRule(rule) {
+    if (rule.displaySelector !== undefined) {
+      if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
+      if (rule.displayShow === undefined) { rule.displayShow = ''; }
+    }
+  }
+
+  initElementRule(rule) {
     if (rule.displaySelector !== undefined) {
       if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
       if (rule.displayShow === undefined) { rule.displayShow = ''; }
@@ -232,6 +250,9 @@ export default class WebAudio {
             break;
           case 'elementChild':
             this.initElementChildRule(rule);
+            break;
+          case 'element':
+            this.initElementRule(rule);
             break;
           case 'text':
             this.initTextRule(rule);
