@@ -1,3 +1,4 @@
+import Constants from './lib/constants';
 import Domain from './domain';
 import Filter from './lib/filter';
 import Page from './page';
@@ -175,7 +176,7 @@ export default class BookmarkletFilter extends Filter {
   cleanPage() {
     this.cfg = new WebConfig(config);
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
-    this.cfg.muteMethod = 1; // Bookmarklet: Force audio muteMethod = 1 (Volume)
+    this.cfg.muteMethod = Constants.MuteMethods.Video; // Bookmarklet: Force video volume mute method
 
     // Use domain-specific settings
     let message: Message = { disabled: (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };

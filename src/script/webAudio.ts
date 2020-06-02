@@ -1,3 +1,4 @@
+import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
@@ -101,11 +102,10 @@ export default class WebAudio {
       }
     });
 
-    // Subtitle display - 0: Show all, 1: Show only filtered, 2: Show only unfiltered, 3: Hide all
     switch (rule.showSubtitles) {
-      case 1: if (filtered) { this.showSubtitles(rule); } else { this.hideSubtitles(subtitles, rule); } break;
-      case 2: if (filtered) { this.hideSubtitles(subtitles, rule); } else { this.showSubtitles(rule); } break;
-      case 3: this.hideSubtitles(subtitles, rule); break;
+      case Constants.ShowSubtitles.Filtered: if (filtered) { this.showSubtitles(rule); } else { this.hideSubtitles(subtitles, rule); } break;
+      case Constants.ShowSubtitles.Unfiltered: if (filtered) { this.hideSubtitles(subtitles, rule); } else { this.showSubtitles(rule); } break;
+      case Constants.ShowSubtitles.None: this.hideSubtitles(subtitles, rule); break;
     }
   }
 
@@ -146,7 +146,7 @@ export default class WebAudio {
     }
 
     // Hide YouTube auto text unless show all subtitles is set
-    if (this.filter.cfg.showSubtitles != 0) {
+    if (this.filter.cfg.showSubtitles !== Constants.ShowSubtitles.All) {
       let container = document.querySelector('div.ytp-caption-window-rollup span.captions-text') as HTMLElement;
       if (container.style.display == 'block') {
         container.style.display = 'none';
@@ -260,17 +260,16 @@ export default class WebAudio {
       this.muted = true;
 
       switch(muteMethod) {
-        case 0: // Mute tab
+        case Constants.MuteMethods.Tab:
           chrome.runtime.sendMessage({ mute: true });
           break;
-        case 1: { // Mute video
+        case Constants.MuteMethods.Video:
           if (!video) { video = document.querySelector('video'); }
           if (video && video.volume != null) {
             this.volume = video.volume; // Save original volume
             video.volume = 0;
           }
           break;
-        }
       }
     }
   }
@@ -361,16 +360,15 @@ export default class WebAudio {
       this.muted = false;
 
       switch(muteMethod) {
-        case 0: // Mute tab
+        case Constants.MuteMethods.Tab:
           chrome.runtime.sendMessage({ mute: false });
           break;
-        case 1: { // Mute video
+        case Constants.MuteMethods.Video:
           if (!video) { video = document.querySelector('video'); }
           if (video && video.volume != null) {
             video.volume = this.volume;
           }
           break;
-        }
       }
     }
   }
@@ -446,9 +444,9 @@ export default class WebAudio {
 
         if (captions.nodeName !== '#text') {
           switch (rule.showSubtitles) {
-            case 1: captions.style.display = filtered ? '' : 'none'; break;
-            case 2: captions.style.display = filtered ? 'none' : ''; break;
-            case 3: captions.style.display = 'none'; break;
+            case Constants.ShowSubtitles.Filtered: captions.style.display = filtered ? '' : 'none'; break;
+            case Constants.ShowSubtitles.Unfiltered: captions.style.display = filtered ? 'none' : ''; break;
+            case Constants.ShowSubtitles.None: captions.style.display = 'none'; break;
           }
         }
 
@@ -465,7 +463,7 @@ export default class WebAudio {
         let textTrack = instance.getVideoTextTrack(video, rule.videoCueLanguage, rule.videoCueRequireShowing);
 
         if (textTrack && !textTrack.oncuechange) {
-          if (!rule.videoCueHideCues && rule.showSubtitles == 3) { textTrack.mode = 'hidden'; }
+          if (!rule.videoCueHideCues && rule.showSubtitles === Constants.ShowSubtitles.None) { textTrack.mode = 'hidden'; }
 
           textTrack.oncuechange = () => {
             if (textTrack.activeCues && textTrack.activeCues.length > 0) {
@@ -489,9 +487,9 @@ export default class WebAudio {
                 // Some sites don't care if textTrack.mode = 'hidden' and will continue showing.
                 // This is a fallback (not preferred) method that can be used for hiding the cues.
                 if (
-                  (rule.showSubtitles === 1 && !filtered)
-                  || (rule.showSubtitles === 2 && filtered)
-                  || rule.showSubtitles === 3
+                  (rule.showSubtitles === Constants.ShowSubtitles.Filtered && !filtered)
+                  || (rule.showSubtitles === Constants.ShowSubtitles.Unfiltered && filtered)
+                  || rule.showSubtitles === Constants.ShowSubtitles.None
                 ) {
                   for (let i = 0; i < textTrack.activeCues.length; i++) {
                     let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
@@ -503,13 +501,13 @@ export default class WebAudio {
               } else {
                 if (filtered) {
                   switch (rule.showSubtitles) {
-                    case 1: textTrack.mode = 'showing'; break;
-                    case 2: textTrack.mode = 'hidden'; break;
+                    case Constants.ShowSubtitles.Filtered: textTrack.mode = 'showing'; break;
+                    case Constants.ShowSubtitles.Unfiltered: textTrack.mode = 'hidden'; break;
                   }
                 } else {
                   switch (rule.showSubtitles) {
-                    case 1: textTrack.mode = 'hidden'; break;
-                    case 2: textTrack.mode = 'showing'; break;
+                    case Constants.ShowSubtitles.Filtered: textTrack.mode = 'hidden'; break;
+                    case Constants.ShowSubtitles.Unfiltered: textTrack.mode = 'showing'; break;
                   }
                 }
               }

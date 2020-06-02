@@ -1,4 +1,5 @@
 const expect = require('chai').expect;
+import Constants from './built/lib/constants';
 import DataMigration from './built/dataMigration';
 import WebConfig from './built/webConfig';
 
@@ -7,9 +8,9 @@ describe('DataMigration', function() {
     it('should add wordlist to all words', function() {
       let cfg = {
         words: {
-          'test': { matchMethod: 0, repeat: true, separators: false, sub: 'tset' },
-          'another': { matchMethod: 0, repeat: true, separators: false, sub: 'tset' },
-          'testWithList': { lists: [1,3,5], matchMethod: 0, repeat: true, separators: false, sub: 'tset' },
+          'test': { matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: false, sub: 'tset' },
+          'another': { matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: false, sub: 'tset' },
+          'testWithList': { lists: [1,3,5], matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: false, sub: 'tset' },
         }
       };
       let dataMigration = new DataMigration(cfg);
@@ -24,9 +25,9 @@ describe('DataMigration', function() {
     it('should remove global match method and adjust RegExp method', function() {
       let data = {
         words: {
-          'test': { matchMethod: 0, repeat: true, separators: false, sub: 'tset' },
-          'another': { matchMethod: 1, repeat: true, separators: false, sub: 'tset' },
-          'testWithList': { lists: [1,3,5], matchMethod: 0, repeat: true, separators: false, sub: 'tset' },
+          'test': { matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: false, sub: 'tset' },
+          'another': { matchMethod: Constants.MatchMethods.Partial, repeat: true, separators: false, sub: 'tset' },
+          'testWithList': { lists: [1,3,5], matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: false, sub: 'tset' },
           '^myRegexp$': { lists: [1,3,5], matchMethod: 4, repeat: true, separators: false, sub: 'tset' },
         },
         globalMatchMethod: 3,
@@ -35,10 +36,10 @@ describe('DataMigration', function() {
       cfg.remove = (prop) => { delete cfg[prop]; return true; }; // TODO: Find a good way to mock chrome.*
       let dataMigration = new DataMigration(cfg);
       dataMigration.removeGlobalMatchMethod();
-      expect(cfg.words['test'].matchMethod).to.eql(0);
-      expect(cfg.words['another'].matchMethod).to.eql(1);
-      expect(cfg.words['testWithList'].matchMethod).to.eql(0);
-      expect(cfg.words['^myRegexp$'].matchMethod).to.eql(3);
+      expect(cfg.words['test'].matchMethod).to.eql(Constants.MatchMethods.Exact);
+      expect(cfg.words['another'].matchMethod).to.eql(Constants.MatchMethods.Partial);
+      expect(cfg.words['testWithList'].matchMethod).to.eql(Constants.MatchMethods.Exact);
+      expect(cfg.words['^myRegexp$'].matchMethod).to.eql(Constants.MatchMethods.Regex);
       expect(cfg.globalMatchMethod).to.not.exist;
     });
   });

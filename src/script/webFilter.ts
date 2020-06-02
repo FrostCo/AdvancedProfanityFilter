@@ -1,3 +1,4 @@
+import Constants from './lib/constants';
 import Domain from './domain';
 import Filter from './lib/filter';
 import Page from './page';
@@ -234,17 +235,17 @@ export default class WebFilter extends Filter {
   foundMatch(word) {
     super.foundMatch(word);
     if (this.cfg.showSummary) {
-      if (this.summary[word]) {
-        this.summary[word].count += 1;
+      if (this.summary[word.value]) {
+        this.summary[word.value].count += 1;
       } else {
         let result;
-        if (this.cfg.words[word].matchMethod == 4) { // Regexp
-          result = this.cfg.words[word].sub || this.cfg.defaultSubstitution;
+        if (word.matchMethod === Constants.MatchMethods.Regex) {
+          result = word.sub || this.cfg.defaultSubstitution;
         } else {
-          result = filter.replaceText(word, 0, false); // We can use 0 (All) here because we are just filtering a word
+          result = filter.replaceText(word.value, 0, false); // We can use 0 (All) here because we are just filtering a word
         }
 
-        this.summary[word] = { filtered: result, count: 1 };
+        this.summary[word.value] = { filtered: result, count: 1 };
       }
     }
   }
@@ -268,7 +269,7 @@ export default class WebFilter extends Filter {
 
   sendInitState(message: Message) {
     // Reset muted state on page load if we muted the tab audio
-    if (this.cfg.muteAudio && this.cfg.muteMethod == 0) { message.clearMute = true; }
+    if (this.cfg.muteAudio && this.cfg.muteMethod == Constants.MuteMethods.Tab) { message.clearMute = true; }
 
     // Send page state to color icon badge
     if (!this.iframe) { message.setBadgeColor = true; }

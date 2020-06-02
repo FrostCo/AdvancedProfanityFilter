@@ -1,3 +1,4 @@
+import Constants from './lib/constants';
 import { dynamicList, escapeHTML, exportToFile, readFile, removeChildren, removeFromArray } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
@@ -177,11 +178,11 @@ export default class OptionPage {
     subInput.value = data.sub;
 
     let matchMethodSelect = document.createElement('select');
-    WebConfig._matchMethodNames.forEach((name, index) => {
+    Constants.orderedArray(Constants.MatchMethods).forEach((matchMethod, index) => {
       let optionElement = document.createElement('option');
-      optionElement.value = index.toString();
-      optionElement.classList.add(`bulkMatchMethod${index}`);
-      optionElement.textContent = name;
+      optionElement.value = Constants.MatchMethods[matchMethod].toString();
+      optionElement.classList.add(`bulkMatchMethod${Constants.MatchMethods[matchMethod]}`);
+      optionElement.textContent = matchMethod;
       matchMethodSelect.appendChild(optionElement);
     });
     matchMethodSelect.selectedIndex = data.matchMethod;
@@ -633,7 +634,7 @@ export default class OptionPage {
     this.updateFilterOptions();
 
     // Settings
-    let selectedFilter = document.getElementById(`filter${WebConfig._filterMethodNames[option.cfg.filterMethod]}`) as HTMLInputElement;
+    let selectedFilter = document.getElementById(`filter${Constants.filterMethodName(option.cfg.filterMethod)}`) as HTMLInputElement;
     let showCounter = document.getElementById('showCounter') as HTMLInputElement;
     let showSummary = document.getElementById('showSummary') as HTMLInputElement;
     let showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
@@ -669,10 +670,11 @@ export default class OptionPage {
     let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     defaultWordSubstitution.value = this.cfg.defaultSubstitution;
     removeChildren(defaultWordMatchMethodSelect);
-    for (let i = 0; i < WebConfig._matchMethodNames.slice(0,-1).length; i++) {
+    for (let i = 0; i < 3; i++) { // Skip Regex
       let optionElement = document.createElement('option');
-      optionElement.value = WebConfig._matchMethodNames[i].toString();
-      optionElement.textContent= WebConfig._matchMethodNames[i];
+      let matchMethodName = Constants.matchMethodName(i);
+      optionElement.value = matchMethodName;
+      optionElement.textContent = matchMethodName;
       defaultWordMatchMethodSelect.appendChild(optionElement);
     }
     defaultWordMatchMethodSelect.selectedIndex = this.cfg.defaultWordMatchMethod;
@@ -742,7 +744,7 @@ export default class OptionPage {
     if (word == '') { // New word
       wordText.value = '';
       OptionPage.disableBtn(wordRemove);
-      let selectedMatchMethod = document.getElementById(`wordMatch${WebConfig._matchMethodNames[option.cfg.defaultWordMatchMethod]}`) as HTMLInputElement;
+      let selectedMatchMethod = document.getElementById(`wordMatch${Constants.matchMethodName(option.cfg.defaultWordMatchMethod)}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
       wordMatchRepeated.checked = option.cfg.defaultWordRepeat;
       wordMatchSeparators.checked = option.cfg.defaultWordSeparators;
@@ -760,7 +762,7 @@ export default class OptionPage {
       OptionPage.enableBtn(wordRemove);
       let wordCfg = option.cfg.words[word];
       wordText.value = word;
-      let selectedMatchMethod = document.getElementById(`wordMatch${WebConfig._matchMethodNames[wordCfg.matchMethod]}`) as HTMLInputElement;
+      let selectedMatchMethod = document.getElementById(`wordMatch${Constants.matchMethodName(wordCfg.matchMethod)}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
       wordMatchRepeated.checked = wordCfg.repeat;
       wordMatchSeparators.checked = wordCfg.separators === undefined ? option.cfg.defaultWordSeparators : wordCfg.separators;
@@ -832,7 +834,7 @@ export default class OptionPage {
     words.forEach(word => {
       let filteredWord = word;
       if (word != words[0] && wordlistFilter.cfg.filterWordList) {
-        if (wordlistFilter.cfg.words[word].matchMethod == 4) { // Regexp
+        if (wordlistFilter.cfg.words[word].matchMethod === Constants.MatchMethods.Regex) { // Regexp
           filteredWord = wordlistFilter.cfg.words[word].sub || wordlistFilter.cfg.defaultSubstitution;
         } else {
           filteredWord = wordlistFilter.replaceText(word, 0, false); // Using 0 (All) here to filter all words
@@ -1172,7 +1174,7 @@ export default class OptionPage {
 
       let wordOptions: WordOptions = {
         lists: lists,
-        matchMethod: WebConfig._matchMethodNames.indexOf(selectedMatchMethod.value),
+        matchMethod: Constants.MatchMethods[selectedMatchMethod.value],
         repeat: wordMatchRepeated.checked,
         separators: wordMatchSeparators.checked,
         sub: sub
@@ -1214,7 +1216,7 @@ export default class OptionPage {
   }
 
   async selectFilterMethod(evt) {
-    option.cfg.filterMethod = WebConfig._filterMethodNames.indexOf(evt.target.value);
+    option.cfg.filterMethod = Constants.FilterMethods[evt.target.value];
     if (await option.saveProp('filterMethod')) {
       filter.rebuildWordlists();
       this.populateOptions();
@@ -1329,17 +1331,17 @@ export default class OptionPage {
   updateFilterOptions() {
     // Show/hide options as needed
     switch(this.cfg.filterMethod) {
-      case 0: // Censor
+      case Constants.FilterMethods.Censor:
         OptionPage.show(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
-      case 1: // Substitution
+      case Constants.FilterMethods.Substitute:
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.show(document.getElementById('substitutionSettings'));
         OptionPage.show(document.getElementById('wordSubstitution'));
         break;
-      case 2: // Remove
+      case Constants.FilterMethods.Remove:
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
         OptionPage.hide(document.getElementById('wordSubstitution'));

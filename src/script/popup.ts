@@ -1,3 +1,4 @@
+import Constants from './lib/constants';
 import { dynamicList, escapeHTML } from './lib/helper';
 import WebAudioSites from './webAudioSites';
 import WebConfig from './webConfig';
@@ -83,7 +84,7 @@ class Popup {
     let wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     let audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
-    dynamicList(WebConfig._filterMethodNames, filterMethodSelect);
+    dynamicList(Constants.orderedArray(Constants.FilterMethods), filterMethodSelect);
     filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
 
     if (popup.cfg.wordlistsEnabled) {
