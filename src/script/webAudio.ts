@@ -103,9 +103,9 @@ export default class WebAudio {
     });
 
     switch (rule.showSubtitles) {
-      case Constants.ShowSubtitles.Filtered: if (filtered) { this.showSubtitles(rule); } else { this.hideSubtitles(subtitles, rule); } break;
-      case Constants.ShowSubtitles.Unfiltered: if (filtered) { this.hideSubtitles(subtitles, rule); } else { this.showSubtitles(rule); } break;
-      case Constants.ShowSubtitles.None: this.hideSubtitles(subtitles, rule); break;
+      case Constants.ShowSubtitles.Filtered: if (filtered) { this.showSubtitles(rule); } else { this.hideSubtitles(rule, subtitles); } break;
+      case Constants.ShowSubtitles.Unfiltered: if (filtered) { this.hideSubtitles(rule, subtitles); } else { this.showSubtitles(rule); } break;
+      case Constants.ShowSubtitles.None: this.hideSubtitles(rule, subtitles); break;
     }
   }
 
@@ -172,10 +172,21 @@ export default class WebAudio {
     }
   }
 
-  hideSubtitles(subtitles, rule: AudioRules) {
+  hideSubtitles(rule: AudioRules, subtitles) {
     if (rule.displaySelector) {
       let container = document.querySelector(rule.displaySelector) as HTMLElement;
-      if (container) { container.style.display = rule.displayHide; }
+      if (container) {
+        // Save the original display style if none was included in the rule
+        if (
+          rule.displayShow === ''
+          && container.style.display !== ''
+          && container.style.display !== rule.displayHide
+        ) {
+          rule.displayShow = container.style.display;
+        }
+
+        container.style.display = rule.displayHide;
+      }
     } else {
       subtitles.forEach(subtitle => {
         subtitle.innerText = '';
@@ -193,6 +204,13 @@ export default class WebAudio {
   }
 
   initElementChildRule(rule) {
+    if (rule.displaySelector !== undefined) {
+      if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
+      if (rule.displayShow === undefined) { rule.displayShow = ''; }
+    }
+  }
+
+  initElementRule(rule) {
     if (rule.displaySelector !== undefined) {
       if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
       if (rule.displayShow === undefined) { rule.displayShow = ''; }
@@ -230,11 +248,14 @@ export default class WebAudio {
             this.initCueRule(rule);
             this.cueRuleIds.push(index);
             break;
-          case 'text':
-            this.initTextRule(rule);
-            break;
           case 'elementChild':
             this.initElementChildRule(rule);
+            break;
+          case 'element':
+            this.initElementRule(rule);
+            break;
+          case 'text':
+            this.initTextRule(rule);
             break;
           case 'watcher':
             this.initWatcherRule(rule);
