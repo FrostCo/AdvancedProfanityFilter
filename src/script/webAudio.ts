@@ -230,8 +230,6 @@ export default class WebAudio {
       }
 
       if (!rule.disabled) {
-        this.enabledRuleIds.push(index);
-
         // Setup rule defaults
         if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
         if (rule.simpleUnmute != null) { this.simpleUnmute = true; }
@@ -246,7 +244,7 @@ export default class WebAudio {
         switch(rule.mode) {
           case 'cue':
             this.initCueRule(rule);
-            this.cueRuleIds.push(index);
+            if (!rule.disabled) { this.cueRuleIds.push(index); }
             break;
           case 'elementChild':
             this.initElementChildRule(rule);
@@ -259,9 +257,10 @@ export default class WebAudio {
             break;
           case 'watcher':
             this.initWatcherRule(rule);
-            this.watcherRuleIds.push(index);
+            if (!rule.disabled) { this.watcherRuleIds.push(index); }
             break;
         }
+        if (!rule.disabled) { this.enabledRuleIds.push(index); }
       }
     });
   }
