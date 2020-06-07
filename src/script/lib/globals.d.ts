@@ -13,7 +13,8 @@ interface AudioRules {
   hasChildrenElements?: boolean;    // [Element] node.childElementCount > 0 [Not commonly used]
   iframe?: boolean | undefined;     // [All] pages to run on (true: only iframes, false: no iframes, undefined: all)
   muteMethod?: number;              // [All] Override global muteMthod (0: tab, 1: video)
-  parentSelector?: string;          // [ElementChild*,Text,Watcher] parent.contains(node)
+  parentSelector?: string;          // [ElementChild?,Text,Watcher] parent.contains(node)
+  parentSelectorAll?: string;       // [ElementChild?] Check if any parents contain the node: parent.contains(node)
   removeSubtitleSpacing?: boolean;  // [Element] Remove subtitle padding/margin when hiding
   showSubtitles?: number;           // [All] Override global showSubtitles (0: all, 1: filtered, 2: unfiltered, 3: none)
   simpleUnmute?: boolean;           // [All] Simplify requirements for unmuting (Only require text match)

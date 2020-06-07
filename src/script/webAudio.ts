@@ -204,6 +204,7 @@ export default class WebAudio {
   }
 
   initElementChildRule(rule) {
+    if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
     if (rule.displaySelector !== undefined) {
       if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
       if (rule.displayShow === undefined) { rule.displayShow = ''; }
@@ -351,8 +352,15 @@ export default class WebAudio {
           break;
         case 'elementChild':
           if (node.nodeName === rule.tagName) {
-            let parent = document.querySelector(rule.parentSelector);
-            if (parent && parent.contains(node)) { return ruleId; }
+            if (rule.parentSelector) {
+              let parent = document.querySelector(rule.parentSelector);
+              if (parent && parent.contains(node)) { return ruleId; }
+            } else {
+              let parents = document.querySelectorAll(rule.parentSelectorAll);
+              for (let j = 0; j < parents.length; j++) {
+                if (parents[j].contains(node)) { return ruleId; }
+              }
+            }
           }
           break;
         case 'text':
