@@ -42,7 +42,7 @@ export default class WebAudioSites {
         tagName: 'DIV',
       }
     ],
-    'play.hbomax.com': [{ mode: 'elementChild', parentSelectorAll: 'div.default.class2.class3 > span', showSubtitles: 0, tagName: 'SPAN' }],
+    'play.hbomax.com': [{ mode: 'elementChild', parentSelectorAll: 'div.class3 > span', showSubtitles: 0, tagName: 'SPAN' }],
     'www.hulu.com': [{ mode: 'element', className: 'caption-text-box', displaySelector: 'div.caption-text-box', subtitleSelector: 'p', tagName: 'DIV' }],
     'www.nbc.com': [
       { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
