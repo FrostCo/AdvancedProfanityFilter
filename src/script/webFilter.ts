@@ -18,6 +18,8 @@ export default class WebFilter extends Filter {
   iframe: Location;
   location: Location | URL;
   mutePage: boolean;
+  observer: MutationObserver;
+  shadowObserver: MutationObserver;
   summary: Summary;
 
   constructor() {
@@ -163,7 +165,7 @@ export default class WebFilter extends Filter {
           if (node.alt != '') { node.alt = this.replaceText(node.alt, this.wordlistId, stats); }
           if (node.title != '') { node.title = this.replaceText(node.title, this.wordlistId, stats); }
         } else if (node.shadowRoot != undefined) {
-          shadowObserver.observe(node.shadowRoot, observerConfig);
+          this.startObserving(node.shadowRoot, this.shadowObserver);
         }
       }
       // else { console.log('[APF] node without nodeName:', node); } // Debug: Filter
@@ -229,7 +231,7 @@ export default class WebFilter extends Filter {
     // console.log('[APF] Filter initialized.', this); // Debug: General
     if (!this.audioOnly) { this.cleanNodeText(document); }
     this.updateCounterBadge();
-    observer.observe(document, observerConfig);
+    this.startObserving(document);
   }
 
   foundMatch(word) {
@@ -279,6 +281,16 @@ export default class WebFilter extends Filter {
     chrome.runtime.sendMessage(message);
   }
 
+  startObserving(target: Node = document, observer: MutationObserver = filter.observer) {
+    observer.observe(target, ObserverConfig);
+  }
+
+  stopObserving(observer: MutationObserver = filter.observer) {
+    let mutations = observer.takeRecords();
+    observer.disconnect();
+    if (mutations) { this.processMutations(mutations); }
+  }
+
   updateCounterBadge() {
     /* istanbul ignore next */
     // console.count('updateCounterBadge'); // Benchmark: Filter
@@ -293,11 +305,8 @@ export default class WebFilter extends Filter {
   }
 }
 
-// Global
 let filter = new WebFilter;
-let observer;
-let shadowObserver;
-let observerConfig: MutationObserverInit = {
+const ObserverConfig: MutationObserverInit = {
   characterData: true,
   characterDataOldValue: true,
   childList: true,
@@ -305,8 +314,8 @@ let observerConfig: MutationObserverInit = {
 };
 
 if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptGlobalScope]'].includes(({}).toString.call(window))) {
-  observer = new MutationObserver(filter.processMutations);
-  shadowObserver = new MutationObserver(filter.processMutations);
+  filter.observer = new MutationObserver(filter.processMutations);
+  filter.shadowObserver = new MutationObserver(filter.processMutations);
 
   // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
   if (window != window.top) {
