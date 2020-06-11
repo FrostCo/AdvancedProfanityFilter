@@ -96,7 +96,13 @@ export default class WebAudio {
       if (result.modified) {
         filtered = true;
         this.mute(rule.muteMethod); // Mute the audio if we haven't already
-        if (rule.filterSubtitles) { subtitle[textMethod] = result.filtered; }
+
+        if (rule.filterSubtitles) {
+          if (rule.ignoreMutations) { this.filter.stopObserving(); }
+          subtitle[textMethod] = result.filtered;
+          if (rule.ignoreMutations) { this.filter.startObserving(); }
+        }
+
         this.lastFilteredNode = subtitle;
         this.lastFilteredText = subtitle[textMethod];
       }

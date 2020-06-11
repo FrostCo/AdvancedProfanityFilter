@@ -11,7 +11,8 @@ interface AudioRules {
   displayShow?: string;             // [Element,ElementChild] Display style for showing captions (Default: '')
   filterSubtitles?: boolean;        // [All] Filter subtitle text (Default: true)
   hasChildrenElements?: boolean;    // [Element] node.childElementCount > 0 [Not commonly used]
-  iframe?: boolean | undefined;     // [All] pages to run on (true: only iframes, false: no iframes, undefined: all)
+  iframe?: boolean | undefined;     // [All] Pages to run on (true: only iframes, false: no iframes, undefined: all)
+  ignoreMutations?: boolean;        // [Element,ElementChild,Text] Ignore mutations when filtering captions/subtitles
   muteMethod?: number;              // [All] Override global muteMthod (0: tab, 1: video)
   parentSelector?: string;          // [ElementChild?,Text,Watcher] parent.contains(node)
   parentSelectorAll?: string;       // [ElementChild?] Check if any parents contain the node: parent.contains(node)
