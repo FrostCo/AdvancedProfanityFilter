@@ -56,7 +56,7 @@ export default class WebAudioSites {
     ],
     'watch.redeemtv.com': [{ mode: 'elementChild', convertBreaks: true, displaySelector: 'div.vp-captions', parentSelector: 'div.vp-captions', tagName: 'SPAN' }],
     'www.sonycrackle.com': [{ mode: 'text', parentSelector: 'div.clpp-subtitles-container' }],
-    'play.stan.com.au': [{ mode: 'text', parentSelector: 'div.clpp-subtitles-container' }],
+    'play.stan.com.au': [{ mode: 'elementChild', ignoreMutations: true, parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'www.syfy.com': [{ mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
     'www.tntdrama.com': [{ mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video.top-media-element' }],
     'www.universalkids.com': [{ mode: 'element', subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' }],
