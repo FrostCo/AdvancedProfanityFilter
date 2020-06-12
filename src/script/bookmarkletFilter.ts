@@ -28,6 +28,8 @@ export default class BookmarkletFilter extends Filter {
   iframe: Location;
   location: Location | URL;
   mutePage: boolean;
+  observer: MutationObserver;
+  shadowObserver: MutationObserver;
   summary: Summary;
 
   constructor() {
@@ -159,7 +161,7 @@ export default class BookmarkletFilter extends Filter {
           if (node.alt != '') { node.alt = this.replaceText(node.alt, this.wordlistId, stats); }
           if (node.title != '') { node.title = this.replaceText(node.title, this.wordlistId, stats); }
         } else if (node.shadowRoot != undefined) {
-          shadowObserver.observe(node.shadowRoot, observerConfig);
+          this.startObserving(node.shadowRoot, this.shadowObserver);
         }
       }
     }
@@ -202,7 +204,7 @@ export default class BookmarkletFilter extends Filter {
     // Remove profanity from the main document and watch for new nodes
     this.init();
     if (!this.audioOnly) { this.cleanNodeText(document); }
-    observer.observe(document, observerConfig);
+    this.startObserving(document);
   }
 
   processMutations(mutations) {
@@ -211,13 +213,21 @@ export default class BookmarkletFilter extends Filter {
     });
   }
 
+  startObserving(target: Node = document, observer: MutationObserver = filter.observer) {
+    observer.observe(target, ObserverConfig);
+  }
+
+  stopObserving(observer: MutationObserver = filter.observer) {
+    let mutations = observer.takeRecords();
+    observer.disconnect();
+    if (mutations) { this.processMutations(mutations); }
+  }
+
   updateCounterBadge() {} // NO-OP
 }
 
 let filter = new BookmarkletFilter;
-let observer;
-let shadowObserver;
-let observerConfig: MutationObserverInit = {
+const ObserverConfig: MutationObserverInit = {
   characterData: true,
   characterDataOldValue: true,
   childList: true,
@@ -225,8 +235,8 @@ let observerConfig: MutationObserverInit = {
 };
 
 if (typeof window !== 'undefined') {
-  observer = new MutationObserver(filter.processMutations);
-  shadowObserver = new MutationObserver(filter.processMutations);
+  filter.observer = new MutationObserver(filter.processMutations);
+  filter.shadowObserver = new MutationObserver(filter.processMutations);
 
   if (window != window.top) {
     filter.iframe = document.location;

@@ -854,12 +854,13 @@ export default class OptionPage {
         let div = document.createElement('div');
         let label = document.createElement('label');
         let input = document.createElement('input');
-        label.textContent = list;
+        let name = document.createTextNode(list);
         input.type = 'checkbox';
         input.classList.add('w3-check');
         input.name = 'wordlistSelection';
         input.value = index.toString();
         label.appendChild(input);
+        label.appendChild(name);
         div.appendChild(label);
         selections.appendChild(div);
       });

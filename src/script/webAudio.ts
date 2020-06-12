@@ -96,7 +96,13 @@ export default class WebAudio {
       if (result.modified) {
         filtered = true;
         this.mute(rule.muteMethod); // Mute the audio if we haven't already
-        if (rule.filterSubtitles) { subtitle[textMethod] = result.filtered; }
+
+        if (rule.filterSubtitles) {
+          if (rule.ignoreMutations) { this.filter.stopObserving(); }
+          subtitle[textMethod] = result.filtered;
+          if (rule.ignoreMutations) { this.filter.startObserving(); }
+        }
+
         this.lastFilteredNode = subtitle;
         this.lastFilteredText = subtitle[textMethod];
       }
@@ -204,6 +210,7 @@ export default class WebAudio {
   }
 
   initElementChildRule(rule) {
+    if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
     if (rule.displaySelector !== undefined) {
       if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
       if (rule.displayShow === undefined) { rule.displayShow = ''; }
@@ -230,8 +237,6 @@ export default class WebAudio {
       }
 
       if (!rule.disabled) {
-        this.enabledRuleIds.push(index);
-
         // Setup rule defaults
         if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
         if (rule.simpleUnmute != null) { this.simpleUnmute = true; }
@@ -246,7 +251,7 @@ export default class WebAudio {
         switch(rule.mode) {
           case 'cue':
             this.initCueRule(rule);
-            this.cueRuleIds.push(index);
+            if (!rule.disabled) { this.cueRuleIds.push(index); }
             break;
           case 'elementChild':
             this.initElementChildRule(rule);
@@ -259,9 +264,10 @@ export default class WebAudio {
             break;
           case 'watcher':
             this.initWatcherRule(rule);
-            this.watcherRuleIds.push(index);
+            if (!rule.disabled) { this.watcherRuleIds.push(index); }
             break;
         }
+        if (!rule.disabled) { this.enabledRuleIds.push(index); }
       }
     });
   }
@@ -352,8 +358,15 @@ export default class WebAudio {
           break;
         case 'elementChild':
           if (node.nodeName === rule.tagName) {
-            let parent = document.querySelector(rule.parentSelector);
-            if (parent && parent.contains(node)) { return ruleId; }
+            if (rule.parentSelector) {
+              let parent = document.querySelector(rule.parentSelector);
+              if (parent && parent.contains(node)) { return ruleId; }
+            } else {
+              let parents = document.querySelectorAll(rule.parentSelectorAll);
+              for (let j = 0; j < parents.length; j++) {
+                if (parents[j].contains(node)) { return ruleId; }
+              }
+            }
           }
           break;
         case 'text':

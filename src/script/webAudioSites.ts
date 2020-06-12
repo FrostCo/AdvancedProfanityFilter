@@ -42,6 +42,8 @@ export default class WebAudioSites {
         tagName: 'DIV',
       }
     ],
+    'play.google.com': [{ className: 'lava-timed-text-window', mode: 'element', subtitleSelector: 'span.lava-timed-text-caption', tagName: 'DIV' }],
+    'play.hbomax.com': [{ mode: 'elementChild', parentSelectorAll: 'div.class3 > span', showSubtitles: 0, tagName: 'SPAN' }],
     'www.hulu.com': [{ mode: 'element', className: 'caption-text-box', displaySelector: 'div.caption-text-box', subtitleSelector: 'p', tagName: 'DIV' }],
     'www.nbc.com': [
       { mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
@@ -54,8 +56,8 @@ export default class WebAudioSites {
       { mode: 'element', containsSelector: 'div[data-dialogue-id]', subtitleSelector: 'span > span', tagName: 'DIV' }
     ],
     'watch.redeemtv.com': [{ mode: 'elementChild', convertBreaks: true, displaySelector: 'div.vp-captions', parentSelector: 'div.vp-captions', tagName: 'SPAN' }],
-    'www.sonycrackle.com': [{ mode: 'text', parentSelector: 'div.clpp-subtitles-container' }],
-    'play.stan.com.au': [{ mode: 'text', parentSelector: 'div.clpp-subtitles-container' }],
+    'www.crackle.com': [{ mode: 'elementChild', ignoreMutations: true, parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
+    'play.stan.com.au': [{ mode: 'elementChild', ignoreMutations: true, parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'www.syfy.com': [{ mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
     'www.tntdrama.com': [{ mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video.top-media-element' }],
     'www.universalkids.com': [{ mode: 'element', subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' }],
