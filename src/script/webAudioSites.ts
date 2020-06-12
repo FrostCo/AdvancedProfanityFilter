@@ -42,6 +42,7 @@ export default class WebAudioSites {
         tagName: 'DIV',
       }
     ],
+    'play.google.com': [{ className: 'lava-timed-text-window', mode: 'element', subtitleSelector: 'span.lava-timed-text-caption', tagName: 'DIV' }],
     'play.hbomax.com': [{ mode: 'elementChild', parentSelectorAll: 'div.class3 > span', showSubtitles: 0, tagName: 'SPAN' }],
     'www.hulu.com': [{ mode: 'element', className: 'caption-text-box', displaySelector: 'div.caption-text-box', subtitleSelector: 'p', tagName: 'DIV' }],
     'www.nbc.com': [
