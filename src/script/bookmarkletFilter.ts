@@ -30,14 +30,12 @@ export default class BookmarkletFilter extends Filter {
   mutePage: boolean;
   observer: MutationObserver;
   shadowObserver: MutationObserver;
-  summary: Summary;
 
   constructor() {
     super();
     this.advanced = false;
     this.audioWordlistId = 0;
     this.mutePage = false;
-    this.summary = {};
   }
 
   advancedReplaceText(node, wordlistId: number, stats = true) {
