@@ -26,6 +26,7 @@ export default class WebAudioSites {
     'www.attwatchtv.com': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
     'gem.cbc.ca': [{ className: 'jw-text-track-container', mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
     'www.cbs.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
+    'www.crackle.com': [{ mode: 'elementChild', ignoreMutations: true, parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'www.dishanywhere.com': [
       { mode: 'element', className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' },
       { mode: 'element', className: 'bmpui-subtitle-region-container', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' }
@@ -56,7 +57,6 @@ export default class WebAudioSites {
       { mode: 'element', containsSelector: 'div[data-dialogue-id]', subtitleSelector: 'span > span', tagName: 'DIV' }
     ],
     'watch.redeemtv.com': [{ mode: 'elementChild', convertBreaks: true, displaySelector: 'div.vp-captions', parentSelector: 'div.vp-captions', tagName: 'SPAN' }],
-    'www.crackle.com': [{ mode: 'elementChild', ignoreMutations: true, parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'play.stan.com.au': [{ mode: 'elementChild', ignoreMutations: true, parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'www.syfy.com': [{ mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
     'www.tntdrama.com': [{ mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video.top-media-element' }],
