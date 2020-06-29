@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-import { escapeHTML, getVersion, isVersionOlder, removeFromArray } from '../built/lib/helper';
+import { escapeHTML, formatNumber, getVersion, isVersionOlder, removeFromArray } from '../built/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 
@@ -9,6 +9,22 @@ describe('Helper', function() {
       expect(escapeHTML('a>b')).to.eql('a&gt;b');
       expect(escapeHTML('(?<!un)censored')).to.eql('(?&lt;!un)censored');
       expect(escapeHTML('already safe')).to.eql('already safe');
+    });
+  });
+
+  describe('formatNumber()', function() {
+    it('Format numbers for counter display', function() {
+      expect(formatNumber(999)).to.eql('999');
+      expect(formatNumber(1000)).to.eql('1K');
+      expect(formatNumber(1499)).to.eql('1.5K');
+      expect(formatNumber(1500)).to.eql('1.5K');
+      expect(formatNumber(9999)).to.eql('10K');
+      expect(formatNumber(10000)).to.eql('10K');
+      expect(formatNumber(500000)).to.eql('500K');
+      expect(formatNumber(999499)).to.eql('999K');
+      expect(formatNumber(999500)).to.eql('1M');
+      expect(formatNumber(1200000)).to.eql('1.2M');
+      expect(formatNumber(994999999)).to.eql('990M');
     });
   });
 

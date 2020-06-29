@@ -32,6 +32,22 @@ export function exportToFile(dataStr, fileName = 'data.txt') {
   linkElement.remove();
 }
 
+// Format numbers up 994,999,999 (990M) 4 characters
+export function formatNumber(number: number): string {
+  let length = number.toString().length;
+  if (length <= 3) {
+    return number.toString();
+  } else if (length <= 5) {
+    return Number((number/1000).toPrecision(2)).toString() + 'K';
+  } else if (length >= 6) {
+    if (number <= 999499) {
+      return Number((number/1000).toPrecision(3)).toString() + 'K';
+    } else {
+      return Number((number/1000000).toPrecision(2)).toString() + 'M';
+    }
+  }
+}
+
 // /^\d+\.\d+\.\d+$/
 export function getVersion(version: string): Version {
   let versionValues = version.split('.');
