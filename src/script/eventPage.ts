@@ -1,6 +1,7 @@
 import DataMigration from './dataMigration';
 import Domain from './domain';
 import WebConfig from './webConfig';
+import { formatNumber } from './lib/helper';
 
 ////
 // Actions and messaging
@@ -55,7 +56,7 @@ chrome.runtime.onMessage.addListener(
 
       // Show count of words filtered on badge
       if (request.counter != undefined) {
-        chrome.browserAction.setBadgeText({ text: request.counter.toString(), tabId: sender.tab.id });
+        chrome.browserAction.setBadgeText({ text: formatNumber(request.counter), tabId: sender.tab.id });
       }
 
       // Set mute state for tab
