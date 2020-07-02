@@ -32,19 +32,21 @@ export function exportToFile(dataStr, fileName = 'data.txt') {
   linkElement.remove();
 }
 
-// Format numbers up 994,999,999 (990M) 4 characters
+// Format numbers up to 1B to be 4 characters or less
 export function formatNumber(number: number): string {
   let length = number.toString().length;
-  if (length <= 3) {
+  if (length <= 3) { // 0 - 999
     return number.toString();
-  } else if (length <= 5) {
-    return Number((number/1000).toPrecision(2)).toString() + 'k';
-  } else if (length >= 6) {
-    if (number <= 999499) {
-      return Number((number/1000).toPrecision(3)).toString() + 'k';
-    } else {
-      return Number((number/1000000).toPrecision(2)).toString() + 'M';
-    }
+  } else if (length <= 6) { // 1,000 - 999,999
+    let n = (number/1000).toPrecision();
+    let index = n.indexOf('.');
+    return ((index >= -1 && index <= 1) ? n.substr(0, 3) : n.substr(0, index)) + 'k';
+  } else if (length <= 9) { // 1,000,000 - 999,999,999
+    let n = (number/1000000).toPrecision();
+    let index = n.indexOf('.');
+    return ((index >= -1 && index <= 1) ? n.substr(0, 3) : n.substr(0, index)) + 'M';
+  } else { // >= 1,000,000,000
+    return '1G+';
   }
 }
 

@@ -16,15 +16,19 @@ describe('Helper', function() {
     it('Format numbers for counter display', function() {
       expect(formatNumber(999)).to.eql('999');
       expect(formatNumber(1000)).to.eql('1k');
-      expect(formatNumber(1499)).to.eql('1.5k');
+      expect(formatNumber(1499)).to.eql('1.4k');
       expect(formatNumber(1500)).to.eql('1.5k');
-      expect(formatNumber(9999)).to.eql('10k');
+      expect(formatNumber(9999)).to.eql('9.9k');
       expect(formatNumber(10000)).to.eql('10k');
       expect(formatNumber(500000)).to.eql('500k');
       expect(formatNumber(999499)).to.eql('999k');
-      expect(formatNumber(999500)).to.eql('1M');
+      expect(formatNumber(999999)).to.eql('999k');
+      expect(formatNumber(1000000)).to.eql('1M');
       expect(formatNumber(1200000)).to.eql('1.2M');
-      expect(formatNumber(994999999)).to.eql('990M');
+      expect(formatNumber(994999999)).to.eql('994M');
+      expect(formatNumber(999999999)).to.eql('999M');
+      expect(formatNumber(1000000000)).to.eql('1G+');
+      expect(formatNumber(9999999999)).to.eql('1G+');
     });
   });
 
