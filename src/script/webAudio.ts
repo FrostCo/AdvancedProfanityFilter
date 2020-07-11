@@ -278,6 +278,7 @@ export default class WebAudio {
 
   initWatcherRule(rule) {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
+    if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
     if (rule.displaySelector !== undefined) {
       if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
@@ -458,7 +459,7 @@ export default class WebAudio {
     let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
 
     if (video && instance.playing(video)) {
-      instance.filter.stopObserving(); // Stop observing when video is playing
+      if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
 
       let captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
       if (captions && captions.textContent) {
@@ -478,7 +479,7 @@ export default class WebAudio {
         instance.unmute(rule.muteMethod);
       }
     } else {
-      instance.filter.startObserving(); // Start observing again when video is not playing
+      if (rule.ignoreMutations) { instance.filter.startObserving(); } // Start observing when video is not playing
     }
   }
 
