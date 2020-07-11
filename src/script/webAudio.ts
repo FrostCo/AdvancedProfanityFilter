@@ -475,7 +475,7 @@ export default class WebAudio {
         }
 
         if (data.filtered) { instance.filter.updateCounterBadge(); }
-      } else { // Unmute if no captions
+      } else if (rule.simpleUnmute) { // Unmute if no captions
         instance.unmute(rule.muteMethod);
       }
     } else {
