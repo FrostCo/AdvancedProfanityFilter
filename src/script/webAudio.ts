@@ -33,7 +33,6 @@ export default class WebAudio {
     this.filter = filter;
     this.lastFilteredNode = null;
     this.lastFilteredText = '';
-    this.lastProcessed = [];
     this.lastProcessedText = '';
     this.muted = false;
     if (
@@ -279,7 +278,6 @@ export default class WebAudio {
 
   initWatcherRule(rule) {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
-    if (rule.trackProcessed === undefined) { rule.trackProcessed = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
     if (rule.displaySelector !== undefined) {
       if (rule.displayHide === undefined) { rule.displayHide = 'none'; }

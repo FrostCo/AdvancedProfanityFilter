@@ -21,7 +21,6 @@ interface AudioRules {
   simpleUnmute?: boolean;           // [All] Simplify requirements for unmuting (Only require text match)
   subtitleSelector?: string;        // [Element,ElementChild,Watcher] *Used for Filtering*: node.querySelector()
   tagName?: string;                 // [Element*,ElementChild*] node.nodeName
-  trackProcessed?: boolean;         // [Watcher] Attempt to only process text once (Default: true)
   videoCueHideCues?: boolean;       // [Cue] Hide activeCues instead of textTrack.mode = 'hidden'
   videoCueLanguage?: string;        // [Cue] Language for video TextTrack
   videoCueRequireShowing?: boolean; // [Cue] Override global setting for muteCueRequireShowing
