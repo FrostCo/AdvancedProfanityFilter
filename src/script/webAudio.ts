@@ -9,7 +9,7 @@ export default class WebAudio {
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
-  lastProcessed: string[];
+  lastProcessedText: string;
   muted: boolean;
   rules: AudioRules[];
   simpleUnmute: boolean;
@@ -34,6 +34,7 @@ export default class WebAudio {
     this.lastFilteredNode = null;
     this.lastFilteredText = '';
     this.lastProcessed = [];
+    this.lastProcessedText = '';
     this.muted = false;
     if (
       !filter.cfg.customAudioSites
@@ -280,6 +281,10 @@ export default class WebAudio {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
     if (rule.trackProcessed === undefined) { rule.trackProcessed = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
+    if (rule.displaySelector !== undefined) {
+      if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
+      if (rule.displayShow === undefined) { rule.displayShow = ''; }
+    }
   }
 
   mute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
@@ -323,6 +328,49 @@ export default class WebAudio {
       } else {
         cue.filtered = false;
       }
+    }
+  }
+
+  processWatcherCaptions(rule, captions, data) {
+    let instance = this;
+
+    let initialCall = data.initialCall; // Check if this is the first call
+    if (initialCall) {
+      // Don't process the same filter again
+      let captionText = captions.innerText;
+      if (instance.lastProcessedText === captionText || instance.lastFilteredText === captionText) {
+        data.skipped = true;
+        return false;
+      } else { // These are new captions, unmute if muted
+        instance.unmute(rule.muteMethod);
+      }
+
+      data.initialCall = false;
+      data.filtered = false;
+    }
+
+    if (captions.hasChildNodes()) {
+      captions.childNodes.forEach(child => {
+        instance.processWatcherCaptions(rule, child, data);
+      });
+    } else { // Process child
+      // innerText handles line feeds/spacing better, but is not available to #text nodes
+      let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
+
+      // Don't process empty/whitespace nodes
+      if (captions[textMethod] && captions[textMethod].trim()) {
+        let result = instance.replaceTextResult(captions[textMethod]);
+        if (result.modified) {
+          instance.mute(rule.muteMethod);
+          data.filtered = true;
+          if (rule.filterSubtitles) { captions[textMethod] = result.filtered; }
+        }
+      }
+    }
+
+    if (initialCall) {
+      if (data.filtered) { instance.lastFilteredText = captions.innerText; }
+      instance.lastProcessedText = captions.innerText;
     }
   }
 
@@ -412,80 +460,27 @@ export default class WebAudio {
     let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
 
     if (video && instance.playing(video)) {
+      instance.filter.stopObserving(); // Stop observing when video is playing
+
       let captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
-
       if (captions && captions.textContent) {
-        let filtered = false;
-        let newCaptions = !rule.trackProcessed;
+        let data: WatcherData = { initialCall: true };
+        instance.processWatcherCaptions(rule, captions, data);
+        if (data.skipped) { return false; }
 
-        if (captions.hasChildNodes()) {
-          captions.childNodes.forEach((child, index) => {
-            // innerText handles line feeds/spacing better, but is not available to #text nodes
-            let textMethod = (child && child.nodeName)  === '#text' ? 'textContent' : 'innerText';
-
-            // Skip captions/subtitles that have already been processed
-            if (!newCaptions) {
-              if (captions.childNodes.length === instance.lastProcessed.length) {
-                if (instance.lastProcessed[index] === child[textMethod]) {
-                  return false;
-                } else {
-                  newCaptions = true;
-                  instance.lastProcessed.slice(0, index);
-                }
-              } else {
-                newCaptions = true;
-                instance.lastProcessed = [];
-              }
-            }
-
-            // Filter the captions/subtitles
-            if (child[textMethod]) {
-              let result = instance.replaceTextResult(child[textMethod]);
-              if (result.modified) {
-                instance.mute(rule.muteMethod);
-                filtered = true;
-                if (rule.filterSubtitles) { child[textMethod] = result.filtered; }
-                instance.lastFilteredNode = child;
-                instance.lastFilteredText = child[textMethod];
-              }
-            }
-            if (rule.trackProcessed) { instance.lastProcessed.push(child[textMethod]); }
-          });
-          if (!newCaptions) { return false; } // Skip captions/subtitles that have already been processed
-        } else {
-          // innerText handles line feeds/spacing better, but is not available to #text nodes
-          let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
-
-          // Skip captions/subtitles that have already been processed
-          if (!newCaptions && instance.lastProcessed.includes(captions[textMethod])) { return false; }
-
-          if (captions[textMethod] && (instance.lastFilteredText && !captions[textMethod].contains(instance.lastFilteredText))) {
-            let result = instance.replaceTextResult(captions[textMethod]);
-            if (result.modified) {
-              instance.mute(rule.muteMethod);
-              filtered = true;
-              if (rule.filterSubtitles) { captions[textMethod] = result.filtered; }
-              instance.lastFilteredNode = captions;
-              instance.lastFilteredText = captions[textMethod];
-            }
-          }
-          if (rule.trackProcessed) { instance.lastProcessed = [captions[textMethod]]; }
+        // Hide captions/subtitles
+        switch (rule.showSubtitles) {
+          case Constants.ShowSubtitles.Filtered: if (data.filtered) { instance.showSubtitles(rule); } else { instance.hideSubtitles(rule, captions); } break;
+          case Constants.ShowSubtitles.Unfiltered: if (data.filtered) { instance.hideSubtitles(rule, captions); } else { instance.showSubtitles(rule); } break;
+          case Constants.ShowSubtitles.None: instance.hideSubtitles(rule, captions); break;
         }
 
-        // Unmute if nothing was filtered and the text doesn't match the last filtered
-        let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
-        if (!filtered && !captions[textMethod].includes(instance.lastFilteredText)) { instance.unmute(rule.muteMethod); }
-
-        if (captions.nodeName !== '#text') {
-          switch (rule.showSubtitles) {
-            case Constants.ShowSubtitles.Filtered: captions.style.display = filtered ? '' : 'none'; break;
-            case Constants.ShowSubtitles.Unfiltered: captions.style.display = filtered ? 'none' : ''; break;
-            case Constants.ShowSubtitles.None: captions.style.display = 'none'; break;
-          }
-        }
-
-        if (filtered) { instance.filter.updateCounterBadge(); } // Update if modified
+        if (data.filtered) { instance.filter.updateCounterBadge(); }
+      } else { // Unmute if no captions
+        instance.unmute(rule.muteMethod);
       }
+    } else {
+      instance.filter.startObserving(); // Start observing again when video is not playing
     }
   }
 

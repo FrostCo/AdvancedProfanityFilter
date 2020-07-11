@@ -88,6 +88,12 @@ interface Version {
   patch: number;
 }
 
+interface WatcherData {
+  filtered?: boolean;
+  initialCall: boolean;
+  skipped?: boolean;
+}
+
 interface WordOptions {
   _filterMethod?: number;  // This should not be stored in the config. Only there for new Word
   lists?: number[];
