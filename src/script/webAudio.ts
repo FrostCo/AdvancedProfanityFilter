@@ -9,11 +9,11 @@ export default class WebAudio {
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
-  lastProcessed: string[];
+  lastProcessedText: string;
   muted: boolean;
-  rules: AudioRules[];
+  rules: AudioRule[];
   simpleUnmute: boolean;
-  sites: { [site: string]: AudioRules[] };
+  sites: { [site: string]: AudioRule[] };
   supportedPage: boolean;
   unmuteDelay: number;
   volume: number;
@@ -33,7 +33,7 @@ export default class WebAudio {
     this.filter = filter;
     this.lastFilteredNode = null;
     this.lastFilteredText = '';
-    this.lastProcessed = [];
+    this.lastProcessedText = '';
     this.muted = false;
     if (
       !filter.cfg.customAudioSites
@@ -178,7 +178,7 @@ export default class WebAudio {
     }
   }
 
-  hideSubtitles(rule: AudioRules, subtitles) {
+  hideSubtitles(rule: AudioRule, subtitles?) {
     if (rule.displaySelector) {
       let container = document.querySelector(rule.displaySelector) as HTMLElement;
       if (container) {
@@ -191,9 +191,9 @@ export default class WebAudio {
           rule.displayShow = container.style.display;
         }
 
-        container.style.display = rule.displayHide;
+        container.style.setProperty('display', rule.displayHide); // , 'important');
       }
-    } else {
+    } else if (subtitles) {
       subtitles.forEach(subtitle => {
         subtitle.innerText = '';
         if (rule.removeSubtitleSpacing && subtitle.style) {
@@ -204,24 +204,25 @@ export default class WebAudio {
     }
   }
 
-  initCueRule(rule) {
+  initCueRule(rule: AudioRule) {
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
   }
 
-  initElementChildRule(rule) {
-    if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
+  initDisplaySelector(rule: AudioRule) {
     if (rule.displaySelector !== undefined) {
       if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
       if (rule.displayShow === undefined) { rule.displayShow = ''; }
     }
   }
 
-  initElementRule(rule) {
-    if (rule.displaySelector !== undefined) {
-      if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
-      if (rule.displayShow === undefined) { rule.displayShow = ''; }
-    }
+  initElementChildRule(rule: AudioRule) {
+    if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
+    this.initDisplaySelector(rule);
+  }
+
+  initElementRule(rule: AudioRule) {
+    this.initDisplaySelector(rule);
   }
 
   initRules() {
@@ -272,14 +273,16 @@ export default class WebAudio {
     });
   }
 
-  initTextRule(rule) {
+  initTextRule(rule: AudioRule) {
     rule.tagName = '#text';
   }
 
-  initWatcherRule(rule) {
+  initWatcherRule(rule: AudioRule) {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
-    if (rule.trackProcessed === undefined) { rule.trackProcessed = true; }
+    if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
+    if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
+    this.initDisplaySelector(rule);
   }
 
   mute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
@@ -305,7 +308,7 @@ export default class WebAudio {
     return !!(video && video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
 
-  processCues(cues: FilteredTextTrackCue[], rule: AudioRules) {
+  processCues(cues: FilteredVTTCue[], rule: AudioRule) {
     for (let i = 0; i < cues.length; i++) {
       let cue = cues[i];
       if (cue.hasOwnProperty('filtered')) { continue; }
@@ -326,6 +329,46 @@ export default class WebAudio {
     }
   }
 
+  processWatcherCaptions(rule, captions, data) {
+    let instance = this;
+
+    let initialCall = data.initialCall; // Check if this is the first call
+    if (initialCall) {
+      // Don't process the same filter again
+      if (instance.lastProcessedText && instance.lastProcessedText === captions.textContent) {
+        data.skipped = true;
+        return false;
+      } else { // These are new captions, unmute if muted
+        instance.unmute(rule.muteMethod);
+        instance.lastProcessedText = '';
+      }
+
+      data.initialCall = false;
+      data.filtered = false;
+    }
+
+    if (captions.hasChildNodes()) {
+      captions.childNodes.forEach(child => {
+        instance.processWatcherCaptions(rule, child, data);
+      });
+    } else { // Process child
+      // innerText handles line feeds/spacing better, but is not available to #text nodes
+      let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
+
+      // Don't process empty/whitespace nodes
+      if (captions[textMethod] && captions[textMethod].trim()) {
+        let result = instance.replaceTextResult(captions[textMethod]);
+        if (result.modified) {
+          instance.mute(rule.muteMethod);
+          data.filtered = true;
+          if (rule.filterSubtitles) { captions[textMethod] = result.filtered; }
+        }
+      }
+    }
+
+    if (initialCall) { instance.lastProcessedText = captions.textContent; }
+  }
+
   replaceTextResult(string: string, stats: boolean = true) {
     return this.filter.replaceTextResult(string, this.wordlistId, stats);
   }
@@ -333,7 +376,7 @@ export default class WebAudio {
   showSubtitles(rule) {
     if (rule.displaySelector) {
       let container = document.querySelector(rule.displaySelector);
-      if (container) { container.style.display = rule.displayShow; }
+      if (container) { container.style.setProperty('display', rule.displayShow); }
     }
   }
 
@@ -412,86 +455,34 @@ export default class WebAudio {
     let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
 
     if (video && instance.playing(video)) {
+      if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
+
       let captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
+      if (captions && captions.textContent && captions.textContent.trim()) {
+        let data: WatcherData = { initialCall: true };
+        instance.processWatcherCaptions(rule, captions, data);
+        if (data.skipped) { return false; }
 
-      if (captions && captions.textContent) {
-        let filtered = false;
-        let newCaptions = !rule.trackProcessed;
-
-        if (captions.hasChildNodes()) {
-          captions.childNodes.forEach((child, index) => {
-            // innerText handles line feeds/spacing better, but is not available to #text nodes
-            let textMethod = (child && child.nodeName)  === '#text' ? 'textContent' : 'innerText';
-
-            // Skip captions/subtitles that have already been processed
-            if (!newCaptions) {
-              if (captions.childNodes.length === instance.lastProcessed.length) {
-                if (instance.lastProcessed[index] === child[textMethod]) {
-                  return false;
-                } else {
-                  newCaptions = true;
-                  instance.lastProcessed.slice(0, index);
-                }
-              } else {
-                newCaptions = true;
-                instance.lastProcessed = [];
-              }
-            }
-
-            // Filter the captions/subtitles
-            if (child[textMethod]) {
-              let result = instance.replaceTextResult(child[textMethod]);
-              if (result.modified) {
-                instance.mute(rule.muteMethod);
-                filtered = true;
-                if (rule.filterSubtitles) { child[textMethod] = result.filtered; }
-                instance.lastFilteredNode = child;
-                instance.lastFilteredText = child[textMethod];
-              }
-            }
-            if (rule.trackProcessed) { instance.lastProcessed.push(child[textMethod]); }
-          });
-          if (!newCaptions) { return false; } // Skip captions/subtitles that have already been processed
-        } else {
-          // innerText handles line feeds/spacing better, but is not available to #text nodes
-          let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
-
-          // Skip captions/subtitles that have already been processed
-          if (!newCaptions && instance.lastProcessed.includes(captions[textMethod])) { return false; }
-
-          if (captions[textMethod] && (instance.lastFilteredText && !captions[textMethod].contains(instance.lastFilteredText))) {
-            let result = instance.replaceTextResult(captions[textMethod]);
-            if (result.modified) {
-              instance.mute(rule.muteMethod);
-              filtered = true;
-              if (rule.filterSubtitles) { captions[textMethod] = result.filtered; }
-              instance.lastFilteredNode = captions;
-              instance.lastFilteredText = captions[textMethod];
-            }
-          }
-          if (rule.trackProcessed) { instance.lastProcessed = [captions[textMethod]]; }
+        // Hide/show captions/subtitles
+        switch (rule.showSubtitles) {
+          case Constants.ShowSubtitles.Filtered: if (data.filtered) { instance.showSubtitles(rule); } else { instance.hideSubtitles(rule); } break;
+          case Constants.ShowSubtitles.Unfiltered: if (data.filtered) { instance.hideSubtitles(rule); } else { instance.showSubtitles(rule); } break;
+          case Constants.ShowSubtitles.None: instance.hideSubtitles(rule); break;
         }
 
-        // Unmute if nothing was filtered and the text doesn't match the last filtered
-        let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
-        if (!filtered && !captions[textMethod].includes(instance.lastFilteredText)) { instance.unmute(rule.muteMethod); }
-
-        if (captions.nodeName !== '#text') {
-          switch (rule.showSubtitles) {
-            case Constants.ShowSubtitles.Filtered: captions.style.display = filtered ? '' : 'none'; break;
-            case Constants.ShowSubtitles.Unfiltered: captions.style.display = filtered ? 'none' : ''; break;
-            case Constants.ShowSubtitles.None: captions.style.display = 'none'; break;
-          }
-        }
-
-        if (filtered) { instance.filter.updateCounterBadge(); } // Update if modified
+        if (data.filtered) { instance.filter.updateCounterBadge(); }
+      } else if (rule.simpleUnmute) { // If there are no captions/subtitles: unmute and hide
+        instance.unmute(rule.muteMethod);
+        if (rule.showSubtitles > 0) { instance.hideSubtitles(rule); }
       }
+    } else {
+      if (rule.ignoreMutations) { instance.filter.startObserving(); } // Start observing when video is not playing
     }
   }
 
   watchForVideo(instance: WebAudio) {
     instance.cueRuleIds.forEach(cueRuleId => {
-      let rule = instance.rules[cueRuleId] as AudioRules;
+      let rule = instance.rules[cueRuleId] as AudioRule;
       let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
         let textTrack = instance.getVideoTextTrack(video, rule.videoCueLanguage, rule.videoCueRequireShowing);
@@ -504,9 +495,9 @@ export default class WebAudio {
               let filtered = false;
 
               for (let i = 0; i < textTrack.activeCues.length; i++) {
-                let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
+                let activeCue = textTrack.activeCues[i] as FilteredVTTCue;
                 if (!activeCue.hasOwnProperty('filtered')) {
-                  let cues = textTrack.cues as any as FilteredTextTrackCue[];
+                  let cues = textTrack.cues as any as FilteredVTTCue[];
                   instance.processCues(cues, rule);
                 }
                 if (activeCue.filtered) {
@@ -526,7 +517,7 @@ export default class WebAudio {
                   || rule.showSubtitles === Constants.ShowSubtitles.None
                 ) {
                   for (let i = 0; i < textTrack.activeCues.length; i++) {
-                    let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
+                    let activeCue = textTrack.activeCues[i] as FilteredVTTCue;
                     activeCue.text = '';
                     activeCue.position = 100;
                     activeCue.size = 0;

@@ -1,19 +1,18 @@
-import Constants from './lib/constants';
-
 export default class WebAudioSites {
-  static combineSites(sites: { [site: string]: AudioRules[] } = {}): { [site: string]: AudioRules[] } {
+  static combineSites(sites: { [site: string]: AudioRule[] } = {}): { [site: string]: AudioRule[] } {
     return Object.assign({}, WebAudioSites.sites, sites);
   }
 
-  static sites: { [site: string]: AudioRules[] } = {
+  static sites: { [site: string]: AudioRule[] } = {
     'abc.com': [{ mode: 'element', className: 'akamai-caption-text', tagName: 'DIV' }],
     'www.amazon.com': [
       {
         mode: 'watcher',
+        displayHide: 'none',
+        displaySelector: 'div.webPlayerContainer div.f35bt6a',
+        displayShow: '',
         iframe: false,
         parentSelector: 'div.webPlayerContainer div p > span',
-        showSubtitles: Constants.ShowSubtitles.All,
-        simpleUnmute: true,
         subtitleSelector: 'div.webPlayerContainer div span > span',
         videoSelector: 'div.webPlayerElement video[src]'
       }
