@@ -209,19 +209,20 @@ export default class WebAudio {
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
   }
 
-  initElementChildRule(rule) {
-    if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
+  initDisplaySelector(rule: AudioRules) {
     if (rule.displaySelector !== undefined) {
       if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
       if (rule.displayShow === undefined) { rule.displayShow = ''; }
     }
   }
 
+  initElementChildRule(rule) {
+    if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
+    this.initDisplaySelector(rule);
+  }
+
   initElementRule(rule) {
-    if (rule.displaySelector !== undefined) {
-      if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
-      if (rule.displayShow === undefined) { rule.displayShow = ''; }
-    }
+    this.initDisplaySelector(rule);
   }
 
   initRules() {
@@ -280,10 +281,7 @@ export default class WebAudio {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
     if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
-    if (rule.displaySelector !== undefined) {
-      if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
-      if (rule.displayShow === undefined) { rule.displayShow = ''; }
-    }
+    this.initDisplaySelector(rule);
   }
 
   mute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
