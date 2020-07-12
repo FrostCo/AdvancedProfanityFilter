@@ -204,7 +204,7 @@ export default class WebAudio {
     }
   }
 
-  initCueRule(rule) {
+  initCueRule(rule: AudioRules) {
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
   }
@@ -216,12 +216,12 @@ export default class WebAudio {
     }
   }
 
-  initElementChildRule(rule) {
+  initElementChildRule(rule: AudioRules) {
     if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
     this.initDisplaySelector(rule);
   }
 
-  initElementRule(rule) {
+  initElementRule(rule: AudioRules) {
     this.initDisplaySelector(rule);
   }
 
@@ -273,11 +273,11 @@ export default class WebAudio {
     });
   }
 
-  initTextRule(rule) {
+  initTextRule(rule: AudioRules) {
     rule.tagName = '#text';
   }
 
-  initWatcherRule(rule) {
+  initWatcherRule(rule: AudioRules) {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
     if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
