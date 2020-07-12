@@ -470,8 +470,9 @@ export default class WebAudio {
         }
 
         if (data.filtered) { instance.filter.updateCounterBadge(); }
-      } else if (rule.simpleUnmute) { // Unmute if no captions
+      } else if (rule.simpleUnmute) { // If there are no captions/subtitles: unmute and hide
         instance.unmute(rule.muteMethod);
+        if (rule.showSubtitles > 0) { instance.hideSubtitles(rule); }
       }
     } else {
       if (rule.ignoreMutations) { instance.filter.startObserving(); } // Start observing when video is not playing
