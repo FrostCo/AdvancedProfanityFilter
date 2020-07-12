@@ -1,5 +1,3 @@
-import Constants from './lib/constants';
-
 export default class WebAudioSites {
   static combineSites(sites: { [site: string]: AudioRule[] } = {}): { [site: string]: AudioRule[] } {
     return Object.assign({}, WebAudioSites.sites, sites);
@@ -10,10 +8,11 @@ export default class WebAudioSites {
     'www.amazon.com': [
       {
         mode: 'watcher',
+        displayHide: 'none',
+        displaySelector: 'div.webPlayerContainer div.f35bt6a',
+        displayShow: '',
         iframe: false,
         parentSelector: 'div.webPlayerContainer div p > span',
-        showSubtitles: Constants.ShowSubtitles.All,
-        simpleUnmute: true,
         subtitleSelector: 'div.webPlayerContainer div span > span',
         videoSelector: 'div.webPlayerElement video[src]'
       }
