@@ -178,7 +178,7 @@ export default class WebAudio {
     }
   }
 
-  hideSubtitles(rule: AudioRules, subtitles) {
+  hideSubtitles(rule: AudioRules, subtitles?) {
     if (rule.displaySelector) {
       let container = document.querySelector(rule.displaySelector) as HTMLElement;
       if (container) {
@@ -193,7 +193,7 @@ export default class WebAudio {
 
         container.style.display = rule.displayHide;
       }
-    } else {
+    } else if (subtitles) {
       subtitles.forEach(subtitle => {
         subtitle.innerText = '';
         if (rule.removeSubtitleSpacing && subtitle.style) {
@@ -462,11 +462,11 @@ export default class WebAudio {
         instance.processWatcherCaptions(rule, captions, data);
         if (data.skipped) { return false; }
 
-        // Hide captions/subtitles
+        // Hide/show captions/subtitles
         switch (rule.showSubtitles) {
-          case Constants.ShowSubtitles.Filtered: if (data.filtered) { instance.showSubtitles(rule); } else { instance.hideSubtitles(rule, captions); } break;
-          case Constants.ShowSubtitles.Unfiltered: if (data.filtered) { instance.hideSubtitles(rule, captions); } else { instance.showSubtitles(rule); } break;
-          case Constants.ShowSubtitles.None: instance.hideSubtitles(rule, captions); break;
+          case Constants.ShowSubtitles.Filtered: if (data.filtered) { instance.showSubtitles(rule); } else { instance.hideSubtitles(rule); } break;
+          case Constants.ShowSubtitles.Unfiltered: if (data.filtered) { instance.hideSubtitles(rule); } else { instance.showSubtitles(rule); } break;
+          case Constants.ShowSubtitles.None: instance.hideSubtitles(rule); break;
         }
 
         if (data.filtered) { instance.filter.updateCounterBadge(); }
