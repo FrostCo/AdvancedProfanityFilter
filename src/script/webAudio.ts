@@ -462,7 +462,7 @@ export default class WebAudio {
       if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
 
       let captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
-      if (captions && captions.textContent) {
+      if (captions && captions.textContent && captions.textContent.trim()) {
         let data: WatcherData = { initialCall: true };
         instance.processWatcherCaptions(rule, captions, data);
         if (data.skipped) { return false; }
