@@ -191,7 +191,7 @@ export default class WebAudio {
           rule.displayShow = container.style.display;
         }
 
-        container.style.display = rule.displayHide;
+        container.style.setProperty('display', rule.displayHide); // , 'important');
       }
     } else if (subtitles) {
       subtitles.forEach(subtitle => {
@@ -376,7 +376,7 @@ export default class WebAudio {
   showSubtitles(rule) {
     if (rule.displaySelector) {
       let container = document.querySelector(rule.displaySelector);
-      if (container) { container.style.display = rule.displayShow; }
+      if (container) { container.style.setProperty('display', rule.displayShow); }
     }
   }
 
