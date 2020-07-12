@@ -6,13 +6,13 @@ interface AudioRule {
   convertBreaks?: boolean;          // [Element,ElementChild] Convert <br> to '\n'
   dataPropPresent?: string;         // [Element] node.dataset.hasOwnProperty()
   disabled?: boolean;               // [All] Set automatically based on iframe status or missing a required property
-  displayHide?: string;             // [Element,ElementChild] Display style for hiding captions (Default: 'none')
-  displaySelector?: string;         // [Element,ElementChild] Alternate selector to hide/show captions
-  displayShow?: string;             // [Element,ElementChild] Display style for showing captions (Default: '')
+  displayHide?: string;             // [Element,ElementChild,Watcher] Display style for hiding captions (Default: 'none')
+  displaySelector?: string;         // [Element,ElementChild,Watcher] Alternate selector to hide/show captions
+  displayShow?: string;             // [Element,ElementChild,Watcher] Display style for showing captions (Default: '')
   filterSubtitles?: boolean;        // [All] Filter subtitle text (Default: true)
   hasChildrenElements?: boolean;    // [Element] node.childElementCount > 0 [Not commonly used]
   iframe?: boolean | undefined;     // [All] Pages to run on (true: only iframes, false: no iframes, undefined: all)
-  ignoreMutations?: boolean;        // [Element,ElementChild,Text] Ignore mutations when filtering captions/subtitles
+  ignoreMutations?: boolean;        // [Element,ElementChild,Text,Watcher] Ignore mutations when filtering captions/subtitles
   muteMethod?: number;              // [All] Override global muteMthod (0: tab, 1: video)
   parentSelector?: string;          // [ElementChild?,Text,Watcher] parent.contains(node)
   parentSelectorAll?: string;       // [ElementChild?] Check if any parents contain the node: parent.contains(node)
