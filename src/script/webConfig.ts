@@ -4,7 +4,7 @@ import Config from './lib/config';
 export default class WebConfig extends Config {
   _splitContainerKeys: { [key: string]: string[] };
   audioWordlistId: number;
-  customAudioSites: { [site: string]: AudioRules[] };
+  customAudioSites: { [site: string]: AudioRule[] };
   domains: { [site: string]: DomainCfg };
   enabledDomainsOnly: boolean;
   muteAudio: boolean;

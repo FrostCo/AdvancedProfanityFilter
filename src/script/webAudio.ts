@@ -11,9 +11,9 @@ export default class WebAudio {
   lastFilteredText: string;
   lastProcessedText: string;
   muted: boolean;
-  rules: AudioRules[];
+  rules: AudioRule[];
   simpleUnmute: boolean;
-  sites: { [site: string]: AudioRules[] };
+  sites: { [site: string]: AudioRule[] };
   supportedPage: boolean;
   unmuteDelay: number;
   volume: number;
@@ -178,7 +178,7 @@ export default class WebAudio {
     }
   }
 
-  hideSubtitles(rule: AudioRules, subtitles?) {
+  hideSubtitles(rule: AudioRule, subtitles?) {
     if (rule.displaySelector) {
       let container = document.querySelector(rule.displaySelector) as HTMLElement;
       if (container) {
@@ -204,24 +204,24 @@ export default class WebAudio {
     }
   }
 
-  initCueRule(rule: AudioRules) {
+  initCueRule(rule: AudioRule) {
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
   }
 
-  initDisplaySelector(rule: AudioRules) {
+  initDisplaySelector(rule: AudioRule) {
     if (rule.displaySelector !== undefined) {
       if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
       if (rule.displayShow === undefined) { rule.displayShow = ''; }
     }
   }
 
-  initElementChildRule(rule: AudioRules) {
+  initElementChildRule(rule: AudioRule) {
     if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
     this.initDisplaySelector(rule);
   }
 
-  initElementRule(rule: AudioRules) {
+  initElementRule(rule: AudioRule) {
     this.initDisplaySelector(rule);
   }
 
@@ -273,11 +273,11 @@ export default class WebAudio {
     });
   }
 
-  initTextRule(rule: AudioRules) {
+  initTextRule(rule: AudioRule) {
     rule.tagName = '#text';
   }
 
-  initWatcherRule(rule: AudioRules) {
+  initWatcherRule(rule: AudioRule) {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
     if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
     if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
@@ -308,7 +308,7 @@ export default class WebAudio {
     return !!(video && video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
 
-  processCues(cues: FilteredVTTCue[], rule: AudioRules) {
+  processCues(cues: FilteredVTTCue[], rule: AudioRule) {
     for (let i = 0; i < cues.length; i++) {
       let cue = cues[i];
       if (cue.hasOwnProperty('filtered')) { continue; }
@@ -482,7 +482,7 @@ export default class WebAudio {
 
   watchForVideo(instance: WebAudio) {
     instance.cueRuleIds.forEach(cueRuleId => {
-      let rule = instance.rules[cueRuleId] as AudioRules;
+      let rule = instance.rules[cueRuleId] as AudioRule;
       let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
         let textTrack = instance.getVideoTextTrack(video, rule.videoCueLanguage, rule.videoCueRequireShowing);

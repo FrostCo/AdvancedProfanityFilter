@@ -1,4 +1,4 @@
-interface AudioRules {
+interface AudioRule {
   mode: string;                     // [All*] 'cue', 'element', 'elementChild', 'text', 'watcher'
   checkInterval?: number;           // [Watcher] Set a custom watch interval (in ms, Default: 20)
   className?: string;               // [Element] node.className.includes()
