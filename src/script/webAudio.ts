@@ -334,12 +334,12 @@ export default class WebAudio {
     let initialCall = data.initialCall; // Check if this is the first call
     if (initialCall) {
       // Don't process the same filter again
-      let captionText = captions.innerText;
-      if (instance.lastProcessedText === captionText || instance.lastFilteredText === captionText) {
+      if (instance.lastProcessedText && instance.lastProcessedText === captions.textContent) {
         data.skipped = true;
         return false;
       } else { // These are new captions, unmute if muted
         instance.unmute(rule.muteMethod);
+        instance.lastProcessedText = '';
       }
 
       data.initialCall = false;
@@ -365,10 +365,7 @@ export default class WebAudio {
       }
     }
 
-    if (initialCall) {
-      if (data.filtered) { instance.lastFilteredText = captions.innerText; }
-      instance.lastProcessedText = captions.innerText;
-    }
+    if (initialCall) { instance.lastProcessedText = captions.textContent; }
   }
 
   replaceTextResult(string: string, stats: boolean = true) {
