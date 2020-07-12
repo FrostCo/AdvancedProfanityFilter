@@ -280,6 +280,7 @@ export default class WebAudio {
   initWatcherRule(rule: AudioRules) {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
     if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
+    if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
     this.initDisplaySelector(rule);
   }
