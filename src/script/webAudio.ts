@@ -307,7 +307,7 @@ export default class WebAudio {
     return !!(video && video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
 
-  processCues(cues: FilteredTextTrackCue[], rule: AudioRules) {
+  processCues(cues: FilteredVTTCue[], rule: AudioRules) {
     for (let i = 0; i < cues.length; i++) {
       let cue = cues[i];
       if (cue.hasOwnProperty('filtered')) { continue; }
@@ -494,9 +494,9 @@ export default class WebAudio {
               let filtered = false;
 
               for (let i = 0; i < textTrack.activeCues.length; i++) {
-                let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
+                let activeCue = textTrack.activeCues[i] as FilteredVTTCue;
                 if (!activeCue.hasOwnProperty('filtered')) {
-                  let cues = textTrack.cues as any as FilteredTextTrackCue[];
+                  let cues = textTrack.cues as any as FilteredVTTCue[];
                   instance.processCues(cues, rule);
                 }
                 if (activeCue.filtered) {
@@ -516,7 +516,7 @@ export default class WebAudio {
                   || rule.showSubtitles === Constants.ShowSubtitles.None
                 ) {
                   for (let i = 0; i < textTrack.activeCues.length; i++) {
-                    let activeCue = textTrack.activeCues[i] as FilteredTextTrackCue;
+                    let activeCue = textTrack.activeCues[i] as FilteredVTTCue;
                     activeCue.text = '';
                     activeCue.position = 100;
                     activeCue.size = 0;

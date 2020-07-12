@@ -43,7 +43,7 @@ interface DomainCfg {
   wordlist?: number;
 }
 
-interface FilteredTextTrackCue extends TextTrackCue {
+interface FilteredVTTCue extends VTTCue {
   filtered: boolean;
   originalText: string;
   position: number; // TextTrackCue
