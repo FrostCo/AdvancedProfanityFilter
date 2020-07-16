@@ -25,6 +25,7 @@ export default class WebAudio {
   youTubeAutoSubsUnmuteDelay: number;
 
   static readonly brTagRegExp = new RegExp('<br>', 'i');
+  static readonly defaultVideoSelector = 'video';
 
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.cueRuleIds = [];
@@ -136,7 +137,7 @@ export default class WebAudio {
     } else {
       if (this.muted) {
         if (this.youTubeAutoSubsMin > 0) {
-          let currentTime = document.getElementsByTagName('video')[0].currentTime;
+          let currentTime = document.getElementsByTagName(WebAudio.defaultVideoSelector)[0].currentTime;
           if (this.youTubeAutoSubsUnmuteDelay == null) { // Start tracking youTubeAutoSubsUnmuteDelay when next unfiltered word is found
             this.youTubeAutoSubsUnmuteDelay = currentTime;
           } else {
@@ -205,7 +206,7 @@ export default class WebAudio {
   }
 
   initCueRule(rule: AudioRule) {
-    if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
+    if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.defaultVideoSelector; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
   }
 
@@ -281,7 +282,7 @@ export default class WebAudio {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
     if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
     if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
-    if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
+    if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.defaultVideoSelector; }
     this.initDisplaySelector(rule);
   }
 
@@ -295,7 +296,7 @@ export default class WebAudio {
           chrome.runtime.sendMessage({ mute: true });
           break;
         case Constants.MuteMethods.Video:
-          if (!video) { video = document.querySelector('video'); }
+          if (!video) { video = document.querySelector(WebAudio.defaultVideoSelector); }
           if (video && video.volume != null) {
             this.volume = video.volume; // Save original volume
             video.volume = 0;
@@ -305,7 +306,7 @@ export default class WebAudio {
     }
   }
 
-  playing(video: HTMLMediaElement): boolean {
+  playing(video: HTMLVideoElement): boolean {
     return !!(video && video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
 
@@ -443,7 +444,7 @@ export default class WebAudio {
           chrome.runtime.sendMessage({ mute: false });
           break;
         case Constants.MuteMethods.Video:
-          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : 'video'); }
+          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
           if (video && video.volume != null) {
             video.volume = this.volume;
           }
@@ -552,7 +553,7 @@ export default class WebAudio {
   }
 
   youTubeAutoSubsMuteTimeout(instance) {
-    let video = window.document.querySelector('video');
+    let video = window.document.querySelector(WebAudio.defaultVideoSelector);
     if (video && instance.playing(video)) {
       instance.unmute();
     }
