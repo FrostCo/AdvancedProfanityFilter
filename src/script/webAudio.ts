@@ -95,7 +95,7 @@ export default class WebAudio {
       let result = this.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
         filtered = true;
-        this.mute(rule.muteMethod); // Mute the audio if we haven't already
+        this.mute(rule); // Mute the audio if we haven't already
 
         if (rule.filterSubtitles) {
           if (rule.ignoreMutations) { this.filter.stopObserving(); }
@@ -285,9 +285,10 @@ export default class WebAudio {
     this.initDisplaySelector(rule);
   }
 
-  mute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
+  mute(rule?: AudioRule, video?: HTMLVideoElement): void {
     if (!this.muted) {
       this.muted = true;
+      let muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
 
       switch(muteMethod) {
         case Constants.MuteMethods.Tab:
@@ -339,7 +340,7 @@ export default class WebAudio {
         data.skipped = true;
         return false;
       } else { // These are new captions, unmute if muted
-        instance.unmute(rule.muteMethod);
+        instance.unmute(rule);
         instance.lastProcessedText = '';
       }
 
@@ -359,7 +360,7 @@ export default class WebAudio {
       if (captions[textMethod] && captions[textMethod].trim()) {
         let result = instance.replaceTextResult(captions[textMethod]);
         if (result.modified) {
-          instance.mute(rule.muteMethod);
+          instance.mute(rule);
           data.filtered = true;
           if (rule.filterSubtitles) { captions[textMethod] = result.filtered; }
         }
@@ -432,16 +433,17 @@ export default class WebAudio {
     return false;
   }
 
-  unmute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
+  unmute(rule?: AudioRule, video?: HTMLVideoElement): void {
     if (this.muted) {
       this.muted = false;
+      let muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
 
       switch(muteMethod) {
         case Constants.MuteMethods.Tab:
           chrome.runtime.sendMessage({ mute: false });
           break;
         case Constants.MuteMethods.Video:
-          if (!video) { video = document.querySelector('video'); }
+          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : 'video'); }
           if (video && video.volume != null) {
             video.volume = this.volume;
           }
@@ -472,7 +474,7 @@ export default class WebAudio {
 
         if (data.filtered) { instance.filter.updateCounterBadge(); }
       } else if (rule.simpleUnmute) { // If there are no captions/subtitles: unmute and hide
-        instance.unmute(rule.muteMethod);
+        instance.unmute(rule, video);
         if (rule.showSubtitles > 0) { instance.hideSubtitles(rule); }
       }
     } else {
@@ -502,11 +504,11 @@ export default class WebAudio {
                 }
                 if (activeCue.filtered) {
                   filtered = true;
-                  instance.mute(rule.muteMethod, video);
+                  instance.mute(rule, video);
                 }
               }
 
-              if (!filtered) { instance.unmute(rule.muteMethod, video); }
+              if (!filtered) { instance.unmute(rule, video); }
 
               if (rule.videoCueHideCues) {
                 // Some sites don't care if textTrack.mode = 'hidden' and will continue showing.
@@ -537,7 +539,7 @@ export default class WebAudio {
                 }
               }
             } else { // No active cues
-              instance.unmute(rule.muteMethod, video);
+              instance.unmute(rule, video);
             }
           };
         }
