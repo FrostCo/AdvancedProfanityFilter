@@ -21,11 +21,12 @@ interface AudioRule {
   simpleUnmute?: boolean;           // [All] Simplify requirements for unmuting (Only require text match)
   subtitleSelector?: string;        // [Element,ElementChild,Watcher] *Used for Filtering*: node.querySelector()
   tagName?: string;                 // [Element*,ElementChild*] node.nodeName
+  unmuteDelay?: number;             // [Watcher] Positive number (in ms) to delay unmuting
   videoCueHideCues?: boolean;       // [Cue] Hide activeCues instead of textTrack.mode = 'hidden'
   videoCueLanguage?: string;        // [Cue] Language for video TextTrack
   videoCueRequireShowing?: boolean; // [Cue] Override global setting for muteCueRequireShowing
   videoCueSync?: number;            // [Cue] Adjust subtitle sync +/- (in seconds)
-  videoSelector?: string;           // [Cue,Watcher] Video selector: (Default: 'video')
+  videoSelector?: string;           // [Cue,Watcher] Selector for video, also used for volume muteMethod (Default: 'video')
 }
 
 interface ConfirmModalSettings {

@@ -15,6 +15,7 @@ export default class WebAudio {
   simpleUnmute: boolean;
   sites: { [site: string]: AudioRule[] };
   supportedPage: boolean;
+  unmuteTimeout: number;
   volume: number;
   watcherRuleIds: number[];
   wordlistId: number;
@@ -161,6 +162,22 @@ export default class WebAudio {
     }
   }
 
+  clearUnmuteTimeout(rule: AudioRule) {
+    if (rule.unmuteDelay && this.unmuteTimeout != null) {
+      clearTimeout(this.unmuteTimeout);
+      this.unmuteTimeout = null;
+    }
+  }
+
+  delayedUnmute(instance: WebAudio, rule: AudioRule) {
+    let delayed = true;
+    let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
+    if (video && instance.playing(video)) {
+      instance.unmute(rule, video, delayed);
+    }
+    this.unmuteTimeout = null;
+  }
+
   getVideoTextTrack(video: HTMLVideoElement, language: string, requireShowing: boolean = true) {
     if (video.textTracks && video.textTracks.length > 0) {
       for (let i = 0; i < video.textTracks.length; i++) {
@@ -296,7 +313,7 @@ export default class WebAudio {
           chrome.runtime.sendMessage({ mute: true });
           break;
         case Constants.MuteMethods.Video:
-          if (!video) { video = document.querySelector(WebAudio.defaultVideoSelector); }
+          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
           if (video && video.volume != null) {
             this.volume = video.volume; // Save original volume
             video.volume = 0;
@@ -304,6 +321,9 @@ export default class WebAudio {
           break;
       }
     }
+
+    // If we called mute and there is a delayedUnmute planned, clear it
+    if (rule && rule.unmuteDelay && this.unmuteTimeout) { this.clearUnmuteTimeout(rule); }
   }
 
   playing(video: HTMLVideoElement): boolean {
@@ -434,8 +454,16 @@ export default class WebAudio {
     return false;
   }
 
-  unmute(rule?: AudioRule, video?: HTMLVideoElement): void {
+  unmute(rule?: AudioRule, video?: HTMLVideoElement, delayed: boolean = false): void {
     if (this.muted) {
+      // If we haven't already delayed unmute and we should (rule.unmuteDelay), set the timeout
+      if (!delayed && rule && rule.unmuteDelay >= 0) {
+        if (this.unmuteTimeout == null) { // Use the first unmuteDelay (unless mute() is called again)
+          this.unmuteTimeout = window.setTimeout(this.delayedUnmute, rule.unmuteDelay, this, rule);
+        }
+        return;
+      }
+
       this.muted = false;
       let muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
 
