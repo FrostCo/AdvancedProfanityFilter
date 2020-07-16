@@ -15,14 +15,14 @@ export default class WebAudio {
   simpleUnmute: boolean;
   sites: { [site: string]: AudioRule[] };
   supportedPage: boolean;
-  unmuteDelay: number;
   volume: number;
   watcherRuleIds: number[];
   wordlistId: number;
   youTube: boolean;
-  youTubeAutoSubsMin: number;
   youTubeAutoSubsMax: number;
+  youTubeAutoSubsMin: number;
   youTubeAutoSubsTimeout: number;
+  youTubeAutoSubsUnmuteDelay: number;
 
   static readonly brTagRegExp = new RegExp('<br>', 'i');
 
@@ -42,11 +42,11 @@ export default class WebAudio {
       filter.cfg.customAudioSites = {};
     }
     this.sites = WebAudioSites.combineSites(filter.cfg.customAudioSites);
-    this.unmuteDelay = 0;
     this.volume = 1;
     this.wordlistId = filter.audioWordlistId;
-    this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;
     this.youTubeAutoSubsMax = filter.cfg.youTubeAutoSubsMax * 1000;
+    this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;
+    this.youTubeAutoSubsUnmuteDelay = 0;
 
     // Setup rules for current site
     this.rules = this.sites[filter.hostname];
@@ -126,7 +126,7 @@ export default class WebAudio {
     if (result.modified) {
       node.textContent = result.filtered;
       this.mute();
-      this.unmuteDelay = null;
+      this.youTubeAutoSubsUnmuteDelay = null;
       this.filter.updateCounterBadge();
 
       // Set a timer to unmute if a max time was specified
@@ -137,11 +137,11 @@ export default class WebAudio {
       if (this.muted) {
         if (this.youTubeAutoSubsMin > 0) {
           let currentTime = document.getElementsByTagName('video')[0].currentTime;
-          if (this.unmuteDelay == null) { // Start tracking unmuteDelay when next unfiltered word is found
-            this.unmuteDelay = currentTime;
+          if (this.youTubeAutoSubsUnmuteDelay == null) { // Start tracking youTubeAutoSubsUnmuteDelay when next unfiltered word is found
+            this.youTubeAutoSubsUnmuteDelay = currentTime;
           } else {
-            if (currentTime < this.unmuteDelay) { this.unmuteDelay = 0; } // Reset unmuteDelay if video reversed
-            if (currentTime > (this.unmuteDelay + this.youTubeAutoSubsMin)) { // Unmute if its been long enough
+            if (currentTime < this.youTubeAutoSubsUnmuteDelay) { this.youTubeAutoSubsUnmuteDelay = 0; } // Reset youTubeAutoSubsUnmuteDelay if video reversed
+            if (currentTime > (this.youTubeAutoSubsUnmuteDelay + this.youTubeAutoSubsMin)) { // Unmute if its been long enough
               this.unmute();
             }
           }
