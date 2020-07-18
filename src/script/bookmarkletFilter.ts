@@ -87,28 +87,31 @@ export default class BookmarkletFilter extends Filter {
 
   checkMutationTargetTextForProfanity(mutation) {
     if (!Page.isForbiddenNode(mutation.target)) {
-      let supported = filter.mutePage ? filter.audio.supportedNode(mutation.target) : false;
-      if (supported !== false && filter.audio.simpleUnmute) {
-        // Supported node. Check if a previously filtered node is being removed
-        if (
-          filter.audio.muted
-          && mutation.oldValue
-          && filter.audio.lastFilteredText
-          && filter.audio.lastFilteredText.includes(mutation.oldValue)
-        ) {
-          filter.audio.unmute();
-        }
-        filter.audio.clean(mutation.target, supported);
-      } else if (filter.mutePage && filter.audio.simpleUnmute && filter.audio.muted && !mutation.target.parentElement) {
-        // Check for removing a filtered subtitle (no parent)
-        if (filter.audio.lastFilteredText && filter.audio.lastFilteredText.includes(mutation.target.textContent)) {
-          filter.audio.unmute();
+      if (filter.mutePage) {
+        let supported = filter.audio.supportedNode(mutation.target);
+        if (supported !== false && filter.audio.simpleUnmute) {
+          // Supported node. Check if a previously filtered node is being removed
+          if (
+            filter.audio.muted
+            && mutation.oldValue
+            && filter.audio.lastFilteredText
+            && filter.audio.lastFilteredText.includes(mutation.oldValue)
+          ) {
+            filter.audio.unmute();
+          }
+          filter.audio.clean(mutation.target, supported);
+        } else if (filter.audio.simpleUnmute && filter.audio.muted && !mutation.target.parentElement) {
+          // Check for removing a filtered subtitle (no parent)
+          if (filter.audio.lastFilteredText && filter.audio.lastFilteredText.includes(mutation.target.textContent)) {
+            filter.audio.unmute();
+          }
+        } else if (!filter.audioOnly) { // Filter regular text
+          let result = this.replaceTextResult(mutation.target.data, this.wordlistId);
+          if (result.modified) { mutation.target.data = result.filtered; }
         }
       } else if (!filter.audioOnly) { // Filter regular text
         let result = this.replaceTextResult(mutation.target.data, this.wordlistId);
-        if (result.modified) {
-          mutation.target.data = result.filtered;
-        }
+        if (result.modified) { mutation.target.data = result.filtered; }
       }
     }
   }
