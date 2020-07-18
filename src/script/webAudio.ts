@@ -171,10 +171,7 @@ export default class WebAudio {
 
   delayedUnmute(instance: WebAudio, rule: AudioRule) {
     let delayed = true;
-    let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
-    if (video && instance.playing(video)) {
-      instance.unmute(rule, video, delayed);
-    }
+    instance.unmute(rule, null, delayed);
     this.unmuteTimeout = null;
   }
 
