@@ -68,7 +68,7 @@ export default class WebFilter extends Filter {
           supported !== false
           || node == filter.audio.lastFilteredNode
           || (
-            filter.audio.simpleUnmute
+            rule.simpleUnmute
             && filter.audio.lastFilteredText
             && filter.audio.lastFilteredText.includes(node.textContent)
           )
@@ -91,7 +91,7 @@ export default class WebFilter extends Filter {
       if (filter.mutePage) {
         let supported = filter.audio.supportedNode(mutation.target);
         let rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0]; // Use the matched rule, or the first rule
-        if (supported !== false && filter.audio.simpleUnmute) {
+        if (supported !== false && rule.simpleUnmute) {
           // Supported node. Check if a previously filtered node is being removed
           if (
             filter.audio.muted
@@ -102,7 +102,7 @@ export default class WebFilter extends Filter {
             filter.audio.unmute(rule);
           }
           filter.audio.clean(mutation.target, supported);
-        } else if (filter.audio.simpleUnmute && filter.audio.muted && !mutation.target.parentElement) {
+        } else if (rule.simpleUnmute && filter.audio.muted && !mutation.target.parentElement) {
           // Check for removing a filtered subtitle (no parent)
           if (filter.audio.lastFilteredText && filter.audio.lastFilteredText.includes(mutation.target.textContent)) {
             filter.audio.unmute(rule);

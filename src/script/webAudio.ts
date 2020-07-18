@@ -12,7 +12,6 @@ export default class WebAudio {
   lastProcessedText: string;
   muted: boolean;
   rules: AudioRule[];
-  simpleUnmute: boolean;
   sites: { [site: string]: AudioRule[] };
   supportedPage: boolean;
   unmuteTimeout: number;
@@ -255,7 +254,6 @@ export default class WebAudio {
       if (!rule.disabled) {
         // Setup rule defaults
         if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
-        if (rule.simpleUnmute != null) { this.simpleUnmute = true; }
 
         // Allow rules to override global settings
         if (rule.muteMethod == null) { rule.muteMethod = this.filter.cfg.muteMethod; }
@@ -290,6 +288,7 @@ export default class WebAudio {
 
   initTextRule(rule: AudioRule) {
     rule.tagName = '#text';
+    if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
   }
 
   initWatcherRule(rule: AudioRule) {
