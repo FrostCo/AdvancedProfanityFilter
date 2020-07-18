@@ -458,9 +458,9 @@ export default class WebAudio {
     if (this.muted) {
       // If we haven't already delayed unmute and we should (rule.unmuteDelay), set the timeout
       if (!delayed && rule && rule.unmuteDelay >= 0) {
-        if (this.unmuteTimeout == null) { // Use the first unmuteDelay (unless mute() is called again)
-          this.unmuteTimeout = window.setTimeout(this.delayedUnmute, rule.unmuteDelay, this, rule);
-        }
+        // If unmute is called after an unmute has been scheduled, remove the older one and schedule a new unmute
+        if (this.unmuteTimeout == null) { this.clearUnmuteTimeout(rule); }
+        this.unmuteTimeout = window.setTimeout(this.delayedUnmute, rule.unmuteDelay, this, rule);
         return;
       }
 
