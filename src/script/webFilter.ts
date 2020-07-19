@@ -63,16 +63,17 @@ export default class WebFilter extends Filter {
     if (filter.mutePage && filter.audio.muted) {
       mutation.removedNodes.forEach(node => {
         let supported = filter.audio.supportedNode(node);
+        let rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0]; // Use the matched rule, or the first rule
         if (
           supported !== false
           || node == filter.audio.lastFilteredNode
           || (
-            filter.audio.simpleUnmute
+            rule.simpleUnmute
             && filter.audio.lastFilteredText
             && filter.audio.lastFilteredText.includes(node.textContent)
           )
         ) {
-          filter.audio.unmute();
+          filter.audio.unmute(rule);
         }
       });
     }
@@ -87,29 +88,32 @@ export default class WebFilter extends Filter {
     // console.count('checkMutationTargetTextForProfanity'); // Benchmark: Filter
     // console.log('[APF] Process mutation.target:', mutation.target, mutation.target.data); // Debug: Filter - Mutation text
     if (!Page.isForbiddenNode(mutation.target)) {
-      let supported = filter.mutePage ? filter.audio.supportedNode(mutation.target) : false;
-      if (supported !== false && filter.audio.simpleUnmute) {
-        // Supported node. Check if a previously filtered node is being removed
-        if (
-          filter.audio.muted
-          && mutation.oldValue
-          && filter.audio.lastFilteredText
-          && filter.audio.lastFilteredText.includes(mutation.oldValue)
-        ) {
-          filter.audio.unmute();
-        }
-        filter.audio.clean(mutation.target, supported);
-      } else if (filter.mutePage && filter.audio.simpleUnmute && filter.audio.muted && !mutation.target.parentElement) {
-        // Check for removing a filtered subtitle (no parent)
-        if (filter.audio.lastFilteredText && filter.audio.lastFilteredText.includes(mutation.target.textContent)) {
-          filter.audio.unmute();
+      if (filter.mutePage) {
+        let supported = filter.audio.supportedNode(mutation.target);
+        let rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0]; // Use the matched rule, or the first rule
+        if (supported !== false && rule.simpleUnmute) {
+          // Supported node. Check if a previously filtered node is being removed
+          if (
+            filter.audio.muted
+            && mutation.oldValue
+            && filter.audio.lastFilteredText
+            && filter.audio.lastFilteredText.includes(mutation.oldValue)
+          ) {
+            filter.audio.unmute(rule);
+          }
+          filter.audio.clean(mutation.target, supported);
+        } else if (rule.simpleUnmute && filter.audio.muted && !mutation.target.parentElement) {
+          // Check for removing a filtered subtitle (no parent)
+          if (filter.audio.lastFilteredText && filter.audio.lastFilteredText.includes(mutation.target.textContent)) {
+            filter.audio.unmute(rule);
+          }
+        } else if (!filter.audioOnly) { // Filter regular text
+          let result = this.replaceTextResult(mutation.target.data, this.wordlistId);
+          if (result.modified) { mutation.target.data = result.filtered; }
         }
       } else if (!filter.audioOnly) { // Filter regular text
         let result = this.replaceTextResult(mutation.target.data, this.wordlistId);
-        if (result.modified) {
-          // console.log('[APF] Text target changed:', result.original, result.filtered); // Debug: Filter - Mutation text
-          mutation.target.data = result.filtered;
-        }
+        if (result.modified) { mutation.target.data = result.filtered; }
       }
     }
     // else { console.log('[APF] Forbidden mutation.target node:', mutation.target); } // Debug: Filter - Mutation text

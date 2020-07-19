@@ -12,19 +12,20 @@ export default class WebAudio {
   lastProcessedText: string;
   muted: boolean;
   rules: AudioRule[];
-  simpleUnmute: boolean;
   sites: { [site: string]: AudioRule[] };
   supportedPage: boolean;
-  unmuteDelay: number;
+  unmuteTimeout: number;
   volume: number;
   watcherRuleIds: number[];
   wordlistId: number;
   youTube: boolean;
-  youTubeAutoSubsMin: number;
   youTubeAutoSubsMax: number;
+  youTubeAutoSubsMin: number;
   youTubeAutoSubsTimeout: number;
+  youTubeAutoSubsUnmuteDelay: number;
 
   static readonly brTagRegExp = new RegExp('<br>', 'i');
+  static readonly DefaultVideoSelector = 'video';
 
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.cueRuleIds = [];
@@ -42,11 +43,11 @@ export default class WebAudio {
       filter.cfg.customAudioSites = {};
     }
     this.sites = WebAudioSites.combineSites(filter.cfg.customAudioSites);
-    this.unmuteDelay = 0;
     this.volume = 1;
     this.wordlistId = filter.audioWordlistId;
-    this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;
     this.youTubeAutoSubsMax = filter.cfg.youTubeAutoSubsMax * 1000;
+    this.youTubeAutoSubsMin = filter.cfg.youTubeAutoSubsMin;
+    this.youTubeAutoSubsUnmuteDelay = 0;
 
     // Setup rules for current site
     this.rules = this.sites[filter.hostname];
@@ -95,7 +96,7 @@ export default class WebAudio {
       let result = this.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
         filtered = true;
-        this.mute(rule.muteMethod); // Mute the audio if we haven't already
+        this.mute(rule); // Mute the audio if we haven't already
 
         if (rule.filterSubtitles) {
           if (rule.ignoreMutations) { this.filter.stopObserving(); }
@@ -126,7 +127,7 @@ export default class WebAudio {
     if (result.modified) {
       node.textContent = result.filtered;
       this.mute();
-      this.unmuteDelay = null;
+      this.youTubeAutoSubsUnmuteDelay = null;
       this.filter.updateCounterBadge();
 
       // Set a timer to unmute if a max time was specified
@@ -136,12 +137,12 @@ export default class WebAudio {
     } else {
       if (this.muted) {
         if (this.youTubeAutoSubsMin > 0) {
-          let currentTime = document.getElementsByTagName('video')[0].currentTime;
-          if (this.unmuteDelay == null) { // Start tracking unmuteDelay when next unfiltered word is found
-            this.unmuteDelay = currentTime;
+          let currentTime = document.getElementsByTagName(WebAudio.DefaultVideoSelector)[0].currentTime;
+          if (this.youTubeAutoSubsUnmuteDelay == null) { // Start tracking youTubeAutoSubsUnmuteDelay when next unfiltered word is found
+            this.youTubeAutoSubsUnmuteDelay = currentTime;
           } else {
-            if (currentTime < this.unmuteDelay) { this.unmuteDelay = 0; } // Reset unmuteDelay if video reversed
-            if (currentTime > (this.unmuteDelay + this.youTubeAutoSubsMin)) { // Unmute if its been long enough
+            if (currentTime < this.youTubeAutoSubsUnmuteDelay) { this.youTubeAutoSubsUnmuteDelay = 0; } // Reset youTubeAutoSubsUnmuteDelay if video reversed
+            if (currentTime > (this.youTubeAutoSubsUnmuteDelay + this.youTubeAutoSubsMin)) { // Unmute if its been long enough
               this.unmute();
             }
           }
@@ -158,6 +159,19 @@ export default class WebAudio {
         container.style.display = 'none';
       }
     }
+  }
+
+  clearUnmuteTimeout(rule: AudioRule) {
+    if (rule.unmuteDelay && this.unmuteTimeout != null) {
+      clearTimeout(this.unmuteTimeout);
+      this.unmuteTimeout = null;
+    }
+  }
+
+  delayedUnmute(instance: WebAudio, rule: AudioRule) {
+    let delayed = true;
+    instance.unmute(rule, null, delayed);
+    this.unmuteTimeout = null;
   }
 
   getVideoTextTrack(video: HTMLVideoElement, language: string, requireShowing: boolean = true) {
@@ -205,7 +219,7 @@ export default class WebAudio {
   }
 
   initCueRule(rule: AudioRule) {
-    if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
+    if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.DefaultVideoSelector; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
   }
 
@@ -240,7 +254,6 @@ export default class WebAudio {
       if (!rule.disabled) {
         // Setup rule defaults
         if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
-        if (rule.simpleUnmute != null) { this.simpleUnmute = true; }
 
         // Allow rules to override global settings
         if (rule.muteMethod == null) { rule.muteMethod = this.filter.cfg.muteMethod; }
@@ -275,26 +288,28 @@ export default class WebAudio {
 
   initTextRule(rule: AudioRule) {
     rule.tagName = '#text';
+    if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
   }
 
   initWatcherRule(rule: AudioRule) {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
     if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
     if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
-    if (rule.videoSelector === undefined) { rule.videoSelector = 'video'; }
+    if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.DefaultVideoSelector; }
     this.initDisplaySelector(rule);
   }
 
-  mute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
+  mute(rule?: AudioRule, video?: HTMLVideoElement): void {
     if (!this.muted) {
       this.muted = true;
+      let muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
 
       switch(muteMethod) {
         case Constants.MuteMethods.Tab:
           chrome.runtime.sendMessage({ mute: true });
           break;
         case Constants.MuteMethods.Video:
-          if (!video) { video = document.querySelector('video'); }
+          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.DefaultVideoSelector); }
           if (video && video.volume != null) {
             this.volume = video.volume; // Save original volume
             video.volume = 0;
@@ -302,9 +317,12 @@ export default class WebAudio {
           break;
       }
     }
+
+    // If we called mute and there is a delayedUnmute planned, clear it
+    if (rule && rule.unmuteDelay && this.unmuteTimeout) { this.clearUnmuteTimeout(rule); }
   }
 
-  playing(video: HTMLMediaElement): boolean {
+  playing(video: HTMLVideoElement): boolean {
     return !!(video && video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
 
@@ -339,7 +357,7 @@ export default class WebAudio {
         data.skipped = true;
         return false;
       } else { // These are new captions, unmute if muted
-        instance.unmute(rule.muteMethod);
+        instance.unmute(rule);
         instance.lastProcessedText = '';
       }
 
@@ -359,7 +377,7 @@ export default class WebAudio {
       if (captions[textMethod] && captions[textMethod].trim()) {
         let result = instance.replaceTextResult(captions[textMethod]);
         if (result.modified) {
-          instance.mute(rule.muteMethod);
+          instance.mute(rule);
           data.filtered = true;
           if (rule.filterSubtitles) { captions[textMethod] = result.filtered; }
         }
@@ -432,16 +450,25 @@ export default class WebAudio {
     return false;
   }
 
-  unmute(muteMethod: number = this.filter.cfg.muteMethod, video?: HTMLVideoElement): void {
+  unmute(rule?: AudioRule, video?: HTMLVideoElement, delayed: boolean = false): void {
     if (this.muted) {
+      // If we haven't already delayed unmute and we should (rule.unmuteDelay), set the timeout
+      if (!delayed && rule && rule.unmuteDelay >= 0) {
+        // If unmute is called after an unmute has been scheduled, remove the older one and schedule a new unmute
+        if (this.unmuteTimeout == null) { this.clearUnmuteTimeout(rule); }
+        this.unmuteTimeout = window.setTimeout(this.delayedUnmute, rule.unmuteDelay, this, rule);
+        return;
+      }
+
       this.muted = false;
+      let muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
 
       switch(muteMethod) {
         case Constants.MuteMethods.Tab:
           chrome.runtime.sendMessage({ mute: false });
           break;
         case Constants.MuteMethods.Video:
-          if (!video) { video = document.querySelector('video'); }
+          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.DefaultVideoSelector); }
           if (video && video.volume != null) {
             video.volume = this.volume;
           }
@@ -472,7 +499,7 @@ export default class WebAudio {
 
         if (data.filtered) { instance.filter.updateCounterBadge(); }
       } else if (rule.simpleUnmute) { // If there are no captions/subtitles: unmute and hide
-        instance.unmute(rule.muteMethod);
+        instance.unmute(rule, video);
         if (rule.showSubtitles > 0) { instance.hideSubtitles(rule); }
       }
     } else {
@@ -502,11 +529,11 @@ export default class WebAudio {
                 }
                 if (activeCue.filtered) {
                   filtered = true;
-                  instance.mute(rule.muteMethod, video);
+                  instance.mute(rule, video);
                 }
               }
 
-              if (!filtered) { instance.unmute(rule.muteMethod, video); }
+              if (!filtered) { instance.unmute(rule, video); }
 
               if (rule.videoCueHideCues) {
                 // Some sites don't care if textTrack.mode = 'hidden' and will continue showing.
@@ -537,7 +564,7 @@ export default class WebAudio {
                 }
               }
             } else { // No active cues
-              instance.unmute(rule.muteMethod, video);
+              instance.unmute(rule, video);
             }
           };
         }
@@ -550,7 +577,7 @@ export default class WebAudio {
   }
 
   youTubeAutoSubsMuteTimeout(instance) {
-    let video = window.document.querySelector('video');
+    let video = window.document.querySelector(WebAudio.DefaultVideoSelector);
     if (video && instance.playing(video)) {
       instance.unmute();
     }
