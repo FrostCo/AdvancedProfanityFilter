@@ -1163,7 +1163,6 @@ export default class OptionPage {
     }
 
     // Make sure word and substitution are different
-    // TODO: More in-depth checking might be needed
     if (word == sub) {
       OptionPage.showInputError(substitutionText, 'Word and substitution must be different.');
       return false;
@@ -1180,6 +1179,21 @@ export default class OptionPage {
         separators: wordMatchSeparators.checked,
         sub: sub
       };
+
+      // Check for endless substitution loop
+      if (wordOptions.matchMethod != Constants.MatchMethods.Regex) {
+        let subFilter = new Filter;
+        let words = {};
+        words[word] = wordOptions;
+        subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: Constants.FilterMethods.Substitute }, { words: words }));
+        subFilter.init();
+        let first = subFilter.replaceTextResult(word);
+        let second = subFilter.replaceTextResult(first.filtered);
+        if (first.filtered != second.filtered) {
+          OptionPage.showInputError(substitutionText, "Substitution can't contain word (causes an endless loop).");
+          return false;
+        }
+      }
 
       if (wordList.value === '') { // New record
         // console.log('Adding new word: ', word, wordOptions); // DEBUG
