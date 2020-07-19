@@ -1210,6 +1210,8 @@ export default class OptionPage {
         // Update states and Reset word form
         filter.rebuildWordlists();
         this.populateOptions();
+      } else {
+        OptionPage.showInputError(wordText, `'${word}' already in list.`);
       }
     } else {
       OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
