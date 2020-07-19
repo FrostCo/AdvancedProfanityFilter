@@ -740,6 +740,8 @@ export default class OptionPage {
     let word = wordList.value;
     let wordWordlistDiv = document.getElementById('wordWordlistDiv') as HTMLSelectElement;
     let wordlistSelections = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
+    OptionPage.hideInputError(wordText);
+    OptionPage.hideInputError(substitutionText);
 
     if (word == '') { // New word
       wordText.value = '';
@@ -1457,6 +1459,7 @@ document.getElementById('defaultWordSubstitutionText').addEventListener('change'
 // Words/Phrases
 document.getElementById('wordList').addEventListener('change', e => { option.populateWord(); });
 document.getElementById('wordText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
+document.getElementById('substitutionText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
 document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
 document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
 document.getElementById('wordRemoveAll').addEventListener('click', e => { option.confirm(e, 'removeAllWords'); });
