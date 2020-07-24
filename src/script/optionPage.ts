@@ -740,6 +740,8 @@ export default class OptionPage {
     let word = wordList.value;
     let wordWordlistDiv = document.getElementById('wordWordlistDiv') as HTMLSelectElement;
     let wordlistSelections = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
+    OptionPage.hideInputError(wordText);
+    OptionPage.hideInputError(substitutionText);
 
     if (word == '') { // New word
       wordText.value = '';
@@ -1163,7 +1165,6 @@ export default class OptionPage {
     }
 
     // Make sure word and substitution are different
-    // TODO: More in-depth checking might be needed
     if (word == sub) {
       OptionPage.showInputError(substitutionText, 'Word and substitution must be different.');
       return false;
@@ -1180,6 +1181,21 @@ export default class OptionPage {
         separators: wordMatchSeparators.checked,
         sub: sub
       };
+
+      // Check for endless substitution loop
+      if (wordOptions.matchMethod != Constants.MatchMethods.Regex) {
+        let subFilter = new Filter;
+        let words = {};
+        words[word] = wordOptions;
+        subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: Constants.FilterMethods.Substitute }, { words: words }));
+        subFilter.init();
+        let first = subFilter.replaceTextResult(word);
+        let second = subFilter.replaceTextResult(first.filtered);
+        if (first.filtered != second.filtered) {
+          OptionPage.showInputError(substitutionText, "Substitution can't contain word (causes an endless loop).");
+          return false;
+        }
+      }
 
       if (wordList.value === '') { // New record
         // console.log('Adding new word: ', word, wordOptions); // DEBUG
@@ -1210,6 +1226,8 @@ export default class OptionPage {
         // Update states and Reset word form
         filter.rebuildWordlists();
         this.populateOptions();
+      } else {
+        OptionPage.showInputError(wordText, `'${word}' already in list.`);
       }
     } else {
       OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
@@ -1441,6 +1459,7 @@ document.getElementById('defaultWordSubstitutionText').addEventListener('change'
 // Words/Phrases
 document.getElementById('wordList').addEventListener('change', e => { option.populateWord(); });
 document.getElementById('wordText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
+document.getElementById('substitutionText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
 document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
 document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
 document.getElementById('wordRemoveAll').addEventListener('click', e => { option.confirm(e, 'removeAllWords'); });
