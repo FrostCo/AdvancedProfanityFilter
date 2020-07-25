@@ -4,7 +4,112 @@ import WebConfig from './webConfig';
 import { formatNumber } from './lib/helper';
 
 ////
-// Actions and messaging
+// Functions
+//
+// Add selected word/phrase and reload page (unless already present)
+async function processSelection(action: string, selection: string) {
+  let cfg = await WebConfig.build('words');
+  let result = cfg[action](selection);
+
+  if (result) {
+    let saved = await cfg.save();
+    if (!saved) { chrome.tabs.reload(); }
+  }
+}
+
+async function toggleDomain(hostname: string, action: string) {
+  let cfg = await WebConfig.build(['domains', 'enabledDomainsOnly']);
+  let domain = Domain.byHostname(hostname, cfg.domains);
+
+  switch(action) {
+    case 'disable':
+      cfg.enabledDomainsOnly ? domain.enabled = !domain.enabled : domain.disabled = !domain.disabled; break;
+    case 'advanced':
+      domain.advanced = !domain.advanced; break;
+  }
+
+  let error = await domain.save(cfg);
+  if (!error) { chrome.tabs.reload(); }
+}
+
+async function updateMigrations(previousVersion) {
+  if (DataMigration.migrationNeeded(previousVersion)) {
+    let cfg = await WebConfig.build();
+    let migration = new DataMigration(cfg);
+    let migrated = migration.byVersion(previousVersion);
+    if (migrated) cfg.save();
+  }
+}
+
+////
+// Context menu
+//
+chrome.contextMenus.removeAll(function() {
+  chrome.contextMenus.create({
+    id: 'addSelection',
+    title: 'Add selection to filter',
+    contexts: ['selection'],
+    documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+  });
+
+  chrome.contextMenus.create({
+    id: 'removeSelection',
+    title: 'Remove selection from filter',
+    contexts: ['selection'],
+    documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+  });
+
+  chrome.contextMenus.create({
+    id: 'toggleFilterForDomain',
+    title: 'Toggle filter for domain',
+    contexts: ['all'],
+    documentUrlPatterns: ['http://*/*', 'https://*/*']
+  });
+
+  chrome.contextMenus.create({
+    id: 'toggleAdvancedModeForDomain',
+    title: 'Toggle advanced mode for domain',
+    contexts: ['all'],
+    documentUrlPatterns: ['http://*/*', 'https://*/*']
+  });
+
+  chrome.contextMenus.create({
+    id: 'options',
+    title: 'Options',
+    contexts: ['all']
+  });
+});
+
+////
+// Listeners
+//
+chrome.contextMenus.onClicked.addListener(function(info, tab) {
+  switch(info.menuItemId) {
+    case 'addSelection':
+      processSelection('addWord', info.selectionText); break;
+    case 'removeSelection':
+      processSelection('removeWord', info.selectionText); break;
+    case 'toggleFilterForDomain': {
+      let url = new URL(tab.url);
+      toggleDomain(url.hostname, 'disable'); break;
+    }
+    case 'toggleAdvancedModeForDomain': {
+      let url = new URL(tab.url);
+      toggleDomain(url.hostname, 'advanced'); break;
+    }
+    case 'options':
+      chrome.runtime.openOptionsPage(); break;
+  }
+});
+
+chrome.notifications.onClicked.addListener(function(notificationId) {
+  switch(notificationId) {
+    case 'extensionUpdate':
+      chrome.notifications.clear('extensionUpdate');
+      chrome.tabs.create({ url: 'https://github.com/richardfrost/AdvancedProfanityFilter/releases' });
+      break;
+  }
+});
 
 // Actions for extension install or upgrade
 chrome.runtime.onInstalled.addListener(function(details){
@@ -74,109 +179,3 @@ chrome.runtime.onMessage.addListener(
     }
   }
 );
-
-////
-// Context menu
-//
-// Add selected word/phrase and reload page (unless already present)
-async function processSelection(action: string, selection: string) {
-  let cfg = await WebConfig.build('words');
-  let result = cfg[action](selection);
-
-  if (result) {
-    let saved = await cfg.save();
-    if (!saved) { chrome.tabs.reload(); }
-  }
-}
-
-async function toggleDomain(hostname: string, action: string) {
-  let cfg = await WebConfig.build(['domains', 'enabledDomainsOnly']);
-  let domain = Domain.byHostname(hostname, cfg.domains);
-
-  switch(action) {
-    case 'disable':
-      cfg.enabledDomainsOnly ? domain.enabled = !domain.enabled : domain.disabled = !domain.disabled; break;
-    case 'advanced':
-      domain.advanced = !domain.advanced; break;
-  }
-
-  let error = await domain.save(cfg);
-  if (!error) { chrome.tabs.reload(); }
-}
-
-async function updateMigrations(previousVersion) {
-  if (DataMigration.migrationNeeded(previousVersion)) {
-    let cfg = await WebConfig.build();
-    let migration = new DataMigration(cfg);
-    let migrated = migration.byVersion(previousVersion);
-    if (migrated) cfg.save();
-  }
-}
-
-////
-// Menu Items
-chrome.contextMenus.removeAll(function() {
-  chrome.contextMenus.create({
-    id: 'addSelection',
-    title: 'Add selection to filter',
-    contexts: ['selection'],
-    documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'removeSelection',
-    title: 'Remove selection from filter',
-    contexts: ['selection'],
-    documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'toggleFilterForDomain',
-    title: 'Toggle filter for domain',
-    contexts: ['all'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'toggleAdvancedModeForDomain',
-    title: 'Toggle advanced mode for domain',
-    contexts: ['all'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'options',
-    title: 'Options',
-    contexts: ['all']
-  });
-});
-
-////
-// Listeners
-chrome.contextMenus.onClicked.addListener(function(info, tab) {
-  switch(info.menuItemId) {
-    case 'addSelection':
-      processSelection('addWord', info.selectionText); break;
-    case 'removeSelection':
-      processSelection('removeWord', info.selectionText); break;
-    case 'toggleFilterForDomain': {
-      let url = new URL(tab.url);
-      toggleDomain(url.hostname, 'disable'); break;
-    }
-    case 'toggleAdvancedModeForDomain': {
-      let url = new URL(tab.url);
-      toggleDomain(url.hostname, 'advanced'); break;
-    }
-    case 'options':
-      chrome.runtime.openOptionsPage(); break;
-  }
-});
-
-chrome.notifications.onClicked.addListener(function(notificationId) {
-  switch(notificationId) {
-    case 'extensionUpdate':
-      chrome.notifications.clear('extensionUpdate');
-      chrome.tabs.create({ url: 'https://github.com/richardfrost/AdvancedProfanityFilter/releases' });
-      break;
-  }
-});
