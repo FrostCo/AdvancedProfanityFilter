@@ -46,7 +46,7 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
     // chrome.runtime.openOptionsPage();
 
     // Run any data migrations on update
-    updateMigrations(details.previousVersion);
+    runUpdateMigrations(details.previousVersion);
 
     // Display update notification
     chrome.storage.sync.get({ showUpdateNotification: true }, function(data) {
@@ -127,7 +127,7 @@ async function toggleDomain(hostname: string, action: string) {
   if (!error) { chrome.tabs.reload(); }
 }
 
-async function updateMigrations(previousVersion) {
+async function runUpdateMigrations(previousVersion) {
   if (DataMigration.migrationNeeded(previousVersion)) {
     let cfg = await WebConfig.build();
     let migration = new DataMigration(cfg);
