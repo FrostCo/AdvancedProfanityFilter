@@ -29,6 +29,16 @@ interface AudioRule {
   videoSelector?: string;           // [Cue,Watcher] Selector for video, also used for volume muteMethod (Default: 'video')
 }
 
+interface BackgroundData {
+  disabledTab?: boolean;
+}
+
+interface BackgroundStorage {
+  tabs?: {
+    [tabId: number]: TabStorageOptions;
+  };
+}
+
 interface ConfirmModalSettings {
   backup?: boolean;
   content?: string;
@@ -53,6 +63,7 @@ interface FilteredVTTCue extends VTTCue {
 
 interface Message {
   advanced?: boolean;
+  backgroundData?: boolean;
   clearMute?: boolean;
   counter?: number;
   disabled?: boolean;
@@ -80,6 +91,12 @@ interface Summary {
     filtered: string;
     count: number;
   };
+}
+
+interface TabStorageOptions {
+  id?: number;
+  disabledOnce?: boolean;
+  registeredAt?: number;
 }
 
 interface Version {

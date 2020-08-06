@@ -3,6 +3,10 @@ import Domain from './domain';
 import WebConfig from './webConfig';
 import { formatNumber } from './lib/helper';
 
+let Storage: BackgroundStorage = {
+  tabs: {},
+};
+
 ////
 // Functions
 //
@@ -10,6 +14,9 @@ function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.
   switch(info.menuItemId) {
     case 'addSelection':
       processSelection('addWord', info.selectionText); break;
+    case 'disableTabOnce':
+      storeTab(tab.id, { disabledOnce: true });
+      chrome.tabs.reload(); break;
     case 'removeSelection':
       processSelection('removeWord', info.selectionText); break;
     case 'toggleFilterForDomain': {
@@ -66,6 +73,15 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
 function onMessage(request: Message, sender, sendResponse) {
   if (request.disabled === true) {
     chrome.browserAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
+  } else if (request.backgroundData === true) {
+    let response: BackgroundData = { disabledTab: false };
+    if (Storage.tabs[sender.tab.id]) {
+      if (Storage.tabs[sender.tab.id].disabledOnce) {
+        response.disabledTab = true;
+        storeTab(sender.tab.id, { disabledOnce: false });
+      }
+    }
+    sendResponse(response);
   } else {
     // Set badge color
     // chrome.browserAction.setBadgeBackgroundColor({ color: [138, 43, 226, 255], tabId: sender.tab.id }); // Blue Violet
@@ -112,6 +128,29 @@ async function processSelection(action: string, selection: string) {
   }
 }
 
+function storeTab(id: number, options: TabStorageOptions = {}) {
+  let tabOptions: TabStorageOptions = {};
+  if (Storage.tabs.hasOwnProperty(id)) { // Existing tab
+    Object.assign(tabOptions, Storage.tabs[id], options) as TabStorageOptions;
+  } else { // New tab
+    Object.assign(tabOptions, { disabledOnce: false }, options) as TabStorageOptions;
+    tabOptions.id = id;
+    tabOptions.registeredAt = new Date().getTime();
+  }
+  Storage.tabs[id] = tabOptions;
+}
+
+function tabsOnActivated(tab: chrome.tabs.TabActiveInfo) {
+  let tabId = tab ? tab.tabId : chrome.tabs.TAB_ID_NONE;
+  if (!Storage.tabs.hasOwnProperty(tabId)) {
+    storeTab(tabId);
+  }
+}
+
+function tabsOnRemoved(tabId: number) {
+  if (Storage.tabs.hasOwnProperty(tabId)) { delete Storage.tabs[tabId]; }
+}
+
 async function toggleDomain(hostname: string, action: string) {
   let cfg = await WebConfig.build(['domains', 'enabledDomainsOnly']);
   let domain = Domain.byHostname(hostname, cfg.domains);
@@ -155,6 +194,13 @@ chrome.contextMenus.removeAll(function() {
   });
 
   chrome.contextMenus.create({
+    id: 'disableTabOnce',
+    title: 'Disable once',
+    contexts: ['all'],
+    documentUrlPatterns: ['http://*/*', 'https://*/*']
+  });
+
+  chrome.contextMenus.create({
     id: 'toggleFilterForDomain',
     title: 'Toggle filter for domain',
     contexts: ['all'],
@@ -182,3 +228,5 @@ chrome.contextMenus.onClicked.addListener((info, tab) => { contextMenusOnClick(i
 chrome.notifications.onClicked.addListener(notificationId => { notificationsOnClick(notificationId); });
 chrome.runtime.onInstalled.addListener(details => { onInstalled(details); });
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { onMessage(request, sender, sendResponse); });
+chrome.tabs.onActivated.addListener(tab => { tabsOnActivated(tab); });
+chrome.tabs.onRemoved.addListener(tabId => { tabsOnRemoved(tabId); });
