@@ -95,6 +95,7 @@ interface Summary {
 
 interface TabStorageOptions {
   id?: number;
+  disabled?: boolean;
   disabledOnce?: boolean;
   registeredAt?: number;
 }

@@ -22,6 +22,8 @@ function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.
       let url = new URL(tab.url);
       toggleDomain(url.hostname, 'disable'); break;
     }
+    case 'toggleTabDisable':
+      toggleTabDisable(tab.id); break;
     case 'toggleAdvancedModeForDomain': {
       let url = new URL(tab.url);
       toggleDomain(url.hostname, 'advanced'); break;
@@ -84,9 +86,9 @@ function onMessage(request: Message, sender, sendResponse) {
   } else if (request.backgroundData === true) {
     let response: BackgroundData = { disabledTab: false };
     let tabOptions = getTabOptions(sender.tab.id);
-    if (tabOptions.disabledOnce) {
+    if (tabOptions.disabled || tabOptions.disabledOnce) {
       response.disabledTab = true;
-      tabOptions.disabledOnce = false;
+      if (tabOptions.disabledOnce) { tabOptions.disabledOnce = false; }
     }
     sendResponse(response);
   } else {
@@ -176,6 +178,12 @@ async function toggleDomain(hostname: string, action: string) {
   if (!error) { chrome.tabs.reload(); }
 }
 
+function toggleTabDisable(id: number) {
+  let tabOptions = getTabOptions(id);
+  tabOptions.disabled = !tabOptions.disabled;
+  chrome.tabs.reload();
+}
+
 async function runUpdateMigrations(previousVersion) {
   if (DataMigration.migrationNeeded(previousVersion)) {
     let cfg = await WebConfig.build();
@@ -206,6 +214,13 @@ chrome.contextMenus.removeAll(function() {
   chrome.contextMenus.create({
     id: 'disableTabOnce',
     title: 'Disable once',
+    contexts: ['all'],
+    documentUrlPatterns: ['http://*/*', 'https://*/*']
+  });
+
+  chrome.contextMenus.create({
+    id: 'toggleTabDisable',
+    title: 'Toggle for tab',
     contexts: ['all'],
     documentUrlPatterns: ['http://*/*', 'https://*/*']
   });
