@@ -18,16 +18,12 @@ function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.
       disableTabOnce(tab.id); break;
     case 'removeSelection':
       processSelection('removeWord', info.selectionText); break;
-    case 'toggleFilterForDomain': {
-      let url = new URL(tab.url);
-      toggleDomain(url.hostname, 'disable'); break;
-    }
+    case 'toggleAdvancedForDomain':
+      toggleDomain((new URL(tab.url)).hostname, 'advanced'); break;
+    case 'toggleForDomain':
+      toggleDomain((new URL(tab.url)).hostname, 'disable'); break;
     case 'toggleTabDisable':
       toggleTabDisable(tab.id); break;
-    case 'toggleAdvancedModeForDomain': {
-      let url = new URL(tab.url);
-      toggleDomain(url.hostname, 'advanced'); break;
-    }
     case 'options':
       chrome.runtime.openOptionsPage(); break;
   }
@@ -226,15 +222,15 @@ chrome.contextMenus.removeAll(function() {
   });
 
   chrome.contextMenus.create({
-    id: 'toggleFilterForDomain',
-    title: 'Toggle filter for domain',
+    id: 'toggleForDomain',
+    title: 'Toggle for domain',
     contexts: ['all'],
     documentUrlPatterns: ['http://*/*', 'https://*/*']
   });
 
   chrome.contextMenus.create({
-    id: 'toggleAdvancedModeForDomain',
-    title: 'Toggle advanced mode for domain',
+    id: 'toggleAdvancedForDomain',
+    title: 'Toggle advanced for domain',
     contexts: ['all'],
     documentUrlPatterns: ['http://*/*', 'https://*/*']
   });
