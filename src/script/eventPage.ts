@@ -16,6 +16,8 @@ function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.
       processSelection('addWord', info.selectionText); break;
     case 'disableTabOnce':
       disableTabOnce(tab.id); break;
+    case 'options':
+      chrome.runtime.openOptionsPage(); break;
     case 'removeSelection':
       processSelection('removeWord', info.selectionText); break;
     case 'toggleAdvancedForDomain':
@@ -24,8 +26,6 @@ function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.
       toggleDomain((new URL(tab.url)).hostname, 'disable'); break;
     case 'toggleTabDisable':
       toggleTabDisable(tab.id); break;
-    case 'options':
-      chrome.runtime.openOptionsPage(); break;
   }
 }
 
@@ -133,6 +133,15 @@ async function processSelection(action: string, selection: string) {
   }
 }
 
+async function runUpdateMigrations(previousVersion) {
+  if (DataMigration.migrationNeeded(previousVersion)) {
+    let cfg = await WebConfig.build();
+    let migration = new DataMigration(cfg);
+    let migrated = migration.byVersion(previousVersion);
+    if (migrated) cfg.save();
+  }
+}
+
 function saveNewTabOptions(id: number, options: TabStorageOptions = {}): TabStorageOptions {
   const _defaults: TabStorageOptions = { disabled: false, disabledOnce: false };
   let tabOptions = Object.assign({}, _defaults, options) as TabStorageOptions;
@@ -178,15 +187,6 @@ function toggleTabDisable(id: number) {
   let tabOptions = getTabOptions(id);
   tabOptions.disabled = !tabOptions.disabled;
   chrome.tabs.reload();
-}
-
-async function runUpdateMigrations(previousVersion) {
-  if (DataMigration.migrationNeeded(previousVersion)) {
-    let cfg = await WebConfig.build();
-    let migration = new DataMigration(cfg);
-    let migrated = migration.byVersion(previousVersion);
-    if (migrated) cfg.save();
-  }
 }
 
 ////
