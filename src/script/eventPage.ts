@@ -15,8 +15,7 @@ function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.
     case 'addSelection':
       processSelection('addWord', info.selectionText); break;
     case 'disableTabOnce':
-      storeTab(tab.id, { disabledOnce: true });
-      chrome.tabs.reload(); break;
+      disableTabOnce(tab.id); break;
     case 'removeSelection':
       processSelection('removeWord', info.selectionText); break;
     case 'toggleFilterForDomain': {
@@ -30,6 +29,15 @@ function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.
     case 'options':
       chrome.runtime.openOptionsPage(); break;
   }
+}
+
+function disableTabOnce(id: number): void {
+  saveTabOptions(id, { disabledOnce: true });
+  chrome.tabs.reload();
+}
+
+function getTabOptions(id: number): TabStorageOptions {
+  return storedTab(id) ? Storage.tabs[id] : saveNewTabOptions(id);
 }
 
 function notificationsOnClick(notificationId: string) {
@@ -75,11 +83,10 @@ function onMessage(request: Message, sender, sendResponse) {
     chrome.browserAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
   } else if (request.backgroundData === true) {
     let response: BackgroundData = { disabledTab: false };
-    if (Storage.tabs[sender.tab.id]) {
-      if (Storage.tabs[sender.tab.id].disabledOnce) {
-        response.disabledTab = true;
-        storeTab(sender.tab.id, { disabledOnce: false });
-      }
+    let tabOptions = getTabOptions(sender.tab.id);
+    if (tabOptions.disabledOnce) {
+      response.disabledTab = true;
+      tabOptions.disabledOnce = false;
     }
     sendResponse(response);
   } else {
@@ -128,27 +135,30 @@ async function processSelection(action: string, selection: string) {
   }
 }
 
-function storeTab(id: number, options: TabStorageOptions = {}) {
-  let tabOptions: TabStorageOptions = {};
-  if (Storage.tabs.hasOwnProperty(id)) { // Existing tab
-    Object.assign(tabOptions, Storage.tabs[id], options) as TabStorageOptions;
-  } else { // New tab
-    Object.assign(tabOptions, { disabledOnce: false }, options) as TabStorageOptions;
-    tabOptions.id = id;
-    tabOptions.registeredAt = new Date().getTime();
-  }
+function saveNewTabOptions(id: number, options: TabStorageOptions = {}): TabStorageOptions {
+  const _defaults: TabStorageOptions = { disabled: false, disabledOnce: false };
+  let tabOptions = Object.assign({}, _defaults, options) as TabStorageOptions;
+  tabOptions.id = id;
+  tabOptions.registeredAt = new Date().getTime();
   Storage.tabs[id] = tabOptions;
+  return tabOptions;
+}
+
+function saveTabOptions(id: number, options: TabStorageOptions = {}): TabStorageOptions {
+  return storedTab(id) ? Object.assign(getTabOptions(id), options) : saveNewTabOptions(id, options);
+}
+
+function storedTab(id: number): boolean {
+  return Storage.tabs.hasOwnProperty(id);
 }
 
 function tabsOnActivated(tab: chrome.tabs.TabActiveInfo) {
   let tabId = tab ? tab.tabId : chrome.tabs.TAB_ID_NONE;
-  if (!Storage.tabs.hasOwnProperty(tabId)) {
-    storeTab(tabId);
-  }
+  if (!storedTab(tabId)) { saveTabOptions(tabId); }
 }
 
 function tabsOnRemoved(tabId: number) {
-  if (Storage.tabs.hasOwnProperty(tabId)) { delete Storage.tabs[tabId]; }
+  if (storedTab(tabId)) { delete Storage.tabs[tabId]; }
 }
 
 async function toggleDomain(hostname: string, action: string) {
