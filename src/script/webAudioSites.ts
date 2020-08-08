@@ -50,6 +50,7 @@ export default class WebAudioSites {
       { mode: 'cue', videoCueLanguage: 'en' }
     ],
     'www.netflix.com': [{ mode: 'element', className: 'player-timedtext-text-container', subtitleSelector: 'span', tagName: 'DIV' }],
+    'www.peacocktv.com': [{ mode: 'elementChild', parentSelector: 'div.video-player__subtitles > div', subtitleSelector: 'SPAN > SPAN', tagName: 'div' }],
     'www.philo.com': [{ mode: 'cue' }],
     'app.plex.tv': [
       { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' },
