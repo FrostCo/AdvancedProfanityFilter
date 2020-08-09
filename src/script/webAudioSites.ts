@@ -26,6 +26,7 @@ export default class WebAudioSites {
     'gem.cbc.ca': [{ className: 'jw-text-track-container', mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
     'www.cbs.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'www.crackle.com': [{ mode: 'elementChild', ignoreMutations: true, parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
+    'www.criterionchannel.com': [{ mode: 'cue', videoCueHideCues: true, videoCueRequireShowing: false, iframe: true }],
     'www.cwtv.com': [{ className: 'ttr-container', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
     'www.dishanywhere.com': [
       { mode: 'element', className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' },
