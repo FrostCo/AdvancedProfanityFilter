@@ -67,6 +67,7 @@ export default class WebFilter extends Filter {
         if (
           supported !== false
           || node == filter.audio.lastFilteredNode
+          || node.contains(filter.audio.lastFilteredNode)
           || (
             rule.simpleUnmute
             && filter.audio.lastFilteredText
@@ -191,8 +192,10 @@ export default class WebFilter extends Filter {
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
     // console.log('[APF] Config loaded', this.cfg); // Debug: General
 
+    let backgroundData: BackgroundData = await this.getBackgroundData();
+
     // Use domain-specific settings
-    let message: Message = { disabled: (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
+    let message: Message = { disabled: backgroundData.disabledTab || (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
     if (message.disabled) {
       // console.log(`[APF] Disabled page: ${this.hostname} - exiting`); // Debug: General
       chrome.runtime.sendMessage(message);
@@ -254,6 +257,15 @@ export default class WebFilter extends Filter {
         this.summary[word.value] = { filtered: result, count: 1 };
       }
     }
+  }
+
+  getBackgroundData() {
+    return new Promise(function(resolve, reject) {
+      chrome.runtime.sendMessage({ backgroundData: true }, function(response) {
+        if (!response) { response = { disabledTab: false }; }
+        resolve(response);
+      });
+    });
   }
 
   // Listen for data requests from Popup

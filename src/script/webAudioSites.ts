@@ -26,6 +26,8 @@ export default class WebAudioSites {
     'gem.cbc.ca': [{ className: 'jw-text-track-container', mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
     'www.cbs.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'www.crackle.com': [{ mode: 'elementChild', ignoreMutations: true, parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
+    'www.criterionchannel.com': [{ mode: 'cue', videoCueHideCues: true, videoCueRequireShowing: false, iframe: true }],
+    'www.cwtv.com': [{ className: 'ttr-container', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
     'www.dishanywhere.com': [
       { mode: 'element', className: 'bmpui-ui-subtitle-label', tagName: 'SPAN' },
       { mode: 'element', className: 'bmpui-subtitle-region-container', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' }
@@ -50,6 +52,7 @@ export default class WebAudioSites {
       { mode: 'cue', videoCueLanguage: 'en' }
     ],
     'www.netflix.com': [{ mode: 'element', className: 'player-timedtext-text-container', subtitleSelector: 'span', tagName: 'DIV' }],
+    'www.peacocktv.com': [{ mode: 'elementChild', parentSelector: 'div.video-player__subtitles > div', subtitleSelector: 'SPAN > SPAN', tagName: 'div' }],
     'www.philo.com': [{ mode: 'cue' }],
     'app.plex.tv': [
       { mode: 'element', dataPropPresent: 'dialogueId', subtitleSelector: 'span > span', tagName: 'DIV' },
