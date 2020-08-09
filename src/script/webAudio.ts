@@ -192,6 +192,20 @@ export default class WebAudio {
     }
   }
 
+  // Some sites ignore textTrack.mode = 'hidden' and will still show captions
+  // This is a fallback (not preferred) method that can be used for hiding the cues
+  hideCue(rule: AudioRule, cue: FilteredVTTCue) {
+    if (
+      (rule.showSubtitles === Constants.ShowSubtitles.Filtered && !cue.filtered)
+      || (rule.showSubtitles === Constants.ShowSubtitles.Unfiltered && cue.filtered)
+      || rule.showSubtitles === Constants.ShowSubtitles.None
+    ) {
+      cue.text = '';
+      cue.position = 100;
+      cue.size = 0;
+    }
+  }
+
   hideSubtitles(rule: AudioRule, subtitles?) {
     if (rule.displaySelector) {
       let container = document.querySelector(rule.displaySelector) as HTMLElement;
@@ -344,6 +358,8 @@ export default class WebAudio {
       } else {
         cue.filtered = false;
       }
+
+      if (rule.videoCueHideCues) { this.hideCue(rule, cue); }
     }
   }
 
@@ -527,6 +543,7 @@ export default class WebAudio {
                   let cues = textTrack.cues as any as FilteredVTTCue[];
                   instance.processCues(cues, rule);
                 }
+
                 if (activeCue.filtered) {
                   filtered = true;
                   instance.mute(rule, video);
@@ -535,22 +552,7 @@ export default class WebAudio {
 
               if (!filtered) { instance.unmute(rule, video); }
 
-              if (rule.videoCueHideCues) {
-                // Some sites don't care if textTrack.mode = 'hidden' and will continue showing.
-                // This is a fallback (not preferred) method that can be used for hiding the cues.
-                if (
-                  (rule.showSubtitles === Constants.ShowSubtitles.Filtered && !filtered)
-                  || (rule.showSubtitles === Constants.ShowSubtitles.Unfiltered && filtered)
-                  || rule.showSubtitles === Constants.ShowSubtitles.None
-                ) {
-                  for (let i = 0; i < textTrack.activeCues.length; i++) {
-                    let activeCue = textTrack.activeCues[i] as FilteredVTTCue;
-                    activeCue.text = '';
-                    activeCue.position = 100;
-                    activeCue.size = 0;
-                  }
-                }
-              } else {
+              if (!rule.videoCueHideCues) {
                 if (filtered) {
                   switch (rule.showSubtitles) {
                     case Constants.ShowSubtitles.Filtered: textTrack.mode = 'showing'; break;

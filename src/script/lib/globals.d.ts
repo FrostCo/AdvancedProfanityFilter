@@ -22,7 +22,7 @@ interface AudioRule {
   subtitleSelector?: string;        // [Element,ElementChild,Watcher] *Used for Filtering*: node.querySelector()
   tagName?: string;                 // [Element*,ElementChild*] node.nodeName
   unmuteDelay?: number;             // [Element,ElementChild,Watcher] Positive number (in ms) to delay unmuting
-  videoCueHideCues?: boolean;       // [Cue] Hide activeCues instead of textTrack.mode = 'hidden'
+  videoCueHideCues?: boolean;       // [Cue] Remove/hide cues instead of setting textTrack.mode = 'hidden'
   videoCueLanguage?: string;        // [Cue] Language for video TextTrack
   videoCueRequireShowing?: boolean; // [Cue] Override global setting for muteCueRequireShowing
   videoCueSync?: number;            // [Cue] Adjust subtitle sync +/- (in seconds)
