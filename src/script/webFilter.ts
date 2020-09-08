@@ -19,6 +19,7 @@ export default class WebFilter extends Filter {
   location: Location | URL;
   mutePage: boolean;
   observer: MutationObserver;
+  processNode: Function;
   shadowObserver: MutationObserver;
   summary: Summary;
 
@@ -31,17 +32,22 @@ export default class WebFilter extends Filter {
   }
 
   advancedReplaceText(node, wordlistId: number, stats = true) {
-    filter.wordlists[wordlistId].regExps.forEach((regExp) => {
-      // @ts-ignore - External library function
-      findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: function(portion, match) {
-        // console.log('[APF] Advanced node match:', node.textContent); // Debug: Filter - Advanced match
-        if (portion.index === 0) { // Replace the whole match on the first portion and skip the rest
-          return filter.replaceText(match[0], wordlistId, stats);
-        } else {
-          return '';
-        }
-      } });
-    });
+    if (node.parentNode || node === document) {
+      filter.wordlists[wordlistId].regExps.forEach((regExp) => {
+        // @ts-ignore - External library function
+        findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: function(portion, match) {
+          // console.log('[APF] Advanced node match:', node.textContent); // Debug: Filter - Advanced match
+          if (portion.index === 0) { // Replace the whole match on the first portion and skip the rest
+            return filter.replaceText(match[0], wordlistId, stats);
+          } else {
+            return '';
+          }
+        } });
+      });
+    } else {
+      // ?: Might want to add support for processNode()
+      this.cleanText(node, wordlistId, stats);
+    }
   }
 
   checkMutationForProfanity(mutation) {
@@ -53,7 +59,7 @@ export default class WebFilter extends Filter {
         if (filter.mutePage) {
           filter.cleanAudio(node);
         } else if (!filter.audioOnly) {
-          filter.cleanNodeText(node);
+          filter.processNode(node, filter.wordlistId);
         }
       }
       // else { console.log('[APF] Forbidden node:', node); } // Debug: Filter - Mutation addedNodes
@@ -128,10 +134,10 @@ export default class WebFilter extends Filter {
           // console.log('[APF] YouTube subtitle node:', node); // Debug: Audio
           filter.audio.cleanYouTubeAutoSubs(node);
         } else if (!filter.audioOnly) {
-          filter.cleanNodeText(node); // Clean the rest of the page
+          filter.processNode(node, filter.wordlistId); // Clean the rest of the page
         }
       } else if (!filter.audioOnly && !filter.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
-        filter.cleanNodeText(node); // Clean the rest of the page
+        filter.processNode(node, filter.wordlistId); // Clean the rest of the page
       }
     } else { // Other audio muting
       let supported = filter.audio.supportedNode(node);
@@ -139,51 +145,28 @@ export default class WebFilter extends Filter {
         // console.log('[APF] Audio subtitle node:', node); // Debug: Audio
         filter.audio.clean(node, supported);
       } else if (!filter.audioOnly) {
-        filter.cleanNodeText(node); // Clean the rest of the page
+        filter.processNode(node, filter.wordlistId); // Clean the rest of the page
       }
     }
   }
 
-  cleanNode(node, stats: boolean = true) {
-    if (Page.isForbiddenNode(node)) { return false; }
-
-    if (node.childElementCount > 0) { // Tree node
-      let treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
-      while(treeWalker.nextNode()) {
-        if (treeWalker.currentNode.childNodes.length > 0) {
-          treeWalker.currentNode.childNodes.forEach(childNode => {
-            this.cleanNode(childNode, stats);
-          });
-        } else {
-          this.cleanNode(treeWalker.currentNode, stats);
+  cleanChildNode(node, wordlistId: number, stats: boolean = true) {
+    if (node.nodeName) {
+      if (node.textContent && node.textContent.trim() != '') {
+        let result = this.replaceTextResult(node.textContent, wordlistId, stats);
+        if (result.modified) {
+          // console.log('[APF] Normal node changed:', result.original, result.filtered); // Debug: Filter - Mutation node filtered
+          node.textContent = result.filtered;
         }
+      } else if (node.nodeName == 'IMG') {
+        if (node.alt != '') { node.alt = this.replaceText(node.alt, wordlistId, stats); }
+        if (node.title != '') { node.title = this.replaceText(node.title, wordlistId, stats); }
+      } else if (node.shadowRoot != undefined) {
+        this.processNode(node.shadowRoot, wordlistId, stats);
+        this.startObserving(node.shadowRoot, this.shadowObserver);
       }
-    } else { // Leaf node
-      if (node.nodeName) {
-        if (node.textContent && node.textContent.trim() != '') {
-          let result = this.replaceTextResult(node.textContent, this.wordlistId, stats);
-          if (result.modified) {
-            // console.log('[APF] Normal node changed:', result.original, result.filtered); // Debug: Filter - Mutation node filtered
-            node.textContent = result.filtered;
-          }
-        } else if (node.nodeName == 'IMG') {
-          if (node.alt != '') { node.alt = this.replaceText(node.alt, this.wordlistId, stats); }
-          if (node.title != '') { node.title = this.replaceText(node.title, this.wordlistId, stats); }
-        } else if (node.shadowRoot != undefined) {
-          this.startObserving(node.shadowRoot, this.shadowObserver);
-        }
-      }
-      // else { console.log('[APF] node without nodeName:', node); } // Debug: Filter
     }
-  }
-
-  cleanNodeText(node) {
-    // console.log('[APF] New node to filter', node); // Debug: Filter
-    if (filter.advanced && (node.parentNode || node === document)) {
-      filter.advancedReplaceText(node, this.wordlistId, true);
-    } else {
-      filter.cleanNode(node);
-    }
+    // else { console.log('[APF] node without nodeName:', node); } // Debug: Filter
   }
 
   async cleanPage() {
@@ -204,6 +187,12 @@ export default class WebFilter extends Filter {
     if (this.domain.advanced) { this.advanced = this.domain.advanced; }
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
     if (this.domain.audioWordlistId !== undefined) { this.audioWordlistId = this.domain.audioWordlistId; }
+
+    if (this.advanced) {
+      this.processNode = this.advancedReplaceText;
+    } else {
+      this.processNode = this.cleanText;
+    }
 
     // Detect if we should mute audio for the current page
     if (this.cfg.muteAudio) {
@@ -236,9 +225,28 @@ export default class WebFilter extends Filter {
     // Remove profanity from the main document and watch for new nodes
     this.init();
     // console.log('[APF] Filter initialized.', this); // Debug: General
-    if (!this.audioOnly) { this.cleanNodeText(document); }
+    if (!this.audioOnly) { this.processNode(document, this.wordlistId); }
     this.updateCounterBadge();
     this.startObserving(document);
+  }
+
+  cleanText(node, wordlistId: number, stats: boolean = true) {
+    if (Page.isForbiddenNode(node)) { return false; }
+
+    if (node.childElementCount > 0) {
+      let treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+      while(treeWalker.nextNode()) {
+        if (treeWalker.currentNode.childNodes.length > 0) {
+          treeWalker.currentNode.childNodes.forEach(childNode => {
+            this.cleanText(childNode, wordlistId, stats);
+          });
+        } else {
+          this.cleanText(treeWalker.currentNode, wordlistId, stats);
+        }
+      }
+    } else {
+      this.cleanChildNode(node, wordlistId, stats);
+    }
   }
 
   foundMatch(word) {
