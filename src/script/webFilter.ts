@@ -241,7 +241,7 @@ export default class WebFilter extends Filter {
             this.cleanText(childNode, wordlistId, stats);
           });
         } else {
-          this.cleanText(treeWalker.currentNode, wordlistId, stats);
+          this.cleanChildNode(treeWalker.currentNode, wordlistId, stats);
         }
       }
     } else {
