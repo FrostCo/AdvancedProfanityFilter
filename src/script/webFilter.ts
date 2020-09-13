@@ -8,7 +8,6 @@ import Wordlist from './lib/wordlist';
 import './vendor/findAndReplaceDOMText';
 
 export default class WebFilter extends Filter {
-  advanced: boolean;
   audio: WebAudio;
   audioOnly: boolean;
   audioWordlistId: number;
@@ -25,7 +24,6 @@ export default class WebFilter extends Filter {
 
   constructor() {
     super();
-    this.advanced = false;
     this.audioWordlistId = 0;
     this.mutePage = false;
     this.summary = {};
@@ -184,11 +182,10 @@ export default class WebFilter extends Filter {
       chrome.runtime.sendMessage(message);
       return false;
     }
-    if (this.domain.advanced) { this.advanced = this.domain.advanced; }
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
     if (this.domain.audioWordlistId !== undefined) { this.audioWordlistId = this.domain.audioWordlistId; }
 
-    if (this.advanced) {
+    if (this.domain.advanced) {
       this.processNode = this.advancedReplaceText;
     } else {
       this.processNode = this.cleanText;
@@ -299,7 +296,7 @@ export default class WebFilter extends Filter {
 
     // Send page state to color icon badge
     if (!this.iframe) { message.setBadgeColor = true; }
-    message.advanced = this.advanced;
+    message.advanced = this.domain.advanced;
     message.mutePage = this.mutePage;
     if (this.mutePage && this.cfg.showCounter) { message.counter = this.counter; } // Always show counter when muting audio
     chrome.runtime.sendMessage(message);
