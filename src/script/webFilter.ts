@@ -235,7 +235,9 @@ export default class WebFilter extends Filter {
       while(treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
           treeWalker.currentNode.childNodes.forEach(childNode => {
-            this.cleanText(childNode, wordlistId, stats);
+            if (!Page.isForbiddenNode(childNode)) {
+              this.cleanText(childNode, wordlistId, stats);
+            }
           });
         } else {
           this.cleanChildNode(treeWalker.currentNode, wordlistId, stats);
