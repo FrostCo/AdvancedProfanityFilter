@@ -5,6 +5,7 @@ export default class Domain {
   audioWordlistId: number;
   cfg: DomainCfg;
   cfgKey: string;
+  deep: boolean;
   disabled: boolean;
   enabled: boolean;
   hostname?: string;
@@ -14,6 +15,7 @@ export default class Domain {
   static readonly _domainCfgDefaults: DomainCfg = {
     adv: undefined,
     audioList: undefined,
+    deep: undefined,
     disabled: undefined,
     enabled: undefined,
     wordlist: undefined,
@@ -81,6 +83,7 @@ export default class Domain {
 
   updateCfg() {
     this.cfg.adv = this.advanced === true ? true : undefined;
+    this.cfg.deep = this.deep === true ? true : undefined;
     this.cfg.disabled = this.disabled === true ? true : undefined;
     this.cfg.enabled = this.enabled === true ? true : undefined;
     this.cfg.wordlist = this.wordlistId >= 0 ? this.wordlistId : undefined;
@@ -89,6 +92,7 @@ export default class Domain {
 
   updateFromCfg() {
     this.advanced = this.cfg.adv;
+    this.deep = this.cfg.deep;
     this.disabled = this.cfg.disabled;
     this.enabled = this.cfg.enabled;
     this.wordlistId = this.cfg.wordlist;

@@ -167,6 +167,18 @@ export default class WebFilter extends Filter {
     // else { console.log('[APF] node without nodeName:', node); } // Debug: Filter
   }
 
+  cleanNode(node, stats: boolean = true) {
+    if (Page.isForbiddenNode(node)) { return false; }
+
+    if (node.childNodes.length > 0) {
+      for (let i = 0; i < node.childNodes.length ; i++) {
+        this.cleanNode(node.childNodes[i]);
+      }
+    } else {
+      this.cleanChildNode(node, this.wordlistId, stats);
+    }
+  }
+
   async cleanPage() {
     // @ts-ignore: Type WebConfig is not assignable to type Config
     this.cfg = await WebConfig.build();
@@ -274,6 +286,8 @@ export default class WebFilter extends Filter {
 
     if (this.domain.advanced) {
       this.processNode = this.advancedReplaceText;
+    } else if (this.domain.deep) {
+      this.processNode = this.cleanNode;
     } else {
       this.processNode = this.cleanText;
     }
