@@ -185,12 +185,6 @@ export default class WebFilter extends Filter {
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
     if (this.domain.audioWordlistId !== undefined) { this.audioWordlistId = this.domain.audioWordlistId; }
 
-    if (this.domain.advanced) {
-      this.processNode = this.advancedReplaceText;
-    } else {
-      this.processNode = this.cleanText;
-    }
-
     // Detect if we should mute audio for the current page
     if (this.cfg.muteAudio) {
       this.audio = new WebAudio(this);
@@ -273,6 +267,16 @@ export default class WebFilter extends Filter {
         resolve(response);
       });
     });
+  }
+
+  init(wordlistId: number | false = false) {
+    super.init(wordlistId);
+
+    if (this.domain.advanced) {
+      this.processNode = this.advancedReplaceText;
+    } else {
+      this.processNode = this.cleanText;
+    }
   }
 
   // Listen for data requests from Popup
