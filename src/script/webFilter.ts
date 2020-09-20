@@ -18,6 +18,7 @@ export default class WebFilter extends Filter {
   location: Location | URL;
   mutePage: boolean;
   observer: MutationObserver;
+  processMutationTarget: boolean;
   processNode: Function;
   shadowObserver: MutationObserver;
   summary: Summary;
@@ -26,6 +27,7 @@ export default class WebFilter extends Filter {
     super();
     this.audioWordlistId = 0;
     this.mutePage = false;
+    this.processMutationTarget = false;
     this.summary = {};
   }
 
@@ -84,8 +86,12 @@ export default class WebFilter extends Filter {
     }
 
     // Only process mutation change if target is text
-    if (mutation.target && mutation.target.nodeName === '#text') {
-      filter.checkMutationTargetTextForProfanity(mutation);
+    if (mutation.target) {
+      if (mutation.target.nodeName === '#text') {
+        filter.checkMutationTargetTextForProfanity(mutation);
+      } else if (filter.processMutationTarget) {
+        filter.processNode(mutation.target, filter.wordlistId);
+      }
     }
   }
 
@@ -287,6 +293,7 @@ export default class WebFilter extends Filter {
     if (this.domain.advanced) {
       this.processNode = this.advancedReplaceText;
     } else if (this.domain.deep) {
+      this.processMutationTarget = true;
       this.processNode = this.cleanNode;
     } else {
       this.processNode = this.cleanText;
