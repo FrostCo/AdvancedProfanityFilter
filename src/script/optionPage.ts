@@ -540,7 +540,7 @@ export default class OptionPage {
   populateDomain() {
     let domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
     let domainText = document.getElementById('domainText') as HTMLInputElement;
-    let domainAdvancedCheck = document.getElementById('domainAdvancedCheck') as HTMLInputElement;
+    let domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     let domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
     let domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
     let domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
@@ -559,7 +559,14 @@ export default class OptionPage {
       domainCfg = this.cfg.domains[domainsSelect.value];
     }
 
-    domainAdvancedCheck.checked = domainCfg.adv;
+    let domainKey = domainText.value.trim().toLowerCase();
+    if (domainKey == '') { // No data
+      domainModeSelect.selectedIndex = Constants.DomainModes.Normal;
+    } else {
+      let domain = new Domain(domainKey, domainCfg);
+      domainModeSelect.selectedIndex = domain.getModeIndex();
+    }
+
     domainDisabledCheck.checked = domainCfg.disabled;
     domainEnabledCheck.checked = domainCfg.enabled;
     let wordlist = domainCfg.wordlist >= 0 ? domainCfg.wordlist + 1 : 0;
@@ -569,6 +576,7 @@ export default class OptionPage {
   }
 
   populateDomainPage() {
+    let domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     let domainsSelect = document.getElementById('domainSelect') as HTMLSelectElement;
     let domainText = document.getElementById('domainText') as HTMLInputElement;
     let mode = this.cfg.enabledDomainsOnly ? 'whitelist' : 'blacklist';
@@ -597,6 +605,8 @@ export default class OptionPage {
       OptionPage.hide(domainEnabledLabel);
       OptionPage.show(domainDisabledLabel);
     }
+
+    dynamicList(Constants.orderedArray(Constants.DomainModes), domainModeSelect);
 
     if (this.cfg.wordlistsEnabled) {
       OptionPage.show(wordlistContainer);
@@ -983,7 +993,7 @@ export default class OptionPage {
   async saveDomain(event) {
     let domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
     let domainText = document.getElementById('domainText') as HTMLInputElement;
-    let domainAdvancedCheck = document.getElementById('domainAdvancedCheck') as HTMLInputElement;
+    let domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     let domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
     let domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
     let domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
@@ -1004,13 +1014,13 @@ export default class OptionPage {
       let wordlist = domainWordlistSelect.selectedIndex > 0 ? domainWordlistSelect.selectedIndex - 1 : undefined;
       let audioList = domainAudioWordlistSelect.selectedIndex > 0 ? domainAudioWordlistSelect.selectedIndex - 1 : undefined;
       let newDomainCfg: DomainCfg = {
-        adv: domainAdvancedCheck.checked,
         audioList: audioList,
         disabled: domainDisabledCheck.checked,
         enabled: domainEnabledCheck.checked,
         wordlist: wordlist,
       };
       let domain = new Domain(newKey, newDomainCfg);
+      domain.updateFromModeIndex(domainModeSelect.selectedIndex);
       let error = await domain.save(this.cfg);
 
       if (error) {

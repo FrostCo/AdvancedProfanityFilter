@@ -1,3 +1,4 @@
+import Constants from './lib/constants';
 import WebConfig from './webConfig';
 
 export default class Domain {
@@ -66,6 +67,16 @@ export default class Domain {
     this.updateFromCfg();
   }
 
+  getModeIndex() {
+    if (this.advanced) {
+      return Constants.DomainModes.Advanced;
+    } else if (this.deep) {
+      return Constants.DomainModes.Deep;
+    } else {
+      return Constants.DomainModes.Normal;
+    }
+  }
+
   // Updates the config from the domain and saves it
   async save(cfg: WebConfig) {
     if (cfg.domains) {
@@ -97,5 +108,13 @@ export default class Domain {
     this.enabled = this.cfg.enabled;
     this.wordlistId = this.cfg.wordlist;
     this.audioWordlistId = this.cfg.audioList;
+  }
+
+  updateFromModeIndex(index: number) {
+    switch(index) {
+      case Constants.DomainModes.Normal: this.advanced = false; this.deep = false; break;
+      case Constants.DomainModes.Advanced: this.advanced = true; this.deep = false; break;
+      case Constants.DomainModes.Deep: this.advanced = false; this.deep = true; break;
+    }
   }
 }
