@@ -9,7 +9,6 @@ class Popup {
   cfg: WebConfig;
   audioSiteKeys: string[];
   domain: Domain;
-  filterMethodContainer: Element;
   filterToggleProp: string;
   protected: boolean;
   tab: chrome.tabs.Tab;
@@ -39,7 +38,6 @@ class Popup {
 
   constructor() {
     this.protected = false;
-    this.filterMethodContainer = document.getElementById('filterMethodContainer');
   }
 
   ////
