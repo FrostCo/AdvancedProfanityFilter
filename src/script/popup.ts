@@ -9,7 +9,6 @@ class Popup {
   cfg: WebConfig;
   audioSiteKeys: string[];
   domain: Domain;
-  filterMethodContainer: Element;
   filterToggleProp: string;
   protected: boolean;
   tab: chrome.tabs.Tab;
@@ -39,7 +38,6 @@ class Popup {
 
   constructor() {
     this.protected = false;
-    this.filterMethodContainer = document.getElementById('filterMethodContainer');
   }
 
   ////
@@ -79,11 +77,13 @@ class Popup {
 
     let domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
     let domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
-    let advancedMode = document.getElementById('advancedMode') as HTMLInputElement;
+    let domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     let wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     let audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
+    dynamicList(Constants.orderedArray(Constants.DomainModes), domainModeSelect);
+    domainModeSelect.selectedIndex = popup.domain.getModeIndex();
     dynamicList(Constants.orderedArray(Constants.FilterMethods), filterMethodSelect);
     filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
 
@@ -109,7 +109,7 @@ class Popup {
       popup.protected = true;
       Popup.disable(domainFilter);
       Popup.disable(domainToggle);
-      Popup.disable(advancedMode);
+      Popup.disable(domainModeSelect);
       Popup.disable(filterMethodSelect);
       Popup.disable(wordlistSelect);
       Popup.disable(audioWordlistSelect);
@@ -120,7 +120,7 @@ class Popup {
       domainFilter.checked = false;
       Popup.disable(domainFilter);
       Popup.disable(domainToggle);
-      Popup.disable(advancedMode);
+      Popup.disable(domainModeSelect);
       Popup.disable(filterMethodSelect);
       Popup.disable(wordlistSelect);
       Popup.disable(audioWordlistSelect);
@@ -130,15 +130,10 @@ class Popup {
     // Set initial value for domain filter and disable options if they are not applicable
     if (popup.domain.disabled || (popup.cfg.enabledDomainsOnly && !popup.domain.enabled)) {
       domainFilter.checked = false;
-      Popup.disable(advancedMode);
+      Popup.disable(domainModeSelect);
       Popup.disable(filterMethodSelect);
       Popup.disable(wordlistSelect);
       Popup.disable(audioWordlistSelect);
-    }
-
-    // Set initial value for advanced mode
-    if (popup.domain.advanced) {
-      advancedMode.checked = true;
     }
   }
 
@@ -184,6 +179,15 @@ class Popup {
     }
   }
 
+  async updateDomainMode() {
+    if (!popup.protected) {
+      let domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+      popup.domain.updateFromModeIndex(domainModeSelect.selectedIndex);
+      let error = await popup.domain.save(popup.cfg);
+      if (!error) { chrome.tabs.reload(); }
+    }
+  }
+
   async wordlistSelect(event) {
     let element = event.target;
     let type = element.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
@@ -214,7 +218,7 @@ let popup = new Popup;
 // Listeners
 window.addEventListener('load', function(event) { popup.populateOptions(); });
 document.getElementById('domainFilter').addEventListener('change', function(event) { popup.toggle(popup.filterToggleProp); });
-document.getElementById('advancedMode').addEventListener('change', function(event) { popup.toggle('advanced'); });
+document.getElementById('domainModeSelect').addEventListener('change', function(event) { popup.updateDomainMode(); });
 document.getElementById('filterMethodSelect').addEventListener('change', function(event) { popup.filterMethodSelect(); });
 document.getElementById('wordlistSelect').addEventListener('change', function(event) { popup.wordlistSelect(event); });
 document.getElementById('audioWordlistSelect').addEventListener('change', function(event) { popup.wordlistSelect(event); });

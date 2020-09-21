@@ -49,6 +49,7 @@ interface ConfirmModalSettings {
 interface DomainCfg {
   adv?: boolean;
   audioList?: number;
+  deep?: boolean;
   disabled?: boolean;
   enabled?: boolean;
   wordlist?: number;

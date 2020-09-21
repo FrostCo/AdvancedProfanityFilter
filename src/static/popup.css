@@ -61,7 +61,8 @@ h4 {
 /* Filter and Wordlist select dropboowns */
 .selectLabel {
   line-height: 39px;
-  padding-left: 15px;
+  padding-left: 25px;
+  text-align: left;
 }
 
 .smallSelect {
