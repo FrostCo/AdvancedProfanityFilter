@@ -18,7 +18,6 @@ config.words = WebConfig._defaultWords;
 /* @preserve - End User Config */
 
 export default class BookmarkletFilter extends Filter {
-  advanced: boolean;
   audio: WebAudio;
   audioOnly: boolean;
   audioWordlistId: number;
@@ -29,26 +28,32 @@ export default class BookmarkletFilter extends Filter {
   location: Location | URL;
   mutePage: boolean;
   observer: MutationObserver;
+  processMutationTarget: boolean;
+  processNode: Function;
   shadowObserver: MutationObserver;
 
   constructor() {
     super();
-    this.advanced = false;
     this.audioWordlistId = 0;
     this.mutePage = false;
+    this.processMutationTarget = false;
   }
 
   advancedReplaceText(node, wordlistId: number, stats = true) {
-    filter.wordlists[wordlistId].regExps.forEach((regExp) => {
-      // @ts-ignore - External library function
-      findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: function(portion, match) {
-        if (portion.index === 0) { // Replace the whole match on the first portion and skip the rest
-          return filter.replaceText(match[0], wordlistId, stats);
-        } else {
-          return '';
-        }
-      } });
-    });
+    if (node.parentNode || node === document) {
+      filter.wordlists[wordlistId].regExps.forEach((regExp) => {
+        // @ts-ignore - External library function
+        findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: function(portion, match) {
+          if (portion.index === 0) {
+            return filter.replaceText(match[0], wordlistId, stats);
+          } else {
+            return '';
+          }
+        } });
+      });
+    } else {
+      this.cleanText(node, wordlistId, stats);
+    }
   }
 
   checkMutationForProfanity(mutation) {
@@ -57,7 +62,7 @@ export default class BookmarkletFilter extends Filter {
         if (filter.mutePage) {
           filter.cleanAudio(node);
         } else if (!filter.audioOnly) {
-          filter.cleanNodeText(node);
+          filter.processNode(node, filter.wordlistId);
         }
       }
     });
@@ -81,9 +86,12 @@ export default class BookmarkletFilter extends Filter {
       });
     }
 
-    // Only process mutation change if target is text
-    if (mutation.target && mutation.target.nodeName === '#text') {
-      filter.checkMutationTargetTextForProfanity(mutation);
+    if (mutation.target) {
+      if (mutation.target.nodeName === '#text') {
+        filter.checkMutationTargetTextForProfanity(mutation);
+      } else if (filter.processMutationTarget) {
+        filter.processNode(mutation.target, filter.wordlistId);
+      }
     }
   }
 
@@ -125,17 +133,34 @@ export default class BookmarkletFilter extends Filter {
         if (filter.audio.youTubeAutoSubsCurrentRow(node)) {
           filter.audio.cleanYouTubeAutoSubs(node);
         } else if (!filter.audioOnly) {
-          filter.cleanNodeText(node);
+          filter.processNode(node, filter.wordlistId);
         }
       } else if (!filter.audioOnly && !filter.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
-        filter.cleanNodeText(node);
+        filter.processNode(node, filter.wordlistId);
       }
     } else {
       let supported = filter.audio.supportedNode(node);
       if (supported !== false) {
         filter.audio.clean(node, supported);
       } else if (!filter.audioOnly) {
-        filter.cleanNodeText(node);
+        filter.processNode(node, filter.wordlistId);
+      }
+    }
+  }
+
+  cleanChildNode(node, wordlistId: number, stats: boolean = true) {
+    if (node.nodeName) {
+      if (node.textContent && node.textContent.trim() != '') {
+        let result = this.replaceTextResult(node.textContent, wordlistId, stats);
+        if (result.modified) {
+          node.textContent = result.filtered;
+        }
+      } else if (node.nodeName == 'IMG') {
+        if (node.alt != '') { node.alt = this.replaceText(node.alt, wordlistId, stats); }
+        if (node.title != '') { node.title = this.replaceText(node.title, wordlistId, stats); }
+      } else if (node.shadowRoot != undefined) {
+        this.processNode(node.shadowRoot, wordlistId, stats);
+        this.startObserving(node.shadowRoot, this.shadowObserver);
       }
     }
   }
@@ -143,39 +168,12 @@ export default class BookmarkletFilter extends Filter {
   cleanNode(node, stats: boolean = true) {
     if (Page.isForbiddenNode(node)) { return false; }
 
-    if (node.childElementCount > 0) { // Tree node
-      let treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
-      while(treeWalker.nextNode()) {
-        if (treeWalker.currentNode.childNodes.length > 0) {
-          treeWalker.currentNode.childNodes.forEach(childNode => {
-            this.cleanNode(childNode, stats);
-          });
-        } else {
-          this.cleanNode(treeWalker.currentNode, stats);
-        }
+    if (node.childNodes.length > 0) {
+      for (let i = 0; i < node.childNodes.length ; i++) {
+        this.cleanNode(node.childNodes[i]);
       }
-    } else { // Leaf node
-      if (node.nodeName) {
-        if (node.textContent && node.textContent.trim() != '') {
-          let result = this.replaceTextResult(node.textContent, this.wordlistId, stats);
-          if (result.modified) {
-            node.textContent = result.filtered;
-          }
-        } else if (node.nodeName == 'IMG') {
-          if (node.alt != '') { node.alt = this.replaceText(node.alt, this.wordlistId, stats); }
-          if (node.title != '') { node.title = this.replaceText(node.title, this.wordlistId, stats); }
-        } else if (node.shadowRoot != undefined) {
-          this.startObserving(node.shadowRoot, this.shadowObserver);
-        }
-      }
-    }
-  }
-
-  cleanNodeText(node) {
-    if (filter.advanced && (node.parentNode || node === document)) {
-      filter.advancedReplaceText(node, this.wordlistId, true);
     } else {
-      filter.cleanNode(node);
+      this.cleanChildNode(node, this.wordlistId, stats);
     }
   }
 
@@ -190,7 +188,6 @@ export default class BookmarkletFilter extends Filter {
       chrome.runtime.sendMessage(message);
       return false;
     }
-    if (this.domain.advanced) { this.advanced = this.domain.advanced; }
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
     if (this.domain.audioWordlistId !== undefined) { this.audioWordlistId = this.domain.audioWordlistId; }
 
@@ -207,8 +204,42 @@ export default class BookmarkletFilter extends Filter {
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
-    if (!this.audioOnly) { this.cleanNodeText(document); }
+    if (!this.audioOnly) { this.processNode(document, this.wordlistId); }
     this.startObserving(document);
+  }
+
+  cleanText(node, wordlistId: number, stats: boolean = true) {
+    if (Page.isForbiddenNode(node)) { return false; }
+
+    if (node.childElementCount > 0) {
+      let treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+      while(treeWalker.nextNode()) {
+        if (treeWalker.currentNode.childNodes.length > 0) {
+          treeWalker.currentNode.childNodes.forEach(childNode => {
+            if (!Page.isForbiddenNode(childNode)) {
+              this.cleanText(childNode, wordlistId, stats);
+            }
+          });
+        } else {
+          this.cleanChildNode(treeWalker.currentNode, wordlistId, stats);
+        }
+      }
+    } else {
+      this.cleanChildNode(node, wordlistId, stats);
+    }
+  }
+
+  init(wordlistId: number | false = false) {
+    super.init(wordlistId);
+
+    if (this.domain.advanced) {
+      this.processNode = this.advancedReplaceText;
+    } else if (this.domain.deep) {
+      this.processMutationTarget = true;
+      this.processNode = this.cleanNode;
+    } else {
+      this.processNode = this.cleanText;
+    }
   }
 
   processMutations(mutations) {
