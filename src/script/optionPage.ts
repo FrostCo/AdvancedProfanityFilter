@@ -579,7 +579,7 @@ export default class OptionPage {
     let domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     let domainsSelect = document.getElementById('domainSelect') as HTMLSelectElement;
     let domainText = document.getElementById('domainText') as HTMLInputElement;
-    let mode = this.cfg.enabledDomainsOnly ? 'whitelist' : 'blacklist';
+    let mode = this.cfg.enabledDomainsOnly ? 'minimal' : 'normal';
     let domainMode = document.querySelector(`input[name=domainMode][value='${mode}']`) as HTMLInputElement;
     let wordlistContainer = document.getElementById('domainWordlistContainer') as HTMLInputElement;
     let audioWordlistContainer = document.getElementById('domainAudioWordlistContainer') as HTMLInputElement;
@@ -598,7 +598,7 @@ export default class OptionPage {
       domainsSelect.appendChild(optionElement);
     });
 
-    if (mode === 'whitelist') {
+    if (mode === 'minimal') {
       OptionPage.hide(domainDisabledLabel);
       OptionPage.show(domainEnabledLabel);
     } else {
@@ -1073,7 +1073,7 @@ export default class OptionPage {
     self.cfg.filterWordList = filterWordList.checked;
     self.cfg.substitutionMark = substitutionMark.checked;
     self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
-    self.cfg.enabledDomainsOnly = (domainMode.value === 'whitelist');
+    self.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
     self.cfg.muteAudio = muteAudioInput.checked;
     self.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
     self.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
