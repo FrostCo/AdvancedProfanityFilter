@@ -85,7 +85,6 @@ export default class WebFilter extends Filter {
       });
     }
 
-    // Only process mutation change if target is text
     if (mutation.target) {
       if (mutation.target.nodeName === '#text') {
         filter.checkMutationTargetTextForProfanity(mutation);
@@ -186,7 +185,6 @@ export default class WebFilter extends Filter {
   }
 
   async cleanPage() {
-    // @ts-ignore: Type WebConfig is not assignable to type Config
     this.cfg = await WebConfig.build();
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
     // console.log('[APF] Config loaded', this.cfg); // Debug: General
