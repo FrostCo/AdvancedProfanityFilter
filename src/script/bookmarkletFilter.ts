@@ -69,6 +69,7 @@ export default class BookmarkletFilter extends Filter {
         if (
           supported !== false
           || node == filter.audio.lastFilteredNode
+          || node.contains(filter.audio.lastFilteredNode)
           || (
             rule.simpleUnmute
             && filter.audio.lastFilteredText
