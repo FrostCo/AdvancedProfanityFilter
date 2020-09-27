@@ -29,7 +29,7 @@ export default class Wordlist {
           self.regExps.push(word.regExp);
         } catch (e) {
           // eslint-disable-next-line no-console
-          console.error(`APF: failed to add word: '${wordStr}'`);
+          console.error(`APF: Failed to add word: '${wordStr}'`);
         }
       }
     });
