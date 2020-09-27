@@ -21,10 +21,16 @@ export default class Wordlist {
     sorted.forEach(wordStr => {
       // wordlistId = 0 includes all words
       if (wordlistId === 0 || !Array.isArray(cfg.words[wordStr].lists) || cfg.words[wordStr].lists.includes(wordlistId)) {
-        self.list.push(wordStr);
-        let word = new Word(wordStr, cfg.words[wordStr], cfg);
-        self.all.push(word);
-        self.regExps.push(word.regExp);
+        let word;
+        try {
+          word = new Word(wordStr, cfg.words[wordStr], cfg);
+          self.list.push(wordStr);
+          self.all.push(word);
+          self.regExps.push(word.regExp);
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error(`APF: failed to add word: '${wordStr}'`);
+        }
       }
     });
   }
