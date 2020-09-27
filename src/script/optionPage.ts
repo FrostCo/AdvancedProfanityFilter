@@ -1206,6 +1206,19 @@ export default class OptionPage {
         }
       }
 
+      // Test for a valid Regex
+      if (wordOptions.matchMethod === Constants.MatchMethods.Regex) {
+        let subFilter = new Filter;
+        let words = {};
+        words[word] = wordOptions;
+        subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { words: words }));
+        subFilter.init();
+        if (subFilter.wordlists[subFilter.wordlistId].regExps.length === 0) {
+          OptionPage.showInputError(wordText, 'Invalid Regex.');
+          return false;
+        }
+      }
+
       if (wordList.value === '') { // New record
         // console.log('Adding new word: ', word, wordOptions); // DEBUG
         added = this.cfg.addWord(word, wordOptions);
