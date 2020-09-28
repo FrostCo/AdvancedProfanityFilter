@@ -27,6 +27,7 @@ interface AudioRule {
   videoCueRequireShowing?: boolean; // [Cue] Override global setting for muteCueRequireShowing
   videoCueSync?: number;            // [Cue] Adjust subtitle sync +/- (in seconds)
   videoSelector?: string;           // [Cue,Watcher] Selector for video, also used for volume muteMethod (Default: 'video')
+  _convertSSA?: boolean;            // [Cue] BETA: Convert SSA subtitles obtained from remote source source to VTTCues
 }
 
 interface BackgroundData {
@@ -79,6 +80,12 @@ interface Migration {
   version: string;
   name: string;
   runOnImport: boolean;
+}
+
+interface ParsedSSA {
+  end: number;
+  start: number;
+  text: string;
 }
 
 interface ReplaceTextResult {

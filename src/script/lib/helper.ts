@@ -60,6 +60,15 @@ export function getVersion(version: string): Version {
   };
 }
 
+export function injectScript(file, node, id: string = '') {
+  var th = document.getElementsByTagName(node)[0];
+  var s = document.createElement('script');
+  s.setAttribute('type', 'text/javascript');
+  if (id) { s.id = id; }
+  s.setAttribute('src', file);
+  th.appendChild(s);
+}
+
 // Is the provided version lower than the minimum version?
 export function isVersionOlder(version: Version, minimum: Version): boolean {
   if (version.major < minimum.major) {
@@ -71,6 +80,30 @@ export function isVersionOlder(version: Version, minimum: Version): boolean {
   }
 
   return false;
+}
+
+export function makeRequest(method: string, url: string) {
+  return new Promise(function (resolve, reject) {
+    let xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    xhr.onload = function () {
+      if (this.status >= 200 && this.status < 300) {
+        resolve(xhr.response);
+      } else {
+        reject({
+          status: this.status,
+          statusText: xhr.statusText
+        });
+      }
+    };
+    xhr.onerror = function () {
+      reject({
+        status: this.status,
+        statusText: xhr.statusText
+      });
+    };
+    xhr.send();
+  });
 }
 
 export function readFile(file) {

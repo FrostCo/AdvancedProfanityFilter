@@ -2,10 +2,12 @@ import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
+import { injectScript, makeRequest } from './lib/helper';
 
 export default class WebAudio {
   cueRuleIds: number[];
   enabledRuleIds: number[];
+  fetching: boolean;
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
@@ -336,6 +338,84 @@ export default class WebAudio {
     if (rule && rule.unmuteDelay && this.unmuteTimeout) { this.clearUnmuteTimeout(rule); }
   }
 
+  parseSSA(ssa: string): ParsedSSA[] {
+    let parsedSSA: ParsedSSA[] = [];
+    let endIndex, startIndex, textIndex;
+
+    let foundEvents = false;
+
+    let lines = ssa.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      if (!foundEvents) {
+        if (lines[i].match(/^\[Events\]/i)) { foundEvents = true; }
+        continue;
+      }
+
+      if (lines[i].match(/^format:/i)) {
+        let format = lines[i].trim().split(',');
+        endIndex = format.indexOf('End');
+        startIndex = format.indexOf('Start');
+        textIndex = format.indexOf('Text');
+      } else if (lines[i].match(/^dialogue:/i)) {
+        let line = lines[i].trim().split(',');
+        // TODO: Maybe we don't need toFixed() or parse
+        // TODO: Maybe use a different method for rounding/truncating so we don't have to parse it later
+        let start = parseFloat(line[startIndex].split(':').reduce((acc, time) => (60 * acc) + +time).toFixed(3));
+        let end = parseFloat(line[endIndex].split(':').reduce((acc, time) => (60 * acc) + + time).toFixed(3));
+        let cleanText = line.slice(textIndex).join(',').replace(/\{\\\w.+?\}/g, '').split('\\N').reverse(); // Cleanup formatting and convert newlines
+        // NOTE: Newlines in my sample text used a capital '\N'
+        // TODO: reverse() to fix order of multiples
+        for (let j = 0; j < cleanText.length; j++) { // Handle newlines (\n)
+          parsedSSA.push({ start: start, end: end, text: cleanText[j] });
+        }
+      }
+    }
+    return parsedSSA;
+  }
+
+  convertSSA(rule: AudioRule, parsedSSA: ParsedSSA[]) {
+    let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
+    if (video.textTracks) {
+      // TODO: Find way to see if already done.. like label = APF-en
+      // TODO: Label value
+      let track = video.addTextTrack('captions', 'English', rule.videoCueLanguage) as TextTrack;
+      track.mode = 'showing';
+      for (let i = 0; i < parsedSSA.length; i++) {
+        let sub = parsedSSA[i];
+        try {
+          track.addCue(new VTTCue(sub.start, sub.end, sub.text));
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error('APF: Failed to convert SSA: ', e);
+        }
+      }
+    }
+  }
+
+  getRuntimeData() {
+    let vrvUrl = chrome.extension.getURL('/webAccessible/vrv.js');
+    if (!document.querySelector(`script[src="${vrvUrl}"]`)) {
+      injectScript(vrvUrl, 'body', 'APFMagic');
+    }
+  }
+
+  getSubConf(lang) {
+    try {
+      // TODO: This needs to be configurable
+      // TODO: And probably need to have another for type
+      // TODO: Aand also the key with the URL
+      if (document.querySelector('script#APFMagic')) {
+        let data = JSON.parse(document.querySelector('APFDATA').textContent);
+        let found = data.subtitles.find(subtitle => subtitle.language === lang);
+        if (!found) { throw(`Failed to find subtitle for language: ${lang}.`); }
+        return found;
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('APF: Error gettign subtitle.', e);
+    }
+  }
+
   playing(video: HTMLVideoElement): boolean {
     return !!(video && video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
@@ -523,11 +603,34 @@ export default class WebAudio {
     }
   }
 
-  watchForVideo(instance: WebAudio) {
-    instance.cueRuleIds.forEach(cueRuleId => {
-      let rule = instance.rules[cueRuleId] as AudioRule;
+  async watchForVideo(instance: WebAudio) {
+    for (let x = 0; x < instance.cueRuleIds.length; x++) {
+      let rule = instance.rules[x] as AudioRule;
       let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
+        if (rule._convertSSA) {
+          // TODO: Check to see if texttrack is there
+          // TODO: Check to see if data is there (and parsable?)
+          if (document.querySelector('APFDATA')) {
+            if (!instance.fetching && !video.textTracks[1]) { // TODO: Handle only doing this once per video
+              let subConf = instance.getSubConf(rule.videoCueLanguage);
+              if (subConf) {
+                instance.fetching = true;
+                let subs = await makeRequest('GET', subConf.url) as string;
+                if (typeof subs == 'string' && subs) {
+                  let parsedSubs = instance.parseSSA(subs);
+                  instance.convertSSA(rule, parsedSubs);
+                  let oldSubtitlesContainer = document.querySelector('div.libassjs-canvas-parent') as HTMLElement;
+                  oldSubtitlesContainer.style.display = 'none';
+                  instance.fetching = false;
+                }
+              }
+            }
+          } else {
+            instance.getRuntimeData();
+          }
+        }
+
         let textTrack = instance.getVideoTextTrack(video, rule.videoCueLanguage, rule.videoCueRequireShowing);
 
         if (textTrack && !textTrack.oncuechange) {
@@ -571,7 +674,7 @@ export default class WebAudio {
           };
         }
       }
-    });
+    }
   }
 
   youTubeAutoSubsCurrentRow(node): boolean {
