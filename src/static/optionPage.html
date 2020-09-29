@@ -564,8 +564,8 @@
     <p>This tab allows you to adjust the filter&#39;s settings on specific domains.</p>
     <h3 id="domain-mode">Domain Mode:</h3>
     <ul>
-    <li><strong>Whitelist: <em>(default)</em></strong> - Filter all pages unless they are specifically added to the whitelist. </li>
-    <li><strong>Blacklist:</strong> - Only filter pages that are specifically added to the blacklist.</li>
+    <li><strong>Normal: <em>(default)</em></strong> Filter all domains unless specifically disabled</li>
+    <li><strong>Minimal:</strong> Only filter pages that are specifically enabled</li>
     </ul>
     <h3 id="domains-1">Domains:</h3>
     <p>Adjust the domain list for the currently selected mode. To match google.com and all its sub-domains, simply add <code>google.com</code>. If you want to just match Gmail, you can add <code>mail.google.com</code>.</p>
@@ -577,6 +577,9 @@
     <p><em>Example:</em></p>
     <pre><code class="language-html">&lt;span&gt;some text to fil&lt;/span&gt;&lt;span&gt;ter&lt;/span&gt;</code></pre>
     <p>On the page, this would look like: &quot;some text to filter&quot;, but the extension (without advanced mode) would see <code>some text to fil</code>, and <code>ter</code>. If you were trying to filter the word <code>text</code>, it would work as expected (because &quot;text&quot; isn&#39;t split across elements). If you were trying to filter the word <code>filter</code>, it would fail without Advanced mode being turned on, because it doesn&#39;t match on <code>some text to fil</code>, or <code>ter</code>. This is not a common practice, and is only needed in a very small number of websites.</p>
+    <h3 id="deep-mode">Deep Mode:</h3>
+    <p><em><strong>WARNING</strong>: This mode will result in lower performance.</em></p>
+    <p>Filter additional elements on the page that are usually not processed. If you notice that words are not being filtered and Advanced mode doesn&#39;t work, try this mode. Deep mode can be especially helpful on pages that heavily utilize the Web Components/Shadow DOM.</p>
     <h3 id="wordlists-1">Wordlists</h3>
     <p>Adjust which wordlist should be used for text and audio muting on the selected domain.</p>
     <p><em>Tip: You can choose <code>Default</code>, which will set it to the default set in the Lists page.</em></p>
