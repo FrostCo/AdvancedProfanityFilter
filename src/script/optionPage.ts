@@ -579,7 +579,7 @@ export default class OptionPage {
     let domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     let domainsSelect = document.getElementById('domainSelect') as HTMLSelectElement;
     let domainText = document.getElementById('domainText') as HTMLInputElement;
-    let mode = this.cfg.enabledDomainsOnly ? 'whitelist' : 'blacklist';
+    let mode = this.cfg.enabledDomainsOnly ? 'minimal' : 'normal';
     let domainMode = document.querySelector(`input[name=domainMode][value='${mode}']`) as HTMLInputElement;
     let wordlistContainer = document.getElementById('domainWordlistContainer') as HTMLInputElement;
     let audioWordlistContainer = document.getElementById('domainAudioWordlistContainer') as HTMLInputElement;
@@ -598,7 +598,7 @@ export default class OptionPage {
       domainsSelect.appendChild(optionElement);
     });
 
-    if (mode === 'whitelist') {
+    if (mode === 'minimal') {
       OptionPage.hide(domainDisabledLabel);
       OptionPage.show(domainEnabledLabel);
     } else {
@@ -1073,7 +1073,7 @@ export default class OptionPage {
     self.cfg.filterWordList = filterWordList.checked;
     self.cfg.substitutionMark = substitutionMark.checked;
     self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
-    self.cfg.enabledDomainsOnly = (domainMode.value === 'whitelist');
+    self.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
     self.cfg.muteAudio = muteAudioInput.checked;
     self.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
     self.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
@@ -1202,6 +1202,19 @@ export default class OptionPage {
         let second = subFilter.replaceTextResult(first.filtered);
         if (first.filtered != second.filtered) {
           OptionPage.showInputError(substitutionText, "Substitution can't contain word (causes an endless loop).");
+          return false;
+        }
+      }
+
+      // Test for a valid Regex
+      if (wordOptions.matchMethod === Constants.MatchMethods.Regex) {
+        let subFilter = new Filter;
+        let words = {};
+        words[word] = wordOptions;
+        subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { words: words }));
+        subFilter.init();
+        if (subFilter.wordlists[subFilter.wordlistId].regExps.length === 0) {
+          OptionPage.showInputError(wordText, 'Invalid Regex.');
           return false;
         }
       }
