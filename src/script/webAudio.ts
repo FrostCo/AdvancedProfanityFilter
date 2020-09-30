@@ -7,12 +7,14 @@ import { hmsToSeconds, injectScript, makeRequest } from './lib/helper';
 export default class WebAudio {
   cueRuleIds: number[];
   enabledRuleIds: number[];
+  externalSubURL: string;
   fetching: boolean;
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
   lastProcessedText: string;
   muted: boolean;
+  port: any;
   rules: AudioRule[];
   sites: { [site: string]: AudioRule[] };
   supportedPage: boolean;
@@ -392,27 +394,31 @@ export default class WebAudio {
     }
   }
 
-  getRuntimeData() {
-    let vrvUrl = chrome.extension.getURL('/webAccessible/vrv.js');
-    if (!document.querySelector(`script[src="${vrvUrl}"]`)) {
-      injectScript(vrvUrl, 'body', 'APFMagic');
-    }
-  }
+  getRuntimeData(rule: AudioRule) {
+    let self = this;
 
-  getSubConf(lang) {
-    try {
-      // TODO: This needs to be configurable
-      // TODO: And probably need to have another for type
-      // TODO: Aand also the key with the URL
-      if (document.querySelector('script#APFMagic')) {
-        let data = JSON.parse(document.querySelector('APFDATA').textContent);
-        let found = data.subtitles.find(subtitle => subtitle.language === lang);
-        if (!found) { throw(`Failed to find subtitle for language: ${lang}.`); }
-        return found;
+    window.addEventListener('message', function(event) {
+      if (event.source == window) { // Only accept messages from ourselves
+        if (event.data.type && (event.data.extension == 'APF', event.data.type == 'FROM_PAGE')) {
+          try {
+            let found = event.data.subtitles.find(subtitle => subtitle.language === rule.videoCueLanguage);
+            if (!found) { throw(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
+            self.externalSubURL = found.url;
+          } catch(e) {
+            // eslint-disable-next-line no-console
+            console.error('APF: Error gettign subtitle.', e);
+          }
+          // self.port.postMessage(event.data.text); // Send data back
+        }
       }
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('APF: Error gettign subtitle.', e);
+    }, false);
+
+    // TODO: I really need to figure out how to handle these requests, and when to make them.
+    // Remeber to consider changing videos too
+    // Request data from main page
+    if (!self.externalSubURL) {
+      let requestSubtitleData = document.querySelector('input#APF-Subtitle-Data') as HTMLInputElement;
+      if (requestSubtitleData) { requestSubtitleData.click(); }
     }
   }
 
@@ -609,25 +615,31 @@ export default class WebAudio {
       let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
         if (rule._convertSSA) {
+          if (!this.port) { this.port = chrome.runtime.connect(); }
+
           // TODO: Check to see if texttrack is there
           // TODO: Check to see if data is there (and parsable?)
-          if (document.querySelector('APFDATA')) {
-            if (!instance.fetching && !video.textTracks[1]) { // TODO: Handle only doing this once per video
-              let subConf = instance.getSubConf(rule.videoCueLanguage);
-              if (subConf) {
-                instance.fetching = true;
-                let subs = await makeRequest('GET', subConf.url) as string;
-                if (typeof subs == 'string' && subs) {
-                  let parsedSubs = instance.parseSSA(subs);
-                  instance.convertSSA(rule, parsedSubs);
-                  let oldSubtitlesContainer = document.querySelector('div.libassjs-canvas-parent') as HTMLElement;
-                  oldSubtitlesContainer.style.display = 'none';
-                  instance.fetching = false;
-                }
+          if (!instance.fetching && !video.textTracks[1]) { // TODO: Handle only doing this once per video
+            // Add script to page if not already there
+            let vrvUrl = chrome.extension.getURL('/webAccessible/vrv.js');
+            if (!document.querySelector(`script[src="${vrvUrl}"]`)) {
+              injectScript(vrvUrl, 'body', 'APFMagic');
+            }
+
+            instance.getRuntimeData(rule); // Get variables from main page
+
+            // let subConf = instance.getSubConf(rule.videoCueLanguage);
+            if (instance.externalSubURL) {
+              instance.fetching = true; // Move up?
+              let subs = await makeRequest('GET', instance.externalSubURL) as string;
+              if (typeof subs == 'string' && subs) {
+                let parsedSubs = instance.parseSSA(subs);
+                instance.convertSSA(rule, parsedSubs);
+                let oldSubtitlesContainer = document.querySelector('div.libassjs-canvas-parent') as HTMLElement;
+                oldSubtitlesContainer.style.display = 'none';
+                instance.fetching = false;
               }
             }
-          } else {
-            instance.getRuntimeData();
           }
         }
 
