@@ -106,6 +106,10 @@ export function makeRequest(method: string, url: string) {
   });
 }
 
+export function hmsToSeconds(str: string, precision: number = 3) {
+  return parseFloat(str.split(':').reduce((acc, time) => (60 * acc) + +time).toFixed(precision));
+}
+
 export function readFile(file) {
   return new Promise((resolve, reject) => {
     let fr = new FileReader();

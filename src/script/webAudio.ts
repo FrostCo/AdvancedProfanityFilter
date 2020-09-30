@@ -2,7 +2,7 @@ import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
-import { injectScript, makeRequest } from './lib/helper';
+import { hmsToSeconds, injectScript, makeRequest } from './lib/helper';
 
 export default class WebAudio {
   cueRuleIds: number[];
@@ -360,8 +360,8 @@ export default class WebAudio {
         let line = lines[i].trim().split(',');
         // TODO: Maybe we don't need toFixed() or parse
         // TODO: Maybe use a different method for rounding/truncating so we don't have to parse it later
-        let start = parseFloat(line[startIndex].split(':').reduce((acc, time) => (60 * acc) + +time).toFixed(3));
-        let end = parseFloat(line[endIndex].split(':').reduce((acc, time) => (60 * acc) + + time).toFixed(3));
+        let start = hmsToSeconds(line[startIndex]);
+        let end = hmsToSeconds(line[endIndex]);
         let cleanText = line.slice(textIndex).join(',').replace(/\{\\\w.+?\}/g, '').split('\\N').reverse(); // Cleanup formatting and convert newlines
         // NOTE: Newlines in my sample text used a capital '\N'
         // TODO: reverse() to fix order of multiples
