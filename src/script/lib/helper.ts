@@ -106,8 +106,13 @@ export function makeRequest(method: string, url: string) {
   });
 }
 
-export function hmsToSeconds(str: string, precision: number = 3) {
-  return parseFloat(str.split(':').reduce((acc, time) => (60 * acc) + +time).toFixed(precision));
+// NOTE: This function requires the hh:mm:ss.ff format
+export function hmsToSeconds(timeStr: string, precision: number = 2): number {
+  let [hh = '0', mm = '0', ss = '0'] = (timeStr || '0:0:0').split(':');
+  let hour = parseInt(hh, 10) || 0;
+  let minute = parseInt(mm, 10) || 0;
+  let second = parseFloat(ss) || 0;
+  return parseFloat(((hour * 3600) + (minute * 60) + second).toFixed(precision));
 }
 
 export function readFile(file) {

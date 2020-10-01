@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-import { escapeHTML, formatNumber, getVersion, isVersionOlder, removeFromArray } from '../built/lib/helper';
+import { escapeHTML, formatNumber, getVersion, hmsToSeconds, isVersionOlder, removeFromArray } from '../built/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 
@@ -29,6 +29,21 @@ describe('Helper', function() {
       expect(formatNumber(999999999)).to.eql('999M');
       expect(formatNumber(1000000000)).to.eql('1G+');
       expect(formatNumber(9999999999)).to.eql('1G+');
+    });
+  });
+
+  describe('hmsToSeconds()', function() {
+    it('Convert HH:MM:SS.mm to seconds', function() {
+      expect(hmsToSeconds('0:00:11.97')).to.eql(11.97);
+      expect(hmsToSeconds('0:00:17')).to.eql(17);
+      expect(hmsToSeconds('0:02:33.09')).to.eql(153.09);
+      expect(hmsToSeconds('0:12:26.59')).to.eql(746.59);
+      expect(hmsToSeconds('0:23:18.39')).to.eql(1398.39);
+      expect(hmsToSeconds('0:28:12.591')).to.eql(1692.59);
+      expect(hmsToSeconds('0:28:12.599')).to.eql(1692.6);
+      expect(hmsToSeconds('00:05:55.55')).to.eql(355.55);
+      expect(hmsToSeconds('1:22:17.79')).to.eql(4937.79);
+      expect(hmsToSeconds('3:00:18.500')).to.eql(10818.5);
     });
   });
 
