@@ -28,6 +28,8 @@ interface AudioRule {
   videoCueSync?: number;            // [Cue] Adjust subtitle sync +/- (in seconds)
   videoSelector?: string;           // [Cue,Watcher] Selector for video, also used for volume muteMethod (Default: 'video')
   _convertSSA?: boolean;            // [Cue] BETA: Convert SSA subtitles obtained from remote source source to VTTCues
+  _externalSubVar?: string;         // [Cue] BETA: Global variable path to find available subtitle URLs
+  _externalSubVarName?: string;     // [Cue] BETA: Variable name for subtitle URL
 }
 
 interface BackgroundData {

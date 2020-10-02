@@ -2,7 +2,7 @@ import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
-import { hmsToSeconds, injectScript, makeRequest } from './lib/helper';
+import { getGlobalVariable, hmsToSeconds, makeRequest } from './lib/helper';
 
 export default class WebAudio {
   cueRuleIds: number[];
@@ -239,6 +239,9 @@ export default class WebAudio {
   initCueRule(rule: AudioRule) {
     if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.DefaultVideoSelector; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
+    if (rule._convertSSA) {
+      if (rule._externalSubVarName === undefined) { rule._externalSubVarName = 'url'; }
+    }
   }
 
   initDisplaySelector(rule: AudioRule) {
@@ -391,34 +394,6 @@ export default class WebAudio {
           console.error('APF: Failed to convert SSA: ', e);
         }
       }
-    }
-  }
-
-  getRuntimeData(rule: AudioRule) {
-    let self = this;
-
-    window.addEventListener('message', function(event) {
-      if (event.source == window) { // Only accept messages from ourselves
-        if (event.data.type && (event.data.extension == 'APF', event.data.type == 'FROM_PAGE')) {
-          try {
-            let found = event.data.subtitles.find(subtitle => subtitle.language === rule.videoCueLanguage);
-            if (!found) { throw(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
-            self.externalSubURL = found.url;
-          } catch(e) {
-            // eslint-disable-next-line no-console
-            console.error('APF: Error gettign subtitle.', e);
-          }
-          // self.port.postMessage(event.data.text); // Send data back
-        }
-      }
-    }, false);
-
-    // TODO: I really need to figure out how to handle these requests, and when to make them.
-    // Remeber to consider changing videos too
-    // Request data from main page
-    if (!self.externalSubURL) {
-      let requestSubtitleData = document.querySelector('input#APF-Subtitle-Data') as HTMLInputElement;
-      if (requestSubtitleData) { requestSubtitleData.click(); }
     }
   }
 
@@ -615,30 +590,29 @@ export default class WebAudio {
       let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
         if (rule._convertSSA) {
-          if (!this.port) { this.port = chrome.runtime.connect(); }
-
-          // TODO: Check to see if texttrack is there
-          // TODO: Check to see if data is there (and parsable?)
-          if (!instance.fetching && !video.textTracks[1]) { // TODO: Handle only doing this once per video
-            // Add script to page if not already there
-            let vrvUrl = chrome.extension.getURL('/webAccessible/vrv.js');
-            if (!document.querySelector(`script[src="${vrvUrl}"]`)) {
-              injectScript(vrvUrl, 'body', 'APFMagic');
-            }
-
-            instance.getRuntimeData(rule); // Get variables from main page
-
-            // let subConf = instance.getSubConf(rule.videoCueLanguage);
-            if (instance.externalSubURL) {
-              instance.fetching = true; // Move up?
-              let subs = await makeRequest('GET', instance.externalSubURL) as string;
-              if (typeof subs == 'string' && subs) {
-                let parsedSubs = instance.parseSSA(subs);
-                instance.convertSSA(rule, parsedSubs);
-                let oldSubtitlesContainer = document.querySelector('div.libassjs-canvas-parent') as HTMLElement;
-                oldSubtitlesContainer.style.display = 'none';
-                instance.fetching = false;
+          if (!instance.fetching && !video.textTracks[1]) { // TODO: find a better way to track subtitle being added
+            try {
+              let subsData = getGlobalVariable(rule._externalSubVar);
+              if (Array.isArray(subsData)) {
+                let found = subsData.find(subtitle => subtitle.language === rule.videoCueLanguage);
+                if (!found) { throw(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
+                instance.fetching = true;
+                let subs = await makeRequest('GET', found[rule._externalSubVarName]) as string;
+                if (typeof subs == 'string' && subs) {
+                  let parsedSubs = instance.parseSSA(subs);
+                  instance.convertSSA(rule, parsedSubs);
+                  let oldSubtitlesContainer = document.querySelector(rule.displaySelector) as HTMLElement;
+                  if (oldSubtitlesContainer) { oldSubtitlesContainer.style.display = 'none'; }
+                  instance.fetching = false;
+                } else {
+                  throw('Failed to download external subtitles.');
+                }
+              } else {
+                throw(`Failed to find subtitle variable: ${rule._externalSubVar}`);
               }
+            } catch(e) {
+              // eslint-disable-next-line no-console
+              console.error('APF: Error using external subtitles. ', e);
             }
           }
         }

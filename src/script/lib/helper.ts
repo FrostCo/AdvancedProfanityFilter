@@ -50,6 +50,16 @@ export function formatNumber(number: number): string {
   }
 }
 
+export function getGlobalVariable(code: string, id: string = 'APFData') {
+  let script = document.createElement('script');
+  script.id = id;
+  script.textContent = `document.getElementById("${id}").textContent = JSON.stringify(${code})`;
+  document.documentElement.appendChild(script);
+  let result = document.querySelector(`script#${id}`).textContent;
+  script.remove();
+  return JSON.parse(result);
+}
+
 // /^\d+\.\d+\.\d+$/
 export function getVersion(version: string): Version {
   let versionValues = version.split('.');
