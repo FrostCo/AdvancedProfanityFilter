@@ -216,12 +216,12 @@ export default class BookmarkletFilter extends Filter {
       while(treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
           treeWalker.currentNode.childNodes.forEach(childNode => {
-            if (!Page.isForbiddenNode(childNode)) {
-              this.cleanText(childNode, wordlistId, stats);
-            }
+            this.cleanText(childNode, wordlistId, stats);
           });
         } else {
-          this.cleanChildNode(treeWalker.currentNode, wordlistId, stats);
+          if (!Page.isForbiddenNode(treeWalker.currentNode)) {
+            this.cleanChildNode(treeWalker.currentNode, wordlistId, stats);
+          }
         }
       }
     } else {
