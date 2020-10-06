@@ -9,6 +9,10 @@ interface AudioRule {
   displayHide?: string;             // [Element,ElementChild,Watcher] Display style for hiding captions (Default: 'none')
   displaySelector?: string;         // [Element,ElementChild,Watcher] Alternate selector to hide/show captions
   displayShow?: string;             // [Element,ElementChild,Watcher] Display style for showing captions (Default: '')
+  externalSub?: boolean;            // [Cue] [BETA]: Convert external captions/subtitles obtained from remote source to VTTCues
+  externalSubVar?: string;          // [Cue] [BETA]: Global variable to find available caption/subtitle data
+  externalSubURLKey?: string;       // [Cue] [BETA]: Key name for caption/subtitle URL (Default: 'url')
+  externalSubFormatKey?: string;    // [Cue] [BETA]: Key name for caption/subtitle format (Default: 'format')
   filterSubtitles?: boolean;        // [All] Filter subtitle text (Default: true)
   hasChildrenElements?: boolean;    // [Element] node.childElementCount > 0 [Not commonly used]
   iframe?: boolean | undefined;     // [All] Pages to run on (true: only iframes, false: no iframes, undefined: all)
@@ -27,9 +31,6 @@ interface AudioRule {
   videoCueRequireShowing?: boolean; // [Cue] Override global setting for muteCueRequireShowing
   videoCueSync?: number;            // [Cue] Adjust subtitle sync +/- (in seconds)
   videoSelector?: string;           // [Cue,Watcher] Selector for video, also used for volume muteMethod (Default: 'video')
-  _convertSSA?: boolean;            // [Cue] BETA: Convert SSA subtitles obtained from remote source source to VTTCues
-  _externalSubVar?: string;         // [Cue] BETA: Global variable path to find available subtitle URLs
-  _externalSubVarName?: string;     // [Cue] BETA: Variable name for subtitle URL
 }
 
 interface BackgroundData {
@@ -84,10 +85,13 @@ interface Migration {
   runOnImport: boolean;
 }
 
-interface ParsedSSA {
+interface ParsedSub {
   end: number;
   start: number;
   text: string;
+  position?: string;
+  line?: string;
+  align?: AlignSetting;
 }
 
 interface ReplaceTextResult {
