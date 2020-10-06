@@ -67,6 +67,7 @@ export default class WebAudioSites {
     'www.universalkids.com': [{ mode: 'element', subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' }],
     'www.usanetwork.com': [{ mode: 'element', className: 'ttr-line', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
     'www.vudu.com': [{ mode: 'element', subtitleSelector: 'span.subtitles', tagName: 'DIV' }],
+    'vrv.co': [{ externalSub: true, externalSubVar: 'window.vilos.content.subtitles', iframe: true, mode: 'cue', videoCueLanguage: 'en-US', videoCueRequireShowing: false, displaySelector: 'div.libassjs-canvas-parent' }],
     'tv.youtube.com': [{ mode: 'element', className: 'caption-window', subtitleSelector: 'span.ytp-caption-segment', tagName: 'DIV' }],
     'www.youtube.com': [{ mode: 'element', className: 'caption-window', subtitleSelector: 'span.ytp-caption-segment', tagName: 'DIV' }],
   };
