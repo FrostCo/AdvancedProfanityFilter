@@ -60,7 +60,14 @@ export default class WebAudio {
       this.initRules();
       if (this.enabledRuleIds.length > 0) {
         this.supportedPage = true;
-        if(['tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) { this.youTube = true; }
+        if(['tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) {
+          this.youTube = true;
+          // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
+          let youTubeAutoCensor = '[ __ ]';
+          let lists = this.wordlistId == 0 ? [] : [this.wordlistId];
+          let youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MatchMethods.Partial, repeat: false, separators: false, sub: '' };
+          this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
+        }
 
         if (this.watcherRuleIds.length > 0) {
           this.watcherRuleIds.forEach(ruleId => {
@@ -124,6 +131,7 @@ export default class WebAudio {
         this.mute(rule); // Mute the audio if we haven't already
 
         if (rule.filterSubtitles) {
+          if (rule.preserveWhiteSpace && subtitle.style.whiteSpace !== 'pre') { subtitle.style.whiteSpace = 'pre'; }
           if (rule.ignoreMutations) { this.filter.stopObserving(); }
           subtitle[textMethod] = result.filtered;
           if (rule.ignoreMutations) { this.filter.startObserving(); }
@@ -135,8 +143,8 @@ export default class WebAudio {
     });
 
     switch (rule.showSubtitles) {
-      case Constants.ShowSubtitles.Filtered: if (filtered) { this.showSubtitles(rule); } else { this.hideSubtitles(rule, subtitles); } break;
-      case Constants.ShowSubtitles.Unfiltered: if (filtered) { this.hideSubtitles(rule, subtitles); } else { this.showSubtitles(rule); } break;
+      case Constants.ShowSubtitles.Filtered: if (filtered) { this.showSubtitles(rule, subtitles); } else { this.hideSubtitles(rule, subtitles); } break;
+      case Constants.ShowSubtitles.Unfiltered: if (filtered) { this.hideSubtitles(rule, subtitles); } else { this.showSubtitles(rule, subtitles); } break;
       case Constants.ShowSubtitles.None: this.hideSubtitles(rule, subtitles); break;
     }
   }
@@ -233,18 +241,21 @@ export default class WebAudio {
 
   hideSubtitles(rule: AudioRule, subtitles?) {
     if (rule.displaySelector) {
-      let container = document.querySelector(rule.displaySelector) as HTMLElement;
-      if (container) {
-        // Save the original display style if none was included in the rule
-        if (
-          rule.displayShow === ''
-          && container.style.display !== ''
-          && container.style.display !== rule.displayHide
-        ) {
-          rule.displayShow = container.style.display;
-        }
+      let root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
+      if (root) {
+        let container = root.querySelector(rule.displaySelector) as HTMLElement;
+        if (container) {
+          // Save the original display style if none was included in the rule
+          if (
+            rule.displayShow === ''
+            && container.style.display !== ''
+            && container.style.display !== rule.displayHide
+          ) {
+            rule.displayShow = container.style.display;
+          }
 
-        container.style.setProperty('display', rule.displayHide); // , 'important');
+          container.style.setProperty('display', rule.displayHide); // , 'important');
+        }
       }
     } else if (subtitles) {
       subtitles.forEach(subtitle => {
@@ -493,7 +504,7 @@ export default class WebAudio {
       });
     } else { // Process child
       // innerText handles line feeds/spacing better, but is not available to #text nodes
-      let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
+      let textMethod = (captions && captions.nodeName) === '#text' ? 'textContent' : 'innerText';
 
       // Don't process empty/whitespace nodes
       if (captions[textMethod] && captions[textMethod].trim()) {
@@ -513,10 +524,13 @@ export default class WebAudio {
     return this.filter.replaceTextResult(string, this.wordlistId, stats);
   }
 
-  showSubtitles(rule) {
+  showSubtitles(rule, subtitles?) {
     if (rule.displaySelector) {
-      let container = document.querySelector(rule.displaySelector);
-      if (container) { container.style.setProperty('display', rule.displayShow); }
+      let root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
+      if (root) {
+        let container = root.querySelector(rule.displaySelector);
+        if (container) { container.style.setProperty('display', rule.displayShow); }
+      }
     }
   }
 
@@ -541,13 +555,16 @@ export default class WebAudio {
           break;
         case 'elementChild':
           if (node.nodeName === rule.tagName) {
-            if (rule.parentSelector) {
-              let parent = document.querySelector(rule.parentSelector);
-              if (parent && parent.contains(node)) { return ruleId; }
-            } else {
-              let parents = document.querySelectorAll(rule.parentSelectorAll);
-              for (let j = 0; j < parents.length; j++) {
-                if (parents[j].contains(node)) { return ruleId; }
+            let root = rule.rootNode ? node.getRootNode() : document;
+            if (root) {
+              if (rule.parentSelector) {
+                let parent = root.querySelector(rule.parentSelector);
+                if (parent && parent.contains(node)) { return ruleId; }
+              } else {
+                let parents = root.querySelectorAll(rule.parentSelectorAll);
+                for (let j = 0; j < parents.length; j++) {
+                  if (parents[j].contains(node)) { return ruleId; }
+                }
               }
             }
           }

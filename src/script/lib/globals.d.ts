@@ -20,7 +20,9 @@ interface AudioRule {
   muteMethod?: number;              // [All] Override global muteMthod (0: tab, 1: video)
   parentSelector?: string;          // [ElementChild?,Text,Watcher] parent.contains(node)
   parentSelectorAll?: string;       // [ElementChild?] Check if any parents contain the node: parent.contains(node)
+  preserveWhiteSpace?: boolean;     // [Element,ElementChild] Set whiteSpace = 'pre' on subtitle elements
   removeSubtitleSpacing?: boolean;  // [Element] Remove subtitle padding/margin when hiding
+  rootNode?: boolean;               // [Element,ElementChild] Use getRootNode() or assume document (Default: false)
   showSubtitles?: number;           // [All] Override global showSubtitles (0: all, 1: filtered, 2: unfiltered, 3: none)
   simpleUnmute?: boolean;           // [Element,ElementChild,Text+,Watcher+] Simplify requirements for unmuting
   subtitleSelector?: string;        // [Element,ElementChild,Watcher] *Used for Filtering*: node.querySelector()

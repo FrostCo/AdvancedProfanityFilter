@@ -21,6 +21,17 @@ export default class WebAudioSites {
       { mode: 'element', className: 'ttr-container', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
       { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video' }
     ],
+    'tv.apple.com': [
+      {
+        mode: 'elementChild',
+        displaySelector: 'div.video-container > div > div > div',
+        parentSelector: 'div.video-container',
+        preserveWhiteSpace: true,
+        rootNode: true,
+        subtitleSelector: 'div > div > div > div > div',
+        tagName: 'DIV'
+      }
+    ],
     'www.att.tv': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
     'www.attwatchtv.com': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
     'gem.cbc.ca': [{ className: 'jw-text-track-container', mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
