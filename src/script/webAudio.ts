@@ -99,6 +99,7 @@ export default class WebAudio {
         this.mute(rule); // Mute the audio if we haven't already
 
         if (rule.filterSubtitles) {
+          if (rule.preserveWhiteSpace && subtitle.style.whiteSpace !== 'pre') { subtitle.style.whiteSpace = 'pre'; }
           if (rule.ignoreMutations) { this.filter.stopObserving(); }
           subtitle[textMethod] = result.filtered;
           if (rule.ignoreMutations) { this.filter.startObserving(); }
