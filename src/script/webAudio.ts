@@ -56,7 +56,14 @@ export default class WebAudio {
       this.initRules();
       if (this.enabledRuleIds.length > 0) {
         this.supportedPage = true;
-        if(['tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) { this.youTube = true; }
+        if(['tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) {
+          this.youTube = true;
+          // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
+          let youTubeAutoCensor = '[ __ ]';
+          let lists = this.wordlistId == 0 ? [] : [this.wordlistId];
+          let youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MatchMethods.Partial, repeat: false, separators: false, sub: '' };
+          this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
+        }
 
         if (this.watcherRuleIds.length > 0) {
           this.watcherRuleIds.forEach(ruleId => {
