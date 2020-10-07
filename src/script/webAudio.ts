@@ -110,8 +110,8 @@ export default class WebAudio {
     });
 
     switch (rule.showSubtitles) {
-      case Constants.ShowSubtitles.Filtered: if (filtered) { this.showSubtitles(rule); } else { this.hideSubtitles(rule, subtitles); } break;
-      case Constants.ShowSubtitles.Unfiltered: if (filtered) { this.hideSubtitles(rule, subtitles); } else { this.showSubtitles(rule); } break;
+      case Constants.ShowSubtitles.Filtered: if (filtered) { this.showSubtitles(rule, subtitles); } else { this.hideSubtitles(rule, subtitles); } break;
+      case Constants.ShowSubtitles.Unfiltered: if (filtered) { this.hideSubtitles(rule, subtitles); } else { this.showSubtitles(rule, subtitles); } break;
       case Constants.ShowSubtitles.None: this.hideSubtitles(rule, subtitles); break;
     }
   }
@@ -208,18 +208,21 @@ export default class WebAudio {
 
   hideSubtitles(rule: AudioRule, subtitles?) {
     if (rule.displaySelector) {
-      let container = document.querySelector(rule.displaySelector) as HTMLElement;
-      if (container) {
-        // Save the original display style if none was included in the rule
-        if (
-          rule.displayShow === ''
-          && container.style.display !== ''
-          && container.style.display !== rule.displayHide
-        ) {
-          rule.displayShow = container.style.display;
-        }
+      let root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
+      if (root) {
+        let container = root.querySelector(rule.displaySelector) as HTMLElement;
+        if (container) {
+          // Save the original display style if none was included in the rule
+          if (
+            rule.displayShow === ''
+            && container.style.display !== ''
+            && container.style.display !== rule.displayHide
+          ) {
+            rule.displayShow = container.style.display;
+          }
 
-        container.style.setProperty('display', rule.displayHide); // , 'important');
+          container.style.setProperty('display', rule.displayHide); // , 'important');
+        }
       }
     } else if (subtitles) {
       subtitles.forEach(subtitle => {
@@ -407,10 +410,13 @@ export default class WebAudio {
     return this.filter.replaceTextResult(string, this.wordlistId, stats);
   }
 
-  showSubtitles(rule) {
+  showSubtitles(rule, subtitles?) {
     if (rule.displaySelector) {
-      let container = document.querySelector(rule.displaySelector);
-      if (container) { container.style.setProperty('display', rule.displayShow); }
+      let root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
+      if (root) {
+        let container = root.querySelector(rule.displaySelector);
+        if (container) { container.style.setProperty('display', rule.displayShow); }
+      }
     }
   }
 
