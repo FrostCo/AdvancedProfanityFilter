@@ -435,13 +435,16 @@ export default class WebAudio {
           break;
         case 'elementChild':
           if (node.nodeName === rule.tagName) {
-            if (rule.parentSelector) {
-              let parent = document.querySelector(rule.parentSelector);
-              if (parent && parent.contains(node)) { return ruleId; }
-            } else {
-              let parents = document.querySelectorAll(rule.parentSelectorAll);
-              for (let j = 0; j < parents.length; j++) {
-                if (parents[j].contains(node)) { return ruleId; }
+            let root = rule.rootNode ? node.getRootNode() : document;
+            if (root) {
+              if (rule.parentSelector) {
+                let parent = root.querySelector(rule.parentSelector);
+                if (parent && parent.contains(node)) { return ruleId; }
+              } else {
+                let parents = root.querySelectorAll(rule.parentSelectorAll);
+                for (let j = 0; j < parents.length; j++) {
+                  if (parents[j].contains(node)) { return ruleId; }
+                }
               }
             }
           }
