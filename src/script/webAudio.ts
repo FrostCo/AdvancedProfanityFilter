@@ -387,7 +387,7 @@ export default class WebAudio {
       });
     } else { // Process child
       // innerText handles line feeds/spacing better, but is not available to #text nodes
-      let textMethod = (captions && captions.nodeName)  === '#text' ? 'textContent' : 'innerText';
+      let textMethod = (captions && captions.nodeName) === '#text' ? 'textContent' : 'innerText';
 
       // Don't process empty/whitespace nodes
       if (captions[textMethod] && captions[textMethod].trim()) {
