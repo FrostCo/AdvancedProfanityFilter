@@ -10,9 +10,9 @@ interface AudioRule {
   displaySelector?: string;         // [Element,ElementChild,Watcher] Alternate selector to hide/show captions
   displayShow?: string;             // [Element,ElementChild,Watcher] Display style for showing captions (Default: '')
   externalSub?: boolean;            // [Cue] [BETA]: Convert external captions/subtitles obtained from remote source to VTTCues
-  externalSubVar?: string;          // [Cue] [BETA]: Global variable to find available caption/subtitle data
-  externalSubURLKey?: string;       // [Cue] [BETA]: Key name for caption/subtitle URL (Default: 'url')
   externalSubFormatKey?: string;    // [Cue] [BETA]: Key name for caption/subtitle format (Default: 'format')
+  externalSubURLKey?: string;       // [Cue] [BETA]: Key name for caption/subtitle URL (Default: 'url')
+  externalSubVar?: string;          // [Cue] [BETA]: Global variable to find available caption/subtitle data
   filterSubtitles?: boolean;        // [All] Filter subtitle text (Default: true)
   hasChildrenElements?: boolean;    // [Element] node.childElementCount > 0 [Not commonly used]
   iframe?: boolean | undefined;     // [All] Pages to run on (true: only iframes, false: no iframes, undefined: all)
@@ -88,12 +88,12 @@ interface Migration {
 }
 
 interface ParsedSub {
+  align?: AlignSetting;
   end: number;
+  line?: string;
+  position?: string;
   start: number;
   text: string;
-  position?: string;
-  line?: string;
-  align?: AlignSetting;
 }
 
 interface ReplaceTextResult {
