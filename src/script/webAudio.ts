@@ -80,27 +80,6 @@ export default class WebAudio {
     }
   }
 
-  addCues(rule: AudioRule, video: HTMLVideoElement, parsedSubs: ParsedSub[]): TextTrack {
-    if (video.textTracks) {
-      let track = video.addTextTrack('captions', rule.externalSubTrackLabel, rule.videoCueLanguage) as TextTrack;
-      track.mode = 'showing';
-      for (let i = 0; i < parsedSubs.length; i++) {
-        let sub = parsedSubs[i];
-        try {
-          let cue = new VTTCue(sub.start, sub.end, sub.text);
-          if (sub.align) { cue.align = sub.align; }
-          if (sub.line) { cue.line = this.parseLineAndPositionSetting(sub.line); }
-          if (sub.position) { cue.position = this.parseLineAndPositionSetting(sub.position); }
-          track.addCue(cue);
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.error(`APF: Failed to add cue: ${sub}`, e);
-        }
-      }
-      return track;
-    }
-  }
-
   clean(subtitleContainer, ruleIndex = 0): void {
     let rule = this.rules[ruleIndex];
     if (rule.mode === 'watcher') { return; } // If this is for a watcher rule, leave the text alone
@@ -385,6 +364,30 @@ export default class WebAudio {
     if (rule && rule.unmuteDelay && this.unmuteTimeout) { this.clearUnmuteTimeout(rule); }
   }
 
+  newCue(start, end, text, options: ParsedSubOptions = {}): VTTCue {
+    try {
+      let cue = new VTTCue(hmsToSeconds(start), hmsToSeconds(end), text);
+      if (options.align) { cue.align = options.align; }
+      if (options.line) { cue.line = this.parseLineAndPositionSetting(options.line); }
+      if (options.position) { cue.position = this.parseLineAndPositionSetting(options.position); }
+      return cue;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(`APF: Failed to add cue: ( start: ${start}, end: ${end}, text: ${text} )`, e);
+    }
+  }
+
+  newTextTrack(rule: AudioRule, video: HTMLVideoElement, cues: VTTCue[]): TextTrack {
+    if (video.textTracks) {
+      let track = video.addTextTrack('captions', rule.externalSubTrackLabel, rule.videoCueLanguage) as TextTrack;
+      track.mode = 'showing';
+      for (let i = 0; i < cues.length; i++) {
+        track.addCue(cues[i]);
+      }
+      return track;
+    }
+  }
+
   parseLineAndPositionSetting(setting: string): LineAndPositionSetting {
     if (typeof setting == 'string' && setting != '') {
       if (setting == 'auto') {
@@ -395,8 +398,8 @@ export default class WebAudio {
     }
   }
 
-  parseSSA(ssa: string): ParsedSub[] {
-    let parsed: ParsedSub[] = [];
+  parseSSA(ssa: string): VTTCue[] {
+    let cues: VTTCue[] = [];
     let endIndex, startIndex, textIndex;
     let foundEvents = false;
 
@@ -414,19 +417,19 @@ export default class WebAudio {
         textIndex = format.indexOf('Text');
       } else if (lines[i].match(/^dialogue:/i)) {
         let line = lines[i].trim().split(',');
-        let start = hmsToSeconds(line[startIndex]);
-        let end = hmsToSeconds(line[endIndex]);
+        let start = line[startIndex];
+        let end = line[endIndex];
         let cleanText = line.slice(textIndex).join(',').replace(/\{\\\w.+?\}/g, '').split('\\N').reverse(); // Cleanup formatting and convert newlines
         for (let j = 0; j < cleanText.length; j++) {
-          parsed.push({ start: start, end: end, text: cleanText[j] });
+          cues.push(this.newCue(start, end, cleanText[j]));
         }
       }
     }
-    return parsed;
+    return cues;
   }
 
-  parseVTT(input: string): ParsedSub[] {
-    let parsed: ParsedSub[] = [];
+  parseVTT(input: string): VTTCue[] {
+    let cues: VTTCue[] = [];
     let lines = input.split('\n');
     let separator = new RegExp('\\s-->\\s');
 
@@ -434,9 +437,10 @@ export default class WebAudio {
       let line = lines[i].trim();
       if (line.match(separator)) { // Timestamp [& option] line
         let parts = line.replace(separator, ' ').split(' ');
-        let [start, end, ...options] = parts;
+        let [start, end, ...extraOptions] = parts;
         start = start.replace(',', '.');
         end = end.replace(',', '.');
+        let options: ParsedSubOptions = extraOptions.map(o => o.split(':')).reduce((acc, cur) => {acc[cur[0]] = cur[1]; return acc;}, {});
 
         // Get text
         let prevLine = lines[i-1].trim();
@@ -450,16 +454,11 @@ export default class WebAudio {
           text = nextLine;
         }
 
-        let data: ParsedSub = { start: hmsToSeconds(start), end: hmsToSeconds(end), text: text };
-        for (let j = 0; j < options.length; j++) {
-          let [prop, val] = options[j].split(':');
-          data[prop] = val;
-        }
-        parsed.push(data);
+        cues.push(this.newCue(start, end, text, options));
         i++; // Skip the next line because we already processed the text
       }
     }
-    return parsed;
+    return cues;
   }
 
   playing(video: HTMLVideoElement): boolean {
@@ -671,23 +670,24 @@ export default class WebAudio {
                 instance.fetching = true;
                 let subs = await makeRequest('GET', found[rule.externalSubURLKey]) as string;
                 if (typeof subs == 'string' && subs) {
-                  let parsedSubs;
-                  if (found[rule.externalSubFormatKey] == 'srt' || found[rule.externalSubFormatKey] == 'vtt') {
-                    parsedSubs = instance.parseVTT(subs);
-                  } else if (found[rule.externalSubFormatKey] == 'ass') {
-                    parsedSubs = instance.parseSSA(subs);
-                  } else {
-                    throw(`Unsupported subtitle type: ${found[rule.externalSubFormatKey]}`);
+                  let parsedCues;
+                  switch(found[rule.externalSubFormatKey]) {
+                    case 'ass': parsedCues = instance.parseSSA(subs); break;
+                    case 'vtt': parsedCues = instance.parseVTT(subs); break;
+                    default:
+                      throw(`Unsupported subtitle type: ${found[rule.externalSubFormatKey]}`);
                   }
-                  let track = instance.addCues(rule, video, parsedSubs);
-                  let cues = track.cues as any as FilteredVTTCue[];
-                  instance.processCues(cues, rule);
-                  instance.fetching = false;
+                  if (parsedCues) {
+                    let track = instance.newTextTrack(rule, video, parsedCues);
+                    let cues = track.cues as any as FilteredVTTCue[];
+                    instance.processCues(cues, rule);
+                    instance.fetching = false;
 
-                  // Hide old captions/subtitles
-                  if (rule.displaySelector) {
-                    let oldSubtitlesContainer = document.querySelector(rule.displaySelector) as HTMLElement;
-                    if (oldSubtitlesContainer) { oldSubtitlesContainer.style.display = 'none'; }
+                    // Hide old captions/subtitles
+                    if (rule.displaySelector) {
+                      let oldSubtitlesContainer = document.querySelector(rule.displaySelector) as HTMLElement;
+                      if (oldSubtitlesContainer) { oldSubtitlesContainer.style.display = 'none'; }
+                    }
                   }
                 } else {
                   throw('Failed to download external subtitles.');

@@ -89,13 +89,10 @@ interface Migration {
   runOnImport: boolean;
 }
 
-interface ParsedSub {
+interface ParsedSubOptions {
   align?: AlignSetting;
-  end: number;
   line?: string;
   position?: string;
-  start: number;
-  text: string;
 }
 
 interface ReplaceTextResult {
