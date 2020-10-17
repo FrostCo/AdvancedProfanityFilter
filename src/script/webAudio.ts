@@ -58,7 +58,7 @@ export default class WebAudio {
       this.initRules();
       if (this.enabledRuleIds.length > 0) {
         this.supportedPage = true;
-        if(['tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) {
+        if(['m.youtube.com', 'tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) {
           this.youTube = true;
           // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
           let youTubeAutoCensor = '[ __ ]';
