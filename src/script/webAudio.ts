@@ -525,6 +525,50 @@ export default class WebAudio {
     }
   }
 
+  async processExternalSub(video: HTMLVideoElement, rule) {
+    let textTrack = this.getVideoTextTrack(video, rule, 'externalSubTrackLabel');
+    if (!this.fetching && !textTrack) {
+      try {
+        let subsData = getGlobalVariable(rule.externalSubVar);
+        if (Array.isArray(subsData)) {
+          let found = subsData.find(subtitle => subtitle.language === rule.videoCueLanguage);
+          if (!found) { throw(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
+          this.fetching = true;
+          let subs = await makeRequest('GET', found[rule.externalSubURLKey]) as string;
+          if (typeof subs == 'string' && subs) {
+            let parsedCues;
+            switch(found[rule.externalSubFormatKey]) {
+              case 'ass': parsedCues = this.parseSSA(subs); break;
+              case 'srt': parsedCues = this.parseSRT(subs); break;
+              case 'vtt': parsedCues = this.parseVTT(subs); break;
+              default:
+                throw(`Unsupported subtitle type: ${found[rule.externalSubFormatKey]}`);
+            }
+            if (parsedCues) {
+              let track = this.newTextTrack(rule, video, parsedCues);
+              let cues = track.cues as any as FilteredVTTCue[];
+              this.processCues(cues, rule);
+              this.fetching = false;
+
+              // Hide old captions/subtitles
+              if (rule.displaySelector) {
+                let oldSubtitlesContainer = document.querySelector(rule.displaySelector) as HTMLElement;
+                if (oldSubtitlesContainer) { oldSubtitlesContainer.style.display = 'none'; }
+              }
+            }
+          } else {
+            throw('Failed to download external subtitles.');
+          }
+        } else {
+          throw(`Failed to find subtitle variable: ${rule.externalSubVar}`);
+        }
+      } catch(e) {
+        // eslint-disable-next-line no-console
+        console.error('APF: Error using external subtitles. ', e);
+      }
+    }
+  }
+
   processWatcherCaptions(rule, captions, data) {
     let instance = this;
 
@@ -691,54 +735,12 @@ export default class WebAudio {
     }
   }
 
-  async watchForVideo(instance: WebAudio) {
+  watchForVideo(instance: WebAudio) {
     for (let x = 0; x < instance.cueRuleIds.length; x++) {
       let rule = instance.rules[x] as AudioRule;
       let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
-        if (rule.externalSub) {
-          let textTrack = instance.getVideoTextTrack(video, rule, 'externalSubTrackLabel');
-          if (!instance.fetching && !textTrack) {
-            try {
-              let subsData = getGlobalVariable(rule.externalSubVar);
-              if (Array.isArray(subsData)) {
-                let found = subsData.find(subtitle => subtitle.language === rule.videoCueLanguage);
-                if (!found) { throw(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
-                instance.fetching = true;
-                let subs = await makeRequest('GET', found[rule.externalSubURLKey]) as string;
-                if (typeof subs == 'string' && subs) {
-                  let parsedCues;
-                  switch(found[rule.externalSubFormatKey]) {
-                    case 'ass': parsedCues = instance.parseSSA(subs); break;
-                    case 'srt': parsedCues = instance.parseSRT(subs); break;
-                    case 'vtt': parsedCues = instance.parseVTT(subs); break;
-                    default:
-                      throw(`Unsupported subtitle type: ${found[rule.externalSubFormatKey]}`);
-                  }
-                  if (parsedCues) {
-                    let track = instance.newTextTrack(rule, video, parsedCues);
-                    let cues = track.cues as any as FilteredVTTCue[];
-                    instance.processCues(cues, rule);
-                    instance.fetching = false;
-
-                    // Hide old captions/subtitles
-                    if (rule.displaySelector) {
-                      let oldSubtitlesContainer = document.querySelector(rule.displaySelector) as HTMLElement;
-                      if (oldSubtitlesContainer) { oldSubtitlesContainer.style.display = 'none'; }
-                    }
-                  }
-                } else {
-                  throw('Failed to download external subtitles.');
-                }
-              } else {
-                throw(`Failed to find subtitle variable: ${rule.externalSubVar}`);
-              }
-            } catch(e) {
-              // eslint-disable-next-line no-console
-              console.error('APF: Error using external subtitles. ', e);
-            }
-          }
-        }
+        if (rule.externalSub) { instance.processExternalSub(video, rule); }
 
         let ruleKey = rule.externalSub ? 'externalSubTrackLabel' : 'videoCueLanguage';
         let textTrack = instance.getVideoTextTrack(video, rule, ruleKey);
