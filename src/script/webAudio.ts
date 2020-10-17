@@ -7,14 +7,12 @@ import { getGlobalVariable, hmsToSeconds, makeRequest } from './lib/helper';
 export default class WebAudio {
   cueRuleIds: number[];
   enabledRuleIds: number[];
-  externalSubURL: string;
   fetching: boolean;
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
   lastProcessedText: string;
   muted: boolean;
-  port: any;
   rules: AudioRule[];
   sites: { [site: string]: AudioRule[] };
   supportedPage: boolean;

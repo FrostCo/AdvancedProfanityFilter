@@ -4,7 +4,7 @@ export default class Page {
 
   static readonly disabledProtocols = new RegExp('(^chrome:|^about:|^[a-zA-Z]+-extension:)', 'i');
   static readonly forbiddenNodeRegExp = new RegExp('^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)');
-  static readonly forbiddenTags = ['APFDATA', 'SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA', 'IFRAME', 'LINK'];
+  static readonly forbiddenTags = ['SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA', 'IFRAME', 'LINK'];
 
   // Returns true if a node should *not* be altered in any way
   static isForbiddenNode(node: any): boolean {
