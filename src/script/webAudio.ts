@@ -428,6 +428,45 @@ export default class WebAudio {
     return cues;
   }
 
+  parseSRT(srt): VTTCue[] {
+    let lines = srt.trim().replace('\r\n', '\n').split(/[\r\n]/).map(function(line) {
+      return line.trim();
+    });
+    let cues: VTTCue[] = [];
+    let start = null;
+    let end = null;
+    let text = null;
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].indexOf('-->') >= 0) {
+        let splitted = lines[i].split(/[ \t]+-->[ \t]+/);
+        if (splitted.length != 2) {
+          throw 'Error when splitting "-->": ' + lines[i];
+        }
+        start = splitted[0];
+        end = splitted[1];
+      } else if (lines[i] == '') {
+        if (start && end) {
+          let cue = this.newCue(start, end, text);
+          cues.push(cue);
+          start = null;
+          end = null;
+          text = null;
+        }
+      } else if(start && end) {
+        if (text == null) {
+          text = lines[i];
+        } else {
+          text += '\n' + lines[i];
+        }
+      }
+    }
+    if (start && end) {
+      let cue = this.newCue(start, end, text);
+      cues.push(cue);
+    }
+    return cues;
+  }
+
   parseVTT(input: string): VTTCue[] {
     let cues: VTTCue[] = [];
     let lines = input.split('\n');
@@ -673,6 +712,7 @@ export default class WebAudio {
                   let parsedCues;
                   switch(found[rule.externalSubFormatKey]) {
                     case 'ass': parsedCues = instance.parseSSA(subs); break;
+                    case 'srt': parsedCues = instance.parseSRT(subs); break;
                     case 'vtt': parsedCues = instance.parseVTT(subs); break;
                     default:
                       throw(`Unsupported subtitle type: ${found[rule.externalSubFormatKey]}`);
