@@ -396,36 +396,6 @@ export default class WebAudio {
     }
   }
 
-  parseSSA(ssa: string): VTTCue[] {
-    let cues: VTTCue[] = [];
-    let endIndex, startIndex, textIndex;
-    let foundEvents = false;
-
-    let lines = ssa.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      if (!foundEvents) {
-        if (lines[i].match(/^\[Events\]/i)) { foundEvents = true; }
-        continue;
-      }
-
-      if (lines[i].match(/^format:/i)) {
-        let format = lines[i].trim().split(',');
-        endIndex = format.indexOf('End');
-        startIndex = format.indexOf('Start');
-        textIndex = format.indexOf('Text');
-      } else if (lines[i].match(/^dialogue:/i)) {
-        let line = lines[i].trim().split(',');
-        let start = line[startIndex];
-        let end = line[endIndex];
-        let cleanText = line.slice(textIndex).join(',').replace(/\{\\\w.+?\}/g, '').split('\\N').reverse(); // Cleanup formatting and convert newlines
-        for (let j = 0; j < cleanText.length; j++) {
-          cues.push(this.newCue(start, end, cleanText[j]));
-        }
-      }
-    }
-    return cues;
-  }
-
   parseSRT(srt): VTTCue[] {
     let lines = srt.trim().replace('\r\n', '\n').split(/[\r\n]/).map(function(line) {
       return line.trim();
@@ -461,6 +431,36 @@ export default class WebAudio {
     if (start && end) {
       let cue = this.newCue(start, end, text);
       cues.push(cue);
+    }
+    return cues;
+  }
+
+  parseSSA(ssa: string): VTTCue[] {
+    let cues: VTTCue[] = [];
+    let endIndex, startIndex, textIndex;
+    let foundEvents = false;
+
+    let lines = ssa.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      if (!foundEvents) {
+        if (lines[i].match(/^\[Events\]/i)) { foundEvents = true; }
+        continue;
+      }
+
+      if (lines[i].match(/^format:/i)) {
+        let format = lines[i].trim().split(',');
+        endIndex = format.indexOf('End');
+        startIndex = format.indexOf('Start');
+        textIndex = format.indexOf('Text');
+      } else if (lines[i].match(/^dialogue:/i)) {
+        let line = lines[i].trim().split(',');
+        let start = line[startIndex];
+        let end = line[endIndex];
+        let cleanText = line.slice(textIndex).join(',').replace(/\{\\\w.+?\}/g, '').split('\\N').reverse(); // Cleanup formatting and convert newlines
+        for (let j = 0; j < cleanText.length; j++) {
+          cues.push(this.newCue(start, end, cleanText[j]));
+        }
+      }
     }
     return cues;
   }
