@@ -38,6 +38,18 @@ export default class WebAudioSites {
     'www.cbs.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'www.crackle.com': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'www.criterionchannel.com': [{ iframe: true, mode: 'cue', videoCueHideCues: true, videoCueRequireShowing: false }],
+    'www.crunchyroll.com': [
+      {
+        displaySelector: 'canvas#velocity-canvas',
+        externalSub: true,
+        externalSubVar: 'window.v1config.media.subtitles',
+        iframe: true,
+        mode: 'cue',
+        showSubtitles: 0,
+        videoCueLanguage: 'enUS',
+        videoCueRequireShowing: false,
+      }
+    ],
     'www.cwtv.com': [{ className: 'ttr-container', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
     'www.dishanywhere.com': [
       { className: 'bmpui-ui-subtitle-label', mode: 'element', tagName: 'SPAN' },
