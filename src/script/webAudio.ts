@@ -82,7 +82,7 @@ export default class WebAudio {
 
   addCues(rule: AudioRule, video: HTMLVideoElement, parsedSubs: ParsedSub[]): TextTrack {
     if (video.textTracks) {
-      let track = video.addTextTrack('captions', 'APF', rule.videoCueLanguage) as TextTrack;
+      let track = video.addTextTrack('captions', rule.externalSubTrackLabel, rule.videoCueLanguage) as TextTrack;
       track.mode = 'showing';
       for (let i = 0; i < parsedSubs.length; i++) {
         let sub = parsedSubs[i];
@@ -207,19 +207,17 @@ export default class WebAudio {
     this.unmuteTimeout = null;
   }
 
-  getVideoTextTrack(video: HTMLVideoElement, language: string, requireShowing: boolean = true) {
+  getVideoTextTrack(video: HTMLVideoElement, rule: AudioRule, ruleKey: string = 'videoCueLanguage') {
     if (video.textTracks && video.textTracks.length > 0) {
       for (let i = 0; i < video.textTracks.length; i++) {
-        if (language) {
-          if (language == video.textTracks[i].language) {
-            if (!requireShowing || (requireShowing && video.textTracks[i].mode === 'showing')) {
-              return video.textTracks[i];
-            }
-          }
-        } else {
-          if (!requireShowing || (requireShowing && video.textTracks[i].mode === 'showing')) {
-            return video.textTracks[i];
-          }
+        let textTrackKey;
+        switch(ruleKey) {
+          case 'videoCueLanguage': textTrackKey = 'language'; break;
+          case 'videoCueLabel': textTrackKey = 'label'; break;
+          case 'externalSubTrackLabel': textTrackKey = 'label'; break;
+        }
+        if (this.matchTextTrack(video.textTracks[i], rule, textTrackKey, ruleKey)) {
+          return video.textTracks[i];
         }
       }
     }
@@ -274,6 +272,7 @@ export default class WebAudio {
     if (rule.externalSub) {
       if (rule.externalSubURLKey === undefined) { rule.externalSubURLKey = 'url'; }
       if (rule.externalSubFormatKey === undefined) { rule.externalSubFormatKey = 'format'; }
+      if (rule.externalSubTrackLabel === undefined) { rule.externalSubTrackLabel = 'APF'; }
     }
   }
 
@@ -351,6 +350,16 @@ export default class WebAudio {
     if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.DefaultVideoSelector; }
     this.initDisplaySelector(rule);
+  }
+
+  matchTextTrack(textTrack: TextTrack, rule: AudioRule, textTrackKey?: string, ruleKey?: string): boolean {
+    if (
+      textTrack.cues.length > 0
+      && (!rule.videoCueRequireShowing || textTrack.mode === 'showing')
+    ) {
+      // Return true if both keys weren't provided, the rule doesn't have a have for key, or if both keys match the textTrack
+      return ((!textTrackKey || !ruleKey || !rule[ruleKey]) || textTrack[textTrackKey] == rule[ruleKey]);
+    }
   }
 
   mute(rule?: AudioRule, video?: HTMLVideoElement): void {
@@ -652,7 +661,8 @@ export default class WebAudio {
       let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
         if (rule.externalSub) {
-          if (!instance.fetching && !video.textTracks[1]) {
+          let textTrack = instance.getVideoTextTrack(video, rule, 'externalSubTrackLabel');
+          if (!instance.fetching && !textTrack) {
             try {
               let subsData = getGlobalVariable(rule.externalSubVar);
               if (Array.isArray(subsData)) {
@@ -692,7 +702,8 @@ export default class WebAudio {
           }
         }
 
-        let textTrack = instance.getVideoTextTrack(video, rule.videoCueLanguage, rule.videoCueRequireShowing);
+        let ruleKey = rule.externalSub ? 'externalSubTrackLabel' : 'videoCueLanguage';
+        let textTrack = instance.getVideoTextTrack(video, rule, ruleKey);
 
         if (textTrack && !textTrack.oncuechange) {
           if (!rule.videoCueHideCues && rule.showSubtitles === Constants.ShowSubtitles.None) { textTrack.mode = 'hidden'; }

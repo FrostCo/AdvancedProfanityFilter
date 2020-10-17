@@ -13,6 +13,7 @@ interface AudioRule {
   externalSubFormatKey?: string;    // [Cue] [BETA]: Key name for caption/subtitle format (Default: 'format')
   externalSubURLKey?: string;       // [Cue] [BETA]: Key name for caption/subtitle URL (Default: 'url')
   externalSubVar?: string;          // [Cue] [BETA]: Global variable to find available caption/subtitle data
+  externalSubTrackLabel?: string;   // [Cue] [BETA]: Label used for processed TextTrack
   filterSubtitles?: boolean;        // [All] Filter subtitle text (Default: true)
   hasChildrenElements?: boolean;    // [Element] node.childElementCount > 0 [Not commonly used]
   iframe?: boolean | undefined;     // [All] Pages to run on (true: only iframes, false: no iframes, undefined: all)
@@ -29,6 +30,7 @@ interface AudioRule {
   tagName?: string;                 // [Element*,ElementChild*] node.nodeName
   unmuteDelay?: number;             // [Element,ElementChild,Watcher] Positive number (in ms) to delay unmuting
   videoCueHideCues?: boolean;       // [Cue] Remove/hide cues instead of setting textTrack.mode = 'hidden'
+  videoCueLabel?: string;           // [Cue] Label for video TextTrack
   videoCueLanguage?: string;        // [Cue] Language for video TextTrack
   videoCueRequireShowing?: boolean; // [Cue] Override global setting for muteCueRequireShowing
   videoCueSync?: number;            // [Cue] Adjust subtitle sync +/- (in seconds)
