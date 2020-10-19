@@ -2,7 +2,7 @@ import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
-import { getGlobalVariable, hmsToSeconds, makeRequest } from './lib/helper';
+import { getGlobalVariable, hmsToSeconds, makeRequest, secondsToHMS } from './lib/helper';
 
 export default class WebAudio {
   cueRuleIds: number[];
@@ -491,7 +491,27 @@ export default class WebAudio {
           text = nextLine;
         }
 
-        cues.push(this.newCue(start, end, text, options));
+        // Handle the case when there are multiple cues that should be shown concurrently
+        // The first line of the entry could look like "Caption-C8_1", and the subsequent entry would be "Caption-C8_2"
+        if (prevLine && !prevLine.match(/_1$/)) {
+          let previousCue = cues[cues.length-1];
+          // If they share an endTime with the previous cue, but startTimes are different, make them match
+          if (previousCue.startTime != hmsToSeconds(start) && previousCue.endTime == hmsToSeconds(end)) {
+            start = secondsToHMS(previousCue.startTime);
+          }
+        }
+
+        let cue = this.newCue(start, end, text, options);
+
+        // Concurrent cues seem to be displayed backwards, so we'll reverse them: [a,b,c] -> [c,b,a]
+        if (prevLine && !prevLine.match(/_1$/)) {
+          let concurrentNumber = parseInt(prevLine.match(/_([2-9])$/)[1]);
+          let firstConcurrentCueIndex = (cues.length - concurrentNumber) + 1; // Find the first concurrent index
+          cues.splice(firstConcurrentCueIndex, 0, cue);
+        } else {
+          cues.push(cue);
+        }
+
         i++; // Skip the next line because we already processed the text
       }
     }
