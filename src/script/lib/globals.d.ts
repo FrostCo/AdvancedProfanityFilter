@@ -1,5 +1,4 @@
 interface AudioRule {
-  mode: string;                     // [All*] 'cue', 'element', 'elementChild', 'text', 'watcher'
   checkInterval?: number;           // [Watcher] Set a custom watch interval (in ms, Default: 20)
   className?: string;               // [Element] node.className.includes()
   containsSelector?: string;        // [Element] node.querySelector() [Not commonly used]
@@ -11,13 +10,14 @@ interface AudioRule {
   displayShow?: string;             // [Element,ElementChild,Watcher] Display style for showing captions (Default: '')
   externalSub?: boolean;            // [Cue] [BETA]: Convert external captions/subtitles obtained from remote source to VTTCues
   externalSubFormatKey?: string;    // [Cue] [BETA]: Key name for caption/subtitle format (Default: 'format')
+  externalSubTrackLabel?: string;   // [Cue] [BETA]: Label used for processed TextTrack
   externalSubURLKey?: string;       // [Cue] [BETA]: Key name for caption/subtitle URL (Default: 'url')
   externalSubVar?: string;          // [Cue] [BETA]: Global variable to find available caption/subtitle data
-  externalSubTrackLabel?: string;   // [Cue] [BETA]: Label used for processed TextTrack
   filterSubtitles?: boolean;        // [All] Filter subtitle text (Default: true)
   hasChildrenElements?: boolean;    // [Element] node.childElementCount > 0 [Not commonly used]
   iframe?: boolean | undefined;     // [All] Pages to run on (true: only iframes, false: no iframes, undefined: all)
   ignoreMutations?: boolean;        // [Element,ElementChild,Text,Watcher] Ignore mutations when filtering captions/subtitles
+  mode: string;                     // [All*] 'cue', 'element', 'elementChild', 'text', 'watcher'
   muteMethod?: number;              // [All] Override global muteMthod (0: tab, 1: video)
   parentSelector?: string;          // [ElementChild?,Text,Watcher] parent.contains(node)
   parentSelectorAll?: string;       // [ElementChild?] Check if any parents contain the node: parent.contains(node)
