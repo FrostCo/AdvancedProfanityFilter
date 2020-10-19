@@ -71,7 +71,7 @@ export function getVersion(version: string): Version {
 }
 
 // NOTE: This function requires the hh:mm:ss.ff format
-export function hmsToSeconds(timeStr: string, precision: number = 2): number {
+export function hmsToSeconds(timeStr: string, precision: number = 3): number {
   let [hh = '0', mm = '0', ss = '0'] = (timeStr || '0:0:0').split(':');
   let hour = parseInt(hh, 10) || 0;
   let minute = parseInt(mm, 10) || 0;
