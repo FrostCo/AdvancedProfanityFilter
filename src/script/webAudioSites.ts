@@ -5,6 +5,16 @@ export default class WebAudioSites {
 
   static sites: { [site: string]: AudioRule[] } = {
     'abc.com': [{ className: 'akamai-caption-text', mode: 'element', tagName: 'DIV' }],
+    'acorn.tv': [
+      {
+        iframe: true,
+        mode: 'elementChild',
+        parentSelector: 'div.vjs-text-track-display',
+        simpleUnmute: true,
+        subtitleSelector: ':scope div > div',
+        tagName: 'DIV',
+      }
+    ],
     'www.amazon.com': [
       {
         displayHide: 'none',
