@@ -15,6 +15,7 @@ export default class DataMigration {
     { version: '2.7.0', name: 'addWordlistsToWords', runOnImport: true },
     { version: '2.7.0', name: 'removeGlobalMatchMethod', runOnImport: true },
     { version: '2.7.0', name: 'removeOldDomainArrays', runOnImport: true },
+    { version: '2.12.0', name: 'overwriteMuteCueRequireShowingDefault', runOnImport: false },
   ];
 
   constructor(config) {
@@ -93,6 +94,15 @@ export default class DataMigration {
         });
       }
     });
+  }
+
+  // This setting has caused some issues for users specifically with Disney+.
+  // This migration should only run once, and sets it to the new default of false.
+  overwriteMuteCueRequireShowingDefault() {
+    let cfg = this.cfg;
+    if (cfg.muteCueRequireShowing === true) {
+      cfg.muteCueRequireShowing = false;
+    }
   }
 
   removeGlobalMatchMethod() {

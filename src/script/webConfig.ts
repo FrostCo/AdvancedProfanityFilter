@@ -24,7 +24,7 @@ export default class WebConfig extends Config {
     enabledDomainsOnly: false,
     muteAudio: false,
     muteAudioOnly: false,
-    muteCueRequireShowing: true,
+    muteCueRequireShowing: false,
     muteMethod: Constants.MuteMethods.Tab,
     password: null,
     showSubtitles: Constants.ShowSubtitles.All,
