@@ -84,34 +84,41 @@ export default class Config {
     Object.assign(this, Config._defaults, data);
   }
 
-  addWord(str: string, options?: WordOptions) {
-    str = str.trim().toLowerCase();
+  addWord(str: string, options: WordOptions = this.defaultWordOptions()) {
+    str = str.trim();
+    options = Object.assign({}, this.defaultWordOptions(), options);
+
+    if (options.matchMethod !== Constants.MatchMethods.Regex) {
+      str = str.toLowerCase();
+    }
+
     if (Object.keys(this.words).includes(str)) {
       return false; // Already exists
-    } else if (options) {
+    } else {
       options.sub = options.sub.trim().toLowerCase();
       this.words[str] = options;
-      return true;
-    } else {
-      let lists = [];
-      if (this.wordlistsEnabled) {
-        lists.push(this.wordlistId);
-      }
-
-      this.words[str] = {
-        matchMethod: this.defaultWordMatchMethod,
-        repeat: this.defaultWordRepeat,
-        separators: this.defaultWordSeparators,
-        lists: lists,
-        sub: ''
-      };
       return true;
     }
   }
 
+  defaultWordOptions(): WordOptions {
+    return {
+      lists: [],
+      matchMethod: this.defaultWordMatchMethod,
+      repeat: this.defaultWordRepeat,
+      separators: this.defaultWordSeparators,
+      sub: '',
+    };
+  }
+
   removeWord(str: string) {
-    str = str.trim().toLowerCase();
-    if (Object.keys(this.words).includes(str)) {
+    str = str.trim();
+    const lower = str.toLowerCase();
+
+    if (Object.keys(this.words).includes(lower)) {
+      delete this.words[lower];
+      return true;
+    } else if (this.words[str]) {
       delete this.words[str];
       return true;
     } else {

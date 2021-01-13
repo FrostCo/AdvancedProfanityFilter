@@ -48,6 +48,14 @@ describe('Config', function() {
       expect(config.words['anothernewword'].sub).to.equal('');
     });
 
+    it('should not lower a regex', function() {
+      const options = { matchMethod: Constants.MatchMethods.Regex };
+      const word = 'Thi\\S';
+      expect(config.addWord(word, options)).to.equal(true);
+      expect(Object.keys(config.words)).to.include(word);
+      expect(config.words[word].matchMethod).to.equal(Constants.MatchMethods.Regex);
+    });
+
     it('should return false when word is already present', function() {
       expect(config.addWord('anotherWord')).to.equal(true);
       expect(config.addWord('anotherWord')).to.equal(false);

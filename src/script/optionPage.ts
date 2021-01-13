@@ -1163,10 +1163,14 @@ export default class OptionPage {
     let wordMatchSeparators = document.getElementById('wordMatchSeparators') as HTMLInputElement;
     let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
     let selectedMatchMethod = document.querySelector('input[name="wordMatchMethod"]:checked') as HTMLInputElement;
-    let word = wordText.value.trim().toLowerCase();
+    let word = wordText.value.trim();
     let sub = substitutionText.value.trim().toLowerCase();
     let added = true;
     let wordlistSelectionsInput = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
+
+    if (Constants.MatchMethods[selectedMatchMethod.value] !== Constants.MatchMethods.Regex) {
+      word = word.toLowerCase();
+    }
 
     if (word == '') {
       OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
