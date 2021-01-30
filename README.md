@@ -18,8 +18,9 @@ For an overview of features and options, please head to the [wiki](https://githu
 | Edge    | [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/lhnbdlbhcokmgpjenkjolnhdnkphnkam) |
 | Edge (Legacy) | [More Info](https://github.com/richardfrost/AdvancedProfanityFilter/issues/102) |
 | Opera   | [Opera addons](https://addons.opera.com/en/extensions/details/advanced-profanity-filter/) |
-| Android | [Kiwi](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser) or [Firefox](https://play.google.com/store/apps/details?id=org.mozilla.firefox) |
+| Android | [Kiwi](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser) or [Firefox](https://github.com/richardfrost/AdvancedProfanityFilter/issues/243#issuecomment-726218625) |
 | iOS/Other | [Bookmarklet Info](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Bookmarklet) |
+| TV Cast | [Instructions](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio#watch-on-tv) - [Discussion](https://github.com/richardfrost/AdvancedProfanityFilter/issues/206) |
 
 ### Features
 * Filter modes
@@ -32,14 +33,14 @@ For an overview of features and options, please head to the [wiki](https://githu
     * Pinterest
     * Reddit
     * Twitter
-* Audio muting for videos on supported sites:
+* [Audio muting](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio) for videos on supported sites:
     * Amazon Video
     * Hulu
     * Netflix
     * Plex
     * Vudu
     * YouTube
-    * And more! You can even add your own! (advanced)
+    * And more! You can even add your own! ([advanced](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site))
 
 For a detailed overview of the features and settings, please see the [Getting Started page](https://github.com/richardfrost/AdvancedProfanityFilter/wiki).
 
