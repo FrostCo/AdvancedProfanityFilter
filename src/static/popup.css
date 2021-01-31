@@ -14,6 +14,11 @@ body {
   margin: 0;
 }
 
+body.dark {
+  background: #202020;
+  color: #fff;
+}
+
 a:link, a:visited {
   color: #333;
   font-size: 10px;
@@ -110,6 +115,15 @@ h4 {
   background: #ccc;
   text-align: center;
   margin-top: 8px;
+}
+
+#footer.dark {
+  background: #202020;
+  color: #fff;
+}
+
+#footer.dark a {
+  color: #fff;
 }
 
 #gettingStarted {

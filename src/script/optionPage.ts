@@ -11,8 +11,23 @@ import WebAudioSites from './webAudioSites';
 export default class OptionPage {
   auth: OptionAuth;
   cfg: WebConfig;
+  themeButtons: Element[];
+  themeElements: Element[];
 
   static readonly activeClass = 'w3-flat-belize-hole';
+  static readonly themeButtonSelectors = [
+    'div.themes > div.moon',
+    'div.themes > div.sun',
+  ];
+  static readonly themeElementSelectors = [
+    'body',
+    'div#page',
+    '#bulkWordEditorModal > div',
+    '#confirmModal > div',
+    '#passwordModal > div',
+    '#statusModal > div',
+    '#supportedAudioSitesModal > div',
+  ];
 
   static closeModal(id: string) {
     OptionPage.hide(document.getElementById(id));
@@ -127,6 +142,16 @@ export default class OptionPage {
   static showWarningModal(content = 'Invalid input.', title = 'Warning', titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
     OptionPage.openModal('statusModal');
+  }
+
+  constructor() {
+    this.themeButtons = OptionPage.themeButtonSelectors.map(selector => { return document.querySelector(selector); });
+    this.themeElements = OptionPage.themeElementSelectors.map(selector => { return document.querySelector(selector); });
+  }
+
+  applyTheme() {
+    option.themeElements.forEach(element => { element.classList.toggle('dark'); });
+    option.themeButtons.forEach(element => { element.classList.toggle('w3-hide'); });
   }
 
   backupConfig() {
@@ -496,6 +521,8 @@ export default class OptionPage {
     } else {
       OptionPage.show(document.getElementById('main'));
     }
+
+    if (this.cfg.darkMode) { this.applyTheme(); }
 
     self.populateOptions();
   }
@@ -1304,30 +1331,35 @@ export default class OptionPage {
     OptionPage.openModal(modalId);
   }
 
+  showSupportedAudioSiteConfig() {
+    const select = document.querySelector('#supportedAudioSitesModal select#siteSelect') as HTMLSelectElement;
+    let textArea = document.querySelector('#supportedAudioSitesModal div#modalContentRight textarea') as HTMLTextAreaElement;
+    let config = {};
+    config[select.value] = WebAudioSites.sites[select.value];
+    textArea.textContent = JSON.stringify(config, null, 2);
+  }
+
   showSupportedAudioSites() {
     let title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
+    title.textContent = 'Supported Audio Sites';
     let contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
-    removeChildren(contentLeft);
+    let select = contentLeft.querySelector('#siteSelect') as HTMLSelectElement;
+    removeChildren(select);
+
     let sortedSites = Object.keys(WebAudioSites.sites).sort(function(a,b) {
       let domainA = a.match(/\w*\.\w*$/)[0];
       let domainB = b.match(/\w*\.\w*$/)[0];
       return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
     });
-    let ul = document.createElement('ul');
-    sortedSites.forEach(site => {
-      let li = document.createElement('li');
-      let a = document.createElement('a');
-      a.href = `https://${site}`;
-      a.target = '_blank';
-      a.textContent = site;
-      li.appendChild(a);
-      ul.appendChild(li);
-    });
-    title.textContent = 'Supported Audio Sites';
-    contentLeft.appendChild(ul);
 
-    let textArea = document.querySelector('#supportedAudioSitesModal div#modalContentRight textarea') as HTMLTextAreaElement;
-    textArea.textContent = JSON.stringify(WebAudioSites.sites, null, 2);
+    sortedSites.forEach(site => {
+      let option = document.createElement('option');
+      option.value = site;
+      option.textContent = site;
+      select.appendChild(option);
+    });
+
+    option.showSupportedAudioSiteConfig();
     OptionPage.openModal('supportedAudioSitesModal');
   }
 
@@ -1348,6 +1380,12 @@ export default class OptionPage {
         document.getElementById('testText').focus();
         break;
     }
+  }
+
+  async toggleTheme() {
+    option.cfg.darkMode = !option.cfg.darkMode;
+    await option.cfg.save('darkMode');
+    option.applyTheme();
   }
 
   updateBookmarklet(url: string) {
@@ -1461,6 +1499,7 @@ document.getElementById('confirmModalBackup').addEventListener('click', e => { o
 document.getElementById('confirmModalOK').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('statusModalOK').addEventListener('click', e => { OptionPage.closeModal('statusModal'); });
+document.querySelector('#supportedAudioSitesModal #siteSelect').addEventListener('change', e => { option.showSupportedAudioSiteConfig(); });
 document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', e => { OptionPage.closeModal('supportedAudioSitesModal'); });
 document.querySelector('#bulkWordEditorModal button.modalAddWord').addEventListener('click', e => { option.bulkEditorAddRow(); });
 document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEventListener('click', e => { option.bulkEditorAddWords(); });
@@ -1531,3 +1570,4 @@ document.getElementById('setPassword').addEventListener('input', e => { option.a
 document.getElementById('setPasswordBtn').addEventListener('click', e => { option.confirm(e, 'setPassword'); });
 // Test
 document.getElementById('testText').addEventListener('input', e => { option.populateTest(); });
+document.getElementsByClassName('themes')[0].addEventListener('click', e => { option.toggleTheme(); });

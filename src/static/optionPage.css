@@ -1,4 +1,26 @@
+/* class colors used:
+w3-red
+w3-flat-peter-river
+w3-border-grey
+w3-flat-silver
+w3-flat-pomegranate */
+
 /* || HTML Elements */
+
+body {
+  background: #f1f1f1; /* w3-light-grey */
+  color: #000;
+}
+
+body.dark {
+  background: #202020;
+  color: #fff;
+}
+
+div.dark {
+  background: #121212;
+  color: #fff;
+}
 
 html {
   --blue: #2980b9; /* belize-hole */
@@ -29,6 +51,15 @@ h4.sectionHeader {
   margin-bottom: 14.5px;
 }
 
+div.themes > div {
+  width: 18px;
+  margin-top: 3px;
+}
+
+div.themes div.sun {
+  color: orange;
+}
+
 #header img.patreon {
   margin-top: 9.5px;
   margin-bottom: 9.5px;
@@ -38,7 +69,12 @@ h4.sectionHeader {
   height: 31px;
 }
 
-#menu > a:hover {
+#menu {
+  height: 40px;
+  line-height: 24px;
+}
+
+#menu > a:hover, #menu > div:hover {
   color: #fff !important;
   background-color: var(--blue) !important;
 }

@@ -5,6 +5,7 @@ export default class WebConfig extends Config {
   _splitContainerKeys: { [key: string]: string[] };
   audioWordlistId: number;
   customAudioSites: { [site: string]: AudioRule[] };
+  darkMode: boolean;
   domains: { [site: string]: DomainCfg };
   enabledDomainsOnly: boolean;
   muteAudio: boolean;
@@ -21,6 +22,7 @@ export default class WebConfig extends Config {
     domains: {},
     audioWordlistId: 0,
     customAudioSites: null,
+    darkMode: false,
     enabledDomainsOnly: false,
     muteAudio: false,
     muteAudioOnly: false,
