@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+import { expect } from 'chai';
 import { escapeHTML, formatNumber, getVersion, hmsToSeconds, isVersionOlder, removeFromArray, secondsToHMS } from '../built/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];

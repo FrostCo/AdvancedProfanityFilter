@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+import { expect } from 'chai';
 import Page from './built/page';
 
 describe('Page', function() {
