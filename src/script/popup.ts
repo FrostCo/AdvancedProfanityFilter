@@ -17,6 +17,7 @@ class Popup {
   static readonly _requiredConfig =  [
     'audioWordlistId',
     'customAudioSites',
+    'darkMode',
     'domains',
     'enabledDomainsOnly',
     'filterMethod',
@@ -62,6 +63,15 @@ class Popup {
     element.classList.add('w3-show');
   }
 
+  applyTheme() {
+    const elements = [];
+    elements.push(document.querySelector('body'));
+    elements.push(document.querySelector('#footer'));
+    elements.forEach(element => { element.classList.toggle('dark'); });
+    const table = document.querySelector('#summary > table');
+    table.classList.toggle('w3-striped');
+  }
+
   async filterMethodSelect() {
     let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     popup.cfg.filterMethod = filterMethodSelect.selectedIndex;
@@ -74,6 +84,7 @@ class Popup {
   async populateOptions(event?: Event) {
     let popup = this;
     await Popup.load(popup);
+    if (popup.cfg.darkMode) { popup.applyTheme(); }
 
     let domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
     let domainToggle = document.getElementById('domainToggle') as HTMLInputElement;

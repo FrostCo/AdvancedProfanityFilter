@@ -11,8 +11,23 @@ import WebAudioSites from './webAudioSites';
 export default class OptionPage {
   auth: OptionAuth;
   cfg: WebConfig;
+  themeButtons: Element[];
+  themeElements: Element[];
 
   static readonly activeClass = 'w3-flat-belize-hole';
+  static readonly themeButtonSelectors = [
+    'div.themes > div.moon',
+    'div.themes > div.sun',
+  ];
+  static readonly themeElementSelectors = [
+    'body',
+    'div#page',
+    '#bulkWordEditorModal > div',
+    '#confirmModal > div',
+    '#passwordModal > div',
+    '#statusModal > div',
+    '#supportedAudioSitesModal > div',
+  ];
 
   static closeModal(id: string) {
     OptionPage.hide(document.getElementById(id));
@@ -127,6 +142,16 @@ export default class OptionPage {
   static showWarningModal(content = 'Invalid input.', title = 'Warning', titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
     OptionPage.openModal('statusModal');
+  }
+
+  constructor() {
+    this.themeButtons = OptionPage.themeButtonSelectors.map(selector => { return document.querySelector(selector); });
+    this.themeElements = OptionPage.themeElementSelectors.map(selector => { return document.querySelector(selector); });
+  }
+
+  applyTheme() {
+    option.themeElements.forEach(element => { element.classList.toggle('dark'); });
+    option.themeButtons.forEach(element => { element.classList.toggle('w3-hide'); });
   }
 
   backupConfig() {
@@ -496,6 +521,8 @@ export default class OptionPage {
     } else {
       OptionPage.show(document.getElementById('main'));
     }
+
+    if (this.cfg.darkMode) { this.applyTheme(); }
 
     self.populateOptions();
   }
@@ -1350,6 +1377,12 @@ export default class OptionPage {
     }
   }
 
+  async toggleTheme() {
+    option.cfg.darkMode = !option.cfg.darkMode;
+    await option.cfg.save('darkMode');
+    option.applyTheme();
+  }
+
   updateBookmarklet(url: string) {
     let bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
     let bookmarklet = new Bookmarklet(url);
@@ -1531,3 +1564,4 @@ document.getElementById('setPassword').addEventListener('input', e => { option.a
 document.getElementById('setPasswordBtn').addEventListener('click', e => { option.confirm(e, 'setPassword'); });
 // Test
 document.getElementById('testText').addEventListener('input', e => { option.populateTest(); });
+document.getElementsByClassName('themes')[0].addEventListener('click', e => { option.toggleTheme(); });
