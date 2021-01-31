@@ -135,7 +135,10 @@
         "error",
         "always"
       ],
-      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/ban-ts-comment": [
+        "warn",
+        { "ts-ignore": "allow-with-description" }
+      ],
       "@typescript-eslint/ban-types": "off",
       "@typescript-eslint/class-name-casing": "off",
       "@typescript-eslint/explicit-function-return-type": "off",

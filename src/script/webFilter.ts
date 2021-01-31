@@ -34,7 +34,7 @@ export default class WebFilter extends Filter {
   advancedReplaceText(node, wordlistId: number, stats = true) {
     if (node.parentNode || node === document) {
       filter.wordlists[wordlistId].regExps.forEach((regExp) => {
-        // @ts-ignore - External library function
+        // @ts-ignore: External library function
         findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: function(portion, match) {
           // console.log('[APF] Advanced node match:', node.textContent); // Debug: Filter - Advanced match
           if (portion.index === 0) { // Replace the whole match on the first portion and skip the rest

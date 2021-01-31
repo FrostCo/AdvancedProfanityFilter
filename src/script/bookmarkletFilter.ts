@@ -42,7 +42,7 @@ export default class BookmarkletFilter extends Filter {
   advancedReplaceText(node, wordlistId: number, stats = true) {
     if (node.parentNode || node === document) {
       filter.wordlists[wordlistId].regExps.forEach((regExp) => {
-        // @ts-ignore - External library function
+        // @ts-ignore: External library function
         findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: function(portion, match) {
           if (portion.index === 0) {
             return filter.replaceText(match[0], wordlistId, stats);
