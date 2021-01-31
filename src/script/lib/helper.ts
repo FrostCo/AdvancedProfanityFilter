@@ -80,8 +80,8 @@ export function hmsToSeconds(timeStr: string, precision: number = 3): number {
 }
 
 export function injectScript(file, node, id: string = '') {
-  var th = document.getElementsByTagName(node)[0];
-  var s = document.createElement('script');
+  let th = document.getElementsByTagName(node)[0];
+  let s = document.createElement('script');
   s.setAttribute('type', 'text/javascript');
   if (id) { s.id = id; }
   s.setAttribute('src', file);

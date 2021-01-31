@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+import { expect } from 'chai';
 import Domain from './built/domain';
 import WebConfig from './built/webConfig';
 import WebFilter from './built/webFilter';

@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+import { expect } from 'chai';
 import Bookmarklet from './built/bookmarklet';
 
 describe('Bookmarklet', function() {

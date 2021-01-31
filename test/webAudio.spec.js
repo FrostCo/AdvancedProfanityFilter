@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+import { expect } from 'chai';
 import WebAudio from './built/webAudio';
 import WebConfig from './built/webConfig';
 import WebFilter from './built/webFilter';
@@ -17,7 +17,7 @@ describe('WebAudio', function() {
       let audio = new WebAudio(filter);
       let rule = { mode: 'cue', videoCueLanguage: 'en-US', videoCueLabel: 'APF', videoCueRequireShowing: false };
       let textTrack = { mode: 'showing', language: 'en-US', label: 'APF', cues: [] };
-      textTrack.addCue = (start, end, text) => { textTrack.cues.push({start: start, end: end, text: text }); };
+      textTrack.addCue = (start, end, text) => { textTrack.cues.push({ start: start, end: end, text: text }); };
       textTrack.addCue('0:00:10', '0:00:20', 'First sample text');
       textTrack.addCue('0:00:25', '0:00:37', 'Second sample text');
       expect(audio.matchTextTrack(textTrack, rule, 'label', 'videoCueLabel')).to.be.true;
@@ -28,7 +28,7 @@ describe('WebAudio', function() {
       let audio = new WebAudio(filter);
       let rule = { mode: 'cue', videoCueLanguage: 'en-US', videoCueLabel: 'APF', videoCueRequireShowing: true };
       let textTrack = { mode: 'hidden', language: 'en-US', label: 'APF', cues: [] };
-      textTrack.addCue = (start, end, text) => { textTrack.cues.push({start: start, end: end, text: text }); };
+      textTrack.addCue = (start, end, text) => { textTrack.cues.push({ start: start, end: end, text: text }); };
       textTrack.addCue('0:00:10', '0:00:20', 'First sample text');
       textTrack.addCue('0:00:25', '0:00:37', 'Second sample text');
       expect(audio.matchTextTrack(textTrack, rule, 'label', 'videoCueLabel')).to.be.undefined;
@@ -39,7 +39,7 @@ describe('WebAudio', function() {
       let audio = new WebAudio(filter);
       let rule = { mode: 'cue', videoCueLanguage: 'en-US', videoCueLabel: 'APF', videoCueRequireShowing: true };
       let textTrack = { mode: 'showing', language: 'en-US', label: 'APF', cues: [] };
-      textTrack.addCue = (start, end, text) => { textTrack.cues.push({start: start, end: end, text: text }); };
+      textTrack.addCue = (start, end, text) => { textTrack.cues.push({ start: start, end: end, text: text }); };
       textTrack.addCue('0:00:10', '0:00:20', 'First sample text');
       textTrack.addCue('0:00:25', '0:00:37', 'Second sample text');
       expect(audio.matchTextTrack(textTrack, rule)).to.be.true;

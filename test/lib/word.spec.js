@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+import { expect } from 'chai';
 import Constants from '../built/lib/constants';
 import Config from '../built/lib/config';
 import Word from '../built/lib/word';
