@@ -1331,30 +1331,35 @@ export default class OptionPage {
     OptionPage.openModal(modalId);
   }
 
+  showSupportedAudioSiteConfig() {
+    const select = document.querySelector('#supportedAudioSitesModal select#siteSelect') as HTMLSelectElement;
+    let textArea = document.querySelector('#supportedAudioSitesModal div#modalContentRight textarea') as HTMLTextAreaElement;
+    let config = {};
+    config[select.value] = WebAudioSites.sites[select.value];
+    textArea.textContent = JSON.stringify(config, null, 2);
+  }
+
   showSupportedAudioSites() {
     let title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
+    title.textContent = 'Supported Audio Sites';
     let contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
-    removeChildren(contentLeft);
+    let select = contentLeft.querySelector('#siteSelect') as HTMLSelectElement;
+    removeChildren(select);
+
     let sortedSites = Object.keys(WebAudioSites.sites).sort(function(a,b) {
       let domainA = a.match(/\w*\.\w*$/)[0];
       let domainB = b.match(/\w*\.\w*$/)[0];
       return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
     });
-    let ul = document.createElement('ul');
-    sortedSites.forEach(site => {
-      let li = document.createElement('li');
-      let a = document.createElement('a');
-      a.href = `https://${site}`;
-      a.target = '_blank';
-      a.textContent = site;
-      li.appendChild(a);
-      ul.appendChild(li);
-    });
-    title.textContent = 'Supported Audio Sites';
-    contentLeft.appendChild(ul);
 
-    let textArea = document.querySelector('#supportedAudioSitesModal div#modalContentRight textarea') as HTMLTextAreaElement;
-    textArea.textContent = JSON.stringify(WebAudioSites.sites, null, 2);
+    sortedSites.forEach(site => {
+      let option = document.createElement('option');
+      option.value = site;
+      option.textContent = site;
+      select.appendChild(option);
+    });
+
+    option.showSupportedAudioSiteConfig();
     OptionPage.openModal('supportedAudioSitesModal');
   }
 
@@ -1494,6 +1499,7 @@ document.getElementById('confirmModalBackup').addEventListener('click', e => { o
 document.getElementById('confirmModalOK').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('statusModalOK').addEventListener('click', e => { OptionPage.closeModal('statusModal'); });
+document.querySelector('#supportedAudioSitesModal #siteSelect').addEventListener('change', e => { option.showSupportedAudioSiteConfig(); });
 document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', e => { OptionPage.closeModal('supportedAudioSitesModal'); });
 document.querySelector('#bulkWordEditorModal button.modalAddWord').addEventListener('click', e => { option.bulkEditorAddRow(); });
 document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEventListener('click', e => { option.bulkEditorAddWords(); });
