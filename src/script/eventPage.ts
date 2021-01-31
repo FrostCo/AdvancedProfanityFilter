@@ -3,7 +3,7 @@ import Domain from './domain';
 import WebConfig from './webConfig';
 import { formatNumber } from './lib/helper';
 
-let Storage: BackgroundStorage = {
+let BackgroundStorage: BackgroundStorage = {
   tabs: {},
 };
 
@@ -35,7 +35,7 @@ function disableTabOnce(id: number): void {
 }
 
 function getTabOptions(id: number): TabStorageOptions {
-  return storedTab(id) ? Storage.tabs[id] : saveNewTabOptions(id);
+  return storedTab(id) ? BackgroundStorage.tabs[id] : saveNewTabOptions(id);
 }
 
 function notificationsOnClick(notificationId: string) {
@@ -147,7 +147,7 @@ function saveNewTabOptions(id: number, options: TabStorageOptions = {}): TabStor
   let tabOptions = Object.assign({}, _defaults, options) as TabStorageOptions;
   tabOptions.id = id;
   tabOptions.registeredAt = new Date().getTime();
-  Storage.tabs[id] = tabOptions;
+  BackgroundStorage.tabs[id] = tabOptions;
   return tabOptions;
 }
 
@@ -156,7 +156,7 @@ function saveTabOptions(id: number, options: TabStorageOptions = {}): TabStorage
 }
 
 function storedTab(id: number): boolean {
-  return Storage.tabs.hasOwnProperty(id);
+  return BackgroundStorage.tabs.hasOwnProperty(id);
 }
 
 function tabsOnActivated(tab: chrome.tabs.TabActiveInfo) {
@@ -165,7 +165,7 @@ function tabsOnActivated(tab: chrome.tabs.TabActiveInfo) {
 }
 
 function tabsOnRemoved(tabId: number) {
-  if (storedTab(tabId)) { delete Storage.tabs[tabId]; }
+  if (storedTab(tabId)) { delete BackgroundStorage.tabs[tabId]; }
 }
 
 async function toggleDomain(hostname: string, action: string) {
