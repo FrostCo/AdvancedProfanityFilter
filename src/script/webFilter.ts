@@ -19,7 +19,7 @@ export default class WebFilter extends Filter {
   mutePage: boolean;
   observer: MutationObserver;
   processMutationTarget: boolean;
-  processNode: Function;
+  processNode: (node: HTMLElement, wordlistId: number, stats: boolean) => void;
   shadowObserver: MutationObserver;
   summary: Summary;
 

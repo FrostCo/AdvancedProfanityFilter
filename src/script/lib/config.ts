@@ -80,7 +80,7 @@ export default class Config {
     'whore': { lists: [], matchMethod: Constants.MatchMethods.Partial, repeat: true, separators: false, sub: 'tramp' },
   };
 
-  constructor(data: object = {}) {
+  constructor(data: Record<string, unknown> = {}) {
     Object.assign(this, Config._defaults, data);
   }
 
