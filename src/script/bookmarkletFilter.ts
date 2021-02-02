@@ -29,7 +29,7 @@ export default class BookmarkletFilter extends Filter {
   mutePage: boolean;
   observer: MutationObserver;
   processMutationTarget: boolean;
-  processNode: (node: HTMLElement, wordlistId: number, stats: boolean) => void;
+  processNode: (node: HTMLElement | Document | ShadowRoot, wordlistId: number, stats?: boolean) => void;
   shadowObserver: MutationObserver;
 
   constructor() {
