@@ -70,7 +70,7 @@ export default class Filter {
     return false;
   }
 
-  foundMatch(word: Word) {
+  foundMatch(word?: Word) {
     this.counter++;
   }
 
