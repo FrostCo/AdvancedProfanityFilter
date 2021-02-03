@@ -150,8 +150,11 @@ export default class OptionPage {
   }
 
   applyTheme() {
-    option.themeElements.forEach(element => { element.classList.toggle('dark'); });
-    option.themeButtons.forEach(element => { element.classList.toggle('w3-hide'); });
+    const darkApplied = this.themeElements[0].classList.contains('dark');
+    if (darkApplied != this.cfg.darkMode) {
+      this.themeElements.forEach(element => { element.classList.toggle('dark'); });
+      this.themeButtons.forEach(element => { element.classList.toggle('w3-hide'); });
+    }
   }
 
   backupConfig() {
