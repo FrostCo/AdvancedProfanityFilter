@@ -226,10 +226,10 @@ const popup = new Popup;
 
 ////
 // Listeners
-window.addEventListener('load', function(event) { popup.populateOptions(); });
-document.getElementById('domainFilter').addEventListener('change', function(event) { popup.toggle(popup.filterToggleProp); });
-document.getElementById('domainModeSelect').addEventListener('change', function(event) { popup.updateDomainMode(); });
-document.getElementById('filterMethodSelect').addEventListener('change', function(event) { popup.filterMethodSelect(); });
-document.getElementById('wordlistSelect').addEventListener('change', function(event) { popup.wordlistSelect(event); });
-document.getElementById('audioWordlistSelect').addEventListener('change', function(event) { popup.wordlistSelect(event); });
-document.getElementById('options').addEventListener('click', function() { chrome.runtime.openOptionsPage(); });
+window.addEventListener('load', (e) => { popup.populateOptions(); });
+document.getElementById('domainFilter').addEventListener('change', (e) => { popup.toggle(popup.filterToggleProp); });
+document.getElementById('domainModeSelect').addEventListener('change', (e) => { popup.updateDomainMode(); });
+document.getElementById('filterMethodSelect').addEventListener('change', (e) => { popup.filterMethodSelect(); });
+document.getElementById('wordlistSelect').addEventListener('change', (e) => { popup.wordlistSelect(e); });
+document.getElementById('audioWordlistSelect').addEventListener('change', (e) => { popup.wordlistSelect(e); });
+document.getElementById('options').addEventListener('click', (e) => { chrome.runtime.openOptionsPage(); });
