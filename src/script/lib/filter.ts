@@ -30,8 +30,8 @@ export default class Filter {
   }
 
   checkWhitelist(match: string, string: string, matchStartIndex: number, word: Word): boolean {
-    let whitelistLength = this.whitelist.length;
-    let iWhitelistLength = this.iWhitelist.length;
+    const whitelistLength = this.whitelist.length;
+    const iWhitelistLength = this.iWhitelist.length;
 
     if (whitelistLength || iWhitelistLength) {
       // Check for exact/whole match (match case)
@@ -42,18 +42,18 @@ export default class Filter {
 
       // Check for partial match (match may not contain the full whitelisted word)
       if (word.matchMethod === Constants.MatchMethods.Partial) {
-        let wordOptions: WordOptions = {
+        const wordOptions: WordOptions = {
           matchMethod: Constants.MatchMethods.Whole,
           repeat: false,
           separators: false,
           sub: ''
         };
-        let wholeWordRegExp = new Word(match, wordOptions, this.cfg).regExp;
+        const wholeWordRegExp = new Word(match, wordOptions, this.cfg).regExp;
 
         let result;
         while ((result = wholeWordRegExp.exec(string)) !== null) {
-          let resultMatch = result.length == 4 ? result[2]: result[0];
-          let resultIndex = result.length == 4 ? result.index + result[1].length: result.index;
+          const resultMatch = result.length == 4 ? result[2]: result[0];
+          const resultIndex = result.length == 4 ? result.index + result[1].length: result.index;
           // Make sure this is the match we want to check
           if (
             resultIndex <= matchStartIndex
@@ -81,16 +81,16 @@ export default class Filter {
   }
 
   matchData(wordlist: Wordlist, index: number, match: string, args: any[]) {
-    let word = wordlist.find(index);
-    let string = args.pop();
-    let matchStartIndex = args.pop();
-    let captureGroups = args;
+    const word = wordlist.find(index);
+    const string = args.pop();
+    const matchStartIndex = args.pop();
+    const captureGroups = args;
 
     // (boundary)(match)(boundary): Used internally for several types of matches:
     // - Remove Filter
     // - Unicode word boundaries (workaround)
     // - Edge punctuation
-    let internalCaptureGroups = (captureGroups.length > 0 && word.matchMethod !== Constants.MatchMethods.Regex);
+    const internalCaptureGroups = (captureGroups.length > 0 && word.matchMethod !== Constants.MatchMethods.Regex);
     if (internalCaptureGroups) { match = captureGroups[1]; }
 
     return { word: word, string: string, match: match, matchStartIndex: matchStartIndex, captureGroups: captureGroups, internalCaptureGroups: internalCaptureGroups };
@@ -104,19 +104,19 @@ export default class Filter {
 
   replaceText(str: string, wordlistId: number | false = false, stats: boolean = true): string {
     wordlistId = this.buildWordlist(wordlistId);
-    let wordlist = this.wordlists[wordlistId];
+    const wordlist = this.wordlists[wordlistId];
 
     switch(this.cfg.filterMethod) {
       case Constants.FilterMethods.Censor:
         wordlist.regExps.forEach((regExp, index) => {
           str = str.replace(regExp, (originalMatch, ...args): string => {
-            let { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
+            const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
             if (this.checkWhitelist(match, string, matchStartIndex, word)) { return match; } // Check for whitelisted match
             if (stats) { this.foundMatch(word); }
 
             // Filter
             let censoredString = '';
-            let censorLength = this.cfg.censorFixedLength > 0 ? this.cfg.censorFixedLength : match.length;
+            const censorLength = this.cfg.censorFixedLength > 0 ? this.cfg.censorFixedLength : match.length;
 
             if (this.cfg.preserveFirst && this.cfg.preserveLast) {
               censoredString = match[0] + this.cfg.censorCharacter.repeat(censorLength - 2) + match.slice(-1);
@@ -136,7 +136,7 @@ export default class Filter {
       case Constants.FilterMethods.Substitute:
         wordlist.regExps.forEach((regExp, index) => {
           str = str.replace(regExp, (originalMatch, ...args): string => {
-            let { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
+            const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
             if (this.checkWhitelist(match, string, matchStartIndex, word)) { return match; } // Check for whitelisted match
             if (stats) { this.foundMatch(word); }
 
@@ -164,7 +164,7 @@ export default class Filter {
       case Constants.FilterMethods.Remove:
         wordlist.regExps.forEach((regExp, index) => {
           str = str.replace(regExp, (originalMatch, ...args): string => {
-            let { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
+            const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
             if (this.checkWhitelist(match.trim(), string, matchStartIndex, word)) { return match; } // Check for whitelisted match
             if (stats) { this.foundMatch(word); }
 
@@ -194,7 +194,7 @@ export default class Filter {
   }
 
   replaceTextResult(str: string, wordlistId: (number | false) = false, stats: boolean = true): ReplaceTextResult {
-    let result: ReplaceTextResult = {
+    const result: ReplaceTextResult = {
       original: str,
       filtered: this.replaceText(str, wordlistId, stats),
       modified: false

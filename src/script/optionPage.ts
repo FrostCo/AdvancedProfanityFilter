@@ -34,14 +34,14 @@ export default class OptionPage {
   }
 
   static configureConfirmModal(settings: ConfirmModalSettings = {}, contentElement?: HTMLElement) {
-    let modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
-    let modalContent = document.getElementById('confirmModalContent') as HTMLElement;
-    let modalHeader = document.querySelector('#confirmModal header') as HTMLElement;
-    let backupButtonContainer = document.querySelector('#confirmModal span.confirmBackupButton') as HTMLElement;
-    let backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
+    const modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
+    const modalContent = document.getElementById('confirmModalContent') as HTMLElement;
+    const modalHeader = document.querySelector('#confirmModal header') as HTMLElement;
+    const backupButtonContainer = document.querySelector('#confirmModal span.confirmBackupButton') as HTMLElement;
+    const backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
     removeChildren(modalContent);
 
-    let defaults = {
+    const defaults = {
       backup: false,
       content: 'Are you sure?',
       title: 'Please Confirm',
@@ -67,10 +67,10 @@ export default class OptionPage {
   }
 
   static configureStatusModal(content: string, title: string, titleColor: string) {
-    let modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
-    let modalContent = document.getElementById('statusModalContent') as HTMLElement;
-    let modalHeader = document.querySelector('#statusModal header') as HTMLElement;
-    let contentElement = document.createElement('span');
+    const modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
+    const modalContent = document.getElementById('statusModalContent') as HTMLElement;
+    const modalHeader = document.querySelector('#statusModal header') as HTMLElement;
+    const contentElement = document.createElement('span');
     removeChildren(modalContent);
 
     modalTitle.textContent = title;
@@ -104,7 +104,7 @@ export default class OptionPage {
   }
 
   static hideStatus() {
-    let notificationPanel = document.getElementById('notificationPanel') as HTMLElement;
+    const notificationPanel = document.getElementById('notificationPanel') as HTMLElement;
     OptionPage.hide(notificationPanel);
   }
 
@@ -156,14 +156,14 @@ export default class OptionPage {
 
   backupConfig() {
     const padded = (num: number) => { return ('0' + num).slice(-2); };
-    let date = new Date;
-    let today = `${date.getFullYear()}-${padded(date.getMonth()+1)}-${padded(date.getDate())}`;
-    let time = `${padded(date.getHours())}${padded(date.getMinutes())}${padded(date.getSeconds())}`;
+    const date = new Date;
+    const today = `${date.getFullYear()}-${padded(date.getMonth()+1)}-${padded(date.getDate())}`;
+    const time = `${padded(date.getHours())}${padded(date.getMinutes())}${padded(date.getSeconds())}`;
     exportToFile(JSON.stringify(option.cfg.ordered(), null, 2), `apf-backup-${today}_${time}.json`);
   }
 
   bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
-    let table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
+    const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
     if (data === undefined) {
       data = {
         lists: [],
@@ -175,36 +175,36 @@ export default class OptionPage {
     }
 
     // Build row
-    let row = table.tBodies[0].insertRow();
+    const row = table.tBodies[0].insertRow();
     row.classList.add('bulkWordRow');
 
     // Add data
-    let cellRemoveRow = row.insertCell(0);
-    let cellWord = row.insertCell(1);
-    let cellSub = row.insertCell(2);
-    let cellMatchMethod = row.insertCell(3);
-    let cellRepeat = row.insertCell(4);
-    let cellSeparators = row.insertCell(5);
+    const cellRemoveRow = row.insertCell(0);
+    const cellWord = row.insertCell(1);
+    const cellSub = row.insertCell(2);
+    const cellMatchMethod = row.insertCell(3);
+    const cellRepeat = row.insertCell(4);
+    const cellSeparators = row.insertCell(5);
 
-    let removeButton = document.createElement('button');
+    const removeButton = document.createElement('button');
     removeButton.textContent = 'X';
     removeButton.addEventListener('click', e => { option.bulkEditorRemoveRow(e); });
     cellRemoveRow.appendChild(removeButton);
 
-    let wordInput = document.createElement('input');
+    const wordInput = document.createElement('input');
     wordInput.type = 'text';
     wordInput.classList.add('bulkAddWordText');
     wordInput.value = word;
     cellWord.appendChild(wordInput);
 
-    let subInput = document.createElement('input');
+    const subInput = document.createElement('input');
     subInput.type = 'text';
     cellSub.appendChild(subInput);
     subInput.value = data.sub;
 
-    let matchMethodSelect = document.createElement('select');
+    const matchMethodSelect = document.createElement('select');
     Constants.orderedArray(Constants.MatchMethods).forEach((matchMethod, index) => {
-      let optionElement = document.createElement('option');
+      const optionElement = document.createElement('option');
       optionElement.value = Constants.MatchMethods[matchMethod].toString();
       optionElement.classList.add(`bulkMatchMethod${Constants.MatchMethods[matchMethod]}`);
       optionElement.textContent = matchMethod;
@@ -213,21 +213,21 @@ export default class OptionPage {
     matchMethodSelect.selectedIndex = data.matchMethod;
     cellMatchMethod.appendChild(matchMethodSelect);
 
-    let repeatInput = document.createElement('input');
+    const repeatInput = document.createElement('input');
     repeatInput.type = 'checkbox';
     repeatInput.name = 'repeat';
     repeatInput.checked = data.repeat;
     cellRepeat.appendChild(repeatInput);
 
-    let separatorsInput = document.createElement('input');
+    const separatorsInput = document.createElement('input');
     separatorsInput.type = 'checkbox';
     separatorsInput.name = 'separators';
     separatorsInput.checked = data.separators;
     cellSeparators.appendChild(separatorsInput);
 
     option.cfg.wordlists.forEach((wordlist, index) => {
-      let cell = row.insertCell(index + 6);
-      let wordlistInput = document.createElement('input');
+      const cell = row.insertCell(index + 6);
+      const wordlistInput = document.createElement('input');
       wordlistInput.type = 'checkbox';
       wordlistInput.name = 'wordlists';
       wordlistInput.classList.add('wordlistData');
@@ -244,17 +244,17 @@ export default class OptionPage {
   }
 
   bulkEditorAddWords() {
-    let bulkAddWordsText = document.querySelector('#bulkWordEditorModal textarea#bulkAddWordsText') as HTMLTextAreaElement;
-    let text = bulkAddWordsText.value;
+    const bulkAddWordsText = document.querySelector('#bulkWordEditorModal textarea#bulkAddWordsText') as HTMLTextAreaElement;
+    const text = bulkAddWordsText.value;
     if (text != '') {
-      let table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
-      let lines = text.toLowerCase().split('\n');
-      let words = lines.map(line => line.trim());
-      let uniqueWords = words.filter((word, index) => words.indexOf(word) === index);
+      const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
+      const lines = text.toLowerCase().split('\n');
+      const words = lines.map(line => line.trim());
+      const uniqueWords = words.filter((word, index) => words.indexOf(word) === index);
 
       // Remove any words that already exist in the current table
-      let currentWords = option.bulkEditorCurrentWords();
-      let wordsToAdd = uniqueWords.filter(newWord => !currentWords.includes(newWord));
+      const currentWords = option.bulkEditorCurrentWords();
+      const wordsToAdd = uniqueWords.filter(newWord => !currentWords.includes(newWord));
 
       // Add the new words to the table
       wordsToAdd.forEach(function(word) {
@@ -270,38 +270,38 @@ export default class OptionPage {
   }
 
   bulkEditorRemoveAll() {
-    let tBody = document.querySelector('#bulkWordEditorModal table tbody') as HTMLTableSectionElement;
+    const tBody = document.querySelector('#bulkWordEditorModal table tbody') as HTMLTableSectionElement;
     removeChildren(tBody);
     this.bulkEditorAddRow();
   }
 
   bulkEditorRemoveRow(event) {
-    let table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
-    let row = event.target.parentElement.parentElement;
+    const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
+    const row = event.target.parentElement.parentElement;
     table.deleteRow(row.rowIndex);
   }
 
   async bulkEditorSave() {
-    let table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
-    let failed = {};
+    const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
+    const failed = {};
     option.cfg.words = {};
 
     table.querySelectorAll('tr.bulkWordRow').forEach((tr, index) => {
-      let cells = tr.querySelectorAll('td');
-      let lists = [];
-      let wordlistSelectionsInput = tr.querySelectorAll('input[name="wordlists"]') as NodeListOf<HTMLInputElement>;
+      const cells = tr.querySelectorAll('td');
+      const lists = [];
+      const wordlistSelectionsInput = tr.querySelectorAll('input[name="wordlists"]') as NodeListOf<HTMLInputElement>;
       wordlistSelectionsInput.forEach((wordlist, index) => { if (wordlist.checked) { lists.push(index + 1); } });
 
-      let name = (cells[1].querySelector('input') as HTMLInputElement).value;
+      const name = (cells[1].querySelector('input') as HTMLInputElement).value;
       if (name != '') {
-        let wordOptions: WordOptions = {
+        const wordOptions: WordOptions = {
           lists: lists,
           matchMethod: (cells[3].querySelector('select') as HTMLSelectElement).selectedIndex,
           repeat: (cells[4].querySelector('input') as HTMLInputElement).checked,
           separators: (cells[5].querySelector('input') as HTMLInputElement).checked,
           sub: (cells[2].querySelector('input') as HTMLInputElement).value
         };
-        let success = option.cfg.addWord(name, wordOptions);
+        const success = option.cfg.addWord(name, wordOptions);
         if (!success) {
           failed[name] = wordOptions;
         }
@@ -319,15 +319,15 @@ export default class OptionPage {
   }
 
   bulkEditorWordlistCheckbox(event) {
-    let checked = (event.target as HTMLInputElement).checked;
+    const checked = (event.target as HTMLInputElement).checked;
     document.querySelectorAll(`#bulkWordEditorModal table td input.wordlistData[data-col="${event.target.dataset.col}"]`).forEach((box: HTMLInputElement) => {
       box.checked = checked;
     });
   }
 
   bulkEditorCurrentWords() {
-    let table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
-    let words = [];
+    const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
+    const words = [];
     table.querySelectorAll('tr > td > input.bulkAddWordText').forEach((wordText: HTMLInputElement, index) => {
       words.push(wordText.value);
     });
@@ -335,32 +335,32 @@ export default class OptionPage {
   }
 
   bulkWordEditorHeaderRow(): HTMLTableRowElement {
-    let row = document.createElement('tr');
-    let removeCell = document.createElement('th');
-    let removeButton = document.createElement('button');
+    const row = document.createElement('tr');
+    const removeCell = document.createElement('th');
+    const removeButton = document.createElement('button');
     removeButton.textContent = 'X';
     removeButton.id = 'bulkEditorRemoveAll';
     removeButton.addEventListener('click', e => { option.bulkEditorRemoveAll(); });
-    let removeSpan = document.createElement('span');
+    const removeSpan = document.createElement('span');
     removeSpan.textContent = ' Remove';
     removeCell.appendChild(removeButton);
     removeCell.appendChild(removeSpan);
     row.appendChild(removeCell);
 
-    let normalHeaders = ['Word', 'Substitution', 'Match Method', 'Repeated', 'Separators'];
+    const normalHeaders = ['Word', 'Substitution', 'Match Method', 'Repeated', 'Separators'];
     normalHeaders.forEach(item => {
-      let cell = document.createElement('th');
-      let cellSpan = document.createElement('span');
+      const cell = document.createElement('th');
+      const cellSpan = document.createElement('span');
       cellSpan.textContent = item;
       cell.appendChild(cellSpan);
       row.appendChild(cell);
     });
 
     this.cfg.wordlists.forEach((wordlist, i) => {
-      let cell = document.createElement('th');
-      let inputLabel = document.createElement('label');
-      let input = document.createElement('input');
-      let span = document.createElement('span');
+      const cell = document.createElement('th');
+      const inputLabel = document.createElement('label');
+      const input = document.createElement('input');
+      const span = document.createElement('span');
       input.type = 'checkbox';
       input.classList.add('wordlistHeader');
       input.dataset.col = (i + 1).toString();
@@ -375,8 +375,8 @@ export default class OptionPage {
   }
 
   configInlineToggle() {
-    let input = document.getElementById('configInlineInput') as HTMLInputElement;
-    let configText = document.getElementById('configText') as HTMLTextAreaElement;
+    const input = document.getElementById('configInlineInput') as HTMLInputElement;
+    const configText = document.getElementById('configText') as HTMLTextAreaElement;
     if (input.checked) {
       OptionPage.show(configText);
       option.exportConfig();
@@ -387,7 +387,7 @@ export default class OptionPage {
   }
 
   confirm(evt, action) {
-    let ok = document.getElementById('confirmModalOK');
+    const ok = document.getElementById('confirmModalOK');
     ok.removeEventListener('click', bulkEditorSave);
     ok.removeEventListener('click', importConfig);
     ok.removeEventListener('click', removeAllWords);
@@ -425,11 +425,11 @@ export default class OptionPage {
         ok.addEventListener('click', restoreDefaults);
         break;
       case 'setPassword': {
-        let passwordText = document.getElementById('setPassword') as HTMLInputElement;
-        let passwordBtn = document.getElementById('setPasswordBtn') as HTMLInputElement;
+        const passwordText = document.getElementById('setPassword') as HTMLInputElement;
+        const passwordBtn = document.getElementById('setPasswordBtn') as HTMLInputElement;
         if (passwordBtn.classList.contains('disabled')) return false;
 
-        let message = passwordText.value == '' ? 'Are you sure you want to remove the password?' : `Are you sure you want to set the password to '${passwordText.value}'?`;
+        const message = passwordText.value == '' ? 'Are you sure you want to remove the password?' : `Are you sure you want to set the password to '${passwordText.value}'?`;
         OptionPage.configureConfirmModal({ content: message });
         ok.addEventListener('click', setPassword);
         break;
@@ -440,7 +440,7 @@ export default class OptionPage {
   }
 
   confirmModalBackup() {
-    let backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
+    const backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
     if (!backupButton.classList.contains('disabled')) {
       option.backupConfig();
       OptionPage.disableBtn(backupButton);
@@ -448,15 +448,15 @@ export default class OptionPage {
   }
 
   async exportBookmarkletFile() {
-    let code = await Bookmarklet.injectConfig(option.cfg.ordered());
+    const code = await Bookmarklet.injectConfig(option.cfg.ordered());
     exportToFile(code, 'apfBookmarklet.js');
   }
 
   exportConfig() {
-    let input = document.getElementById('configInlineInput') as HTMLInputElement;
+    const input = document.getElementById('configInlineInput') as HTMLInputElement;
 
     if (input.checked) { // inline editor
-      let configText = document.getElementById('configText') as HTMLTextAreaElement;
+      const configText = document.getElementById('configText') as HTMLTextAreaElement;
       configText.value = JSON.stringify(option.cfg.ordered(), null, 2);
     } else {
       option.backupConfig();
@@ -464,34 +464,34 @@ export default class OptionPage {
   }
 
   importConfig(e) {
-    let input = document.getElementById('configInlineInput') as HTMLInputElement;
+    const input = document.getElementById('configInlineInput') as HTMLInputElement;
     if (input.checked) { // inline editor
-      let configText = document.getElementById('configText') as HTMLTextAreaElement;
+      const configText = document.getElementById('configText') as HTMLTextAreaElement;
       this.importConfigText(configText.value);
     } else {
-      let importFileInput = document.getElementById('importFileInput') as HTMLInputElement;
+      const importFileInput = document.getElementById('importFileInput') as HTMLInputElement;
       importFileInput.click();
     }
   }
 
   async importConfigFile(e) {
-    let file = e.target.files[0];
-    let importFileInput = document.getElementById('importFileInput') as HTMLInputElement;
-    let fileText = await readFile(file) as string;
+    const file = e.target.files[0];
+    const importFileInput = document.getElementById('importFileInput') as HTMLInputElement;
+    const fileText = await readFile(file) as string;
     option.importConfigText(fileText);
     importFileInput.value = '';
   }
 
   async importConfigText(cfg: string) {
     try {
-      let importedCfg = new WebConfig(JSON.parse(cfg));
-      let migration = new DataMigration(importedCfg);
+      const importedCfg = new WebConfig(JSON.parse(cfg));
+      const migration = new DataMigration(importedCfg);
       migration.runImportMigrations();
-      let resetSuccess = await this.restoreDefaults(null, true);
+      const resetSuccess = await this.restoreDefaults(null, true);
 
       if (resetSuccess) {
         this.cfg = importedCfg;
-        let error = await this.cfg.save();
+        const error = await this.cfg.save();
         if (!error) {
           OptionPage.showStatusModal('Settings imported successfully.');
           this.init();
@@ -525,15 +525,15 @@ export default class OptionPage {
   }
 
   populateAudio() {
-    let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
-    let muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
-    let muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
-    let selectedMuteMethod = document.querySelector(`input[name=audioMuteMethod][value='${this.cfg.muteMethod}']`) as HTMLInputElement;
-    let selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
-    let muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
-    let audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
-    let audioYouTubeAutoSubsMax = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
-    let customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
+    const muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
+    const muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
+    const muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
+    const selectedMuteMethod = document.querySelector(`input[name=audioMuteMethod][value='${this.cfg.muteMethod}']`) as HTMLInputElement;
+    const selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
+    const muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
+    const audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
+    const audioYouTubeAutoSubsMax = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
+    const customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
     muteAudioInput.checked = this.cfg.muteAudio;
     muteAudioOnlyInput.checked = this.cfg.muteAudioOnly;
     muteCueRequireShowingInput.checked = this.cfg.muteCueRequireShowing;
@@ -546,8 +546,8 @@ export default class OptionPage {
   }
 
   populateBookmarkletPage() {
-    let bookmarkletConfig = document.querySelector('input[name="bookmarkletConfig"]:checked') as HTMLInputElement;
-    let bookmarkletCustomConfig = document.getElementById('bookmarkletCustomConfig') as HTMLDivElement;
+    const bookmarkletConfig = document.querySelector('input[name="bookmarkletConfig"]:checked') as HTMLInputElement;
+    const bookmarkletCustomConfig = document.getElementById('bookmarkletCustomConfig') as HTMLDivElement;
     if (bookmarkletConfig.value == 'default') {
       OptionPage.hide(bookmarkletCustomConfig);
       this.updateBookmarklet(Bookmarklet._defaultBookmarklet);
@@ -562,16 +562,16 @@ export default class OptionPage {
   }
 
   populateDomain() {
-    let domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
-    let domainText = document.getElementById('domainText') as HTMLInputElement;
-    let domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
-    let domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
-    let domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
-    let domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
-    let domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
-    let domainRemoveBtn = document.getElementById('domainRemove') as HTMLButtonElement;
+    const domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
+    const domainText = document.getElementById('domainText') as HTMLInputElement;
+    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+    const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
+    const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
+    const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
+    const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
+    const domainRemoveBtn = document.getElementById('domainRemove') as HTMLButtonElement;
 
-    let key = domainsSelect.value;
+    const key = domainsSelect.value;
     domainText.value = key;
 
     let domainCfg;
@@ -583,40 +583,40 @@ export default class OptionPage {
       domainCfg = this.cfg.domains[domainsSelect.value];
     }
 
-    let domainKey = domainText.value.trim().toLowerCase();
+    const domainKey = domainText.value.trim().toLowerCase();
     if (domainKey == '') { // No data
       domainModeSelect.selectedIndex = Constants.DomainModes.Normal;
     } else {
-      let domain = new Domain(domainKey, domainCfg);
+      const domain = new Domain(domainKey, domainCfg);
       domainModeSelect.selectedIndex = domain.getModeIndex();
     }
 
     domainDisabledCheck.checked = domainCfg.disabled;
     domainEnabledCheck.checked = domainCfg.enabled;
-    let wordlist = domainCfg.wordlist >= 0 ? domainCfg.wordlist + 1 : 0;
-    let audioList = domainCfg.audioList >= 0 ? domainCfg.audioList + 1 : 0;
+    const wordlist = domainCfg.wordlist >= 0 ? domainCfg.wordlist + 1 : 0;
+    const audioList = domainCfg.audioList >= 0 ? domainCfg.audioList + 1 : 0;
     domainWordlistSelect.selectedIndex = wordlist;
     domainAudioWordlistSelect.selectedIndex = audioList;
   }
 
   populateDomainPage() {
-    let domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
-    let domainsSelect = document.getElementById('domainSelect') as HTMLSelectElement;
-    let domainText = document.getElementById('domainText') as HTMLInputElement;
-    let mode = this.cfg.enabledDomainsOnly ? 'minimal' : 'normal';
-    let domainMode = document.querySelector(`input[name=domainMode][value='${mode}']`) as HTMLInputElement;
-    let wordlistContainer = document.getElementById('domainWordlistContainer') as HTMLInputElement;
-    let audioWordlistContainer = document.getElementById('domainAudioWordlistContainer') as HTMLInputElement;
+    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+    const domainsSelect = document.getElementById('domainSelect') as HTMLSelectElement;
+    const domainText = document.getElementById('domainText') as HTMLInputElement;
+    const mode = this.cfg.enabledDomainsOnly ? 'minimal' : 'normal';
+    const domainMode = document.querySelector(`input[name=domainMode][value='${mode}']`) as HTMLInputElement;
+    const wordlistContainer = document.getElementById('domainWordlistContainer') as HTMLInputElement;
+    const audioWordlistContainer = document.getElementById('domainAudioWordlistContainer') as HTMLInputElement;
     domainMode.checked = true;
-    let domainDisabledLabel = document.getElementById('domainDisabledLabel') as HTMLLabelElement;
-    let domainEnabledLabel = document.getElementById('domainEnabledLabel') as HTMLLabelElement;
+    const domainDisabledLabel = document.getElementById('domainDisabledLabel') as HTMLLabelElement;
+    const domainEnabledLabel = document.getElementById('domainEnabledLabel') as HTMLLabelElement;
     OptionPage.hideInputError(domainText);
     removeChildren(domainsSelect);
 
-    let domains = Domain.sortedKeys(this.cfg.domains);
+    const domains = Domain.sortedKeys(this.cfg.domains);
     domains.unshift('Add, or update existing...');
     domains.forEach((domain) => {
-      let optionElement = document.createElement('option');
+      const optionElement = document.createElement('option');
       optionElement.textContent = domain;
       optionElement.value = domain === domains[0] ? '' : domain;
       domainsSelect.appendChild(optionElement);
@@ -634,10 +634,10 @@ export default class OptionPage {
 
     if (this.cfg.wordlistsEnabled) {
       OptionPage.show(wordlistContainer);
-      let domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
-      let domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
+      const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
+      const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
 
-      let wordlists = ['Default'].concat(WebConfig._allWordlists, this.cfg.wordlists);
+      const wordlists = ['Default'].concat(WebConfig._allWordlists, this.cfg.wordlists);
       dynamicList(wordlists, domainWordlistSelect);
       if (this.cfg.muteAudio) {
         OptionPage.show(audioWordlistContainer);
@@ -668,11 +668,11 @@ export default class OptionPage {
     this.updateFilterOptions();
 
     // Settings
-    let selectedFilter = document.getElementById(`filter${Constants.filterMethodName(option.cfg.filterMethod)}`) as HTMLInputElement;
-    let showCounter = document.getElementById('showCounter') as HTMLInputElement;
-    let showSummary = document.getElementById('showSummary') as HTMLInputElement;
-    let showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
-    let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
+    const selectedFilter = document.getElementById(`filter${Constants.filterMethodName(option.cfg.filterMethod)}`) as HTMLInputElement;
+    const showCounter = document.getElementById('showCounter') as HTMLInputElement;
+    const showSummary = document.getElementById('showSummary') as HTMLInputElement;
+    const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
+    const filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     selectedFilter.checked = true;
     showCounter.checked = this.cfg.showCounter;
     showSummary.checked = this.cfg.showSummary;
@@ -680,33 +680,33 @@ export default class OptionPage {
     filterWordList.checked = this.cfg.filterWordList;
 
     // Censor Settings
-    let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
-    let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
-    let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
-    let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
+    const preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
+    const preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
+    const censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
+    const censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
     preserveFirst.checked = this.cfg.preserveFirst;
     preserveLast.checked = this.cfg.preserveLast;
     censorCharacterSelect.value = this.cfg.censorCharacter;
     censorFixedLengthSelect.selectedIndex = this.cfg.censorFixedLength;
 
     // Substitution Settings
-    let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
-    let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
+    const preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
+    const substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     preserveCase.checked = this.cfg.preserveCase;
     substitutionMark.checked = this.cfg.substitutionMark;
 
     // Default Settings
-    let defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
-    let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
-    let defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
+    const defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
+    const defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
+    const defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
     defaultWordRepeat.checked = this.cfg.defaultWordRepeat;
     defaultWordSeparators.checked = this.cfg.defaultWordSeparators;
-    let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
+    const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     defaultWordSubstitution.value = this.cfg.defaultSubstitution;
     removeChildren(defaultWordMatchMethodSelect);
     for (let i = 0; i < 3; i++) { // Skip Regex
-      let optionElement = document.createElement('option');
-      let matchMethodName = Constants.matchMethodName(i);
+      const optionElement = document.createElement('option');
+      const matchMethodName = Constants.matchMethodName(i);
       optionElement.value = matchMethodName;
       optionElement.textContent = matchMethodName;
       defaultWordMatchMethodSelect.appendChild(optionElement);
@@ -715,8 +715,8 @@ export default class OptionPage {
   }
 
   populateTest() {
-    let testText = document.getElementById('testText') as HTMLInputElement;
-    let filteredTestText = document.getElementById('filteredTestText') as HTMLElement;
+    const testText = document.getElementById('testText') as HTMLInputElement;
+    const filteredTestText = document.getElementById('filteredTestText') as HTMLElement;
 
     if (testText.value === '') {
       filteredTestText.textContent = 'Enter some text above to test the filter...';
@@ -726,14 +726,14 @@ export default class OptionPage {
   }
 
   populateWhitelist() {
-    let regExp = RegExp(' [*]$');
-    let sensitiveList = filter.cfg.wordWhitelist.map((item) => { return item + ' *'; });
-    let list = [].concat(sensitiveList, filter.cfg.iWordWhitelist).sort();
-    let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
+    const regExp = RegExp(' [*]$');
+    const sensitiveList = filter.cfg.wordWhitelist.map((item) => { return item + ' *'; });
+    const list = [].concat(sensitiveList, filter.cfg.iWordWhitelist).sort();
+    const whitelist = document.getElementById('whitelist') as HTMLSelectElement;
     removeChildren(whitelist);
     list.unshift('Add, or update existing...');
     list.forEach((item) => {
-      let optionElement = document.createElement('option');
+      const optionElement = document.createElement('option');
       optionElement.value = item === list[0] ? '' : item.replace(regExp, '');
       optionElement.dataset.sensitive = regExp.test(item).toString();
       optionElement.textContent = escapeHTML(item);
@@ -743,44 +743,44 @@ export default class OptionPage {
   }
 
   populateWhitelistWord() {
-    let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
-    let whitelistRemove = document.getElementById('whitelistRemove') as HTMLInputElement;
-    let whitelistText = document.getElementById('whitelistText') as HTMLInputElement;
-    let selected = whitelist.selectedOptions[0];
+    const whitelist = document.getElementById('whitelist') as HTMLSelectElement;
+    const whitelistRemove = document.getElementById('whitelistRemove') as HTMLInputElement;
+    const whitelistText = document.getElementById('whitelistText') as HTMLInputElement;
+    const selected = whitelist.selectedOptions[0];
 
     if (selected.value == '') { // New word
       whitelistText.value = '';
       OptionPage.disableBtn(whitelistRemove);
 
       // Default to case-insensitive
-      let whitelistCase = document.getElementById('whitelistInsensitive') as HTMLInputElement;
+      const whitelistCase = document.getElementById('whitelistInsensitive') as HTMLInputElement;
       whitelistCase.checked = true;
     } else {
       whitelistText.value = selected.value;
-      let caseId = selected.dataset.sensitive === 'true' ? 'whitelistSensitive' : 'whitelistInsensitive';
-      let whitelistCase = document.getElementById(caseId) as HTMLInputElement;
+      const caseId = selected.dataset.sensitive === 'true' ? 'whitelistSensitive' : 'whitelistInsensitive';
+      const whitelistCase = document.getElementById(caseId) as HTMLInputElement;
       whitelistCase.checked = true;
       OptionPage.enableBtn(whitelistRemove);
     }
   }
 
   populateWord() {
-    let wordList = document.getElementById('wordList') as HTMLSelectElement;
-    let wordText = document.getElementById('wordText') as HTMLInputElement;
-    let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
-    let wordMatchSeparators = document.getElementById('wordMatchSeparators') as HTMLInputElement;
-    let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
-    let wordRemove = document.getElementById('wordRemove') as HTMLInputElement;
-    let word = wordList.value;
-    let wordWordlistDiv = document.getElementById('wordWordlistDiv') as HTMLSelectElement;
-    let wordlistSelections = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
+    const wordList = document.getElementById('wordList') as HTMLSelectElement;
+    const wordText = document.getElementById('wordText') as HTMLInputElement;
+    const wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
+    const wordMatchSeparators = document.getElementById('wordMatchSeparators') as HTMLInputElement;
+    const substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
+    const wordRemove = document.getElementById('wordRemove') as HTMLInputElement;
+    const word = wordList.value;
+    const wordWordlistDiv = document.getElementById('wordWordlistDiv') as HTMLSelectElement;
+    const wordlistSelections = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
     OptionPage.hideInputError(wordText);
     OptionPage.hideInputError(substitutionText);
 
     if (word == '') { // New word
       wordText.value = '';
       OptionPage.disableBtn(wordRemove);
-      let selectedMatchMethod = document.getElementById(`wordMatch${Constants.matchMethodName(option.cfg.defaultWordMatchMethod)}`) as HTMLInputElement;
+      const selectedMatchMethod = document.getElementById(`wordMatch${Constants.matchMethodName(option.cfg.defaultWordMatchMethod)}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
       wordMatchRepeated.checked = option.cfg.defaultWordRepeat;
       wordMatchSeparators.checked = option.cfg.defaultWordSeparators;
@@ -796,9 +796,9 @@ export default class OptionPage {
       });
     } else { // Existing word
       OptionPage.enableBtn(wordRemove);
-      let wordCfg = option.cfg.words[word];
+      const wordCfg = option.cfg.words[word];
       wordText.value = word;
-      let selectedMatchMethod = document.getElementById(`wordMatch${Constants.matchMethodName(wordCfg.matchMethod)}`) as HTMLInputElement;
+      const selectedMatchMethod = document.getElementById(`wordMatch${Constants.matchMethodName(wordCfg.matchMethod)}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
       wordMatchRepeated.checked = wordCfg.repeat;
       wordMatchSeparators.checked = wordCfg.separators === undefined ? option.cfg.defaultWordSeparators : wordCfg.separators;
@@ -816,21 +816,21 @@ export default class OptionPage {
   }
 
   populateWordlist() {
-    let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
-    let wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
+    const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    const wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
     wordlistText.value = wordlistSelect.value;
   }
 
   populateWordlists(selectedIndex: number = 0) {
-    let wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
-    let wordlistContainer = document.getElementById('wordlistContainer') as HTMLElement;
+    const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
+    const wordlistContainer = document.getElementById('wordlistContainer') as HTMLElement;
     wordlistsEnabledInput.checked = this.cfg.wordlistsEnabled;
 
     if (this.cfg.wordlistsEnabled) {
-      let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
-      let textWordlistSelect = document.getElementById('textWordlistSelect') as HTMLSelectElement;
-      let audioWordlistDiv = document.getElementById('audioWordlistDiv') as HTMLElement;
-      let audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
+      const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+      const textWordlistSelect = document.getElementById('textWordlistSelect') as HTMLSelectElement;
+      const audioWordlistDiv = document.getElementById('audioWordlistDiv') as HTMLElement;
+      const audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
       dynamicList(this.cfg.wordlists, wordlistSelect);
       dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), textWordlistSelect);
       wordlistSelect.selectedIndex = selectedIndex;
@@ -853,8 +853,8 @@ export default class OptionPage {
 
   populateWordPage() {
     let wordlistFilter = filter;
-    let selections = document.getElementById('wordlistSelections') as HTMLInputElement;
-    let wordsSelect = document.getElementById('wordList') as HTMLSelectElement;
+    const selections = document.getElementById('wordlistSelections') as HTMLInputElement;
+    const wordsSelect = document.getElementById('wordList') as HTMLSelectElement;
     removeChildren(wordsSelect);
 
     // Workaround for remove filter method
@@ -865,7 +865,7 @@ export default class OptionPage {
       wordlistFilter.init();
     }
 
-    let words = Object.keys(option.cfg.words).sort();
+    const words = Object.keys(option.cfg.words).sort();
     words.unshift('Add, or update existing...');
     words.forEach(word => {
       let filteredWord = word;
@@ -877,7 +877,7 @@ export default class OptionPage {
         }
       }
 
-      let optionElement = document.createElement('option');
+      const optionElement = document.createElement('option');
       optionElement.value = word === words[0] ? '' : word;
       optionElement.dataset.filtered = filteredWord;
       optionElement.textContent = escapeHTML(filteredWord);
@@ -887,10 +887,10 @@ export default class OptionPage {
     // Dynamically create the wordlist selection checkboxes
     if (selections.hasChildNodes()) { removeChildren(selections); }
     option.cfg.wordlists.forEach(function(list, index) {
-      let div = document.createElement('div');
-      let label = document.createElement('label');
-      let input = document.createElement('input');
-      let name = document.createTextNode(list);
+      const div = document.createElement('div');
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      const name = document.createTextNode(list);
       input.type = 'checkbox';
       input.classList.add('w3-check');
       input.name = 'wordlistSelection';
@@ -906,18 +906,18 @@ export default class OptionPage {
 
   removeAllWords(evt) {
     this.cfg.words = {};
-    let wordList = document.getElementById('wordList') as HTMLSelectElement;
+    const wordList = document.getElementById('wordList') as HTMLSelectElement;
     wordList.selectedIndex = 0;
     filter.rebuildWordlists();
     this.populateOptions();
   }
 
   async removeDomain(event) {
-    let domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
+    const domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
     if (domainsSelect.value) {
       delete this.cfg.domains[domainsSelect.value];
 
-      let error = await this.cfg.save('domains');
+      const error = await this.cfg.save('domains');
       if (error) {
         OptionPage.showErrorModal();
         return false;
@@ -928,14 +928,14 @@ export default class OptionPage {
   }
 
   async removeWhitelist(evt) {
-    let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
-    let selected = whitelist.selectedOptions[0];
-    let originalWord = selected.value;
-    let originalCase = selected.dataset.sensitive === 'true' ? 'sensitive': 'insensitive';
-    let originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
+    const whitelist = document.getElementById('whitelist') as HTMLSelectElement;
+    const selected = whitelist.selectedOptions[0];
+    const originalWord = selected.value;
+    const originalCase = selected.dataset.sensitive === 'true' ? 'sensitive': 'insensitive';
+    const originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
     option.cfg[originalListName] = removeFromArray(option.cfg[originalListName], originalWord);
 
-    let error = await option.cfg.save(originalListName);
+    const error = await option.cfg.save(originalListName);
     if (error) {
       OptionPage.showErrorModal();
       return false;
@@ -947,8 +947,8 @@ export default class OptionPage {
 
   async removeWord(evt) {
     if (evt.target.classList.contains('disabled')) return false;
-    let wordList = document.getElementById('wordList') as HTMLSelectElement;
-    let word = wordList.value;
+    const wordList = document.getElementById('wordList') as HTMLSelectElement;
+    const word = wordList.value;
 
     let result = this.cfg.removeWord(word);
     if (result) {
@@ -963,10 +963,10 @@ export default class OptionPage {
   }
 
   async renameWordlist() {
-    let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
-    let wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
-    let name = wordlistText.value.trim();
-    let index = wordlistSelect.selectedIndex;
+    const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    const wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
+    const name = wordlistText.value.trim();
+    const index = wordlistSelect.selectedIndex;
 
     if (wordlistText.checkValidity()) {
       // Make sure there are no duplicates
@@ -988,7 +988,7 @@ export default class OptionPage {
   }
 
   async restoreDefaults(evt, silent = false) {
-    let error = await this.cfg.reset();
+    const error = await this.cfg.reset();
     if (error) {
       OptionPage.showErrorModal('Error restoring defaults!');
       return false;
@@ -1000,9 +1000,9 @@ export default class OptionPage {
   }
 
   async saveCustomAudioSites() {
-    let customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
+    const customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
     try {
-      let text = customAudioSitesTextArea.value;
+      const text = customAudioSitesTextArea.value;
       this.cfg.customAudioSites = text == '' ? null : JSON.parse(text);
       if (await option.saveProp('customAudioSites')) {
         customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
@@ -1014,16 +1014,16 @@ export default class OptionPage {
   }
 
   async saveDomain(event) {
-    let domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
-    let domainText = document.getElementById('domainText') as HTMLInputElement;
-    let domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
-    let domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
-    let domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
-    let domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
-    let domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
+    const domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
+    const domainText = document.getElementById('domainText') as HTMLInputElement;
+    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+    const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
+    const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
+    const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
+    const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
 
-    let originalKey = domainsSelect.value;
-    let newKey = domainText.value.trim().toLowerCase();
+    const originalKey = domainsSelect.value;
+    const newKey = domainText.value.trim().toLowerCase();
 
     if (newKey == '') { // No data
       OptionPage.showInputError(domainText, 'Please enter a value.');
@@ -1034,17 +1034,17 @@ export default class OptionPage {
       OptionPage.hideInputError(domainText);
       if (newKey != originalKey) { delete this.cfg.domains[originalKey]; } // URL changed: remove old entry
 
-      let wordlist = domainWordlistSelect.selectedIndex > 0 ? domainWordlistSelect.selectedIndex - 1 : undefined;
-      let audioList = domainAudioWordlistSelect.selectedIndex > 0 ? domainAudioWordlistSelect.selectedIndex - 1 : undefined;
-      let newDomainCfg: DomainCfg = {
+      const wordlist = domainWordlistSelect.selectedIndex > 0 ? domainWordlistSelect.selectedIndex - 1 : undefined;
+      const audioList = domainAudioWordlistSelect.selectedIndex > 0 ? domainAudioWordlistSelect.selectedIndex - 1 : undefined;
+      const newDomainCfg: DomainCfg = {
         audioList: audioList,
         disabled: domainDisabledCheck.checked,
         enabled: domainEnabledCheck.checked,
         wordlist: wordlist,
       };
-      let domain = new Domain(newKey, newDomainCfg);
+      const domain = new Domain(newKey, newDomainCfg);
       domain.updateFromModeIndex(domainModeSelect.selectedIndex);
-      let error = await domain.save(this.cfg);
+      const error = await domain.save(this.cfg);
 
       if (error) {
         OptionPage.showErrorModal();
@@ -1060,27 +1060,27 @@ export default class OptionPage {
 
   async saveOptions(evt) {
     // Gather current settings
-    let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
-    let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
-    let defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
-    let defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
-    let defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
-    let preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
-    let preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
-    let preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
-    let showCounter = document.getElementById('showCounter') as HTMLInputElement;
-    let showSummary = document.getElementById('showSummary') as HTMLInputElement;
-    let showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
-    let filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
-    let substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
-    let defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
-    let domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
-    let muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
-    let muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
-    let muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
-    let muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
-    let showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
-    let wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
+    const censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
+    const censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
+    const defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
+    const defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
+    const defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
+    const preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
+    const preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
+    const preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
+    const showCounter = document.getElementById('showCounter') as HTMLInputElement;
+    const showSummary = document.getElementById('showSummary') as HTMLInputElement;
+    const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
+    const filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
+    const substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
+    const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
+    const domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
+    const muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
+    const muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
+    const muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
+    const muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
+    const showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
+    const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
     this.cfg.censorCharacter = censorCharacterSelect.value;
     this.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     this.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
@@ -1104,7 +1104,7 @@ export default class OptionPage {
     this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
 
     // Save settings
-    let error = await this.cfg.save();
+    const error = await this.cfg.save();
     if (error) {
       OptionPage.showErrorModal('Settings not saved! Please try again.');
       return false;
@@ -1115,7 +1115,7 @@ export default class OptionPage {
   }
 
   async saveProp(prop: string) {
-    let error = await option.cfg.save(prop);
+    const error = await option.cfg.save(prop);
     if (error) {
       OptionPage.showErrorModal();
       return false;
@@ -1124,15 +1124,15 @@ export default class OptionPage {
   }
 
   async saveWhitelist(evt) {
-    let whitelist = document.getElementById('whitelist') as HTMLSelectElement;
-    let selected = whitelist.selectedOptions[0];
-    let selectedCase = document.querySelector('input[name="whitelistCase"]:checked') as HTMLInputElement;
-    let whitelistText = document.getElementById('whitelistText') as HTMLInputElement;
+    const whitelist = document.getElementById('whitelist') as HTMLSelectElement;
+    const selected = whitelist.selectedOptions[0];
+    const selectedCase = document.querySelector('input[name="whitelistCase"]:checked') as HTMLInputElement;
+    const whitelistText = document.getElementById('whitelistText') as HTMLInputElement;
 
-    let propsToSave = [];
-    let newCase = selectedCase.value;
-    let newWord = newCase === 'sensitive' ? whitelistText.value : whitelistText.value.toLowerCase();
-    let newListName = newCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
+    const propsToSave = [];
+    const newCase = selectedCase.value;
+    const newWord = newCase === 'sensitive' ? whitelistText.value : whitelistText.value.toLowerCase();
+    const newListName = newCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
 
     if (whitelistText.value === '') {
       OptionPage.showInputError(whitelistText, 'Please enter a valid word/phrase.');
@@ -1149,9 +1149,9 @@ export default class OptionPage {
         option.cfg[newListName].push(newWord);
         propsToSave.push(newListName);
       } else { // Modifying existing word
-        let originalWord = selected.value;
-        let originalCase = selected.dataset.sensitive === 'true' ? 'sensitive': 'insensitive';
-        let originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
+        const originalWord = selected.value;
+        const originalCase = selected.dataset.sensitive === 'true' ? 'sensitive': 'insensitive';
+        const originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
 
         if ((originalWord != newWord) || (originalCase != newCase)) {
           option.cfg[originalListName] = removeFromArray(option.cfg[originalListName], originalWord);
@@ -1164,7 +1164,7 @@ export default class OptionPage {
         propsToSave.forEach(prop => {
           option.cfg[prop] = option.cfg[prop].sort();
         });
-        let error = await option.cfg.save(propsToSave);
+        const error = await option.cfg.save(propsToSave);
         if (error) {
           OptionPage.showErrorModal();
           return false;
@@ -1179,16 +1179,16 @@ export default class OptionPage {
   }
 
   async saveWord(evt) {
-    let wordList = document.getElementById('wordList') as HTMLSelectElement;
-    let wordText = document.getElementById('wordText') as HTMLInputElement;
-    let wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
-    let wordMatchSeparators = document.getElementById('wordMatchSeparators') as HTMLInputElement;
-    let substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
-    let selectedMatchMethod = document.querySelector('input[name="wordMatchMethod"]:checked') as HTMLInputElement;
+    const wordList = document.getElementById('wordList') as HTMLSelectElement;
+    const wordText = document.getElementById('wordText') as HTMLInputElement;
+    const wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
+    const wordMatchSeparators = document.getElementById('wordMatchSeparators') as HTMLInputElement;
+    const substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
+    const selectedMatchMethod = document.querySelector('input[name="wordMatchMethod"]:checked') as HTMLInputElement;
     let word = wordText.value.trim();
-    let sub = substitutionText.value.trim().toLowerCase();
+    const sub = substitutionText.value.trim().toLowerCase();
     let added = true;
-    let wordlistSelectionsInput = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
+    const wordlistSelectionsInput = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
 
     if (Constants.MatchMethods[selectedMatchMethod.value] !== Constants.MatchMethods.Regex) {
       word = word.toLowerCase();
@@ -1206,10 +1206,10 @@ export default class OptionPage {
     }
 
     if (wordText.checkValidity()) {
-      let lists = [];
+      const lists = [];
       wordlistSelectionsInput.forEach((wordlist, index) => { if (wordlist.checked) { lists.push(index + 1); } });
 
-      let wordOptions: WordOptions = {
+      const wordOptions: WordOptions = {
         lists: lists,
         matchMethod: Constants.MatchMethods[selectedMatchMethod.value],
         repeat: wordMatchRepeated.checked,
@@ -1219,13 +1219,13 @@ export default class OptionPage {
 
       // Check for endless substitution loop
       if (wordOptions.matchMethod != Constants.MatchMethods.Regex) {
-        let subFilter = new Filter;
-        let words = {};
+        const subFilter = new Filter;
+        const words = {};
         words[word] = wordOptions;
         subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: Constants.FilterMethods.Substitute }, { words: words }));
         subFilter.init();
-        let first = subFilter.replaceTextResult(word);
-        let second = subFilter.replaceTextResult(first.filtered);
+        const first = subFilter.replaceTextResult(word);
+        const second = subFilter.replaceTextResult(first.filtered);
         if (first.filtered != second.filtered) {
           OptionPage.showInputError(substitutionText, "Substitution can't contain word (causes an endless loop).");
           return false;
@@ -1234,8 +1234,8 @@ export default class OptionPage {
 
       // Test for a valid Regex
       if (wordOptions.matchMethod === Constants.MatchMethods.Regex) {
-        let subFilter = new Filter;
-        let words = {};
+        const subFilter = new Filter;
+        const words = {};
         words[word] = wordOptions;
         subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { words: words }));
         subFilter.init();
@@ -1249,7 +1249,7 @@ export default class OptionPage {
         // console.log('Adding new word: ', word, wordOptions); // DEBUG
         added = this.cfg.addWord(word, wordOptions);
       } else { // Updating existing record
-        let originalWord = wordList.value;
+        const originalWord = wordList.value;
         if (originalWord == word) { // Word options changed
           // console.log('Modifying existing word options: ', word, wordOptions); // DEBUG
           this.cfg.words[word] = wordOptions;
@@ -1265,7 +1265,7 @@ export default class OptionPage {
       }
 
       if (added) {
-        let success = await this.saveOptions(evt);
+        const success = await this.saveOptions(evt);
         if (!success) {
           OptionPage.showErrorModal();
           return false;
@@ -1291,7 +1291,7 @@ export default class OptionPage {
   }
 
   async setDefaultWordlist(element: HTMLSelectElement) {
-    let prop = element.id === 'textWordlistSelect' ? 'wordlistId' : 'audioWordlistId';
+    const prop = element.id === 'textWordlistSelect' ? 'wordlistId' : 'audioWordlistId';
     this.cfg[prop] = element.selectedIndex;
 
     if (!await this.saveProp(prop)) {
@@ -1303,17 +1303,17 @@ export default class OptionPage {
   }
 
   showBulkWordEditor() {
-    let modalId = 'bulkWordEditorModal';
-    let title = document.querySelector(`#${modalId} h5.modalTitle`) as HTMLHeadingElement;
-    let tableContainer = document.querySelector(`#${modalId} div.tableContainer`) as HTMLDivElement;
-    let table = tableContainer.querySelector('table') as HTMLTableElement;
+    const modalId = 'bulkWordEditorModal';
+    const title = document.querySelector(`#${modalId} h5.modalTitle`) as HTMLHeadingElement;
+    const tableContainer = document.querySelector(`#${modalId} div.tableContainer`) as HTMLDivElement;
+    const table = tableContainer.querySelector('table') as HTMLTableElement;
     title.textContent = 'Bulk Word Editor';
     if (table.tHead.rows.length === 0) { table.tHead.appendChild(option.bulkWordEditorHeaderRow()); }
-    let tBody = table.querySelector('tbody') as HTMLTableSectionElement;
+    const tBody = table.querySelector('tbody') as HTMLTableSectionElement;
     removeChildren(tBody);
 
     // Add current words to the table
-    let wordKeys = Object.keys(option.cfg.words);
+    const wordKeys = Object.keys(option.cfg.words);
     if (wordKeys.length === 0) {
       option.bulkEditorAddRow();
     } else {
@@ -1328,27 +1328,27 @@ export default class OptionPage {
 
   showSupportedAudioSiteConfig() {
     const select = document.querySelector('#supportedAudioSitesModal select#siteSelect') as HTMLSelectElement;
-    let textArea = document.querySelector('#supportedAudioSitesModal div#modalContentRight textarea') as HTMLTextAreaElement;
-    let config = {};
+    const textArea = document.querySelector('#supportedAudioSitesModal div#modalContentRight textarea') as HTMLTextAreaElement;
+    const config = {};
     config[select.value] = WebAudioSites.sites[select.value];
     textArea.textContent = JSON.stringify(config, null, 2);
   }
 
   showSupportedAudioSites() {
-    let title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
+    const title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
     title.textContent = 'Supported Audio Sites';
-    let contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
-    let select = contentLeft.querySelector('#siteSelect') as HTMLSelectElement;
+    const contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
+    const select = contentLeft.querySelector('#siteSelect') as HTMLSelectElement;
     removeChildren(select);
 
-    let sortedSites = Object.keys(WebAudioSites.sites).sort(function(a,b) {
-      let domainA = a.match(/\w*\.\w*$/)[0];
-      let domainB = b.match(/\w*\.\w*$/)[0];
+    const sortedSites = Object.keys(WebAudioSites.sites).sort(function(a,b) {
+      const domainA = a.match(/\w*\.\w*$/)[0];
+      const domainB = b.match(/\w*\.\w*$/)[0];
       return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
     });
 
     sortedSites.forEach(site => {
-      let option = document.createElement('option');
+      const option = document.createElement('option');
       option.value = site;
       option.textContent = site;
       select.appendChild(option);
@@ -1359,14 +1359,14 @@ export default class OptionPage {
   }
 
   switchPage(evt) {
-    let currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
-    let newTab = evt.target as HTMLElement;
+    const currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
+    const newTab = evt.target as HTMLElement;
 
     currentTab.classList.remove(OptionPage.activeClass);
     newTab.classList.add(OptionPage.activeClass);
 
-    let currentPage = document.getElementById(currentTab.textContent.toLowerCase() + 'Page') as HTMLElement;
-    let newPage = document.getElementById(newTab.textContent.toLowerCase() + 'Page') as HTMLElement;
+    const currentPage = document.getElementById(currentTab.textContent.toLowerCase() + 'Page') as HTMLElement;
+    const newPage = document.getElementById(newTab.textContent.toLowerCase() + 'Page') as HTMLElement;
     OptionPage.hide(currentPage);
     OptionPage.show(newPage);
 
@@ -1384,15 +1384,15 @@ export default class OptionPage {
   }
 
   updateBookmarklet(url: string) {
-    let bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
-    let bookmarklet = new Bookmarklet(url);
+    const bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
+    const bookmarklet = new Bookmarklet(url);
     bookmarkletLink.href = bookmarklet.destination();
     OptionPage.enableBtn(bookmarkletLink);
   }
 
   updateHostedBookmarklet() {
-    let bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
-    let bookmarkletHostedURLInput = document.getElementById('bookmarkletHostedURL') as HTMLInputElement;
+    const bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
+    const bookmarkletHostedURLInput = document.getElementById('bookmarkletHostedURL') as HTMLInputElement;
     OptionPage.hideInputError(bookmarkletHostedURLInput);
 
     if (bookmarkletHostedURLInput.checkValidity()) {
@@ -1428,7 +1428,7 @@ export default class OptionPage {
   }
 
   updateItemList(evt, input, attr: string, invalidMessage: string, original = ''): boolean {
-    let item = input.value.trim().toLowerCase();
+    const item = input.value.trim().toLowerCase();
     if (item == '') { // No data
       OptionPage.showInputError(input, 'Please enter a value.');
       return false;
@@ -1458,13 +1458,13 @@ export default class OptionPage {
   async updateYouTubeAutoLimits(target) {
     OptionPage.hideInputError(target);
     if (target.checkValidity()) {
-      let updateMin = target.id === 'audioYouTubeAutoSubsMin';
-      let min = parseFloat(updateMin ? target.value : (document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement).value);
-      let max = parseFloat(updateMin ? (document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement).value : target.value);
+      const updateMin = target.id === 'audioYouTubeAutoSubsMin';
+      const min = parseFloat(updateMin ? target.value : (document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement).value);
+      const max = parseFloat(updateMin ? (document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement).value : target.value);
       if (min != 0 && max != 0 && min > max) {
         OptionPage.showInputError(target, 'Min must be less than max.');
       } else {
-        let prop = updateMin ? 'youTubeAutoSubsMin' : 'youTubeAutoSubsMax';
+        const prop = updateMin ? 'youTubeAutoSubsMin' : 'youTubeAutoSubsMax';
         this.cfg[prop] = parseFloat(target.value);
         await option.saveProp(prop);
       }
@@ -1474,8 +1474,8 @@ export default class OptionPage {
   }
 }
 
-let filter = new Filter;
-let option = new OptionPage;
+const filter = new Filter;
+const option = new OptionPage;
 
 ////
 // Events

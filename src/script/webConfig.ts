@@ -42,8 +42,8 @@ export default class WebConfig extends Config {
 
   static async build(keys: string | string[] = []) {
     if (typeof keys === 'string') { keys = [keys]; }
-    let asyncResult = await WebConfig.getConfig(keys);
-    let instance = new WebConfig(asyncResult);
+    const asyncResult = await WebConfig.getConfig(keys);
+    const instance = new WebConfig(asyncResult);
     return instance;
   }
 
@@ -62,7 +62,7 @@ export default class WebConfig extends Config {
   static combineData(data, prop: string): string[] {
     data[prop] = {};
     if (data[`_${prop}0`] !== undefined) {
-      let dataKeys = WebConfig.getDataContainerKeys(data, prop);
+      const dataKeys = WebConfig.getDataContainerKeys(data, prop);
 
       // Add all _[prop]* to .[prop] and remove _[prop]*
       dataKeys.forEach(function(key) {
@@ -103,7 +103,7 @@ export default class WebConfig extends Config {
         }
 
         WebConfig._splittingKeys.forEach(function(splittingKey) {
-          let keys = WebConfig.combineData(items, splittingKey);
+          const keys = WebConfig.combineData(items, splittingKey);
           if (keys) { items._splitContainerKeys[splittingKey] = keys; }
         });
 
@@ -123,8 +123,8 @@ export default class WebConfig extends Config {
 
   // Find all _[prop]* to combine
   static getDataContainerKeys(data, prop) {
-    let pattern = new RegExp(`^_${prop}\\d+`);
-    let containerKeys = Object.keys(data).filter(function(key) {
+    const pattern = new RegExp(`^_${prop}\\d+`);
+    const containerKeys = Object.keys(data).filter(function(key) {
       return pattern.test(key);
     });
 
@@ -158,7 +158,7 @@ export default class WebConfig extends Config {
   // Pass a key or array of keys to save, or save everything
   save(props: string | string[] = []) {
     if (typeof props === 'string') { props = [props]; }
-    let data = {};
+    const data = {};
 
     // Save everything
     if (props.length === 0) {
@@ -178,9 +178,9 @@ export default class WebConfig extends Config {
     if (Object.keys(this._splitContainerKeys).length !== 0 && props.some((prop) => WebConfig._splittingKeys.includes(prop))) {
       WebConfig._splittingKeys.forEach((splittingKey) => {
         if (props.includes(splittingKey)) {
-          let newContainerKeys = WebConfig.getDataContainerKeys(data, splittingKey);
+          const newContainerKeys = WebConfig.getDataContainerKeys(data, splittingKey);
           if (this._splitContainerKeys[splittingKey]) {
-            let containersToRemove = this._splitContainerKeys[splittingKey].filter((oldKey) => !newContainerKeys.includes(oldKey));
+            const containersToRemove = this._splitContainerKeys[splittingKey].filter((oldKey) => !newContainerKeys.includes(oldKey));
             if (containersToRemove.length !== 0) {
               this.remove(containersToRemove);
               this._splitContainerKeys[splittingKey] = newContainerKeys;
@@ -201,7 +201,7 @@ export default class WebConfig extends Config {
     const encoder = new TextEncoder();
     let currentContainerNum = 0;
     let currentBytes = 2; // For double-quotes around entire stringified JSON
-    let data = {};
+    const data = {};
 
     let currentContainer = `_${key}${currentContainerNum}`;
     data[currentContainer] = {};

@@ -68,8 +68,8 @@ export default class WebFilter extends Filter {
     // Check removed nodes to see if we should unmute
     if (filter.mutePage && filter.audio.muted) {
       mutation.removedNodes.forEach(node => {
-        let supported = filter.audio.supportedNode(node);
-        let rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0]; // Use the matched rule, or the first rule
+        const supported = filter.audio.supportedNode(node);
+        const rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0]; // Use the matched rule, or the first rule
         if (
           supported !== false
           || node == filter.audio.lastFilteredNode
@@ -99,8 +99,8 @@ export default class WebFilter extends Filter {
     // console.log('[APF] Process mutation.target:', mutation.target, mutation.target.data); // Debug: Filter - Mutation text
     if (!Page.isForbiddenNode(mutation.target)) {
       if (filter.mutePage) {
-        let supported = filter.audio.supportedNode(mutation.target);
-        let rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0]; // Use the matched rule, or the first rule
+        const supported = filter.audio.supportedNode(mutation.target);
+        const rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0]; // Use the matched rule, or the first rule
         if (supported !== false && rule.simpleUnmute) {
           // Supported node. Check if a previously filtered node is being removed
           if (
@@ -118,11 +118,11 @@ export default class WebFilter extends Filter {
             filter.audio.unmute(rule);
           }
         } else if (!filter.audioOnly) { // Filter regular text
-          let result = this.replaceTextResult(mutation.target.data, this.wordlistId);
+          const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
           if (result.modified) { mutation.target.data = result.filtered; }
         }
       } else if (!filter.audioOnly) { // Filter regular text
-        let result = this.replaceTextResult(mutation.target.data, this.wordlistId);
+        const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
         if (result.modified) { mutation.target.data = result.filtered; }
       }
     }
@@ -143,7 +143,7 @@ export default class WebFilter extends Filter {
         filter.processNode(node, filter.wordlistId); // Clean the rest of the page
       }
     } else { // Other audio muting
-      let supported = filter.audio.supportedNode(node);
+      const supported = filter.audio.supportedNode(node);
       if (supported !== false) {
         // console.log('[APF] Audio subtitle node:', node); // Debug: Audio
         filter.audio.clean(node, supported);
@@ -156,7 +156,7 @@ export default class WebFilter extends Filter {
   cleanChildNode(node, wordlistId: number, stats: boolean = true) {
     if (node.nodeName) {
       if (node.textContent && node.textContent.trim() != '') {
-        let result = this.replaceTextResult(node.textContent, wordlistId, stats);
+        const result = this.replaceTextResult(node.textContent, wordlistId, stats);
         if (result.modified) {
           // console.log('[APF] Normal node changed:', result.original, result.filtered); // Debug: Filter - Mutation node filtered
           node.textContent = result.filtered;
@@ -188,10 +188,10 @@ export default class WebFilter extends Filter {
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
     // console.log('[APF] Config loaded', this.cfg); // Debug: General
 
-    let backgroundData: BackgroundData = await this.getBackgroundData();
+    const backgroundData: BackgroundData = await this.getBackgroundData();
 
     // Use domain-specific settings
-    let message: Message = { disabled: backgroundData.disabledTab || (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
+    const message: Message = { disabled: backgroundData.disabledTab || (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
     if (message.disabled) {
       // console.log(`[APF] Disabled page: ${this.hostname} - exiting`); // Debug: General
       chrome.runtime.sendMessage(message);
@@ -240,7 +240,7 @@ export default class WebFilter extends Filter {
     if (Page.isForbiddenNode(node)) { return false; }
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, stats); }
     if (node.childElementCount > 0) {
-      let treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+      const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
       while(treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
           treeWalker.currentNode.childNodes.forEach(childNode => {
@@ -336,7 +336,7 @@ export default class WebFilter extends Filter {
   }
 
   stopObserving(observer: MutationObserver = filter.observer) {
-    let mutations = observer.takeRecords();
+    const mutations = observer.takeRecords();
     observer.disconnect();
     if (mutations) { this.processMutations(mutations); }
   }
@@ -355,7 +355,7 @@ export default class WebFilter extends Filter {
   }
 }
 
-let filter = new WebFilter;
+const filter = new WebFilter;
 const ObserverConfig: MutationObserverInit = {
   characterData: true,
   characterDataOldValue: true,

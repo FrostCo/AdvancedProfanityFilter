@@ -14,7 +14,7 @@ export default class Constants {
   }
 
   static orderedArray(obj: Record<string, number>) {
-    let result = [];
+    const result = [];
     Object.values(obj).sort().forEach(id => { result.push(Constants.nameById(obj, id)); });
     return result;
   }

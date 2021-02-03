@@ -3,7 +3,7 @@ import Domain from './domain';
 import WebConfig from './webConfig';
 import { formatNumber } from './lib/helper';
 
-let BackgroundStorage: BackgroundStorage = {
+const BackgroundStorage: BackgroundStorage = {
   tabs: {},
 };
 
@@ -52,7 +52,7 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
   if (details.reason == 'install') {
     chrome.runtime.openOptionsPage();
   } else if (details.reason == 'update') {
-    // let thisVersion = chrome.runtime.getManifest().version;
+    // const thisVersion = chrome.runtime.getManifest().version;
     // console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion);
 
     // Open options page to show new features
@@ -80,8 +80,8 @@ function onMessage(request: Message, sender, sendResponse) {
   if (request.disabled === true) {
     chrome.browserAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
   } else if (request.backgroundData === true) {
-    let response: BackgroundData = { disabledTab: false };
-    let tabOptions = getTabOptions(sender.tab.id);
+    const response: BackgroundData = { disabledTab: false };
+    const tabOptions = getTabOptions(sender.tab.id);
     if (tabOptions.disabled || tabOptions.disabledOnce) {
       response.disabledTab = true;
       if (tabOptions.disabledOnce) { tabOptions.disabledOnce = false; }
@@ -114,7 +114,7 @@ function onMessage(request: Message, sender, sendResponse) {
 
     // Unmute on page reload
     if (request.clearMute === true && sender.tab != undefined) {
-      let { muted, reason, extensionId } = sender.tab.mutedInfo;
+      const { muted, reason, extensionId } = sender.tab.mutedInfo;
       if (muted && reason == 'extension' && extensionId == chrome.runtime.id) {
         chrome.tabs.update(sender.tab.id, { muted: false });
       }
@@ -124,27 +124,27 @@ function onMessage(request: Message, sender, sendResponse) {
 
 // Add selected word/phrase and reload page (unless already present)
 async function processSelection(action: string, selection: string) {
-  let cfg = await WebConfig.build('words');
-  let result = cfg[action](selection);
+  const cfg = await WebConfig.build('words');
+  const result = cfg[action](selection);
 
   if (result) {
-    let saved = await cfg.save();
+    const saved = await cfg.save();
     if (!saved) { chrome.tabs.reload(); }
   }
 }
 
 async function runUpdateMigrations(previousVersion) {
   if (DataMigration.migrationNeeded(previousVersion)) {
-    let cfg = await WebConfig.build();
-    let migration = new DataMigration(cfg);
-    let migrated = migration.byVersion(previousVersion);
+    const cfg = await WebConfig.build();
+    const migration = new DataMigration(cfg);
+    const migrated = migration.byVersion(previousVersion);
     if (migrated) cfg.save();
   }
 }
 
 function saveNewTabOptions(id: number, options: TabStorageOptions = {}): TabStorageOptions {
   const _defaults: TabStorageOptions = { disabled: false, disabledOnce: false };
-  let tabOptions = Object.assign({}, _defaults, options) as TabStorageOptions;
+  const tabOptions = Object.assign({}, _defaults, options) as TabStorageOptions;
   tabOptions.id = id;
   tabOptions.registeredAt = new Date().getTime();
   BackgroundStorage.tabs[id] = tabOptions;
@@ -160,7 +160,7 @@ function storedTab(id: number): boolean {
 }
 
 function tabsOnActivated(tab: chrome.tabs.TabActiveInfo) {
-  let tabId = tab ? tab.tabId : chrome.tabs.TAB_ID_NONE;
+  const tabId = tab ? tab.tabId : chrome.tabs.TAB_ID_NONE;
   if (!storedTab(tabId)) { saveTabOptions(tabId); }
 }
 
@@ -169,8 +169,8 @@ function tabsOnRemoved(tabId: number) {
 }
 
 async function toggleDomain(hostname: string, action: string) {
-  let cfg = await WebConfig.build(['domains', 'enabledDomainsOnly']);
-  let domain = Domain.byHostname(hostname, cfg.domains);
+  const cfg = await WebConfig.build(['domains', 'enabledDomainsOnly']);
+  const domain = Domain.byHostname(hostname, cfg.domains);
 
   switch(action) {
     case 'disable':
@@ -179,12 +179,12 @@ async function toggleDomain(hostname: string, action: string) {
       domain.advanced = !domain.advanced; break;
   }
 
-  let error = await domain.save(cfg);
+  const error = await domain.save(cfg);
   if (!error) { chrome.tabs.reload(); }
 }
 
 function toggleTabDisable(id: number) {
-  let tabOptions = getTabOptions(id);
+  const tabOptions = getTabOptions(id);
   tabOptions.disabled = !tabOptions.disabled;
   chrome.tabs.reload();
 }

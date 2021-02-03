@@ -12,7 +12,7 @@ export default class Bookmarklet {
   // Input (share link): https://www.dropbox.com/s/id/apfBookmarklet.js?dl=0
   // Output: https://dl.dropbox.com/s/id/apfBookmarklet.js?raw=1
   static dropboxDownloadURL(url: string): string {
-    let match = url.match(Bookmarklet.dropboxRegExp);
+    const match = url.match(Bookmarklet.dropboxRegExp);
     if (match) {
       return url.replace(/\/www\./, '/dl.').replace(/\?dl=0/, '?raw=1');
     }
@@ -22,12 +22,12 @@ export default class Bookmarklet {
   // Input: https://raw.githubusercontent.com/user/project/branch/apfBookmarklet.js
   // Output: https://cdn.jsdelivr.net/gh/user/project@branch/apfBookmarklet.js
   static githubDownloadURL(url: string): string {
-    let match = url.match(Bookmarklet.githubRawRegExp);
+    const match = url.match(Bookmarklet.githubRawRegExp);
     if (match && match[1] && match[2] && match[3] && match[4]) {
-      let user = match[1];
-      let project = match[2];
-      let branch = match[3];
-      let filename = match[4];
+      const user = match[1];
+      const project = match[2];
+      const branch = match[3];
+      const filename = match[4];
       return `https://cdn.jsdelivr.net/gh/${user}/${project}@${branch}/${filename}`;
     }
     return url;
@@ -39,15 +39,15 @@ export default class Bookmarklet {
   static gitHubGistDownloadURL(url: string): string {
     let match = url.match(Bookmarklet.gitHubGistRawRegExp);
     if (match && match[1] && match[2]) {
-      let user = match[1];
-      let gistId = match[2];
-      let filename = match[3];
+      const user = match[1];
+      const gistId = match[2];
+      const filename = match[3];
       return `https://cdn.statically.io/gist/${user}/${gistId}/raw/${filename}?env=dev`;
     } else {
       match = url.match(Bookmarklet.gitHubGistLinkRegExp);
       if (match && match[1] && match[2]) {
-        let user = match[1];
-        let gistId = match[2];
+        const user = match[1];
+        const gistId = match[2];
         return `https://cdn.statically.io/gist/${user}/${gistId}/raw/${Bookmarklet._defaultFilename}?env=dev`;
       }
     }
@@ -58,7 +58,7 @@ export default class Bookmarklet {
   // Input (share link): https://drive.google.com/file/d/id/view?usp=sharing
   // Output: https://drive.google.com/uc?export=view&id=id
   static googleDriveDownloadURL(url: string): string {
-    let match = url.match(Bookmarklet.googleDriveRegExp);
+    const match = url.match(Bookmarklet.googleDriveRegExp);
     if (match && match[1]) {
       return `https://drive.google.com/uc?export=view&id=${match[1]}`;
     }
@@ -66,7 +66,7 @@ export default class Bookmarklet {
   }
 
   static processDownloadURL(url: string): string {
-    let originalUrl = url;
+    const originalUrl = url;
     if (originalUrl === url) { url = Bookmarklet.dropboxDownloadURL(url); }
     if (originalUrl === url) { url = Bookmarklet.githubDownloadURL(url); }
     if (originalUrl === url) { url = Bookmarklet.gitHubGistDownloadURL(url); }
@@ -81,13 +81,13 @@ export default class Bookmarklet {
     const origURL = './bookmarkletFilter.js';
     const lowerCaseLettersRegExp = new RegExp('^[a-z]$');
 
-    let response = await fetch(origURL);
-    let code = await response.text();
-    let cfgCode = code.match(configRegExp).toString();
+    const response = await fetch(origURL);
+    const code = await response.text();
+    const cfgCode = code.match(configRegExp).toString();
     try {
-      let variable = cfgCode.match(/^let ([a-z])=/m)[1];
+      const variable = cfgCode.match(/^const ([a-z])=/m)[1];
       if (lowerCaseLettersRegExp.test(variable)) {
-        return code.replace(configRegExp, `${prefix}\nlet ${variable}=${JSON.stringify(config)}\n${postfix}`);
+        return code.replace(configRegExp, `${prefix}\nconst ${variable}=${JSON.stringify(config)}\n${postfix}`);
       } else {
         throw('Unable to set user config - using defaults');
       }
@@ -102,8 +102,8 @@ export default class Bookmarklet {
   }
 
   destination(): string {
-    let prefix = '(function(){if(!document.querySelector("script.apfBookmarklet")){let apfScriptEl=document.body.appendChild(document.createElement("script"));apfScriptEl.type="text/javascript";apfScriptEl.src="';
-    let postfix = '";apfScriptEl.className="apfBookmarklet";}})()';
+    const prefix = '(function(){if(!document.querySelector("script.apfBookmarklet")){const apfScriptEl=document.body.appendChild(document.createElement("script"));apfScriptEl.type="text/javascript";apfScriptEl.src="';
+    const postfix = '";apfScriptEl.className="apfBookmarklet";}})()';
     return 'javascript:' + encodeURIComponent(prefix + this.hostedUrl + postfix);
   }
 }

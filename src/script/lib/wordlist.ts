@@ -12,7 +12,7 @@ export default class Wordlist {
     this.regExps = [];
 
     // Sort the words array by longest (most-specific) first
-    let sorted = Object.keys(cfg.words).sort((a, b) => {
+    const sorted = Object.keys(cfg.words).sort((a, b) => {
       return b.length - a.length;
     });
 
@@ -20,9 +20,8 @@ export default class Wordlist {
     sorted.forEach(wordStr => {
       // wordlistId = 0 includes all words
       if (wordlistId === 0 || !Array.isArray(cfg.words[wordStr].lists) || cfg.words[wordStr].lists.includes(wordlistId)) {
-        let word;
         try {
-          word = new Word(wordStr, cfg.words[wordStr], cfg);
+          const word = new Word(wordStr, cfg.words[wordStr], cfg);
           this.list.push(wordStr);
           this.all.push(word);
           this.regExps.push(word.regExp);

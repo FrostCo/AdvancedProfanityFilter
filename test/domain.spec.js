@@ -12,9 +12,9 @@ const domains = {
 describe('Domain', function() {
   describe('.byKey()', function() {
     it('should give a new domain with defaults if no matching record', function() {
-      let cfg = new WebConfig({ domains: domains });
-      let key = 'www.example.org';
-      let domain = Domain.byKey(key, cfg.domains);
+      const cfg = new WebConfig({ domains: domains });
+      const key = 'www.example.org';
+      const domain = Domain.byKey(key, cfg.domains);
       expect(domain.advanced).to.be.undefined;
       expect(domain.disabled).to.be.undefined;
       expect(domain.enabled).to.be.undefined;
@@ -24,9 +24,9 @@ describe('Domain', function() {
     });
 
     it('should give a domain with exact domain match', function() {
-      let cfg = new WebConfig({ domains: domains });
-      let key = 'www.example.com';
-      let domain = Domain.byKey(key, cfg.domains);
+      const cfg = new WebConfig({ domains: domains });
+      const key = 'www.example.com';
+      const domain = Domain.byKey(key, cfg.domains);
       expect(domain.advanced).to.be.undefined;
       expect(domain.disabled).to.be.true;
       expect(domain.cfg.disabled).to.be.true;
@@ -37,9 +37,9 @@ describe('Domain', function() {
     });
 
     it('should give return for exact match', function() {
-      let cfg = new WebConfig({ domains: domains });
-      let key = 'sub.another.com';
-      let domain = Domain.byKey(key, cfg.domains);
+      const cfg = new WebConfig({ domains: domains });
+      const key = 'sub.another.com';
+      const domain = Domain.byKey(key, cfg.domains);
       expect(domain.advanced).to.be.undefined;
       expect(domain.disabled).to.be.undefined;
       expect(domain.enabled).to.be.undefined;
@@ -51,9 +51,9 @@ describe('Domain', function() {
 
   describe('.byHostname()', function() {
     it('should give a new domain with defaults if no matching record', function() {
-      let cfg = new WebConfig({ domains: domains });
-      let hostname = 'www.example.org';
-      let domain = Domain.byHostname(hostname, cfg.domains);
+      const cfg = new WebConfig({ domains: domains });
+      const hostname = 'www.example.org';
+      const domain = Domain.byHostname(hostname, cfg.domains);
       expect(domain.advanced).to.be.undefined;
       expect(domain.disabled).to.be.undefined;
       expect(domain.enabled).to.be.undefined;
@@ -63,9 +63,9 @@ describe('Domain', function() {
     });
 
     it('should give a domain with exact domain match', function() {
-      let cfg = new WebConfig({ domains: domains });
-      let hostname = 'www.example.com';
-      let domain = Domain.byHostname(hostname, cfg.domains);
+      const cfg = new WebConfig({ domains: domains });
+      const hostname = 'www.example.com';
+      const domain = Domain.byHostname(hostname, cfg.domains);
       expect(domain.advanced).to.be.undefined;
       expect(domain.disabled).to.be.true;
       expect(domain.cfg.disabled).to.be.true;
@@ -76,9 +76,9 @@ describe('Domain', function() {
     });
 
     it('should give a parent domain for subdomain', function() {
-      let cfg = new WebConfig({ domains: domains });
-      let hostname = 'sub.another.com';
-      let domain = Domain.byHostname(hostname, cfg.domains);
+      const cfg = new WebConfig({ domains: domains });
+      const hostname = 'sub.another.com';
+      const domain = Domain.byHostname(hostname, cfg.domains);
       expect(domain.advanced).to.be.true;
       expect(domain.cfg.adv).to.be.true;
       expect(domain.disabled).to.be.undefined;
@@ -90,14 +90,14 @@ describe('Domain', function() {
   });
 
   describe('.findDomainKey()', function() {
-    let cfg = new WebConfig({ domains: domains });
+    const cfg = new WebConfig({ domains: domains });
     it('should return an exact match', function() { expect(Domain.findDomainKey('www.example.com', cfg.domains)).to.eq('www.example.com'); });
     it('should match a subdomain of a parent', function() { expect(Domain.findDomainKey('sub.another.com', cfg.domains)).to.eq('another.com'); });
     it('return undefined if no match', function() { expect(Domain.findDomainKey('nowhere.com', cfg.domains)).to.be.undefined; });
   });
 
   describe('.sortedKeys()', function() {
-    let cfg = new WebConfig({ domains: domains });
+    const cfg = new WebConfig({ domains: domains });
     it('should sort domains by parent', function() {
       expect(Domain.sortedKeys(cfg.domains)).to.eql(['another.com', 'a.example.com', 'www.example.com', 'abc.zoo.edu']);
     });
@@ -105,7 +105,7 @@ describe('Domain', function() {
 
   describe('updateCfg()', function() {
     it('should update domain.cfg', function() {
-      let domain = new Domain('new.domain.com');
+      const domain = new Domain('new.domain.com');
       domain.advanced = true;
       expect(domain.cfg.adv).to.be.undefined;
       domain.updateCfg();
@@ -115,7 +115,7 @@ describe('Domain', function() {
 
   describe('updateFromCfg()', function() {
     it('should set domain attributes from domain.cfg', function() {
-      let domain = new Domain('new.domain.com');
+      const domain = new Domain('new.domain.com');
       domain.cfg.adv = true;
       expect(domain.advanced).to.be.undefined;
       domain.updateFromCfg();

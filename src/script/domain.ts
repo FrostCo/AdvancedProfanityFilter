@@ -23,8 +23,8 @@ export default class Domain {
   }
 
   static byHostname(hostname: string, domains: { [domain: string]: DomainCfg }): Domain {
-    let cfgKey = Domain.findDomainKey(hostname, domains) || hostname;
-    let domain = Domain.byKey(cfgKey, domains);
+    const cfgKey = Domain.findDomainKey(hostname, domains) || hostname;
+    const domain = Domain.byKey(cfgKey, domains);
     domain.hostname = hostname;
     return domain;
   }
@@ -34,7 +34,7 @@ export default class Domain {
   }
 
   static findDomainKey(hostname: string, domains: { [domain: string]: DomainCfg }): string {
-    let sorted = Object.keys(domains).sort((a, b) => { return b.length - a.length; });
+    const sorted = Object.keys(domains).sort((a, b) => { return b.length - a.length; });
     return sorted.find(key => new RegExp(`(^|.)${key}$`).test(hostname));
   }
 
@@ -49,8 +49,8 @@ export default class Domain {
 
   static sortedKeys(domains: { [site: string]: DomainCfg }) {
     return Object.keys(domains).sort(function(a,b) {
-      let domainA = a.match(/\w*\.\w*$/)[0];
-      let domainB = b.match(/\w*\.\w*$/)[0];
+      const domainA = a.match(/\w*\.\w*$/)[0];
+      const domainB = b.match(/\w*\.\w*$/)[0];
       return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
     });
   }

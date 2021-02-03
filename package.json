@@ -125,7 +125,12 @@
       "no-useless-escape": [
         "off"
       ],
-      "prefer-const": "off",
+      "prefer-const": [
+        "error",
+        {
+          "destructuring": "all"
+        }
+      ],
       "quotes": [
         "error",
         "single",

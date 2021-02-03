@@ -135,7 +135,7 @@ export default class Config {
   }
 
   sanitizeWords() {
-    let sanitizedWords = {};
+    const sanitizedWords = {};
     Object.keys(this.words).sort().forEach((key) => {
       sanitizedWords[key.trim().toLowerCase()] = this.words[key];
     });

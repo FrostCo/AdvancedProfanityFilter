@@ -132,10 +132,10 @@ export default class Word {
   hasEdgePunctuation(): boolean { return Word._edgePunctuationRegExp.test(this.value); }
 
   processedPhrase(): string {
-    let isEscaped = this.escaped.includes('\\');
+    const isEscaped = this.escaped.includes('\\');
 
     let val = '';
-    let lastCharIndex = this.escaped.length - 1;
+    const lastCharIndex = this.escaped.length - 1;
     for (let i = 0; i < this.escaped.length; i++) {
       // If the current character is a '\', add it and then move to next character
       if (isEscaped && this.escaped[i] === '\\') {

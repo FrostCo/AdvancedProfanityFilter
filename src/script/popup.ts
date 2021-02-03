@@ -73,9 +73,9 @@ class Popup {
   }
 
   async filterMethodSelect() {
-    let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     popup.cfg.filterMethod = filterMethodSelect.selectedIndex;
-    let error = await popup.cfg.save('filterMethod');
+    const error = await popup.cfg.save('filterMethod');
     if (!error) {
       chrome.tabs.reload();
     }
@@ -85,30 +85,30 @@ class Popup {
     await Popup.load(popup);
     if (popup.cfg.darkMode) { popup.applyTheme(); }
 
-    let domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
-    let domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
-    let domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
-    let filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
-    let wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
-    let wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
-    let audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
+    const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
+    const domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
+    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+    const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    const wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
+    const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    const audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
     dynamicList(Constants.orderedArray(Constants.DomainModes), domainModeSelect);
     domainModeSelect.selectedIndex = popup.domain.getModeIndex();
     dynamicList(Constants.orderedArray(Constants.FilterMethods), filterMethodSelect);
     filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
 
     if (popup.cfg.wordlistsEnabled) {
-      let wordlists = ['Default Wordlist'].concat(WebConfig._allWordlists, popup.cfg.wordlists);
-      let wordlistIndex = popup.domain.wordlistId >= 0 ? popup.domain.wordlistId + 1 : 0;
+      const wordlists = ['Default Wordlist'].concat(WebConfig._allWordlists, popup.cfg.wordlists);
+      const wordlistIndex = popup.domain.wordlistId >= 0 ? popup.domain.wordlistId + 1 : 0;
       dynamicList(wordlists, wordlistSelect);
       wordlistSelect.selectedIndex = wordlistIndex;
       if (popup.cfg.muteAudio) {
         popup.audioSiteKeys = Object.keys(WebAudioSites.combineSites(popup.cfg.customAudioSites));
         if (popup.audioSiteKeys.includes(popup.domain.cfgKey)) {
-          let audioWordlistIndex = popup.domain.audioWordlistId >= 0 ? popup.domain.audioWordlistId + 1 : 0;
+          const audioWordlistIndex = popup.domain.audioWordlistId >= 0 ? popup.domain.audioWordlistId + 1 : 0;
           dynamicList(wordlists, audioWordlistSelect);
           audioWordlistSelect.selectedIndex = audioWordlistIndex;
-          let audioWordlistContainer = document.getElementById('audioWordlistContainer') as HTMLElement;
+          const audioWordlistContainer = document.getElementById('audioWordlistContainer') as HTMLElement;
           Popup.show(audioWordlistContainer);
         }
       }
@@ -148,28 +148,28 @@ class Popup {
   }
 
   populateSummary(summary: Summary) {
-    let summaryContainer = document.getElementById('summary') as HTMLDivElement;
-    let table = summaryContainer.querySelector('table') as HTMLTableElement;
-    let oldTBody = table.tBodies[0];
-    let tBody = document.createElement('tbody');
+    const summaryContainer = document.getElementById('summary') as HTMLDivElement;
+    const table = summaryContainer.querySelector('table') as HTMLTableElement;
+    const oldTBody = table.tBodies[0];
+    const tBody = document.createElement('tbody');
 
     if (Object.keys(summary).length > 0) {
-      let sortedKeys = Object.keys(summary).sort((a,b) => summary[b].count - summary[a].count);
+      const sortedKeys = Object.keys(summary).sort((a,b) => summary[b].count - summary[a].count);
       sortedKeys.forEach(key => {
-        let row = tBody.insertRow();
-        let wordCell = row.insertCell(0);
+        const row = tBody.insertRow();
+        const wordCell = row.insertCell(0);
         wordCell.classList.add('w3-tooltip');
-        let tooltipSpan = document.createElement('span');
+        const tooltipSpan = document.createElement('span');
         tooltipSpan.classList.add('summaryTooltip');
         tooltipSpan.classList.add('w3-tag');
         tooltipSpan.classList.add('w3-text');
         tooltipSpan.textContent = escapeHTML(key);
-        let wordSpan = document.createElement('span');
+        const wordSpan = document.createElement('span');
         wordSpan.textContent = escapeHTML(summary[key].filtered);
         wordCell.appendChild(tooltipSpan);
         wordCell.appendChild(wordSpan);
 
-        let countCell = row.insertCell(1);
+        const countCell = row.insertCell(1);
         countCell.classList.add('w3-right');
         countCell.textContent = summary[key].count.toString();
       });
@@ -184,23 +184,23 @@ class Popup {
   async toggle(prop: string) {
     if (!popup.protected) {
       popup.domain[prop] = !popup.domain[prop];
-      let error = await popup.domain.save(popup.cfg);
+      const error = await popup.domain.save(popup.cfg);
       if (!error) { chrome.tabs.reload(); }
     }
   }
 
   async updateDomainMode() {
     if (!popup.protected) {
-      let domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+      const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
       popup.domain.updateFromModeIndex(domainModeSelect.selectedIndex);
-      let error = await popup.domain.save(popup.cfg);
+      const error = await popup.domain.save(popup.cfg);
       if (!error) { chrome.tabs.reload(); }
     }
   }
 
   async wordlistSelect(event) {
-    let element = event.target;
-    let type = element.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
+    const element = event.target;
+    const type = element.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
     popup.domain[type] = element.selectedIndex > 0 ? element.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
     if (!await popup.domain.save(popup.cfg)) {
       chrome.tabs.reload();
@@ -222,7 +222,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
   chrome.tabs.sendMessage(tabs[0].id, { popup: true });
 });
 
-let popup = new Popup;
+const popup = new Popup;
 
 ////
 // Listeners

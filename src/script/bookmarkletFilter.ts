@@ -8,12 +8,12 @@ import Wordlist from './lib/wordlist';
 import './vendor/findAndReplaceDOMText';
 
 // NO-OP for chrome.* API
-let chrome = {} as any;
+const chrome = {} as any;
 chrome.runtime = {};
 chrome.runtime.sendMessage = function(obj){};
 
 /* @preserve - Start User Config */
-let config = WebConfig._defaults as any;
+const config = WebConfig._defaults as any;
 config.words = WebConfig._defaultWords;
 /* @preserve - End User Config */
 
@@ -69,8 +69,8 @@ export default class BookmarkletFilter extends Filter {
 
     if (filter.mutePage && filter.audio.muted) {
       mutation.removedNodes.forEach(node => {
-        let supported = filter.audio.supportedNode(node);
-        let rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0];
+        const supported = filter.audio.supportedNode(node);
+        const rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0];
         if (
           supported !== false
           || node == filter.audio.lastFilteredNode
@@ -98,8 +98,8 @@ export default class BookmarkletFilter extends Filter {
   checkMutationTargetTextForProfanity(mutation) {
     if (!Page.isForbiddenNode(mutation.target)) {
       if (filter.mutePage) {
-        let supported = filter.audio.supportedNode(mutation.target);
-        let rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0];
+        const supported = filter.audio.supportedNode(mutation.target);
+        const rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0];
         if (supported !== false && rule.simpleUnmute) {
           // Supported node. Check if a previously filtered node is being removed
           if (
@@ -117,11 +117,11 @@ export default class BookmarkletFilter extends Filter {
             filter.audio.unmute(rule);
           }
         } else if (!filter.audioOnly) { // Filter regular text
-          let result = this.replaceTextResult(mutation.target.data, this.wordlistId);
+          const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
           if (result.modified) { mutation.target.data = result.filtered; }
         }
       } else if (!filter.audioOnly) { // Filter regular text
-        let result = this.replaceTextResult(mutation.target.data, this.wordlistId);
+        const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
         if (result.modified) { mutation.target.data = result.filtered; }
       }
     }
@@ -139,7 +139,7 @@ export default class BookmarkletFilter extends Filter {
         filter.processNode(node, filter.wordlistId);
       }
     } else {
-      let supported = filter.audio.supportedNode(node);
+      const supported = filter.audio.supportedNode(node);
       if (supported !== false) {
         filter.audio.clean(node, supported);
       } else if (!filter.audioOnly) {
@@ -151,7 +151,7 @@ export default class BookmarkletFilter extends Filter {
   cleanChildNode(node, wordlistId: number, stats: boolean = true) {
     if (node.nodeName) {
       if (node.textContent && node.textContent.trim() != '') {
-        let result = this.replaceTextResult(node.textContent, wordlistId, stats);
+        const result = this.replaceTextResult(node.textContent, wordlistId, stats);
         if (result.modified) {
           node.textContent = result.filtered;
         }
@@ -182,7 +182,7 @@ export default class BookmarkletFilter extends Filter {
     this.cfg.muteMethod = Constants.MuteMethods.Video; // Bookmarklet: Force video volume mute method
 
     // Use domain-specific settings
-    let message: Message = { disabled: (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
+    const message: Message = { disabled: (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
     if (message.disabled) {
       chrome.runtime.sendMessage(message);
       return false;
@@ -211,7 +211,7 @@ export default class BookmarkletFilter extends Filter {
     if (Page.isForbiddenNode(node)) { return false; }
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, stats); }
     if (node.childElementCount > 0) {
-      let treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+      const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
       while(treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
           treeWalker.currentNode.childNodes.forEach(childNode => {
@@ -257,7 +257,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   stopObserving(observer: MutationObserver = filter.observer) {
-    let mutations = observer.takeRecords();
+    const mutations = observer.takeRecords();
     observer.disconnect();
     if (mutations) { this.processMutations(mutations); }
   }
@@ -265,7 +265,7 @@ export default class BookmarkletFilter extends Filter {
   updateCounterBadge() {} // NO-OP
 }
 
-let filter = new BookmarkletFilter;
+const filter = new BookmarkletFilter;
 const ObserverConfig: MutationObserverInit = {
   characterData: true,
   characterDataOldValue: true,
