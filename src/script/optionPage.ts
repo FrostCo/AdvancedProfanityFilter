@@ -162,7 +162,7 @@ export default class OptionPage {
     const date = new Date;
     const today = `${date.getFullYear()}-${padded(date.getMonth()+1)}-${padded(date.getDate())}`;
     const time = `${padded(date.getHours())}${padded(date.getMinutes())}${padded(date.getSeconds())}`;
-    exportToFile(JSON.stringify(option.cfg.ordered(), null, 2), `apf-backup-${today}_${time}.json`);
+    exportToFile(JSON.stringify(this.cfg.ordered(), null, 2), `apf-backup-${today}_${time}.json`);
   }
 
   bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
@@ -170,9 +170,9 @@ export default class OptionPage {
     if (data === undefined) {
       data = {
         lists: [],
-        matchMethod: option.cfg.defaultWordMatchMethod,
-        repeat: option.cfg.defaultWordRepeat,
-        separators: option.cfg.defaultWordSeparators,
+        matchMethod: this.cfg.defaultWordMatchMethod,
+        repeat: this.cfg.defaultWordRepeat,
+        separators: this.cfg.defaultWordSeparators,
         sub: '',
       };
     }
@@ -191,7 +191,7 @@ export default class OptionPage {
 
     const removeButton = document.createElement('button');
     removeButton.textContent = 'X';
-    removeButton.addEventListener('click', e => { option.bulkEditorRemoveRow(e); });
+    removeButton.addEventListener('click', e => { this.bulkEditorRemoveRow(e); });
     cellRemoveRow.appendChild(removeButton);
 
     const wordInput = document.createElement('input');
@@ -228,7 +228,7 @@ export default class OptionPage {
     separatorsInput.checked = data.separators;
     cellSeparators.appendChild(separatorsInput);
 
-    option.cfg.wordlists.forEach((wordlist, index) => {
+    this.cfg.wordlists.forEach((wordlist, index) => {
       const cell = row.insertCell(index + 6);
       const wordlistInput = document.createElement('input');
       wordlistInput.type = 'checkbox';
@@ -256,12 +256,12 @@ export default class OptionPage {
       const uniqueWords = words.filter((word, index) => words.indexOf(word) === index);
 
       // Remove any words that already exist in the current table
-      const currentWords = option.bulkEditorCurrentWords();
+      const currentWords = this.bulkEditorCurrentWords();
       const wordsToAdd = uniqueWords.filter(newWord => !currentWords.includes(newWord));
 
       // Add the new words to the table
-      wordsToAdd.forEach(function(word) {
-        if (word != '') { option.bulkEditorAddRow(word); }
+      wordsToAdd.forEach((word) => {
+        if (word != '') { this.bulkEditorAddRow(word); }
       });
 
       // Scroll to the bottom
@@ -287,7 +287,7 @@ export default class OptionPage {
   async bulkEditorSave() {
     const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
     const failed = {};
-    option.cfg.words = {};
+    this.cfg.words = {};
 
     table.querySelectorAll('tr.bulkWordRow').forEach((tr, index) => {
       const cells = tr.querySelectorAll('td');
@@ -304,20 +304,20 @@ export default class OptionPage {
           separators: (cells[5].querySelector('input') as HTMLInputElement).checked,
           sub: (cells[2].querySelector('input') as HTMLInputElement).value
         };
-        const success = option.cfg.addWord(name, wordOptions);
+        const success = this.cfg.addWord(name, wordOptions);
         if (!success) {
           failed[name] = wordOptions;
         }
       }
     });
 
-    if (await option.cfg.save('words')) {
+    if (await this.cfg.save('words')) {
       OptionPage.showErrorModal('Failed to save.');
     } else {
       OptionPage.closeModal('bulkWordEditorModal');
       OptionPage.showStatusModal('Words saved successfully.');
       filter.rebuildWordlists();
-      option.populateOptions();
+      this.populateOptions();
     }
   }
 
@@ -343,7 +343,7 @@ export default class OptionPage {
     const removeButton = document.createElement('button');
     removeButton.textContent = 'X';
     removeButton.id = 'bulkEditorRemoveAll';
-    removeButton.addEventListener('click', e => { option.bulkEditorRemoveAll(); });
+    removeButton.addEventListener('click', e => { this.bulkEditorRemoveAll(); });
     const removeSpan = document.createElement('span');
     removeSpan.textContent = ' Remove';
     removeCell.appendChild(removeButton);
@@ -382,7 +382,7 @@ export default class OptionPage {
     const configText = document.getElementById('configText') as HTMLTextAreaElement;
     if (input.checked) {
       OptionPage.show(configText);
-      option.exportConfig();
+      this.exportConfig();
     } else {
       OptionPage.hide(configText);
       configText.value = '';
@@ -445,13 +445,13 @@ export default class OptionPage {
   confirmModalBackup() {
     const backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
     if (!backupButton.classList.contains('disabled')) {
-      option.backupConfig();
+      this.backupConfig();
       OptionPage.disableBtn(backupButton);
     }
   }
 
   async exportBookmarkletFile() {
-    const code = await Bookmarklet.injectConfig(option.cfg.ordered());
+    const code = await Bookmarklet.injectConfig(this.cfg.ordered());
     exportToFile(code, 'apfBookmarklet.js');
   }
 
@@ -460,9 +460,9 @@ export default class OptionPage {
 
     if (input.checked) { // inline editor
       const configText = document.getElementById('configText') as HTMLTextAreaElement;
-      configText.value = JSON.stringify(option.cfg.ordered(), null, 2);
+      configText.value = JSON.stringify(this.cfg.ordered(), null, 2);
     } else {
-      option.backupConfig();
+      this.backupConfig();
     }
   }
 
@@ -481,7 +481,7 @@ export default class OptionPage {
     const file = e.target.files[0];
     const importFileInput = document.getElementById('importFileInput') as HTMLInputElement;
     const fileText = await readFile(file) as string;
-    option.importConfigText(fileText);
+    this.importConfigText(fileText);
     importFileInput.value = '';
   }
 
@@ -671,7 +671,7 @@ export default class OptionPage {
     this.updateFilterOptions();
 
     // Settings
-    const selectedFilter = document.getElementById(`filter${Constants.filterMethodName(option.cfg.filterMethod)}`) as HTMLInputElement;
+    const selectedFilter = document.getElementById(`filter${Constants.filterMethodName(this.cfg.filterMethod)}`) as HTMLInputElement;
     const showCounter = document.getElementById('showCounter') as HTMLInputElement;
     const showSummary = document.getElementById('showSummary') as HTMLInputElement;
     const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
@@ -783,35 +783,35 @@ export default class OptionPage {
     if (word == '') { // New word
       wordText.value = '';
       OptionPage.disableBtn(wordRemove);
-      const selectedMatchMethod = document.getElementById(`wordMatch${Constants.matchMethodName(option.cfg.defaultWordMatchMethod)}`) as HTMLInputElement;
+      const selectedMatchMethod = document.getElementById(`wordMatch${Constants.matchMethodName(this.cfg.defaultWordMatchMethod)}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
-      wordMatchRepeated.checked = option.cfg.defaultWordRepeat;
-      wordMatchSeparators.checked = option.cfg.defaultWordSeparators;
+      wordMatchRepeated.checked = this.cfg.defaultWordRepeat;
+      wordMatchSeparators.checked = this.cfg.defaultWordSeparators;
       substitutionText.value = '';
-      wordlistSelections.forEach(function(wordlist, index) {
+      wordlistSelections.forEach((wordlist, index) => {
         wordlist.checked = (
-          index == (option.cfg.wordlistId - 1)
+          index == (this.cfg.wordlistId - 1)
           || (
-            option.cfg.muteAudio
-            && index == (option.cfg.audioWordlistId - 1)
+            this.cfg.muteAudio
+            && index == (this.cfg.audioWordlistId - 1)
           )
         );
       });
     } else { // Existing word
       OptionPage.enableBtn(wordRemove);
-      const wordCfg = option.cfg.words[word];
+      const wordCfg = this.cfg.words[word];
       wordText.value = word;
       const selectedMatchMethod = document.getElementById(`wordMatch${Constants.matchMethodName(wordCfg.matchMethod)}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
       wordMatchRepeated.checked = wordCfg.repeat;
-      wordMatchSeparators.checked = wordCfg.separators === undefined ? option.cfg.defaultWordSeparators : wordCfg.separators;
+      wordMatchSeparators.checked = wordCfg.separators === undefined ? this.cfg.defaultWordSeparators : wordCfg.separators;
       substitutionText.value = wordCfg.sub;
-      wordlistSelections.forEach(function(wordlist, index) {
+      wordlistSelections.forEach((wordlist, index) => {
         wordlist.checked = wordCfg.lists.includes(index + 1);
       });
     }
 
-    if (option.cfg.wordlistsEnabled) {
+    if (this.cfg.wordlistsEnabled) {
       OptionPage.show(wordWordlistDiv);
     } else {
       OptionPage.hide(wordWordlistDiv);
@@ -868,7 +868,7 @@ export default class OptionPage {
       wordlistFilter.init();
     }
 
-    const words = Object.keys(option.cfg.words).sort();
+    const words = Object.keys(this.cfg.words).sort();
     words.unshift('Add, or update existing...');
     words.forEach(word => {
       let filteredWord = word;
@@ -889,7 +889,7 @@ export default class OptionPage {
 
     // Dynamically create the wordlist selection checkboxes
     if (selections.hasChildNodes()) { removeChildren(selections); }
-    option.cfg.wordlists.forEach(function(list, index) {
+    this.cfg.wordlists.forEach((list, index) => {
       const div = document.createElement('div');
       const label = document.createElement('label');
       const input = document.createElement('input');
@@ -936,9 +936,9 @@ export default class OptionPage {
     const originalWord = selected.value;
     const originalCase = selected.dataset.sensitive === 'true' ? 'sensitive': 'insensitive';
     const originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
-    option.cfg[originalListName] = removeFromArray(option.cfg[originalListName], originalWord);
+    this.cfg[originalListName] = removeFromArray(this.cfg[originalListName], originalWord);
 
-    const error = await option.cfg.save(originalListName);
+    const error = await this.cfg.save(originalListName);
     if (error) {
       OptionPage.showErrorModal();
       return false;
@@ -1007,7 +1007,7 @@ export default class OptionPage {
     try {
       const text = customAudioSitesTextArea.value;
       this.cfg.customAudioSites = text == '' ? null : JSON.parse(text);
-      if (await option.saveProp('customAudioSites')) {
+      if (await this.saveProp('customAudioSites')) {
         customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
         OptionPage.showStatusModal('Custom Audio Sites saved.');
       }
@@ -1118,7 +1118,7 @@ export default class OptionPage {
   }
 
   async saveProp(prop: string) {
-    const error = await option.cfg.save(prop);
+    const error = await this.cfg.save(prop);
     if (error) {
       OptionPage.showErrorModal();
       return false;
@@ -1142,14 +1142,14 @@ export default class OptionPage {
       return false;
     }
 
-    if (option.cfg[newListName].indexOf(newWord) > -1) {
+    if (this.cfg[newListName].indexOf(newWord) > -1) {
       OptionPage.showInputError(whitelistText, 'Already whitelisted.');
       return false;
     }
 
     if (whitelistText.checkValidity()) {
       if (selected.value === '') { // New word
-        option.cfg[newListName].push(newWord);
+        this.cfg[newListName].push(newWord);
         propsToSave.push(newListName);
       } else { // Modifying existing word
         const originalWord = selected.value;
@@ -1157,17 +1157,17 @@ export default class OptionPage {
         const originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
 
         if ((originalWord != newWord) || (originalCase != newCase)) {
-          option.cfg[originalListName] = removeFromArray(option.cfg[originalListName], originalWord);
-          option.cfg[newListName].push(newWord);
+          this.cfg[originalListName] = removeFromArray(this.cfg[originalListName], originalWord);
+          this.cfg[newListName].push(newWord);
           originalListName === newListName ? propsToSave.push(newListName) : propsToSave.push(originalListName, newListName);
         }
       }
 
       if (propsToSave.length) {
         propsToSave.forEach(prop => {
-          option.cfg[prop] = option.cfg[prop].sort();
+          this.cfg[prop] = this.cfg[prop].sort();
         });
-        const error = await option.cfg.save(propsToSave);
+        const error = await this.cfg.save(propsToSave);
         if (error) {
           OptionPage.showErrorModal();
           return false;
@@ -1286,8 +1286,8 @@ export default class OptionPage {
   }
 
   async selectFilterMethod(evt) {
-    option.cfg.filterMethod = Constants.FilterMethods[evt.target.value];
-    if (await option.saveProp('filterMethod')) {
+    this.cfg.filterMethod = Constants.FilterMethods[evt.target.value];
+    if (await this.saveProp('filterMethod')) {
       filter.rebuildWordlists();
       this.populateOptions();
     }
@@ -1311,21 +1311,21 @@ export default class OptionPage {
     const tableContainer = document.querySelector(`#${modalId} div.tableContainer`) as HTMLDivElement;
     const table = tableContainer.querySelector('table') as HTMLTableElement;
     title.textContent = 'Bulk Word Editor';
-    if (table.tHead.rows.length === 0) { table.tHead.appendChild(option.bulkWordEditorHeaderRow()); }
+    if (table.tHead.rows.length === 0) { table.tHead.appendChild(this.bulkWordEditorHeaderRow()); }
     const tBody = table.querySelector('tbody') as HTMLTableSectionElement;
     removeChildren(tBody);
 
     // Add current words to the table
-    const wordKeys = Object.keys(option.cfg.words);
+    const wordKeys = Object.keys(this.cfg.words);
     if (wordKeys.length === 0) {
-      option.bulkEditorAddRow();
+      this.bulkEditorAddRow();
     } else {
       wordKeys.forEach(key => {
-        option.bulkEditorAddRow(key, option.cfg.words[key]);
+        this.bulkEditorAddRow(key, this.cfg.words[key]);
       });
     }
 
-    tableContainer.querySelectorAll('th input.wordlistHeader').forEach(el => { el.addEventListener('click', e => { option.bulkEditorWordlistCheckbox(e); }); });
+    tableContainer.querySelectorAll('th input.wordlistHeader').forEach(el => { el.addEventListener('click', e => { this.bulkEditorWordlistCheckbox(e); }); });
     OptionPage.openModal(modalId);
   }
 
@@ -1344,20 +1344,20 @@ export default class OptionPage {
     const select = contentLeft.querySelector('#siteSelect') as HTMLSelectElement;
     removeChildren(select);
 
-    const sortedSites = Object.keys(WebAudioSites.sites).sort(function(a,b) {
+    const sortedSites = Object.keys(WebAudioSites.sites).sort((a, b) => {
       const domainA = a.match(/\w*\.\w*$/)[0];
       const domainB = b.match(/\w*\.\w*$/)[0];
       return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
     });
 
-    sortedSites.forEach(site => {
-      const option = document.createElement('option');
-      option.value = site;
-      option.textContent = site;
-      select.appendChild(option);
+    sortedSites.forEach((site) => {
+      const optionElement = document.createElement('option');
+      optionElement.value = site;
+      optionElement.textContent = site;
+      select.appendChild(optionElement);
     });
 
-    option.showSupportedAudioSiteConfig();
+    this.showSupportedAudioSiteConfig();
     OptionPage.openModal('supportedAudioSitesModal');
   }
 
@@ -1381,9 +1381,9 @@ export default class OptionPage {
   }
 
   async toggleTheme() {
-    option.cfg.darkMode = !option.cfg.darkMode;
-    await option.cfg.save('darkMode');
-    option.applyTheme();
+    this.cfg.darkMode = !this.cfg.darkMode;
+    await this.cfg.save('darkMode');
+    this.applyTheme();
   }
 
   updateBookmarklet(url: string) {
@@ -1438,14 +1438,14 @@ export default class OptionPage {
     } else {
       if (input.checkValidity()) {
         OptionPage.hideInputError(input);
-        if (!option.cfg[attr].includes(item)) {
-          if (original != '' && option.cfg[attr].includes(original)) {
+        if (!this.cfg[attr].includes(item)) {
+          if (original != '' && this.cfg[attr].includes(original)) {
             // Update existing record (remove it before adding the new record)
-            option.cfg[attr].splice(option.cfg[attr].indexOf(original), 1);
+            this.cfg[attr].splice(this.cfg[attr].indexOf(original), 1);
           }
           // Save new record
-          option.cfg[attr].push(item);
-          option.cfg[attr] = option.cfg[attr].sort();
+          this.cfg[attr].push(item);
+          this.cfg[attr] = this.cfg[attr].sort();
           return true;
         } else {
           OptionPage.showInputError(input, 'Already in list.');
@@ -1469,7 +1469,7 @@ export default class OptionPage {
       } else {
         const prop = updateMin ? 'youTubeAutoSubsMin' : 'youTubeAutoSubsMax';
         this.cfg[prop] = parseFloat(target.value);
-        await option.saveProp(prop);
+        await this.saveProp(prop);
       }
     } else {
       OptionPage.showInputError(target, 'Please enter a valid number of seconds.');

@@ -10,7 +10,7 @@ import './vendor/findAndReplaceDOMText';
 // NO-OP for chrome.* API
 const chrome = {} as any;
 chrome.runtime = {};
-chrome.runtime.sendMessage = function(obj){};
+chrome.runtime.sendMessage = (obj) => {};
 
 /* @preserve - Start User Config */
 const config = WebConfig._defaults as any;
@@ -41,11 +41,11 @@ export default class BookmarkletFilter extends Filter {
 
   advancedReplaceText(node, wordlistId: number, stats = true) {
     if (node.parentNode || node === document) {
-      filter.wordlists[wordlistId].regExps.forEach((regExp) => {
+      this.wordlists[wordlistId].regExps.forEach((regExp) => {
         // @ts-ignore: External library function
-        findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: function(portion, match) {
+        findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: (portion, match) => {
           if (portion.index === 0) {
-            return filter.replaceText(match[0], wordlistId, stats);
+            return this.replaceText(match[0], wordlistId, stats);
           } else {
             return '';
           }
@@ -57,70 +57,70 @@ export default class BookmarkletFilter extends Filter {
   }
 
   checkMutationForProfanity(mutation) {
-    mutation.addedNodes.forEach(node => {
+    mutation.addedNodes.forEach((node) => {
       if (!Page.isForbiddenNode(node)) {
-        if (filter.mutePage) {
-          filter.cleanAudio(node);
-        } else if (!filter.audioOnly) {
-          filter.processNode(node, filter.wordlistId);
+        if (this.mutePage) {
+          this.cleanAudio(node);
+        } else if (!this.audioOnly) {
+          this.processNode(node, this.wordlistId);
         }
       }
     });
 
-    if (filter.mutePage && filter.audio.muted) {
-      mutation.removedNodes.forEach(node => {
-        const supported = filter.audio.supportedNode(node);
-        const rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0];
+    if (this.mutePage && this.audio.muted) {
+      mutation.removedNodes.forEach((node) => {
+        const supported = this.audio.supportedNode(node);
+        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0];
         if (
           supported !== false
-          || node == filter.audio.lastFilteredNode
-          || node.contains(filter.audio.lastFilteredNode)
+          || node == this.audio.lastFilteredNode
+          || node.contains(this.audio.lastFilteredNode)
           || (
             rule.simpleUnmute
-            && filter.audio.lastFilteredText
-            && filter.audio.lastFilteredText.includes(node.textContent)
+            && this.audio.lastFilteredText
+            && this.audio.lastFilteredText.includes(node.textContent)
           )
         ) {
-          filter.audio.unmute(rule);
+          this.audio.unmute(rule);
         }
       });
     }
 
     if (mutation.target) {
       if (mutation.target.nodeName === '#text') {
-        filter.checkMutationTargetTextForProfanity(mutation);
-      } else if (filter.processMutationTarget) {
-        filter.processNode(mutation.target, filter.wordlistId);
+        this.checkMutationTargetTextForProfanity(mutation);
+      } else if (this.processMutationTarget) {
+        this.processNode(mutation.target, this.wordlistId);
       }
     }
   }
 
   checkMutationTargetTextForProfanity(mutation) {
     if (!Page.isForbiddenNode(mutation.target)) {
-      if (filter.mutePage) {
-        const supported = filter.audio.supportedNode(mutation.target);
-        const rule = supported !== false ? filter.audio.rules[supported] : filter.audio.rules[0];
+      if (this.mutePage) {
+        const supported = this.audio.supportedNode(mutation.target);
+        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0];
         if (supported !== false && rule.simpleUnmute) {
           // Supported node. Check if a previously filtered node is being removed
           if (
-            filter.audio.muted
+            this.audio.muted
             && mutation.oldValue
-            && filter.audio.lastFilteredText
-            && filter.audio.lastFilteredText.includes(mutation.oldValue)
+            && this.audio.lastFilteredText
+            && this.audio.lastFilteredText.includes(mutation.oldValue)
           ) {
-            filter.audio.unmute(rule);
+            this.audio.unmute(rule);
           }
-          filter.audio.clean(mutation.target, supported);
-        } else if (rule.simpleUnmute && filter.audio.muted && !mutation.target.parentElement) {
+          this.audio.clean(mutation.target, supported);
+        } else if (rule.simpleUnmute && this.audio.muted && !mutation.target.parentElement) {
           // Check for removing a filtered subtitle (no parent)
-          if (filter.audio.lastFilteredText && filter.audio.lastFilteredText.includes(mutation.target.textContent)) {
-            filter.audio.unmute(rule);
+          if (this.audio.lastFilteredText && this.audio.lastFilteredText.includes(mutation.target.textContent)) {
+            this.audio.unmute(rule);
           }
-        } else if (!filter.audioOnly) { // Filter regular text
+        } else if (!this.audioOnly) { // Filter regular text
           const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
           if (result.modified) { mutation.target.data = result.filtered; }
         }
-      } else if (!filter.audioOnly) { // Filter regular text
+      } else if (!this.audioOnly) { // Filter regular text
         const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
         if (result.modified) { mutation.target.data = result.filtered; }
       }
@@ -128,22 +128,22 @@ export default class BookmarkletFilter extends Filter {
   }
 
   cleanAudio(node) {
-    if (filter.audio.youTube && filter.audio.youTubeAutoSubsPresent()) {
-      if (filter.audio.youTubeAutoSubsSupportedNode(node)) {
-        if (filter.audio.youTubeAutoSubsCurrentRow(node)) {
-          filter.audio.cleanYouTubeAutoSubs(node);
-        } else if (!filter.audioOnly) {
-          filter.processNode(node, filter.wordlistId);
+    if (this.audio.youTube && this.audio.youTubeAutoSubsPresent()) {
+      if (this.audio.youTubeAutoSubsSupportedNode(node)) {
+        if (this.audio.youTubeAutoSubsCurrentRow(node)) {
+          this.audio.cleanYouTubeAutoSubs(node);
+        } else if (!this.audioOnly) {
+          this.processNode(node, this.wordlistId);
         }
-      } else if (!filter.audioOnly && !filter.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
-        filter.processNode(node, filter.wordlistId);
+      } else if (!this.audioOnly && !this.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
+        this.processNode(node, this.wordlistId);
       }
     } else {
-      const supported = filter.audio.supportedNode(node);
+      const supported = this.audio.supportedNode(node);
       if (supported !== false) {
-        filter.audio.clean(node, supported);
-      } else if (!filter.audioOnly) {
-        filter.processNode(node, filter.wordlistId);
+        this.audio.clean(node, supported);
+      } else if (!this.audioOnly) {
+        this.processNode(node, this.wordlistId);
       }
     }
   }
@@ -214,7 +214,7 @@ export default class BookmarkletFilter extends Filter {
       const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
       while(treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
-          treeWalker.currentNode.childNodes.forEach(childNode => {
+          treeWalker.currentNode.childNodes.forEach((childNode) => {
             this.cleanText(childNode, wordlistId, stats);
           });
         } else {
@@ -247,16 +247,16 @@ export default class BookmarkletFilter extends Filter {
   }
 
   processMutations(mutations) {
-    mutations.forEach(function(mutation) {
+    mutations.forEach((mutation) => {
       filter.checkMutationForProfanity(mutation);
     });
   }
 
-  startObserving(target: Node = document, observer: MutationObserver = filter.observer) {
+  startObserving(target: Node = document, observer: MutationObserver = this.observer) {
     observer.observe(target, ObserverConfig);
   }
 
-  stopObserving(observer: MutationObserver = filter.observer) {
+  stopObserving(observer: MutationObserver = this.observer) {
     const mutations = observer.takeRecords();
     observer.disconnect();
     if (mutations) { this.processMutations(mutations); }

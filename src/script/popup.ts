@@ -74,8 +74,8 @@ class Popup {
 
   async filterMethodSelect() {
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
-    popup.cfg.filterMethod = filterMethodSelect.selectedIndex;
-    const error = await popup.cfg.save('filterMethod');
+    this.cfg.filterMethod = filterMethodSelect.selectedIndex;
+    const error = await this.cfg.save('filterMethod');
     if (!error) {
       chrome.tabs.reload();
     }
@@ -83,7 +83,7 @@ class Popup {
 
   async populateOptions(event?: Event) {
     await Popup.load(popup);
-    if (popup.cfg.darkMode) { popup.applyTheme(); }
+    if (this.cfg.darkMode) { this.applyTheme(); }
 
     const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
     const domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
@@ -93,19 +93,19 @@ class Popup {
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
     dynamicList(Constants.orderedArray(Constants.DomainModes), domainModeSelect);
-    domainModeSelect.selectedIndex = popup.domain.getModeIndex();
+    domainModeSelect.selectedIndex = this.domain.getModeIndex();
     dynamicList(Constants.orderedArray(Constants.FilterMethods), filterMethodSelect);
-    filterMethodSelect.selectedIndex = popup.cfg.filterMethod;
+    filterMethodSelect.selectedIndex = this.cfg.filterMethod;
 
-    if (popup.cfg.wordlistsEnabled) {
-      const wordlists = ['Default Wordlist'].concat(WebConfig._allWordlists, popup.cfg.wordlists);
-      const wordlistIndex = popup.domain.wordlistId >= 0 ? popup.domain.wordlistId + 1 : 0;
+    if (this.cfg.wordlistsEnabled) {
+      const wordlists = ['Default Wordlist'].concat(WebConfig._allWordlists, this.cfg.wordlists);
+      const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
       dynamicList(wordlists, wordlistSelect);
       wordlistSelect.selectedIndex = wordlistIndex;
-      if (popup.cfg.muteAudio) {
-        popup.audioSiteKeys = Object.keys(WebAudioSites.combineSites(popup.cfg.customAudioSites));
-        if (popup.audioSiteKeys.includes(popup.domain.cfgKey)) {
-          const audioWordlistIndex = popup.domain.audioWordlistId >= 0 ? popup.domain.audioWordlistId + 1 : 0;
+      if (this.cfg.muteAudio) {
+        this.audioSiteKeys = Object.keys(WebAudioSites.combineSites(this.cfg.customAudioSites));
+        if (this.audioSiteKeys.includes(this.domain.cfgKey)) {
+          const audioWordlistIndex = this.domain.audioWordlistId >= 0 ? this.domain.audioWordlistId + 1 : 0;
           dynamicList(wordlists, audioWordlistSelect);
           audioWordlistSelect.selectedIndex = audioWordlistIndex;
           const audioWordlistContainer = document.getElementById('audioWordlistContainer') as HTMLElement;
@@ -115,8 +115,8 @@ class Popup {
       Popup.show(wordListContainer);
     }
 
-    if (popup.cfg.password && popup.cfg.password != '') {
-      popup.protected = true;
+    if (this.cfg.password && this.cfg.password != '') {
+      this.protected = true;
       Popup.disable(domainFilter);
       Popup.disable(domainToggle);
       Popup.disable(domainModeSelect);
@@ -126,7 +126,7 @@ class Popup {
     }
 
     // Restricted pages
-    if (Page.disabledProtocols.test(popup.url.protocol) || popup.domain.hostname == 'chrome.google.com') {
+    if (Page.disabledProtocols.test(this.url.protocol) || this.domain.hostname == 'chrome.google.com') {
       domainFilter.checked = false;
       Popup.disable(domainFilter);
       Popup.disable(domainToggle);
@@ -138,7 +138,7 @@ class Popup {
     }
 
     // Set initial value for domain filter and disable options if they are not applicable
-    if (popup.domain.disabled || (popup.cfg.enabledDomainsOnly && !popup.domain.enabled)) {
+    if (this.domain.disabled || (this.cfg.enabledDomainsOnly && !this.domain.enabled)) {
       domainFilter.checked = false;
       Popup.disable(domainModeSelect);
       Popup.disable(filterMethodSelect);
@@ -182,18 +182,18 @@ class Popup {
   }
 
   async toggle(prop: string) {
-    if (!popup.protected) {
-      popup.domain[prop] = !popup.domain[prop];
-      const error = await popup.domain.save(popup.cfg);
+    if (!this.protected) {
+      this.domain[prop] = !this.domain[prop];
+      const error = await this.domain.save(this.cfg);
       if (!error) { chrome.tabs.reload(); }
     }
   }
 
   async updateDomainMode() {
-    if (!popup.protected) {
+    if (!this.protected) {
       const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
-      popup.domain.updateFromModeIndex(domainModeSelect.selectedIndex);
-      const error = await popup.domain.save(popup.cfg);
+      this.domain.updateFromModeIndex(domainModeSelect.selectedIndex);
+      const error = await this.domain.save(this.cfg);
       if (!error) { chrome.tabs.reload(); }
     }
   }
@@ -201,8 +201,8 @@ class Popup {
   async wordlistSelect(event) {
     const element = event.target;
     const type = element.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
-    popup.domain[type] = element.selectedIndex > 0 ? element.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
-    if (!await popup.domain.save(popup.cfg)) {
+    this.domain[type] = element.selectedIndex > 0 ? element.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
+    if (!await this.domain.save(this.cfg)) {
       chrome.tabs.reload();
     }
   }
@@ -211,7 +211,7 @@ class Popup {
 // Listen for data updates from filter
 chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) => {
   if (request.summary) {
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (sender.tab.id == tabs[0].id) { popup.populateSummary(request.summary); }
     });
   }
