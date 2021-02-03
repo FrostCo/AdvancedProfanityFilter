@@ -133,19 +133,17 @@ export default class WebConfig extends Config {
 
   // Order and remove `_` prefixed values
   ordered() {
-    let self = this;
-    return Object.keys(self).sort().reduce((obj, key) => {
-      if (key[0] != '_') { obj[key] = self[key]; }
+    return Object.keys(this).sort().reduce((obj, key) => {
+      if (key[0] != '_') { obj[key] = this[key]; }
       return obj;
     }, {});
   }
 
   remove(props: string | string[]) {
-    let self = this;
     if (typeof props === 'string') { props = [props]; }
     chrome.storage.sync.remove(props);
-    props.forEach(function(prop) {
-      delete self[prop];
+    props.forEach((prop) => {
+      delete this[prop];
     });
   }
 
@@ -159,7 +157,6 @@ export default class WebConfig extends Config {
 
   // Pass a key or array of keys to save, or save everything
   save(props: string | string[] = []) {
-    let self = this;
     if (typeof props === 'string') { props = [props]; }
     let data = {};
 
@@ -169,24 +166,24 @@ export default class WebConfig extends Config {
       props.push('words'); // words is not part of _defaults
     }
 
-    props.forEach(function(prop) {
+    props.forEach((prop) => {
       if (WebConfig._splittingKeys.includes(prop)) {
-        Object.assign(data, self.splitData(prop));
+        Object.assign(data, this.splitData(prop));
       } else {
-        data[prop] = self[prop];
+        data[prop] = this[prop];
       }
     });
 
     // If we have more containers in storage than are needed, remove them
-    if (Object.keys(self._splitContainerKeys).length !== 0 && props.some(prop => WebConfig._splittingKeys.includes(prop))) {
-      WebConfig._splittingKeys.forEach(function(splittingKey) {
+    if (Object.keys(this._splitContainerKeys).length !== 0 && props.some((prop) => WebConfig._splittingKeys.includes(prop))) {
+      WebConfig._splittingKeys.forEach((splittingKey) => {
         if (props.includes(splittingKey)) {
           let newContainerKeys = WebConfig.getDataContainerKeys(data, splittingKey);
-          if (self._splitContainerKeys[splittingKey]) {
-            let containersToRemove = self._splitContainerKeys[splittingKey].filter(oldKey => !newContainerKeys.includes(oldKey));
+          if (this._splitContainerKeys[splittingKey]) {
+            let containersToRemove = this._splitContainerKeys[splittingKey].filter((oldKey) => !newContainerKeys.includes(oldKey));
             if (containersToRemove.length !== 0) {
-              self.remove(containersToRemove);
-              self._splitContainerKeys[splittingKey] = newContainerKeys;
+              this.remove(containersToRemove);
+              this._splitContainerKeys[splittingKey] = newContainerKeys;
             }
           }
         }
@@ -201,7 +198,6 @@ export default class WebConfig extends Config {
   }
 
   splitData(key: string) {
-    let self = this;
     const encoder = new TextEncoder();
     let currentContainerNum = 0;
     let currentBytes = 2; // For double-quotes around entire stringified JSON
@@ -211,9 +207,9 @@ export default class WebConfig extends Config {
     data[currentContainer] = {};
     currentBytes += encoder.encode(`{"${currentContainer}":{}}`).length;
 
-    Object.keys(self[key]).sort().forEach(function(item) {
+    Object.keys(this[key]).sort().forEach((item) => {
       let newBytes = encoder.encode(`",${item}":`).length; // This leads to an extra ',' for the last entry
-      newBytes += encoder.encode(JSON.stringify(self[key][item])).length;
+      newBytes += encoder.encode(JSON.stringify(this[key][item])).length;
 
       // Next word would be too big, setup next container
       if ((currentBytes + newBytes) >= WebConfig._maxBytes) {
@@ -225,7 +221,7 @@ export default class WebConfig extends Config {
 
       // Adding a word
       currentBytes += newBytes;
-      data[currentContainer][item] = self[key][item];
+      data[currentContainer][item] = this[key][item];
     });
 
     return data;

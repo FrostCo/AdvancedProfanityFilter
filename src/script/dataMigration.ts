@@ -48,13 +48,12 @@ export default class DataMigration {
 
   // This will look at the version (from before the update) and perform data migrations if necessary
   byVersion(oldVersion: string) {
-    let self = this;
     let version = getVersion(oldVersion) as Version;
     let migrated = false;
-    DataMigration.migrations.forEach(function(migration) {
+    DataMigration.migrations.forEach((migration) => {
       if (isVersionOlder(version, getVersion(migration.version))) {
         migrated = true;
-        self[migration.name]();
+        this[migration.name]();
       }
     });
 
@@ -137,12 +136,11 @@ export default class DataMigration {
   }
 
   runImportMigrations() {
-    let self = this;
     let migrated = false;
-    DataMigration.migrations.forEach(function(migration) {
+    DataMigration.migrations.forEach((migration) => {
       if (migration.runOnImport) {
         migrated = true;
-        self[migration.name]();
+        this[migration.name]();
       }
     });
 

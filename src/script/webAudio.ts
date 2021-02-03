@@ -590,17 +590,15 @@ export default class WebAudio {
   }
 
   processWatcherCaptions(rule, captions, data) {
-    let instance = this;
-
     let initialCall = data.initialCall; // Check if this is the first call
     if (initialCall) {
       // Don't process the same filter again
-      if (instance.lastProcessedText && instance.lastProcessedText === captions.textContent) {
+      if (this.lastProcessedText && this.lastProcessedText === captions.textContent) {
         data.skipped = true;
         return false;
       } else { // These are new captions, unmute if muted
-        instance.unmute(rule);
-        instance.lastProcessedText = '';
+        this.unmute(rule);
+        this.lastProcessedText = '';
       }
 
       data.initialCall = false;
@@ -608,8 +606,8 @@ export default class WebAudio {
     }
 
     if (captions.hasChildNodes()) {
-      captions.childNodes.forEach(child => {
-        instance.processWatcherCaptions(rule, child, data);
+      captions.childNodes.forEach((child) => {
+        this.processWatcherCaptions(rule, child, data);
       });
     } else { // Process child
       // innerText handles line feeds/spacing better, but is not available to #text nodes
@@ -617,16 +615,16 @@ export default class WebAudio {
 
       // Don't process empty/whitespace nodes
       if (captions[textMethod] && captions[textMethod].trim()) {
-        let result = instance.replaceTextResult(captions[textMethod]);
+        let result = this.replaceTextResult(captions[textMethod]);
         if (result.modified) {
-          instance.mute(rule);
+          this.mute(rule);
           data.filtered = true;
           if (rule.filterSubtitles) { captions[textMethod] = result.filtered; }
         }
       }
     }
 
-    if (initialCall) { instance.lastProcessedText = captions.textContent; }
+    if (initialCall) { this.lastProcessedText = captions.textContent; }
   }
 
   replaceTextResult(string: string, stats: boolean = true) {

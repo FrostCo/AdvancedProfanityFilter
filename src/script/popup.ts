@@ -82,7 +82,6 @@ class Popup {
   }
 
   async populateOptions(event?: Event) {
-    let popup = this;
     await Popup.load(popup);
     if (popup.cfg.darkMode) { popup.applyTheme(); }
 

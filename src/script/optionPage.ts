@@ -483,20 +483,18 @@ export default class OptionPage {
   }
 
   async importConfigText(cfg: string) {
-    let self = this;
-
     try {
       let importedCfg = new WebConfig(JSON.parse(cfg));
       let migration = new DataMigration(importedCfg);
       migration.runImportMigrations();
-      let resetSuccess = await self.restoreDefaults(null, true);
+      let resetSuccess = await this.restoreDefaults(null, true);
 
       if (resetSuccess) {
-        self.cfg = importedCfg;
-        let error = await self.cfg.save();
+        this.cfg = importedCfg;
+        let error = await this.cfg.save();
         if (!error) {
           OptionPage.showStatusModal('Settings imported successfully.');
-          self.init();
+          this.init();
         } else {
           OptionPage.showErrorModal('Failed to import settings.');
         }
@@ -507,14 +505,13 @@ export default class OptionPage {
   }
 
   async init() {
-    let self = this;
-    self.cfg = await WebConfig.build();
-    if (!self.auth) self.auth = new OptionAuth(self.cfg.password);
-    filter.cfg = self.cfg;
+    this.cfg = await WebConfig.build();
+    if (!this.auth) this.auth = new OptionAuth(this.cfg.password);
+    filter.cfg = this.cfg;
     filter.init();
 
     // console.log('Password:', cfg.password, 'Authenticated:', authenticated); // DEBUG Password
-    if (self.cfg.password && !self.auth.authenticated) {
+    if (this.cfg.password && !this.auth.authenticated) {
       // console.log('Prompt for password'); // DEBUG Password
       OptionPage.openModal('passwordModal');
       document.getElementById('passwordInput').focus();
@@ -524,7 +521,7 @@ export default class OptionPage {
 
     if (this.cfg.darkMode) { this.applyTheme(); }
 
-    self.populateOptions();
+    this.populateOptions();
   }
 
   populateAudio() {
@@ -1003,13 +1000,12 @@ export default class OptionPage {
   }
 
   async saveCustomAudioSites() {
-    let self = this;
     let customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
     try {
       let text = customAudioSitesTextArea.value;
-      self.cfg.customAudioSites = text == '' ? null : JSON.parse(text);
+      this.cfg.customAudioSites = text == '' ? null : JSON.parse(text);
       if (await option.saveProp('customAudioSites')) {
-        customAudioSitesTextArea.value = self.cfg.customAudioSites ? JSON.stringify(self.cfg.customAudioSites, null, 2) : '';
+        customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
         OptionPage.showStatusModal('Custom Audio Sites saved.');
       }
     } catch(e) {
@@ -1063,7 +1059,6 @@ export default class OptionPage {
   }
 
   async saveOptions(evt) {
-    let self = this;
     // Gather current settings
     let censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
     let censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
@@ -1086,35 +1081,35 @@ export default class OptionPage {
     let muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
     let showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
     let wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
-    self.cfg.censorCharacter = censorCharacterSelect.value;
-    self.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
-    self.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
-    self.cfg.defaultWordRepeat = defaultWordRepeat.checked;
-    self.cfg.defaultWordSeparators = defaultWordSeparators.checked;
-    self.cfg.preserveCase = preserveCase.checked;
-    self.cfg.preserveFirst = preserveFirst.checked;
-    self.cfg.preserveLast = preserveLast.checked;
-    self.cfg.showCounter = showCounter.checked;
-    self.cfg.showSummary = showSummary.checked;
-    self.cfg.showUpdateNotification = showUpdateNotification.checked;
-    self.cfg.filterWordList = filterWordList.checked;
-    self.cfg.substitutionMark = substitutionMark.checked;
-    self.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
-    self.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
-    self.cfg.muteAudio = muteAudioInput.checked;
-    self.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
-    self.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
-    self.cfg.muteMethod = parseInt(muteMethodInput.value);
-    self.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
-    self.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
+    this.cfg.censorCharacter = censorCharacterSelect.value;
+    this.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
+    this.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
+    this.cfg.defaultWordRepeat = defaultWordRepeat.checked;
+    this.cfg.defaultWordSeparators = defaultWordSeparators.checked;
+    this.cfg.preserveCase = preserveCase.checked;
+    this.cfg.preserveFirst = preserveFirst.checked;
+    this.cfg.preserveLast = preserveLast.checked;
+    this.cfg.showCounter = showCounter.checked;
+    this.cfg.showSummary = showSummary.checked;
+    this.cfg.showUpdateNotification = showUpdateNotification.checked;
+    this.cfg.filterWordList = filterWordList.checked;
+    this.cfg.substitutionMark = substitutionMark.checked;
+    this.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
+    this.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
+    this.cfg.muteAudio = muteAudioInput.checked;
+    this.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
+    this.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
+    this.cfg.muteMethod = parseInt(muteMethodInput.value);
+    this.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
+    this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
 
     // Save settings
-    let error = await self.cfg.save();
+    let error = await this.cfg.save();
     if (error) {
       OptionPage.showErrorModal('Settings not saved! Please try again.');
       return false;
     } else {
-      self.init();
+      this.init();
       return true;
     }
   }

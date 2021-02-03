@@ -7,7 +7,6 @@ export default class Wordlist {
   regExps: RegExp[];
 
   constructor(cfg: Config, wordlistId: number) {
-    let self = this;
     this.all = [];
     this.list = [];
     this.regExps = [];
@@ -24,9 +23,9 @@ export default class Wordlist {
         let word;
         try {
           word = new Word(wordStr, cfg.words[wordStr], cfg);
-          self.list.push(wordStr);
-          self.all.push(word);
-          self.regExps.push(word.regExp);
+          this.list.push(wordStr);
+          this.all.push(word);
+          this.regExps.push(word.regExp);
         } catch (e) {
           // eslint-disable-next-line no-console
           console.error(`APF: Failed to add word: '${wordStr}'`);
