@@ -83,9 +83,9 @@ export default class DataMigration {
 
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
   moveToNewWordsStorage() {
-    chrome.storage.sync.get({ 'words': null }, function(oldWords) {
+    chrome.storage.sync.get({ 'words': null }, (oldWords) => {
       if (oldWords.words) {
-        chrome.storage.sync.set({ '_words0': oldWords.words }, function() {
+        chrome.storage.sync.set({ '_words0': oldWords.words }, () => {
           if (!chrome.runtime.lastError) {
             // Remove old words
             chrome.storage.sync.remove('words');
@@ -122,10 +122,10 @@ export default class DataMigration {
     const cfg = this.cfg as any;
     if (!cfg.domains) { cfg.domains = {}; }
     const propsToDelete = { advancedDomains: 'adv', disabledDomains: 'disabled', enabledDomains: 'enabled' };
-    Object.keys(propsToDelete).forEach(function(propToDelete) {
+    Object.keys(propsToDelete).forEach((propToDelete) => {
       if (cfg[propToDelete] && Array.isArray(cfg[propToDelete])) {
         if (cfg[propToDelete].length > 0) {
-          cfg[propToDelete].forEach(function(domain) {
+          cfg[propToDelete].forEach((domain) => {
             if (cfg.domains[domain] == undefined) { cfg.domains[domain] = {}; }
             cfg.domains[domain][propsToDelete[propToDelete]] = true;
           });

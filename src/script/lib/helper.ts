@@ -102,10 +102,10 @@ export function isVersionOlder(version: Version, minimum: Version): boolean {
 }
 
 export function makeRequest(method: string, url: string) {
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open(method, url);
-    xhr.onload = function () {
+    xhr.onload = () => {
       if (this.status >= 200 && this.status < 300) {
         resolve(xhr.response);
       } else {
@@ -115,7 +115,7 @@ export function makeRequest(method: string, url: string) {
         });
       }
     };
-    xhr.onerror = function () {
+    xhr.onerror = () => {
       reject({
         status: this.status,
         statusText: xhr.statusText

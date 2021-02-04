@@ -65,7 +65,7 @@ export default class WebConfig extends Config {
       const dataKeys = WebConfig.getDataContainerKeys(data, prop);
 
       // Add all _[prop]* to .[prop] and remove _[prop]*
-      dataKeys.forEach(function(key) {
+      dataKeys.forEach((key) => {
         Object.assign(data[prop], data[key]);
         delete data[key];
       });
@@ -75,7 +75,7 @@ export default class WebConfig extends Config {
 
   // Async call to get provided keys (or default keys) from chrome storage
   static getConfig(keys: string[]) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       let request = null; // Get all data from storage
 
       if (keys.length > 0 && ! keys.some(key => WebConfig._splittingKeys.includes(key))) {
@@ -83,12 +83,12 @@ export default class WebConfig extends Config {
         keys.forEach(key => { request[key] = WebConfig._defaults[key]; });
       }
 
-      chrome.storage.sync.get(request, function(items) {
+      chrome.storage.sync.get(request, (items) => {
         // Add internal tracker for split keys
         items._splitContainerKeys = {};
 
         // Ensure defaults for undefined settings
-        Object.keys(WebConfig._defaults).forEach(function(defaultKey) {
+        Object.keys(WebConfig._defaults).forEach((defaultKey) => {
           if ((request == null || keys.includes(defaultKey)) && items[defaultKey] === undefined) {
             items[defaultKey] = WebConfig._defaults[defaultKey];
           }
@@ -102,14 +102,14 @@ export default class WebConfig extends Config {
           }
         }
 
-        WebConfig._splittingKeys.forEach(function(splittingKey) {
+        WebConfig._splittingKeys.forEach((splittingKey) => {
           const keys = WebConfig.combineData(items, splittingKey);
           if (keys) { items._splitContainerKeys[splittingKey] = keys; }
         });
 
         // Remove keys we didn't request (Required when requests for specific keys include ones that supports splitting)
         if (request !== null && keys.length > 0) {
-          Object.keys(items).forEach(function(item) {
+          Object.keys(items).forEach((item) => {
             if (!keys.includes(item)) {
               delete items[item];
             }
@@ -124,10 +124,7 @@ export default class WebConfig extends Config {
   // Find all _[prop]* to combine
   static getDataContainerKeys(data, prop) {
     const pattern = new RegExp(`^_${prop}\\d+`);
-    const containerKeys = Object.keys(data).filter(function(key) {
-      return pattern.test(key);
-    });
-
+    const containerKeys = Object.keys(data).filter((key) => pattern.test(key));
     return containerKeys;
   }
 
@@ -148,8 +145,8 @@ export default class WebConfig extends Config {
   }
 
   reset() {
-    return new Promise(function(resolve, reject) {
-      chrome.storage.sync.clear(function() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.clear(() => {
         resolve(chrome.runtime.lastError ? 1 : 0);
       });
     });
@@ -190,8 +187,8 @@ export default class WebConfig extends Config {
       });
     }
 
-    return new Promise(function(resolve, reject) {
-      chrome.storage.sync.set(data, function() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.set(data, () => {
         resolve(chrome.runtime.lastError ? 1 : 0);
       });
     });

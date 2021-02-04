@@ -397,9 +397,7 @@ export default class WebAudio {
   }
 
   parseSRT(srt): VTTCue[] {
-    const lines = srt.trim().replace('\r\n', '\n').split(/[\r\n]/).map(function(line) {
-      return line.trim();
-    });
+    const lines = srt.trim().replace('\r\n', '\n').split(/[\r\n]/).map((line) => line.trim());
     const cues: VTTCue[] = [];
     let start = null;
     let end = null;

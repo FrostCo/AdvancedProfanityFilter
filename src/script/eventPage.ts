@@ -62,7 +62,7 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
     runUpdateMigrations(details.previousVersion);
 
     // Display update notification
-    chrome.storage.sync.get({ showUpdateNotification: true }, function(data) {
+    chrome.storage.sync.get({ showUpdateNotification: true }, (data) => {
       if (data.showUpdateNotification) {
         chrome.notifications.create('extensionUpdate', {
           'type': 'basic',
@@ -192,7 +192,7 @@ function toggleTabDisable(id: number) {
 ////
 // Context menu
 //
-chrome.contextMenus.removeAll(function() {
+chrome.contextMenus.removeAll(() => {
   chrome.contextMenus.create({
     id: 'addSelection',
     title: 'Add selection to filter',

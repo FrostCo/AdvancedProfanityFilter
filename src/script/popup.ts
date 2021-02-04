@@ -6,15 +6,15 @@ import Domain from './domain';
 import Page from './page';
 
 class Popup {
-  cfg: WebConfig;
   audioSiteKeys: string[];
+  cfg: WebConfig;
   domain: Domain;
   filterToggleProp: string;
   protected: boolean;
   tab: chrome.tabs.Tab;
   url: URL;
 
-  static readonly _requiredConfig =  [
+  static readonly _requiredConfig = [
     'audioWordlistId',
     'customAudioSites',
     'darkMode',
@@ -23,9 +23,9 @@ class Popup {
     'filterMethod',
     'muteAudio',
     'password',
+    'wordlistId',
     'wordlists',
     'wordlistsEnabled',
-    'wordlistId'
   ];
 
   static async load(instance: Popup) {
