@@ -154,7 +154,7 @@ class Popup {
     const tBody = document.createElement('tbody');
 
     if (Object.keys(summary).length > 0) {
-      const sortedKeys = Object.keys(summary).sort((a,b) => summary[b].count - summary[a].count);
+      const sortedKeys = Object.keys(summary).sort((a, b) => summary[b].count - summary[a].count);
       sortedKeys.forEach((key) => {
         const row = tBody.insertRow();
         const wordCell = row.insertCell(0);

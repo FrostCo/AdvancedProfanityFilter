@@ -110,6 +110,7 @@
         "warn",
         "always"
       ],
+      "comma-spacing": "warn",
       "indent": [
         "warn",
         2,

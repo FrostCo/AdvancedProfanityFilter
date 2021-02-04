@@ -32,7 +32,7 @@ describe('Config', function() {
     });
 
     it('should add a new word to the config with provided options', function() {
-      const wordOptions = { matchMethod: Constants.MatchMethods.Partial , repeat: true, sub: 'Older-word' };
+      const wordOptions = { matchMethod: Constants.MatchMethods.Partial, repeat: true, sub: 'Older-word' };
       expect(config.addWord('newer-word', wordOptions)).to.equal(true);
       expect(Object.keys(config.words)).to.include('newer-word');
       expect(config.words['newer-word'].matchMethod).to.equal(wordOptions.matchMethod);

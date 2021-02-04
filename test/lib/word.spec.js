@@ -245,7 +245,7 @@ describe('Word', function() {
 
     it('should use provided matchMethod (Exact) and fill in defaults', function() {
       const cfg = Object.assign({}, Config._defaults, { defaultWordMatchMethod: Constants.MatchMethods.Whole });
-      const options = { lists: [1,5], matchMethod: Constants.MatchMethods.Exact, repeat: true };
+      const options = { lists: [1, 5], matchMethod: Constants.MatchMethods.Exact, repeat: true };
       const word = new Word('again', options, cfg);
       expect(word.matchMethod).to.eql(options.matchMethod);
       expect(word.matchRepeated).to.eql(options.repeat);

@@ -146,5 +146,5 @@ export function removeFromArray(array: string[], element: string) {
 }
 
 export function secondsToHMS(seconds: number): string {
-  return new Date(seconds * 1000).toISOString().substr(11,12);
+  return new Date(seconds * 1000).toISOString().substr(11, 12);
 }
