@@ -102,6 +102,10 @@
       "@typescript-eslint"
     ],
     "rules": {
+      "arrow-parens": [
+        "warn",
+        "always"
+      ],
       "indent": "off",
       "no-console": "warn",
       "array-bracket-spacing": [

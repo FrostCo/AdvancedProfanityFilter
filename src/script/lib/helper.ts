@@ -3,7 +3,7 @@ export function dynamicList(list: string[], select: HTMLSelectElement, title?: s
   removeChildren(select);
   const array = title !== undefined ? [title].concat(list) : list;
 
-  array.forEach(item => {
+  array.forEach((item) => {
     const option = document.createElement('option');
     option.value = (title && item === title) ? '' : item;
     option.textContent = item;
@@ -142,7 +142,7 @@ export function removeChildren(element) {
 }
 
 export function removeFromArray(array: string[], element: string) {
-  return array.filter(e => e !== element);
+  return array.filter((e) => e !== element);
 }
 
 export function secondsToHMS(seconds: number): string {

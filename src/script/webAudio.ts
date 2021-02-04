@@ -68,7 +68,7 @@ export default class WebAudio {
         }
 
         if (this.watcherRuleIds.length > 0) {
-          this.watcherRuleIds.forEach(ruleId => {
+          this.watcherRuleIds.forEach((ruleId) => {
             setInterval(this.watcher, this.rules[ruleId].checkInterval, this, ruleId);
           });
         }
@@ -90,7 +90,7 @@ export default class WebAudio {
     if (subtitles.length === 0) { return; }
 
     // Process subtitles
-    subtitles.forEach(subtitle => {
+    subtitles.forEach((subtitle) => {
       // innerText handles line feeds/spacing better, but is not available to #text nodes
       const textMethod = subtitle.nodeName === '#text' ? 'textContent' : 'innerText';
       if (
@@ -233,7 +233,7 @@ export default class WebAudio {
         }
       }
     } else if (subtitles) {
-      subtitles.forEach(subtitle => {
+      subtitles.forEach((subtitle) => {
         subtitle.innerText = '';
         if (rule.removeSubtitleSpacing && subtitle.style) {
           if (subtitle.style.padding) { subtitle.style.padding = 0; }
@@ -475,7 +475,7 @@ export default class WebAudio {
         let [start, end, ...extraOptions] = parts;
         start = start.replace(',', '.');
         end = end.replace(',', '.');
-        const options: ParsedSubOptions = extraOptions.map(o => o.split(':')).reduce((acc, cur) => {acc[cur[0]] = cur[1]; return acc;}, {});
+        const options: ParsedSubOptions = extraOptions.map((o) => o.split(':')).reduce((acc, cur) => {acc[cur[0]] = cur[1]; return acc;}, {});
 
         // Get text
         const prevLine = lines[i-1].trim();
@@ -549,7 +549,7 @@ export default class WebAudio {
       try {
         const subsData = getGlobalVariable(rule.externalSubVar);
         if (Array.isArray(subsData)) {
-          const found = subsData.find(subtitle => subtitle.language === rule.videoCueLanguage);
+          const found = subsData.find((subtitle) => subtitle.language === rule.videoCueLanguage);
           if (!found) { throw(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
           this.fetching = true;
           const subs = await makeRequest('GET', found[rule.externalSubURLKey]) as string;

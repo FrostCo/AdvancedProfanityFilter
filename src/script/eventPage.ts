@@ -246,8 +246,8 @@ chrome.contextMenus.removeAll(() => {
 // Listeners
 //
 chrome.contextMenus.onClicked.addListener((info, tab) => { contextMenusOnClick(info, tab); });
-chrome.notifications.onClicked.addListener(notificationId => { notificationsOnClick(notificationId); });
-chrome.runtime.onInstalled.addListener(details => { onInstalled(details); });
+chrome.notifications.onClicked.addListener((notificationId) => { notificationsOnClick(notificationId); });
+chrome.runtime.onInstalled.addListener((details) => { onInstalled(details); });
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { onMessage(request, sender, sendResponse); });
-chrome.tabs.onActivated.addListener(tab => { tabsOnActivated(tab); });
-chrome.tabs.onRemoved.addListener(tabId => { tabsOnRemoved(tabId); });
+chrome.tabs.onActivated.addListener((tab) => { tabsOnActivated(tab); });
+chrome.tabs.onRemoved.addListener((tabId) => { tabsOnRemoved(tabId); });

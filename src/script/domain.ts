@@ -35,7 +35,7 @@ export default class Domain {
 
   static findDomainKey(hostname: string, domains: { [domain: string]: DomainCfg }): string {
     const sorted = Object.keys(domains).sort((a, b) => { return b.length - a.length; });
-    return sorted.find(key => new RegExp(`(^|.)${key}$`).test(hostname));
+    return sorted.find((key) => new RegExp(`(^|.)${key}$`).test(hostname));
   }
 
   static getCurrentTab() {

@@ -145,15 +145,15 @@ export default class OptionPage {
   }
 
   constructor() {
-    this.themeButtons = OptionPage.themeButtonSelectors.map(selector => { return document.querySelector(selector); });
-    this.themeElements = OptionPage.themeElementSelectors.map(selector => { return document.querySelector(selector); });
+    this.themeButtons = OptionPage.themeButtonSelectors.map((selector) => { return document.querySelector(selector); });
+    this.themeElements = OptionPage.themeElementSelectors.map((selector) => { return document.querySelector(selector); });
   }
 
   applyTheme() {
     const darkApplied = this.themeElements[0].classList.contains('dark');
     if (darkApplied != this.cfg.darkMode) {
-      this.themeElements.forEach(element => { element.classList.toggle('dark'); });
-      this.themeButtons.forEach(element => { element.classList.toggle('w3-hide'); });
+      this.themeElements.forEach((element) => { element.classList.toggle('dark'); });
+      this.themeButtons.forEach((element) => { element.classList.toggle('w3-hide'); });
     }
   }
 
@@ -191,7 +191,7 @@ export default class OptionPage {
 
     const removeButton = document.createElement('button');
     removeButton.textContent = 'X';
-    removeButton.addEventListener('click', e => { this.bulkEditorRemoveRow(e); });
+    removeButton.addEventListener('click', (e) => { this.bulkEditorRemoveRow(e); });
     cellRemoveRow.appendChild(removeButton);
 
     const wordInput = document.createElement('input');
@@ -252,12 +252,12 @@ export default class OptionPage {
     if (text != '') {
       const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
       const lines = text.toLowerCase().split('\n');
-      const words = lines.map(line => line.trim());
+      const words = lines.map((line) => line.trim());
       const uniqueWords = words.filter((word, index) => words.indexOf(word) === index);
 
       // Remove any words that already exist in the current table
       const currentWords = this.bulkEditorCurrentWords();
-      const wordsToAdd = uniqueWords.filter(newWord => !currentWords.includes(newWord));
+      const wordsToAdd = uniqueWords.filter((newWord) => !currentWords.includes(newWord));
 
       // Add the new words to the table
       wordsToAdd.forEach((word) => {
@@ -343,7 +343,7 @@ export default class OptionPage {
     const removeButton = document.createElement('button');
     removeButton.textContent = 'X';
     removeButton.id = 'bulkEditorRemoveAll';
-    removeButton.addEventListener('click', e => { this.bulkEditorRemoveAll(); });
+    removeButton.addEventListener('click', (e) => { this.bulkEditorRemoveAll(); });
     const removeSpan = document.createElement('span');
     removeSpan.textContent = ' Remove';
     removeCell.appendChild(removeButton);
@@ -351,7 +351,7 @@ export default class OptionPage {
     row.appendChild(removeCell);
 
     const normalHeaders = ['Word', 'Substitution', 'Match Method', 'Repeated', 'Separators'];
-    normalHeaders.forEach(item => {
+    normalHeaders.forEach((item) => {
       const cell = document.createElement('th');
       const cellSpan = document.createElement('span');
       cellSpan.textContent = item;
@@ -870,7 +870,7 @@ export default class OptionPage {
 
     const words = Object.keys(this.cfg.words).sort();
     words.unshift('Add, or update existing...');
-    words.forEach(word => {
+    words.forEach((word) => {
       let filteredWord = word;
       if (word != words[0] && wordlistFilter.cfg.filterWordList) {
         if (wordlistFilter.cfg.words[word].matchMethod === Constants.MatchMethods.Regex) { // Regexp
@@ -1164,7 +1164,7 @@ export default class OptionPage {
       }
 
       if (propsToSave.length) {
-        propsToSave.forEach(prop => {
+        propsToSave.forEach((prop) => {
           this.cfg[prop] = this.cfg[prop].sort();
         });
         const error = await this.cfg.save(propsToSave);
@@ -1320,12 +1320,12 @@ export default class OptionPage {
     if (wordKeys.length === 0) {
       this.bulkEditorAddRow();
     } else {
-      wordKeys.forEach(key => {
+      wordKeys.forEach((key) => {
         this.bulkEditorAddRow(key, this.cfg.words[key]);
       });
     }
 
-    tableContainer.querySelectorAll('th input.wordlistHeader').forEach(el => { el.addEventListener('click', e => { this.bulkEditorWordlistCheckbox(e); }); });
+    tableContainer.querySelectorAll('th input.wordlistHeader').forEach((el) => { el.addEventListener('click', (e) => { this.bulkEditorWordlistCheckbox(e); }); });
     OptionPage.openModal(modalId);
   }
 
@@ -1489,83 +1489,83 @@ function removeAllWords(e) { option.removeAllWords(e); }
 function restoreDefaults(e) { option.restoreDefaults(e); }
 function setPassword(e) { option.auth.setPassword(option); }
 // Add event listeners to DOM
-window.addEventListener('load', e => { option.init(); });
-document.querySelectorAll('#menu a').forEach(el => { el.addEventListener('click', e => { option.switchPage(e); }); });
+window.addEventListener('load', (e) => { option.init(); });
+document.querySelectorAll('#menu a').forEach((el) => { el.addEventListener('click', (e) => { option.switchPage(e); }); });
 // Modals
-document.getElementById('submitPassword').addEventListener('click', e => { option.auth.authenticate(e); });
-document.getElementById('confirmModalBackup').addEventListener('click', e => { option.confirmModalBackup(); });
-document.getElementById('confirmModalOK').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
-document.getElementById('confirmModalCancel').addEventListener('click', e => { OptionPage.closeModal('confirmModal'); });
-document.getElementById('statusModalOK').addEventListener('click', e => { OptionPage.closeModal('statusModal'); });
-document.querySelector('#supportedAudioSitesModal #siteSelect').addEventListener('change', e => { option.showSupportedAudioSiteConfig(); });
-document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', e => { OptionPage.closeModal('supportedAudioSitesModal'); });
-document.querySelector('#bulkWordEditorModal button.modalAddWord').addEventListener('click', e => { option.bulkEditorAddRow(); });
-document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEventListener('click', e => { option.bulkEditorAddWords(); });
-document.querySelector('#bulkWordEditorModal button.modalCancel').addEventListener('click', e => { OptionPage.closeModal('bulkWordEditorModal'); });
-document.querySelector('#bulkWordEditorModal button.modalSave').addEventListener('click', e => { option.confirm(e, 'bulkEditorSave'); });
+document.getElementById('submitPassword').addEventListener('click', (e) => { option.auth.authenticate(e); });
+document.getElementById('confirmModalBackup').addEventListener('click', (e) => { option.confirmModalBackup(); });
+document.getElementById('confirmModalOK').addEventListener('click', (e) => { OptionPage.closeModal('confirmModal'); });
+document.getElementById('confirmModalCancel').addEventListener('click', (e) => { OptionPage.closeModal('confirmModal'); });
+document.getElementById('statusModalOK').addEventListener('click', (e) => { OptionPage.closeModal('statusModal'); });
+document.querySelector('#supportedAudioSitesModal #siteSelect').addEventListener('change', (e) => { option.showSupportedAudioSiteConfig(); });
+document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', (e) => { OptionPage.closeModal('supportedAudioSitesModal'); });
+document.querySelector('#bulkWordEditorModal button.modalAddWord').addEventListener('click', (e) => { option.bulkEditorAddRow(); });
+document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEventListener('click', (e) => { option.bulkEditorAddWords(); });
+document.querySelector('#bulkWordEditorModal button.modalCancel').addEventListener('click', (e) => { OptionPage.closeModal('bulkWordEditorModal'); });
+document.querySelector('#bulkWordEditorModal button.modalSave').addEventListener('click', (e) => { option.confirm(e, 'bulkEditorSave'); });
 // Settings
-document.querySelectorAll('#filterMethod input').forEach(el => { el.addEventListener('click', e => { option.selectFilterMethod(e); }); });
-document.getElementById('censorCharacterSelect').addEventListener('change', e => { option.saveOptions(e); });
-document.getElementById('censorFixedLengthSelect').addEventListener('change', e => { option.saveOptions(e); });
-document.getElementById('defaultWordMatchMethodSelect').addEventListener('change', e => { option.saveOptions(e); });
-document.getElementById('defaultWordRepeat').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('defaultWordSeparators').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('preserveCase').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('preserveFirst').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('preserveLast').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('showCounter').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('showSummary').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('showUpdateNotification').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('filterWordList').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('substitutionMark').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('defaultWordSubstitutionText').addEventListener('change', e => { option.saveOptions(e); });
+document.querySelectorAll('#filterMethod input').forEach((el) => { el.addEventListener('click', (e) => { option.selectFilterMethod(e); }); });
+document.getElementById('censorCharacterSelect').addEventListener('change', (e) => { option.saveOptions(e); });
+document.getElementById('censorFixedLengthSelect').addEventListener('change', (e) => { option.saveOptions(e); });
+document.getElementById('defaultWordMatchMethodSelect').addEventListener('change', (e) => { option.saveOptions(e); });
+document.getElementById('defaultWordRepeat').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('defaultWordSeparators').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('preserveCase').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('preserveFirst').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('preserveLast').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('showCounter').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('showSummary').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('showUpdateNotification').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('filterWordList').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('substitutionMark').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('defaultWordSubstitutionText').addEventListener('change', (e) => { option.saveOptions(e); });
 // Words/Phrases
-document.getElementById('wordList').addEventListener('change', e => { option.populateWord(); });
-document.getElementById('wordText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
-document.getElementById('substitutionText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
-document.getElementById('wordSave').addEventListener('click', e => { option.saveWord(e); });
-document.getElementById('wordRemove').addEventListener('click', e => { option.removeWord(e); });
-document.getElementById('wordRemoveAll').addEventListener('click', e => { option.confirm(e, 'removeAllWords'); });
-document.getElementById('bulkWordEditorButton').addEventListener('click', e => { option.showBulkWordEditor(); });
+document.getElementById('wordList').addEventListener('change', (e) => { option.populateWord(); });
+document.getElementById('wordText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
+document.getElementById('substitutionText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
+document.getElementById('wordSave').addEventListener('click', (e) => { option.saveWord(e); });
+document.getElementById('wordRemove').addEventListener('click', (e) => { option.removeWord(e); });
+document.getElementById('wordRemoveAll').addEventListener('click', (e) => { option.confirm(e, 'removeAllWords'); });
+document.getElementById('bulkWordEditorButton').addEventListener('click', (e) => { option.showBulkWordEditor(); });
 // Lists
-document.getElementById('whitelist').addEventListener('change', e => { option.populateWhitelistWord(); });
-document.getElementById('whitelistText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
-document.getElementById('whitelistSave').addEventListener('click', e => { option.saveWhitelist(e); });
-document.getElementById('whitelistRemove').addEventListener('click', e => { option.removeWhitelist(e); });
-document.getElementById('wordlistsEnabled').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('wordlistRename').addEventListener('click', e => { option.renameWordlist(); });
-document.getElementById('wordlistSelect').addEventListener('change', e => { option.populateWordlist(); });
-document.getElementById('wordlistText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
-document.getElementById('textWordlistSelect').addEventListener('change', e => { option.setDefaultWordlist(e.target as HTMLSelectElement); });
-document.getElementById('audioWordlistSelect').addEventListener('change', e => { option.setDefaultWordlist(e.target as HTMLSelectElement); });
+document.getElementById('whitelist').addEventListener('change', (e) => { option.populateWhitelistWord(); });
+document.getElementById('whitelistText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
+document.getElementById('whitelistSave').addEventListener('click', (e) => { option.saveWhitelist(e); });
+document.getElementById('whitelistRemove').addEventListener('click', (e) => { option.removeWhitelist(e); });
+document.getElementById('wordlistsEnabled').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('wordlistRename').addEventListener('click', (e) => { option.renameWordlist(); });
+document.getElementById('wordlistSelect').addEventListener('change', (e) => { option.populateWordlist(); });
+document.getElementById('wordlistText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
+document.getElementById('textWordlistSelect').addEventListener('change', (e) => { option.setDefaultWordlist(e.target as HTMLSelectElement); });
+document.getElementById('audioWordlistSelect').addEventListener('change', (e) => { option.setDefaultWordlist(e.target as HTMLSelectElement); });
 // Domains
-document.querySelectorAll('#domainMode input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
-document.getElementById('domainSelect').addEventListener('change', e => { option.populateDomain(); });
-document.getElementById('domainText').addEventListener('input', e => { OptionPage.hideInputError(e.target); });
-document.getElementById('domainSave').addEventListener('click', e => { option.saveDomain(e); });
-document.getElementById('domainRemove').addEventListener('click', e => { option.removeDomain(e); });
+document.querySelectorAll('#domainMode input').forEach((el) => { el.addEventListener('click', (e) => { option.saveOptions(e); }); });
+document.getElementById('domainSelect').addEventListener('change', (e) => { option.populateDomain(); });
+document.getElementById('domainText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
+document.getElementById('domainSave').addEventListener('click', (e) => { option.saveDomain(e); });
+document.getElementById('domainRemove').addEventListener('click', (e) => { option.removeDomain(e); });
 // Audio
-document.getElementById('muteAudio').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('supportedAudioSites').addEventListener('click', e => { option.showSupportedAudioSites(); });
-document.getElementById('muteAudioOnly').addEventListener('click', e => { option.saveOptions(e); });
-document.getElementById('muteCueRequireShowing').addEventListener('click', e => { option.saveOptions(e); });
-document.querySelectorAll('#audioMuteMethod input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
-document.querySelectorAll('#audioSubtitleSelection input').forEach(el => { el.addEventListener('click', e => { option.saveOptions(e); }); });
-document.querySelectorAll('input.updateYouTubeAutoLimits').forEach(el => { el.addEventListener('input', e => { option.updateYouTubeAutoLimits(e.target); }); });
-document.getElementById('customAudioSitesSave').addEventListener('click', e => { option.saveCustomAudioSites(); });
+document.getElementById('muteAudio').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('supportedAudioSites').addEventListener('click', (e) => { option.showSupportedAudioSites(); });
+document.getElementById('muteAudioOnly').addEventListener('click', (e) => { option.saveOptions(e); });
+document.getElementById('muteCueRequireShowing').addEventListener('click', (e) => { option.saveOptions(e); });
+document.querySelectorAll('#audioMuteMethod input').forEach((el) => { el.addEventListener('click', (e) => { option.saveOptions(e); }); });
+document.querySelectorAll('#audioSubtitleSelection input').forEach((el) => { el.addEventListener('click', (e) => { option.saveOptions(e); }); });
+document.querySelectorAll('input.updateYouTubeAutoLimits').forEach((el) => { el.addEventListener('input', (e) => { option.updateYouTubeAutoLimits(e.target); }); });
+document.getElementById('customAudioSitesSave').addEventListener('click', (e) => { option.saveCustomAudioSites(); });
 // Bookmarklet
-document.querySelectorAll('#bookmarkletConfigInputs input').forEach(el => { el.addEventListener('click', e => { option.populateBookmarkletPage(); }); });
-document.getElementById('bookmarkletFile').addEventListener('click', e => { option.exportBookmarkletFile(); });
-document.getElementById('bookmarkletHostedURL').addEventListener('input', e => { option.updateHostedBookmarklet(); });
-document.getElementById('bookmarkletLink').addEventListener('click', e => { e.preventDefault(); });
+document.querySelectorAll('#bookmarkletConfigInputs input').forEach((el) => { el.addEventListener('click', (e) => { option.populateBookmarkletPage(); }); });
+document.getElementById('bookmarkletFile').addEventListener('click', (e) => { option.exportBookmarkletFile(); });
+document.getElementById('bookmarkletHostedURL').addEventListener('input', (e) => { option.updateHostedBookmarklet(); });
+document.getElementById('bookmarkletLink').addEventListener('click', (e) => { e.preventDefault(); });
 // Config
-document.getElementById('configInlineInput').addEventListener('click', e => { option.configInlineToggle(); });
-document.getElementById('importFileInput').addEventListener('change', e => { option.importConfigFile(e); });
-document.getElementById('configReset').addEventListener('click', e => { option.confirm(e, 'restoreDefaults'); });
-document.getElementById('configExport').addEventListener('click', e => { option.exportConfig(); });
-document.getElementById('configImport').addEventListener('click', e => { option.confirm(e, 'importConfig'); });
-document.getElementById('setPassword').addEventListener('input', e => { option.auth.setPasswordButton(option); });
-document.getElementById('setPasswordBtn').addEventListener('click', e => { option.confirm(e, 'setPassword'); });
+document.getElementById('configInlineInput').addEventListener('click', (e) => { option.configInlineToggle(); });
+document.getElementById('importFileInput').addEventListener('change', (e) => { option.importConfigFile(e); });
+document.getElementById('configReset').addEventListener('click', (e) => { option.confirm(e, 'restoreDefaults'); });
+document.getElementById('configExport').addEventListener('click', (e) => { option.exportConfig(); });
+document.getElementById('configImport').addEventListener('click', (e) => { option.confirm(e, 'importConfig'); });
+document.getElementById('setPassword').addEventListener('input', (e) => { option.auth.setPasswordButton(option); });
+document.getElementById('setPasswordBtn').addEventListener('click', (e) => { option.confirm(e, 'setPassword'); });
 // Test
-document.getElementById('testText').addEventListener('input', e => { option.populateTest(); });
-document.getElementsByClassName('themes')[0].addEventListener('click', e => { option.toggleTheme(); });
+document.getElementById('testText').addEventListener('input', (e) => { option.populateTest(); });
+document.getElementsByClassName('themes')[0].addEventListener('click', (e) => { option.toggleTheme(); });

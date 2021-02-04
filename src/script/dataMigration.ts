@@ -38,7 +38,7 @@ export default class DataMigration {
   // [2.7.0]
   addWordlistsToWords() {
     const cfg = this.cfg as WebConfig;
-    Object.keys(cfg.words).forEach(key => {
+    Object.keys(cfg.words).forEach((key) => {
       const word = cfg.words[key];
       if (!Array.isArray(word.lists)) {
         word.lists = [];
@@ -75,7 +75,7 @@ export default class DataMigration {
       && cfg.words[originalWord].matchMethod == originalWordConf.matchMethod
       && cfg.words[originalWord].sub == originalWordConf.sub
     ) {
-      Object.keys(update).forEach(word => {
+      Object.keys(update).forEach((word) => {
         cfg.words[word] = update[word];
       });
     }
@@ -107,7 +107,7 @@ export default class DataMigration {
   removeGlobalMatchMethod() {
     const cfg = this.cfg;
     if ((cfg as any).globalMatchMethod !== undefined) {
-      Object.keys(cfg.words).forEach(name => {
+      Object.keys(cfg.words).forEach((name) => {
         const word = cfg.words[name];
         // Move RegExp from 4 to 3
         if (word.matchMethod === 4) {
@@ -157,7 +157,7 @@ export default class DataMigration {
     const cfg = this.cfg;
 
     // console.log('before', JSON.stringify(cfg.words));
-    Object.keys(cfg.words).forEach(word => {
+    Object.keys(cfg.words).forEach((word) => {
       const wordObj = cfg.words[word] as WordOptions;
       if (wordObj.hasOwnProperty('words')) {
         // @ts-ignore: Old 'words' doesn't exist on Interface.
@@ -190,7 +190,7 @@ export default class DataMigration {
       twat: { original: 'explative', update: 'dumbo' },
     };
 
-    Object.keys(updatedWords).forEach(updatedWord => {
+    Object.keys(updatedWords).forEach((updatedWord) => {
       if (cfg.words[updatedWord]) {
         const wordObj = cfg.words[updatedWord] as WordOptions;
         if (wordObj.sub == updatedWords[updatedWord].original) {

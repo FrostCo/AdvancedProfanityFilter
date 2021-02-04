@@ -67,7 +67,7 @@ class Popup {
     const elements = [];
     elements.push(document.querySelector('body'));
     elements.push(document.querySelector('#footer'));
-    elements.forEach(element => { element.classList.toggle('dark'); });
+    elements.forEach((element) => { element.classList.toggle('dark'); });
     const table = document.querySelector('#summary > table');
     table.classList.toggle('w3-striped');
   }
@@ -155,7 +155,7 @@ class Popup {
 
     if (Object.keys(summary).length > 0) {
       const sortedKeys = Object.keys(summary).sort((a,b) => summary[b].count - summary[a].count);
-      sortedKeys.forEach(key => {
+      sortedKeys.forEach((key) => {
         const row = tBody.insertRow();
         const wordCell = row.insertCell(0);
         wordCell.classList.add('w3-tooltip');
@@ -218,7 +218,7 @@ chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) =>
 });
 
 // Initial data request
-chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   chrome.tabs.sendMessage(tabs[0].id, { popup: true });
 });
 

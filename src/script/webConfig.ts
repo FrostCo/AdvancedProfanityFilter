@@ -78,9 +78,9 @@ export default class WebConfig extends Config {
     return new Promise((resolve, reject) => {
       let request = null; // Get all data from storage
 
-      if (keys.length > 0 && ! keys.some(key => WebConfig._splittingKeys.includes(key))) {
+      if (keys.length > 0 && ! keys.some((key) => WebConfig._splittingKeys.includes(key))) {
         request = {};
-        keys.forEach(key => { request[key] = WebConfig._defaults[key]; });
+        keys.forEach((key) => { request[key] = WebConfig._defaults[key]; });
       }
 
       chrome.storage.sync.get(request, (items) => {

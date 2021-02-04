@@ -17,7 +17,7 @@ export default class Wordlist {
     });
 
     // Process list of words
-    sorted.forEach(wordStr => {
+    sorted.forEach((wordStr) => {
       // wordlistId = 0 includes all words
       if (wordlistId === 0 || !Array.isArray(cfg.words[wordStr].lists) || cfg.words[wordStr].lists.includes(wordlistId)) {
         try {
