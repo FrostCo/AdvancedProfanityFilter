@@ -289,7 +289,7 @@ export default class OptionPage {
     const failed = {};
     this.cfg.words = {};
 
-    table.querySelectorAll('tr.bulkWordRow').forEach((tr, index) => {
+    table.querySelectorAll('tr.bulkWordRow').forEach((tr) => {
       const cells = tr.querySelectorAll('td');
       const lists = [];
       const wordlistSelectionsInput = tr.querySelectorAll('input[name="wordlists"]') as NodeListOf<HTMLInputElement>;

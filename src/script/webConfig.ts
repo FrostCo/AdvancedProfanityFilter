@@ -103,8 +103,8 @@ export default class WebConfig extends Config {
         }
 
         WebConfig._splittingKeys.forEach((splittingKey) => {
-          const keys = WebConfig.combineData(items, splittingKey);
-          if (keys) { items._splitContainerKeys[splittingKey] = keys; }
+          const splitKeys = WebConfig.combineData(items, splittingKey);
+          if (splitKeys) { items._splitContainerKeys[splittingKey] = splitKeys; }
         });
 
         // Remove keys we didn't request (Required when requests for specific keys include ones that supports splitting)

@@ -123,6 +123,7 @@
         "off"
       ],
       "no-prototype-builtins": "off",
+      "no-shadow": "warn",
       "no-undef": [
         "off"
       ],
