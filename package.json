@@ -64,9 +64,8 @@
     "marked": "^0.7.0",
     "mocha": "^7.2.0",
     "nyc": "^14.1.1",
-    "terser-webpack-plugin": "^1.3.0",
     "typescript": ">=4.1.3",
-    "webpack": "^4.46.0",
+    "webpack": "^5.20.2",
     "webpack-cli": "^3.3.12"
   },
   "babel": {

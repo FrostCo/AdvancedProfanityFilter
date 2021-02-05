@@ -1,19 +1,11 @@
-const path = require('path');
-
 module.exports = {
   entry: {
     eventPage: './src/script/eventPage.ts',
-    webFilter: './src/script/webFilter.ts',
     optionPage: './src/script/optionPage.ts',
-    popup: './src/script/popup.ts'
-  },
-  output: {
-    path: path.resolve('dist'),
+    popup: './src/script/popup.ts',
+    webFilter: './src/script/webFilter.ts',
   },
   mode: 'production',
-  optimization: {
-    minimize: false
-  },
   module: {
     rules: [
       {
@@ -22,20 +14,23 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            "presets": [
-              "@babel/typescript",
+            presets: [
+              '@babel/typescript',
             ],
-            "plugins": [
-              "@babel/proposal-class-properties",
-              "@babel/proposal-object-rest-spread",
+            plugins: [
+              '@babel/proposal-class-properties',
+              '@babel/proposal-object-rest-spread',
             ]
           }
         }
       }
     ]
   },
-  target: 'web',
+  optimization: {
+    minimize: false
+  },
   resolve: {
     extensions: ['.js', '.ts']
-  }
+  },
+  target: 'web',
 };
