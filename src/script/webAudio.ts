@@ -186,17 +186,21 @@ export default class WebAudio {
 
   getVideoTextTrack(video: HTMLVideoElement, rule: AudioRule, ruleKey: string = 'videoCueLanguage') {
     if (video.textTracks && video.textTracks.length > 0) {
+      let textTrackKey;
+      switch(ruleKey) {
+        case 'videoCueLanguage': textTrackKey = 'language'; break;
+        case 'videoCueLabel': textTrackKey = 'label'; break;
+        case 'externalSubTrackLabel': textTrackKey = 'label'; break;
+      }
+
       for (let i = 0; i < video.textTracks.length; i++) {
-        let textTrackKey;
-        switch(ruleKey) {
-          case 'videoCueLanguage': textTrackKey = 'language'; break;
-          case 'videoCueLabel': textTrackKey = 'label'; break;
-          case 'externalSubTrackLabel': textTrackKey = 'label'; break;
-        }
         if (this.matchTextTrack(video.textTracks[i], rule, textTrackKey, ruleKey)) {
           return video.textTracks[i];
         }
       }
+
+      // Return the first textTrack if it has cues even if it doesn't match label or language
+      if (video.textTracks[0] && video.textTracks[0].cues.length) { return video.textTracks[0]; }
     }
   }
 
