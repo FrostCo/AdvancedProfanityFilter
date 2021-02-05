@@ -61,14 +61,14 @@ export default class WebAudio {
         if(['m.youtube.com', 'tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) {
           this.youTube = true;
           // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
-          let youTubeAutoCensor = '[ __ ]';
-          let lists = this.wordlistId == 0 ? [] : [this.wordlistId];
-          let youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MatchMethods.Partial, repeat: false, separators: false, sub: '' };
+          const youTubeAutoCensor = '[ __ ]';
+          const lists = this.wordlistId == 0 ? [] : [this.wordlistId];
+          const youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MatchMethods.Partial, repeat: false, separators: false, sub: '' };
           this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
         }
 
         if (this.watcherRuleIds.length > 0) {
-          this.watcherRuleIds.forEach(ruleId => {
+          this.watcherRuleIds.forEach((ruleId) => {
             setInterval(this.watcher, this.rules[ruleId].checkInterval, this, ruleId);
           });
         }
@@ -79,20 +79,20 @@ export default class WebAudio {
   }
 
   clean(subtitleContainer, ruleIndex = 0): void {
-    let rule = this.rules[ruleIndex];
+    const rule = this.rules[ruleIndex];
     if (rule.mode === 'watcher') { return; } // If this is for a watcher rule, leave the text alone
     let filtered = false;
 
     if (subtitleContainer.nodeName && subtitleContainer.nodeName === '#text' && subtitleContainer.parentElement) {
       subtitleContainer = subtitleContainer.parentElement;
     }
-    let subtitles = rule.subtitleSelector && subtitleContainer.querySelectorAll ? subtitleContainer.querySelectorAll(rule.subtitleSelector) : [subtitleContainer];
+    const subtitles = rule.subtitleSelector && subtitleContainer.querySelectorAll ? subtitleContainer.querySelectorAll(rule.subtitleSelector) : [subtitleContainer];
     if (subtitles.length === 0) { return; }
 
     // Process subtitles
-    subtitles.forEach(subtitle => {
+    subtitles.forEach((subtitle) => {
       // innerText handles line feeds/spacing better, but is not available to #text nodes
-      let textMethod = subtitle.nodeName === '#text' ? 'textContent' : 'innerText';
+      const textMethod = subtitle.nodeName === '#text' ? 'textContent' : 'innerText';
       if (
         rule.convertBreaks === true
         && subtitle.nodeName !== '#text'
@@ -102,7 +102,7 @@ export default class WebAudio {
         if (subtitle.style.whiteSpace !== 'pre') { subtitle.style.whiteSpace = 'pre'; }
         subtitle.textContent = subtitle.innerHTML.replace(WebAudio.brTagRegExp, '\n');
       }
-      let result = this.replaceTextResult(subtitle[textMethod]);
+      const result = this.replaceTextResult(subtitle[textMethod]);
       if (result.modified) {
         filtered = true;
         this.mute(rule); // Mute the audio if we haven't already
@@ -133,7 +133,7 @@ export default class WebAudio {
       this.youTubeAutoSubsTimeout = null;
     }
 
-    let result = this.replaceTextResult(node.textContent);
+    const result = this.replaceTextResult(node.textContent);
     if (result.modified) {
       node.textContent = result.filtered;
       this.mute();
@@ -147,7 +147,7 @@ export default class WebAudio {
     } else {
       if (this.muted) {
         if (this.youTubeAutoSubsMin > 0) {
-          let currentTime = document.getElementsByTagName(WebAudio.DefaultVideoSelector)[0].currentTime;
+          const currentTime = document.getElementsByTagName(WebAudio.DefaultVideoSelector)[0].currentTime;
           if (this.youTubeAutoSubsUnmuteDelay == null) { // Start tracking youTubeAutoSubsUnmuteDelay when next unfiltered word is found
             this.youTubeAutoSubsUnmuteDelay = currentTime;
           } else {
@@ -164,7 +164,7 @@ export default class WebAudio {
 
     // Hide YouTube auto text unless show all subtitles is set
     if (this.filter.cfg.showSubtitles !== Constants.ShowSubtitles.All) {
-      let container = document.querySelector('div.ytp-caption-window-rollup span.captions-text') as HTMLElement;
+      const container = document.querySelector('div.ytp-caption-window-rollup span.captions-text') as HTMLElement;
       if (container.style.display == 'block') {
         container.style.display = 'none';
       }
@@ -179,24 +179,28 @@ export default class WebAudio {
   }
 
   delayedUnmute(instance: WebAudio, rule: AudioRule) {
-    let delayed = true;
+    const delayed = true;
     instance.unmute(rule, null, delayed);
     this.unmuteTimeout = null;
   }
 
   getVideoTextTrack(video: HTMLVideoElement, rule: AudioRule, ruleKey: string = 'videoCueLanguage') {
     if (video.textTracks && video.textTracks.length > 0) {
+      let textTrackKey;
+      switch(ruleKey) {
+        case 'videoCueLanguage': textTrackKey = 'language'; break;
+        case 'videoCueLabel': textTrackKey = 'label'; break;
+        case 'externalSubTrackLabel': textTrackKey = 'label'; break;
+      }
+
       for (let i = 0; i < video.textTracks.length; i++) {
-        let textTrackKey;
-        switch(ruleKey) {
-          case 'videoCueLanguage': textTrackKey = 'language'; break;
-          case 'videoCueLabel': textTrackKey = 'label'; break;
-          case 'externalSubTrackLabel': textTrackKey = 'label'; break;
-        }
         if (this.matchTextTrack(video.textTracks[i], rule, textTrackKey, ruleKey)) {
           return video.textTracks[i];
         }
       }
+
+      // Return the first textTrack if it has cues even if it doesn't match label or language
+      if (video.textTracks[0] && video.textTracks[0].cues.length) { return video.textTracks[0]; }
     }
   }
 
@@ -216,9 +220,9 @@ export default class WebAudio {
 
   hideSubtitles(rule: AudioRule, subtitles?) {
     if (rule.displaySelector) {
-      let root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
+      const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
-        let container = root.querySelector(rule.displaySelector) as HTMLElement;
+        const container = root.querySelector(rule.displaySelector) as HTMLElement;
         if (container) {
           // Save the original display style if none was included in the rule
           if (
@@ -233,7 +237,7 @@ export default class WebAudio {
         }
       }
     } else if (subtitles) {
-      subtitles.forEach(subtitle => {
+      subtitles.forEach((subtitle) => {
         subtitle.innerText = '';
         if (rule.removeSubtitleSpacing && subtitle.style) {
           if (subtitle.style.padding) { subtitle.style.padding = 0; }
@@ -342,7 +346,7 @@ export default class WebAudio {
   mute(rule?: AudioRule, video?: HTMLVideoElement): void {
     if (!this.muted) {
       this.muted = true;
-      let muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
+      const muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
 
       switch(muteMethod) {
         case Constants.MuteMethods.Tab:
@@ -364,7 +368,7 @@ export default class WebAudio {
 
   newCue(start, end, text, options: ParsedSubOptions = {}): VTTCue {
     try {
-      let cue = new VTTCue(hmsToSeconds(start), hmsToSeconds(end), text);
+      const cue = new VTTCue(hmsToSeconds(start), hmsToSeconds(end), text);
       if (options.align) { cue.align = options.align; }
       if (options.line) { cue.line = this.parseLineAndPositionSetting(options.line); }
       if (options.position) { cue.position = this.parseLineAndPositionSetting(options.position); }
@@ -377,7 +381,7 @@ export default class WebAudio {
 
   newTextTrack(rule: AudioRule, video: HTMLVideoElement, cues: VTTCue[]): TextTrack {
     if (video.textTracks) {
-      let track = video.addTextTrack('captions', rule.externalSubTrackLabel, rule.videoCueLanguage) as TextTrack;
+      const track = video.addTextTrack('captions', rule.externalSubTrackLabel, rule.videoCueLanguage) as TextTrack;
       track.mode = 'showing';
       for (let i = 0; i < cues.length; i++) {
         track.addCue(cues[i]);
@@ -397,16 +401,14 @@ export default class WebAudio {
   }
 
   parseSRT(srt): VTTCue[] {
-    let lines = srt.trim().replace('\r\n', '\n').split(/[\r\n]/).map(function(line) {
-      return line.trim();
-    });
-    let cues: VTTCue[] = [];
+    const lines = srt.trim().replace('\r\n', '\n').split(/[\r\n]/).map((line) => line.trim());
+    const cues: VTTCue[] = [];
     let start = null;
     let end = null;
     let text = null;
     for (let i = 0; i < lines.length; i++) {
       if (lines[i].indexOf('-->') >= 0) {
-        let splitted = lines[i].split(/[ \t]+-->[ \t]+/);
+        const splitted = lines[i].split(/[ \t]+-->[ \t]+/);
         if (splitted.length != 2) {
           throw 'Error when splitting "-->": ' + lines[i];
         }
@@ -414,7 +416,7 @@ export default class WebAudio {
         end = splitted[1];
       } else if (lines[i] == '') {
         if (start && end) {
-          let cue = this.newCue(start, end, text);
+          const cue = this.newCue(start, end, text);
           cues.push(cue);
           start = null;
           end = null;
@@ -429,18 +431,18 @@ export default class WebAudio {
       }
     }
     if (start && end) {
-      let cue = this.newCue(start, end, text);
+      const cue = this.newCue(start, end, text);
       cues.push(cue);
     }
     return cues;
   }
 
   parseSSA(ssa: string): VTTCue[] {
-    let cues: VTTCue[] = [];
+    const cues: VTTCue[] = [];
     let endIndex, startIndex, textIndex;
     let foundEvents = false;
 
-    let lines = ssa.split('\n');
+    const lines = ssa.split('\n');
     for (let i = 0; i < lines.length; i++) {
       if (!foundEvents) {
         if (lines[i].match(/^\[Events\]/i)) { foundEvents = true; }
@@ -448,15 +450,15 @@ export default class WebAudio {
       }
 
       if (lines[i].match(/^format:/i)) {
-        let format = lines[i].trim().split(',');
+        const format = lines[i].trim().split(',');
         endIndex = format.indexOf('End');
         startIndex = format.indexOf('Start');
         textIndex = format.indexOf('Text');
       } else if (lines[i].match(/^dialogue:/i)) {
-        let line = lines[i].trim().split(',');
-        let start = line[startIndex];
-        let end = line[endIndex];
-        let cleanText = line.slice(textIndex).join(',').replace(/\{\\\w.+?\}/g, '').split('\\N').reverse(); // Cleanup formatting and convert newlines
+        const line = lines[i].trim().split(',');
+        const start = line[startIndex];
+        const end = line[endIndex];
+        const cleanText = line.slice(textIndex).join(',').replace(/\{\\\w.+?\}/g, '').split('\\N').reverse(); // Cleanup formatting and convert newlines
         for (let j = 0; j < cleanText.length; j++) {
           cues.push(this.newCue(start, end, cleanText[j]));
         }
@@ -466,24 +468,24 @@ export default class WebAudio {
   }
 
   parseVTT(input: string): VTTCue[] {
-    let cues: VTTCue[] = [];
-    let lines = input.split('\n');
-    let separator = new RegExp('\\s-->\\s');
+    const cues: VTTCue[] = [];
+    const lines = input.split('\n');
+    const separator = new RegExp('\\s-->\\s');
 
     for (let i = 0; i < lines.length; i++) {
-      let line = lines[i].trim();
+      const line = lines[i].trim();
       if (line.match(separator)) { // Timestamp [& option] line
-        let parts = line.replace(separator, ' ').split(' ');
+        const parts = line.replace(separator, ' ').split(' ');
         let [start, end, ...extraOptions] = parts;
         start = start.replace(',', '.');
         end = end.replace(',', '.');
-        let options: ParsedSubOptions = extraOptions.map(o => o.split(':')).reduce((acc, cur) => {acc[cur[0]] = cur[1]; return acc;}, {});
+        const options: ParsedSubOptions = extraOptions.map((o) => o.split(':')).reduce((acc, cur) => {acc[cur[0]] = cur[1]; return acc;}, {});
 
         // Get text
-        let prevLine = lines[i-1].trim();
-        let nextLine = lines[i+1].trim();
-        let textStartRegex = new RegExp(`^<[cs]\\.${prevLine}>`);
-        let textEndRegex = new RegExp('<\/[cs]>$');
+        const prevLine = lines[i-1].trim();
+        const nextLine = lines[i+1].trim();
+        const textStartRegex = new RegExp(`^<[cs]\\.${prevLine}>`);
+        const textEndRegex = new RegExp('<\/[cs]>$');
         let text;
         if (nextLine.match(textStartRegex)) {
           text = nextLine.replace(textStartRegex, '').replace(textEndRegex, '');
@@ -494,19 +496,19 @@ export default class WebAudio {
         // Handle the case when there are multiple cues that should be shown concurrently
         // The first line of the entry could look like "Caption-C8_1", and the subsequent entry would be "Caption-C8_2"
         if (prevLine && !prevLine.match(/_1$/)) {
-          let previousCue = cues[cues.length-1];
+          const previousCue = cues[cues.length-1];
           // If they share an endTime with the previous cue, but startTimes are different, make them match
           if (previousCue.startTime != hmsToSeconds(start) && previousCue.endTime == hmsToSeconds(end)) {
             start = secondsToHMS(previousCue.startTime);
           }
         }
 
-        let cue = this.newCue(start, end, text, options);
+        const cue = this.newCue(start, end, text, options);
 
         // Concurrent cues seem to be displayed backwards, so we'll reverse them: [a,b,c] -> [c,b,a]
         if (prevLine && !prevLine.match(/_1$/)) {
-          let concurrentNumber = parseInt(prevLine.match(/_([2-9])$/)[1]);
-          let firstConcurrentCueIndex = (cues.length - concurrentNumber) + 1; // Find the first concurrent index
+          const concurrentNumber = parseInt(prevLine.match(/_([2-9])$/)[1]);
+          const firstConcurrentCueIndex = (cues.length - concurrentNumber) + 1; // Find the first concurrent index
           cues.splice(firstConcurrentCueIndex, 0, cue);
         } else {
           cues.push(cue);
@@ -524,7 +526,7 @@ export default class WebAudio {
 
   processCues(cues: FilteredVTTCue[], rule: AudioRule) {
     for (let i = 0; i < cues.length; i++) {
-      let cue = cues[i];
+      const cue = cues[i];
       if (cue.hasOwnProperty('filtered')) { continue; }
 
       if (rule.videoCueSync) {
@@ -532,7 +534,7 @@ export default class WebAudio {
         cue.endTime += rule.videoCueSync;
       }
 
-      let result = this.replaceTextResult(cue.text);
+      const result = this.replaceTextResult(cue.text);
       if (result.modified) {
         cue.filtered = true;
         cue.originalText = cue.text;
@@ -546,15 +548,15 @@ export default class WebAudio {
   }
 
   async processExternalSub(video: HTMLVideoElement, rule) {
-    let textTrack = this.getVideoTextTrack(video, rule, 'externalSubTrackLabel');
+    const textTrack = this.getVideoTextTrack(video, rule, 'externalSubTrackLabel');
     if (!this.fetching && !textTrack) {
       try {
-        let subsData = getGlobalVariable(rule.externalSubVar);
+        const subsData = getGlobalVariable(rule.externalSubVar);
         if (Array.isArray(subsData)) {
-          let found = subsData.find(subtitle => subtitle.language === rule.videoCueLanguage);
+          const found = subsData.find((subtitle) => subtitle.language === rule.videoCueLanguage);
           if (!found) { throw(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
           this.fetching = true;
-          let subs = await makeRequest('GET', found[rule.externalSubURLKey]) as string;
+          const subs = await makeRequest('GET', found[rule.externalSubURLKey]) as string;
           if (typeof subs == 'string' && subs) {
             let parsedCues;
             switch(found[rule.externalSubFormatKey]) {
@@ -565,14 +567,14 @@ export default class WebAudio {
                 throw(`Unsupported subtitle type: ${found[rule.externalSubFormatKey]}`);
             }
             if (parsedCues) {
-              let track = this.newTextTrack(rule, video, parsedCues);
-              let cues = track.cues as any as FilteredVTTCue[];
+              const track = this.newTextTrack(rule, video, parsedCues);
+              const cues = track.cues as any as FilteredVTTCue[];
               this.processCues(cues, rule);
               this.fetching = false;
 
               // Hide old captions/subtitles
               if (rule.displaySelector) {
-                let oldSubtitlesContainer = document.querySelector(rule.displaySelector) as HTMLElement;
+                const oldSubtitlesContainer = document.querySelector(rule.displaySelector) as HTMLElement;
                 if (oldSubtitlesContainer) { oldSubtitlesContainer.style.display = 'none'; }
               }
             }
@@ -590,17 +592,15 @@ export default class WebAudio {
   }
 
   processWatcherCaptions(rule, captions, data) {
-    let instance = this;
-
-    let initialCall = data.initialCall; // Check if this is the first call
+    const initialCall = data.initialCall; // Check if this is the first call
     if (initialCall) {
       // Don't process the same filter again
-      if (instance.lastProcessedText && instance.lastProcessedText === captions.textContent) {
+      if (this.lastProcessedText && this.lastProcessedText === captions.textContent) {
         data.skipped = true;
         return false;
       } else { // These are new captions, unmute if muted
-        instance.unmute(rule);
-        instance.lastProcessedText = '';
+        this.unmute(rule);
+        this.lastProcessedText = '';
       }
 
       data.initialCall = false;
@@ -608,25 +608,25 @@ export default class WebAudio {
     }
 
     if (captions.hasChildNodes()) {
-      captions.childNodes.forEach(child => {
-        instance.processWatcherCaptions(rule, child, data);
+      captions.childNodes.forEach((child) => {
+        this.processWatcherCaptions(rule, child, data);
       });
     } else { // Process child
       // innerText handles line feeds/spacing better, but is not available to #text nodes
-      let textMethod = (captions && captions.nodeName) === '#text' ? 'textContent' : 'innerText';
+      const textMethod = (captions && captions.nodeName) === '#text' ? 'textContent' : 'innerText';
 
       // Don't process empty/whitespace nodes
       if (captions[textMethod] && captions[textMethod].trim()) {
-        let result = instance.replaceTextResult(captions[textMethod]);
+        const result = this.replaceTextResult(captions[textMethod]);
         if (result.modified) {
-          instance.mute(rule);
+          this.mute(rule);
           data.filtered = true;
           if (rule.filterSubtitles) { captions[textMethod] = result.filtered; }
         }
       }
     }
 
-    if (initialCall) { instance.lastProcessedText = captions.textContent; }
+    if (initialCall) { this.lastProcessedText = captions.textContent; }
   }
 
   replaceTextResult(string: string, stats: boolean = true) {
@@ -635,9 +635,9 @@ export default class WebAudio {
 
   showSubtitles(rule, subtitles?) {
     if (rule.displaySelector) {
-      let root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
+      const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
-        let container = root.querySelector(rule.displaySelector);
+        const container = root.querySelector(rule.displaySelector);
         if (container) { container.style.setProperty('display', rule.displayShow); }
       }
     }
@@ -647,8 +647,8 @@ export default class WebAudio {
   // Returns rule id upon first match, otherwise returns false
   supportedNode(node) {
     for (let i = 0; i < this.enabledRuleIds.length; i++) {
-      let ruleId = this.enabledRuleIds[i];
-      let rule = this.rules[ruleId];
+      const ruleId = this.enabledRuleIds[i];
+      const rule = this.rules[ruleId];
 
       switch(rule.mode) {
         case 'element':
@@ -664,13 +664,13 @@ export default class WebAudio {
           break;
         case 'elementChild':
           if (node.nodeName === rule.tagName) {
-            let root = rule.rootNode ? node.getRootNode() : document;
+            const root = rule.rootNode ? node.getRootNode() : document;
             if (root) {
               if (rule.parentSelector) {
-                let parent = root.querySelector(rule.parentSelector);
+                const parent = root.querySelector(rule.parentSelector);
                 if (parent && parent.contains(node)) { return ruleId; }
               } else {
-                let parents = root.querySelectorAll(rule.parentSelectorAll);
+                const parents = root.querySelectorAll(rule.parentSelectorAll);
                 for (let j = 0; j < parents.length; j++) {
                   if (parents[j].contains(node)) { return ruleId; }
                 }
@@ -680,14 +680,14 @@ export default class WebAudio {
           break;
         case 'text':
           if (node.nodeName === rule.tagName) {
-            let parent = document.querySelector(rule.parentSelector);
+            const parent = document.querySelector(rule.parentSelector);
             if (parent && parent.contains(node)) { return ruleId; }
           }
           break;
         case 'watcher':
           if (node.parentElement && node.parentElement == document.querySelector(rule.subtitleSelector)) { return ruleId; }
           if (rule.parentSelector != null) {
-            let parent = document.querySelector(rule.parentSelector);
+            const parent = document.querySelector(rule.parentSelector);
             if (parent && parent.contains(node)) { return ruleId; }
           }
           break;
@@ -709,7 +709,7 @@ export default class WebAudio {
       }
 
       this.muted = false;
-      let muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
+      const muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
 
       switch(muteMethod) {
         case Constants.MuteMethods.Tab:
@@ -726,15 +726,15 @@ export default class WebAudio {
   }
 
   watcher(instance: WebAudio, ruleId = 0) {
-    let rule = instance.rules[ruleId];
-    let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
+    const rule = instance.rules[ruleId];
+    const video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
 
     if (video && instance.playing(video)) {
       if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
 
-      let captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
+      const captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
       if (captions && captions.textContent && captions.textContent.trim()) {
-        let data: WatcherData = { initialCall: true };
+        const data: WatcherData = { initialCall: true };
         instance.processWatcherCaptions(rule, captions, data);
         if (data.skipped) { return false; }
 
@@ -757,13 +757,13 @@ export default class WebAudio {
 
   watchForVideo(instance: WebAudio) {
     for (let x = 0; x < instance.cueRuleIds.length; x++) {
-      let rule = instance.rules[x] as AudioRule;
-      let video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
+      const rule = instance.rules[x] as AudioRule;
+      const video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
         if (rule.externalSub) { instance.processExternalSub(video, rule); }
 
-        let ruleKey = rule.externalSub ? 'externalSubTrackLabel' : 'videoCueLanguage';
-        let textTrack = instance.getVideoTextTrack(video, rule, ruleKey);
+        const ruleKey = rule.externalSub ? 'externalSubTrackLabel' : 'videoCueLanguage';
+        const textTrack = instance.getVideoTextTrack(video, rule, ruleKey);
 
         if (textTrack && !textTrack.oncuechange) {
           if (!rule.videoCueHideCues && rule.showSubtitles === Constants.ShowSubtitles.None) { textTrack.mode = 'hidden'; }
@@ -773,9 +773,9 @@ export default class WebAudio {
               let filtered = false;
 
               for (let i = 0; i < textTrack.activeCues.length; i++) {
-                let activeCue = textTrack.activeCues[i] as FilteredVTTCue;
+                const activeCue = textTrack.activeCues[i] as FilteredVTTCue;
                 if (!activeCue.hasOwnProperty('filtered')) {
-                  let cues = textTrack.cues as any as FilteredVTTCue[];
+                  const cues = textTrack.cues as any as FilteredVTTCue[];
                   instance.processCues(cues, rule);
                 }
 
@@ -814,7 +814,7 @@ export default class WebAudio {
   }
 
   youTubeAutoSubsMuteTimeout(instance) {
-    let video = window.document.querySelector(WebAudio.DefaultVideoSelector);
+    const video = window.document.querySelector(WebAudio.DefaultVideoSelector);
     if (video && instance.playing(video)) {
       instance.unmute();
     }
@@ -822,7 +822,7 @@ export default class WebAudio {
   }
 
   youTubeAutoSubsNodeIsSubtitleText(node): boolean {
-    let captionWindow = document.querySelector('div.caption-window'); // YouTube Auto-gen subs
+    const captionWindow = document.querySelector('div.caption-window'); // YouTube Auto-gen subs
     return !!(captionWindow && captionWindow.contains(node));
   }
 

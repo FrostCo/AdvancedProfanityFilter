@@ -23,7 +23,7 @@ export default class DataMigration {
   }
 
   static async build() {
-    let cfg = await WebConfig.build();
+    const cfg = await WebConfig.build();
     return new DataMigration(cfg);
   }
 
@@ -37,9 +37,9 @@ export default class DataMigration {
 
   // [2.7.0]
   addWordlistsToWords() {
-    let cfg = this.cfg as WebConfig;
-    Object.keys(cfg.words).forEach(key => {
-      let word = cfg.words[key];
+    const cfg = this.cfg as WebConfig;
+    Object.keys(cfg.words).forEach((key) => {
+      const word = cfg.words[key];
       if (!Array.isArray(word.lists)) {
         word.lists = [];
       }
@@ -48,13 +48,12 @@ export default class DataMigration {
 
   // This will look at the version (from before the update) and perform data migrations if necessary
   byVersion(oldVersion: string) {
-    let self = this;
-    let version = getVersion(oldVersion) as Version;
+    const version = getVersion(oldVersion) as Version;
     let migrated = false;
-    DataMigration.migrations.forEach(function(migration) {
+    DataMigration.migrations.forEach((migration) => {
       if (isVersionOlder(version, getVersion(migration.version))) {
         migrated = true;
-        self[migration.name]();
+        this[migration.name]();
       }
     });
 
@@ -63,10 +62,10 @@ export default class DataMigration {
 
   // [2.3.0]
   fixSmartWatch() {
-    let cfg = this.cfg;
-    let originalWord = 'twat';
-    let originalWordConf = { matchMethod: Constants.MatchMethods.Partial, repeat: true, sub: 'dumbo' };
-    let update = {
+    const cfg = this.cfg;
+    const originalWord = 'twat';
+    const originalWordConf = { matchMethod: Constants.MatchMethods.Partial, repeat: true, sub: 'dumbo' };
+    const update = {
       twat: { matchMethod: Constants.MatchMethods.Exact, repeat: true, sub: 'dumbo' },
       twats: { matchMethod: Constants.MatchMethods.Exact, repeat: true, sub: 'dumbos' }
     };
@@ -76,7 +75,7 @@ export default class DataMigration {
       && cfg.words[originalWord].matchMethod == originalWordConf.matchMethod
       && cfg.words[originalWord].sub == originalWordConf.sub
     ) {
-      Object.keys(update).forEach(word => {
+      Object.keys(update).forEach((word) => {
         cfg.words[word] = update[word];
       });
     }
@@ -84,9 +83,9 @@ export default class DataMigration {
 
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
   moveToNewWordsStorage() {
-    chrome.storage.sync.get({ 'words': null }, function(oldWords) {
+    chrome.storage.sync.get({ 'words': null }, (oldWords) => {
       if (oldWords.words) {
-        chrome.storage.sync.set({ '_words0': oldWords.words }, function() {
+        chrome.storage.sync.set({ '_words0': oldWords.words }, () => {
           if (!chrome.runtime.lastError) {
             // Remove old words
             chrome.storage.sync.remove('words');
@@ -99,17 +98,17 @@ export default class DataMigration {
   // This setting has caused some issues for users specifically with Disney+.
   // This migration should only run once, and sets it to the new default of false.
   overwriteMuteCueRequireShowingDefault() {
-    let cfg = this.cfg;
+    const cfg = this.cfg;
     if (cfg.muteCueRequireShowing === true) {
       cfg.muteCueRequireShowing = false;
     }
   }
 
   removeGlobalMatchMethod() {
-    let cfg = this.cfg;
+    const cfg = this.cfg;
     if ((cfg as any).globalMatchMethod !== undefined) {
-      Object.keys(cfg.words).forEach(name => {
-        let word = cfg.words[name];
+      Object.keys(cfg.words).forEach((name) => {
+        const word = cfg.words[name];
         // Move RegExp from 4 to 3
         if (word.matchMethod === 4) {
           word.matchMethod = Constants.MatchMethods.Regex;
@@ -120,13 +119,13 @@ export default class DataMigration {
   }
 
   removeOldDomainArrays() {
-    let cfg = this.cfg as any;
+    const cfg = this.cfg as any;
     if (!cfg.domains) { cfg.domains = {}; }
-    let propsToDelete = { advancedDomains: 'adv', disabledDomains: 'disabled', enabledDomains: 'enabled' };
-    Object.keys(propsToDelete).forEach(function(propToDelete) {
+    const propsToDelete = { advancedDomains: 'adv', disabledDomains: 'disabled', enabledDomains: 'enabled' };
+    Object.keys(propsToDelete).forEach((propToDelete) => {
       if (cfg[propToDelete] && Array.isArray(cfg[propToDelete])) {
         if (cfg[propToDelete].length > 0) {
-          cfg[propToDelete].forEach(function(domain) {
+          cfg[propToDelete].forEach((domain) => {
             if (cfg.domains[domain] == undefined) { cfg.domains[domain] = {}; }
             cfg.domains[domain][propsToDelete[propToDelete]] = true;
           });
@@ -137,12 +136,11 @@ export default class DataMigration {
   }
 
   runImportMigrations() {
-    let self = this;
     let migrated = false;
-    DataMigration.migrations.forEach(function(migration) {
+    DataMigration.migrations.forEach((migration) => {
       if (migration.runOnImport) {
         migrated = true;
-        self[migration.name]();
+        this[migration.name]();
       }
     });
 
@@ -156,11 +154,11 @@ export default class DataMigration {
 
   // [1.2.0] - Change from a word having many substitutions to a single substitution ({words: []} to {sub: ''})
   singleWordSubstitution() {
-    let cfg = this.cfg;
+    const cfg = this.cfg;
 
     // console.log('before', JSON.stringify(cfg.words));
-    Object.keys(cfg.words).forEach(word => {
-      let wordObj = cfg.words[word] as WordOptions;
+    Object.keys(cfg.words).forEach((word) => {
+      const wordObj = cfg.words[word] as WordOptions;
       if (wordObj.hasOwnProperty('words')) {
         // @ts-ignore: Old 'words' doesn't exist on Interface.
         wordObj.sub = wordObj.words[0] || '';
@@ -173,8 +171,8 @@ export default class DataMigration {
 
   // [2.1.4] - Update default sub values
   updateDefaultSubs() {
-    let cfg = this.cfg;
-    let updatedWords = {
+    const cfg = this.cfg;
+    const updatedWords = {
       bastard: { original: 'jerk', update: 'idiot' },
       bitch: { original: 'jerk', update: 'bench' },
       cocksucker: { original: 'idiot', update: 'suckup' },
@@ -192,9 +190,9 @@ export default class DataMigration {
       twat: { original: 'explative', update: 'dumbo' },
     };
 
-    Object.keys(updatedWords).forEach(updatedWord => {
+    Object.keys(updatedWords).forEach((updatedWord) => {
       if (cfg.words[updatedWord]) {
-        let wordObj = cfg.words[updatedWord] as WordOptions;
+        const wordObj = cfg.words[updatedWord] as WordOptions;
         if (wordObj.sub == updatedWords[updatedWord].original) {
           wordObj.sub = updatedWords[updatedWord].update;
         }

@@ -5,7 +5,7 @@ import WebFilter from './built/webFilter';
 
 describe('WebFilter', function() {
   describe('domains', function() {
-    let filter = new WebFilter;
+    const filter = new WebFilter;
     filter.cfg = new WebConfig({
       domains: {
         'example.com': { disabled: true },
@@ -14,7 +14,7 @@ describe('WebFilter', function() {
     });
 
     // Setup mock window/document
-    let location = { hostname: 'example.com' };
+    const location = { hostname: 'example.com' };
     global.window = { parent: { location: location }, location: location };
     global.document = { location: location, referrer: 'sample.com' };
     filter.getTestHostname = () => (window.location == window.parent.location) ? document.location.hostname : new URL(document.referrer).hostname;

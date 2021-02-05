@@ -5,14 +5,14 @@ import Config from '../built/lib/config';
 describe('Config', function() {
   describe('constructor()', function() {
     it('should create a new Config instance with defaults', function() {
-      let config = new Config();
+      const config = new Config();
       expect(config instanceof Config).to.equal(true);
       expect(config.censorCharacter).to.equal('*');
       expect(config.censorFixedLength).to.equal(0);
     });
 
     it('should create a new Config instance with the provided data', function() {
-      let config = new Config({ censorCharacter: '-' });
+      const config = new Config({ censorCharacter: '-' });
       expect(config instanceof Config).to.equal(true);
       expect(config.censorCharacter).to.equal('-');
       expect(config.censorFixedLength).to.equal(0);
@@ -20,7 +20,7 @@ describe('Config', function() {
   });
 
   describe('addWord()', function() {
-    let config = new Config(Config._defaults);
+    const config = new Config(Config._defaults);
     config.words = Object.assign({}, Config._defaultWords);
 
     it('should add a new word to the config', function() {
@@ -32,7 +32,7 @@ describe('Config', function() {
     });
 
     it('should add a new word to the config with provided options', function() {
-      let wordOptions = { matchMethod: Constants.MatchMethods.Partial , repeat: true, sub: 'Older-word' };
+      const wordOptions = { matchMethod: Constants.MatchMethods.Partial, repeat: true, sub: 'Older-word' };
       expect(config.addWord('newer-word', wordOptions)).to.equal(true);
       expect(Object.keys(config.words)).to.include('newer-word');
       expect(config.words['newer-word'].matchMethod).to.equal(wordOptions.matchMethod);
@@ -63,7 +63,7 @@ describe('Config', function() {
   });
 
   describe('repeatForWord()', function() {
-    let config = new Config(Config._defaults);
+    const config = new Config(Config._defaults);
     config.words = Object.assign({}, Config._defaultWords);
 
     it('should return the repeat option for a word', function() {
@@ -80,7 +80,7 @@ describe('Config', function() {
   });
 
   describe('sanitizeWords()', function() {
-    let config = new Config(Config._defaults);
+    const config = new Config(Config._defaults);
     config.words = Object.assign({}, Config._defaultWords);
 
     it('should sanitize words', function() {

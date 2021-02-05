@@ -64,9 +64,8 @@
     "marked": "^0.7.0",
     "mocha": "^7.2.0",
     "nyc": "^14.1.1",
-    "terser-webpack-plugin": "^1.3.0",
     "typescript": ">=4.1.3",
-    "webpack": "^4.46.0",
+    "webpack": "^5.20.2",
     "webpack-cli": "^3.3.12"
   },
   "babel": {
@@ -102,20 +101,28 @@
       "@typescript-eslint"
     ],
     "rules": {
-      "indent": "off",
-      "no-console": "warn",
       "array-bracket-spacing": [
         "warn",
         "never"
       ],
-      "object-curly-spacing": [
+      "arrow-parens": [
         "warn",
         "always"
       ],
+      "comma-spacing": "warn",
+      "indent": [
+        "warn",
+        2,
+        {
+          "SwitchCase": 1
+        }
+      ],
+      "no-console": "warn",
       "no-control-regex": [
         "off"
       ],
       "no-prototype-builtins": "off",
+      "no-shadow": "warn",
       "no-undef": [
         "off"
       ],
@@ -125,7 +132,16 @@
       "no-useless-escape": [
         "off"
       ],
-      "prefer-const": "off",
+      "object-curly-spacing": [
+        "warn",
+        "always"
+      ],
+      "prefer-const": [
+        "error",
+        {
+          "destructuring": "all"
+        }
+      ],
       "quotes": [
         "error",
         "single",
@@ -135,21 +151,19 @@
         "error",
         "always"
       ],
-      "@typescript-eslint/ban-ts-comment": "off",
-      "@typescript-eslint/ban-types": "off",
-      "@typescript-eslint/class-name-casing": "off",
+      "@typescript-eslint/ban-ts-comment": [
+        "warn",
+        {
+          "ts-ignore": "allow-with-description"
+        }
+      ],
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-member-accessibility": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
-      "@typescript-eslint/indent": [
-        "error",
-        2
-      ],
       "@typescript-eslint/naming-convention": "off",
       "@typescript-eslint/no-empty-function": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-inferrable-types": "off",
-      "@typescript-eslint/no-this-alias": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
         {

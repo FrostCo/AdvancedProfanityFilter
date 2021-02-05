@@ -1,14 +1,30 @@
-const path = require('path');
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
   entry: {
-    bookmarkletFilter: './src/script/bookmarkletFilter.ts'
-  },
-  output: {
-    path: path.resolve('dist'),
+    bookmarkletFilter: './src/script/bookmarkletFilter.ts',
   },
   mode: 'production',
+  module: {
+    rules: [
+      {
+        exclude: /(node_modules|bower_components)/,
+        test: /\.tsx?$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              '@babel/typescript',
+            ],
+            plugins: [
+              '@babel/proposal-class-properties',
+              '@babel/proposal-object-rest-spread',
+            ]
+          }
+        }
+      }
+    ]
+  },
   optimization: {
     minimizer: [
       new TerserPlugin({
@@ -32,28 +48,8 @@ module.exports = {
       }),
     ],
   },
-  module: {
-    rules: [
-      {
-        exclude: /(node_modules|bower_components)/,
-        test: /\.tsx?$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            "presets": [
-              "@babel/typescript",
-            ],
-            "plugins": [
-              "@babel/proposal-class-properties",
-              "@babel/proposal-object-rest-spread",
-            ]
-          }
-        }
-      }
-    ]
-  },
-  target: 'web',
   resolve: {
     extensions: ['.js', '.ts']
-  }
+  },
+  target: 'web',
 };

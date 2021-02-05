@@ -9,13 +9,13 @@ export default class Constants {
   // Helper Functions
   static filterMethodName(id: number) { return this.nameById(this.FilterMethods, id); }
   static matchMethodName(id: number) { return this.nameById(this.MatchMethods, id); }
-  static nameById(obj: object, id: number): string {
-    return Object.entries(obj).filter(arr => arr[1] === id)[0][0];
+  static nameById(obj: Record<string, number>, id: number): string {
+    return Object.entries(obj).filter((arr) => arr[1] === id)[0][0];
   }
 
-  static orderedArray(obj: object) {
-    let result = [];
-    Object.values(obj).sort().forEach(id => { result.push(Constants.nameById(obj, id)); });
+  static orderedArray(obj: Record<string, number>) {
+    const result = [];
+    Object.values(obj).sort().forEach((id) => { result.push(Constants.nameById(obj, id)); });
     return result;
   }
 }

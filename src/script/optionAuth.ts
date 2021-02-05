@@ -4,7 +4,7 @@ export default class OptionAuth {
   password: string;
 
   authenticate(evt) {
-    let passwordInput = document.getElementById('passwordInput') as HTMLInputElement;
+    const passwordInput = document.getElementById('passwordInput') as HTMLInputElement;
     if (passwordInput.value == this.password) {
       this.authenticated = true;
       OptionPage.closeModal('passwordModal');
@@ -21,7 +21,7 @@ export default class OptionAuth {
   }
 
   setPassword(optionPage: OptionPage) {
-    let password = document.getElementById('setPassword') as HTMLInputElement;
+    const password = document.getElementById('setPassword') as HTMLInputElement;
     optionPage.cfg.password = password.value;
     optionPage.saveProp('password');
     password.value = '';
@@ -29,8 +29,8 @@ export default class OptionAuth {
   }
 
   setPasswordButton(optionPage: OptionPage) {
-    let passwordText = document.getElementById('setPassword') as HTMLInputElement;
-    let passwordBtn = document.getElementById('setPasswordBtn') as HTMLButtonElement;
+    const passwordText = document.getElementById('setPassword') as HTMLInputElement;
+    const passwordBtn = document.getElementById('setPasswordBtn') as HTMLButtonElement;
 
     if (optionPage.cfg.password) { // Password already set
       OptionPage.enableBtn(passwordBtn);

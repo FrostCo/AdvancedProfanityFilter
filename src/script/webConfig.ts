@@ -42,8 +42,8 @@ export default class WebConfig extends Config {
 
   static async build(keys: string | string[] = []) {
     if (typeof keys === 'string') { keys = [keys]; }
-    let asyncResult = await WebConfig.getConfig(keys);
-    let instance = new WebConfig(asyncResult);
+    const asyncResult = await WebConfig.getConfig(keys);
+    const instance = new WebConfig(asyncResult);
     return instance;
   }
 
@@ -62,10 +62,10 @@ export default class WebConfig extends Config {
   static combineData(data, prop: string): string[] {
     data[prop] = {};
     if (data[`_${prop}0`] !== undefined) {
-      let dataKeys = WebConfig.getDataContainerKeys(data, prop);
+      const dataKeys = WebConfig.getDataContainerKeys(data, prop);
 
       // Add all _[prop]* to .[prop] and remove _[prop]*
-      dataKeys.forEach(function(key) {
+      dataKeys.forEach((key) => {
         Object.assign(data[prop], data[key]);
         delete data[key];
       });
@@ -75,20 +75,20 @@ export default class WebConfig extends Config {
 
   // Async call to get provided keys (or default keys) from chrome storage
   static getConfig(keys: string[]) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       let request = null; // Get all data from storage
 
-      if (keys.length > 0 && ! keys.some(key => WebConfig._splittingKeys.includes(key))) {
+      if (keys.length > 0 && ! keys.some((key) => WebConfig._splittingKeys.includes(key))) {
         request = {};
-        keys.forEach(key => { request[key] = WebConfig._defaults[key]; });
+        keys.forEach((key) => { request[key] = WebConfig._defaults[key]; });
       }
 
-      chrome.storage.sync.get(request, function(items) {
+      chrome.storage.sync.get(request, (items) => {
         // Add internal tracker for split keys
         items._splitContainerKeys = {};
 
         // Ensure defaults for undefined settings
-        Object.keys(WebConfig._defaults).forEach(function(defaultKey) {
+        Object.keys(WebConfig._defaults).forEach((defaultKey) => {
           if ((request == null || keys.includes(defaultKey)) && items[defaultKey] === undefined) {
             items[defaultKey] = WebConfig._defaults[defaultKey];
           }
@@ -102,14 +102,14 @@ export default class WebConfig extends Config {
           }
         }
 
-        WebConfig._splittingKeys.forEach(function(splittingKey) {
-          let keys = WebConfig.combineData(items, splittingKey);
-          if (keys) { items._splitContainerKeys[splittingKey] = keys; }
+        WebConfig._splittingKeys.forEach((splittingKey) => {
+          const splitKeys = WebConfig.combineData(items, splittingKey);
+          if (splitKeys) { items._splitContainerKeys[splittingKey] = splitKeys; }
         });
 
         // Remove keys we didn't request (Required when requests for specific keys include ones that supports splitting)
         if (request !== null && keys.length > 0) {
-          Object.keys(items).forEach(function(item) {
+          Object.keys(items).forEach((item) => {
             if (!keys.includes(item)) {
               delete items[item];
             }
@@ -123,35 +123,30 @@ export default class WebConfig extends Config {
 
   // Find all _[prop]* to combine
   static getDataContainerKeys(data, prop) {
-    let pattern = new RegExp(`^_${prop}\\d+`);
-    let containerKeys = Object.keys(data).filter(function(key) {
-      return pattern.test(key);
-    });
-
+    const pattern = new RegExp(`^_${prop}\\d+`);
+    const containerKeys = Object.keys(data).filter((key) => pattern.test(key));
     return containerKeys;
   }
 
   // Order and remove `_` prefixed values
   ordered() {
-    let self = this;
-    return Object.keys(self).sort().reduce((obj, key) => {
-      if (key[0] != '_') { obj[key] = self[key]; }
+    return Object.keys(this).sort().reduce((obj, key) => {
+      if (key[0] != '_') { obj[key] = this[key]; }
       return obj;
     }, {});
   }
 
   remove(props: string | string[]) {
-    let self = this;
     if (typeof props === 'string') { props = [props]; }
     chrome.storage.sync.remove(props);
-    props.forEach(function(prop) {
-      delete self[prop];
+    props.forEach((prop) => {
+      delete this[prop];
     });
   }
 
   reset() {
-    return new Promise(function(resolve, reject) {
-      chrome.storage.sync.clear(function() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.clear(() => {
         resolve(chrome.runtime.lastError ? 1 : 0);
       });
     });
@@ -159,9 +154,8 @@ export default class WebConfig extends Config {
 
   // Pass a key or array of keys to save, or save everything
   save(props: string | string[] = []) {
-    let self = this;
     if (typeof props === 'string') { props = [props]; }
-    let data = {};
+    const data = {};
 
     // Save everything
     if (props.length === 0) {
@@ -169,51 +163,50 @@ export default class WebConfig extends Config {
       props.push('words'); // words is not part of _defaults
     }
 
-    props.forEach(function(prop) {
+    props.forEach((prop) => {
       if (WebConfig._splittingKeys.includes(prop)) {
-        Object.assign(data, self.splitData(prop));
+        Object.assign(data, this.splitData(prop));
       } else {
-        data[prop] = self[prop];
+        data[prop] = this[prop];
       }
     });
 
     // If we have more containers in storage than are needed, remove them
-    if (Object.keys(self._splitContainerKeys).length !== 0 && props.some(prop => WebConfig._splittingKeys.includes(prop))) {
-      WebConfig._splittingKeys.forEach(function(splittingKey) {
+    if (Object.keys(this._splitContainerKeys).length !== 0 && props.some((prop) => WebConfig._splittingKeys.includes(prop))) {
+      WebConfig._splittingKeys.forEach((splittingKey) => {
         if (props.includes(splittingKey)) {
-          let newContainerKeys = WebConfig.getDataContainerKeys(data, splittingKey);
-          if (self._splitContainerKeys[splittingKey]) {
-            let containersToRemove = self._splitContainerKeys[splittingKey].filter(oldKey => !newContainerKeys.includes(oldKey));
+          const newContainerKeys = WebConfig.getDataContainerKeys(data, splittingKey);
+          if (this._splitContainerKeys[splittingKey]) {
+            const containersToRemove = this._splitContainerKeys[splittingKey].filter((oldKey) => !newContainerKeys.includes(oldKey));
             if (containersToRemove.length !== 0) {
-              self.remove(containersToRemove);
-              self._splitContainerKeys[splittingKey] = newContainerKeys;
+              this.remove(containersToRemove);
+              this._splitContainerKeys[splittingKey] = newContainerKeys;
             }
           }
         }
       });
     }
 
-    return new Promise(function(resolve, reject) {
-      chrome.storage.sync.set(data, function() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.set(data, () => {
         resolve(chrome.runtime.lastError ? 1 : 0);
       });
     });
   }
 
   splitData(key: string) {
-    let self = this;
     const encoder = new TextEncoder();
     let currentContainerNum = 0;
     let currentBytes = 2; // For double-quotes around entire stringified JSON
-    let data = {};
+    const data = {};
 
     let currentContainer = `_${key}${currentContainerNum}`;
     data[currentContainer] = {};
     currentBytes += encoder.encode(`{"${currentContainer}":{}}`).length;
 
-    Object.keys(self[key]).sort().forEach(function(item) {
+    Object.keys(this[key]).sort().forEach((item) => {
       let newBytes = encoder.encode(`",${item}":`).length; // This leads to an extra ',' for the last entry
-      newBytes += encoder.encode(JSON.stringify(self[key][item])).length;
+      newBytes += encoder.encode(JSON.stringify(this[key][item])).length;
 
       // Next word would be too big, setup next container
       if ((currentBytes + newBytes) >= WebConfig._maxBytes) {
@@ -225,7 +218,7 @@ export default class WebConfig extends Config {
 
       // Adding a word
       currentBytes += newBytes;
-      data[currentContainer][item] = self[key][item];
+      data[currentContainer][item] = this[key][item];
     });
 
     return data;

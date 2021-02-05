@@ -7,26 +7,24 @@ export default class Wordlist {
   regExps: RegExp[];
 
   constructor(cfg: Config, wordlistId: number) {
-    let self = this;
     this.all = [];
     this.list = [];
     this.regExps = [];
 
     // Sort the words array by longest (most-specific) first
-    let sorted = Object.keys(cfg.words).sort((a, b) => {
+    const sorted = Object.keys(cfg.words).sort((a, b) => {
       return b.length - a.length;
     });
 
     // Process list of words
-    sorted.forEach(wordStr => {
+    sorted.forEach((wordStr) => {
       // wordlistId = 0 includes all words
       if (wordlistId === 0 || !Array.isArray(cfg.words[wordStr].lists) || cfg.words[wordStr].lists.includes(wordlistId)) {
-        let word;
         try {
-          word = new Word(wordStr, cfg.words[wordStr], cfg);
-          self.list.push(wordStr);
-          self.all.push(word);
-          self.regExps.push(word.regExp);
+          const word = new Word(wordStr, cfg.words[wordStr], cfg);
+          this.list.push(wordStr);
+          this.all.push(word);
+          this.regExps.push(word.regExp);
         } catch (e) {
           // eslint-disable-next-line no-console
           console.error(`APF: Failed to add word: '${wordStr}'`);
