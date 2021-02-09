@@ -19,10 +19,10 @@ export default class WebConfig extends Config {
   youTubeAutoSubsMin: number;
 
   static readonly _classDefaults = {
-    domains: {},
     audioWordlistId: 0,
     customAudioSites: null,
     darkMode: false,
+    domains: {},
     enabledDomainsOnly: false,
     muteAudio: false,
     muteAudioOnly: false,
