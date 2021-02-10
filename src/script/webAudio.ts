@@ -255,6 +255,7 @@ export default class WebAudio {
       if (rule.externalSubFormatKey === undefined) { rule.externalSubFormatKey = 'format'; }
       if (rule.externalSubTrackLabel === undefined) { rule.externalSubTrackLabel = 'APF'; }
     }
+    this.initDisplaySelector(rule);
   }
 
   initDisplaySelector(rule: AudioRule) {
@@ -797,6 +798,20 @@ export default class WebAudio {
                   switch (rule.showSubtitles) {
                     case Constants.ShowSubtitles.Filtered: textTrack.mode = 'hidden'; break;
                     case Constants.ShowSubtitles.Unfiltered: textTrack.mode = 'showing'; break;
+                  }
+                }
+              }
+
+              if (rule.displaySelector) {
+                if (filtered) {
+                  switch (rule.showSubtitles) {
+                    case Constants.ShowSubtitles.Filtered: instance.showSubtitles(rule); break;
+                    case Constants.ShowSubtitles.Unfiltered: instance.hideSubtitles(rule); break;
+                  }
+                } else {
+                  switch (rule.showSubtitles) {
+                    case Constants.ShowSubtitles.Filtered: instance.hideSubtitles(rule); break;
+                    case Constants.ShowSubtitles.Unfiltered: instance.showSubtitles(rule); break;
                   }
                 }
               }

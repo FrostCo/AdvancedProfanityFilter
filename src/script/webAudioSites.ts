@@ -65,6 +65,7 @@ export default class WebAudioSites {
       }
     ],
     'www.cwtv.com': [{ className: 'ttr-container', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
+    'www.discoveryplus.com': [{ displaySelector: 'div.cjRVXG', mode: 'cue', videoCueLanguage: 'en' }],
     'www.dishanywhere.com': [
       { className: 'bmpui-ui-subtitle-label', mode: 'element', tagName: 'SPAN' },
       { className: 'bmpui-subtitle-region-container', mode: 'element', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' },
