@@ -147,7 +147,9 @@ export default class WebConfig extends Config {
   reset() {
     return new Promise((resolve, reject) => {
       chrome.storage.sync.clear(() => {
-        resolve(chrome.runtime.lastError ? 1 : 0);
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError.message)
+          : resolve(0);
       });
     });
   }
@@ -189,7 +191,9 @@ export default class WebConfig extends Config {
 
     return new Promise((resolve, reject) => {
       chrome.storage.sync.set(data, () => {
-        resolve(chrome.runtime.lastError ? 1 : 0);
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError.message)
+          : resolve(0);
       });
     });
   }

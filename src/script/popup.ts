@@ -4,6 +4,8 @@ import WebAudioSites from './webAudioSites';
 import WebConfig from './webConfig';
 import Domain from './domain';
 import Page from './page';
+import Logger from './lib/logger';
+const logger = new Logger();
 
 class Popup {
   audioSiteKeys: string[];
@@ -75,9 +77,11 @@ class Popup {
   async filterMethodSelect() {
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     this.cfg.filterMethod = filterMethodSelect.selectedIndex;
-    const error = await this.cfg.save('filterMethod');
-    if (!error) {
+    try {
+      await this.cfg.save('filterMethod');
       chrome.tabs.reload();
+    } catch(e) {
+      logger.error('Failed to update selected filter method.', e);
     }
   }
 
@@ -184,8 +188,12 @@ class Popup {
   async toggle(prop: string) {
     if (!this.protected) {
       this.domain[prop] = !this.domain[prop];
-      const error = await this.domain.save(this.cfg);
-      if (!error) { chrome.tabs.reload(); }
+      try {
+        await this.domain.save(this.cfg);
+        chrome.tabs.reload();
+      } catch(e) {
+        logger.error(`Failed to toggle domain '${this.domain.hostname}'.`, e);
+      }
     }
   }
 
@@ -193,8 +201,12 @@ class Popup {
     if (!this.protected) {
       const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
       this.domain.updateFromModeIndex(domainModeSelect.selectedIndex);
-      const error = await this.domain.save(this.cfg);
-      if (!error) { chrome.tabs.reload(); }
+      try {
+        await this.domain.save(this.cfg);
+        chrome.tabs.reload();
+      } catch(e) {
+        logger.error(`Failed to update mode for domain '${this.domain.hostname}'.`, e);
+      }
     }
   }
 
@@ -202,8 +214,11 @@ class Popup {
     const element = event.target;
     const type = element.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
     this.domain[type] = element.selectedIndex > 0 ? element.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
-    if (!await this.domain.save(this.cfg)) {
+    try {
+      await this.domain.save(this.cfg);
       chrome.tabs.reload();
+    } catch(e) {
+      logger.error(`Failed to select wordlist for domain ${this.domain.hostname}.`, e);
     }
   }
 }

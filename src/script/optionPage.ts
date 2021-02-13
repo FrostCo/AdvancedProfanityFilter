@@ -7,6 +7,8 @@ import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
 import WebAudioSites from './webAudioSites';
+import Logger from './lib/logger';
+const logger = new Logger();
 
 export default class OptionPage {
   auth: OptionAuth;
@@ -311,13 +313,15 @@ export default class OptionPage {
       }
     });
 
-    if (await this.cfg.save('words')) {
-      OptionPage.showErrorModal('Failed to save.');
-    } else {
+    try {
+      await this.cfg.save('words');
       OptionPage.closeModal('bulkWordEditorModal');
       OptionPage.showStatusModal('Words saved successfully.');
       filter.rebuildWordlists();
       this.populateOptions();
+    } catch(e) {
+      logger.warn('Failed to save.', e);
+      OptionPage.showErrorModal(`Failed to save. [Error: ${e}]`);
     }
   }
 
@@ -491,15 +495,15 @@ export default class OptionPage {
       const migration = new DataMigration(importedCfg);
       migration.runImportMigrations();
       const resetSuccess = await this.restoreDefaults(null, true);
-
       if (resetSuccess) {
-        this.cfg = importedCfg;
-        const error = await this.cfg.save();
-        if (!error) {
+        try {
+          this.cfg = importedCfg;
+          await this.cfg.save();
           OptionPage.showStatusModal('Settings imported successfully.');
           this.init();
-        } else {
-          OptionPage.showErrorModal('Failed to import settings.');
+        } catch(e) {
+          logger.warn('Failed to import settings.', e);
+          OptionPage.showErrorModal(`Failed to import settings. [Error: ${e}]`);
         }
       }
     } catch(e) {
@@ -920,12 +924,13 @@ export default class OptionPage {
     if (domainsSelect.value) {
       delete this.cfg.domains[domainsSelect.value];
 
-      const error = await this.cfg.save('domains');
-      if (error) {
-        OptionPage.showErrorModal();
-        return false;
-      } else {
+      try {
+        await this.cfg.save('domains');
         this.populateDomainPage();
+      } catch(e) {
+        logger.warn(`Failed to remove domain '${domainsSelect.value}'.`, e);
+        OptionPage.showErrorModal(`Failed to remove domain '${domainsSelect.value}'. [Error: ${e}]`);
+        return false;
       }
     }
   }
@@ -938,13 +943,14 @@ export default class OptionPage {
     const originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
     this.cfg[originalListName] = removeFromArray(this.cfg[originalListName], originalWord);
 
-    const error = await this.cfg.save(originalListName);
-    if (error) {
-      OptionPage.showErrorModal();
-      return false;
-    } else {
+    try {
+      await this.cfg.save(originalListName);
       filter.init();
       this.populateOptions();
+    } catch(e) {
+      logger.warn(`Failed to remove '${originalWord} from whitelist.`, e);
+      OptionPage.showErrorModal(`Failed to remove '${originalWord} from whitelist. [Error: ${e}]`);
+      return false;
     }
   }
 
@@ -991,14 +997,15 @@ export default class OptionPage {
   }
 
   async restoreDefaults(evt, silent = false) {
-    const error = await this.cfg.reset();
-    if (error) {
-      OptionPage.showErrorModal('Error restoring defaults!');
-      return false;
-    } else {
-      if (!silent) OptionPage.showStatusModal('Default settings restored');
+    try {
+      await this.cfg.reset();
+      if (!silent) OptionPage.showStatusModal('Default settings restored.');
       this.init();
       return true;
+    } catch(e) {
+      logger.warn('Error restoring defaults.', e);
+      OptionPage.showErrorModal(`Error restoring defaults. [Error: ${e}]`);
+      return false;
     }
   }
 
@@ -1107,23 +1114,26 @@ export default class OptionPage {
     this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
 
     // Save settings
-    const error = await this.cfg.save();
-    if (error) {
-      OptionPage.showErrorModal('Settings not saved! Please try again.');
-      return false;
-    } else {
+    try {
+      await this.cfg.save();
       this.init();
       return true;
+    } catch(e) {
+      logger.warn('Settings not saved! Please try again.', e);
+      OptionPage.showErrorModal(`Settings not saved! Please try again. [Error: ${e}]`);
+      return false;
     }
   }
 
   async saveProp(prop: string) {
-    const error = await this.cfg.save(prop);
-    if (error) {
-      OptionPage.showErrorModal();
+    try {
+      await this.cfg.save(prop);
+      return true;
+    } catch(e) {
+      logger.warn(`Failed to save '${prop}'.`, e);
+      OptionPage.showErrorModal(`Failed to save '${prop}'. [Error: ${e}]`);
       return false;
     }
-    return true;
   }
 
   async saveWhitelist(evt) {
@@ -1167,13 +1177,14 @@ export default class OptionPage {
         propsToSave.forEach((prop) => {
           this.cfg[prop] = this.cfg[prop].sort();
         });
-        const error = await this.cfg.save(propsToSave);
-        if (error) {
-          OptionPage.showErrorModal();
-          return false;
-        } else {
+        try {
+          await this.cfg.save(propsToSave);
           filter.init();
           this.populateOptions();
+        } catch(e) {
+          logger.warn('Failed to update whitelist.', e);
+          OptionPage.showErrorModal(`Failed to update whitelist. [Error: ${e}]`);
+          return false;
         }
       }
     } else {
@@ -1268,15 +1279,17 @@ export default class OptionPage {
       }
 
       if (added) {
-        const success = await this.saveOptions(evt);
-        if (!success) {
-          OptionPage.showErrorModal();
+        try {
+          await this.saveOptions(evt);
+          // Update states and Reset word form
+          filter.rebuildWordlists();
+          this.populateOptions();
+        } catch(e) {
+          logger.warn(`Failed to update word '${word}'.`, e);
+          OptionPage.showErrorModal(`Failed to update word '${word}'. [Error: ${e}]`);
+          this.cfg.removeWord(word);
           return false;
         }
-
-        // Update states and Reset word form
-        filter.rebuildWordlists();
-        this.populateOptions();
       } else {
         OptionPage.showInputError(wordText, `'${word}' already in list.`);
       }
