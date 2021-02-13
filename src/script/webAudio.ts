@@ -28,6 +28,12 @@ export default class WebAudio {
 
   static readonly brTagRegExp = new RegExp('<br>', 'i');
   static readonly DefaultVideoSelector = 'video';
+  static readonly TextTrackRuleMappings = {
+    externalSubTrackLabel: 'label',
+    videoCueKind: 'kind',
+    videoCueLabel: 'label',
+    videoCueLanguage: 'language',
+  };
 
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.cueRuleIds = [];
@@ -184,24 +190,44 @@ export default class WebAudio {
     this.unmuteTimeout = null;
   }
 
-  getVideoTextTrack(video: HTMLVideoElement, rule: AudioRule, ruleKey: string = 'videoCueLanguage') {
-    if (video.textTracks && video.textTracks.length > 0) {
-      let textTrackKey;
-      switch(ruleKey) {
-        case 'videoCueLanguage': textTrackKey = 'language'; break;
-        case 'videoCueLabel': textTrackKey = 'label'; break;
-        case 'externalSubTrackLabel': textTrackKey = 'label'; break;
+  // Priority (requires cues): [overrideKey], label, language, kind (prefer caption/subtitle), order
+  getVideoTextTrack(textTracks, rule, overrideKey?: string): TextTrack {
+    let bestIndex = 0;
+    let bestScore = 0;
+    let foundCues = false; // Return the first match with cues if no other matches are found
+    let perfectScore = 0;
+    if (rule.overrideKey) { perfectScore += 1000; }
+    if (rule.videoCueLabel) { perfectScore += 100; }
+    if (rule.videoCueLanguage) { perfectScore += 10; }
+    if (rule.videoCueKind) { perfectScore += 1; } // Add one, because we will default to 'captions'/'subtitles'
+
+    for (let i = 0; i < textTracks.length; i++) {
+      const textTrack = textTracks[i];
+      if (textTrack.cues.length === 0) { continue; }
+      if (rule.videoCueRequireShowing && textTrack.mode !== 'showing') { continue; }
+
+      let currentScore = 0;
+      if (overrideKey && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings[overrideKey], rule[overrideKey])) { currentScore += 1000; }
+      if (rule.videoCueLabel && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueLabel, rule.videoCueLabel)) { currentScore += 100; }
+      if (rule.videoCueLanguage && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueLanguage, rule.videoCueLanguage)) { currentScore += 10; }
+      if (rule.videoCueKind) {
+        if (this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueKind, rule.videoCueKind)) { currentScore += 1; }
+      } else {
+        if (
+          this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueKind, 'captions')
+          || this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueKind, 'subtitles')
+        ) { currentScore += 1; }
       }
 
-      for (let i = 0; i < video.textTracks.length; i++) {
-        if (this.matchTextTrack(video.textTracks[i], rule, textTrackKey, ruleKey)) {
-          return video.textTracks[i];
-        }
+      if (currentScore === perfectScore) { return textTrack; }
+      if (currentScore > bestScore || !foundCues) {
+        bestScore = currentScore;
+        bestIndex = i;
+        foundCues = true;
       }
-
-      // Return the first textTrack if it has cues even if it doesn't match label or language
-      if (video.textTracks[0] && video.textTracks[0].cues.length) { return video.textTracks[0]; }
     }
+
+    if (foundCues) { return textTracks[bestIndex]; }
   }
 
   // Some sites ignore textTrack.mode = 'hidden' and will still show captions
@@ -332,16 +358,6 @@ export default class WebAudio {
     if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.DefaultVideoSelector; }
     this.initDisplaySelector(rule);
-  }
-
-  matchTextTrack(textTrack: TextTrack, rule: AudioRule, textTrackKey?: string, ruleKey?: string): boolean {
-    if (
-      textTrack.cues.length > 0
-      && (!rule.videoCueRequireShowing || textTrack.mode === 'showing')
-    ) {
-      // Return true if both keys weren't provided, the rule doesn't have a have for key, or if both keys match the textTrack
-      return ((!textTrackKey || !ruleKey || !rule[ruleKey]) || textTrack[textTrackKey] == rule[ruleKey]);
-    }
   }
 
   mute(rule?: AudioRule, video?: HTMLVideoElement): void {
@@ -699,6 +715,10 @@ export default class WebAudio {
     return false;
   }
 
+  textTrackKeyTest(textTrack: TextTrack, key: string, value: string) {
+    return (textTrack[key] && value && textTrack[key] === value);
+  }
+
   unmute(rule?: AudioRule, video?: HTMLVideoElement, delayed: boolean = false): void {
     if (this.muted) {
       // If we haven't already delayed unmute and we should (rule.unmuteDelay), set the timeout
@@ -762,9 +782,7 @@ export default class WebAudio {
       const video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
         if (rule.externalSub) { instance.processExternalSub(video, rule); }
-
-        const ruleKey = rule.externalSub ? 'externalSubTrackLabel' : 'videoCueLanguage';
-        const textTrack = instance.getVideoTextTrack(video, rule, ruleKey);
+        const textTrack = instance.getVideoTextTrack(video.textTracks, rule);
 
         if (textTrack && !textTrack.oncuechange) {
           if (!rule.videoCueHideCues && rule.showSubtitles === Constants.ShowSubtitles.None) { textTrack.mode = 'hidden'; }
