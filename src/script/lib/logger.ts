@@ -1,27 +1,33 @@
 export default class Logger {
+  level: number;
   prefix: string;
-  // TODO: maxLevel
-  // TODO: devOnly
 
   static readonly APP = 'APF'
-  static readonly DEBUG = 'debug';
-  static readonly ERROR = 'error';
-  static readonly INFO = 'info';
-  static readonly WARN = 'warn';
+  static readonly DebugLevel = 0;
+  static readonly DebugName = 'debug';
+  static readonly ErrorLevel = 3;
+  static readonly ErrorName = 'error';
+  static readonly InfoLevel = 1;
+  static readonly InfoName = 'info';
+  static readonly WarnLevel = 2;
+  static readonly WarnName = 'warn';
 
-  constructor(tag?: string) {
+  static readonly DefaultLevel = Logger.WarnLevel;
+
+  constructor( level: number = Logger.DefaultLevel, tag?: string) {
+    this.level = level;
     this.prefix = `[${Logger.APP}] `;
     if (tag) { this.prefix = `${this.prefix}[${tag}] `; }
   }
 
-  debug = (message: string, ...data: any[]) => { this.output(Logger.DEBUG, message, data); }
-  debugTime = (message: string, ...data: any[]) => { this.outputTime(Logger.DEBUG, message, data); }
-  error = (message: string, ...data: any[]) => { this.output(Logger.ERROR, message, data); }
-  errorTime = (message: string, ...data: any[]) => { this.outputTime(Logger.ERROR, message, data); }
-  info = (message: string, ...data: any[]) => { this.output(Logger.INFO, message, data); }
-  infoTime = (message: string, ...data: any[]) => { this.outputTime(Logger.INFO, message, data); }
-  warn = (message: string, ...data: any[]) => { this.output(Logger.WARN, message, data); }
-  warnTime = (message: string, ...data: any[]) => { this.outputTime(Logger.WARN, message, data); }
+  debug = (message: string, ...data: any[]) => { if (Logger.DebugLevel >= this.level) { this.output(Logger.DebugName, message, data); } };
+  debugTime = (message: string, ...data: any[]) => { if (Logger.DebugLevel >= this.level) { this.outputTime(Logger.DebugName, message, data); } };
+  error = (message: string, ...data: any[]) => { if (Logger.ErrorLevel >= this.level) { this.output(Logger.ErrorName, message, data); } };
+  errorTime = (message: string, ...data: any[]) => { if (Logger.ErrorLevel >= this.level) { this.outputTime(Logger.ErrorName, message, data); } };
+  info = (message: string, ...data: any[]) => { if (Logger.InfoLevel >= this.level) { this.output(Logger.InfoName, message, data); } };
+  infoTime = (message: string, ...data: any[]) => { if (Logger.InfoLevel >= this.level) { this.outputTime(Logger.InfoName, message, data); } };
+  warn = (message: string, ...data: any[]) => { if (Logger.WarnLevel >= this.level) { this.output(Logger.WarnName, message, data); } };
+  warnTime = (message: string, ...data: any[]) => { if (Logger.WarnLevel >= this.level) { this.outputTime(Logger.WarnName, message, data); } };
 
   output(level: string, message: string, data: any[] = []) {
     if (data.length) {
