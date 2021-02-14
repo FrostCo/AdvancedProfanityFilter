@@ -156,7 +156,6 @@ export default class DataMigration {
   singleWordSubstitution() {
     const cfg = this.cfg;
 
-    // console.log('before', JSON.stringify(cfg.words));
     Object.keys(cfg.words).forEach((word) => {
       const wordObj = cfg.words[word] as WordOptions;
       if (wordObj.hasOwnProperty('words')) {
@@ -166,7 +165,6 @@ export default class DataMigration {
         delete wordObj.words;
       }
     });
-    // console.log('after', JSON.stringify(cfg.words));
   }
 
   // [2.1.4] - Update default sub values

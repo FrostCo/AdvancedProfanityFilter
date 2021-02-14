@@ -3,6 +3,8 @@ import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
 import { getGlobalVariable, hmsToSeconds, makeRequest, secondsToHMS } from './lib/helper';
+import Logger from './lib/logger';
+const logger = new Logger();
 
 export default class WebAudio {
   cueRuleIds: number[];
@@ -391,8 +393,7 @@ export default class WebAudio {
       if (options.position) { cue.position = this.parseLineAndPositionSetting(options.position); }
       return cue;
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(`APF: Failed to add cue: ( start: ${start}, end: ${end}, text: ${text} )`, e);
+      logger.error(`[Audio] Failed to add cue: ( start: ${start}, end: ${end}, text: ${text} )`, e);
     }
   }
 
@@ -602,8 +603,7 @@ export default class WebAudio {
           throw(`Failed to find subtitle variable: ${rule.externalSubVar}`);
         }
       } catch(e) {
-        // eslint-disable-next-line no-console
-        console.error('APF: Error using external subtitles. ', e);
+        logger.error(`[Audio] Error using external subtitles for ${this.filter.hostname}.`, e);
       }
     }
   }

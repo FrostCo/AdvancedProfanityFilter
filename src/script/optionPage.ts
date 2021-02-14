@@ -517,9 +517,8 @@ export default class OptionPage {
     filter.cfg = this.cfg;
     filter.init();
 
-    // console.log('Password:', cfg.password, 'Authenticated:', authenticated); // DEBUG Password
+    // logger.debug(`Password: '${this.cfg.password}', Authenticated: ${this.auth.authenticated}`);
     if (this.cfg.password && !this.auth.authenticated) {
-      // console.log('Prompt for password'); // DEBUG Password
       OptionPage.openModal('passwordModal');
       document.getElementById('passwordInput').focus();
     } else {
@@ -1260,15 +1259,15 @@ export default class OptionPage {
       }
 
       if (wordList.value === '') { // New record
-        // console.log('Adding new word: ', word, wordOptions); // DEBUG
+        logger.info(`Adding new word: '${word}'.`, wordOptions);
         added = this.cfg.addWord(word, wordOptions);
       } else { // Updating existing record
         const originalWord = wordList.value;
         if (originalWord == word) { // Word options changed
-          // console.log('Modifying existing word options: ', word, wordOptions); // DEBUG
+          logger.info(`Modifying existing word options for '${word}'.`, wordOptions);
           this.cfg.words[word] = wordOptions;
         } else { // Existing word modified
-          // console.log('Modifying existing word: ', word, wordOptions); // DEBUG
+          logger.info(`Rename existing word '${originalWord}' to '${word}'.`, wordOptions);
           added = this.cfg.addWord(word, wordOptions);
           if (added) {
             delete this.cfg.words[originalWord];

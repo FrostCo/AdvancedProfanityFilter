@@ -54,8 +54,8 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
   if (details.reason == 'install') {
     chrome.runtime.openOptionsPage();
   } else if (details.reason == 'update') {
-    // const thisVersion = chrome.runtime.getManifest().version;
-    // console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion);
+    const thisVersion = chrome.runtime.getManifest().version;
+    logger.info(`Updated from ${details.previousVersion} to ${thisVersion}`);
 
     // Open options page to show new features
     // chrome.runtime.openOptionsPage();
