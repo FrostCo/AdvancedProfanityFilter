@@ -351,7 +351,7 @@ export default class WebFilter extends Filter {
         if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter });
         if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
       } catch (e) {
-        if (e !== 'Error: Extension context invalidated.') {
+        if (e.message !== 'Extension context invalidated.') {
           logger.warn('Failed to sendMessage', e);
         }
       }
