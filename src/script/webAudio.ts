@@ -566,7 +566,7 @@ export default class WebAudio {
   }
 
   async processExternalSub(video: HTMLVideoElement, rule) {
-    const textTrack = this.getVideoTextTrack(video, rule, 'externalSubTrackLabel');
+    const textTrack = this.getVideoTextTrack(video.textTracks, rule, 'externalSubTrackLabel');
     if (!this.fetching && !textTrack) {
       try {
         const subsData = getGlobalVariable(rule.externalSubVar);
@@ -597,7 +597,7 @@ export default class WebAudio {
               }
             }
           } else {
-            throw('Failed to download external subtitles.');
+            throw(`Failed to download external subtitles from '${found[rule.externalSubURLKey]}'.`);
           }
         } else {
           throw(`Failed to find subtitle variable: ${rule.externalSubVar}`);
