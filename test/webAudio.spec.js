@@ -57,7 +57,7 @@ describe('WebAudio', function() {
       expect(audio.getVideoTextTrack(video.textTracks, rule)).to.eq(textTrack0);
     });
 
-    it ('Match on label and language and kind', function() {
+    it('Match on label and language and kind', function() {
       const audio = new WebAudio(filter);
       const rule = { mode: 'cue', videoCueLanguage: 'en-US', videoCueLabel: 'English', videoCueKind: 'subtitles', videoCueRequireShowing: false };
       const video = newVideo();
@@ -70,7 +70,7 @@ describe('WebAudio', function() {
       expect(audio.getVideoTextTrack(video.textTracks, rule)).to.eq(textTrack1);
     });
 
-    it ('Require showing', function() {
+    it('Require showing', function() {
       const audio = new WebAudio(filter);
       const rule = { mode: 'cue', videoCueLanguage: 'en-US', videoCueLabel: 'English', videoCueKind: 'subtitles', videoCueRequireShowing: true };
       const video = newVideo();
@@ -83,7 +83,7 @@ describe('WebAudio', function() {
       expect(audio.getVideoTextTrack(video.textTracks, rule)).to.eq(textTrack0);
     });
 
-    it ('Return first match with cues when no matches are found', function() {
+    it('Return first match with cues when no matches are found', function() {
       const audio = new WebAudio(filter);
       const rule = { mode: 'cue', videoCueLanguage: 'es', videoCueLabel: 'Spanish', videoCueRequireShowing: false };
       const video = newVideo();
@@ -93,7 +93,20 @@ describe('WebAudio', function() {
       expect(audio.getVideoTextTrack(video.textTracks, rule)).to.eq(textTrack0);
     });
 
-    it ('Use the override value', function() {
+    it('Return first match when 2 identically scored matches are found (precedence)', function() {
+      const audio = new WebAudio(filter);
+      const rule = { mode: 'cue', videoCueLanguage: 'es', videoCueLabel: 'Spanish', videoCueRequireShowing: false };
+      const video = newVideo();
+      video.addTextTrack('captions', '', 'es');
+      const textTrack0 = video.textTracks[0];
+      textTrack0.addCue('0:00:10', '0:00:20', 'First sample text');
+      video.addTextTrack('captions', 'Spanish (text)', 'es');
+      const textTrack1 = video.textTracks[1];
+      textTrack1.addCue('0:00:10', '0:00:20', 'First sample text');
+      expect(audio.getVideoTextTrack(video.textTracks, rule)).to.eq(textTrack0);
+    });
+
+    it('Use the override value', function() {
       const audio = new WebAudio(filter);
       const rule = { mode: 'cue', videoCueLanguage: 'en-US', videoCueLabel: 'English', videoCueKind: 'subtitles', externalSubTrackLabel: 'APF' };
       const video = newVideo();
