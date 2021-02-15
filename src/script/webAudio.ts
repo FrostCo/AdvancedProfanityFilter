@@ -198,7 +198,7 @@ export default class WebAudio {
     let bestScore = 0;
     let foundCues = false; // Return the first match with cues if no other matches are found
     let perfectScore = 0;
-    if (rule.overrideKey) { perfectScore += 1000; }
+    if (overrideKey && rule[overrideKey]) { perfectScore += 1000; }
     if (rule.videoCueLabel) { perfectScore += 100; }
     if (rule.videoCueLanguage) { perfectScore += 10; }
     if (rule.videoCueKind) { perfectScore += 1; } // Add one, because we will default to 'captions'/'subtitles'
@@ -209,7 +209,7 @@ export default class WebAudio {
       if (rule.videoCueRequireShowing && textTrack.mode !== 'showing') { continue; }
 
       let currentScore = 0;
-      if (overrideKey && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings[overrideKey], rule[overrideKey])) { currentScore += 1000; }
+      if (overrideKey && rule[overrideKey] && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings[overrideKey], rule[overrideKey])) { currentScore += 1000; }
       if (rule.videoCueLabel && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueLabel, rule.videoCueLabel)) { currentScore += 100; }
       if (rule.videoCueLanguage && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueLanguage, rule.videoCueLanguage)) { currentScore += 10; }
       if (rule.videoCueKind) {
