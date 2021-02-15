@@ -525,8 +525,7 @@ export default class OptionPage {
       OptionPage.show(document.getElementById('main'));
     }
 
-    if (this.cfg.darkMode) { this.applyTheme(); }
-
+    this.applyTheme();
     this.populateOptions();
   }
 
