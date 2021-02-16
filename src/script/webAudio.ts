@@ -10,6 +10,7 @@ export default class WebAudio {
   cueRuleIds: number[];
   enabledRuleIds: number[];
   fetching: boolean;
+  fillerAudio: HTMLAudioElement;
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
@@ -30,6 +31,20 @@ export default class WebAudio {
 
   static readonly brTagRegExp = new RegExp('<br>', 'i');
   static readonly DefaultVideoSelector = 'video';
+  static readonly FillerConfig = {
+    beep: {
+      fileName: 'audio/beep.mp3',
+      volume: 0.2,
+    },
+    crickets: {
+      fileName: 'audio/crickets.mp3',
+      volume: 0.4,
+    },
+    static: {
+      fileName: 'audio/static.mp3',
+      volume: 0.3,
+    },
+  };
   static readonly TextTrackRuleMappings = {
     externalSubTrackLabel: 'label',
     videoCueKind: 'kind',
@@ -38,10 +53,11 @@ export default class WebAudio {
   };
 
   constructor(filter: WebFilter | BookmarkletFilter) {
+    this.filter = filter;
     this.cueRuleIds = [];
     this.enabledRuleIds = [];
     this.watcherRuleIds = [];
-    this.filter = filter;
+    if (this.filter.extension) { this.fillerAudio = this.initFillerAudio(this.filter.cfg.fillerAudio); }
     this.lastFilteredNode = null;
     this.lastFilteredText = '';
     this.lastProcessedText = '';
@@ -302,6 +318,25 @@ export default class WebAudio {
     this.initDisplaySelector(rule);
   }
 
+  initFillerAudio(name: string = ''): HTMLAudioElement {
+    const fillerConfig = WebAudio.FillerConfig[name];
+    if (fillerConfig) {
+      const url = chrome.runtime.getURL(fillerConfig.fileName);
+      const audioFiller = new Audio();
+      audioFiller.src = url;
+      audioFiller.loop = true;
+      if (fillerConfig.volume) { audioFiller.volume = fillerConfig.volume; }
+      if (fillerConfig.loopAfter) {
+        audioFiller.ontimeupdate = () => {
+          if (audioFiller.currentTime > fillerConfig.loopAfter) {
+            audioFiller.currentTime = 0;
+          }
+        };
+      }
+      return audioFiller;
+    }
+  }
+
   initRules() {
     this.rules.forEach((rule, index) => {
       if (
@@ -377,6 +412,7 @@ export default class WebAudio {
             this.volume = video.volume; // Save original volume
             video.volume = 0;
           }
+          if (this.fillerAudio) { this.playFillerAudio(); }
           break;
       }
     }
@@ -538,6 +574,10 @@ export default class WebAudio {
     return cues;
   }
 
+  playFillerAudio() {
+    this.fillerAudio.play();
+  }
+
   playing(video: HTMLVideoElement): boolean {
     return !!(video && video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
@@ -660,6 +700,11 @@ export default class WebAudio {
     }
   }
 
+  stopFillerAudio() {
+    this.fillerAudio.pause();
+    this.fillerAudio.currentTime = 0;
+  }
+
   // Checks if a node is a supported audio node.
   // Returns rule id upon first match, otherwise returns false
   supportedNode(node) {
@@ -737,6 +782,7 @@ export default class WebAudio {
           chrome.runtime.sendMessage({ mute: false });
           break;
         case Constants.MuteMethods.Video:
+          if (this.fillerAudio) { this.stopFillerAudio(); }
           if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.DefaultVideoSelector); }
           if (video && video.volume != null) {
             video.volume = this.volume;

@@ -531,6 +531,7 @@ export default class OptionPage {
 
   populateAudio() {
     const muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
+    const fillerAudioSelect = document.getElementById('fillerAudioSelect') as HTMLSelectElement;
     const muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
     const muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
     const selectedMuteMethod = document.querySelector(`input[name=audioMuteMethod][value='${this.cfg.muteMethod}']`) as HTMLInputElement;
@@ -540,6 +541,7 @@ export default class OptionPage {
     const audioYouTubeAutoSubsMax = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
     const customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
     muteAudioInput.checked = this.cfg.muteAudio;
+    fillerAudioSelect.value = this.cfg.fillerAudio;
     muteAudioOnlyInput.checked = this.cfg.muteAudioOnly;
     muteCueRequireShowingInput.checked = this.cfg.muteCueRequireShowing;
     this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
@@ -1084,6 +1086,7 @@ export default class OptionPage {
     const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     const domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
     const muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
+    const fillerAudioSelect = document.getElementById('fillerAudioSelect') as HTMLSelectElement;
     const muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
     const muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
     const muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
@@ -1105,6 +1108,7 @@ export default class OptionPage {
     this.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
     this.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
     this.cfg.muteAudio = muteAudioInput.checked;
+    this.cfg.fillerAudio = fillerAudioSelect.value;
     this.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
     this.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
     this.cfg.muteMethod = parseInt(muteMethodInput.value);
@@ -1558,6 +1562,7 @@ document.getElementById('domainRemove').addEventListener('click', (e) => { optio
 // Audio
 document.getElementById('muteAudio').addEventListener('click', (e) => { option.saveOptions(e); });
 document.getElementById('supportedAudioSites').addEventListener('click', (e) => { option.showSupportedAudioSites(); });
+document.getElementById('fillerAudioSelect').addEventListener('change', (e) => { option.saveOptions(e); });
 document.getElementById('muteAudioOnly').addEventListener('click', (e) => { option.saveOptions(e); });
 document.getElementById('muteCueRequireShowing').addEventListener('click', (e) => { option.saveOptions(e); });
 document.querySelectorAll('#audioMuteMethod input').forEach((el) => { el.addEventListener('click', (e) => { option.saveOptions(e); }); });

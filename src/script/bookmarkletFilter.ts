@@ -23,6 +23,7 @@ export default class BookmarkletFilter extends Filter {
   audioWordlistId: number;
   cfg: WebConfig;
   domain: Domain;
+  extension: boolean;
   hostname: string;
   iframe: Location;
   location: Location | URL;
@@ -34,6 +35,7 @@ export default class BookmarkletFilter extends Filter {
 
   constructor() {
     super();
+    this.extension = false;
     this.audioWordlistId = 0;
     this.mutePage = false;
     this.processMutationTarget = false;

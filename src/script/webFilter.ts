@@ -15,6 +15,7 @@ export default class WebFilter extends Filter {
   audioWordlistId: number;
   cfg: WebConfig;
   domain: Domain;
+  extension: boolean;
   hostname: string;
   iframe: Location;
   location: Location | URL;
@@ -28,6 +29,7 @@ export default class WebFilter extends Filter {
   constructor() {
     super();
     this.audioWordlistId = 0;
+    this.extension = true;
     this.mutePage = false;
     this.processMutationTarget = false;
     this.summary = {};
