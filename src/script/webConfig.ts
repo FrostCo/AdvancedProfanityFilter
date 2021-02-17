@@ -8,6 +8,7 @@ export default class WebConfig extends Config {
   darkMode: boolean;
   domains: { [site: string]: DomainCfg };
   enabledDomainsOnly: boolean;
+  fillerAudio: string;
   muteAudio: boolean;
   muteAudioOnly: boolean;
   muteCueRequireShowing: boolean;
@@ -19,11 +20,12 @@ export default class WebConfig extends Config {
   youTubeAutoSubsMin: number;
 
   static readonly _classDefaults = {
-    domains: {},
     audioWordlistId: 0,
     customAudioSites: null,
     darkMode: false,
+    domains: {},
     enabledDomainsOnly: false,
+    fillerAudio: '',
     muteAudio: false,
     muteAudioOnly: false,
     muteCueRequireShowing: false,
@@ -147,7 +149,9 @@ export default class WebConfig extends Config {
   reset() {
     return new Promise((resolve, reject) => {
       chrome.storage.sync.clear(() => {
-        resolve(chrome.runtime.lastError ? 1 : 0);
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError.message)
+          : resolve(0);
       });
     });
   }
@@ -189,7 +193,9 @@ export default class WebConfig extends Config {
 
     return new Promise((resolve, reject) => {
       chrome.storage.sync.set(data, () => {
-        resolve(chrome.runtime.lastError ? 1 : 0);
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError.message)
+          : resolve(0);
       });
     });
   }

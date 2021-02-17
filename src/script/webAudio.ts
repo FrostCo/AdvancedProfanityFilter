@@ -3,11 +3,14 @@ import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
 import { getGlobalVariable, hmsToSeconds, makeRequest, secondsToHMS } from './lib/helper';
+import Logger from './lib/logger';
+const logger = new Logger();
 
 export default class WebAudio {
   cueRuleIds: number[];
   enabledRuleIds: number[];
   fetching: boolean;
+  fillerAudio: HTMLAudioElement;
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
@@ -28,12 +31,33 @@ export default class WebAudio {
 
   static readonly brTagRegExp = new RegExp('<br>', 'i');
   static readonly DefaultVideoSelector = 'video';
+  static readonly FillerConfig = {
+    beep: {
+      fileName: 'audio/beep.mp3',
+      volume: 0.2,
+    },
+    crickets: {
+      fileName: 'audio/crickets.mp3',
+      volume: 0.4,
+    },
+    static: {
+      fileName: 'audio/static.mp3',
+      volume: 0.3,
+    },
+  };
+  static readonly TextTrackRuleMappings = {
+    externalSubTrackLabel: 'label',
+    videoCueKind: 'kind',
+    videoCueLabel: 'label',
+    videoCueLanguage: 'language',
+  };
 
   constructor(filter: WebFilter | BookmarkletFilter) {
+    this.filter = filter;
     this.cueRuleIds = [];
     this.enabledRuleIds = [];
     this.watcherRuleIds = [];
-    this.filter = filter;
+    if (this.filter.extension) { this.fillerAudio = this.initFillerAudio(this.filter.cfg.fillerAudio); }
     this.lastFilteredNode = null;
     this.lastFilteredText = '';
     this.lastProcessedText = '';
@@ -184,24 +208,44 @@ export default class WebAudio {
     this.unmuteTimeout = null;
   }
 
-  getVideoTextTrack(video: HTMLVideoElement, rule: AudioRule, ruleKey: string = 'videoCueLanguage') {
-    if (video.textTracks && video.textTracks.length > 0) {
-      let textTrackKey;
-      switch(ruleKey) {
-        case 'videoCueLanguage': textTrackKey = 'language'; break;
-        case 'videoCueLabel': textTrackKey = 'label'; break;
-        case 'externalSubTrackLabel': textTrackKey = 'label'; break;
+  // Priority (requires cues): [overrideKey], label, language, kind (prefer caption/subtitle), order
+  getVideoTextTrack(textTracks, rule, overrideKey?: string): TextTrack {
+    let bestIndex = 0;
+    let bestScore = 0;
+    let foundCues = false; // Return the first match with cues if no other matches are found
+    let perfectScore = 0;
+    if (overrideKey && rule[overrideKey]) { perfectScore += 1000; }
+    if (rule.videoCueLabel) { perfectScore += 100; }
+    if (rule.videoCueLanguage) { perfectScore += 10; }
+    if (rule.videoCueKind) { perfectScore += 1; } // Add one, because we will default to 'captions'/'subtitles'
+
+    for (let i = 0; i < textTracks.length; i++) {
+      const textTrack = textTracks[i];
+      if (textTrack.cues.length === 0) { continue; }
+      if (rule.videoCueRequireShowing && textTrack.mode !== 'showing') { continue; }
+
+      let currentScore = 0;
+      if (overrideKey && rule[overrideKey] && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings[overrideKey], rule[overrideKey])) { currentScore += 1000; }
+      if (rule.videoCueLabel && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueLabel, rule.videoCueLabel)) { currentScore += 100; }
+      if (rule.videoCueLanguage && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueLanguage, rule.videoCueLanguage)) { currentScore += 10; }
+      if (rule.videoCueKind) {
+        if (this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueKind, rule.videoCueKind)) { currentScore += 1; }
+      } else {
+        if (
+          this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueKind, 'captions')
+          || this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueKind, 'subtitles')
+        ) { currentScore += 1; }
       }
 
-      for (let i = 0; i < video.textTracks.length; i++) {
-        if (this.matchTextTrack(video.textTracks[i], rule, textTrackKey, ruleKey)) {
-          return video.textTracks[i];
-        }
+      if (currentScore === perfectScore) { return textTrack; }
+      if (currentScore > bestScore || !foundCues) {
+        bestScore = currentScore;
+        bestIndex = i;
+        foundCues = true;
       }
-
-      // Return the first textTrack if it has cues even if it doesn't match label or language
-      if (video.textTracks[0] && video.textTracks[0].cues.length) { return video.textTracks[0]; }
     }
+
+    if (foundCues) { return textTracks[bestIndex]; }
   }
 
   // Some sites ignore textTrack.mode = 'hidden' and will still show captions
@@ -255,6 +299,7 @@ export default class WebAudio {
       if (rule.externalSubFormatKey === undefined) { rule.externalSubFormatKey = 'format'; }
       if (rule.externalSubTrackLabel === undefined) { rule.externalSubTrackLabel = 'APF'; }
     }
+    this.initDisplaySelector(rule);
   }
 
   initDisplaySelector(rule: AudioRule) {
@@ -271,6 +316,25 @@ export default class WebAudio {
 
   initElementRule(rule: AudioRule) {
     this.initDisplaySelector(rule);
+  }
+
+  initFillerAudio(name: string = ''): HTMLAudioElement {
+    const fillerConfig = WebAudio.FillerConfig[name];
+    if (fillerConfig) {
+      const url = chrome.runtime.getURL(fillerConfig.fileName);
+      const audioFiller = new Audio();
+      audioFiller.src = url;
+      audioFiller.loop = true;
+      if (fillerConfig.volume) { audioFiller.volume = fillerConfig.volume; }
+      if (fillerConfig.loopAfter) {
+        audioFiller.ontimeupdate = () => {
+          if (audioFiller.currentTime > fillerConfig.loopAfter) {
+            audioFiller.currentTime = 0;
+          }
+        };
+      }
+      return audioFiller;
+    }
   }
 
   initRules() {
@@ -333,16 +397,6 @@ export default class WebAudio {
     this.initDisplaySelector(rule);
   }
 
-  matchTextTrack(textTrack: TextTrack, rule: AudioRule, textTrackKey?: string, ruleKey?: string): boolean {
-    if (
-      textTrack.cues.length > 0
-      && (!rule.videoCueRequireShowing || textTrack.mode === 'showing')
-    ) {
-      // Return true if both keys weren't provided, the rule doesn't have a have for key, or if both keys match the textTrack
-      return ((!textTrackKey || !ruleKey || !rule[ruleKey]) || textTrack[textTrackKey] == rule[ruleKey]);
-    }
-  }
-
   mute(rule?: AudioRule, video?: HTMLVideoElement): void {
     if (!this.muted) {
       this.muted = true;
@@ -358,6 +412,7 @@ export default class WebAudio {
             this.volume = video.volume; // Save original volume
             video.volume = 0;
           }
+          if (this.fillerAudio) { this.playFillerAudio(); }
           break;
       }
     }
@@ -374,8 +429,7 @@ export default class WebAudio {
       if (options.position) { cue.position = this.parseLineAndPositionSetting(options.position); }
       return cue;
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(`APF: Failed to add cue: ( start: ${start}, end: ${end}, text: ${text} )`, e);
+      logger.error(`[Audio] Failed to add cue: ( start: ${start}, end: ${end}, text: ${text} )`, e);
     }
   }
 
@@ -520,6 +574,10 @@ export default class WebAudio {
     return cues;
   }
 
+  playFillerAudio() {
+    this.fillerAudio.play();
+  }
+
   playing(video: HTMLVideoElement): boolean {
     return !!(video && video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
   }
@@ -548,7 +606,7 @@ export default class WebAudio {
   }
 
   async processExternalSub(video: HTMLVideoElement, rule) {
-    const textTrack = this.getVideoTextTrack(video, rule, 'externalSubTrackLabel');
+    const textTrack = this.getVideoTextTrack(video.textTracks, rule, 'externalSubTrackLabel');
     if (!this.fetching && !textTrack) {
       try {
         const subsData = getGlobalVariable(rule.externalSubVar);
@@ -579,14 +637,13 @@ export default class WebAudio {
               }
             }
           } else {
-            throw('Failed to download external subtitles.');
+            throw(`Failed to download external subtitles from '${found[rule.externalSubURLKey]}'.`);
           }
         } else {
           throw(`Failed to find subtitle variable: ${rule.externalSubVar}`);
         }
       } catch(e) {
-        // eslint-disable-next-line no-console
-        console.error('APF: Error using external subtitles. ', e);
+        logger.error(`[Audio] Error using external subtitles for ${this.filter.hostname}.`, e);
       }
     }
   }
@@ -641,6 +698,11 @@ export default class WebAudio {
         if (container) { container.style.setProperty('display', rule.displayShow); }
       }
     }
+  }
+
+  stopFillerAudio() {
+    this.fillerAudio.pause();
+    this.fillerAudio.currentTime = 0;
   }
 
   // Checks if a node is a supported audio node.
@@ -698,6 +760,10 @@ export default class WebAudio {
     return false;
   }
 
+  textTrackKeyTest(textTrack: TextTrack, key: string, value: string) {
+    return (textTrack[key] && value && textTrack[key] === value);
+  }
+
   unmute(rule?: AudioRule, video?: HTMLVideoElement, delayed: boolean = false): void {
     if (this.muted) {
       // If we haven't already delayed unmute and we should (rule.unmuteDelay), set the timeout
@@ -716,6 +782,7 @@ export default class WebAudio {
           chrome.runtime.sendMessage({ mute: false });
           break;
         case Constants.MuteMethods.Video:
+          if (this.fillerAudio) { this.stopFillerAudio(); }
           if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.DefaultVideoSelector); }
           if (video && video.volume != null) {
             video.volume = this.volume;
@@ -761,9 +828,7 @@ export default class WebAudio {
       const video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
         if (rule.externalSub) { instance.processExternalSub(video, rule); }
-
-        const ruleKey = rule.externalSub ? 'externalSubTrackLabel' : 'videoCueLanguage';
-        const textTrack = instance.getVideoTextTrack(video, rule, ruleKey);
+        const textTrack = instance.getVideoTextTrack(video.textTracks, rule);
 
         if (textTrack && !textTrack.oncuechange) {
           if (!rule.videoCueHideCues && rule.showSubtitles === Constants.ShowSubtitles.None) { textTrack.mode = 'hidden'; }
@@ -797,6 +862,20 @@ export default class WebAudio {
                   switch (rule.showSubtitles) {
                     case Constants.ShowSubtitles.Filtered: textTrack.mode = 'hidden'; break;
                     case Constants.ShowSubtitles.Unfiltered: textTrack.mode = 'showing'; break;
+                  }
+                }
+              }
+
+              if (rule.displaySelector) {
+                if (filtered) {
+                  switch (rule.showSubtitles) {
+                    case Constants.ShowSubtitles.Filtered: instance.showSubtitles(rule); break;
+                    case Constants.ShowSubtitles.Unfiltered: instance.hideSubtitles(rule); break;
+                  }
+                } else {
+                  switch (rule.showSubtitles) {
+                    case Constants.ShowSubtitles.Filtered: instance.hideSubtitles(rule); break;
+                    case Constants.ShowSubtitles.Unfiltered: instance.showSubtitles(rule); break;
                   }
                 }
               }

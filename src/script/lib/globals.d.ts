@@ -30,6 +30,7 @@ interface AudioRule {
   tagName?: string;                 // [Element*,ElementChild*] node.nodeName
   unmuteDelay?: number;             // [Element,ElementChild,Watcher] Positive number (in ms) to delay unmuting
   videoCueHideCues?: boolean;       // [Cue] Remove/hide cues instead of setting textTrack.mode = 'hidden'
+  videoCueKind?: string;            // [Cue] Kind of video TextTrack ('captions', 'subtitles', etc.)
   videoCueLabel?: string;           // [Cue] Label for video TextTrack
   videoCueLanguage?: string;        // [Cue] Language for video TextTrack
   videoCueRequireShowing?: boolean; // [Cue] Override global setting for muteCueRequireShowing

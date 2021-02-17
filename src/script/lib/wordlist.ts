@@ -1,5 +1,7 @@
 import Word from './word';
 import Config from './config';
+import Logger from './logger';
+const logger = new Logger();
 
 export default class Wordlist {
   all: Word[];
@@ -26,8 +28,7 @@ export default class Wordlist {
           this.all.push(word);
           this.regExps.push(word.regExp);
         } catch (e) {
-          // eslint-disable-next-line no-console
-          console.error(`APF: Failed to add word: '${wordStr}'`);
+          logger.warn(`Failed to add word to wordlist: '${wordStr}'.`);
         }
       }
     });

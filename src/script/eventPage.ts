@@ -2,6 +2,8 @@ import DataMigration from './dataMigration';
 import Domain from './domain';
 import WebConfig from './webConfig';
 import { formatNumber } from './lib/helper';
+import Logger from './lib/logger';
+const logger = new Logger();
 
 const BackgroundStorage: BackgroundStorage = {
   tabs: {},
@@ -52,8 +54,8 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
   if (details.reason == 'install') {
     chrome.runtime.openOptionsPage();
   } else if (details.reason == 'update') {
-    // const thisVersion = chrome.runtime.getManifest().version;
-    // console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion);
+    const thisVersion = chrome.runtime.getManifest().version;
+    logger.info(`Updated from ${details.previousVersion} to ${thisVersion}`);
 
     // Open options page to show new features
     // chrome.runtime.openOptionsPage();
@@ -128,8 +130,12 @@ async function processSelection(action: string, selection: string) {
   const result = cfg[action](selection);
 
   if (result) {
-    const saved = await cfg.save();
-    if (!saved) { chrome.tabs.reload(); }
+    try {
+      await cfg.save();
+      chrome.tabs.reload();
+    } catch(e) {
+      logger.errorTime(`Failed to process selection '${selection}'.`, e);
+    }
   }
 }
 
@@ -179,8 +185,12 @@ async function toggleDomain(hostname: string, action: string) {
       domain.advanced = !domain.advanced; break;
   }
 
-  const error = await domain.save(cfg);
-  if (!error) { chrome.tabs.reload(); }
+  try {
+    await domain.save(cfg);
+    chrome.tabs.reload();
+  } catch(e) {
+    logger.error(`Failed to modify '${action}' for domain '${domain.cfgKey}'.`, e, domain);
+  }
 }
 
 function toggleTabDisable(id: number) {
