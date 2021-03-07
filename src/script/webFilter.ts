@@ -234,8 +234,9 @@ export default class WebFilter extends Filter {
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
-    logger.info('Filter initialized.', this);
+    logger.infoTime('Filter initialized.', this);
     if (!this.audioOnly) { this.processNode(document, this.wordlistId); }
+    logger.infoTime('Initial page filtered.');
     this.updateCounterBadge();
     this.startObserving(document);
   }
@@ -245,6 +246,7 @@ export default class WebFilter extends Filter {
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, stats); }
     if (node.childElementCount > 0) {
       const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+      // Note: This while loop skips processing on first node
       while(treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
           treeWalker.currentNode.childNodes.forEach((childNode) => {
