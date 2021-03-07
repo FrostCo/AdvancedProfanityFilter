@@ -82,6 +82,7 @@ export default class WebAudioSites {
         tagName: 'DIV',
       }
     ],
+    'www.paramountplus.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'play.google.com': [{ className: 'lava-timed-text-window', mode: 'element', subtitleSelector: 'span.lava-timed-text-caption', tagName: 'DIV' }],
     'play.hbomax.com': [{ mode: 'elementChild', parentSelectorAll: 'div.class3 > span, div.class28 > span', showSubtitles: 0, tagName: 'SPAN' }],
     'www.hulu.com': [
