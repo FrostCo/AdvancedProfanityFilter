@@ -19,6 +19,7 @@ interface AudioRule {
   ignoreMutations?: boolean;        // [Element,ElementChild,Text,Watcher] Ignore mutations when filtering captions/subtitles
   mode: string;                     // [All*] 'cue', 'element', 'elementChild', 'text', 'watcher'
   muteMethod?: number;              // [All] Override global muteMthod (0: tab, 1: video)
+  note?: string;                    // [All] Note about the rule
   parentSelector?: string;          // [ElementChild?,Text,Watcher] parent.contains(node)
   parentSelectorAll?: string;       // [ElementChild?] Check if any parents contain the node: parent.contains(node)
   preserveWhiteSpace?: boolean;     // [Element,ElementChild] Set whiteSpace = 'pre' on subtitle elements
