@@ -11,18 +11,6 @@ export function dynamicList(list: string[], select: HTMLSelectElement, title?: s
   });
 }
 
-export function escapeHTML(str: string): string {
-  return str.replace(/([<>&"'])/g, (match, p1) => (
-    {
-      '<': '&lt;',
-      '>': '&gt;',
-      '&': '&amp;',
-      '"': '&quot;',
-      "'": '&apos;'
-    }[p1])
-  );
-}
-
 export function exportToFile(dataStr, fileName = 'data.txt') {
   const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
   const linkElement = document.createElement('a');

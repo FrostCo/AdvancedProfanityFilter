@@ -1,5 +1,5 @@
 import Constants from './lib/constants';
-import { dynamicList, escapeHTML, exportToFile, readFile, removeChildren, removeFromArray } from './lib/helper';
+import { dynamicList, exportToFile, readFile, removeChildren, removeFromArray } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
 import Domain from './domain';
@@ -743,7 +743,7 @@ export default class OptionPage {
       const optionElement = document.createElement('option');
       optionElement.value = item === list[0] ? '' : item.replace(regExp, '');
       optionElement.dataset.sensitive = regExp.test(item).toString();
-      optionElement.textContent = escapeHTML(item);
+      optionElement.textContent = item;
       whitelist.appendChild(optionElement);
     });
     this.populateWhitelistWord();
@@ -887,7 +887,7 @@ export default class OptionPage {
       const optionElement = document.createElement('option');
       optionElement.value = word === words[0] ? '' : word;
       optionElement.dataset.filtered = filteredWord;
-      optionElement.textContent = escapeHTML(filteredWord);
+      optionElement.textContent = filteredWord;
       wordsSelect.appendChild(optionElement);
     });
 

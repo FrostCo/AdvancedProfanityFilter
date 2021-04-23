@@ -1,5 +1,5 @@
 import Constants from './lib/constants';
-import { dynamicList, escapeHTML } from './lib/helper';
+import { dynamicList } from './lib/helper';
 import WebAudioSites from './webAudioSites';
 import WebConfig from './webConfig';
 import Domain from './domain';
@@ -167,9 +167,9 @@ class Popup {
         tooltipSpan.classList.add('summaryTooltip');
         tooltipSpan.classList.add('w3-tag');
         tooltipSpan.classList.add('w3-text');
-        tooltipSpan.textContent = escapeHTML(key);
+        tooltipSpan.textContent = key;
         const wordSpan = document.createElement('span');
-        wordSpan.textContent = escapeHTML(summary[key].filtered);
+        wordSpan.textContent = summary[key].filtered;
         wordCell.appendChild(tooltipSpan);
         wordCell.appendChild(wordSpan);
 

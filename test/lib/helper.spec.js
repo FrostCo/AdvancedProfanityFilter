@@ -1,17 +1,9 @@
 import { expect } from 'chai';
-import { escapeHTML, formatNumber, getVersion, hmsToSeconds, isVersionOlder, removeFromArray, secondsToHMS } from '../built/lib/helper';
+import { formatNumber, getVersion, hmsToSeconds, isVersionOlder, removeFromArray, secondsToHMS } from '../built/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 
 describe('Helper', function() {
-  describe('escapeHTML()', function() {
-    it('should return HTML safe string', function() {
-      expect(escapeHTML('a>b')).to.eql('a&gt;b');
-      expect(escapeHTML('(?<!un)censored')).to.eql('(?&lt;!un)censored');
-      expect(escapeHTML('already safe')).to.eql('already safe');
-    });
-  });
-
   describe('formatNumber()', function() {
     it('Format numbers for counter display', function() {
       expect(formatNumber(999)).to.eql('999');
