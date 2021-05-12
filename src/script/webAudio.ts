@@ -248,9 +248,9 @@ export default class WebAudio {
   }
 
   hideSubtitles(rule: AudioRule, subtitles?) {
-    if (rule.displayVisibility && subtitles) {
+    if (rule.displayVisibility && rule._displayElement) {
       // TODO: Only tested with Watcher: HBO Max. This may be a much better solution
-      subtitles.style.visibility = 'hidden';
+      rule._displayElement.style.visibility = 'hidden';
     } else if (rule.displaySelector) {
       const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
@@ -731,9 +731,9 @@ export default class WebAudio {
   }
 
   showSubtitles(rule, subtitles?) {
-    if (rule.displayVisibility && subtitles) {
+    if (rule.displayVisibility && rule._displayElement) {
       // TODO: Only tested with Watcher: HBO Max. This may be a much better solution
-      subtitles.style.visibility = 'visible';
+      rule._displayElement.style.visibility = 'visible';
     } else if (rule.displaySelector) {
       const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
@@ -852,37 +852,42 @@ export default class WebAudio {
       if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
       const data: WatcherData = { initialCall: true };
       let captions;
-      let displayElement = null;
 
       if (rule.parentSelectorAll) { // TODO: Only tested with HBO Max
         const parents = Array.from(document.querySelectorAll(rule.parentSelectorAll)).filter((result) => {
           return rule._dynamic && result.textContent !== rule.dynamicTextKey;
         }) as HTMLElement[];
 
-        if (parents[0] && parents[0].parentElement && parents[0].parentElement.parentElement && parents[0].parentElement.parentElement.parentElement) {
-          displayElement = parents[0].parentElement.parentElement.parentElement;
+        if (
+          !rule._displayElement
+          && parents[0]
+          && parents[0].parentElement
+          && parents[0].parentElement.parentElement
+          && parents[0].parentElement.parentElement.parentElement
+        ) {
+          rule._displayElement = parents[0].parentElement.parentElement.parentElement;
         }
         captions = parents.map((parent) => parent.querySelector(rule.subtitleSelector));
         if (captions.length) {
           instance.processWatcherCaptionsArray(rule, captions, data);
         } else { // If there are no captions/subtitles: unmute and hide
-          instance.watcherSimpleUnmute(rule, video, displayElement);
+          instance.watcherSimpleUnmute(rule, video);
         }
       } else if (rule.subtitleSelector) {
         captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
         if (captions && captions.textContent && captions.textContent.trim()) {
           instance.processWatcherCaptions(rule, captions, data);
         } else { // If there are no captions/subtitles: unmute and hide
-          instance.watcherSimpleUnmute(rule, video, displayElement);
+          instance.watcherSimpleUnmute(rule, video);
         }
       }
 
       if (data.skipped) { return false; }
       // Hide/show captions/subtitles
       switch (rule.showSubtitles) {
-        case Constants.ShowSubtitles.Filtered: if (data.filtered) { instance.showSubtitles(rule, displayElement); } else { instance.hideSubtitles(rule, displayElement); } break;
-        case Constants.ShowSubtitles.Unfiltered: if (data.filtered) { instance.hideSubtitles(rule, displayElement); } else { instance.showSubtitles(rule, displayElement); } break;
-        case Constants.ShowSubtitles.None: instance.hideSubtitles(rule, displayElement); break;
+        case Constants.ShowSubtitles.Filtered: if (data.filtered) { instance.showSubtitles(rule); } else { instance.hideSubtitles(rule); } break;
+        case Constants.ShowSubtitles.Unfiltered: if (data.filtered) { instance.hideSubtitles(rule); } else { instance.showSubtitles(rule); } break;
+        case Constants.ShowSubtitles.None: instance.hideSubtitles(rule); break;
       }
       if (data.filtered) { instance.filter.updateCounterBadge(); }
     } else {
@@ -956,9 +961,9 @@ export default class WebAudio {
     }
   }
 
-  watcherSimpleUnmute(rule: AudioRule, video: HTMLVideoElement, displayElement) {
+  watcherSimpleUnmute(rule: AudioRule, video: HTMLVideoElement) {
     this.unmute(rule, video);
-    if (rule.showSubtitles > 0) { this.hideSubtitles(rule, displayElement); }
+    if (rule.showSubtitles > 0) { this.hideSubtitles(rule, rule._displayElement); }
   }
 
   youTubeAutoSubsCurrentRow(node): boolean {

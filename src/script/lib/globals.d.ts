@@ -1,4 +1,5 @@
 interface AudioRule {
+  _displayElement?: HTMLElement     // Element to display/hide
   _dynamic?: boolean;               // [Dynamic] Set to true on a dynamic rule
   checkInterval?: number;           // [Watcher] Set a custom watch interval (in ms, Default: 20)
   className?: string;               // [Element] node.className.includes()
