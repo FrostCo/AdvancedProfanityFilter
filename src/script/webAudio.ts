@@ -79,7 +79,7 @@ export default class WebAudio {
     this.rules = this.sites[filter.hostname];
     if (this.rules) {
       if (!Array.isArray(this.rules)) { this.rules = [this.rules]; }
-      this.initRules();
+      this.rules.forEach((rule) => { this.initRule(rule); });
       if (this.enabledRuleIds.length > 0) {
         this.supportedPage = true;
         if(['m.youtube.com', 'tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) {
@@ -90,14 +90,6 @@ export default class WebAudio {
           const youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MatchMethods.Partial, repeat: false, separators: false, sub: '' };
           this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
         }
-
-        if (this.watcherRuleIds.length > 0) {
-          this.watcherRuleIds.forEach((ruleId) => {
-            setInterval(this.watcher, this.rules[ruleId].checkInterval, this, ruleId);
-          });
-        }
-
-        if (this.cueRuleIds.length > 0) { setInterval(this.watchForVideo, 250, this); }
       }
     }
   }
@@ -337,51 +329,58 @@ export default class WebAudio {
     }
   }
 
-  initRules() {
-    this.rules.forEach((rule, index) => {
-      if (
-        rule.mode === undefined
-        || ((rule.mode == 'element' || rule.mode == 'elementChild') && !rule.tagName)
-        // Skip this rule if it doesn't apply to the current page
-        || (rule.iframe === true && this.filter.iframe == null)
-        || (rule.iframe === false && this.filter.iframe != null)
-      ) {
-        rule.disabled = true;
-      }
+  initRule(rule: AudioRule) {
+    const ruleId = this.rules.indexOf(rule);
+    if (
+      rule.mode === undefined
+      || ((rule.mode == 'element' || rule.mode == 'elementChild') && !rule.tagName)
+      // Skip this rule if it doesn't apply to the current page
+      || (rule.iframe === true && this.filter.iframe == null)
+      || (rule.iframe === false && this.filter.iframe != null)
+    ) {
+      rule.disabled = true;
+    }
 
+    if (!rule.disabled) {
+      // Setup rule defaults
+      if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
+
+      // Allow rules to override global settings
+      if (rule.muteMethod == null) { rule.muteMethod = this.filter.cfg.muteMethod; }
+      if (rule.showSubtitles == null) { rule.showSubtitles = this.filter.cfg.showSubtitles; }
+
+      // Ensure proper rule values
+      if (rule.tagName != null && rule.tagName != '#text') { rule.tagName = rule.tagName.toUpperCase(); }
+
+      switch(rule.mode) {
+        case 'cue':
+          this.initCueRule(rule);
+          if (!rule.disabled) { this.cueRuleIds.push(ruleId); }
+          break;
+        case 'elementChild':
+          this.initElementChildRule(rule);
+          break;
+        case 'element':
+          this.initElementRule(rule);
+          break;
+        case 'text':
+          this.initTextRule(rule);
+          break;
+        case 'watcher':
+          this.initWatcherRule(rule);
+          if (!rule.disabled) { this.watcherRuleIds.push(ruleId); }
+          break;
+      }
       if (!rule.disabled) {
-        // Setup rule defaults
-        if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
+        this.enabledRuleIds.push(ruleId);
 
-        // Allow rules to override global settings
-        if (rule.muteMethod == null) { rule.muteMethod = this.filter.cfg.muteMethod; }
-        if (rule.showSubtitles == null) { rule.showSubtitles = this.filter.cfg.showSubtitles; }
-
-        // Ensure proper rule values
-        if (rule.tagName != null && rule.tagName != '#text') { rule.tagName = rule.tagName.toUpperCase(); }
-
-        switch(rule.mode) {
-          case 'cue':
-            this.initCueRule(rule);
-            if (!rule.disabled) { this.cueRuleIds.push(index); }
-            break;
-          case 'elementChild':
-            this.initElementChildRule(rule);
-            break;
-          case 'element':
-            this.initElementRule(rule);
-            break;
-          case 'text':
-            this.initTextRule(rule);
-            break;
-          case 'watcher':
-            this.initWatcherRule(rule);
-            if (!rule.disabled) { this.watcherRuleIds.push(index); }
-            break;
+        if (rule.mode == 'cue' && this.cueRuleIds.length === 1) { // Only for first rule
+          setInterval(this.watchForVideo, 250, this);
+        } else if (rule.mode == 'watcher') {
+          setInterval(this.watcher, rule.checkInterval, this, ruleId);
         }
-        if (!rule.disabled) { this.enabledRuleIds.push(index); }
       }
-    });
+    }
   }
 
   initTextRule(rule: AudioRule) {
