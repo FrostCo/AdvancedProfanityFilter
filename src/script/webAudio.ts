@@ -284,7 +284,6 @@ export default class WebAudio {
       if (rule.externalSubFormatKey === undefined) { rule.externalSubFormatKey = 'format'; }
       if (rule.externalSubTrackLabel === undefined) { rule.externalSubTrackLabel = 'APF'; }
     }
-    this.initDisplaySelector(rule);
   }
 
   initDisplaySelector(rule: AudioRule) {
@@ -296,12 +295,9 @@ export default class WebAudio {
 
   initElementChildRule(rule: AudioRule) {
     if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
-    this.initDisplaySelector(rule);
   }
 
-  initElementRule(rule: AudioRule) {
-    this.initDisplaySelector(rule);
-  }
+  initElementRule(rule: AudioRule) { }
 
   initFillerAudio(name: string = ''): HTMLAudioElement {
     const fillerConfig = WebAudio.FillerConfig[name];
@@ -337,6 +333,7 @@ export default class WebAudio {
     if (!rule.disabled) {
       // Setup rule defaults
       if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
+      this.initDisplaySelector(rule);
 
       // Allow rules to override global settings
       if (rule.muteMethod == null) { rule.muteMethod = this.filter.cfg.muteMethod; }
@@ -386,7 +383,6 @@ export default class WebAudio {
     if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
     if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.DefaultVideoSelector; }
-    this.initDisplaySelector(rule);
   }
 
   initYouTube() {
