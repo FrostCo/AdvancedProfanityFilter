@@ -82,14 +82,7 @@ export default class WebAudio {
       this.rules.forEach((rule) => { this.initRule(rule); });
       if (this.enabledRuleIds.length > 0) {
         this.supportedPage = true;
-        if(['m.youtube.com', 'tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) {
-          this.youTube = true;
-          // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
-          const youTubeAutoCensor = '[ __ ]';
-          const lists = this.wordlistId == 0 ? [] : [this.wordlistId];
-          const youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MatchMethods.Partial, repeat: false, separators: false, sub: '' };
-          this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
-        }
+        this.initYouTube();
       }
     }
   }
@@ -394,6 +387,17 @@ export default class WebAudio {
     if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.DefaultVideoSelector; }
     this.initDisplaySelector(rule);
+  }
+
+  initYouTube() {
+    if(['m.youtube.com', 'tv.youtube.com', 'www.youtube.com'].includes(this.filter.hostname)) {
+      this.youTube = true;
+      // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
+      const youTubeAutoCensor = '[ __ ]';
+      const lists = this.wordlistId == 0 ? [] : [this.wordlistId];
+      const youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MatchMethods.Partial, repeat: false, separators: false, sub: '' };
+      this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
+    }
   }
 
   mute(rule?: AudioRule, video?: HTMLVideoElement): void {
