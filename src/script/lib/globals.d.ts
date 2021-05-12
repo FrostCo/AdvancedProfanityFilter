@@ -1,4 +1,5 @@
 interface AudioRule {
+  _dynamic?: boolean;               // [Dynamic] Set to true on a dynamic rule
   checkInterval?: number;           // [Watcher] Set a custom watch interval (in ms, Default: 20)
   className?: string;               // [Element] node.className.includes()
   containsSelector?: string;        // [Element] node.querySelector() [Not commonly used]
@@ -8,6 +9,10 @@ interface AudioRule {
   displayHide?: string;             // [Element,ElementChild,Watcher] Display style for hiding captions (Default: 'none')
   displaySelector?: string;         // [Element,ElementChild,Watcher] Alternate selector to hide/show captions
   displayShow?: string;             // [Element,ElementChild,Watcher] Display style for showing captions (Default: '')
+  displayVisibility?: boolean;      // [Watcher*] Use visibility to show/hide caption container
+  dynamicClasslist?: string;        // [Dynamic] Set when a dynamicTextKey is found
+  dynamicTargetMode?: string;       // [Dynamic] Target mode for dynamic rule
+  dynamicTextKey?: string;          // [Dynamic] Key used to identify a dynamic caption node
   externalSub?: boolean;            // [Cue] [BETA]: Convert external captions/subtitles obtained from remote source to VTTCues
   externalSubFormatKey?: string;    // [Cue] [BETA]: Key name for caption/subtitle format (Default: 'format')
   externalSubTrackLabel?: string;   // [Cue] [BETA]: Label used for processed TextTrack
@@ -17,7 +22,7 @@ interface AudioRule {
   hasChildrenElements?: boolean;    // [Element] node.childElementCount > 0 [Not commonly used]
   iframe?: boolean | undefined;     // [All] Pages to run on (true: only iframes, false: no iframes, undefined: all)
   ignoreMutations?: boolean;        // [Element,ElementChild,Text,Watcher] Ignore mutations when filtering captions/subtitles
-  mode: string;                     // [All*] 'cue', 'element', 'elementChild', 'text', 'watcher'
+  mode: string;                     // [All*] 'cue', 'dynamic', 'element', 'elementChild', 'text', 'watcher'
   muteMethod?: number;              // [All] Override global muteMthod (0: tab, 1: video)
   note?: string;                    // [All] Note about the rule
   parentSelector?: string;          // [ElementChild?,Text,Watcher] parent.contains(node)
