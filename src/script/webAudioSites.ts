@@ -54,8 +54,11 @@ export default class WebAudioSites {
     'www.criterionchannel.com': [{ iframe: true, mode: 'cue', videoCueHideCues: true, videoCueRequireShowing: false }],
     'www.crunchyroll.com': [
       {
+        apfCaptions: true,
+        apfCaptionsSelector: 'vilosVttJs',
         displaySelector: 'canvas#velocity-canvas',
         externalSub: true,
+        externalSubTrackMode: 'hidden',
         externalSubVar: 'window.v1config.media.subtitles',
         iframe: true,
         mode: 'cue',

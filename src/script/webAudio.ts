@@ -87,6 +87,33 @@ export default class WebAudio {
     }
   }
 
+  apfCaptionLine(rule: AudioRule, text: string): HTMLSpanElement {
+    const line = document.createElement('span');
+    line.classList.add('APF-subtitle-line');
+    line.style.background = 'black';
+    line.style.color = 'white';
+    line.style.fontSize = '3.5vw';
+    line.style.paddingLeft = '4px';
+    line.style.paddingRight = '4px';
+    line.style.height = '18px';
+    line.textContent = text;
+    return line;
+  }
+
+  apfCaptionLines(rule: AudioRule, lines: HTMLSpanElement[]): HTMLDivElement {
+    const apfLines = document.createElement('div');
+    apfLines.classList.add('APF-subtitles');
+    apfLines.style.bottom = '10px';
+    apfLines.style.position = 'absolute';
+    apfLines.style.textAlign = 'center';
+    apfLines.style.width = '100%';
+    lines.forEach((line) => {
+      apfLines.appendChild(line);
+      apfLines.appendChild(document.createElement('br'));
+    });
+    return apfLines;
+  }
+
   clean(subtitleContainer, ruleIndex = 0): void {
     const rule = this.rules[ruleIndex];
     if (rule.mode === 'watcher') { return; } // If this is for a watcher rule, leave the text alone
@@ -280,9 +307,11 @@ export default class WebAudio {
   }
 
   initCueRule(rule: AudioRule) {
+    if (rule.apfCaptions === true) { rule.videoCueHideCues = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.DefaultVideoSelector; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
     if (rule.externalSub) {
+      if (rule.externalSubTrackMode === undefined) { rule.externalSubTrackMode = 'showing'; }
       if (rule.externalSubURLKey === undefined) { rule.externalSubURLKey = 'url'; }
       if (rule.externalSubFormatKey === undefined) { rule.externalSubFormatKey = 'format'; }
       if (rule.externalSubTrackLabel === undefined) { rule.externalSubTrackLabel = 'APF'; }
@@ -446,7 +475,7 @@ export default class WebAudio {
   newTextTrack(rule: AudioRule, video: HTMLVideoElement, cues: VTTCue[]): TextTrack {
     if (video.textTracks) {
       const track = video.addTextTrack('captions', rule.externalSubTrackLabel, rule.videoCueLanguage) as TextTrack;
-      track.mode = 'showing';
+      track.mode = rule.externalSubTrackMode;
       for (let i = 0; i < cues.length; i++) {
         track.addCue(cues[i]);
       }
@@ -909,6 +938,7 @@ export default class WebAudio {
           textTrack.oncuechange = () => {
             if (textTrack.activeCues && textTrack.activeCues.length > 0) {
               let filtered = false;
+              const apfLines = [];
 
               for (let i = 0; i < textTrack.activeCues.length; i++) {
                 const activeCue = textTrack.activeCues[i] as FilteredVTTCue;
@@ -921,6 +951,20 @@ export default class WebAudio {
                   filtered = true;
                   instance.mute(rule, video);
                 }
+
+                if (rule.apfCaptions) {
+                  const line = instance.apfCaptionLine(rule, activeCue.text);
+                  apfLines.unshift(line); // Cues seem to show up in reverse order
+                }
+              }
+
+              if (apfLines.length) {
+                // TODO: Implement rule.showSubtitles
+                const container = document.getElementById(rule.apfCaptionsSelector);
+                const old_lines = container.querySelector('div');
+                if (old_lines) { old_lines.remove(); }
+                const apfCaptions = instance.apfCaptionLines(rule, apfLines);
+                container.appendChild(apfCaptions);
               }
 
               if (!filtered) { instance.unmute(rule, video); }
