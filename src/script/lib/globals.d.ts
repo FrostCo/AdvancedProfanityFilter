@@ -1,5 +1,5 @@
 interface AudioRule {
-  _displayElement?: HTMLElement     // Element to display/hide
+  _displayElement?: HTMLElement;     // Element to display/hide
   _dynamic?: boolean;               // [Dynamic] Set to true on a dynamic rule
   apfCaptions?: boolean;            // [Cue] Display an HTML version of the caption/subtitle text: Requires videoCueHideCues = true
   apfCaptionsSelector?: string;     // [Cue] Selector for container that will hold the custom HTML captions
