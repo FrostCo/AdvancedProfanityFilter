@@ -155,11 +155,8 @@ export default class WebAudio {
       }
     });
 
-    switch (rule.showSubtitles) {
-      case Constants.ShowSubtitles.Filtered: if (filtered) { this.showSubtitles(rule, subtitles); } else { this.hideSubtitles(rule, subtitles); } break;
-      case Constants.ShowSubtitles.Unfiltered: if (filtered) { this.hideSubtitles(rule, subtitles); } else { this.showSubtitles(rule, subtitles); } break;
-      case Constants.ShowSubtitles.None: this.hideSubtitles(rule, subtitles); break;
-    }
+    const shouldBeShown = this.subtitlesShouldBeShown(rule, filtered);
+    shouldBeShown ? this.showSubtitles(rule) : this.hideSubtitles(rule);
   }
 
   cleanYouTubeAutoSubs(node): void {
@@ -777,6 +774,15 @@ export default class WebAudio {
     this.fillerAudio.currentTime = 0;
   }
 
+  subtitlesShouldBeShown(rule, filtered: boolean = false): boolean {
+    switch(rule.showSubtitles) {
+      case Constants.ShowSubtitles.All: return true;
+      case Constants.ShowSubtitles.Filtered: return filtered;
+      case Constants.ShowSubtitles.Unfiltered: return !filtered;
+      case Constants.ShowSubtitles.None: return false;
+    }
+  }
+
   // Checks if a node is a supported audio node.
   // Returns rule id upon first match, otherwise returns false
   supportedNode(node) {
@@ -912,12 +918,8 @@ export default class WebAudio {
       }
 
       if (data.skipped) { return false; }
-      // Hide/show captions/subtitles
-      switch (rule.showSubtitles) {
-        case Constants.ShowSubtitles.Filtered: if (data.filtered) { instance.showSubtitles(rule); } else { instance.hideSubtitles(rule); } break;
-        case Constants.ShowSubtitles.Unfiltered: if (data.filtered) { instance.hideSubtitles(rule); } else { instance.showSubtitles(rule); } break;
-        case Constants.ShowSubtitles.None: instance.hideSubtitles(rule); break;
-      }
+      const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
+      shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
       if (data.filtered) { instance.filter.updateCounterBadge(); }
     } else {
       if (rule.ignoreMutations) { instance.filter.startObserving(); } // Start observing when video is not playing
