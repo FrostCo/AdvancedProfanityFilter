@@ -79,25 +79,10 @@ export default class WebAudio {
     this.rules = this.sites[filter.hostname];
     if (this.rules) {
       if (!Array.isArray(this.rules)) { this.rules = [this.rules]; }
-      this.initRules();
+      this.rules.forEach((rule) => { this.initRule(rule); });
       if (this.enabledRuleIds.length > 0) {
         this.supportedPage = true;
-        if(['m.youtube.com', 'tv.youtube.com', 'www.youtube.com'].includes(filter.hostname)) {
-          this.youTube = true;
-          // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
-          const youTubeAutoCensor = '[ __ ]';
-          const lists = this.wordlistId == 0 ? [] : [this.wordlistId];
-          const youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MatchMethods.Partial, repeat: false, separators: false, sub: '' };
-          this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
-        }
-
-        if (this.watcherRuleIds.length > 0) {
-          this.watcherRuleIds.forEach((ruleId) => {
-            setInterval(this.watcher, this.rules[ruleId].checkInterval, this, ruleId);
-          });
-        }
-
-        if (this.cueRuleIds.length > 0) { setInterval(this.watchForVideo, 250, this); }
+        this.initYouTube();
       }
     }
   }
@@ -263,7 +248,10 @@ export default class WebAudio {
   }
 
   hideSubtitles(rule: AudioRule, subtitles?) {
-    if (rule.displaySelector) {
+    if (rule.displayVisibility && rule._displayElement) {
+      // TODO: Only tested with Watcher: HBO Max. This may be a much better solution
+      rule._displayElement.style.visibility = 'hidden';
+    } else if (rule.displaySelector) {
       const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
         const container = root.querySelector(rule.displaySelector) as HTMLElement;
@@ -299,7 +287,6 @@ export default class WebAudio {
       if (rule.externalSubFormatKey === undefined) { rule.externalSubFormatKey = 'format'; }
       if (rule.externalSubTrackLabel === undefined) { rule.externalSubTrackLabel = 'APF'; }
     }
-    this.initDisplaySelector(rule);
   }
 
   initDisplaySelector(rule: AudioRule) {
@@ -309,14 +296,16 @@ export default class WebAudio {
     }
   }
 
-  initElementChildRule(rule: AudioRule) {
-    if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
-    this.initDisplaySelector(rule);
+  initDynamicRule(rule: AudioRule) {
+    rule._dynamic = true;
+    if (rule.dynamicTargetMode == undefined) { rule.disabled == true; }
   }
 
-  initElementRule(rule: AudioRule) {
-    this.initDisplaySelector(rule);
+  initElementChildRule(rule: AudioRule) {
+    if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
   }
+
+  initElementRule(rule: AudioRule) { }
 
   initFillerAudio(name: string = ''): HTMLAudioElement {
     const fillerConfig = WebAudio.FillerConfig[name];
@@ -337,51 +326,62 @@ export default class WebAudio {
     }
   }
 
-  initRules() {
-    this.rules.forEach((rule, index) => {
-      if (
-        rule.mode === undefined
-        || ((rule.mode == 'element' || rule.mode == 'elementChild') && !rule.tagName)
-        // Skip this rule if it doesn't apply to the current page
-        || (rule.iframe === true && this.filter.iframe == null)
-        || (rule.iframe === false && this.filter.iframe != null)
-      ) {
-        rule.disabled = true;
-      }
+  initRule(rule: AudioRule) {
+    const ruleId = this.rules.indexOf(rule);
+    if (
+      rule.mode === undefined
+      || ((rule.mode == 'element' || rule.mode == 'elementChild') && !rule.tagName)
+      // Skip this rule if it doesn't apply to the current page
+      || (rule.iframe === true && this.filter.iframe == null)
+      || (rule.iframe === false && this.filter.iframe != null)
+    ) {
+      rule.disabled = true;
+    }
 
+    if (!rule.disabled) {
+      // Setup rule defaults
+      if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
+      this.initDisplaySelector(rule);
+
+      // Allow rules to override global settings
+      if (rule.muteMethod == null) { rule.muteMethod = this.filter.cfg.muteMethod; }
+      if (rule.showSubtitles == null) { rule.showSubtitles = this.filter.cfg.showSubtitles; }
+
+      // Ensure proper rule values
+      if (rule.tagName != null && rule.tagName != '#text') { rule.tagName = rule.tagName.toUpperCase(); }
+
+      switch(rule.mode) {
+        case 'cue':
+          this.initCueRule(rule);
+          if (!rule.disabled) { this.cueRuleIds.push(ruleId); }
+          break;
+        case 'dynamic':
+          this.initDynamicRule(rule);
+          break;
+        case 'elementChild':
+          this.initElementChildRule(rule);
+          break;
+        case 'element':
+          this.initElementRule(rule);
+          break;
+        case 'text':
+          this.initTextRule(rule);
+          break;
+        case 'watcher':
+          this.initWatcherRule(rule);
+          if (!rule.disabled) { this.watcherRuleIds.push(ruleId); }
+          break;
+      }
       if (!rule.disabled) {
-        // Setup rule defaults
-        if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
+        this.enabledRuleIds.push(ruleId);
 
-        // Allow rules to override global settings
-        if (rule.muteMethod == null) { rule.muteMethod = this.filter.cfg.muteMethod; }
-        if (rule.showSubtitles == null) { rule.showSubtitles = this.filter.cfg.showSubtitles; }
-
-        // Ensure proper rule values
-        if (rule.tagName != null && rule.tagName != '#text') { rule.tagName = rule.tagName.toUpperCase(); }
-
-        switch(rule.mode) {
-          case 'cue':
-            this.initCueRule(rule);
-            if (!rule.disabled) { this.cueRuleIds.push(index); }
-            break;
-          case 'elementChild':
-            this.initElementChildRule(rule);
-            break;
-          case 'element':
-            this.initElementRule(rule);
-            break;
-          case 'text':
-            this.initTextRule(rule);
-            break;
-          case 'watcher':
-            this.initWatcherRule(rule);
-            if (!rule.disabled) { this.watcherRuleIds.push(index); }
-            break;
+        if (rule.mode == 'cue' && this.cueRuleIds.length === 1) { // Only for first rule
+          setInterval(this.watchForVideo, 250, this);
+        } else if (rule.mode == 'watcher') {
+          setInterval(this.watcher, rule.checkInterval, this, ruleId);
         }
-        if (!rule.disabled) { this.enabledRuleIds.push(index); }
       }
-    });
+    }
   }
 
   initTextRule(rule: AudioRule) {
@@ -394,7 +394,17 @@ export default class WebAudio {
     if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
     if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.DefaultVideoSelector; }
-    this.initDisplaySelector(rule);
+  }
+
+  initYouTube() {
+    if(['m.youtube.com', 'tv.youtube.com', 'www.youtube.com'].includes(this.filter.hostname)) {
+      this.youTube = true;
+      // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
+      const youTubeAutoCensor = '[ __ ]';
+      const lists = this.wordlistId == 0 ? [] : [this.wordlistId];
+      const youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MatchMethods.Partial, repeat: false, separators: false, sub: '' };
+      this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
+    }
   }
 
   mute(rule?: AudioRule, video?: HTMLVideoElement): void {
@@ -686,12 +696,45 @@ export default class WebAudio {
     if (initialCall) { this.lastProcessedText = captions.textContent; }
   }
 
+  // TODO: Only tested with HBO Max
+  processWatcherCaptionsArray(rule: AudioRule, captions: HTMLElement[], data: WatcherData) {
+    const originalText = captions.map((caption) => caption.textContent).join(' ');
+
+    // Don't process the same filter again
+    if (this.lastProcessedText && this.lastProcessedText === originalText) {
+      data.skipped = true;
+      return false;
+    } else { // These are new captions, unmute if muted
+      this.unmute(rule);
+      this.lastProcessedText = '';
+      data.filtered = false;
+    }
+
+    captions.forEach((caption) => {
+      rule.displayVisibility = true; // Requires .textContent()
+      // Don't process empty/whitespace nodes
+      if (caption.textContent && caption.textContent.trim()) {
+        const result = this.replaceTextResult(caption.textContent);
+        if (result.modified) {
+          this.mute(rule);
+          data.filtered = true;
+          if (rule.filterSubtitles) { caption.textContent = result.filtered; }
+        }
+      }
+    });
+
+    this.lastProcessedText = captions.map((caption) => caption.textContent).join(' ');
+  }
+
   replaceTextResult(string: string, stats: boolean = true) {
     return this.filter.replaceTextResult(string, this.wordlistId, stats);
   }
 
   showSubtitles(rule, subtitles?) {
-    if (rule.displaySelector) {
+    if (rule.displayVisibility && rule._displayElement) {
+      // TODO: Only tested with Watcher: HBO Max. This may be a much better solution
+      rule._displayElement.style.visibility = 'visible';
+    } else if (rule.displaySelector) {
       const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
         const container = root.querySelector(rule.displaySelector);
@@ -753,6 +796,15 @@ export default class WebAudio {
             if (parent && parent.contains(node)) { return ruleId; }
           }
           break;
+        case 'dynamic':
+          // HBO Max: When playing a video, this node gets added, but doesn't include any context. Grabbing classList and then start watching.
+          if (node.textContent === rule.dynamicTextKey) {
+            rule.mode = rule.dynamicTargetMode;
+            // TODO: Only working for HBO Max right now
+            rule.parentSelectorAll = `${node.tagName.toLowerCase()}.${Array.from(node.classList).join('.')} ${rule.parentSelectorAll}`;
+            this.initRule(rule);
+          }
+          break;
       }
     }
 
@@ -798,25 +850,46 @@ export default class WebAudio {
 
     if (video && instance.playing(video)) {
       if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
+      const data: WatcherData = { initialCall: true };
+      let captions;
 
-      const captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
-      if (captions && captions.textContent && captions.textContent.trim()) {
-        const data: WatcherData = { initialCall: true };
-        instance.processWatcherCaptions(rule, captions, data);
-        if (data.skipped) { return false; }
+      if (rule.parentSelectorAll) { // TODO: Only tested with HBO Max
+        const parents = Array.from(document.querySelectorAll(rule.parentSelectorAll)).filter((result) => {
+          return rule._dynamic && result.textContent !== rule.dynamicTextKey;
+        }) as HTMLElement[];
 
-        // Hide/show captions/subtitles
-        switch (rule.showSubtitles) {
-          case Constants.ShowSubtitles.Filtered: if (data.filtered) { instance.showSubtitles(rule); } else { instance.hideSubtitles(rule); } break;
-          case Constants.ShowSubtitles.Unfiltered: if (data.filtered) { instance.hideSubtitles(rule); } else { instance.showSubtitles(rule); } break;
-          case Constants.ShowSubtitles.None: instance.hideSubtitles(rule); break;
+        if (
+          !rule._displayElement
+          && parents[0]
+          && parents[0].parentElement
+          && parents[0].parentElement.parentElement
+          && parents[0].parentElement.parentElement.parentElement
+        ) {
+          rule._displayElement = parents[0].parentElement.parentElement.parentElement;
         }
-
-        if (data.filtered) { instance.filter.updateCounterBadge(); }
-      } else if (rule.simpleUnmute) { // If there are no captions/subtitles: unmute and hide
-        instance.unmute(rule, video);
-        if (rule.showSubtitles > 0) { instance.hideSubtitles(rule); }
+        captions = parents.map((parent) => parent.querySelector(rule.subtitleSelector));
+        if (captions.length) {
+          instance.processWatcherCaptionsArray(rule, captions, data);
+        } else { // If there are no captions/subtitles: unmute and hide
+          instance.watcherSimpleUnmute(rule, video);
+        }
+      } else if (rule.subtitleSelector) {
+        captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
+        if (captions && captions.textContent && captions.textContent.trim()) {
+          instance.processWatcherCaptions(rule, captions, data);
+        } else { // If there are no captions/subtitles: unmute and hide
+          instance.watcherSimpleUnmute(rule, video);
+        }
       }
+
+      if (data.skipped) { return false; }
+      // Hide/show captions/subtitles
+      switch (rule.showSubtitles) {
+        case Constants.ShowSubtitles.Filtered: if (data.filtered) { instance.showSubtitles(rule); } else { instance.hideSubtitles(rule); } break;
+        case Constants.ShowSubtitles.Unfiltered: if (data.filtered) { instance.hideSubtitles(rule); } else { instance.showSubtitles(rule); } break;
+        case Constants.ShowSubtitles.None: instance.hideSubtitles(rule); break;
+      }
+      if (data.filtered) { instance.filter.updateCounterBadge(); }
     } else {
       if (rule.ignoreMutations) { instance.filter.startObserving(); } // Start observing when video is not playing
     }
@@ -886,6 +959,11 @@ export default class WebAudio {
         }
       }
     }
+  }
+
+  watcherSimpleUnmute(rule: AudioRule, video: HTMLVideoElement) {
+    this.unmute(rule, video);
+    if (rule.showSubtitles > 0) { this.hideSubtitles(rule, rule._displayElement); }
   }
 
   youTubeAutoSubsCurrentRow(node): boolean {
