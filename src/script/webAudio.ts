@@ -87,6 +87,33 @@ export default class WebAudio {
     }
   }
 
+  apfCaptionLine(rule: AudioRule, text: string): HTMLSpanElement {
+    const line = document.createElement('span');
+    line.classList.add('APF-subtitle-line');
+    line.style.background = 'black';
+    line.style.color = 'white';
+    line.style.fontSize = '3.5vw';
+    line.style.paddingLeft = '4px';
+    line.style.paddingRight = '4px';
+    line.style.height = '18px';
+    line.textContent = text;
+    return line;
+  }
+
+  apfCaptionLines(rule: AudioRule, lines: HTMLSpanElement[]): HTMLDivElement {
+    const apfLines = document.createElement('div');
+    apfLines.classList.add('APF-subtitles');
+    apfLines.style.bottom = '10px';
+    apfLines.style.position = 'absolute';
+    apfLines.style.textAlign = 'center';
+    apfLines.style.width = '100%';
+    lines.forEach((line) => {
+      apfLines.appendChild(line);
+      apfLines.appendChild(document.createElement('br'));
+    });
+    return apfLines;
+  }
+
   clean(subtitleContainer, ruleIndex = 0): void {
     const rule = this.rules[ruleIndex];
     if (rule.mode === 'watcher') { return; } // If this is for a watcher rule, leave the text alone
@@ -128,11 +155,8 @@ export default class WebAudio {
       }
     });
 
-    switch (rule.showSubtitles) {
-      case Constants.ShowSubtitles.Filtered: if (filtered) { this.showSubtitles(rule, subtitles); } else { this.hideSubtitles(rule, subtitles); } break;
-      case Constants.ShowSubtitles.Unfiltered: if (filtered) { this.hideSubtitles(rule, subtitles); } else { this.showSubtitles(rule, subtitles); } break;
-      case Constants.ShowSubtitles.None: this.hideSubtitles(rule, subtitles); break;
-    }
+    const shouldBeShown = this.subtitlesShouldBeShown(rule, filtered);
+    shouldBeShown ? this.showSubtitles(rule) : this.hideSubtitles(rule);
   }
 
   cleanYouTubeAutoSubs(node): void {
@@ -236,15 +260,9 @@ export default class WebAudio {
   // Some sites ignore textTrack.mode = 'hidden' and will still show captions
   // This is a fallback (not preferred) method that can be used for hiding the cues
   hideCue(rule: AudioRule, cue: FilteredVTTCue) {
-    if (
-      (rule.showSubtitles === Constants.ShowSubtitles.Filtered && !cue.filtered)
-      || (rule.showSubtitles === Constants.ShowSubtitles.Unfiltered && cue.filtered)
-      || rule.showSubtitles === Constants.ShowSubtitles.None
-    ) {
-      cue.text = '';
-      cue.position = 100;
-      cue.size = 0;
-    }
+    cue.text = '';
+    cue.position = 100;
+    cue.size = 0;
   }
 
   hideSubtitles(rule: AudioRule, subtitles?) {
@@ -280,9 +298,11 @@ export default class WebAudio {
   }
 
   initCueRule(rule: AudioRule) {
+    if (rule.apfCaptions === true) { rule.videoCueHideCues = true; }
     if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.DefaultVideoSelector; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
     if (rule.externalSub) {
+      if (rule.externalSubTrackMode === undefined) { rule.externalSubTrackMode = 'showing'; }
       if (rule.externalSubURLKey === undefined) { rule.externalSubURLKey = 'url'; }
       if (rule.externalSubFormatKey === undefined) { rule.externalSubFormatKey = 'format'; }
       if (rule.externalSubTrackLabel === undefined) { rule.externalSubTrackLabel = 'APF'; }
@@ -446,7 +466,7 @@ export default class WebAudio {
   newTextTrack(rule: AudioRule, video: HTMLVideoElement, cues: VTTCue[]): TextTrack {
     if (video.textTracks) {
       const track = video.addTextTrack('captions', rule.externalSubTrackLabel, rule.videoCueLanguage) as TextTrack;
-      track.mode = 'showing';
+      track.mode = rule.externalSubTrackMode;
       for (let i = 0; i < cues.length; i++) {
         track.addCue(cues[i]);
       }
@@ -603,15 +623,13 @@ export default class WebAudio {
       }
 
       const result = this.replaceTextResult(cue.text);
+      cue.originalText = cue.text;
       if (result.modified) {
         cue.filtered = true;
-        cue.originalText = cue.text;
         cue.text = result.filtered;
       } else {
         cue.filtered = false;
       }
-
-      if (rule.videoCueHideCues) { this.hideCue(rule, cue); }
     }
   }
 
@@ -746,6 +764,15 @@ export default class WebAudio {
   stopFillerAudio() {
     this.fillerAudio.pause();
     this.fillerAudio.currentTime = 0;
+  }
+
+  subtitlesShouldBeShown(rule, filtered: boolean = false): boolean {
+    switch(rule.showSubtitles) {
+      case Constants.ShowSubtitles.All: return true;
+      case Constants.ShowSubtitles.Filtered: return filtered;
+      case Constants.ShowSubtitles.Unfiltered: return !filtered;
+      case Constants.ShowSubtitles.None: return false;
+    }
   }
 
   // Checks if a node is a supported audio node.
@@ -883,12 +910,8 @@ export default class WebAudio {
       }
 
       if (data.skipped) { return false; }
-      // Hide/show captions/subtitles
-      switch (rule.showSubtitles) {
-        case Constants.ShowSubtitles.Filtered: if (data.filtered) { instance.showSubtitles(rule); } else { instance.hideSubtitles(rule); } break;
-        case Constants.ShowSubtitles.Unfiltered: if (data.filtered) { instance.hideSubtitles(rule); } else { instance.showSubtitles(rule); } break;
-        case Constants.ShowSubtitles.None: instance.hideSubtitles(rule); break;
-      }
+      const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
+      shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
       if (data.filtered) { instance.filter.updateCounterBadge(); }
     } else {
       if (rule.ignoreMutations) { instance.filter.startObserving(); } // Start observing when video is not playing
@@ -908,49 +931,38 @@ export default class WebAudio {
 
           textTrack.oncuechange = () => {
             if (textTrack.activeCues && textTrack.activeCues.length > 0) {
-              let filtered = false;
+              const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
+              const apfLines = [];
 
-              for (let i = 0; i < textTrack.activeCues.length; i++) {
-                const activeCue = textTrack.activeCues[i] as FilteredVTTCue;
-                if (!activeCue.hasOwnProperty('filtered')) {
-                  const cues = textTrack.cues as any as FilteredVTTCue[];
-                  instance.processCues(cues, rule);
-                }
+              const processed = activeCues.some((activeCue) => activeCue.hasOwnProperty('filtered'));
+              if (!processed) { instance.processCues(activeCues, rule); }
+              const filtered = activeCues.some((activeCue) => activeCue.filtered);
+              filtered ? instance.mute(rule, video) : instance.unmute(rule, video);
+              const shouldBeShown = instance.subtitlesShouldBeShown(rule, filtered);
 
-                if (activeCue.filtered) {
-                  filtered = true;
-                  instance.mute(rule, video);
-                }
-              }
-
-              if (!filtered) { instance.unmute(rule, video); }
-
-              if (!rule.videoCueHideCues) {
-                if (filtered) {
-                  switch (rule.showSubtitles) {
-                    case Constants.ShowSubtitles.Filtered: textTrack.mode = 'showing'; break;
-                    case Constants.ShowSubtitles.Unfiltered: textTrack.mode = 'hidden'; break;
-                  }
-                } else {
-                  switch (rule.showSubtitles) {
-                    case Constants.ShowSubtitles.Filtered: textTrack.mode = 'hidden'; break;
-                    case Constants.ShowSubtitles.Unfiltered: textTrack.mode = 'showing'; break;
-                  }
+              for (let i = 0; i < activeCues.length; i++) {
+                const activeCue = activeCues[i];
+                if (!shouldBeShown && rule.videoCueHideCues) { instance.hideCue(rule, activeCue); }
+                if (rule.apfCaptions) {
+                  const text = filtered ? activeCue.text : activeCue.originalText;
+                  const line = instance.apfCaptionLine(rule, text);
+                  apfLines.unshift(line); // Cues seem to show up in reverse order
                 }
               }
 
-              if (rule.displaySelector) {
-                if (filtered) {
-                  switch (rule.showSubtitles) {
-                    case Constants.ShowSubtitles.Filtered: instance.showSubtitles(rule); break;
-                    case Constants.ShowSubtitles.Unfiltered: instance.hideSubtitles(rule); break;
-                  }
-                } else {
-                  switch (rule.showSubtitles) {
-                    case Constants.ShowSubtitles.Filtered: instance.hideSubtitles(rule); break;
-                    case Constants.ShowSubtitles.Unfiltered: instance.showSubtitles(rule); break;
-                  }
+              if (apfLines.length) {
+                const container = document.getElementById(rule.apfCaptionsSelector);
+                const oldLines = container.querySelector('div.APF-subtitles');
+                if (oldLines) { oldLines.remove(); }
+                if (shouldBeShown) {
+                  const apfCaptions = instance.apfCaptionLines(rule, apfLines);
+                  container.appendChild(apfCaptions);
                 }
+              }
+
+              if (!rule.videoCueHideCues) { textTrack.mode = shouldBeShown ? 'showing' : 'hidden'; }
+              if (rule.displaySelector) { // Hide original subtitles if using apfCaptions
+                apfLines.length || !shouldBeShown ? instance.hideSubtitles(rule) : instance.showSubtitles(rule);
               }
             } else { // No active cues
               instance.unmute(rule, video);

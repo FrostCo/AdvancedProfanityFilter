@@ -1,6 +1,8 @@
 interface AudioRule {
   _displayElement?: HTMLElement;     // Element to display/hide
   _dynamic?: boolean;               // [Dynamic] Set to true on a dynamic rule
+  apfCaptions?: boolean;            // [Cue] Display an HTML version of the caption/subtitle text: Requires videoCueHideCues = true
+  apfCaptionsSelector?: string;     // [Cue] Selector for container that will hold the custom HTML captions
   checkInterval?: number;           // [Watcher] Set a custom watch interval (in ms, Default: 20)
   className?: string;               // [Element] node.className.includes()
   containsSelector?: string;        // [Element] node.querySelector() [Not commonly used]
@@ -17,6 +19,7 @@ interface AudioRule {
   externalSub?: boolean;            // [Cue] [BETA]: Convert external captions/subtitles obtained from remote source to VTTCues
   externalSubFormatKey?: string;    // [Cue] [BETA]: Key name for caption/subtitle format (Default: 'format')
   externalSubTrackLabel?: string;   // [Cue] [BETA]: Label used for processed TextTrack
+  externalSubTrackMode?: TextTrackMode;          // [Cue] [BETA]: TextTrack mode for new TextTrack
   externalSubURLKey?: string;       // [Cue] [BETA]: Key name for caption/subtitle URL (Default: 'url')
   externalSubVar?: string;          // [Cue] [BETA]: Global variable to find available caption/subtitle data
   filterSubtitles?: boolean;        // [All] Filter subtitle text (Default: true)
