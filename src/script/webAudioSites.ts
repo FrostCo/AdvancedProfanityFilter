@@ -62,7 +62,6 @@ export default class WebAudioSites {
         externalSubVar: 'window.v1config.media.subtitles',
         iframe: true,
         mode: 'cue',
-        showSubtitles: 0,
         videoCueLanguage: 'enUS',
         videoCueRequireShowing: false,
       }
