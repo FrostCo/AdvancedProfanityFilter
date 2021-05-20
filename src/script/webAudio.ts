@@ -961,8 +961,8 @@ export default class WebAudio {
               if (apfLines.length) {
                 // TODO: Implement rule.showSubtitles
                 const container = document.getElementById(rule.apfCaptionsSelector);
-                const old_lines = container.querySelector('div');
-                if (old_lines) { old_lines.remove(); }
+                const oldLines = container.querySelector('div');
+                if (oldLines) { oldLines.remove(); }
                 const apfCaptions = instance.apfCaptionLines(rule, apfLines);
                 container.appendChild(apfCaptions);
               }
