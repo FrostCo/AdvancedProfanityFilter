@@ -100,7 +100,11 @@ export default class WebAudioSites {
     ],
     'www.netflix.com': [{ className: 'player-timedtext-text-container', mode: 'element', subtitleSelector: 'span', tagName: 'DIV' }],
     'www.pbs.org': [{ iframe: true, mode: 'element', subtitleSelector: 'div.vjs-text-track-cue > div', tagName: 'DIV' }],
-    'www.peacocktv.com': [{ mode: 'elementChild', parentSelector: 'div.video-player__subtitles > div', subtitleSelector: 'SPAN > SPAN', tagName: 'div' }],
+    'www.peacocktv.com': [
+      { displaySelector: 'div.video-player__subtitles', mode: 'elementChild', parentSelector: 'div.video-player__subtitles > div', simpleUnmute: true, tagName: '#text' },
+      { displaySelector: 'div.video-player__subtitles', mode: 'elementChild', parentSelector: 'div.video-player__subtitles > div', subtitleSelector: 'SPAN > SPAN', tagName: 'DIV' },
+      { displaySelector: 'div.video-player__subtitles', mode: 'elementChild', parentSelector: 'div.video-player__subtitles > div', tagName: 'SPAN' },
+    ],
     'www.philo.com': [{ mode: 'cue' }],
     'app.plex.tv': [
       { dataPropPresent: 'dialogueId', mode: 'element', subtitleSelector: 'span > span', tagName: 'DIV' },
