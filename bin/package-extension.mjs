@@ -1,8 +1,7 @@
-/* eslint-disable no-console, @typescript-eslint/no-var-requires */
-'use strict';
-const fse = require('fs-extra');
-const path = require('path');
-const AdmZip = require('adm-zip');
+/* eslint-disable no-console */
+import fse from 'fs-extra';
+import path from 'path';
+import AdmZip from 'adm-zip';
 
 function buildAll() {
   build(prepareZip());

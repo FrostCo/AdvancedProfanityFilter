@@ -1,13 +1,12 @@
-'use strict';
-
-const fs = require('fs-extra');
-const path = require('path');
-const marked = require('marked');
-const download = require('download');
+/* eslint-disable no-console */
+import fse from 'fs-extra';
+import path from 'path';
+import marked from 'marked';
+import download from 'download';
 
 let readmeURI = 'https://raw.githubusercontent.com/wiki/richardfrost/AdvancedProfanityFilter/Home.md';
 let optionPage = path.join('src/static', 'optionPage.html');
-let optionPageHTML = fs.readFileSync(optionPage).toString();
+let optionPageHTML = fse.readFileSync(optionPage).toString();
 let prefix = '<div id="helpContainer">';
 let postfix = '\n  </div>';
 let foundMatch = false;
@@ -26,7 +25,7 @@ download(readmeURI).then(data => {
   });
   if (foundMatch) {
     console.log('Updating Help content...');
-    fs.writeFileSync(optionPage, newOptionPageHTML);
+    fse.writeFileSync(optionPage, newOptionPageHTML);
   } else {
     throw `Failed to update ${optionPage}`;
   }

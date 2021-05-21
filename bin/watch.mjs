@@ -1,9 +1,9 @@
-'use strict';
+/* eslint-disable no-console */
+import fse from 'fs-extra';
+import path from 'path';
+import chokidar from 'chokidar';
+import { execSync } from 'child_process';
 
-const chokidar = require('chokidar');
-const execSync = require('child_process').execSync;
-const path = require('path');
-const fse = require('fs-extra');
 let scriptRegExp = new RegExp('\/script\/');
 let staticRegExp = new RegExp('\/static\/');
 
