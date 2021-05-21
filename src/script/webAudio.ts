@@ -155,6 +155,13 @@ export default class WebAudio {
       }
     });
 
+    // When captions/subtitles are spread across multiple mutations, check to see if a filtered node is still present
+    if (!filtered) {
+      if (this.lastFilteredNode && this.lastFilteredNode.parentElement && this.lastFilteredNode.textContent === this.lastFilteredText) {
+        filtered = true;
+      }
+    }
+
     const shouldBeShown = this.subtitlesShouldBeShown(rule, filtered);
     shouldBeShown ? this.showSubtitles(rule, subtitles) : this.hideSubtitles(rule, subtitles);
   }
