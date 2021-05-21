@@ -156,7 +156,7 @@ export default class WebAudio {
     });
 
     const shouldBeShown = this.subtitlesShouldBeShown(rule, filtered);
-    shouldBeShown ? this.showSubtitles(rule) : this.hideSubtitles(rule);
+    shouldBeShown ? this.showSubtitles(rule, subtitles) : this.hideSubtitles(rule, subtitles);
   }
 
   cleanYouTubeAutoSubs(node): void {
