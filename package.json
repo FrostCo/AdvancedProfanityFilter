@@ -32,6 +32,8 @@
     "test:all": "npm run test && npm run test:lint:tests && npm run test:addon",
     "test:cov": "npm run build:test && nyc --reporter=lcov --reporter=text node_modules/mocha/bin/_mocha",
     "test:debug": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
+    "test:lint:all": "npm run test:lint && npm run test:lint:bin && npm run test:lint:tests",
+    "test:lint:bin": "eslint \"bin/**/*.*js\"",
     "test:lint:nibble": "npx eslint-nibble \"src/**/*.ts\"",
     "test:lint:tests": "eslint \"test/**/*.spec.js\"",
     "test:lint": "eslint \"src/**/*.ts\"",
