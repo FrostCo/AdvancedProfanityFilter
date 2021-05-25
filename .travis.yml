@@ -2,11 +2,12 @@ language: node_js
 
 node_js:
   - "node"
-  - "15"
+  - "16"
 
 before_script:
   - npm install
   - npm run package
 
 script:
+  - npm run test:lint:all
   - npm run test:all

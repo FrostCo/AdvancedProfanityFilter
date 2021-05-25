@@ -1,14 +1,14 @@
-'use strict';
+/* eslint-disable no-console */
+import fse from 'fs-extra';
+import path from 'path';
+import chokidar from 'chokidar';
+import { execSync } from 'child_process';
 
-const chokidar = require('chokidar');
-const execSync = require('child_process').execSync;
-const path = require('path');
-const fse = require('fs-extra');
-let scriptRegExp = new RegExp('\/script\/');
-let staticRegExp = new RegExp('\/static\/');
+const scriptRegExp = new RegExp('\/script\/');
+const staticRegExp = new RegExp('\/static\/');
 
 function copyStatic(file) {
-  let basename = path.basename(file);
+  const basename = path.basename(file);
   console.log('Copying static file: ', basename);
   fse.copySync(file, path.join('./dist/', basename));
 
@@ -20,8 +20,8 @@ function copyStatic(file) {
 }
 
 function compileScript(file) {
-  let basename = path.basename(file);
-  console.log('TypeScript file updated: ', basename)
+  const basename = path.basename(file);
+  console.log('TypeScript file updated: ', basename);
 
   try {
     console.log('Building Typescript...');
@@ -32,7 +32,7 @@ function compileScript(file) {
   }
 }
 
-let watcher = chokidar.watch(
+const watcher = chokidar.watch(
   [
     path.join(process.cwd() + '/src/**/*.ts'),
     path.join(process.cwd() + '/src/static/**/*.(css|html|json|)')
@@ -42,7 +42,7 @@ let watcher = chokidar.watch(
   }
 );
 
-let log = console.log.bind(console);
+const log = console.log.bind(console);
 // watcher.on('add', filePath => log(`File ${filePath} has been added`))
 // watcher.on('unlink', filePath => log(`File ${filePath} has been removed`));
 watcher.on('ready', () => log('Initial scan complete. Watching for changes...\n\n'));
