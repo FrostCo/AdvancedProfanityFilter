@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const TerserPlugin = require('terser-webpack-plugin');
+/* eslint-disable @typescript-eslint/naming-convention */
+const TerserPlugin = require('terser-webpack-plugin'); // eslint-disable-line @typescript-eslint/no-var-requires
 
 module.exports = {
   entry: {
