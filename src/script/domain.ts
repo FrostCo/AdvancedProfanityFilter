@@ -69,11 +69,11 @@ export default class Domain {
 
   getModeIndex() {
     if (this.advanced) {
-      return Constants.DomainModes.Advanced;
+      return Constants.DOMAIN_MODES.ADVANCED;
     } else if (this.deep) {
-      return Constants.DomainModes.Deep;
+      return Constants.DOMAIN_MODES.DEEP;
     } else {
-      return Constants.DomainModes.Normal;
+      return Constants.DOMAIN_MODES.NORMAL;
     }
   }
 
@@ -112,9 +112,9 @@ export default class Domain {
 
   updateFromModeIndex(index: number) {
     switch(index) {
-      case Constants.DomainModes.Normal: this.advanced = false; this.deep = false; break;
-      case Constants.DomainModes.Advanced: this.advanced = true; this.deep = false; break;
-      case Constants.DomainModes.Deep: this.advanced = false; this.deep = true; break;
+      case Constants.DOMAIN_MODES.NORMAL: this.advanced = false; this.deep = false; break;
+      case Constants.DOMAIN_MODES.ADVANCED: this.advanced = true; this.deep = false; break;
+      case Constants.DOMAIN_MODES.DEEP: this.advanced = false; this.deep = true; break;
     }
   }
 }

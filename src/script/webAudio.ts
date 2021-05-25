@@ -30,8 +30,8 @@ export default class WebAudio {
   youTubeAutoSubsUnmuteDelay: number;
 
   static readonly brTagRegExp = new RegExp('<br>', 'i');
-  static readonly DefaultVideoSelector = 'video';
-  static readonly FillerConfig = {
+  static readonly defaultVideoSelector = 'video';
+  static readonly fillerConfig = {
     beep: {
       fileName: 'audio/beep.mp3',
       volume: 0.2,
@@ -45,7 +45,7 @@ export default class WebAudio {
       volume: 0.3,
     },
   };
-  static readonly TextTrackRuleMappings = {
+  static readonly textTrackRuleMappings = {
     externalSubTrackLabel: 'label',
     videoCueKind: 'kind',
     videoCueLabel: 'label',
@@ -187,7 +187,7 @@ export default class WebAudio {
     } else {
       if (this.muted) {
         if (this.youTubeAutoSubsMin > 0) {
-          const currentTime = document.getElementsByTagName(WebAudio.DefaultVideoSelector)[0].currentTime;
+          const currentTime = document.getElementsByTagName(WebAudio.defaultVideoSelector)[0].currentTime;
           if (this.youTubeAutoSubsUnmuteDelay == null) { // Start tracking youTubeAutoSubsUnmuteDelay when next unfiltered word is found
             this.youTubeAutoSubsUnmuteDelay = currentTime;
           } else {
@@ -203,7 +203,7 @@ export default class WebAudio {
     }
 
     // Hide YouTube auto text unless show all subtitles is set
-    if (this.filter.cfg.showSubtitles !== Constants.ShowSubtitles.All) {
+    if (this.filter.cfg.showSubtitles !== Constants.SHOW_SUBTITLES.ALL) {
       const container = document.querySelector('div.ytp-caption-window-rollup span.captions-text') as HTMLElement;
       if (container.style.display == 'block') {
         container.style.display = 'none';
@@ -241,15 +241,15 @@ export default class WebAudio {
       if (rule.videoCueRequireShowing && textTrack.mode !== 'showing') { continue; }
 
       let currentScore = 0;
-      if (overrideKey && rule[overrideKey] && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings[overrideKey], rule[overrideKey])) { currentScore += 1000; }
-      if (rule.videoCueLabel && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueLabel, rule.videoCueLabel)) { currentScore += 100; }
-      if (rule.videoCueLanguage && this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueLanguage, rule.videoCueLanguage)) { currentScore += 10; }
+      if (overrideKey && rule[overrideKey] && this.textTrackKeyTest(textTrack, WebAudio.textTrackRuleMappings[overrideKey], rule[overrideKey])) { currentScore += 1000; }
+      if (rule.videoCueLabel && this.textTrackKeyTest(textTrack, WebAudio.textTrackRuleMappings.videoCueLabel, rule.videoCueLabel)) { currentScore += 100; }
+      if (rule.videoCueLanguage && this.textTrackKeyTest(textTrack, WebAudio.textTrackRuleMappings.videoCueLanguage, rule.videoCueLanguage)) { currentScore += 10; }
       if (rule.videoCueKind) {
-        if (this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueKind, rule.videoCueKind)) { currentScore += 1; }
+        if (this.textTrackKeyTest(textTrack, WebAudio.textTrackRuleMappings.videoCueKind, rule.videoCueKind)) { currentScore += 1; }
       } else {
         if (
-          this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueKind, 'captions')
-          || this.textTrackKeyTest(textTrack, WebAudio.TextTrackRuleMappings.videoCueKind, 'subtitles')
+          this.textTrackKeyTest(textTrack, WebAudio.textTrackRuleMappings.videoCueKind, 'captions')
+          || this.textTrackKeyTest(textTrack, WebAudio.textTrackRuleMappings.videoCueKind, 'subtitles')
         ) { currentScore += 1; }
       }
 
@@ -306,7 +306,7 @@ export default class WebAudio {
 
   initCueRule(rule: AudioRule) {
     if (rule.apfCaptions === true) { rule.videoCueHideCues = true; }
-    if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.DefaultVideoSelector; }
+    if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.defaultVideoSelector; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
     if (rule.externalSub) {
       if (rule.externalSubTrackMode === undefined) { rule.externalSubTrackMode = 'showing'; }
@@ -335,7 +335,7 @@ export default class WebAudio {
   initElementRule(rule: AudioRule) { }
 
   initFillerAudio(name: string = ''): HTMLAudioElement {
-    const fillerConfig = WebAudio.FillerConfig[name];
+    const fillerConfig = WebAudio.fillerConfig[name];
     if (fillerConfig) {
       const url = chrome.runtime.getURL(fillerConfig.fileName);
       const audioFiller = new Audio();
@@ -420,7 +420,7 @@ export default class WebAudio {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
     if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
     if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
-    if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.DefaultVideoSelector; }
+    if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.defaultVideoSelector; }
   }
 
   initYouTube() {
@@ -429,7 +429,7 @@ export default class WebAudio {
       // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
       const youTubeAutoCensor = '[ __ ]';
       const lists = this.wordlistId == 0 ? [] : [this.wordlistId];
-      const youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MatchMethods.Partial, repeat: false, separators: false, sub: '' };
+      const youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: false, separators: false, sub: '' };
       this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
     }
   }
@@ -440,11 +440,11 @@ export default class WebAudio {
       const muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
 
       switch(muteMethod) {
-        case Constants.MuteMethods.Tab:
+        case Constants.MUTE_METHODS.TAB:
           chrome.runtime.sendMessage({ mute: true });
           break;
-        case Constants.MuteMethods.Video:
-          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.DefaultVideoSelector); }
+        case Constants.MUTE_METHODS.VIDEO:
+          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
           if (video && video.volume != null) {
             this.volume = video.volume; // Save original volume
             video.volume = 0;
@@ -775,10 +775,10 @@ export default class WebAudio {
 
   subtitlesShouldBeShown(rule, filtered: boolean = false): boolean {
     switch(rule.showSubtitles) {
-      case Constants.ShowSubtitles.All: return true;
-      case Constants.ShowSubtitles.Filtered: return filtered;
-      case Constants.ShowSubtitles.Unfiltered: return !filtered;
-      case Constants.ShowSubtitles.None: return false;
+      case Constants.SHOW_SUBTITLES.ALL: return true;
+      case Constants.SHOW_SUBTITLES.FILTERED: return filtered;
+      case Constants.SHOW_SUBTITLES.UNFILTERED: return !filtered;
+      case Constants.SHOW_SUBTITLES.NONE: return false;
     }
   }
 
@@ -864,12 +864,12 @@ export default class WebAudio {
       const muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
 
       switch(muteMethod) {
-        case Constants.MuteMethods.Tab:
+        case Constants.MUTE_METHODS.TAB:
           chrome.runtime.sendMessage({ mute: false });
           break;
-        case Constants.MuteMethods.Video:
+        case Constants.MUTE_METHODS.VIDEO:
           if (this.fillerAudio) { this.stopFillerAudio(); }
-          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.DefaultVideoSelector); }
+          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
           if (video && video.volume != null) {
             video.volume = this.volume;
           }
@@ -934,7 +934,7 @@ export default class WebAudio {
         const textTrack = instance.getVideoTextTrack(video.textTracks, rule);
 
         if (textTrack && !textTrack.oncuechange) {
-          if (!rule.videoCueHideCues && rule.showSubtitles === Constants.ShowSubtitles.None) { textTrack.mode = 'hidden'; }
+          if (!rule.videoCueHideCues && rule.showSubtitles === Constants.SHOW_SUBTITLES.NONE) { textTrack.mode = 'hidden'; }
 
           textTrack.oncuechange = () => {
             if (textTrack.activeCues && textTrack.activeCues.length > 0) {
@@ -990,7 +990,7 @@ export default class WebAudio {
   }
 
   youTubeAutoSubsMuteTimeout(instance) {
-    const video = window.document.querySelector(WebAudio.DefaultVideoSelector);
+    const video = window.document.querySelector(WebAudio.defaultVideoSelector);
     if (video && instance.playing(video)) {
       instance.unmute();
     }

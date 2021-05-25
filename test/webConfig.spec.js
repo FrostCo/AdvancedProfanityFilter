@@ -26,19 +26,18 @@ describe('WebConfig', function() {
     it('should combine _words# data', function() {
       const config = new WebConfig(WebConfig._defaults);
       config._words0 = WebConfig._defaultWords;
-      config._words1 = { 'test': { lists: [], matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: false, sub: 'tset' } };
+      config._words1 = { 'test': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' } };
       config._splitContainerKeys = ['words'];
       expect(config.words).to.not.exist;
       const combinedKeys = WebConfig.combineData(config, 'words');
       expect(combinedKeys).to.eql(['_words0', '_words1']);
-      expect(config.words['test'].matchMethod).to.eq(Constants.MatchMethods.Exact);
+      expect(config.words['test'].matchMethod).to.eq(Constants.MATCH_METHODS.EXACT);
       expect(config.words[Object.keys(WebConfig._defaultWords)[0]]).to.exist;
       expect(config.words['undefined']).to.not.exist;
       expect(config._words0).to.not.exist;
       expect(config._words1).to.not.exist;
     });
   });
-
 
   describe('.getDataContainerKeys()', function() {
     it('should return all matches', function() {

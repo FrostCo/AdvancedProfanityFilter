@@ -264,7 +264,7 @@ export default class WebFilter extends Filter {
   }
 
   filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, stats: boolean = true) {
-    this.shadowObserver.observe(shadowRoot, ObserverConfig);
+    this.shadowObserver.observe(shadowRoot, observerConfig);
     this.processNode(shadowRoot, wordlistId, stats);
   }
 
@@ -275,7 +275,7 @@ export default class WebFilter extends Filter {
         this.summary[word.value].count += 1;
       } else {
         let result;
-        if (word.matchMethod === Constants.MatchMethods.Regex) {
+        if (word.matchMethod === Constants.MATCH_METHODS.REGEX) {
           result = word.sub || this.cfg.defaultSubstitution;
         } else {
           result = this.replaceText(word.value, 0, false); // We can use 0 (All) here because we are just filtering a word
@@ -327,7 +327,7 @@ export default class WebFilter extends Filter {
 
   sendInitState(message: Message) {
     // Reset muted state on page load if we muted the tab audio
-    if (this.cfg.muteAudio && this.cfg.muteMethod == Constants.MuteMethods.Tab) { message.clearMute = true; }
+    if (this.cfg.muteAudio && this.cfg.muteMethod == Constants.MUTE_METHODS.TAB) { message.clearMute = true; }
 
     // Send page state to color icon badge
     if (!this.iframe) { message.setBadgeColor = true; }
@@ -338,7 +338,7 @@ export default class WebFilter extends Filter {
   }
 
   startObserving(target: Node = document, observer: MutationObserver = this.observer) {
-    observer.observe(target, ObserverConfig);
+    observer.observe(target, observerConfig);
   }
 
   stopObserving(observer: MutationObserver = this.observer) {
@@ -364,7 +364,7 @@ export default class WebFilter extends Filter {
 }
 
 const filter = new WebFilter;
-const ObserverConfig: MutationObserverInit = {
+const observerConfig: MutationObserverInit = {
   characterData: true,
   characterDataOldValue: true,
   childList: true,

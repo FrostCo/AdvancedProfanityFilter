@@ -41,9 +41,9 @@ export default class Filter {
       if (iWhitelistLength && this.iWhitelist.includes(match.toLowerCase())) { return true; }
 
       // Check for partial match (match may not contain the full whitelisted word)
-      if (word.matchMethod === Constants.MatchMethods.Partial) {
+      if (word.matchMethod === Constants.MATCH_METHODS.PARTIAL) {
         const wordOptions: WordOptions = {
-          matchMethod: Constants.MatchMethods.Whole,
+          matchMethod: Constants.MATCH_METHODS.WHOLE,
           repeat: false,
           separators: false,
           sub: ''
@@ -90,7 +90,7 @@ export default class Filter {
     // - Remove Filter
     // - Unicode word boundaries (workaround)
     // - Edge punctuation
-    const internalCaptureGroups = (captureGroups.length > 0 && word.matchMethod !== Constants.MatchMethods.Regex);
+    const internalCaptureGroups = (captureGroups.length > 0 && word.matchMethod !== Constants.MATCH_METHODS.REGEX);
     if (internalCaptureGroups) { match = captureGroups[1]; }
 
     return { word: word, string: string, match: match, matchStartIndex: matchStartIndex, captureGroups: captureGroups, internalCaptureGroups: internalCaptureGroups };
@@ -107,7 +107,7 @@ export default class Filter {
     const wordlist = this.wordlists[wordlistId];
 
     switch(this.cfg.filterMethod) {
-      case Constants.FilterMethods.Censor:
+      case Constants.FILTER_METHODS.CENSOR:
         wordlist.regExps.forEach((regExp, index) => {
           str = str.replace(regExp, (originalMatch, ...args): string => {
             const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
@@ -133,7 +133,7 @@ export default class Filter {
           });
         });
         break;
-      case Constants.FilterMethods.Substitute:
+      case Constants.FILTER_METHODS.SUBSTITUTE:
         wordlist.regExps.forEach((regExp, index) => {
           str = str.replace(regExp, (originalMatch, ...args): string => {
             const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
@@ -161,7 +161,7 @@ export default class Filter {
           });
         });
         break;
-      case Constants.FilterMethods.Remove:
+      case Constants.FILTER_METHODS.REMOVE:
         wordlist.regExps.forEach((regExp, index) => {
           str = str.replace(regExp, (originalMatch, ...args): string => {
             const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);

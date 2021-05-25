@@ -1,12 +1,12 @@
 /* istanbul ignore next */
-export function dynamicList(list: string[], select: HTMLSelectElement, title?: string) {
+export function dynamicList(list: string[], select: HTMLSelectElement, upperCaseFirstChar: boolean = false, title?: string) {
   removeChildren(select);
   const array = title !== undefined ? [title].concat(list) : list;
 
   array.forEach((item) => {
     const option = document.createElement('option');
     option.value = (title && item === title) ? '' : item;
-    option.textContent = item;
+    option.textContent = upperCaseFirstChar ? upperCaseFirst(item) : item;
     select.appendChild(option);
   });
 }
@@ -135,4 +135,10 @@ export function removeFromArray(array: string[], element: string) {
 
 export function secondsToHMS(seconds: number): string {
   return new Date(seconds * 1000).toISOString().substr(11, 12);
+}
+
+export function upperCaseFirst(str: string, lowerCaseRest: boolean = true): string {
+  let value = str.charAt(0).toUpperCase();
+  value += lowerCaseRest ? str.toLowerCase().slice(1) : str.slice(1);
+  return value;
 }

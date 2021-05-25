@@ -3,10 +3,10 @@ import Constants from '../built/lib/constants';
 import Wordlist from '../built/lib/wordlist';
 
 const testWords = {
-  'example': { lists: [1], matchMethod: Constants.MatchMethods.Exact, repeat: true, sub: 'demo' },
-  'placeholder': { lists: [1, 2], matchMethod: Constants.MatchMethods.Exact, repeat: false, sub: 'variable' },
-  'sample': { lists: [2], matchMethod: Constants.MatchMethods.Partial, repeat: false, sub: 'piece' },
-  'word': { matchMethod: Constants.MatchMethods.Whole, repeat: true, sub: 'idea' }
+  'example': { lists: [1], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'demo' },
+  'placeholder': { lists: [1, 2], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: false, sub: 'variable' },
+  'sample': { lists: [2], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: false, sub: 'piece' },
+  'word': { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: true, sub: 'idea' }
 };
 
 describe('Wordlist', function() {

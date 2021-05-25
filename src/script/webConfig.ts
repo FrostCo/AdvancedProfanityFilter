@@ -29,14 +29,15 @@ export default class WebConfig extends Config {
     muteAudio: false,
     muteAudioOnly: false,
     muteCueRequireShowing: false,
-    muteMethod: Constants.MuteMethods.Tab,
+    muteMethod: Constants.MUTE_METHODS.TAB,
     password: null,
-    showSubtitles: Constants.ShowSubtitles.All,
+    showSubtitles: Constants.SHOW_SUBTITLES.ALL,
     showUpdateNotification: true,
     youTubeAutoSubsMax: 0,
     youTubeAutoSubsMin: 0,
   }
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   static readonly QUOTA_BYTES_PER_ITEM = 8192; // https://developer.chrome.com/apps/storage chrome.storage.sync.QUOTA_BYTES_PER_ITEM
   static readonly _defaults = Object.assign({}, Config._defaults, WebConfig._classDefaults);
   static readonly _splittingKeys = ['domains', 'words'];

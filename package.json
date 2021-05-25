@@ -164,7 +164,52 @@
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-member-accessibility": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
-      "@typescript-eslint/naming-convention": "off",
+      "@typescript-eslint/naming-convention": [
+        "error",
+        {
+          "selector": "class",
+          "format": [
+            "PascalCase"
+          ],
+          "leadingUnderscore": "allow",
+          "trailingUnderscore": "allow"
+        },
+        {
+          "selector": "classProperty",
+          "modifiers": ["static", "readonly"],
+          "format": [
+            "camelCase",
+            "UPPER_CASE"
+          ],
+          "leadingUnderscore": "allow",
+          "trailingUnderscore": "allow"
+        },
+        {
+          "selector": "interface",
+          "format": [
+            "PascalCase"
+          ],
+          "leadingUnderscore": "forbid",
+          "trailingUnderscore": "forbid"
+        },
+        {
+          "selector": "variable",
+          "format": [
+            "camelCase",
+            "UPPER_CASE"
+          ],
+          "leadingUnderscore": "allow",
+          "trailingUnderscore": "allow"
+        },
+        {
+          "selector": "default",
+          "format": [
+            "camelCase"
+          ],
+          "leadingUnderscore": "allow",
+          "trailingUnderscore": "allow"
+        }
+      ],
       "@typescript-eslint/no-empty-function": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-inferrable-types": "off",
