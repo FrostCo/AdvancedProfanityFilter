@@ -55,6 +55,20 @@ export default class WebAudioSites {
     'www.cbs.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'www.crackle.com': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'www.criterionchannel.com': [{ iframe: true, mode: 'cue', videoCueHideCues: true, videoCueRequireShowing: false }],
+    'beta.crunchyroll.com': [
+      {
+        apfCaptions: true,
+        apfCaptionsSelector: 'vilosVttJs',
+        displaySelector: 'canvas#velocity-canvas',
+        externalSub: true,
+        externalSubTrackMode: 'hidden',
+        externalSubVar: 'window.v1config.media.subtitles',
+        iframe: true,
+        mode: 'cue',
+        videoCueLanguage: 'en-US',
+        videoCueRequireShowing: false
+      },
+    ],
     'www.crunchyroll.com': [
       {
         apfCaptions: true,
@@ -67,7 +81,8 @@ export default class WebAudioSites {
         mode: 'cue',
         videoCueLanguage: 'enUS',
         videoCueRequireShowing: false,
-      }
+        videoSelector: 'video#player0',
+      },
     ],
     'www.cwtv.com': [
       { className: 'ttr-container', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
