@@ -26,6 +26,7 @@ export default class WebAudio {
   youTube: boolean;
   youTubeAutoSubsMax: number;
   youTubeAutoSubsMin: number;
+  youTubeAutoSubsRule: AudioRule;
   youTubeAutoSubsTimeout: number;
   youTubeAutoSubsUnmuteDelay: number;
 
@@ -176,7 +177,7 @@ export default class WebAudio {
     const result = this.replaceTextResult(node.textContent);
     if (result.modified) {
       node.textContent = result.filtered;
-      this.mute();
+      this.mute(this.youTubeAutoSubsRule);
       this.youTubeAutoSubsUnmuteDelay = null;
       this.filter.updateCounterBadge();
 
@@ -193,11 +194,11 @@ export default class WebAudio {
           } else {
             if (currentTime < this.youTubeAutoSubsUnmuteDelay) { this.youTubeAutoSubsUnmuteDelay = 0; } // Reset youTubeAutoSubsUnmuteDelay if video reversed
             if (currentTime > (this.youTubeAutoSubsUnmuteDelay + this.youTubeAutoSubsMin)) { // Unmute if its been long enough
-              this.unmute();
+              this.unmute(this.youTubeAutoSubsRule);
             }
           }
         } else { // Unmute immediately if youTubeAutoSubsMin = 0
-          this.unmute();
+          this.unmute(this.youTubeAutoSubsRule);
         }
       }
     }
@@ -431,6 +432,9 @@ export default class WebAudio {
       const lists = this.wordlistId == 0 ? [] : [this.wordlistId];
       const youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: false, separators: false, sub: '' };
       this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
+
+      // Setup rule for YouTube Auto Subs
+      this.youTubeAutoSubsRule = { mode: 'ytauto', muteMethod: this.filter.cfg.muteMethod } as AudioRule;
     }
   }
 
@@ -989,7 +993,7 @@ export default class WebAudio {
   youTubeAutoSubsMuteTimeout(instance) {
     const video = window.document.querySelector(WebAudio.defaultVideoSelector);
     if (video && instance.playing(video)) {
-      instance.unmute();
+      instance.unmute(this.youTubeAutoSubsRule);
     }
     instance.youTubeAutoSubsTimeout = null;
   }
