@@ -1,3 +1,5 @@
+import Constants from './lib/constants';
+
 export default class WebAudioSites {
   static combineSites(sites: { [site: string]: AudioRule[] } = {}): { [site: string]: AudioRule[] } {
     return Object.assign({}, WebAudioSites.sites, sites);
@@ -35,6 +37,7 @@ export default class WebAudioSites {
       {
         displaySelector: 'div.video-container > div > div > div',
         mode: 'elementChild',
+        muteMethod: Constants.MUTE_METHODS.TAB,
         parentSelector: 'div.video-container',
         preserveWhiteSpace: true,
         rootNode: true,
