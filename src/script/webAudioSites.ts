@@ -95,6 +95,16 @@ export default class WebAudioSites {
     ],
     'www.disneyplus.com': [{ mode: 'cue', videoCueHideCues: true, videoSelector: 'video.btm-media-client-element' }],
     'www.fox.com': [{ className: 'jw-text-track-container', mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
+    'www.fubo.tv': [
+      {
+        displayHide: 'none',
+        displaySelector: 'div.bmpui-ui-subtitle-overlay',
+        iframe: false,
+        mode: 'watcher',
+        parentSelector: 'div.bmpui-ui-subtitle-overlay',
+        subtitleSelector: 'div.bmpui-ui-subtitle-overlay span',
+      },
+    ],
     'www.funimation.com': [
       {
         iframe: true,
