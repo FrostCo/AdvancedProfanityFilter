@@ -437,9 +437,8 @@ export default class WebAudio {
   mute(rule?: AudioRule, video?: HTMLVideoElement): void {
     if (!this.muted) {
       this.muted = true;
-      const muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
 
-      switch(muteMethod) {
+      switch(rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
           chrome.runtime.sendMessage({ mute: true });
           break;
@@ -861,9 +860,7 @@ export default class WebAudio {
       }
 
       this.muted = false;
-      const muteMethod = rule && rule.muteMethod >= 0 ? rule.muteMethod : this.filter.cfg.muteMethod;
-
-      switch(muteMethod) {
+      switch(rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
           chrome.runtime.sendMessage({ mute: false });
           break;
