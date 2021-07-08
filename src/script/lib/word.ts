@@ -59,15 +59,15 @@ export default class Word {
     this.sub = options.sub === undefined ? cfg.defaultSubstitution : options.sub;
     this._filterMethod = options._filterMethod === undefined ? cfg.filterMethod : options._filterMethod;
     this.unicode = Word.containsDoubleByte(word);
-    this.escaped = this.matchMethod === Constants.MatchMethods.Regex ? this.value : Word.escapeRegExp(this.value); // Don't escape a RegExp
+    this.escaped = this.matchMethod === Constants.MATCH_METHODS.REGEX ? this.value : Word.escapeRegExp(this.value); // Don't escape a RegExp
     this.regExp = this.buildRegExp();
   }
 
   buildRegExp(): RegExp {
     try {
       switch(this.matchMethod) {
-        case Constants.MatchMethods.Partial:
-          if (this._filterMethod === Constants.FilterMethods.Remove) {
+        case Constants.MATCH_METHODS.PARTIAL:
+          if (this._filterMethod === Constants.FILTER_METHODS.REMOVE) {
             // Match entire word that contains sub-string and surrounding whitespace
             // /\s?\b[\w-]*word[\w-]*\b\s?/gi
             if (this.unicode) {
@@ -83,7 +83,7 @@ export default class Word {
             // /word/gi
             return new RegExp(this.processedPhrase(), this.regexOptions());
           }
-        case Constants.MatchMethods.Whole:
+        case Constants.MATCH_METHODS.WHOLE:
           // /\b[\w-]*word[\w-]*\b/gi
           if (this.unicode) {
             // Work around for lack of word boundary support for unicode characters
@@ -94,13 +94,13 @@ export default class Word {
           } else {
             return new RegExp('\\b[\\w-]*' + this.processedPhrase() + '[\\w-]*\\b', this.regexOptions());
           }
-        case Constants.MatchMethods.Regex:
+        case Constants.MATCH_METHODS.REGEX:
           return new RegExp(this.value, this.regexOptions());
-        case Constants.MatchMethods.Exact:
+        case Constants.MATCH_METHODS.EXACT:
         default:
           // Match entire word that contains sub-string and surrounding whitespace
           // /\s?\bword\b\s?/gi
-          if (this._filterMethod === Constants.FilterMethods.Remove) {
+          if (this._filterMethod === Constants.FILTER_METHODS.REMOVE) {
             if (this.unicode) {
               // Work around for lack of word boundary support for unicode characters
               // /(^|[\s.,'"+!?|-])(word)([\s.,'"+!?|-]+|$)/giu

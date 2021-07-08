@@ -1,5 +1,5 @@
 import Constants from './lib/constants';
-import { dynamicList, exportToFile, readFile, removeChildren, removeFromArray } from './lib/helper';
+import { dynamicList, exportToFile, readFile, removeChildren, removeFromArray, upperCaseFirst } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
 import Domain from './domain';
@@ -208,10 +208,11 @@ export default class OptionPage {
     subInput.value = data.sub;
 
     const matchMethodSelect = document.createElement('select');
-    Constants.orderedArray(Constants.MatchMethods).forEach((matchMethod, index) => {
+    Constants.orderedArray(Constants.MATCH_METHODS).forEach((matchMethodConst, index) => {
+      const matchMethod = upperCaseFirst(matchMethodConst);
       const optionElement = document.createElement('option');
-      optionElement.value = Constants.MatchMethods[matchMethod].toString();
-      optionElement.classList.add(`bulkMatchMethod${Constants.MatchMethods[matchMethod]}`);
+      optionElement.value = Constants.MATCH_METHODS[matchMethod].toString();
+      optionElement.classList.add(`bulkMatchMethod${Constants.MATCH_METHODS[matchMethod]}`);
       optionElement.textContent = matchMethod;
       matchMethodSelect.appendChild(optionElement);
     });
@@ -592,7 +593,7 @@ export default class OptionPage {
 
     const domainKey = domainText.value.trim().toLowerCase();
     if (domainKey == '') { // No data
-      domainModeSelect.selectedIndex = Constants.DomainModes.Normal;
+      domainModeSelect.selectedIndex = Constants.DOMAIN_MODES.NORMAL;
     } else {
       const domain = new Domain(domainKey, domainCfg);
       domainModeSelect.selectedIndex = domain.getModeIndex();
@@ -637,7 +638,7 @@ export default class OptionPage {
       OptionPage.show(domainDisabledLabel);
     }
 
-    dynamicList(Constants.orderedArray(Constants.DomainModes), domainModeSelect);
+    dynamicList(Constants.orderedArray(Constants.DOMAIN_MODES), domainModeSelect, true);
 
     if (this.cfg.wordlistsEnabled) {
       OptionPage.show(wordlistContainer);
@@ -713,7 +714,7 @@ export default class OptionPage {
     removeChildren(defaultWordMatchMethodSelect);
     for (let i = 0; i < 3; i++) { // Skip Regex
       const optionElement = document.createElement('option');
-      const matchMethodName = Constants.matchMethodName(i);
+      const matchMethodName = upperCaseFirst(Constants.matchMethodName(i));
       optionElement.value = matchMethodName;
       optionElement.textContent = matchMethodName;
       defaultWordMatchMethodSelect.appendChild(optionElement);
@@ -787,7 +788,7 @@ export default class OptionPage {
     if (word == '') { // New word
       wordText.value = '';
       OptionPage.disableBtn(wordRemove);
-      const selectedMatchMethod = document.getElementById(`wordMatch${Constants.matchMethodName(this.cfg.defaultWordMatchMethod)}`) as HTMLInputElement;
+      const selectedMatchMethod = document.getElementById(`wordMatch${upperCaseFirst(Constants.matchMethodName(this.cfg.defaultWordMatchMethod))}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
       wordMatchRepeated.checked = this.cfg.defaultWordRepeat;
       wordMatchSeparators.checked = this.cfg.defaultWordSeparators;
@@ -805,7 +806,7 @@ export default class OptionPage {
       OptionPage.enableBtn(wordRemove);
       const wordCfg = this.cfg.words[word];
       wordText.value = word;
-      const selectedMatchMethod = document.getElementById(`wordMatch${Constants.matchMethodName(wordCfg.matchMethod)}`) as HTMLInputElement;
+      const selectedMatchMethod = document.getElementById(`wordMatch${upperCaseFirst(Constants.matchMethodName(wordCfg.matchMethod))}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
       wordMatchRepeated.checked = wordCfg.repeat;
       wordMatchSeparators.checked = wordCfg.separators === undefined ? this.cfg.defaultWordSeparators : wordCfg.separators;
@@ -877,7 +878,7 @@ export default class OptionPage {
     words.forEach((word) => {
       let filteredWord = word;
       if (word != words[0] && wordlistFilter.cfg.filterWordList) {
-        if (wordlistFilter.cfg.words[word].matchMethod === Constants.MatchMethods.Regex) { // Regexp
+        if (wordlistFilter.cfg.words[word].matchMethod === Constants.MATCH_METHODS.REGEX) { // Regexp
           filteredWord = wordlistFilter.cfg.words[word].sub || wordlistFilter.cfg.defaultSubstitution;
         } else {
           filteredWord = wordlistFilter.replaceText(word, 0, false); // Using 0 (All) here to filter all words
@@ -1206,7 +1207,7 @@ export default class OptionPage {
     let added = true;
     const wordlistSelectionsInput = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
 
-    if (Constants.MatchMethods[selectedMatchMethod.value] !== Constants.MatchMethods.Regex) {
+    if (Constants.MATCH_METHODS[selectedMatchMethod.value] !== Constants.MATCH_METHODS.REGEX) {
       word = word.toLowerCase();
     }
 
@@ -1227,18 +1228,18 @@ export default class OptionPage {
 
       const wordOptions: WordOptions = {
         lists: lists,
-        matchMethod: Constants.MatchMethods[selectedMatchMethod.value],
+        matchMethod: Constants.MATCH_METHODS[selectedMatchMethod.value],
         repeat: wordMatchRepeated.checked,
         separators: wordMatchSeparators.checked,
         sub: sub
       };
 
       // Check for endless substitution loop
-      if (wordOptions.matchMethod != Constants.MatchMethods.Regex) {
+      if (wordOptions.matchMethod != Constants.MATCH_METHODS.REGEX) {
         const subFilter = new Filter;
         const words = {};
         words[word] = wordOptions;
-        subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: Constants.FilterMethods.Substitute }, { words: words }));
+        subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: Constants.FILTER_METHODS.SUBSTITUTE }, { words: words }));
         subFilter.init();
         const first = subFilter.replaceTextResult(word);
         const second = subFilter.replaceTextResult(first.filtered);
@@ -1249,7 +1250,7 @@ export default class OptionPage {
       }
 
       // Test for a valid Regex
-      if (wordOptions.matchMethod === Constants.MatchMethods.Regex) {
+      if (wordOptions.matchMethod === Constants.MATCH_METHODS.REGEX) {
         const subFilter = new Filter;
         const words = {};
         words[word] = wordOptions;
@@ -1301,7 +1302,7 @@ export default class OptionPage {
   }
 
   async selectFilterMethod(evt) {
-    this.cfg.filterMethod = Constants.FilterMethods[evt.target.value];
+    this.cfg.filterMethod = Constants.FILTER_METHODS[evt.target.value];
     if (await this.saveProp('filterMethod')) {
       filter.rebuildWordlists();
       this.populateOptions();
@@ -1427,17 +1428,17 @@ export default class OptionPage {
   updateFilterOptions() {
     // Show/hide options as needed
     switch(this.cfg.filterMethod) {
-      case Constants.FilterMethods.Censor:
+      case Constants.FILTER_METHODS.CENSOR:
         OptionPage.show(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
-      case Constants.FilterMethods.Substitute:
+      case Constants.FILTER_METHODS.SUBSTITUTE:
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.show(document.getElementById('substitutionSettings'));
         OptionPage.show(document.getElementById('wordSubstitution'));
         break;
-      case Constants.FilterMethods.Remove:
+      case Constants.FILTER_METHODS.REMOVE:
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
         OptionPage.hide(document.getElementById('wordSubstitution'));

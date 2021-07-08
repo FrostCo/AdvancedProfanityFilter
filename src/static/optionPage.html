@@ -49,19 +49,19 @@
 
   <div id="filterMethod">
     <label>
-      <input id="filterCensor" class="w3-radio" type="radio" name="filterMethod" value="Censor">
+      <input id="filterCensor" class="w3-radio" type="radio" name="filterMethod" value="CENSOR">
       Censor<span class="notes">(dog: dog = d**)</span>
     </label>
 
     <br/>
     <label>
-      <input id="filterSubstitute" class="w3-radio" type="radio" name="filterMethod" value="Substitute">
+      <input id="filterSubstitute" class="w3-radio" type="radio" name="filterMethod" value="SUBSTITUTE">
       Substitute<span class="notes">(dog > cat: dog = cat)</span>
     </label>
 
     <br/>
     <label>
-      <input id="filterRemove" class="w3-radio" type="radio" name="filterMethod" value="Remove">
+      <input id="filterRemove" class="w3-radio" type="radio" name="filterMethod" value="REMOVE">
       Remove<span class="notes">(dog: doghouse = house)</span>
     </label>
   </div>
@@ -187,25 +187,25 @@
     <div id="wordMatchMethod">
       <h4 class="sectionHeader">Match Method</h4>
       <label>
-        <input id="wordMatchExact" type="radio" class="w3-radio" name="wordMatchMethod" value="Exact">
+        <input id="wordMatchExact" type="radio" class="w3-radio" name="wordMatchMethod" value="EXACT">
         Exact<span class="notes">(dog: *** in the doghouse)</span>
       </label>
 
       <br>
       <label>
-        <input id="wordMatchPartial" type="radio" class="w3-radio" name="wordMatchMethod" value="Partial">
+        <input id="wordMatchPartial" type="radio" class="w3-radio" name="wordMatchMethod" value="PARTIAL">
         Partial<span class="notes">(dog: *** in the ***house)</span>
       </label>
 
       <br>
       <label>
-        <input id="wordMatchWhole" type="radio" class="w3-radio" name="wordMatchMethod" value="Whole">
+        <input id="wordMatchWhole" type="radio" class="w3-radio" name="wordMatchMethod" value="WHOLE">
         Whole<span class="notes">(dog: *** in the ********)</span>
       </label>
 
       <br>
       <label>
-        <input id="wordMatchRegex" type="radio" class="w3-radio" name="wordMatchMethod" value="Regex">
+        <input id="wordMatchRegex" type="radio" class="w3-radio" name="wordMatchMethod" value="REGEX">
         Regex
       </label>
     </div>

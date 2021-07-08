@@ -8,9 +8,9 @@ describe('DataMigration', function() {
     it('should add wordlist to all words', function() {
       const cfg = {
         words: {
-          'test': { matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: false, sub: 'tset' },
-          'another': { matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: false, sub: 'tset' },
-          'testWithList': { lists: [1, 3, 5], matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: false, sub: 'tset' },
+          'test': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
+          'another': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
+          'testWithList': { lists: [1, 3, 5], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
         }
       };
       const dataMigration = new DataMigration(cfg);
@@ -25,9 +25,9 @@ describe('DataMigration', function() {
     it('should remove global match method and adjust RegExp method', function() {
       const data = {
         words: {
-          'test': { matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: false, sub: 'tset' },
-          'another': { matchMethod: Constants.MatchMethods.Partial, repeat: true, separators: false, sub: 'tset' },
-          'testWithList': { lists: [1, 3, 5], matchMethod: Constants.MatchMethods.Exact, repeat: true, separators: false, sub: 'tset' },
+          'test': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
+          'another': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'tset' },
+          'testWithList': { lists: [1, 3, 5], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
           '^myRegexp$': { lists: [1, 3, 5], matchMethod: 4, repeat: true, separators: false, sub: 'tset' },
         },
         globalMatchMethod: 3,
@@ -36,10 +36,10 @@ describe('DataMigration', function() {
       cfg.remove = (prop) => { delete cfg[prop]; return true; }; // TODO: Find a good way to mock chrome.*
       const dataMigration = new DataMigration(cfg);
       dataMigration.removeGlobalMatchMethod();
-      expect(cfg.words['test'].matchMethod).to.eql(Constants.MatchMethods.Exact);
-      expect(cfg.words['another'].matchMethod).to.eql(Constants.MatchMethods.Partial);
-      expect(cfg.words['testWithList'].matchMethod).to.eql(Constants.MatchMethods.Exact);
-      expect(cfg.words['^myRegexp$'].matchMethod).to.eql(Constants.MatchMethods.Regex);
+      expect(cfg.words['test'].matchMethod).to.eql(Constants.MATCH_METHODS.EXACT);
+      expect(cfg.words['another'].matchMethod).to.eql(Constants.MATCH_METHODS.PARTIAL);
+      expect(cfg.words['testWithList'].matchMethod).to.eql(Constants.MATCH_METHODS.EXACT);
+      expect(cfg.words['^myRegexp$'].matchMethod).to.eql(Constants.MATCH_METHODS.REGEX);
       expect(cfg.globalMatchMethod).to.not.exist;
     });
   });

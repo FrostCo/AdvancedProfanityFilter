@@ -1,10 +1,15 @@
+import Constants from './lib/constants';
+
 export default class WebAudioSites {
   static combineSites(sites: { [site: string]: AudioRule[] } = {}): { [site: string]: AudioRule[] } {
     return Object.assign({}, WebAudioSites.sites, sites);
   }
 
   static sites: { [site: string]: AudioRule[] } = {
-    'abc.com': [{ className: 'akamai-caption-text', mode: 'element', tagName: 'DIV' }],
+    'abc.com': [
+      { className: 'akamai-caption-text', mode: 'element', tagName: 'DIV' },
+      { className: 'amp-caption-area', displaySelector: 'div.amp-caption-area', mode: 'element', muteMethod: Constants.MUTE_METHODS.VIDEO, subtitleSelector: 'div.amp-caption > p', tagName: 'DIV' },
+    ],
     'acorn.tv': [
       {
         iframe: true,
@@ -35,6 +40,7 @@ export default class WebAudioSites {
       {
         displaySelector: 'div.video-container > div > div > div',
         mode: 'elementChild',
+        muteMethod: Constants.MUTE_METHODS.TAB,
         parentSelector: 'div.video-container',
         preserveWhiteSpace: true,
         rootNode: true,
@@ -52,6 +58,20 @@ export default class WebAudioSites {
     'www.cbs.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'www.crackle.com': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'www.criterionchannel.com': [{ iframe: true, mode: 'cue', videoCueHideCues: true, videoCueRequireShowing: false }],
+    'beta.crunchyroll.com': [
+      {
+        apfCaptions: true,
+        apfCaptionsSelector: 'vilosVttJs',
+        displaySelector: 'canvas#velocity-canvas',
+        externalSub: true,
+        externalSubTrackMode: 'hidden',
+        externalSubVar: 'window.v1config.media.subtitles',
+        iframe: true,
+        mode: 'cue',
+        videoCueLanguage: 'en-US',
+        videoCueRequireShowing: false
+      },
+    ],
     'www.crunchyroll.com': [
       {
         apfCaptions: true,
@@ -64,11 +84,12 @@ export default class WebAudioSites {
         mode: 'cue',
         videoCueLanguage: 'enUS',
         videoCueRequireShowing: false,
-      }
+        videoSelector: 'video#player0',
+      },
     ],
     'www.cwtv.com': [
-      { className: 'ttr-container', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
-      { className: 'ttr-line', mode: 'element', note: '[CC]', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
+      { className: 'ttr-container', convertBreaks: true, mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
+      { className: 'ttr-line', convertBreaks: true, mode: 'element', note: '[CC]', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
     ],
     'www.discoveryplus.com': [{ displaySelector: 'div.cjRVXG', mode: 'cue', videoCueKind: 'captions', videoCueLanguage: 'en' }],
     'www.dishanywhere.com': [
@@ -77,6 +98,16 @@ export default class WebAudioSites {
     ],
     'www.disneyplus.com': [{ mode: 'cue', videoCueHideCues: true, videoSelector: 'video.btm-media-client-element' }],
     'www.fox.com': [{ className: 'jw-text-track-container', mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
+    'www.fubo.tv': [
+      {
+        displayHide: 'none',
+        displaySelector: 'div.bmpui-ui-subtitle-overlay',
+        iframe: false,
+        mode: 'watcher',
+        parentSelector: 'div.bmpui-ui-subtitle-overlay',
+        subtitleSelector: 'div.bmpui-ui-subtitle-overlay span',
+      },
+    ],
     'www.funimation.com': [
       {
         iframe: true,

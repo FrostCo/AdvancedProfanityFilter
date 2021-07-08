@@ -96,9 +96,9 @@ class Popup {
     const wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
-    dynamicList(Constants.orderedArray(Constants.DomainModes), domainModeSelect);
+    dynamicList(Constants.orderedArray(Constants.DOMAIN_MODES), domainModeSelect, true);
     domainModeSelect.selectedIndex = this.domain.getModeIndex();
-    dynamicList(Constants.orderedArray(Constants.FilterMethods), filterMethodSelect);
+    dynamicList(Constants.orderedArray(Constants.FILTER_METHODS), filterMethodSelect, true);
     filterMethodSelect.selectedIndex = this.cfg.filterMethod;
 
     if (this.cfg.wordlistsEnabled) {

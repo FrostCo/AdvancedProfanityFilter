@@ -181,7 +181,7 @@ export default class BookmarkletFilter extends Filter {
   cleanPage() {
     this.cfg = new WebConfig(config);
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
-    this.cfg.muteMethod = Constants.MuteMethods.Video; // Bookmarklet: Force video volume mute method
+    this.cfg.muteMethod = Constants.MUTE_METHODS.VIDEO; // Bookmarklet: Force video volume mute method
 
     // Use domain-specific settings
     const message: Message = { disabled: (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
@@ -231,7 +231,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, stats: boolean = true) {
-    this.shadowObserver.observe(shadowRoot, ObserverConfig);
+    this.shadowObserver.observe(shadowRoot, observerConfig);
     this.processNode(shadowRoot, wordlistId, stats);
   }
 
@@ -255,7 +255,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   startObserving(target: Node = document, observer: MutationObserver = this.observer) {
-    observer.observe(target, ObserverConfig);
+    observer.observe(target, observerConfig);
   }
 
   stopObserving(observer: MutationObserver = this.observer) {
@@ -268,7 +268,7 @@ export default class BookmarkletFilter extends Filter {
 }
 
 const filter = new BookmarkletFilter;
-const ObserverConfig: MutationObserverInit = {
+const observerConfig: MutationObserverInit = {
   characterData: true,
   characterDataOldValue: true,
   childList: true,
