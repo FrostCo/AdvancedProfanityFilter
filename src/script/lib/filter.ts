@@ -69,7 +69,7 @@ export default class Filter {
     return false;
   }
 
-  foundMatch(word?: Word) {
+  foundMatch(word?: Word, statsType?: string) {
     this.counter++;
   }
 
@@ -102,7 +102,7 @@ export default class Filter {
     });
   }
 
-  replaceText(str: string, wordlistId: number | false = false, stats: boolean = true): string {
+  replaceText(str: string, wordlistId: number | false = false, statsType: string | null = Constants.STATS_TYPE_TEXT): string {
     wordlistId = this.buildWordlist(wordlistId);
     const wordlist = this.wordlists[wordlistId];
 
@@ -112,7 +112,7 @@ export default class Filter {
           str = str.replace(regExp, (originalMatch, ...args): string => {
             const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
             if (this.checkWhitelist(match, string, matchStartIndex, word)) { return match; } // Check for whitelisted match
-            if (stats) { this.foundMatch(word); }
+            if (statsType) { this.foundMatch(word, statsType); }
 
             // Filter
             let censoredString = '';
@@ -138,7 +138,7 @@ export default class Filter {
           str = str.replace(regExp, (originalMatch, ...args): string => {
             const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
             if (this.checkWhitelist(match, string, matchStartIndex, word)) { return match; } // Check for whitelisted match
-            if (stats) { this.foundMatch(word); }
+            if (statsType) { this.foundMatch(word, statsType); }
 
             // Filter
             let sub = word.sub || this.cfg.defaultSubstitution;
@@ -166,7 +166,7 @@ export default class Filter {
           str = str.replace(regExp, (originalMatch, ...args): string => {
             const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
             if (this.checkWhitelist(match.trim(), string, matchStartIndex, word)) { return match; } // Check for whitelisted match
-            if (stats) { this.foundMatch(word); }
+            if (statsType) { this.foundMatch(word, statsType); }
 
             // Filter
             if (internalCaptureGroups) {
@@ -193,10 +193,10 @@ export default class Filter {
     return str;
   }
 
-  replaceTextResult(str: string, wordlistId: (number | false) = false, stats: boolean = true): ReplaceTextResult {
+  replaceTextResult(str: string, wordlistId: (number | false) = false, statsType: string | null = Constants.STATS_TYPE_TEXT): ReplaceTextResult {
     const result: ReplaceTextResult = {
       original: str,
-      filtered: this.replaceText(str, wordlistId, stats),
+      filtered: this.replaceText(str, wordlistId, statsType),
       modified: false
     };
     result.modified = (result.filtered != str);
