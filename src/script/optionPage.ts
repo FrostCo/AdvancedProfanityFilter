@@ -745,25 +745,6 @@ export default class OptionPage {
     const statsWordContainer = document.querySelector('div#statsWordContainer') as HTMLDivElement;
     const statsWordTable = statsWordContainer.querySelector('table#statsWordTable') as HTMLTableElement;
 
-    // Add table header row
-    const tHead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    const wordHeader = document.createElement('th');
-    const textHeader = document.createElement('th');
-    const audioHeader = document.createElement('th');
-    const totalHeader = document.createElement('th');
-    headerRow.classList.add('w3-flat-peter-river');
-    wordHeader.textContent = 'Word';
-    textHeader.textContent = 'Text';
-    audioHeader.textContent = 'Audio';
-    totalHeader.textContent = 'Total';
-    headerRow.appendChild(wordHeader);
-    headerRow.appendChild(textHeader);
-    headerRow.appendChild(audioHeader);
-    headerRow.appendChild(totalHeader);
-    tHead.appendChild(headerRow);
-    statsWordTable.appendChild(tHead);
-
     // Table body
     const tBody = document.createElement('tbody');
     sortedWords.forEach((word) => {
@@ -788,7 +769,8 @@ export default class OptionPage {
       const totalCell = row.insertCell(3);
       totalCell.textContent = wordStats.total.toString();
     });
-    statsWordTable.appendChild(tBody);
+    const oldTBody = statsWordTable.tBodies[0];
+    statsWordTable.replaceChild(tBody, oldTBody);
 
     // Summary
     const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableDataCellElement;
