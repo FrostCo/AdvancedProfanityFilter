@@ -30,7 +30,7 @@ export default class WebFilter extends Filter {
 
   constructor() {
     super();
-    this.audioWordlistId = 0;
+    this.audioWordlistId = Constants.ALL_WORDS_WORDLIST_ID;
     this.extension = true;
     this.mutePage = false;
     this.processMutationTarget = false;
@@ -290,7 +290,7 @@ export default class WebFilter extends Filter {
         if (word.matchMethod === Constants.MATCH_METHODS.REGEX) {
           result = word.sub || this.cfg.defaultSubstitution;
         } else {
-          result = this.replaceText(word.value, 0, null); // We can use 0 (All) here because we are just filtering a word
+          result = this.replaceText(word.value, Constants.ALL_WORDS_WORDLIST_ID, null); // Use all words because we are just filtering a word
         }
 
         this.summary[word.value] = { filtered: result, count: 1 };

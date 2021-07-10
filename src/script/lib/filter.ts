@@ -76,7 +76,7 @@ export default class Filter {
   init(wordlistId: number | false = false) {
     this.iWhitelist = this.cfg.iWordWhitelist;
     this.whitelist = this.cfg.wordWhitelist;
-    if (this.wordlistId === undefined) { this.wordlistId = this.cfg.wordlistId == null ? 0 : this.cfg.wordlistId; }
+    if (this.wordlistId === undefined) { this.wordlistId = this.cfg.wordlistId == null ? Constants.ALL_WORDS_WORDLIST_ID : this.cfg.wordlistId; }
     this.buildWordlist(wordlistId);
   }
 

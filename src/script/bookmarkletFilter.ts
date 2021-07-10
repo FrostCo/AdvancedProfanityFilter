@@ -36,7 +36,7 @@ export default class BookmarkletFilter extends Filter {
   constructor() {
     super();
     this.extension = false;
-    this.audioWordlistId = 0;
+    this.audioWordlistId = Constants.ALL_WORDS_WORDLIST_ID;
     this.mutePage = false;
     this.processMutationTarget = false;
   }
