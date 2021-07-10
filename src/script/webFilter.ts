@@ -244,7 +244,7 @@ export default class WebFilter extends Filter {
     this.startObserving(document);
 
     // Track stats (if enabled)
-    if (this.cfg.captureStats) {
+    if (this.cfg.collectStats) {
       if (Object.keys(this.stats)) {
         this.persistStats();
       }
@@ -297,7 +297,7 @@ export default class WebFilter extends Filter {
       }
     }
 
-    if (this.cfg.captureStats) {
+    if (this.cfg.collectStats) {
       if (!this.stats[word.value]) {
         this.stats[word.value] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
       }
