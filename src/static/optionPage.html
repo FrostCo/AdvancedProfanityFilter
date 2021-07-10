@@ -40,6 +40,7 @@
     </div>
   </div>
   <a href="#" class="w3-bar-item w3-button w3-right">Help</a>
+  <a href="#" class="w3-bar-item w3-button w3-right">Stats</a>
   <a href="#" class="w3-bar-item w3-button w3-right">Test</a>
 </div>
 
@@ -491,6 +492,38 @@
     <h4 class="sectionHeader">Password</h4>
     <input id="setPassword" class="w3-input w3-border small" style="display:inline">
     <button id="setPasswordBtn" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">REMOVE</button>
+  </div>
+</div>
+
+<div id="statsPage" class="w3-container w3-hide">
+  <h4 class="sectionHeader">Stats</h4>
+  <label>
+    <input id="collectStats" type="checkbox" class="w3-check">
+    Collect stats
+    <span class="notes">(Only stored locally)</span>
+  </label>
+
+  <button id="statsReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESET</button>
+
+  <h4 class="sectionHeader">Summary</h4>
+  <div id="statsSummaryContainer" class="small">
+    <table id="statsSummaryTable" class="w3-table w3-striped w3-border w3-bordered w3-card w3-small">
+      <tbody>
+        <tr>
+          <td>Total Filtered Words</td>
+          <td id="statsSummaryTotal"></td>
+        </tr>
+        <tr>
+          <td>Total Mutes</td>
+          <td id="statsSummaryMutes"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4 class="sectionHeader">Words Filtered</h4>
+  <div id="statsWordContainer">
+    <table id="statsWordTable" class="w3-table w3-striped w3-border w3-bordered w3-card w3-small"></table>
   </div>
 </div>
 

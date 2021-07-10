@@ -133,6 +133,16 @@ export default class WebConfig extends Config {
     return containerKeys;
   }
 
+  static getLocalStoragePromise(keys: string | string[]) {
+    if (typeof keys === 'string') { keys = [keys]; }
+
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(keys, (data) => {
+        resolve(data);
+      });
+    });
+  }
+
   // Order and remove `_` prefixed values
   ordered() {
     return Object.keys(this).sort().reduce((obj, key) => {

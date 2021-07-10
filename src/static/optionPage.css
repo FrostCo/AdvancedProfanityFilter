@@ -165,3 +165,16 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 .small {
   width: 300px;
 }
+
+/* Summary table */
+#statsWordContainer {
+  overflow: auto;
+  max-height: 800px;
+  margin-bottom: 8px;
+}
+
+#statsWordContainer table tbody .statsTooltip {
+  position: absolute;
+  left: 0;
+  bottom: 18px
+}

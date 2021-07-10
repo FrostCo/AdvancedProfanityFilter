@@ -669,6 +669,7 @@ export default class OptionPage {
     this.populateDomainPage();
     this.populateAudio();
     this.populateConfig();
+    this.populateStats();
     this.populateTest();
   }
 
@@ -720,6 +721,81 @@ export default class OptionPage {
       defaultWordMatchMethodSelect.appendChild(optionElement);
     }
     defaultWordMatchMethodSelect.selectedIndex = this.cfg.defaultWordMatchMethod;
+  }
+
+  async populateStats() {
+    const { stats } = await WebConfig.getLocalStoragePromise('stats') as Statistics;
+    const words = Object.keys(stats);
+    if (!words.length) { return null; }
+
+    // Prepare data (collect totals, add words without stats, sort output)
+    let totalFiltered = 0;
+    const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
+    allWords.forEach((word) => {
+      const wordStats = stats[word] as Statistic;
+      if (wordStats) {
+        wordStats.total = wordStats.audio + wordStats.text;
+        totalFiltered += wordStats.total;
+      } else {
+        stats[word] = { audio: 0, text: 0, total: 0 };
+      }
+    });
+    const alphaSortedWords = allWords.sort();
+    const sortedWords = alphaSortedWords.sort((a, b) => stats[b].total - stats[a].total);
+
+    const statsWordContainer = document.querySelector('div#statsWordContainer') as HTMLDivElement;
+    const statsWordTable = statsWordContainer.querySelector('table#statsWordTable') as HTMLTableElement;
+
+    // Add table header row
+    const tHead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const wordHeader = document.createElement('th');
+    const textHeader = document.createElement('th');
+    const audioHeader = document.createElement('th');
+    const totalHeader = document.createElement('th');
+    headerRow.classList.add('w3-flat-peter-river');
+    wordHeader.textContent = 'Word';
+    textHeader.textContent = 'Text';
+    audioHeader.textContent = 'Audio';
+    totalHeader.textContent = 'Total';
+    headerRow.appendChild(wordHeader);
+    headerRow.appendChild(textHeader);
+    headerRow.appendChild(audioHeader);
+    headerRow.appendChild(totalHeader);
+    tHead.appendChild(headerRow);
+    statsWordTable.appendChild(tHead);
+
+    // Table body
+    const tBody = document.createElement('tbody');
+    sortedWords.forEach((word) => {
+      const wordStats = stats[word] as Statistic;
+      const row = tBody.insertRow();
+      const wordCell = row.insertCell(0);
+      wordCell.classList.add('w3-tooltip');
+      const tooltipSpan = document.createElement('span');
+      tooltipSpan.classList.add('statsTooltip', 'w3-tag', 'w3-text');
+      tooltipSpan.textContent = word;
+      const wordSpan = document.createElement('span');
+      wordSpan.textContent = filter.replaceText(word, Constants.ALL_WORDS_WORDLIST_ID, null);
+      wordCell.appendChild(tooltipSpan);
+      wordCell.appendChild(wordSpan);
+
+      const textCell = row.insertCell(1);
+      textCell.textContent = wordStats.text.toString();
+
+      const audioCell = row.insertCell(2);
+      audioCell.textContent = wordStats.audio.toString();
+
+      const totalCell = row.insertCell(3);
+      totalCell.textContent = wordStats.total.toString();
+    });
+    statsWordTable.appendChild(tBody);
+
+    // Summary
+    const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableDataCellElement;
+    statsSummaryTotal.textContent = totalFiltered.toString();
+    const statsSummaryMutes = document.querySelector('table#statsSummaryTable td#statsSummaryMutes') as HTMLTableDataCellElement;
+    statsSummaryMutes.textContent = '0';
   }
 
   populateTest() {

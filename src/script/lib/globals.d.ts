@@ -115,6 +115,7 @@ interface ReplaceTextResult {
 interface Statistic {
   audio: number;
   text: number;
+  total?: number;
 }
 
 interface Statistics {
