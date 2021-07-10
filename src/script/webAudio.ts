@@ -754,8 +754,8 @@ export default class WebAudio {
     this.lastProcessedText = captions.map((caption) => caption.textContent).join(' ');
   }
 
-  replaceTextResult(string: string, stats: boolean = true) {
-    return this.filter.replaceTextResult(string, this.wordlistId, stats);
+  replaceTextResult(string: string, wordlistId: number = this.wordlistId, statsType: string | null = Constants.STATS_TYPE_AUDIO) {
+    return this.filter.replaceTextResult(string, wordlistId, statsType);
   }
 
   showSubtitles(rule, subtitles?) {

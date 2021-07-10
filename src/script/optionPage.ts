@@ -729,7 +729,7 @@ export default class OptionPage {
     if (testText.value === '') {
       filteredTestText.textContent = 'Enter some text above to test the filter...';
     } else {
-      filteredTestText.textContent = filter.replaceText(testText.value, filter.cfg.wordlistId, false);
+      filteredTestText.textContent = filter.replaceText(testText.value, filter.cfg.wordlistId, null);
     }
   }
 
@@ -881,7 +881,7 @@ export default class OptionPage {
         if (wordlistFilter.cfg.words[word].matchMethod === Constants.MATCH_METHODS.REGEX) { // Regexp
           filteredWord = wordlistFilter.cfg.words[word].sub || wordlistFilter.cfg.defaultSubstitution;
         } else {
-          filteredWord = wordlistFilter.replaceText(word, 0, false); // Using 0 (All) here to filter all words
+          filteredWord = wordlistFilter.replaceText(word, 0, null); // Using 0 (All) here to filter all words
         }
       }
 
@@ -1241,8 +1241,8 @@ export default class OptionPage {
         words[word] = wordOptions;
         subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: Constants.FILTER_METHODS.SUBSTITUTE }, { words: words }));
         subFilter.init();
-        const first = subFilter.replaceTextResult(word);
-        const second = subFilter.replaceTextResult(first.filtered);
+        const first = subFilter.replaceTextResult(word, 0, null);
+        const second = subFilter.replaceTextResult(first.filtered, 0, null);
         if (first.filtered != second.filtered) {
           OptionPage.showInputError(substitutionText, "Substitution can't contain word (causes an endless loop).");
           return false;
