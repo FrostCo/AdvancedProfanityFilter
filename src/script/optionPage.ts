@@ -724,9 +724,8 @@ export default class OptionPage {
   }
 
   async populateStats() {
-    const { stats } = await WebConfig.getLocalStoragePromise('stats') as Statistics;
-    const words = Object.keys(stats);
-    if (!words.length) { return null; }
+    // Gather data
+    const { stats } = await WebConfig.getLocalStoragePromise({ stats: {} }) as Statistics;
 
     // Prepare data (collect totals, add words without stats, sort output)
     let totalFiltered = 0;

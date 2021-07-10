@@ -133,7 +133,7 @@ export default class WebConfig extends Config {
     return containerKeys;
   }
 
-  static getLocalStoragePromise(keys: string | string[]) {
+  static getLocalStoragePromise(keys: string | string[] | Record<string, unknown>) {
     if (typeof keys === 'string') { keys = [keys]; }
 
     return new Promise((resolve, reject) => {
