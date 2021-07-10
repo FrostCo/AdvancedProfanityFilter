@@ -772,6 +772,10 @@ export default class OptionPage {
     const oldTBody = statsWordTable.tBodies[0];
     statsWordTable.replaceChild(tBody, oldTBody);
 
+    // Options
+    const collectStats = document.getElementById('collectStats') as HTMLInputElement;
+    collectStats.checked = this.cfg.collectStats;
+
     // Summary
     const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableDataCellElement;
     statsSummaryTotal.textContent = totalFiltered.toString();
@@ -1150,6 +1154,7 @@ export default class OptionPage {
     const muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
     const showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
     const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
+    const collectStats = document.getElementById('collectStats') as HTMLInputElement;
     this.cfg.censorCharacter = censorCharacterSelect.value;
     this.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     this.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
@@ -1172,6 +1177,7 @@ export default class OptionPage {
     this.cfg.muteMethod = parseInt(muteMethodInput.value);
     this.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
     this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
+    this.cfg.collectStats = collectStats.checked;
 
     // Save settings
     try {
