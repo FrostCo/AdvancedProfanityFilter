@@ -301,7 +301,11 @@ export default class WebFilter extends Filter {
       if (!this.stats[word.value]) {
         this.stats[word.value] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
       }
-      this.stats[word.value].text++;
+
+      switch(statsType) {
+        case Constants.STATS_TYPE_AUDIO: this.stats[word.value].audio++; break;
+        case Constants.STATS_TYPE_TEXT: this.stats[word.value].text++; break;
+      }
     }
   }
 
@@ -330,11 +334,12 @@ export default class WebFilter extends Filter {
   persistStats() {
     const words = Object.keys(filter.stats);
     if (words.length) {
-      chrome.storage.local.get({ stats: {} }, (data) => {
+      chrome.storage.local.get({ stats: {} }, (data: Statistics) => {
         words.forEach((word) => {
           if (!data.stats[word]) {
             data.stats[word] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
           }
+          data.stats[word].audio += filter.stats[word].audio;
           data.stats[word].text += filter.stats[word].text;
         });
         chrome.storage.local.set({ stats: data.stats }, () => {
