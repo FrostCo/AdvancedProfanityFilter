@@ -8,6 +8,8 @@ export default class Constants {
   static readonly MATCH_METHODS = { EXACT: 0, PARTIAL: 1, WHOLE: 2, REGEX: 3 };
   static readonly MUTE_METHODS = { TAB: 0, VIDEO: 1, NONE: 2 };
   static readonly SHOW_SUBTITLES = { ALL: 0, FILTERED: 1, UNFILTERED: 2, NONE: 3 };
+  static readonly STATS_TYPE_AUDIO = 'audio';
+  static readonly STATS_TYPE_TEXT = 'text';
 
   // Helper Functions
   static filterMethodName(id: number) { return this.nameById(this.FILTER_METHODS, id); }

@@ -24,6 +24,7 @@ export default class WebFilter extends Filter {
   processMutationTarget: boolean;
   processNode: (node: HTMLElement | Document | ShadowRoot, wordlistId: number, stats?: boolean) => void;
   shadowObserver: MutationObserver;
+  stats: Statistics;
   summary: Summary;
 
   constructor() {
@@ -32,6 +33,7 @@ export default class WebFilter extends Filter {
     this.extension = true;
     this.mutePage = false;
     this.processMutationTarget = false;
+    this.stats = {};
     this.summary = {};
   }
 
@@ -239,6 +241,14 @@ export default class WebFilter extends Filter {
     logger.infoTime('Initial page filtered.');
     this.updateCounterBadge();
     this.startObserving(document);
+
+    // Track stats (if enabled)
+    if (this.cfg.captureStats) {
+      if (Object.keys(this.stats)) {
+        this.persistStats();
+      }
+      window.setTimeout(filter.persistStats, 10000); // Persist stats at an interval
+    }
   }
 
   cleanText(node, wordlistId: number, stats: boolean = true) {
@@ -270,6 +280,7 @@ export default class WebFilter extends Filter {
 
   foundMatch(word) {
     super.foundMatch(word);
+
     if (this.cfg.showSummary) {
       if (this.summary[word.value]) {
         this.summary[word.value].count += 1;
@@ -283,6 +294,13 @@ export default class WebFilter extends Filter {
 
         this.summary[word.value] = { filtered: result, count: 1 };
       }
+    }
+
+    if (this.cfg.captureStats) {
+      if (!this.stats[word.value]) {
+        this.stats[word.value] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
+      }
+      this.stats[word.value].text++;
     }
   }
 
@@ -305,6 +323,25 @@ export default class WebFilter extends Filter {
       this.processNode = this.cleanNode;
     } else {
       this.processNode = this.cleanText;
+    }
+  }
+
+  persistStats() {
+    const words = Object.keys(filter.stats);
+    if (words.length) {
+      chrome.storage.local.get({ stats: {} }, (data) => {
+        words.forEach((word) => {
+          if (!data.stats[word]) {
+            data.stats[word] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
+          }
+          data.stats[word].text += filter.stats[word].text;
+        });
+        chrome.storage.local.set({ stats: data.stats }, () => {
+          if (!chrome.runtime.lastError) {
+            filter.stats = {};
+          }
+        });
+      });
     }
   }
 

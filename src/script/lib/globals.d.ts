@@ -112,6 +112,15 @@ interface ReplaceTextResult {
   modified: boolean;
 }
 
+interface Statistic {
+  audio: number;
+  text: number;
+}
+
+interface Statistics {
+  [word: string]: Statistic;
+}
+
 interface Summary {
   [word: string]: {
     filtered: string;

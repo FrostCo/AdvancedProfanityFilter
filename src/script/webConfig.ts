@@ -16,6 +16,7 @@ export default class WebConfig extends Config {
   password: string;
   showSubtitles: number;
   showUpdateNotification: boolean;
+  captureStats: boolean;
   youTubeAutoSubsMax: number;
   youTubeAutoSubsMin: number;
 
@@ -32,6 +33,7 @@ export default class WebConfig extends Config {
     muteMethod: Constants.MUTE_METHODS.TAB,
     password: null,
     showSubtitles: Constants.SHOW_SUBTITLES.ALL,
+    captureStats: false,
     showUpdateNotification: true,
     youTubeAutoSubsMax: 0,
     youTubeAutoSubsMin: 0,
