@@ -729,23 +729,22 @@ export default class OptionPage {
   }
 
   async populateStats() {
-    // Gather data
-    const { stats } = await WebConfig.getLocalStoragePromise({ stats: {} }) as Statistics;
+    const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
 
     // Prepare data (collect totals, add words without stats, sort output)
     let totalFiltered = 0;
     const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
     allWords.forEach((word) => {
-      const wordStats = stats[word] as Statistic;
+      const wordStats = stats.words[word];
       if (wordStats) {
         wordStats.total = wordStats.audio + wordStats.text;
         totalFiltered += wordStats.total;
       } else {
-        stats[word] = { audio: 0, text: 0, total: 0 };
+        stats.words[word] = { audio: 0, text: 0, total: 0 };
       }
     });
     const alphaSortedWords = allWords.sort();
-    const sortedWords = alphaSortedWords.sort((a, b) => stats[b].total - stats[a].total);
+    const sortedWords = alphaSortedWords.sort((a, b) => stats.words[b].total - stats.words[a].total);
 
     const statsWordContainer = document.querySelector('div#statsWordContainer') as HTMLDivElement;
     const statsWordTable = statsWordContainer.querySelector('table#statsWordTable') as HTMLTableElement;
@@ -753,7 +752,7 @@ export default class OptionPage {
     // Table body
     const tBody = document.createElement('tbody');
     sortedWords.forEach((word) => {
-      const wordStats = stats[word] as Statistic;
+      const wordStats = stats.words[word];
       const row = tBody.insertRow();
       const wordCell = row.insertCell(0);
       wordCell.classList.add('w3-tooltip');

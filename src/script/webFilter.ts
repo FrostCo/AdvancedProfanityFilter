@@ -34,7 +34,7 @@ export default class WebFilter extends Filter {
     this.extension = true;
     this.mutePage = false;
     this.processMutationTarget = false;
-    this.stats = {};
+    this.stats = { mutes: 0, words: {} };
     this.summary = {};
   }
 
@@ -298,13 +298,14 @@ export default class WebFilter extends Filter {
     }
 
     if (this.cfg.collectStats) {
-      if (!this.stats[word.value]) {
-        this.stats[word.value] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
+      const wordStats = this.stats.words;
+      if (!wordStats[word.value]) {
+        wordStats[word.value] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
       }
 
       switch(statsType) {
-        case Constants.STATS_TYPE_AUDIO: this.stats[word.value].audio++; break;
-        case Constants.STATS_TYPE_TEXT: this.stats[word.value].text++; break;
+        case Constants.STATS_TYPE_AUDIO: wordStats[word.value].audio++; break;
+        case Constants.STATS_TYPE_TEXT: wordStats[word.value].text++; break;
       }
     }
   }
@@ -332,19 +333,24 @@ export default class WebFilter extends Filter {
   }
 
   persistStats() {
-    const words = Object.keys(filter.stats);
+    const words = Object.keys(filter.stats.words);
     if (words.length) {
-      chrome.storage.local.get({ stats: {} }, (data: Statistics) => {
+      chrome.storage.local.get({ stats: { mutes: 0, words: {} } }, (data) => {
+        const storedStats = data.stats as Statistics;
+        const storedWords = storedStats.words;
         words.forEach((word) => {
-          if (!data.stats[word]) {
-            data.stats[word] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
+          if (!storedWords[word]) {
+            storedWords[word] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
           }
-          data.stats[word].audio += filter.stats[word].audio;
-          data.stats[word].text += filter.stats[word].text;
+          storedWords[word].audio += filter.stats.words[word].audio;
+          storedWords[word].text += filter.stats.words[word].text;
         });
-        chrome.storage.local.set({ stats: data.stats }, () => {
+
+        storedStats.mutes += filter.stats.mutes;
+        if (storedStats.startedAt == null) { storedStats.startedAt = new Date(); }
+        chrome.storage.local.set({ stats: storedStats }, () => {
           if (!chrome.runtime.lastError) {
-            filter.stats = {};
+            filter.stats = { mutes: 0, words: {} };
           }
         });
       });

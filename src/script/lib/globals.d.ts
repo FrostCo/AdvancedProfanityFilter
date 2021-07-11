@@ -112,14 +112,10 @@ interface ReplaceTextResult {
   modified: boolean;
 }
 
-interface Statistic {
-  audio: number;
-  text: number;
-  total?: number;
-}
-
 interface Statistics {
-  [word: string]: Statistic;
+  mutes: number;
+  startedAt?: Date;
+  words: WordStatistics;
 }
 
 interface Summary {
@@ -155,4 +151,14 @@ interface WordOptions {
   repeat: boolean;
   separators?: boolean;
   sub: string;
+}
+
+interface WordStatistic {
+  audio: number;
+  text: number;
+  total?: number;
+}
+
+interface WordStatistics {
+  [word: string]: WordStatistic;
 }
