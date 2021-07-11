@@ -441,6 +441,9 @@ export default class WebAudio {
   mute(rule?: AudioRule, video?: HTMLVideoElement): void {
     if (!this.muted) {
       this.muted = true;
+      if (this.filter.cfg.collectStats) {
+        this.filter.stats.mutes++;
+      }
 
       switch(rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:

@@ -784,7 +784,7 @@ export default class OptionPage {
     const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableDataCellElement;
     statsSummaryTotal.textContent = totalFiltered.toString();
     const statsSummaryMutes = document.querySelector('table#statsSummaryTable td#statsSummaryMutes') as HTMLTableDataCellElement;
-    statsSummaryMutes.textContent = '0';
+    statsSummaryMutes.textContent = stats.mutes.toString();
   }
 
   populateTest() {

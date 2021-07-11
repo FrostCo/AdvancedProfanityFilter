@@ -32,6 +32,7 @@ export default class BookmarkletFilter extends Filter {
   processMutationTarget: boolean;
   processNode: (node: HTMLElement | Document | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
   shadowObserver: MutationObserver;
+  stats?: Statistics; // Bookmarklet: Not used
 
   constructor() {
     super();
