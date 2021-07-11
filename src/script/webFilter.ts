@@ -333,24 +333,28 @@ export default class WebFilter extends Filter {
   }
 
   async persistStats() {
-    const words = Object.keys(filter.stats.words);
-    if (words.length) {
-      const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
-      const storedWords = stats.words;
+    try {
+      const words = Object.keys(filter.stats.words);
+      if (words.length) {
+        const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
+        const storedWords = stats.words;
 
-      words.forEach((word) => {
-        if (!storedWords[word]) {
-          storedWords[word] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
-        }
-        storedWords[word].audio += filter.stats.words[word].audio;
-        storedWords[word].text += filter.stats.words[word].text;
-      });
+        words.forEach((word) => {
+          if (!storedWords[word]) {
+            storedWords[word] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
+          }
+          storedWords[word].audio += filter.stats.words[word].audio;
+          storedWords[word].text += filter.stats.words[word].text;
+        });
 
-      stats.mutes += filter.stats.mutes;
-      if (stats.startedAt == null) { stats.startedAt = new Date(); }
+        stats.mutes += filter.stats.mutes;
+        if (stats.startedAt == null) { stats.startedAt = new Date(); }
 
-      const error = await WebConfig.saveLocalStoragePromise({ stats: stats });
-      if (!error) { filter.stats = { mutes: 0, words: {} }; }
+        await WebConfig.saveLocalStoragePromise({ stats: stats });
+        filter.stats = { mutes: 0, words: {} };
+      }
+    } catch (e) {
+      logger.warn('Failed to save stats.', e);
     }
   }
 

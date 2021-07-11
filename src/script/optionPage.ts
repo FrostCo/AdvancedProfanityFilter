@@ -729,62 +729,67 @@ export default class OptionPage {
   }
 
   async populateStats() {
-    const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
+    try {
+      const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
 
-    // Prepare data (collect totals, add words without stats, sort output)
-    let totalFiltered = 0;
-    const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
-    allWords.forEach((word) => {
-      const wordStats = stats.words[word];
-      if (wordStats) {
-        wordStats.total = wordStats.audio + wordStats.text;
-        totalFiltered += wordStats.total;
-      } else {
-        stats.words[word] = { audio: 0, text: 0, total: 0 };
-      }
-    });
-    const alphaSortedWords = allWords.sort();
-    const sortedWords = alphaSortedWords.sort((a, b) => stats.words[b].total - stats.words[a].total);
+      // Prepare data (collect totals, add words without stats, sort output)
+      let totalFiltered = 0;
+      const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
+      allWords.forEach((word) => {
+        const wordStats = stats.words[word];
+        if (wordStats) {
+          wordStats.total = wordStats.audio + wordStats.text;
+          totalFiltered += wordStats.total;
+        } else {
+          stats.words[word] = { audio: 0, text: 0, total: 0 };
+        }
+      });
+      const alphaSortedWords = allWords.sort();
+      const sortedWords = alphaSortedWords.sort((a, b) => stats.words[b].total - stats.words[a].total);
 
-    const statsWordContainer = document.querySelector('div#statsWordContainer') as HTMLDivElement;
-    const statsWordTable = statsWordContainer.querySelector('table#statsWordTable') as HTMLTableElement;
+      const statsWordContainer = document.querySelector('div#statsWordContainer') as HTMLDivElement;
+      const statsWordTable = statsWordContainer.querySelector('table#statsWordTable') as HTMLTableElement;
 
-    // Table body
-    const tBody = document.createElement('tbody');
-    sortedWords.forEach((word) => {
-      const wordStats = stats.words[word];
-      const row = tBody.insertRow();
-      const wordCell = row.insertCell(0);
-      wordCell.classList.add('w3-tooltip');
-      const tooltipSpan = document.createElement('span');
-      tooltipSpan.classList.add('statsTooltip', 'w3-tag', 'w3-text');
-      tooltipSpan.textContent = word;
-      const wordSpan = document.createElement('span');
-      wordSpan.textContent = filter.replaceText(word, Constants.ALL_WORDS_WORDLIST_ID, null);
-      wordCell.appendChild(tooltipSpan);
-      wordCell.appendChild(wordSpan);
+      // Table body
+      const tBody = document.createElement('tbody');
+      sortedWords.forEach((word) => {
+        const wordStats = stats.words[word];
+        const row = tBody.insertRow();
+        const wordCell = row.insertCell(0);
+        wordCell.classList.add('w3-tooltip');
+        const tooltipSpan = document.createElement('span');
+        tooltipSpan.classList.add('statsTooltip', 'w3-tag', 'w3-text');
+        tooltipSpan.textContent = word;
+        const wordSpan = document.createElement('span');
+        wordSpan.textContent = filter.replaceText(word, Constants.ALL_WORDS_WORDLIST_ID, null);
+        wordCell.appendChild(tooltipSpan);
+        wordCell.appendChild(wordSpan);
 
-      const textCell = row.insertCell(1);
-      textCell.textContent = numberWithCommas(wordStats.text);
+        const textCell = row.insertCell(1);
+        textCell.textContent = numberWithCommas(wordStats.text);
 
-      const audioCell = row.insertCell(2);
-      audioCell.textContent = numberWithCommas(wordStats.audio);
+        const audioCell = row.insertCell(2);
+        audioCell.textContent = numberWithCommas(wordStats.audio);
 
-      const totalCell = row.insertCell(3);
-      totalCell.textContent = numberWithCommas(wordStats.total);
-    });
-    const oldTBody = statsWordTable.tBodies[0];
-    statsWordTable.replaceChild(tBody, oldTBody);
+        const totalCell = row.insertCell(3);
+        totalCell.textContent = numberWithCommas(wordStats.total);
+      });
+      const oldTBody = statsWordTable.tBodies[0];
+      statsWordTable.replaceChild(tBody, oldTBody);
 
-    // Options
-    const collectStats = document.getElementById('collectStats') as HTMLInputElement;
-    collectStats.checked = this.cfg.collectStats;
+      // Options
+      const collectStats = document.getElementById('collectStats') as HTMLInputElement;
+      collectStats.checked = this.cfg.collectStats;
 
-    // Summary
-    const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableDataCellElement;
-    statsSummaryTotal.textContent = numberWithCommas(totalFiltered);
-    const statsSummaryMutes = document.querySelector('table#statsSummaryTable td#statsSummaryMutes') as HTMLTableDataCellElement;
-    statsSummaryMutes.textContent = numberWithCommas(stats.mutes);
+      // Summary
+      const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableDataCellElement;
+      statsSummaryTotal.textContent = numberWithCommas(totalFiltered);
+      const statsSummaryMutes = document.querySelector('table#statsSummaryTable td#statsSummaryMutes') as HTMLTableDataCellElement;
+      statsSummaryMutes.textContent = numberWithCommas(stats.mutes);
+    } catch(e) {
+      logger.warn('Failed to populate stats.', e);
+      OptionPage.showErrorModal(`Failed to populate stats. [Error: ${e}]`);
+    }
   }
 
   populateTest() {
