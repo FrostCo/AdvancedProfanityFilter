@@ -346,7 +346,7 @@ export default class WebFilter extends Filter {
         });
 
         stats.mutes += filter.stats.mutes;
-        if (stats.startedAt == null) { stats.startedAt = new Date(); }
+        if (stats.startedAt == null) { stats.startedAt = Date.now(); }
 
         await WebConfig.saveLocalStoragePromise({ stats: stats });
         filter.stats = { mutes: 0, words: {} };

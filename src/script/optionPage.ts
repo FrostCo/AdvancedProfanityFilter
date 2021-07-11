@@ -786,6 +786,8 @@ export default class OptionPage {
       statsSummaryTotal.textContent = numberWithCommas(totalFiltered);
       const statsSummaryMutes = document.querySelector('table#statsSummaryTable td#statsSummaryMutes') as HTMLTableDataCellElement;
       statsSummaryMutes.textContent = numberWithCommas(stats.mutes);
+      const statsSummarySince = document.querySelector('table#statsSummaryTable td#statsSummarySince') as HTMLTableDataCellElement;
+      statsSummarySince.textContent = stats.startedAt ? new Date(stats.startedAt).toLocaleString() : '';
     } catch(e) {
       logger.warn('Failed to populate stats.', e);
       OptionPage.showErrorModal(`Failed to populate stats. [Error: ${e}]`);

@@ -166,7 +166,11 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   width: 300px;
 }
 
-/* Summary table */
+/* Stats Page */
+#statsSummaryContainer {
+  width: 400px;
+}
+
 #statsWordContainer {
   overflow: auto;
   max-height: 800px;

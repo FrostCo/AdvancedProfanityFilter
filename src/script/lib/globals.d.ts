@@ -114,7 +114,7 @@ interface ReplaceTextResult {
 
 interface Statistics {
   mutes: number;
-  startedAt?: Date;
+  startedAt?: number;
   words: WordStatistics;
 }
 
