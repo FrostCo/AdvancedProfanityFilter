@@ -164,7 +164,7 @@ class Popup {
         const wordCell = row.insertCell(0);
         wordCell.classList.add('w3-tooltip');
         const tooltipSpan = document.createElement('span');
-        tooltipSpan.classList.add('statsTooltip', 'w3-tag', 'w3-text');
+        tooltipSpan.classList.add('summaryTooltip', 'w3-tag', 'w3-text');
         tooltipSpan.textContent = key;
         const wordSpan = document.createElement('span');
         wordSpan.textContent = summary[key].filtered;
