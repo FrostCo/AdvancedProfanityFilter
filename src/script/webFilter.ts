@@ -246,6 +246,7 @@ export default class WebFilter extends Filter {
     // Track stats (if enabled)
     if (this.cfg.collectStats) {
       this.persistStats();
+      window.setTimeout(filter.persistStats, 3000); // Persist once quickly
       window.setInterval(filter.persistStats, 10000); // Persist stats at an interval
     }
   }
