@@ -332,27 +332,27 @@ export default class WebFilter extends Filter {
     }
   }
 
-  persistStats() {
+  async persistStats() {
     const words = Object.keys(filter.stats.words);
     if (words.length) {
-      chrome.storage.local.get({ stats: { mutes: 0, words: {} } }, (data) => {
-        const storedStats = data.stats as Statistics;
-        const storedWords = storedStats.words;
-        words.forEach((word) => {
-          if (!storedWords[word]) {
-            storedWords[word] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
-          }
-          storedWords[word].audio += filter.stats.words[word].audio;
-          storedWords[word].text += filter.stats.words[word].text;
-        });
+      const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
+      const storedWords = stats.words;
 
-        storedStats.mutes += filter.stats.mutes;
-        if (storedStats.startedAt == null) { storedStats.startedAt = new Date(); }
-        chrome.storage.local.set({ stats: storedStats }, () => {
-          if (!chrome.runtime.lastError) {
-            filter.stats = { mutes: 0, words: {} };
-          }
-        });
+      words.forEach((word) => {
+        if (!storedWords[word]) {
+          storedWords[word] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
+        }
+        storedWords[word].audio += filter.stats.words[word].audio;
+        storedWords[word].text += filter.stats.words[word].text;
+      });
+
+      stats.mutes += filter.stats.mutes;
+      if (stats.startedAt == null) { stats.startedAt = new Date(); }
+
+      chrome.storage.local.set({ stats: stats }, () => {
+        if (!chrome.runtime.lastError) {
+          filter.stats = { mutes: 0, words: {} };
+        }
       });
     }
   }
