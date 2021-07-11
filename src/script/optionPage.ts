@@ -1450,8 +1450,13 @@ export default class OptionPage {
   }
 
   async statsReset() {
-    await WebConfig.removeLocalStoragePromise('stats');
-    this.populateStats();
+    try {
+      await WebConfig.removeLocalStoragePromise('stats');
+      this.populateStats();
+    } catch(e) {
+      logger.warn('Failed to reset stats.', e);
+      OptionPage.showErrorModal(`Failed to reset stats. [Error: ${e}]`);
+    }
   }
 
   switchPage(evt) {

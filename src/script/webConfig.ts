@@ -81,6 +81,8 @@ export default class WebConfig extends Config {
   // Async call to get provided keys (or default keys) from chrome storage
   static getConfig(keys: string[]) {
     return new Promise((resolve, reject) => {
+      if (chrome.runtime.lastError) { reject(chrome.runtime.lastError.message); }
+
       let request = null; // Get all data from storage
 
       if (keys.length > 0 && ! keys.some((key) => WebConfig._splittingKeys.includes(key))) {
@@ -138,7 +140,9 @@ export default class WebConfig extends Config {
 
     return new Promise((resolve, reject) => {
       chrome.storage.local.get(keys, (data) => {
-        resolve(data);
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError.message)
+          : resolve(data);
       });
     });
   }
@@ -147,7 +151,9 @@ export default class WebConfig extends Config {
     if (keys === 'ALL') {
       return new Promise((resolve, reject) => {
         chrome.storage.local.clear(() => {
-          resolve(true);
+          chrome.runtime.lastError
+            ? reject(chrome.runtime.lastError.message)
+            : resolve(0);
         });
       });
     }
@@ -156,7 +162,9 @@ export default class WebConfig extends Config {
 
     return new Promise((resolve, reject) => {
       chrome.storage.local.remove(keys, () => {
-        resolve(true);
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError.message)
+          : resolve(0);
       });
     });
   }
