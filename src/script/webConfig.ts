@@ -161,6 +161,16 @@ export default class WebConfig extends Config {
     });
   }
 
+  static saveLocalStoragePromise(data: Record<string, unknown>) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(data, () => {
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError.message)
+          : resolve(0);
+      });
+    });
+  }
+
   // Order and remove `_` prefixed values
   ordered() {
     return Object.keys(this).sort().reduce((obj, key) => {

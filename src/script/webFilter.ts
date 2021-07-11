@@ -349,11 +349,8 @@ export default class WebFilter extends Filter {
       stats.mutes += filter.stats.mutes;
       if (stats.startedAt == null) { stats.startedAt = new Date(); }
 
-      chrome.storage.local.set({ stats: stats }, () => {
-        if (!chrome.runtime.lastError) {
-          filter.stats = { mutes: 0, words: {} };
-        }
-      });
+      const error = await WebConfig.saveLocalStoragePromise({ stats: stats });
+      if (!error) { filter.stats = { mutes: 0, words: {} }; }
     }
   }
 
