@@ -248,7 +248,7 @@ export default class WebFilter extends Filter {
       if (Object.keys(this.stats)) {
         this.persistStats();
       }
-      window.setTimeout(filter.persistStats, 10000); // Persist stats at an interval
+      window.setInterval(filter.persistStats, 10000); // Persist stats at an interval
     }
   }
 
