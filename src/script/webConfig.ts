@@ -143,6 +143,24 @@ export default class WebConfig extends Config {
     });
   }
 
+  static removeLocalStoragePromise(keys: string | string[]) {
+    if (keys === 'ALL') {
+      return new Promise((resolve, reject) => {
+        chrome.storage.local.clear(() => {
+          resolve(true);
+        });
+      });
+    }
+
+    if (typeof keys === 'string') { keys = [keys]; }
+
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.remove(keys, () => {
+        resolve(true);
+      });
+    });
+  }
+
   // Order and remove `_` prefixed values
   ordered() {
     return Object.keys(this).sort().reduce((obj, key) => {

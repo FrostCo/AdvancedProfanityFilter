@@ -401,6 +401,7 @@ export default class OptionPage {
     ok.removeEventListener('click', removeAllWords);
     ok.removeEventListener('click', restoreDefaults);
     ok.removeEventListener('click', setPassword);
+    ok.removeEventListener('click', statsReset);
     let content;
     let italics;
 
@@ -427,6 +428,10 @@ export default class OptionPage {
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ }, content);
         ok.addEventListener('click', removeAllWords);
+        break;
+      case 'statsReset':
+        OptionPage.configureConfirmModal({ content: 'Are you sure you want to reset filter statistics?' });
+        ok.addEventListener('click', statsReset);
         break;
       case 'restoreDefaults':
         OptionPage.configureConfirmModal({ content: 'Are you sure you want to restore defaults?', backup: true });
@@ -1440,6 +1445,11 @@ export default class OptionPage {
     OptionPage.openModal('supportedAudioSitesModal');
   }
 
+  async statsReset() {
+    await WebConfig.removeLocalStoragePromise('stats');
+    this.populateStats();
+  }
+
   switchPage(evt) {
     const currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
     const newTab = evt.target as HTMLElement;
@@ -1567,6 +1577,7 @@ function importConfig(e) { option.importConfig(e); }
 function removeAllWords(e) { option.removeAllWords(e); }
 function restoreDefaults(e) { option.restoreDefaults(e); }
 function setPassword(e) { option.auth.setPassword(option); }
+function statsReset(e) { option.statsReset(); }
 // Add event listeners to DOM
 window.addEventListener('load', (e) => { option.init(); });
 document.querySelectorAll('#menu a').forEach((el) => { el.addEventListener('click', (e) => { option.switchPage(e); }); });
@@ -1648,4 +1659,7 @@ document.getElementById('setPassword').addEventListener('input', (e) => { option
 document.getElementById('setPasswordBtn').addEventListener('click', (e) => { option.confirm(e, 'setPassword'); });
 // Test
 document.getElementById('testText').addEventListener('input', (e) => { option.populateTest(); });
+// Stats
+document.getElementById('statsReset').addEventListener('click', (e) => { option.confirm(e, 'statsReset'); });
+// Other
 document.getElementsByClassName('themes')[0].addEventListener('click', (e) => { option.toggleTheme(); });
