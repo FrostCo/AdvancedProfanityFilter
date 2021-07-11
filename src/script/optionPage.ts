@@ -156,6 +156,8 @@ export default class OptionPage {
     if (darkApplied != this.cfg.darkMode) {
       this.themeElements.forEach((element) => { element.classList.toggle('dark'); });
       this.themeButtons.forEach((element) => { element.classList.toggle('w3-hide'); });
+      const statsWordTable = document.querySelector('table#statsWordTable') as HTMLTableElement;
+      statsWordTable.classList.toggle('w3-striped');
     }
   }
 
