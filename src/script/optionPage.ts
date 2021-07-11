@@ -1,5 +1,5 @@
 import Constants from './lib/constants';
-import { dynamicList, exportToFile, readFile, removeChildren, removeFromArray, upperCaseFirst } from './lib/helper';
+import { dynamicList, exportToFile, numberWithCommas, readFile, removeChildren, removeFromArray, upperCaseFirst } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
 import Domain from './domain';
@@ -765,13 +765,13 @@ export default class OptionPage {
       wordCell.appendChild(wordSpan);
 
       const textCell = row.insertCell(1);
-      textCell.textContent = wordStats.text.toString();
+      textCell.textContent = numberWithCommas(wordStats.text);
 
       const audioCell = row.insertCell(2);
-      audioCell.textContent = wordStats.audio.toString();
+      audioCell.textContent = numberWithCommas(wordStats.audio);
 
       const totalCell = row.insertCell(3);
-      totalCell.textContent = wordStats.total.toString();
+      totalCell.textContent = numberWithCommas(wordStats.total);
     });
     const oldTBody = statsWordTable.tBodies[0];
     statsWordTable.replaceChild(tBody, oldTBody);
@@ -782,9 +782,9 @@ export default class OptionPage {
 
     // Summary
     const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableDataCellElement;
-    statsSummaryTotal.textContent = totalFiltered.toString();
+    statsSummaryTotal.textContent = numberWithCommas(totalFiltered);
     const statsSummaryMutes = document.querySelector('table#statsSummaryTable td#statsSummaryMutes') as HTMLTableDataCellElement;
-    statsSummaryMutes.textContent = stats.mutes.toString();
+    statsSummaryMutes.textContent = numberWithCommas(stats.mutes);
   }
 
   populateTest() {

@@ -113,6 +113,10 @@ export function makeRequest(method: string, url: string) {
   });
 }
 
+export function numberWithCommas(number: number | string): string {
+  return number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
+}
+
 export function readFile(file) {
   return new Promise((resolve, reject) => {
     const fr = new FileReader();
