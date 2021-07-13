@@ -4,6 +4,7 @@ import Filter from './lib/filter';
 import Page from './page';
 import WebAudio from './webAudio';
 import WebConfig from './webConfig';
+import Word from './lib/word';
 import Wordlist from './lib/wordlist';
 import './vendor/findAndReplaceDOMText';
 import Logger from './lib/logger';
@@ -22,27 +23,29 @@ export default class WebFilter extends Filter {
   mutePage: boolean;
   observer: MutationObserver;
   processMutationTarget: boolean;
-  processNode: (node: HTMLElement | Document | ShadowRoot, wordlistId: number, stats?: boolean) => void;
+  processNode: (node: HTMLElement | Document | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
   shadowObserver: MutationObserver;
+  stats: Statistics;
   summary: Summary;
 
   constructor() {
     super();
-    this.audioWordlistId = 0;
+    this.audioWordlistId = Constants.ALL_WORDS_WORDLIST_ID;
     this.extension = true;
     this.mutePage = false;
     this.processMutationTarget = false;
+    this.stats = { mutes: 0, words: {} };
     this.summary = {};
   }
 
-  advancedReplaceText(node, wordlistId: number, stats = true) {
+  advancedReplaceText(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     if (node.parentNode || node === document) {
       this.wordlists[wordlistId].regExps.forEach((regExp) => {
         // @ts-ignore: External library function
         findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: (portion, match) => {
           // logger.debug('[APF] Advanced match found', node.textContent);
           if (portion.index === 0) { // Replace the whole match on the first portion and skip the rest
-            return this.replaceText(match[0], wordlistId, stats);
+            return this.replaceText(match[0], wordlistId, statsType);
           } else {
             return '';
           }
@@ -50,7 +53,7 @@ export default class WebFilter extends Filter {
       });
     } else {
       // ?: Might want to add support for processNode()
-      this.cleanText(node, wordlistId, stats);
+      this.cleanText(node, wordlistId, statsType);
     }
   }
 
@@ -157,33 +160,33 @@ export default class WebFilter extends Filter {
     }
   }
 
-  cleanChildNode(node, wordlistId: number, stats: boolean = true) {
+  cleanChildNode(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     if (node.nodeName) {
       if (node.textContent && node.textContent.trim() != '') {
-        const result = this.replaceTextResult(node.textContent, wordlistId, stats);
+        const result = this.replaceTextResult(node.textContent, wordlistId, statsType);
         if (result.modified) {
           // logger.debug(`Normal node text changed: '${result.original}' to '${result.filtered}'.`);
           node.textContent = result.filtered;
         }
       } else if (node.nodeName == 'IMG') {
-        if (node.alt != '') { node.alt = this.replaceText(node.alt, wordlistId, stats); }
-        if (node.title != '') { node.title = this.replaceText(node.title, wordlistId, stats); }
+        if (node.alt != '') { node.alt = this.replaceText(node.alt, wordlistId, statsType); }
+        if (node.title != '') { node.title = this.replaceText(node.title, wordlistId, statsType); }
       } else if (node.shadowRoot) {
-        this.filterShadowRoot(node.shadowRoot, wordlistId, stats);
+        this.filterShadowRoot(node.shadowRoot, wordlistId, statsType);
       }
     }
     // else { logger.debug('Node without nodeName', node); }
   }
 
-  cleanNode(node, wordlistId: number, stats: boolean = true) {
+  cleanNode(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     if (Page.isForbiddenNode(node)) { return false; }
-    if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, stats); }
+    if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
     if (node.childNodes.length > 0) {
       for (let i = 0; i < node.childNodes.length ; i++) {
-        this.cleanNode(node.childNodes[i], wordlistId, stats);
+        this.cleanNode(node.childNodes[i], wordlistId, statsType);
       }
     } else {
-      this.cleanChildNode(node, this.wordlistId, stats);
+      this.cleanChildNode(node, this.wordlistId, statsType);
     }
   }
 
@@ -239,37 +242,46 @@ export default class WebFilter extends Filter {
     logger.infoTime('Initial page filtered.');
     this.updateCounterBadge();
     this.startObserving(document);
+
+    // Track stats (if enabled)
+    if (this.cfg.collectStats) {
+      this.persistStats();
+      window.setTimeout(filter.persistStats, 3000); // Persist once after 3 seconds
+      window.setTimeout(filter.persistStats, 6000); // Persist once again after 3 more seconds
+      window.setInterval(filter.persistStats, 10000); // Persist every 10 seconds after that
+    }
   }
 
-  cleanText(node, wordlistId: number, stats: boolean = true) {
+  cleanText(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     if (Page.isForbiddenNode(node)) { return false; }
-    if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, stats); }
+    if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
     if (node.childElementCount > 0) {
       const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
       // Note: This while loop skips processing on first node
       while(treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
           treeWalker.currentNode.childNodes.forEach((childNode) => {
-            this.cleanText(childNode, wordlistId, stats);
+            this.cleanText(childNode, wordlistId, statsType);
           });
         } else {
           if (!Page.isForbiddenNode(treeWalker.currentNode)) {
-            this.cleanChildNode(treeWalker.currentNode, wordlistId, stats);
+            this.cleanChildNode(treeWalker.currentNode, wordlistId, statsType);
           }
         }
       }
     } else {
-      this.cleanChildNode(node, wordlistId, stats);
+      this.cleanChildNode(node, wordlistId, statsType);
     }
   }
 
-  filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, stats: boolean = true) {
+  filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     this.shadowObserver.observe(shadowRoot, observerConfig);
-    this.processNode(shadowRoot, wordlistId, stats);
+    this.processNode(shadowRoot, wordlistId, statsType);
   }
 
-  foundMatch(word) {
+  foundMatch(word: Word, statsType?: string) {
     super.foundMatch(word);
+
     if (this.cfg.showSummary) {
       if (this.summary[word.value]) {
         this.summary[word.value].count += 1;
@@ -278,10 +290,22 @@ export default class WebFilter extends Filter {
         if (word.matchMethod === Constants.MATCH_METHODS.REGEX) {
           result = word.sub || this.cfg.defaultSubstitution;
         } else {
-          result = this.replaceText(word.value, 0, false); // We can use 0 (All) here because we are just filtering a word
+          result = this.replaceText(word.value, Constants.ALL_WORDS_WORDLIST_ID, null); // Use all words because we are just filtering a word
         }
 
         this.summary[word.value] = { filtered: result, count: 1 };
+      }
+    }
+
+    if (this.cfg.collectStats) {
+      const wordStats = this.stats.words;
+      if (!wordStats[word.value]) {
+        wordStats[word.value] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
+      }
+
+      switch(statsType) {
+        case Constants.STATS_TYPE_AUDIO: wordStats[word.value].audio++; break;
+        case Constants.STATS_TYPE_TEXT: wordStats[word.value].text++; break;
       }
     }
   }
@@ -305,6 +329,32 @@ export default class WebFilter extends Filter {
       this.processNode = this.cleanNode;
     } else {
       this.processNode = this.cleanText;
+    }
+  }
+
+  async persistStats() {
+    try {
+      const words = Object.keys(filter.stats.words);
+      if (words.length) {
+        const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
+        const storedWords = stats.words;
+
+        words.forEach((word) => {
+          if (!storedWords[word]) {
+            storedWords[word] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
+          }
+          storedWords[word].audio += filter.stats.words[word].audio;
+          storedWords[word].text += filter.stats.words[word].text;
+        });
+
+        stats.mutes += filter.stats.mutes;
+        if (stats.startedAt == null) { stats.startedAt = Date.now(); }
+
+        await WebConfig.saveLocalStoragePromise({ stats: stats });
+        filter.stats = { mutes: 0, words: {} };
+      }
+    } catch (e) {
+      logger.warn('Failed to save stats.', e);
     }
   }
 

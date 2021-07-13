@@ -16,6 +16,7 @@ export default class WebConfig extends Config {
   password: string;
   showSubtitles: number;
   showUpdateNotification: boolean;
+  collectStats: boolean;
   youTubeAutoSubsMax: number;
   youTubeAutoSubsMin: number;
 
@@ -32,6 +33,7 @@ export default class WebConfig extends Config {
     muteMethod: Constants.MUTE_METHODS.TAB,
     password: null,
     showSubtitles: Constants.SHOW_SUBTITLES.ALL,
+    collectStats: true,
     showUpdateNotification: true,
     youTubeAutoSubsMax: 0,
     youTubeAutoSubsMin: 0,
@@ -79,6 +81,8 @@ export default class WebConfig extends Config {
   // Async call to get provided keys (or default keys) from chrome storage
   static getConfig(keys: string[]) {
     return new Promise((resolve, reject) => {
+      if (chrome.runtime.lastError) { reject(chrome.runtime.lastError.message); }
+
       let request = null; // Get all data from storage
 
       if (keys.length > 0 && ! keys.some((key) => WebConfig._splittingKeys.includes(key))) {
@@ -129,6 +133,50 @@ export default class WebConfig extends Config {
     const pattern = new RegExp(`^_${prop}\\d+`);
     const containerKeys = Object.keys(data).filter((key) => pattern.test(key));
     return containerKeys;
+  }
+
+  static getLocalStoragePromise(keys: string | string[] | Record<string, unknown>) {
+    if (typeof keys === 'string') { keys = [keys]; }
+
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(keys, (data) => {
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError.message)
+          : resolve(data);
+      });
+    });
+  }
+
+  static removeLocalStoragePromise(keys: string | string[]) {
+    if (keys === 'ALL') {
+      return new Promise((resolve, reject) => {
+        chrome.storage.local.clear(() => {
+          chrome.runtime.lastError
+            ? reject(chrome.runtime.lastError.message)
+            : resolve(0);
+        });
+      });
+    }
+
+    if (typeof keys === 'string') { keys = [keys]; }
+
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.remove(keys, () => {
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError.message)
+          : resolve(0);
+      });
+    });
+  }
+
+  static saveLocalStoragePromise(data: Record<string, unknown>) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(data, () => {
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError.message)
+          : resolve(0);
+      });
+    });
   }
 
   // Order and remove `_` prefixed values

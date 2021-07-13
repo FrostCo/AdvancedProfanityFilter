@@ -1,5 +1,5 @@
 import Constants from './lib/constants';
-import { dynamicList, exportToFile, readFile, removeChildren, removeFromArray, upperCaseFirst } from './lib/helper';
+import { dynamicList, exportToFile, numberWithCommas, readFile, removeChildren, removeFromArray, upperCaseFirst } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
 import Domain from './domain';
@@ -156,6 +156,8 @@ export default class OptionPage {
     if (darkApplied != this.cfg.darkMode) {
       this.themeElements.forEach((element) => { element.classList.toggle('dark'); });
       this.themeButtons.forEach((element) => { element.classList.toggle('w3-hide'); });
+      const statsWordTable = document.querySelector('table#statsWordTable') as HTMLTableElement;
+      statsWordTable.classList.toggle('w3-striped');
     }
   }
 
@@ -401,6 +403,7 @@ export default class OptionPage {
     ok.removeEventListener('click', removeAllWords);
     ok.removeEventListener('click', restoreDefaults);
     ok.removeEventListener('click', setPassword);
+    ok.removeEventListener('click', statsReset);
     let content;
     let italics;
 
@@ -427,6 +430,10 @@ export default class OptionPage {
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ }, content);
         ok.addEventListener('click', removeAllWords);
+        break;
+      case 'statsReset':
+        OptionPage.configureConfirmModal({ content: 'Are you sure you want to reset filter statistics?' });
+        ok.addEventListener('click', statsReset);
         break;
       case 'restoreDefaults':
         OptionPage.configureConfirmModal({ content: 'Are you sure you want to restore defaults?', backup: true });
@@ -669,6 +676,7 @@ export default class OptionPage {
     this.populateDomainPage();
     this.populateAudio();
     this.populateConfig();
+    this.populateStats();
     this.populateTest();
   }
 
@@ -722,6 +730,72 @@ export default class OptionPage {
     defaultWordMatchMethodSelect.selectedIndex = this.cfg.defaultWordMatchMethod;
   }
 
+  async populateStats() {
+    try {
+      const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
+
+      // Prepare data (collect totals, add words without stats, sort output)
+      let totalFiltered = 0;
+      const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
+      allWords.forEach((word) => {
+        const wordStats = stats.words[word];
+        if (wordStats) {
+          wordStats.total = wordStats.audio + wordStats.text;
+          totalFiltered += wordStats.total;
+        } else {
+          stats.words[word] = { audio: 0, text: 0, total: 0 };
+        }
+      });
+      const alphaSortedWords = allWords.sort();
+      const sortedWords = alphaSortedWords.sort((a, b) => stats.words[b].total - stats.words[a].total);
+
+      const statsWordContainer = document.querySelector('div#statsWordContainer') as HTMLDivElement;
+      const statsWordTable = statsWordContainer.querySelector('table#statsWordTable') as HTMLTableElement;
+
+      // Table body
+      const tBody = document.createElement('tbody');
+      sortedWords.forEach((word) => {
+        const wordStats = stats.words[word];
+        const row = tBody.insertRow();
+        const wordCell = row.insertCell(0);
+        wordCell.classList.add('w3-tooltip');
+        const tooltipSpan = document.createElement('span');
+        tooltipSpan.classList.add('statsTooltip', 'w3-tag', 'w3-text');
+        tooltipSpan.textContent = word;
+        const wordSpan = document.createElement('span');
+        wordSpan.textContent = filter.replaceText(word, Constants.ALL_WORDS_WORDLIST_ID, null);
+        wordCell.appendChild(tooltipSpan);
+        wordCell.appendChild(wordSpan);
+
+        const textCell = row.insertCell(1);
+        textCell.textContent = numberWithCommas(wordStats.text);
+
+        const audioCell = row.insertCell(2);
+        audioCell.textContent = numberWithCommas(wordStats.audio);
+
+        const totalCell = row.insertCell(3);
+        totalCell.textContent = numberWithCommas(wordStats.total);
+      });
+      const oldTBody = statsWordTable.tBodies[0];
+      statsWordTable.replaceChild(tBody, oldTBody);
+
+      // Options
+      const collectStats = document.getElementById('collectStats') as HTMLInputElement;
+      collectStats.checked = this.cfg.collectStats;
+
+      // Summary
+      const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableDataCellElement;
+      statsSummaryTotal.textContent = numberWithCommas(totalFiltered);
+      const statsSummaryMutes = document.querySelector('table#statsSummaryTable td#statsSummaryMutes') as HTMLTableDataCellElement;
+      statsSummaryMutes.textContent = numberWithCommas(stats.mutes);
+      const statsSummarySince = document.querySelector('table#statsSummaryTable td#statsSummarySince') as HTMLTableDataCellElement;
+      statsSummarySince.textContent = stats.startedAt ? new Date(stats.startedAt).toLocaleString() : '';
+    } catch(e) {
+      logger.warn('Failed to populate stats.', e);
+      OptionPage.showErrorModal(`Failed to populate stats. [Error: ${e}]`);
+    }
+  }
+
   populateTest() {
     const testText = document.getElementById('testText') as HTMLInputElement;
     const filteredTestText = document.getElementById('filteredTestText') as HTMLElement;
@@ -729,7 +803,7 @@ export default class OptionPage {
     if (testText.value === '') {
       filteredTestText.textContent = 'Enter some text above to test the filter...';
     } else {
-      filteredTestText.textContent = filter.replaceText(testText.value, filter.cfg.wordlistId, false);
+      filteredTestText.textContent = filter.replaceText(testText.value, filter.cfg.wordlistId, null);
     }
   }
 
@@ -881,7 +955,7 @@ export default class OptionPage {
         if (wordlistFilter.cfg.words[word].matchMethod === Constants.MATCH_METHODS.REGEX) { // Regexp
           filteredWord = wordlistFilter.cfg.words[word].sub || wordlistFilter.cfg.defaultSubstitution;
         } else {
-          filteredWord = wordlistFilter.replaceText(word, 0, false); // Using 0 (All) here to filter all words
+          filteredWord = wordlistFilter.replaceText(word, Constants.ALL_WORDS_WORDLIST_ID, null);
         }
       }
 
@@ -1093,6 +1167,7 @@ export default class OptionPage {
     const muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
     const showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
     const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
+    const collectStats = document.getElementById('collectStats') as HTMLInputElement;
     this.cfg.censorCharacter = censorCharacterSelect.value;
     this.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     this.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
@@ -1115,6 +1190,7 @@ export default class OptionPage {
     this.cfg.muteMethod = parseInt(muteMethodInput.value);
     this.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
     this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
+    this.cfg.collectStats = collectStats.checked;
 
     // Save settings
     try {
@@ -1241,8 +1317,8 @@ export default class OptionPage {
         words[word] = wordOptions;
         subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: Constants.FILTER_METHODS.SUBSTITUTE }, { words: words }));
         subFilter.init();
-        const first = subFilter.replaceTextResult(word);
-        const second = subFilter.replaceTextResult(first.filtered);
+        const first = subFilter.replaceTextResult(word, Constants.ALL_WORDS_WORDLIST_ID, null);
+        const second = subFilter.replaceTextResult(first.filtered, Constants.ALL_WORDS_WORDLIST_ID, null);
         if (first.filtered != second.filtered) {
           OptionPage.showInputError(substitutionText, "Substitution can't contain word (causes an endless loop).");
           return false;
@@ -1377,6 +1453,16 @@ export default class OptionPage {
     OptionPage.openModal('supportedAudioSitesModal');
   }
 
+  async statsReset() {
+    try {
+      await WebConfig.removeLocalStoragePromise('stats');
+      this.populateStats();
+    } catch(e) {
+      logger.warn('Failed to reset stats.', e);
+      OptionPage.showErrorModal(`Failed to reset stats. [Error: ${e}]`);
+    }
+  }
+
   switchPage(evt) {
     const currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
     const newTab = evt.target as HTMLElement;
@@ -1504,6 +1590,7 @@ function importConfig(e) { option.importConfig(e); }
 function removeAllWords(e) { option.removeAllWords(e); }
 function restoreDefaults(e) { option.restoreDefaults(e); }
 function setPassword(e) { option.auth.setPassword(option); }
+function statsReset(e) { option.statsReset(); }
 // Add event listeners to DOM
 window.addEventListener('load', (e) => { option.init(); });
 document.querySelectorAll('#menu a').forEach((el) => { el.addEventListener('click', (e) => { option.switchPage(e); }); });
@@ -1585,4 +1672,7 @@ document.getElementById('setPassword').addEventListener('input', (e) => { option
 document.getElementById('setPasswordBtn').addEventListener('click', (e) => { option.confirm(e, 'setPassword'); });
 // Test
 document.getElementById('testText').addEventListener('input', (e) => { option.populateTest(); });
+// Stats
+document.getElementById('statsReset').addEventListener('click', (e) => { option.confirm(e, 'statsReset'); });
+// Other
 document.getElementsByClassName('themes')[0].addEventListener('click', (e) => { option.toggleTheme(); });

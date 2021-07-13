@@ -1,3 +1,4 @@
+import Constants from './constants';
 import Word from './word';
 import Config from './config';
 import Logger from './logger';
@@ -20,8 +21,7 @@ export default class Wordlist {
 
     // Process list of words
     sorted.forEach((wordStr) => {
-      // wordlistId = 0 includes all words
-      if (wordlistId === 0 || !Array.isArray(cfg.words[wordStr].lists) || cfg.words[wordStr].lists.includes(wordlistId)) {
+      if (wordlistId === Constants.ALL_WORDS_WORDLIST_ID || !Array.isArray(cfg.words[wordStr].lists) || cfg.words[wordStr].lists.includes(wordlistId)) {
         try {
           const word = new Word(wordStr, cfg.words[wordStr], cfg);
           this.list.push(wordStr);

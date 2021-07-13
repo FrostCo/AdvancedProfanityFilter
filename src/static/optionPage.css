@@ -165,3 +165,27 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 .small {
   width: 300px;
 }
+
+/* Stats Page */
+#statsSummaryContainer {
+  width: 400px;
+}
+
+#statsWordContainer {
+  overflow: auto;
+  max-height: 500px;
+  margin-bottom: 8px;
+}
+
+#statsWordTable th {
+  background-color: var(--blue);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+#statsWordTable tbody .statsTooltip {
+  position: absolute;
+  left: 0;
+  bottom: 18px
+}

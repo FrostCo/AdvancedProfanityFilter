@@ -429,7 +429,7 @@ export default class WebAudio {
       this.youTube = true;
       // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
       const youTubeAutoCensor = '[ __ ]';
-      const lists = this.wordlistId == 0 ? [] : [this.wordlistId];
+      const lists = this.wordlistId === Constants.ALL_WORDS_WORDLIST_ID ? [] : [this.wordlistId];
       const youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: false, separators: false, sub: '' };
       this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
 
@@ -441,6 +441,9 @@ export default class WebAudio {
   mute(rule?: AudioRule, video?: HTMLVideoElement): void {
     if (!this.muted) {
       this.muted = true;
+      if (this.filter.cfg.collectStats) {
+        this.filter.stats.mutes++;
+      }
 
       switch(rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
@@ -754,8 +757,8 @@ export default class WebAudio {
     this.lastProcessedText = captions.map((caption) => caption.textContent).join(' ');
   }
 
-  replaceTextResult(string: string, stats: boolean = true) {
-    return this.filter.replaceTextResult(string, this.wordlistId, stats);
+  replaceTextResult(string: string, wordlistId: number = this.wordlistId, statsType: string | null = Constants.STATS_TYPE_AUDIO) {
+    return this.filter.replaceTextResult(string, wordlistId, statsType);
   }
 
   showSubtitles(rule, subtitles?) {
