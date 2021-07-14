@@ -333,6 +333,7 @@ export default class WebFilter extends Filter {
   }
 
   async persistStats() {
+    if (!WebConfig.chromeStorageAvailable()) { return false; }
     try {
       const words = Object.keys(filter.stats.words);
       if (words.length) {

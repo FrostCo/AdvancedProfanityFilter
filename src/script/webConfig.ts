@@ -63,6 +63,10 @@ export default class WebConfig extends Config {
     Object.assign(this, WebConfig._classDefaults, asyncParam); // Separate due to _defineProperty()
   }
 
+  static chromeStorageAvailable(): boolean {
+    return !!(chrome && chrome.storage && (chrome.storage.sync || chrome.storage.local));
+  }
+
   // Combine all ._[prop]* into .[prop]
   static combineData(data, prop: string): string[] {
     data[prop] = {};
