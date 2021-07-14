@@ -11,6 +11,8 @@ export default class WebAudio {
   enabledRuleIds: number[];
   fetching: boolean;
   fillerAudio: HTMLAudioElement;
+  fillerAudioPauseHandler: any;
+  fillerAudioPlayHandler: any;
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
@@ -225,6 +227,16 @@ export default class WebAudio {
     this.unmuteTimeout = null;
   }
 
+  fillerAudioHandlePause() {
+    this.fillerAudio.pause();
+  }
+
+  fillerAudioHandlePlay() {
+    if (this.muted) {
+      this.fillerAudio.play();
+    }
+  }
+
   // Priority (requires cues): [overrideKey], label, language, kind (prefer caption/subtitle), order
   getVideoTextTrack(textTracks, rule, overrideKey?: string): TextTrack {
     let bestIndex = 0;
@@ -350,6 +362,8 @@ export default class WebAudio {
           }
         };
       }
+      this.fillerAudioPauseHandler = this.fillerAudioHandlePause.bind(this);
+      this.fillerAudioPlayHandler = this.fillerAudioHandlePlay.bind(this);
       return audioFiller;
     }
   }
@@ -455,7 +469,7 @@ export default class WebAudio {
             this.volume = video.volume; // Save original volume
             video.volume = 0;
           }
-          if (this.fillerAudio) { this.playFillerAudio(); }
+          if (this.fillerAudio) { this.playFillerAudio(video); }
           break;
       }
     }
@@ -617,8 +631,12 @@ export default class WebAudio {
     return cues;
   }
 
-  playFillerAudio() {
-    this.fillerAudio.play();
+  playFillerAudio(video: HTMLVideoElement) {
+    if (this.playing(video)) {
+      this.fillerAudio.play();
+      video.addEventListener('pause', this.fillerAudioPauseHandler);
+      video.addEventListener('play', this.fillerAudioPlayHandler);
+    }
   }
 
   playing(video: HTMLVideoElement): boolean {
