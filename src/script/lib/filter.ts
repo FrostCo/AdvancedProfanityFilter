@@ -144,7 +144,7 @@ export default class Filter {
             let sub = word.sub || this.cfg.defaultSubstitution;
 
             // Make substitution match case of original match
-            if (this.cfg.preserveCase) {
+            if (!word.case && this.cfg.preserveCase) {
               if (Word.allUpperCase(match)) {
                 sub = sub.toUpperCase();
               } else if (Word.capitalized(match)) {

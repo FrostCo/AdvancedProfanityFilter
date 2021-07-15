@@ -852,6 +852,7 @@ export default class OptionPage {
     const wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
     const wordMatchSeparators = document.getElementById('wordMatchSeparators') as HTMLInputElement;
     const substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
+    const substitutionCase = document.getElementById('substitutionCase') as HTMLInputElement;
     const wordRemove = document.getElementById('wordRemove') as HTMLInputElement;
     const word = wordList.value;
     const wordWordlistDiv = document.getElementById('wordWordlistDiv') as HTMLSelectElement;
@@ -867,6 +868,7 @@ export default class OptionPage {
       wordMatchRepeated.checked = this.cfg.defaultWordRepeat;
       wordMatchSeparators.checked = this.cfg.defaultWordSeparators;
       substitutionText.value = '';
+      substitutionCase.checked = false;
       wordlistSelections.forEach((wordlist, index) => {
         wordlist.checked = (
           index == (this.cfg.wordlistId - 1)
@@ -885,6 +887,7 @@ export default class OptionPage {
       wordMatchRepeated.checked = wordCfg.repeat;
       wordMatchSeparators.checked = wordCfg.separators === undefined ? this.cfg.defaultWordSeparators : wordCfg.separators;
       substitutionText.value = wordCfg.sub;
+      substitutionCase.checked = wordCfg.case > 0;
       wordlistSelections.forEach((wordlist, index) => {
         wordlist.checked = wordCfg.lists.includes(index + 1);
       });
@@ -1277,11 +1280,13 @@ export default class OptionPage {
     const wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
     const wordMatchSeparators = document.getElementById('wordMatchSeparators') as HTMLInputElement;
     const substitutionText = document.getElementById('substitutionText') as HTMLInputElement;
+    const substitutionCase = document.getElementById('substitutionCase') as HTMLInputElement;
     const selectedMatchMethod = document.querySelector('input[name="wordMatchMethod"]:checked') as HTMLInputElement;
-    let word = wordText.value.trim();
-    const sub = substitutionText.value.trim().toLowerCase();
-    let added = true;
     const wordlistSelectionsInput = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
+    let added = true;
+    let word = wordText.value.trim();
+    const subCase = substitutionCase.checked ? 1 : 0;
+    const sub = subCase > 0 ? substitutionText.value.trim() : substitutionText.value.trim().toLowerCase();
 
     if (Constants.MATCH_METHODS[selectedMatchMethod.value] !== Constants.MATCH_METHODS.REGEX) {
       word = word.toLowerCase();
@@ -1303,6 +1308,7 @@ export default class OptionPage {
       wordlistSelectionsInput.forEach((wordlist, index) => { if (wordlist.checked) { lists.push(index + 1); } });
 
       const wordOptions: WordOptions = {
+        case: subCase,
         lists: lists,
         matchMethod: Constants.MATCH_METHODS[selectedMatchMethod.value],
         repeat: wordMatchRepeated.checked,

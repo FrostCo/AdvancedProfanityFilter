@@ -95,7 +95,7 @@ export default class Config {
     if (Object.keys(this.words).includes(str)) {
       return false; // Already exists
     } else {
-      options.sub = options.sub.trim().toLowerCase();
+      options.sub = options.case ? options.sub.trim() : options.sub.trim().toLowerCase();
       this.words[str] = options;
       return true;
     }

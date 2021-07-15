@@ -3,6 +3,7 @@ import Config from './config';
 
 export default class Word {
   _filterMethod: number;
+  case?: number;
   escaped: string;
   lists: number[];
   matchMethod: number;
@@ -52,6 +53,7 @@ export default class Word {
 
   constructor(word: string, options: WordOptions, cfg: Config) {
     this.value = word;
+    this.case = options.case > 0 ? 1 : 0;
     this.lists = options.lists === undefined ? [] : options.lists;
     this.matchMethod = options.matchMethod === undefined ? cfg.defaultWordMatchMethod : options.matchMethod;
     this.matchRepeated = options.repeat === undefined ? cfg.defaultWordRepeat : options.repeat;

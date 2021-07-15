@@ -146,6 +146,7 @@ interface WatcherData {
 
 interface WordOptions {
   _filterMethod?: number;  // This should not be stored in the config. Only there for new Word
+  case?: number;
   lists?: number[];
   matchMethod: number;
   repeat: boolean;
