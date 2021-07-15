@@ -1,5 +1,5 @@
 import Constants from './lib/constants';
-import { dynamicList, exportToFile, numberWithCommas, readFile, removeChildren, removeFromArray, upperCaseFirst } from './lib/helper';
+import { booleanToNumber, dynamicList, exportToFile, numberToBoolean, numberWithCommas, readFile, removeChildren, removeFromArray, upperCaseFirst } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
 import Domain from './domain';
@@ -224,13 +224,13 @@ export default class OptionPage {
     const repeatInput = document.createElement('input');
     repeatInput.type = 'checkbox';
     repeatInput.name = 'repeat';
-    repeatInput.checked = data.repeat;
+    repeatInput.checked = numberToBoolean(data.repeat);
     cellRepeat.appendChild(repeatInput);
 
     const separatorsInput = document.createElement('input');
     separatorsInput.type = 'checkbox';
     separatorsInput.name = 'separators';
-    separatorsInput.checked = data.separators;
+    separatorsInput.checked =  numberToBoolean(data.separators);
     cellSeparators.appendChild(separatorsInput);
 
     this.cfg.wordlists.forEach((wordlist, index) => {
@@ -305,8 +305,8 @@ export default class OptionPage {
         const wordOptions: WordOptions = {
           lists: lists,
           matchMethod: (cells[3].querySelector('select') as HTMLSelectElement).selectedIndex,
-          repeat: (cells[4].querySelector('input') as HTMLInputElement).checked,
-          separators: (cells[5].querySelector('input') as HTMLInputElement).checked,
+          repeat: booleanToNumber((cells[4].querySelector('input') as HTMLInputElement).checked),
+          separators: booleanToNumber((cells[5].querySelector('input') as HTMLInputElement).checked),
           sub: (cells[2].querySelector('input') as HTMLInputElement).value
         };
         const success = this.cfg.addWord(name, wordOptions);
@@ -715,8 +715,8 @@ export default class OptionPage {
     const defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
     const defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
     const defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
-    defaultWordRepeat.checked = this.cfg.defaultWordRepeat;
-    defaultWordSeparators.checked = this.cfg.defaultWordSeparators;
+    defaultWordRepeat.checked = numberToBoolean(this.cfg.defaultWordRepeat);
+    defaultWordSeparators.checked = numberToBoolean(this.cfg.defaultWordSeparators);
     const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     defaultWordSubstitution.value = this.cfg.defaultSubstitution;
     removeChildren(defaultWordMatchMethodSelect);
@@ -865,8 +865,8 @@ export default class OptionPage {
       OptionPage.disableBtn(wordRemove);
       const selectedMatchMethod = document.getElementById(`wordMatch${upperCaseFirst(Constants.matchMethodName(this.cfg.defaultWordMatchMethod))}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
-      wordMatchRepeated.checked = this.cfg.defaultWordRepeat;
-      wordMatchSeparators.checked = this.cfg.defaultWordSeparators;
+      wordMatchRepeated.checked = numberToBoolean(this.cfg.defaultWordRepeat);
+      wordMatchSeparators.checked = numberToBoolean(this.cfg.defaultWordSeparators);
       substitutionText.value = '';
       substitutionCase.checked = false;
       wordlistSelections.forEach((wordlist, index) => {
@@ -884,8 +884,8 @@ export default class OptionPage {
       wordText.value = word;
       const selectedMatchMethod = document.getElementById(`wordMatch${upperCaseFirst(Constants.matchMethodName(wordCfg.matchMethod))}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
-      wordMatchRepeated.checked = wordCfg.repeat;
-      wordMatchSeparators.checked = wordCfg.separators === undefined ? this.cfg.defaultWordSeparators : wordCfg.separators;
+      wordMatchRepeated.checked = numberToBoolean(wordCfg.repeat);
+      wordMatchSeparators.checked = numberToBoolean(wordCfg.separators === undefined ? this.cfg.defaultWordSeparators : wordCfg.separators);
       substitutionText.value = wordCfg.sub;
       substitutionCase.checked = wordCfg.case > 0;
       wordlistSelections.forEach((wordlist, index) => {
@@ -1174,8 +1174,8 @@ export default class OptionPage {
     this.cfg.censorCharacter = censorCharacterSelect.value;
     this.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     this.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
-    this.cfg.defaultWordRepeat = defaultWordRepeat.checked;
-    this.cfg.defaultWordSeparators = defaultWordSeparators.checked;
+    this.cfg.defaultWordRepeat = booleanToNumber(defaultWordRepeat.checked);
+    this.cfg.defaultWordSeparators = booleanToNumber(defaultWordSeparators.checked);
     this.cfg.preserveCase = preserveCase.checked;
     this.cfg.preserveFirst = preserveFirst.checked;
     this.cfg.preserveLast = preserveLast.checked;
@@ -1312,8 +1312,8 @@ export default class OptionPage {
         case: subCase,
         lists: lists,
         matchMethod: matchMethod,
-        repeat: wordMatchRepeated.checked,
-        separators: wordMatchSeparators.checked,
+        repeat: booleanToNumber(wordMatchRepeated.checked),
+        separators: booleanToNumber(wordMatchSeparators.checked),
         sub: sub,
       };
 

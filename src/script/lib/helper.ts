@@ -1,3 +1,9 @@
+import Constants from './constants';
+
+export function booleanToNumber(value: boolean): number {
+  return value ? Constants.TRUE : Constants.FALSE;
+}
+
 /* istanbul ignore next */
 export function dynamicList(list: string[], select: HTMLSelectElement, upperCaseFirstChar: boolean = false, title?: string) {
   removeChildren(select);
@@ -111,6 +117,10 @@ export function makeRequest(method: string, url: string) {
     };
     xhr.send();
   });
+}
+
+export function numberToBoolean(value: number): boolean {
+  return value > Constants.FALSE;
 }
 
 export function numberWithCommas(number: number | string): string {

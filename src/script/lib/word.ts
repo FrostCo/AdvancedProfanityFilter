@@ -7,8 +7,8 @@ export default class Word {
   escaped: string;
   lists: number[];
   matchMethod: number;
-  matchRepeated: boolean;
-  matchSeparators: boolean;
+  matchRepeated: number;
+  matchSeparators: number;
   regExp: RegExp;
   sub: string;
   unicode: boolean;

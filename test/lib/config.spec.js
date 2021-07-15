@@ -67,10 +67,10 @@ describe('Config', function() {
     config.words = Object.assign({}, Config._defaultWords);
 
     it('should return the repeat option for a word', function() {
-      config.words['newWord'] = { matchMethod: config.defaultWordMatchMethod, repeat: true, words: [] };
-      expect(config.repeatForWord('newWord')).to.eql(true);
-      config.words['anotherNewWord'] = { matchMethod: config.defaultWordMatchMethod, repeat: false, words: [] };
-      expect(config.repeatForWord('anotherNewWord')).to.eql(false);
+      config.words['newWord'] = { matchMethod: config.defaultWordMatchMethod, repeat: Constants.TRUE, words: [] };
+      expect(config.repeatForWord('newWord')).to.eql(Constants.TRUE);
+      config.words['anotherNewWord'] = { matchMethod: config.defaultWordMatchMethod, repeat: Constants.FALSE, words: [] };
+      expect(config.repeatForWord('anotherNewWord')).to.eql(Constants.FALSE);
     });
 
     it('should return the default word repeat when not present on word', function() {

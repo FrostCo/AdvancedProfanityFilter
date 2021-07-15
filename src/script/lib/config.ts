@@ -5,8 +5,8 @@ export default class Config {
   censorFixedLength: number;
   defaultSubstitution: string;
   defaultWordMatchMethod: number;
-  defaultWordRepeat: boolean;
-  defaultWordSeparators: boolean;
+  defaultWordRepeat: number;
+  defaultWordSeparators: number;
   filterMethod: number;
   filterWordList: boolean;
   iWordWhitelist: string[];
@@ -29,8 +29,8 @@ export default class Config {
     censorFixedLength: 0,
     defaultSubstitution: 'censored',
     defaultWordMatchMethod: Constants.MATCH_METHODS.EXACT,
-    defaultWordRepeat: false,
-    defaultWordSeparators: false,
+    defaultWordRepeat: Constants.FALSE,
+    defaultWordSeparators: Constants.FALSE,
     filterMethod: Constants.FILTER_METHODS.SUBSTITUTE,
     filterWordList: true,
     iWordWhitelist: [],
@@ -47,37 +47,37 @@ export default class Config {
   };
 
   static readonly _defaultWords: { [key: string]: WordOptions } = {
-    'ass': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'butt' },
-    'asses': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: false, separators: false, sub: 'butts' },
-    'asshole': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'jerk' },
-    'badass': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: true, sub: 'cool' },
-    'bastard': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'idiot' },
-    'bitch': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'bench' },
-    'cocksucker': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: true, sub: 'suckup' },
-    'cunt': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'expletive' },
-    'dammit': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: false, separators: true, sub: 'dangit' },
-    'damn': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: false, separators: false, sub: 'dang' },
-    'dumbass': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'idiot' },
-    'fag': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'gay' },
-    'faggot': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'gay' },
-    'fags': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'gays' },
-    'fuck': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: true, sub: 'freak' },
-    'goddammit': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: true, sub: 'dangit' },
-    'hell': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: false, separators: false, sub: 'heck' },
-    'jackass': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: true, sub: 'jerk' },
-    'nigga': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'bruh' },
-    'nigger': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'man' },
-    'niggers': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'people' },
-    'piss': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'pee' },
-    'pissed': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'ticked' },
-    'pussies': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'softies' },
-    'pussy': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'softie' },
-    'shit': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'crap' },
-    'slut': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'tramp' },
-    'tits': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'chest' },
-    'twat': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'dumbo' },
-    'twats': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'dumbos' },
-    'whore': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'tramp' },
+    'ass': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'butt' },
+    'asses': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE, separators: Constants.FALSE, sub: 'butts' },
+    'asshole': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'jerk' },
+    'badass': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.TRUE, sub: 'cool' },
+    'bastard': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'idiot' },
+    'bitch': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'bench' },
+    'cocksucker': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.TRUE, sub: 'suckup' },
+    'cunt': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'expletive' },
+    'dammit': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE, separators: Constants.TRUE, sub: 'dangit' },
+    'damn': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE, separators: Constants.FALSE, sub: 'dang' },
+    'dumbass': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'idiot' },
+    'fag': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'gay' },
+    'faggot': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'gay' },
+    'fags': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'gays' },
+    'fuck': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.TRUE, sub: 'freak' },
+    'goddammit': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.TRUE, sub: 'dangit' },
+    'hell': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE, separators: Constants.FALSE, sub: 'heck' },
+    'jackass': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.TRUE, sub: 'jerk' },
+    'nigga': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'bruh' },
+    'nigger': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'man' },
+    'niggers': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'people' },
+    'piss': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'pee' },
+    'pissed': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'ticked' },
+    'pussies': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'softies' },
+    'pussy': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'softie' },
+    'shit': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'crap' },
+    'slut': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'tramp' },
+    'tits': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'chest' },
+    'twat': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'dumbo' },
+    'twats': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'dumbos' },
+    'whore': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'tramp' },
   };
 
   constructor(data: Record<string, unknown> = {}) {
@@ -126,8 +126,8 @@ export default class Config {
     }
   }
 
-  repeatForWord(word: string): boolean {
-    if (this.words[word].repeat === true || this.words[word].repeat === false) {
+  repeatForWord(word: string): number {
+    if (this.words[word].repeat === Constants.TRUE || this.words[word].repeat === Constants.FALSE) {
       return this.words[word].repeat;
     } else {
       return this.defaultWordRepeat;

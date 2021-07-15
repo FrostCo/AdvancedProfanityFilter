@@ -44,8 +44,8 @@ export default class Filter {
       if (word.matchMethod === Constants.MATCH_METHODS.PARTIAL) {
         const wordOptions: WordOptions = {
           matchMethod: Constants.MATCH_METHODS.WHOLE,
-          repeat: false,
-          separators: false,
+          repeat: Constants.FALSE,
+          separators: Constants.FALSE,
           sub: ''
         };
         const wholeWordRegExp = new Word(match, wordOptions, this.cfg).regExp;

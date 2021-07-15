@@ -1,5 +1,5 @@
 import Constants from './lib/constants';
-import { getVersion, isVersionOlder } from './lib/helper';
+import { booleanToNumber, getVersion, isVersionOlder } from './lib/helper';
 import WebConfig from './webConfig';
 
 export default class DataMigration {
@@ -16,6 +16,7 @@ export default class DataMigration {
     { version: '2.7.0', name: 'removeGlobalMatchMethod', runOnImport: true },
     { version: '2.7.0', name: 'removeOldDomainArrays', runOnImport: true },
     { version: '2.12.0', name: 'overwriteMuteCueRequireShowingDefault', runOnImport: false },
+    { version: '2.22.0', name: 'updateWordRepeatAndSeparatorTypes', runOnImport: true },
   ];
 
   constructor(config) {
@@ -194,6 +195,29 @@ export default class DataMigration {
         if (wordObj.sub == updatedWords[updatedWord].original) {
           wordObj.sub = updatedWords[updatedWord].update;
         }
+      }
+    });
+  }
+
+  // [2.22.0] - Update word repeat and separator types
+  updateWordRepeatAndSeparatorTypes() {
+    const cfg = this.cfg;
+
+    Object.keys(cfg.words).forEach((word) => {
+      const wordOptions = cfg.words[word] as WordOptions;
+
+      // @ts-ignore: Converting repeat from boolean to number
+      if (wordOptions.repeat === true || wordOptions.repeat === false) {
+        wordOptions.repeat = booleanToNumber(wordOptions.repeat);
+      } else if (wordOptions.repeat == null) {
+        wordOptions.repeat = cfg.defaultWordRepeat;
+      }
+
+      // @ts-ignore: Converting separators from boolean to number
+      if (wordOptions.separators === true || wordOptions.separators === false) {
+        wordOptions.separators = booleanToNumber(wordOptions.separators);
+      } else if (wordOptions.separators == null) {
+        wordOptions.separators = cfg.defaultWordSeparators;
       }
     });
   }

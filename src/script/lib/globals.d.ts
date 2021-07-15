@@ -149,8 +149,8 @@ interface WordOptions {
   case?: number;
   lists?: number[];
   matchMethod: number;
-  repeat: boolean;
-  separators?: boolean;
+  repeat: number;
+  separators?: number;
   sub: string;
 }
 
