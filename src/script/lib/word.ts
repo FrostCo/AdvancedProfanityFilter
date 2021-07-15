@@ -31,7 +31,7 @@ export default class Word {
   }
 
   // Note: Requires the input string to be all lower case
-  static capitalizeEachFirst(string: string): string {
+  static capitalizeEachWord(string: string): string {
     const split = string.split(/[-_ ]+/i);
     split.forEach((word) => { string = string.replace(word, this.capitalizeFirst(word)); });
     return string;
@@ -47,7 +47,7 @@ export default class Word {
     return Word._unicodeRegExp.test(str);
   }
 
-  static eachCapitalized(string: string): boolean {
+  static eachWordCapitalized(string: string): boolean {
     const split = string.split(/[-_ ]+/i);
     if (split.length > 1) {
       const each = split.every((word) => this.firstCapitalized(word));
