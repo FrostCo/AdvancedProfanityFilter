@@ -26,7 +26,7 @@ describe('WebConfig', function() {
     it('should combine _words# data', function() {
       const config = new WebConfig(WebConfig._defaults);
       config._words0 = WebConfig._defaultWords;
-      config._words1 = { 'test': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' } };
+      config._words1 = { 'test': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'tset' } };
       config._splitContainerKeys = ['words'];
       expect(config.words).to.not.exist;
       const combinedKeys = WebConfig.combineData(config, 'words');
