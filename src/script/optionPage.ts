@@ -1287,8 +1287,9 @@ export default class OptionPage {
     let word = wordText.value.trim();
     const subCase = substitutionCase.checked ? 1 : 0;
     const sub = subCase > 0 ? substitutionText.value.trim() : substitutionText.value.trim().toLowerCase();
+    const matchMethod = Constants.MATCH_METHODS[selectedMatchMethod.value];
 
-    if (Constants.MATCH_METHODS[selectedMatchMethod.value] !== Constants.MATCH_METHODS.REGEX) {
+    if (matchMethod !== Constants.MATCH_METHODS.REGEX) {
       word = word.toLowerCase();
     }
 
@@ -1310,10 +1311,10 @@ export default class OptionPage {
       const wordOptions: WordOptions = {
         case: subCase,
         lists: lists,
-        matchMethod: Constants.MATCH_METHODS[selectedMatchMethod.value],
+        matchMethod: matchMethod,
         repeat: wordMatchRepeated.checked,
         separators: wordMatchSeparators.checked,
-        sub: sub
+        sub: sub,
       };
 
       // Check for endless substitution loop
