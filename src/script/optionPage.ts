@@ -887,7 +887,7 @@ export default class OptionPage {
       wordMatchRepeated.checked = numberToBoolean(wordCfg.repeat);
       wordMatchSeparators.checked = numberToBoolean(wordCfg.separators === undefined ? this.cfg.defaultWordSeparators : wordCfg.separators);
       substitutionText.value = wordCfg.sub;
-      substitutionCase.checked = wordCfg.case > 0;
+      substitutionCase.checked = numberToBoolean(wordCfg.case);
       wordlistSelections.forEach((wordlist, index) => {
         wordlist.checked = wordCfg.lists.includes(index + 1);
       });
@@ -1285,8 +1285,8 @@ export default class OptionPage {
     const wordlistSelectionsInput = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
     let added = true;
     let word = wordText.value.trim();
-    const subCase = substitutionCase.checked ? 1 : 0;
-    const sub = subCase > 0 ? substitutionText.value.trim() : substitutionText.value.trim().toLowerCase();
+    const subCase = booleanToNumber(substitutionCase.checked);
+    const sub = numberToBoolean(subCase) ? substitutionText.value.trim() : substitutionText.value.trim().toLowerCase();
     const matchMethod = Constants.MATCH_METHODS[selectedMatchMethod.value];
 
     if (matchMethod !== Constants.MATCH_METHODS.REGEX) {
