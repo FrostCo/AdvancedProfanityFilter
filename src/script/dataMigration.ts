@@ -16,7 +16,7 @@ export default class DataMigration {
     { version: '2.7.0', name: 'removeGlobalMatchMethod', runOnImport: true },
     { version: '2.7.0', name: 'removeOldDomainArrays', runOnImport: true },
     { version: '2.12.0', name: 'overwriteMuteCueRequireShowingDefault', runOnImport: false },
-    { version: '2.22.0', name: 'updateWordRepeatAndSeparatorTypes', runOnImport: true },
+    { version: '2.22.0', name: 'updateWordRepeatAndSeparatorDataTypes', runOnImport: true },
   ];
 
   constructor(config) {
@@ -199,8 +199,8 @@ export default class DataMigration {
     });
   }
 
-  // [2.22.0] - Update word repeat and separator types
-  updateWordRepeatAndSeparatorTypes() {
+  // [2.22.0] - Update word repeat and separator data types
+  updateWordRepeatAndSeparatorDataTypes() {
     const cfg = this.cfg;
 
     Object.keys(cfg.words).forEach((word) => {

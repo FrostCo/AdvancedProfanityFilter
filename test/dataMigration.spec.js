@@ -4,6 +4,7 @@ import DataMigration from './built/dataMigration';
 import WebConfig from './built/webConfig';
 
 describe('DataMigration', function() {
+  // 2.7.0
   describe('addWordlistsToWords()', function() {
     it('should add wordlist to all words', function() {
       const cfg = {
@@ -21,6 +22,7 @@ describe('DataMigration', function() {
     });
   });
 
+  // 2.7.0
   describe('removeGlobalMatchMethod()', function() {
     it('should remove global match method and adjust RegExp method', function() {
       const data = {
@@ -44,6 +46,7 @@ describe('DataMigration', function() {
     });
   });
 
+  // 2.7.0
   describe('removeOldDomainArrays()', function() {
     it('should migrate all old domain arrays', function() {
       const cfg = {
@@ -62,6 +65,43 @@ describe('DataMigration', function() {
       expect(cfg.domains['example.com'].enabled).to.be.true;
       expect(cfg.domains['test.org'].disabled).to.be.true;
       expect(cfg.domains['test.org'].adv).to.be.undefined;
+    });
+  });
+
+  // 2.20.0
+  describe('updateWordRepeatAndSeparatorDataTypes()', function() {
+    describe('convert repeat and separators to numbers', function() {
+      const data = {
+        words: {
+          'test': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: false, separators: false, sub: 'tset' },
+          'another': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: true, sub: 'tset' },
+          'testWithList': { lists: [1, 3, 5], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
+          'withoutRepeat': { lists: [1, 3, 5], matchMethod: Constants.MATCH_METHODS.EXACT, separators: true, sub: 'tset' },
+        }
+      };
+      const cfg = new WebConfig(data);
+      const dataMigration = new DataMigration(cfg);
+      dataMigration.updateWordRepeatAndSeparatorDataTypes();
+
+      it('when both are false', function() {
+        expect(cfg.words['test'].repeat).to.equal(Constants.FALSE);
+        expect(cfg.words['test'].separators).to.equal(Constants.FALSE);
+      });
+
+      it('when both are false', function() {
+        expect(cfg.words['another'].repeat).to.equal(Constants.TRUE);
+        expect(cfg.words['another'].separators).to.equal(Constants.TRUE);
+      });
+
+      it('when repeat is true and separators is false', function() {
+        expect(cfg.words['testWithList'].repeat).to.equal(Constants.TRUE);
+        expect(cfg.words['testWithList'].separators).to.equal(Constants.FALSE);
+      });
+
+      it('when repeat is not present and separators is true', function() {
+        expect(cfg.words['withoutRepeat'].repeat).to.equal(Constants.FALSE);
+        expect(cfg.words['withoutRepeat'].separators).to.equal(Constants.TRUE);
+      });
     });
   });
 });
