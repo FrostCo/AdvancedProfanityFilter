@@ -49,11 +49,7 @@ export default class Word {
 
   static eachWordCapitalized(string: string): boolean {
     const split = string.split(/[-_ ]+/i);
-    if (split.length > 1) {
-      const each = split.every((word) => this.firstCapitalized(word));
-      return each;
-    }
-    return false;
+    return split.every((word) => this.firstCapitalized(word));
   }
 
   // /[-\/\\^$*+?.()|[\]{}]/g
