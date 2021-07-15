@@ -1,9 +1,19 @@
 import { expect } from 'chai';
-import { formatNumber, getVersion, hmsToSeconds, isVersionOlder, removeFromArray, secondsToHMS } from '../built/lib/helper';
+import Constants from '../built/lib/constants';
+import { booleanToNumber, formatNumber, getVersion, hmsToSeconds, isVersionOlder, numberToBoolean, removeFromArray, secondsToHMS } from '../built/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 
 describe('Helper', function() {
+  describe('booleanToNumber()', function() {
+    it('Return a number from a boolean', function() {
+      expect(booleanToNumber(true)).to.eql(Constants.TRUE);
+      expect(booleanToNumber(false)).to.eql(Constants.FALSE);
+      expect(booleanToNumber(undefined)).to.eql(Constants.FALSE);
+      expect(booleanToNumber(null)).to.eql(Constants.FALSE);
+    });
+  });
+
   describe('formatNumber()', function() {
     it('Format numbers for counter display', function() {
       expect(formatNumber(999)).to.eql('999');
@@ -90,6 +100,16 @@ describe('Helper', function() {
       version = getVersion('1.5.11');
       minimum = getVersion('1.5.10');
       expect(isVersionOlder(version, minimum)).to.equal(false);
+    });
+  });
+
+  describe('numberToBoolean()', function() {
+    it('Return a boolean from a number', function() {
+      expect(numberToBoolean(Constants.FALSE)).to.eql(false);
+      expect(numberToBoolean(Constants.TRUE)).to.eql(true);
+      expect(numberToBoolean(5)).to.eql(true);
+      expect(numberToBoolean(undefined)).to.eql(false);
+      expect(numberToBoolean(null)).to.eql(false);
     });
   });
 
