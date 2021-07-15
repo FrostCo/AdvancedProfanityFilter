@@ -212,23 +212,23 @@ describe('Word', function() {
     });
   });
 
-  describe('capitalized()', function() {
-    it('should return true when word is capitalized', function() {
-      expect(Word.capitalized('Upper')).to.equal(true);
+  describe('firstCapitalized()', function() {
+    it('should return true when only the first character of the word is capitalized', function() {
+      expect(Word.firstCapitalized('Upper')).to.equal(true);
     });
 
-    it('should return false when word is not capitalized', function() {
-      expect(Word.capitalized('upper')).to.equal(false);
+    it('should return false when word does not start with a capital letter', function() {
+      expect(Word.firstCapitalized('upper')).to.equal(false);
     });
   });
 
-  describe('capitalize()', function() {
-    it('should return a capitalized string', function() {
-      expect(Word.capitalize('upper')).to.equal('Upper');
+  describe('capitalizeFirst()', function() {
+    it('should return a string with the first character capitalized', function() {
+      expect(Word.capitalizeFirst('upper')).to.equal('Upper');
     });
 
     it('should return a capitalized string when its already capitalized', function() {
-      expect(Word.capitalize('Upper')).to.equal('Upper');
+      expect(Word.capitalizeFirst('Upper')).to.equal('Upper');
     });
   });
 

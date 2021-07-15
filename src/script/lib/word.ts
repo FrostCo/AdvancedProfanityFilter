@@ -30,12 +30,15 @@ export default class Word {
     return string.toUpperCase() === string;
   }
 
-  static capitalize(string: string): string {
-    return string.charAt(0).toUpperCase() + string.substr(1);
+  // Note: Requires the input string to be all lower case
+  static capitalizeEachFirst(string: string): string {
+    const split = string.split(/[-_ ]+/i);
+    split.forEach((word) => { string = string.replace(word, this.capitalizeFirst(word)); });
+    return string;
   }
 
-  static capitalized(string: string): boolean {
-    return string.charAt(0).toUpperCase() === string.charAt(0);
+  static capitalizeFirst(string: string): string {
+    return string.charAt(0).toUpperCase() + string.substr(1);
   }
 
   static containsDoubleByte(str): boolean {
@@ -44,11 +47,24 @@ export default class Word {
     return Word._unicodeRegExp.test(str);
   }
 
+  static eachCapitalized(string: string): boolean {
+    const split = string.split(/[-_ ]+/i);
+    if (split.length > 1) {
+      const each = split.every((word) => this.firstCapitalized(word));
+      return each;
+    }
+    return false;
+  }
+
   // /[-\/\\^$*+?.()|[\]{}]/g
   // /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
   // Removing '-' for '/пресс-релиз/, giu'
   static escapeRegExp(str: string): string {
     return str.replace(Word._escapeRegExp, '\\$&');
+  }
+
+  static firstCapitalized(string: string): boolean {
+    return string.charAt(0).toUpperCase() === string.charAt(0);
   }
 
   constructor(word: string, options: WordOptions, cfg: Config) {

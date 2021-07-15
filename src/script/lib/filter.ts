@@ -147,8 +147,10 @@ export default class Filter {
             if (!word.case && this.cfg.preserveCase) {
               if (Word.allUpperCase(match)) {
                 sub = sub.toUpperCase();
-              } else if (Word.capitalized(match)) {
-                sub = Word.capitalize(sub);
+              } else if (Word.eachCapitalized(match)) {
+                sub = Word.capitalizeEachFirst(sub);
+              } else if (Word.firstCapitalized(match)) {
+                sub = Word.capitalizeFirst(sub);
               }
             }
 
