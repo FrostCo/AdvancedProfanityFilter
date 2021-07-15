@@ -232,6 +232,30 @@ describe('Word', function() {
     });
   });
 
+  describe('eachWordCapitalized()', function() {
+    it('should return true when only the first character of each word is capitalized', function() {
+      expect(Word.eachWordCapitalized('Upper Limit')).to.equal(true);
+    });
+
+    it('should return false when each word does not start with a capital letter', function() {
+      expect(Word.eachWordCapitalized('Upper limit')).to.equal(false);
+    });
+  });
+
+  describe('capitalizeEachWord()', function() {
+    it('should return a string with the first character of each word capitalized', function() {
+      expect(Word.capitalizeEachWord('live long and prosper')).to.equal('Live Long And Prosper');
+    });
+
+    it('should handle a phrase with repeated words', function() {
+      expect(Word.capitalizeEachWord('the best in the world')).to.equal('The Best In The World');
+    });
+
+    it('should return a capitalized string when its already capitalized', function() {
+      expect(Word.capitalizeEachWord('Upper Limit')).to.equal('Upper Limit');
+    });
+  });
+
   describe('constructor()', function() {
     it('should use all provided defaults', function() {
       const cfg = Object.assign({}, Config._defaults, { defaultWordMatchMethod: Constants.MATCH_METHODS.WHOLE });
