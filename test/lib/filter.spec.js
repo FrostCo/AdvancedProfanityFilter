@@ -275,6 +275,62 @@ describe('Filter', () => {
           expect(filter.replaceText('Go out with a !Bang!')).to.equal('Go out with a !Bang!');
           expect(filter.replaceText('!ANOTHER! so cool!')).to.equal('$ZNOTHER# so cool!');
         });
+
+        describe('Words and phrases with both case sensitivities', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            words: {
+              'oneword': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, case: Constants.TRUE, sub: 'wOrD', lists: [] },
+              'pizza': { matchMethod: Constants.MATCH_METHODS.EXACT, sub: 'chocolate', lists: [] },
+              'pie': { matchMethod: Constants.MATCH_METHODS.EXACT, sub: 'ice cream', lists: [] },
+              'corn on the cob': { matchMethod: Constants.MATCH_METHODS.EXACT, sub: 'corn', lists: [] },
+              'a phrase too': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, case: Constants.TRUE, sub: 'mULTIPLE wORDS tOO', lists: [] },
+              "here's a little song i wrote": { matchMethod: Constants.MATCH_METHODS.EXACT, sub: 'my gift is my song', lists: [] },
+            }, filterMethod: Constants.FILTER_METHODS.SUBSTITUTE,
+            substitutionMark: false,
+            preserveCase: true,
+          });
+          filter.init();
+
+          it('Word with case sensitivity on', () => {
+            expect(filter.replaceText('What is the oneword?')).to.equal('What is the wOrD?');
+            expect(filter.replaceText('What is the oneword?')).to.equal('What is the wOrD?');
+          });
+
+          it('Word with case sensitivity off (preserveCase on)', () => {
+            expect(filter.replaceText('Pizza is the best!')).to.equal('Chocolate is the best!');
+          });
+
+          it('Word with case sensitivity off (preserveCase on)', () => {
+            expect(filter.replaceText('Pizza is the best!')).to.equal('Chocolate is the best!');
+          });
+
+          it('Phrase with case sensitivity on', () => {
+            expect(filter.replaceText('I can filter and capitalize A Phrase Too!')).to.equal('I can filter and capitalize mULTIPLE wORDS tOO!');
+            expect(filter.replaceText('I can filter and capitalize A Phraseeeee Too!')).to.equal('I can filter and capitalize mULTIPLE wORDS tOO!');
+          });
+
+          it('Phrase with case sensitivity off (preserveCase on)', () => {
+            expect(filter.replaceText("Here's A Little Song I Wrote, you might want to sing it note for note")).to.equal('My Gift Is My Song, you might want to sing it note for note');
+            expect(filter.replaceText("Here's a Little Song I Wrote, you might want to sing it note for note")).to.equal('My gift is my song, you might want to sing it note for note');
+            expect(filter.replaceText("here's a little song i wrote, you might want to sing it note for note")).to.equal('my gift is my song, you might want to sing it note for note');
+            expect(filter.replaceText("HERE'S A LITTLE SONG I WROTE, you might want to sing it note for note")).to.equal('MY GIFT IS MY SONG, you might want to sing it note for note');
+          });
+
+          it('Word to substitution phrase with case sensitivity off (preserveCase on)', () => {
+            expect(filter.replaceText('Do you like to eat pie?')).to.equal('Do you like to eat ice cream?');
+            expect(filter.replaceText('Do you like to eat Pie?')).to.equal('Do you like to eat Ice Cream?');
+            expect(filter.replaceText('Do you like to eat PIE?')).to.equal('Do you like to eat ICE CREAM?');
+          });
+
+          it('Phrase to substitution word with case sensitivity off (preserveCase on)', () => {
+            expect(filter.replaceText('Do you like to eat corn on the cob?')).to.equal('Do you like to eat corn?');
+            expect(filter.replaceText('Do you like to eat corn On The Cob?')).to.equal('Do you like to eat corn?');
+            expect(filter.replaceText('Do you like to eat Corn on the cob?')).to.equal('Do you like to eat Corn?');
+            expect(filter.replaceText('Do you like to eat Corn On The Cob?')).to.equal('Do you like to eat Corn?');
+            expect(filter.replaceText('Do you like to eat CORN ON THE COB?')).to.equal('Do you like to eat CORN?');
+          });
+        });
       });
 
       describe('Partial', () => {
