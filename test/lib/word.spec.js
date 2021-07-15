@@ -192,67 +192,69 @@ describe('Word', function() {
     });
   });
 
-  describe('allLowerCase()', function() {
-    it('should return true when all lowercase', function() {
-      expect(Word.allLowerCase('lower')).to.equal(true);
+  describe('Capitalization', () =>{
+    describe('allLowerCase()', function() {
+      it('should return true when all lowercase', function() {
+        expect(Word.allLowerCase('lower')).to.equal(true);
+      });
+
+      it('should return false when not all lowercase', function() {
+        expect(Word.allLowerCase('Lower')).to.equal(false);
+      });
     });
 
-    it('should return false when not all lowercase', function() {
-      expect(Word.allLowerCase('Lower')).to.equal(false);
-    });
-  });
+    describe('allUpperCase()', function() {
+      it('should return true when all uppercase', function() {
+        expect(Word.allUpperCase('UPPER')).to.equal(true);
+      });
 
-  describe('allUpperCase()', function() {
-    it('should return true when all uppercase', function() {
-      expect(Word.allUpperCase('UPPER')).to.equal(true);
-    });
-
-    it('should return false when not all uppercase', function() {
-      expect(Word.allUpperCase('upper')).to.equal(false);
-    });
-  });
-
-  describe('firstCapitalized()', function() {
-    it('should return true when only the first character of the word is capitalized', function() {
-      expect(Word.firstCapitalized('Upper')).to.equal(true);
+      it('should return false when not all uppercase', function() {
+        expect(Word.allUpperCase('upper')).to.equal(false);
+      });
     });
 
-    it('should return false when word does not start with a capital letter', function() {
-      expect(Word.firstCapitalized('upper')).to.equal(false);
-    });
-  });
+    describe('capitalizeEachWord()', function() {
+      it('should return a string with the first character of each word capitalized', function() {
+        expect(Word.capitalizeEachWord('live long and prosper')).to.equal('Live Long And Prosper');
+      });
 
-  describe('capitalizeFirst()', function() {
-    it('should return a string with the first character capitalized', function() {
-      expect(Word.capitalizeFirst('upper')).to.equal('Upper');
-    });
+      it('should handle a phrase with repeated words', function() {
+        expect(Word.capitalizeEachWord('the best in the world')).to.equal('The Best In The World');
+      });
 
-    it('should return a capitalized string when its already capitalized', function() {
-      expect(Word.capitalizeFirst('Upper')).to.equal('Upper');
-    });
-  });
-
-  describe('eachWordCapitalized()', function() {
-    it('should return true when only the first character of each word is capitalized', function() {
-      expect(Word.eachWordCapitalized('Upper Limit')).to.equal(true);
+      it('should return a capitalized string when its already capitalized', function() {
+        expect(Word.capitalizeEachWord('Upper Limit')).to.equal('Upper Limit');
+      });
     });
 
-    it('should return false when each word does not start with a capital letter', function() {
-      expect(Word.eachWordCapitalized('Upper limit')).to.equal(false);
-    });
-  });
+    describe('capitalizeFirst()', function() {
+      it('should return a string with the first character capitalized', function() {
+        expect(Word.capitalizeFirst('upper')).to.equal('Upper');
+      });
 
-  describe('capitalizeEachWord()', function() {
-    it('should return a string with the first character of each word capitalized', function() {
-      expect(Word.capitalizeEachWord('live long and prosper')).to.equal('Live Long And Prosper');
-    });
-
-    it('should handle a phrase with repeated words', function() {
-      expect(Word.capitalizeEachWord('the best in the world')).to.equal('The Best In The World');
+      it('should return a capitalized string when its already capitalized', function() {
+        expect(Word.capitalizeFirst('Upper')).to.equal('Upper');
+      });
     });
 
-    it('should return a capitalized string when its already capitalized', function() {
-      expect(Word.capitalizeEachWord('Upper Limit')).to.equal('Upper Limit');
+    describe('eachWordCapitalized()', function() {
+      it('should return true when only the first character of each word is capitalized', function() {
+        expect(Word.eachWordCapitalized('Upper Limit')).to.equal(true);
+      });
+
+      it('should return false when each word does not start with a capital letter', function() {
+        expect(Word.eachWordCapitalized('Upper limit')).to.equal(false);
+      });
+    });
+
+    describe('firstCapitalized()', function() {
+      it('should return true when only the first character of the word is capitalized', function() {
+        expect(Word.firstCapitalized('Upper')).to.equal(true);
+      });
+
+      it('should return false when word does not start with a capital letter', function() {
+        expect(Word.firstCapitalized('upper')).to.equal(false);
+      });
     });
   });
 
