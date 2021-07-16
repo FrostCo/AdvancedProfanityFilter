@@ -20,6 +20,7 @@ export default class WebAudio {
   muted: boolean;
   rules: AudioRule[];
   sites: { [site: string]: AudioRule[] };
+  siteKey: string;
   supportedPage: boolean;
   unmuteTimeout: number;
   volume: number;
@@ -79,7 +80,8 @@ export default class WebAudio {
     this.youTubeAutoSubsUnmuteDelay = 0;
 
     // Setup rules for current site
-    this.rules = this.sites[filter.hostname];
+    this.siteKey = this.getSiteKey();
+    this.rules = this.sites[this.siteKey];
     if (this.rules) {
       if (!Array.isArray(this.rules)) { this.rules = [this.rules]; }
       this.rules.forEach((rule) => { this.initRule(rule); });
@@ -235,6 +237,20 @@ export default class WebAudio {
     if (this.muted) {
       this.fillerAudio.play();
     }
+  }
+
+  getSiteKey(): string {
+    if (this.sites.hasOwnProperty(this.filter.hostname)) {
+      return this.filter.hostname;
+    } else if (
+      this.filter.iframe
+      && this.filter.iframe.hostname
+      && this.sites.hasOwnProperty(this.filter.iframe.hostname)
+    ) {
+      return this.filter.iframe.hostname;
+    }
+
+    return '';
   }
 
   // Priority (requires cues): [overrideKey], label, language, kind (prefer caption/subtitle), order
@@ -439,7 +455,7 @@ export default class WebAudio {
   }
 
   initYouTube() {
-    if(['m.youtube.com', 'tv.youtube.com', 'www.youtube.com'].includes(this.filter.hostname)) {
+    if(['m.youtube.com', 'tv.youtube.com', 'www.youtube.com'].includes(this.siteKey)) {
       this.youTube = true;
       // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
       const youTubeAutoCensor = '[ __ ]';
@@ -708,7 +724,7 @@ export default class WebAudio {
           throw(`Failed to find subtitle variable: ${rule.externalSubVar}`);
         }
       } catch(e) {
-        logger.error(`[Audio] Error using external subtitles for ${this.filter.hostname}.`, e);
+        logger.error(`[Audio] Error using external subtitles for ${this.siteKey}.`, e);
       }
     }
   }
