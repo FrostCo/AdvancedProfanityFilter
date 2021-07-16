@@ -444,7 +444,13 @@ export default class WebAudio {
       // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
       const youTubeAutoCensor = '[ __ ]';
       const lists = this.wordlistId === Constants.ALL_WORDS_WORDLIST_ID ? [] : [this.wordlistId];
-      const youTubeAutoCensorOptions: WordOptions = { lists: lists, matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: false, separators: false, sub: '' };
+      const youTubeAutoCensorOptions: WordOptions = {
+        lists: lists,
+        matchMethod: Constants.MATCH_METHODS.PARTIAL,
+        repeat: Constants.FALSE,
+        separators: Constants.FALSE,
+        sub: '',
+      };
       this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
 
       // Setup rule for YouTube Auto Subs

@@ -3,11 +3,12 @@ import Config from './config';
 
 export default class Word {
   _filterMethod: number;
+  case?: number;
   escaped: string;
   lists: number[];
   matchMethod: number;
-  matchRepeated: boolean;
-  matchSeparators: boolean;
+  matchRepeated: number;
+  matchSeparators: number;
   regExp: RegExp;
   sub: string;
   unicode: boolean;
@@ -29,18 +30,26 @@ export default class Word {
     return string.toUpperCase() === string;
   }
 
-  static capitalize(string: string): string {
-    return string.charAt(0).toUpperCase() + string.substr(1);
+  // Note: Requires the input string to be all lower case
+  static capitalizeEachWord(string: string): string {
+    const split = string.split(/[-_ ]+/i);
+    split.forEach((word) => { string = string.replace(word, this.capitalizeFirst(word)); });
+    return string;
   }
 
-  static capitalized(string: string): boolean {
-    return string.charAt(0).toUpperCase() === string.charAt(0);
+  static capitalizeFirst(string: string): string {
+    return string.charAt(0).toUpperCase() + string.substr(1);
   }
 
   static containsDoubleByte(str): boolean {
     if (!str.length) return false;
     if (str.charCodeAt(0) > 127) return true;
     return Word._unicodeRegExp.test(str);
+  }
+
+  static eachWordCapitalized(string: string): boolean {
+    const split = string.split(/[-_ ]+/i);
+    return split.every((word) => this.firstCapitalized(word));
   }
 
   // /[-\/\\^$*+?.()|[\]{}]/g
@@ -50,8 +59,13 @@ export default class Word {
     return str.replace(Word._escapeRegExp, '\\$&');
   }
 
+  static firstCapitalized(string: string): boolean {
+    return string.charAt(0).toUpperCase() === string.charAt(0);
+  }
+
   constructor(word: string, options: WordOptions, cfg: Config) {
     this.value = word;
+    this.case = options.case > Constants.FALSE ? Constants.TRUE : Constants.FALSE;
     this.lists = options.lists === undefined ? [] : options.lists;
     this.matchMethod = options.matchMethod === undefined ? cfg.defaultWordMatchMethod : options.matchMethod;
     this.matchRepeated = options.repeat === undefined ? cfg.defaultWordRepeat : options.repeat;

@@ -64,7 +64,7 @@ export default class WebConfig extends Config {
   }
 
   static chromeStorageAvailable(): boolean {
-    return !!(chrome && chrome.storage && (chrome.storage.sync || chrome.storage.local));
+    return !!(chrome && chrome.storage && chrome.storage.sync && chrome.storage.local);
   }
 
   // Combine all ._[prop]* into .[prop]

@@ -12,7 +12,7 @@ describe('Word', function() {
       });
 
       it('should build RegExp with matchRepeated', function() {
-        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true }, Config._defaults);
+        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE }, Config._defaults);
         expect(word.regExp).to.eql(/\bw+o+r+d+\b/gi);
       });
 
@@ -29,7 +29,7 @@ describe('Word', function() {
       });
 
       it('should build RegExp with matchSeparators and matchRepeated', function() {
-        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: true }, Config._defaults);
+        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.TRUE }, Config._defaults);
         expect(word.regExp).to.eql(/\bw+[-_ ]*o+[-_ ]*r+[-_ ]*d+\b/gi);
       });
 
@@ -44,7 +44,7 @@ describe('Word', function() {
         });
 
         it('should use workaround for UTF word boundaries with matchRepeated', function() {
-          const word = new Word('врата', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true }, Config._defaults);
+          const word = new Word('врата', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-]+)(в+р+а+т+а+)([\\s.,\'"+!?|-]+|$)', 'giu')
@@ -60,17 +60,17 @@ describe('Word', function() {
       });
 
       it('should build RegExp with matchRepeated', function() {
-        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true }, Config._defaults);
+        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE }, Config._defaults);
         expect(word.regExp).to.eql(/w+o+r+d+/gi);
       });
 
       it('should build RegExp with matchSeparators', function() {
-        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.PARTIAL, separators: true }, Config._defaults);
+        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.PARTIAL, separators: Constants.TRUE }, Config._defaults);
         expect(word.regExp).to.eql(/w[-_ ]*o[-_ ]*r[-_ ]*d/gi);
       });
 
       it('should build RegExp with matchSeparators and matchRepeated', function() {
-        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: true }, Config._defaults);
+        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.TRUE }, Config._defaults);
         expect(word.regExp).to.eql(/w+[-_ ]*o+[-_ ]*r+[-_ ]*d+/gi);
       });
     });
@@ -82,7 +82,7 @@ describe('Word', function() {
       });
 
       it('should build RegExp with matchRepeated', function() {
-        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, _filterMethod: Constants.FILTER_METHODS.REMOVE }, Config._defaults);
+        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, _filterMethod: Constants.FILTER_METHODS.REMOVE }, Config._defaults);
         expect(word.regExp).to.eql(/\s?\bw+o+r+d+\b\s?/gi);
       });
 
@@ -102,7 +102,7 @@ describe('Word', function() {
         });
 
         it('should build RegExp with matchRepeated', function() {
-          const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, _filterMethod: Constants.FILTER_METHODS.REMOVE }, Config._defaults);
+          const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, _filterMethod: Constants.FILTER_METHODS.REMOVE }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-])(к+у+ч+е+)([\\s.,\'"+!?|-]|$)', 'giu')
@@ -118,7 +118,7 @@ describe('Word', function() {
       });
 
       it('should build RegExp with matchRepeated', function() {
-        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true }, Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }));
+        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE }, Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }));
         expect(word.regExp).to.eql(/\s?\b[\w-]*w+o+r+d+[\w-]*\b\s?/gi);
       });
 
@@ -138,7 +138,7 @@ describe('Word', function() {
         });
 
         it('should build RegExp with matchRepeated', function() {
-          const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true }, Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }));
+          const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE }, Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }));
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-]?)([\\w-]*к+у+ч+е+[\\w-]*)([\\s.,\'"+!?|-]?|$)', 'giu')
@@ -154,7 +154,7 @@ describe('Word', function() {
       });
 
       it('should build RegExp with matchRepeated', function() {
-        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: true }, Config._defaults);
+        const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE }, Config._defaults);
         expect(word.regExp).to.eql(/\b[\w-]*w+o+r+d+[\w-]*\b/gi);
       });
 
@@ -174,7 +174,7 @@ describe('Word', function() {
         });
 
         it('should build RegExp with matchRepeated', function() {
-          const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: true }, Config._defaults);
+          const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*к+у+ч+е+[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
@@ -182,7 +182,7 @@ describe('Word', function() {
         });
 
         it('should build RegExp with matchRepeated and matchSeparators', function() {
-          const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: true, separators: true }, Config._defaults);
+          const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE, separators: Constants.TRUE }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
             new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*к+[-_ ]*у+[-_ ]*ч+[-_ ]*е+[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
@@ -192,43 +192,71 @@ describe('Word', function() {
     });
   });
 
-  describe('allLowerCase()', function() {
-    it('should return true when all lowercase', function() {
-      expect(Word.allLowerCase('lower')).to.equal(true);
+  describe('Capitalization', () =>{
+    describe('allLowerCase()', function() {
+      it('should return true when all lowercase', function() {
+        expect(Word.allLowerCase('lower')).to.equal(true);
+      });
+
+      it('should return false when not all lowercase', function() {
+        expect(Word.allLowerCase('Lower')).to.equal(false);
+      });
     });
 
-    it('should return false when not all lowercase', function() {
-      expect(Word.allLowerCase('Lower')).to.equal(false);
-    });
-  });
+    describe('allUpperCase()', function() {
+      it('should return true when all uppercase', function() {
+        expect(Word.allUpperCase('UPPER')).to.equal(true);
+      });
 
-  describe('allUpperCase()', function() {
-    it('should return true when all uppercase', function() {
-      expect(Word.allUpperCase('UPPER')).to.equal(true);
-    });
-
-    it('should return false when not all uppercase', function() {
-      expect(Word.allUpperCase('upper')).to.equal(false);
-    });
-  });
-
-  describe('capitalized()', function() {
-    it('should return true when word is capitalized', function() {
-      expect(Word.capitalized('Upper')).to.equal(true);
+      it('should return false when not all uppercase', function() {
+        expect(Word.allUpperCase('upper')).to.equal(false);
+      });
     });
 
-    it('should return false when word is not capitalized', function() {
-      expect(Word.capitalized('upper')).to.equal(false);
-    });
-  });
+    describe('capitalizeEachWord()', function() {
+      it('should return a string with the first character of each word capitalized', function() {
+        expect(Word.capitalizeEachWord('live long and prosper')).to.equal('Live Long And Prosper');
+        expect(Word.capitalizeEachWord('cool')).to.equal('Cool');
+      });
 
-  describe('capitalize()', function() {
-    it('should return a capitalized string', function() {
-      expect(Word.capitalize('upper')).to.equal('Upper');
+      it('should handle a phrase with repeated words', function() {
+        expect(Word.capitalizeEachWord('the best in the world')).to.equal('The Best In The World');
+      });
+
+      it('should return a capitalized string when its already capitalized', function() {
+        expect(Word.capitalizeEachWord('Upper Limit')).to.equal('Upper Limit');
+      });
     });
 
-    it('should return a capitalized string when its already capitalized', function() {
-      expect(Word.capitalize('Upper')).to.equal('Upper');
+    describe('capitalizeFirst()', function() {
+      it('should return a string with the first character capitalized', function() {
+        expect(Word.capitalizeFirst('upper')).to.equal('Upper');
+      });
+
+      it('should return a capitalized string when its already capitalized', function() {
+        expect(Word.capitalizeFirst('Upper')).to.equal('Upper');
+      });
+    });
+
+    describe('eachWordCapitalized()', function() {
+      it('should return true when only the first character of each word is capitalized', function() {
+        expect(Word.eachWordCapitalized('Upper Limit')).to.equal(true);
+        expect(Word.eachWordCapitalized('Upper')).to.equal(true);
+      });
+
+      it('should return false when each word does not start with a capital letter', function() {
+        expect(Word.eachWordCapitalized('Upper limit')).to.equal(false);
+      });
+    });
+
+    describe('firstCapitalized()', function() {
+      it('should return true when only the first character of the word is capitalized', function() {
+        expect(Word.firstCapitalized('Upper')).to.equal(true);
+      });
+
+      it('should return false when word does not start with a capital letter', function() {
+        expect(Word.firstCapitalized('upper')).to.equal(false);
+      });
     });
   });
 
@@ -245,7 +273,7 @@ describe('Word', function() {
 
     it('should use provided matchMethod (Exact) and fill in defaults', function() {
       const cfg = Object.assign({}, Config._defaults, { defaultWordMatchMethod: Constants.MATCH_METHODS.WHOLE });
-      const options = { lists: [1, 5], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true };
+      const options = { lists: [1, 5], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE };
       const word = new Word('again', options, cfg);
       expect(word.matchMethod).to.eql(options.matchMethod);
       expect(word.matchRepeated).to.eql(options.repeat);
@@ -255,7 +283,7 @@ describe('Word', function() {
 
     it('should use provided matchMethod (Whole) and fill in defaults', function() {
       const cfg = Config._defaults;
-      const options = { matchMethod: Constants.MATCH_METHODS.WHOLE, separators: true };
+      const options = { matchMethod: Constants.MATCH_METHODS.WHOLE, separators: Constants.TRUE };
       const word = new Word('testing', options, cfg);
       expect(word.matchMethod).to.eql(options.matchMethod);
       expect(word.matchRepeated).to.eql(cfg.defaultWordRepeat);

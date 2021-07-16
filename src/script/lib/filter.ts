@@ -44,8 +44,8 @@ export default class Filter {
       if (word.matchMethod === Constants.MATCH_METHODS.PARTIAL) {
         const wordOptions: WordOptions = {
           matchMethod: Constants.MATCH_METHODS.WHOLE,
-          repeat: false,
-          separators: false,
+          repeat: Constants.FALSE,
+          separators: Constants.FALSE,
           sub: ''
         };
         const wholeWordRegExp = new Word(match, wordOptions, this.cfg).regExp;
@@ -144,11 +144,13 @@ export default class Filter {
             let sub = word.sub || this.cfg.defaultSubstitution;
 
             // Make substitution match case of original match
-            if (this.cfg.preserveCase) {
+            if (!word.case && this.cfg.preserveCase) {
               if (Word.allUpperCase(match)) {
                 sub = sub.toUpperCase();
-              } else if (Word.capitalized(match)) {
-                sub = Word.capitalize(sub);
+              } else if (Word.eachWordCapitalized(match)) {
+                sub = Word.capitalizeEachWord(sub);
+              } else if (Word.firstCapitalized(match)) {
+                sub = Word.capitalizeFirst(sub);
               }
             }
 

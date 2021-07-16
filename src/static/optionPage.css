@@ -90,6 +90,10 @@ div#wordsPage #wordlistSelections label input {
   margin-right: 5px;
 }
 
+div#wordsPage input#substitutionText {
+  display: inline;
+}
+
 /* Audio */
 .updateYouTubeAutoLimits {
   width: 70px;

@@ -4,10 +4,10 @@ import Config from '../built/lib/config';
 import Filter from '../built/lib/filter';
 
 const testWords = {
-  'example': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'demo', lists: [] },
-  'placeholder': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: false, sub: 'variable', lists: [] },
-  'sample': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: false, sub: 'piece', lists: [] },
-  'word': { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: true, sub: 'idea', lists: [] }
+  'example': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'demo', lists: [] },
+  'placeholder': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE, sub: 'variable', lists: [] },
+  'sample': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE, sub: 'piece', lists: [] },
+  'word': { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE, sub: 'idea', lists: [] },
 };
 
 describe('Filter', () => {
@@ -28,7 +28,7 @@ describe('Filter', () => {
       filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.CENSOR });
       filter.cfg = new Config({
         filterMethod: Constants.FILTER_METHODS.CENSOR,
-        words: Object.assign({}, testWords, { '^regexp.*?$': { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: false, sub: 'substitute' } })
+        words: Object.assign({}, testWords, { '^regexp.*?$': { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: Constants.FALSE, sub: 'substitute' } })
       });
       filter.init();
       expect(filter.wordlists[filter.wordlistId].regExps).to.eql([
@@ -64,13 +64,13 @@ describe('Filter', () => {
     it('should rebuild all wordlists', () => {
       const filter = new Filter;
       filter.cfg = new Config({ words: Object.assign({}, testWords) });
-      filter.cfg.words['book'] = { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: true, sub: 'journal', lists: [1] };
+      filter.cfg.words['book'] = { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE, sub: 'journal', lists: [1] };
       filter.init();
       expect(Object.keys(filter.wordlists).length).to.equal(1);
       filter.buildWordlist(1);
       expect(Object.keys(filter.wordlists).length).to.equal(2);
       expect(Object.keys(filter.wordlists[1].all).length).to.equal(1);
-      filter.cfg.words['food'] = { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: true, sub: 'sustenance', lists: [1] };
+      filter.cfg.words['food'] = { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE, sub: 'sustenance', lists: [1] };
       expect(Object.keys(filter.wordlists[0].all).length).to.equal(5);
       expect(Object.keys(filter.wordlists[1].all).length).to.equal(1);
       filter.rebuildWordlists();
@@ -110,7 +110,7 @@ describe('Filter', () => {
 
         it('With separators', () => {
           const filter = new Filter;
-          const words = { pizza: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: true } };
+          const words = { pizza: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.TRUE } };
           filter.cfg = new Config({ words: words, filterMethod: Constants.FILTER_METHODS.CENSOR, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
           filter.init();
           expect(filter.replaceText('I love to eat P-I-Z-___Z---A!')).to.equal('I love to eat P************A!');
@@ -149,7 +149,7 @@ describe('Filter', () => {
         it('Should filter a RegExp and fixed length (5) with preserveLast', () => {
           const filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.CENSOR, censorCharacter: '_', censorFixedLength: 5, preserveFirst: false, preserveLast: true });
-          filter.cfg.words['^The'] = { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: false, sub: 'substitute' };
+          filter.cfg.words['^The'] = { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: Constants.FALSE, sub: 'substitute' };
           filter.init();
           expect(filter.replaceText('The best things are always the best.')).to.equal('____e best things are always the best.');
         });
@@ -158,7 +158,7 @@ describe('Filter', () => {
       describe('whitelist', () => {
         it('case-sensitive exact match', () => {
           const filter = new Filter;
-          const words = { master: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, sub: 'padawan' } };
+          const words = { master: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'padawan' } };
           filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: Constants.FILTER_METHODS.CENSOR, wordWhitelist: ['Master'] });
           filter.init();
           expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the m***** outsmart the Master?');
@@ -167,7 +167,7 @@ describe('Filter', () => {
 
         it('case-sensitive partial match', () => {
           const filter = new Filter;
-          const words = { more: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true } };
+          const words = { more: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE } };
           filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: Constants.FILTER_METHODS.CENSOR, wordWhitelist: ['smore'] });
           filter.init();
           expect(filter.replaceText('Would you like smore smores?')).to.equal('Would you like smore sm***s?');
@@ -177,8 +177,8 @@ describe('Filter', () => {
         it('case-insensitive exact match', () => {
           const filter = new Filter;
           const words = {
-            master: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, sub: 'padawan' },
-            the: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, sub: 'teh' }
+            master: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'padawan' },
+            the: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'teh' }
           };
           filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: Constants.FILTER_METHODS.CENSOR, iWordWhitelist: ['master'] });
           filter.init();
@@ -188,7 +188,7 @@ describe('Filter', () => {
 
         it('case-sinsensitive partial match', () => {
           const filter = new Filter;
-          const words = { more: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true } };
+          const words = { more: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE } };
           filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: Constants.FILTER_METHODS.CENSOR, iWordWhitelist: ['smore'] });
           filter.init();
           expect(filter.replaceText('Would you like sMorE smores?')).to.equal('Would you like sMorE sm***s?');
@@ -200,7 +200,7 @@ describe('Filter', () => {
         it('preserveFirst', () => {
           const filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.CENSOR, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: false });
-          filter.cfg.words['врата'] = { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'door' };
+          filter.cfg.words['врата'] = { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'door' };
           filter.init();
           expect(filter.replaceText('this even works on unicode words like врата, cool huh?')).to.equal('this even works on unicode w**** like в****, cool huh?');
         });
@@ -208,7 +208,7 @@ describe('Filter', () => {
         it('preserveFirst and preserveLast', () => {
           const filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.CENSOR, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
-          filter.cfg.words['котка'] = { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, sub: 'cat' };
+          filter.cfg.words['котка'] = { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'cat' };
           filter.init();
           expect(filter.replaceText('The коткаs in the hat')).to.equal('The к***аs in the hat');
         });
@@ -216,7 +216,7 @@ describe('Filter', () => {
         it('With (_) characters and preserveFirst', () => {
           const filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.CENSOR, censorCharacter: '_', censorFixedLength: 0, preserveFirst: true, preserveLast: false });
-          filter.cfg.words['куче'] = { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: true, sub: 'dog' };
+          filter.cfg.words['куче'] = { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE, sub: 'dog' };
           filter.init();
           expect(filter.replaceText('The bigкучеs ran around the yard.')).to.equal('The b_______ ran around the yard.');
         });
@@ -224,7 +224,7 @@ describe('Filter', () => {
         it('With (*) characters', () => {
           const filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.CENSOR, censorCharacter: '*', censorFixedLength: 0, preserveFirst: false, preserveLast: false });
-          filter.cfg.words['словен'] = { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: false };
+          filter.cfg.words['словен'] = { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.FALSE };
           filter.init();
           expect(filter.replaceText('За пределами Словении этнические словенцы компактно')).to.equal('За пределами ******** этнические ******** компактно');
         });
@@ -232,7 +232,7 @@ describe('Filter', () => {
         it('Should not filter a whitelisted word (partial match)', () => {
           const filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.CENSOR, censorCharacter: '*', preserveFirst: false, preserveLast: false, wordWhitelist: ['словенцы'] });
-          filter.cfg.words['ловен'] = { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: false };
+          filter.cfg.words['ловен'] = { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE };
           filter.init();
           expect(filter.replaceText('За пределами Словении этнические словенцы компактно')).to.equal('За пределами С*****ии этнические словенцы компактно');
           expect(filter.counter).to.equal(1);
@@ -263,9 +263,9 @@ describe('Filter', () => {
             substitutionMark: false,
             preserveCase: true,
             words: {
-              'this!': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: false, sub: 'that!' },
-              '!bang': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, sub: '!poof' },
-              '!another!': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: false, sub: '$znother#' }
+              'this!': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE, sub: 'that!' },
+              '!bang': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: '!poof' },
+              '!another!': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE, sub: '$znother#' }
             },
           });
           filter.init();
@@ -274,6 +274,62 @@ describe('Filter', () => {
           expect(filter.replaceText('Go out with a !baangg')).to.equal('Go out with a !poof');
           expect(filter.replaceText('Go out with a !Bang!')).to.equal('Go out with a !Bang!');
           expect(filter.replaceText('!ANOTHER! so cool!')).to.equal('$ZNOTHER# so cool!');
+        });
+
+        describe('Words and phrases with both case sensitivities', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            words: {
+              'oneword': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, case: Constants.TRUE, sub: 'wOrD', lists: [] },
+              'pizza': { matchMethod: Constants.MATCH_METHODS.EXACT, sub: 'chocolate', lists: [] },
+              'pie': { matchMethod: Constants.MATCH_METHODS.EXACT, sub: 'ice cream', lists: [] },
+              'corn on the cob': { matchMethod: Constants.MATCH_METHODS.EXACT, sub: 'corn', lists: [] },
+              'a phrase too': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, case: Constants.TRUE, sub: 'mULTIPLE wORDS tOO', lists: [] },
+              "here's a little song i wrote": { matchMethod: Constants.MATCH_METHODS.EXACT, sub: 'my gift is my song', lists: [] },
+            }, filterMethod: Constants.FILTER_METHODS.SUBSTITUTE,
+            substitutionMark: false,
+            preserveCase: true,
+          });
+          filter.init();
+
+          it('Word with case sensitivity on', () => {
+            expect(filter.replaceText('What is the oneword?')).to.equal('What is the wOrD?');
+            expect(filter.replaceText('What is the oneword?')).to.equal('What is the wOrD?');
+          });
+
+          it('Word with case sensitivity off (preserveCase on)', () => {
+            expect(filter.replaceText('Pizza is the best!')).to.equal('Chocolate is the best!');
+          });
+
+          it('Word with case sensitivity off (preserveCase on)', () => {
+            expect(filter.replaceText('Pizza is the best!')).to.equal('Chocolate is the best!');
+          });
+
+          it('Phrase with case sensitivity on', () => {
+            expect(filter.replaceText('I can filter and capitalize A Phrase Too!')).to.equal('I can filter and capitalize mULTIPLE wORDS tOO!');
+            expect(filter.replaceText('I can filter and capitalize A Phraseeeee Too!')).to.equal('I can filter and capitalize mULTIPLE wORDS tOO!');
+          });
+
+          it('Phrase with case sensitivity off (preserveCase on)', () => {
+            expect(filter.replaceText("Here's A Little Song I Wrote, you might want to sing it note for note")).to.equal('My Gift Is My Song, you might want to sing it note for note');
+            expect(filter.replaceText("Here's a Little Song I Wrote, you might want to sing it note for note")).to.equal('My gift is my song, you might want to sing it note for note');
+            expect(filter.replaceText("here's a little song i wrote, you might want to sing it note for note")).to.equal('my gift is my song, you might want to sing it note for note');
+            expect(filter.replaceText("HERE'S A LITTLE SONG I WROTE, you might want to sing it note for note")).to.equal('MY GIFT IS MY SONG, you might want to sing it note for note');
+          });
+
+          it('Word to substitution phrase with case sensitivity off (preserveCase on)', () => {
+            expect(filter.replaceText('Do you like to eat pie?')).to.equal('Do you like to eat ice cream?');
+            expect(filter.replaceText('Do you like to eat Pie?')).to.equal('Do you like to eat Ice Cream?');
+            expect(filter.replaceText('Do you like to eat PIE?')).to.equal('Do you like to eat ICE CREAM?');
+          });
+
+          it('Phrase to substitution word with case sensitivity off (preserveCase on)', () => {
+            expect(filter.replaceText('Do you like to eat corn on the cob?')).to.equal('Do you like to eat corn?');
+            expect(filter.replaceText('Do you like to eat corn On The Cob?')).to.equal('Do you like to eat corn?');
+            expect(filter.replaceText('Do you like to eat Corn on the cob?')).to.equal('Do you like to eat Corn?');
+            expect(filter.replaceText('Do you like to eat Corn On The Cob?')).to.equal('Do you like to eat Corn?');
+            expect(filter.replaceText('Do you like to eat CORN ON THE COB?')).to.equal('Do you like to eat CORN?');
+          });
         });
       });
 
@@ -288,7 +344,7 @@ describe('Filter', () => {
         it('Default substitution not marked and preserveCase', () => {
           const filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), defaultSubstitution: 'censored', filterMethod: Constants.FILTER_METHODS.SUBSTITUTE, substitutionMark: false, preserveCase: true });
-          filter.cfg.words['this'] = { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, sub: '' };
+          filter.cfg.words['this'] = { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: '' };
           filter.init();
           expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal('Censored Piece is a pretty good piecer to piece.');
         });
@@ -313,7 +369,7 @@ describe('Filter', () => {
 
         it('Match separators', () => {
           const filter = new Filter;
-          const words = { pizza: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: true, sub: 'pie' } };
+          const words = { pizza: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.TRUE, sub: 'pie' } };
           filter.cfg = new Config({ words: words, filterMethod: Constants.FILTER_METHODS.SUBSTITUTE, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
           filter.init();
           expect(filter.replaceText('I love to eat P-I-Z-Z-A!')).to.equal('I love to eat PIE!');
@@ -326,7 +382,7 @@ describe('Filter', () => {
         it('Should filter a RegExp with capture groups', () => {
           const filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.SUBSTITUTE });
-          filter.cfg.words['c(a|u)t'] = { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: false, sub: 'bit' };
+          filter.cfg.words['c(a|u)t'] = { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: Constants.FALSE, sub: 'bit' };
           filter.init();
           expect(filter.replaceText('Have you ever been cut by a Cat?')).to.equal('Have you ever been bit by a Bit?');
         });
@@ -335,7 +391,7 @@ describe('Filter', () => {
       describe('whitelist', () => {
         it('case-sensitive exact match', () => {
           const filter = new Filter;
-          const words = { master: { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: true, sub: 'padawan' } };
+          const words = { master: { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE, sub: 'padawan' } };
           filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: Constants.FILTER_METHODS.SUBSTITUTE, substitutionMark: false, preserveCase: true, wordWhitelist: ['Master'] });
           filter.init();
           expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the padawan outsmart the Master?');
@@ -345,8 +401,8 @@ describe('Filter', () => {
         it('case insensitive exact match', () => {
           const filter = new Filter;
           const words = {
-            master: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'padawan' },
-            the: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, sub: 'teh' }
+            master: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'padawan' },
+            the: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'teh' }
           };
           filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: Constants.FILTER_METHODS.SUBSTITUTE, iWordWhitelist: ['master'] });
           filter.init();
@@ -356,7 +412,7 @@ describe('Filter', () => {
 
         it('case insensitive partial match', () => {
           const filter = new Filter;
-          const words = { more: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, sub: 'less' } };
+          const words = { more: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'less' } };
           filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: Constants.FILTER_METHODS.SUBSTITUTE, iWordWhitelist: ['smore'] });
           filter.init();
           expect(filter.replaceText('Would you like sMorE smores?')).to.equal('Would you like sMorE slesss?');
@@ -368,7 +424,7 @@ describe('Filter', () => {
         it('Exact word with substitions marked and preserveCase with repeated characters', () => {
           const filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.SUBSTITUTE, substitutionMark: true, preserveCase: true });
-          filter.cfg.words['врата'] = { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'door' };
+          filter.cfg.words['врата'] = { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'door' };
           filter.init();
           expect(filter.replaceText('this even works on unicode WORDS like Врата, cool huh?')).to.equal('this even works on unicode [IDEA] like [Door], cool huh?');
         });
@@ -388,7 +444,7 @@ describe('Filter', () => {
 
         it('Ending with punctuation', () => {
           const filter = new Filter;
-          filter.cfg = new Config({ filterMethod: Constants.FILTER_METHODS.REMOVE, words: { 'this!': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: false } } });
+          filter.cfg = new Config({ filterMethod: Constants.FILTER_METHODS.REMOVE, words: { 'this!': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE } } });
           filter.init();
           expect(filter.replaceText('I love This! Do you?')).to.equal('I love Do you?');
           expect(filter.replaceText('I love this!')).to.equal('I love');
@@ -396,7 +452,7 @@ describe('Filter', () => {
 
         it('With separators', () => {
           const filter = new Filter;
-          const words = { pizza: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: true } };
+          const words = { pizza: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.TRUE } };
           filter.cfg = new Config({ words: words, filterMethod: Constants.FILTER_METHODS.REMOVE, censorCharacter: '*', censorFixedLength: 0, preserveFirst: true, preserveLast: true });
           filter.init();
           expect(filter.replaceText('I love to eat PPPPPP-I-----ZZZZZZZZZZZ__A!')).to.equal('I love to eat!');
@@ -415,7 +471,7 @@ describe('Filter', () => {
 
         it('Ending with punctuation', () => {
           const filter = new Filter;
-          filter.cfg = new Config({ filterMethod: Constants.FILTER_METHODS.REMOVE, words: { 'this!': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: false } } });
+          filter.cfg = new Config({ filterMethod: Constants.FILTER_METHODS.REMOVE, words: { 'this!': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE } } });
           filter.init();
           expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love Do you?');
           expect(filter.replaceText('I love this! Do you?')).to.equal('I love Do you?');
@@ -425,7 +481,7 @@ describe('Filter', () => {
       it('Should filter a RegExp', () => {
         const filter = new Filter;
         filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.REMOVE });
-        filter.cfg.words['this and everything after.*$'] = { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: false, sub: 'substitute' };
+        filter.cfg.words['this and everything after.*$'] = { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: Constants.FALSE, sub: 'substitute' };
         filter.init();
         expect(filter.replaceText('Have you ever done this and everything after it?')).to.equal('Have you ever done ');
       });
@@ -433,7 +489,7 @@ describe('Filter', () => {
       describe('whitelist', () => {
         it('case-sensitive exact match', () => {
           const filter = new Filter;
-          const words = { master: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'padawan' } };
+          const words = { master: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'padawan' } };
           filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: Constants.FILTER_METHODS.REMOVE, wordWhitelist: ['Master'] });
           filter.init();
           expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the outsmart the Master?');
@@ -442,7 +498,7 @@ describe('Filter', () => {
 
         it('case-sensitive partial match', () => {
           const filter = new Filter;
-          const words = { more: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true } };
+          const words = { more: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE } };
           filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: Constants.FILTER_METHODS.REMOVE, wordWhitelist: ['smores'] });
           filter.init();
           expect(filter.replaceText('Would you like smore smores?')).to.equal('Would you like smores?');
@@ -451,7 +507,7 @@ describe('Filter', () => {
 
         it('case-insensitive exact match)', () => {
           const filter = new Filter;
-          const words = { pie: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'cake' } };
+          const words = { pie: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'cake' } };
           filter.cfg = new Config({ words: Object.assign({}, words), filterMethod: Constants.FILTER_METHODS.REMOVE, iWordWhitelist: ['pie'] });
           filter.init();
           expect(filter.replaceText('Apple pie is the best PIE!')).to.equal('Apple pie is the best PIE!');
@@ -463,7 +519,7 @@ describe('Filter', () => {
         it('Exact word', () => {
           const filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.REMOVE });
-          filter.cfg.words['врата'] = { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'door' };
+          filter.cfg.words['врата'] = { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'door' };
           filter.init();
           expect(filter.replaceText('This even works on врата. cool huh?')).to.equal('This even works on. cool huh?');
           expect(filter.replaceText('This even works on врата, cool huh?')).to.equal('This even works on, cool huh?');
@@ -473,7 +529,7 @@ describe('Filter', () => {
         it('Partial word', () => {
           const filter = new Filter;
           filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.REMOVE });
-          filter.cfg.words['врата'] = { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, sub: 'door' };
+          filter.cfg.words['врата'] = { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'door' };
           filter.init();
           expect(filter.replaceText('This even works on with-врата. Cool huh?')).to.equal('This even works on. Cool huh?');
           expect(filter.replaceText('The вратаs in the hat')).to.equal('The in the hat');
