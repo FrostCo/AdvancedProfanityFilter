@@ -127,8 +127,10 @@ export default class DataMigration {
       if (cfg[propToDelete] && Array.isArray(cfg[propToDelete])) {
         if (cfg[propToDelete].length > 0) {
           cfg[propToDelete].forEach((domain) => {
-            if (cfg.domains[domain] == undefined) { cfg.domains[domain] = {}; }
-            cfg.domains[domain][propsToDelete[propToDelete]] = true;
+            if (domain) {
+              if (cfg.domains[domain] == null) { cfg.domains[domain] = {}; }
+              cfg.domains[domain][propsToDelete[propToDelete]] = true;
+            }
           });
         }
       }
