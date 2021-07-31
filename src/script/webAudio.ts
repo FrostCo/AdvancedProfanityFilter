@@ -1036,7 +1036,7 @@ export default class WebAudio {
   youTubeAutoSubsMuteTimeout(instance) {
     const video = window.document.querySelector(WebAudio.defaultVideoSelector);
     if (video && instance.playing(video)) {
-      instance.unmute(this.youTubeAutoSubsRule);
+      instance.unmute(instance.youTubeAutoSubsRule);
     }
     instance.youTubeAutoSubsTimeout = null;
   }
