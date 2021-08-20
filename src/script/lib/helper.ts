@@ -124,7 +124,31 @@ export function numberToBoolean(value: number): boolean {
 }
 
 export function numberWithCommas(number: number | string): string {
-  return number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
+  if (typeof Intl == 'object' && typeof Intl.NumberFormat == 'function') {
+    if (typeof number === 'string') {
+      number = parseInt(number).toString();
+    }
+
+    return number.toLocaleString();
+  } else {
+    number = number.toString();
+
+    // Get numbers before `.` (if present)
+    const decimalIndex = number.indexOf('.');
+    let output = decimalIndex === -1 ? number : number.slice(0, decimalIndex);
+
+    // Insert commas every 3 digits from the right
+    for (let i = output.length - 3; i > 0; i -= 3) {
+      output = output.slice(0, i) + ',' + output.slice(i);
+    }
+
+    // Append fractional part
+    if (decimalIndex !== -1) {
+      output += number.slice(decimalIndex);
+    }
+
+    return output;
+  }
 }
 
 export function readFile(file) {

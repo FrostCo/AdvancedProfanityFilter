@@ -3,6 +3,7 @@ module.exports = {
     eventPage: './src/script/eventPage.ts',
     optionPage: './src/script/optionPage.ts',
     popup: './src/script/popup.ts',
+    showErrors: '/src/script/showErrors.ts',
     webFilter: './src/script/webFilter.ts',
   },
   mode: 'production',
