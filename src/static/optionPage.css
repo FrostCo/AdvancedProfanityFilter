@@ -193,3 +193,12 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   left: 0;
   bottom: 18px
 }
+
+/* Uncaught Errors */
+#uncaughtErrors P {
+  color: red;
+}
+
+#uncaughtErrors P:first-child {
+  font-weight: bolder;
+}

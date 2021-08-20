@@ -29,12 +29,6 @@ a:hover, a:active {
   font-size: 10px;
 }
 
-p {
-  margin-right: 35px;
-  margin-top: 40px;
-  float: right;
-}
-
 h4 {
   margin-bottom: 5px;
 }
@@ -210,4 +204,15 @@ input:checked + .slider:before {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+/* Uncaught Errors */
+#uncaughtErrors P {
+  color: red;
+  font-size: 12px;
+  line-height: 1;
+}
+
+#uncaughtErrors P:first-child {
+  font-weight: bolder;
 }
