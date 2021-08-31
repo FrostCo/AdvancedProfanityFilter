@@ -180,7 +180,7 @@ export default class WebAudio {
 
     const result = this.replaceTextResult(node.textContent);
     if (result.modified) {
-      node.textContent = result.filtered;
+      if (this.youTubeAutoSubsRule.filterSubtitles) { node.textContent = result.filtered; }
       this.mute(this.youTubeAutoSubsRule);
       this.youTubeAutoSubsUnmuteDelay = null;
       this.filter.updateCounterBadge();
@@ -399,6 +399,7 @@ export default class WebAudio {
     if (!rule.disabled) {
       // Setup rule defaults
       if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
+      if (this.filter.filterText == false) { rule.filterSubtitles = false; }
       this.initDisplaySelector(rule);
 
       // Allow rules to override global settings
@@ -470,7 +471,7 @@ export default class WebAudio {
       this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
 
       // Setup rule for YouTube Auto Subs
-      this.youTubeAutoSubsRule = { mode: 'ytauto', muteMethod: this.filter.cfg.muteMethod } as AudioRule;
+      this.youTubeAutoSubsRule = { filterSubtitles: true, mode: 'ytauto', muteMethod: this.filter.cfg.muteMethod } as AudioRule;
     }
   }
 
@@ -679,7 +680,7 @@ export default class WebAudio {
       cue.originalText = cue.text;
       if (result.modified) {
         cue.filtered = true;
-        cue.text = result.filtered;
+        if (rule.filterSubtitles) { cue.text = result.filtered; }
       } else {
         cue.filtered = false;
       }

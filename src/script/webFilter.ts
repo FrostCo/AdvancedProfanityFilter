@@ -17,6 +17,7 @@ export default class WebFilter extends Filter {
   cfg: WebConfig;
   domain: Domain;
   extension: boolean;
+  filterText: boolean;
   hostname: string;
   iframe: Location;
   location: Location | URL;
@@ -32,6 +33,7 @@ export default class WebFilter extends Filter {
     super();
     this.audioWordlistId = Constants.ALL_WORDS_WORDLIST_ID;
     this.extension = true;
+    this.filterText = true;
     this.mutePage = false;
     this.processMutationTarget = false;
     this.stats = { mutes: 0, words: {} };
@@ -164,13 +166,13 @@ export default class WebFilter extends Filter {
     if (node.nodeName) {
       if (node.textContent && node.textContent.trim() != '') {
         const result = this.replaceTextResult(node.textContent, wordlistId, statsType);
-        if (result.modified) {
+        if (result.modified && this.filterText) {
           // logger.debug(`Normal node text changed: '${result.original}' to '${result.filtered}'.`);
           node.textContent = result.filtered;
         }
       } else if (node.nodeName == 'IMG') {
-        if (node.alt != '') { node.alt = this.replaceText(node.alt, wordlistId, statsType); }
-        if (node.title != '') { node.title = this.replaceText(node.title, wordlistId, statsType); }
+        this.cleanNodeAttribute(node, 'alt', wordlistId, statsType);
+        this.cleanNodeAttribute(node, 'title', wordlistId, statsType);
       } else if (node.shadowRoot) {
         this.filterShadowRoot(node.shadowRoot, wordlistId, statsType);
       }
@@ -190,8 +192,18 @@ export default class WebFilter extends Filter {
     }
   }
 
+  cleanNodeAttribute(node, attribute: string, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+    if (node[attribute] != '') {
+      const result = this.replaceTextResult(node[attribute], wordlistId, statsType);
+      if (result.modified && this.filterText) {
+        node[attribute] = result.filtered;
+      }
+    }
+  }
+
   async cleanPage() {
     this.cfg = await WebConfig.build();
+    this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
     logger.info('Config loaded', this.cfg);
 
@@ -284,7 +296,11 @@ export default class WebFilter extends Filter {
 
     if (this.cfg.showSummary) {
       if (this.summary[word.value]) {
-        this.summary[word.value].count += 1;
+        if (this.filterText) {
+          this.summary[word.value].count += 1;
+        } else {
+          this.counter--; // Remove count if we've already found a match for this word when the filter is 'OFF'
+        }
       } else {
         let result;
         if (word.matchMethod === Constants.MATCH_METHODS.REGEX) {
@@ -303,9 +319,11 @@ export default class WebFilter extends Filter {
         wordStats[word.value] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
       }
 
-      switch(statsType) {
-        case Constants.STATS_TYPE_AUDIO: wordStats[word.value].audio++; break;
-        case Constants.STATS_TYPE_TEXT: wordStats[word.value].text++; break;
+      if (this.filterText) {
+        switch(statsType) {
+          case Constants.STATS_TYPE_AUDIO: wordStats[word.value].audio++; break;
+          case Constants.STATS_TYPE_TEXT: wordStats[word.value].text++; break;
+        }
       }
     }
   }
