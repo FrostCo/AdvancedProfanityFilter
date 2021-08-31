@@ -812,7 +812,11 @@ export default class OptionPage {
     if (testText.value === '') {
       filteredTestText.textContent = 'Enter some text above to test the filter...';
     } else {
-      filteredTestText.textContent = filter.replaceText(testText.value, filter.cfg.wordlistId, null);
+      if (option.cfg.filterMethod === Constants.FILTER_METHODS.OFF) {
+        filteredTestText.textContent = testText.value;
+      } else {
+        filteredTestText.textContent = filter.replaceText(testText.value, filter.cfg.wordlistId, null);
+      }
     }
   }
 
@@ -1540,6 +1544,7 @@ export default class OptionPage {
         OptionPage.show(document.getElementById('substitutionSettings'));
         OptionPage.show(document.getElementById('wordSubstitution'));
         break;
+      case Constants.FILTER_METHODS.OFF:
       case Constants.FILTER_METHODS.REMOVE:
         OptionPage.hide(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));

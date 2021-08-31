@@ -24,6 +24,7 @@ export default class BookmarkletFilter extends Filter {
   cfg: WebConfig;
   domain: Domain;
   extension: boolean;
+  filterText: boolean;
   hostname: string;
   iframe: Location;
   location: Location | URL;
@@ -37,6 +38,7 @@ export default class BookmarkletFilter extends Filter {
   constructor() {
     super();
     this.extension = false;
+    this.filterText = true;
     this.audioWordlistId = Constants.ALL_WORDS_WORDLIST_ID;
     this.mutePage = false;
     this.processMutationTarget = false;
@@ -155,12 +157,12 @@ export default class BookmarkletFilter extends Filter {
     if (node.nodeName) {
       if (node.textContent && node.textContent.trim() != '') {
         const result = this.replaceTextResult(node.textContent, wordlistId, statsType);
-        if (result.modified) {
+        if (result.modified && this.filterText) {
           node.textContent = result.filtered;
         }
       } else if (node.nodeName == 'IMG') {
-        if (node.alt != '') { node.alt = this.replaceText(node.alt, wordlistId, statsType); }
-        if (node.title != '') { node.title = this.replaceText(node.title, wordlistId, statsType); }
+        this.cleanNodeAttribute(node, 'alt', wordlistId, statsType);
+        this.cleanNodeAttribute(node, 'title', wordlistId, statsType);
       } else if (node.shadowRoot) {
         this.filterShadowRoot(node.shadowRoot, wordlistId, statsType);
       }
@@ -179,8 +181,18 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
+  cleanNodeAttribute(node, attribute: string, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+    if (node[attribute] != '') {
+      const result = this.replaceTextResult(node[attribute], wordlistId, statsType);
+      if (result.modified && this.filterText) {
+        node[attribute] = result.filtered;
+      }
+    }
+  }
+
   cleanPage() {
     this.cfg = new WebConfig(config);
+    this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
     this.cfg.muteMethod = Constants.MUTE_METHODS.VIDEO; // Bookmarklet: Force video volume mute method
 

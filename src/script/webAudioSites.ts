@@ -46,7 +46,17 @@ export default class WebAudioSites {
         rootNode: true,
         subtitleSelector: 'div > div > div > div > div',
         tagName: 'DIV',
-      }
+      },
+      {
+        displaySelector: 'div.video-container > div > div > div',
+        mode: 'elementChild',
+        muteMethod: Constants.MUTE_METHODS.TAB,
+        parentSelector: 'div.video-container',
+        preserveWhiteSpace: true,
+        rootNode: true,
+        subtitleSelector: 'div > div > div > div > span',
+        tagName: 'DIV',
+      },
     ],
     'www.att.tv': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
     'www.attwatchtv.com': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
