@@ -741,6 +741,7 @@ export default class OptionPage {
 
   async populateStats() {
     try {
+      filter.buildWordlist(Constants.ALL_WORDS_WORDLIST_ID);
       const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
 
       // Prepare data (collect totals, add words without stats, sort output)
@@ -1694,6 +1695,7 @@ document.getElementById('setPasswordBtn').addEventListener('click', (e) => { opt
 // Test
 document.getElementById('testText').addEventListener('input', (e) => { option.populateTest(); });
 // Stats
+document.getElementById('collectStats').addEventListener('click', (e) => { option.saveOptions(e); });
 document.getElementById('statsReset').addEventListener('click', (e) => { option.confirm(e, 'statsReset'); });
 // Other
 document.getElementsByClassName('themes')[0].addEventListener('click', (e) => { option.toggleTheme(); });
