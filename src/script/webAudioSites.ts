@@ -106,7 +106,7 @@ export default class WebAudioSites {
       { className: 'bmpui-ui-subtitle-label', mode: 'element', tagName: 'SPAN' },
       { className: 'bmpui-subtitle-region-container', mode: 'element', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' },
     ],
-    'www.disneyplus.com': [{ mode: 'cue', videoCueHideCues: true, videoSelector: 'video.btm-media-client-element' }],
+    'www.disneyplus.com': [{ className: 'dss-subtitle-renderer-wrapper', mode: 'element', subtitleSelector: 'div.dss-subtitle-renderer-cue-window span.dss-subtitle-renderer-line', tagName: 'DIV' }],
     'www.fox.com': [{ className: 'jw-text-track-container', mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
     'www.fubo.tv': [
       {
