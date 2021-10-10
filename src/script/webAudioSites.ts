@@ -120,13 +120,20 @@ export default class WebAudioSites {
     ],
     'www.funimation.com': [
       {
+        displaySelector: 'div > div.vjs-text-track-cue',
+        mode: 'element',
+        subtitleSelector: 'div.vjs-text-track-cue > div',
+        tagName: 'DIV'
+      },
+      {
         iframe: true,
         mode: 'elementChild',
+        note: 'Embedded videos',
         parentSelector: 'div.vjs-text-track-display',
         simpleUnmute: true,
         subtitleSelector: ':scope div > div',
         tagName: 'DIV',
-      }
+      },
     ],
     'www.paramountplus.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'play.google.com': [{ className: 'lava-timed-text-window', mode: 'element', subtitleSelector: 'span.lava-timed-text-caption', tagName: 'DIV' }],
