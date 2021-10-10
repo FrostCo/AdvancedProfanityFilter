@@ -158,6 +158,12 @@ export default class WebAudio {
         this.lastFilteredNode = subtitle;
         this.lastFilteredText = subtitle[textMethod];
       }
+
+      // Final check to see if we already filtered this text
+      // Reason: Hide/show for Funimation (ignoreMutations didn't fix the issue, but no issue if filterSubtitles = false)
+      if (!filtered && this.lastFilteredNode == subtitle && this.lastFilteredText == subtitle[textMethod]) {
+        filtered = true;
+      }
     });
 
     // When captions/subtitles are spread across multiple mutations, check to see if a filtered node is still present
