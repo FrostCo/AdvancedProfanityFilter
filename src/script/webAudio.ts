@@ -956,7 +956,7 @@ export default class WebAudio {
         } else { // If there are no captions/subtitles: unmute and hide
           instance.watcherSimpleUnmute(rule, video);
         }
-      } else if (rule.subtitleSelector) {
+      } else if (rule.subtitleSelector) { // Tested on: Amazon
         captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
         if (captions && captions.textContent && captions.textContent.trim()) {
           instance.processWatcherCaptions(rule, captions, data);
@@ -966,6 +966,7 @@ export default class WebAudio {
       }
 
       if (data.skipped) { return false; }
+
       const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
       shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
       if (data.filtered) { instance.filter.updateCounterBadge(); }
