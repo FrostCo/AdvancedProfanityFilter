@@ -137,7 +137,7 @@ export default class WebAudioSites {
     ],
     'www.paramountplus.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'play.google.com': [{ className: 'lava-timed-text-window', mode: 'element', subtitleSelector: 'span.lava-timed-text-caption', tagName: 'DIV' }],
-    'play.hbomax.com': [{ displayVisibility: true, dynamicTargetMode: 'watcher', dynamicTextKey: 'Example Text', mode: 'dynamic', parentSelectorAll: '> span', subtitleSelector: 'span' }],
+    'play.hbomax.com': [{ displayVisibility: true, mode: 'watcher', parentSelectorAll: 'div.default.class1.class2 > span', showSubtitles: Constants.SHOW_SUBTITLES.ALL, subtitleSelector: 'span' }],
     'www.hulu.com': [
       { className: 'caption-text-box', displaySelector: 'div.caption-text-box', mode: 'element', subtitleSelector: 'p', tagName: 'DIV' },
       { displaySelector: 'div.CaptionBox', mode: 'elementChild', parentSelector: 'div.CaptionBox', tagName: 'P' }

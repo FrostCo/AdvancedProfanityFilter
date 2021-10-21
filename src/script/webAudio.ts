@@ -948,6 +948,8 @@ export default class WebAudio {
           if (!rule._displayElement) {
             rule._displayElement = getParent(parents[0], rule.getParentLevel);
           }
+        } else {
+          parents = Array.from(document.querySelectorAll(rule.parentSelectorAll)) as HTMLElement[];
         }
 
         captions = parents.map((parent) => parent.querySelector(rule.subtitleSelector));
