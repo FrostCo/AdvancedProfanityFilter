@@ -54,6 +54,16 @@ export function getGlobalVariable(code: string, id: string = 'APFData') {
   return JSON.parse(result);
 }
 
+export function getParent(node: HTMLElement, level: number = 1): HTMLElement {
+  if (!node) {
+    return null;
+  } else if (level > 0) {
+    return getParent(node.parentElement, level - 1);
+  } else {
+    return node;
+  }
+}
+
 // /^\d+\.\d+\.\d+$/
 export function getVersion(version: string): Version {
   const versionValues = version.split('.');
