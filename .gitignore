@@ -15,3 +15,12 @@
 
 # Built shared libs
 /src/script/lib/*.js
+
+# Xcode
+*.swp
+xcuserdata/
+
+# General
+# MacOS
+.DS_Store
+.Trashes
