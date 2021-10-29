@@ -176,7 +176,10 @@
         },
         {
           "selector": "classProperty",
-          "modifiers": ["static", "readonly"],
+          "modifiers": [
+            "static",
+            "readonly"
+          ],
           "format": [
             "camelCase",
             "UPPER_CASE"
