@@ -34,7 +34,7 @@ export default class WebConfig extends Config {
     password: null,
     showSubtitles: Constants.SHOW_SUBTITLES.ALL,
     collectStats: true,
-    showUpdateNotification: true,
+    showUpdateNotification: false,
     youTubeAutoSubsMax: 0,
     youTubeAutoSubsMin: 0,
   }
