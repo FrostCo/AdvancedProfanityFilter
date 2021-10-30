@@ -15,3 +15,8 @@
 
 # Built shared libs
 /dist-lib
+
+# General
+# Windows
+Thumbs.db
+[Dd]esktop.ini
