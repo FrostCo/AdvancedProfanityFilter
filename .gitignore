@@ -14,4 +14,4 @@
 /test/coverage/*
 
 # Built shared libs
-/src/script/lib/*.js
+/dist-lib
