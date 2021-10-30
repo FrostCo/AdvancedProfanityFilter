@@ -37,7 +37,7 @@ export default class WebConfig extends Config {
     showUpdateNotification: false,
     youTubeAutoSubsMax: 0,
     youTubeAutoSubsMin: 0,
-  }
+  };
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   static readonly QUOTA_BYTES_PER_ITEM = 8192; // https://developer.chrome.com/apps/storage chrome.storage.sync.QUOTA_BYTES_PER_ITEM

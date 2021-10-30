@@ -20,7 +20,7 @@ export default class Domain {
     disabled: undefined,
     enabled: undefined,
     wordlist: undefined,
-  }
+  };
 
   static byHostname(hostname: string, domains: { [domain: string]: DomainCfg }): Domain {
     const cfgKey = Domain.findDomainKey(hostname, domains) || hostname;
