@@ -86,6 +86,12 @@
       ]
     ],
     "plugins": [
+      [
+        "@babel/plugin-transform-typescript",
+        {
+          "allowDeclareFields": true
+        }
+      ],
       "@babel/proposal-class-properties",
       "@babel/proposal-object-rest-spread"
     ]

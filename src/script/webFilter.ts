@@ -14,7 +14,7 @@ export default class WebFilter extends Filter {
   audio: WebAudio;
   audioOnly: boolean;
   audioWordlistId: number;
-  cfg: WebConfig;
+  declare cfg: WebConfig;
   domain: Domain;
   extension: boolean;
   filterText: boolean;
