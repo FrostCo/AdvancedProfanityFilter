@@ -17,6 +17,7 @@ export default class DataMigration {
     { version: '2.7.0', name: 'removeOldDomainArrays', runOnImport: true },
     { version: '2.12.0', name: 'overwriteMuteCueRequireShowingDefault', runOnImport: false },
     { version: '2.22.0', name: 'updateWordRepeatAndSeparatorDataTypes', runOnImport: true },
+    { version: '2.26.0', name: 'changeShowUpdateNotificationDefaultToFalse', runOnImport: false },
   ];
 
   constructor(config) {
@@ -222,5 +223,10 @@ export default class DataMigration {
         wordOptions.separators = cfg.defaultWordSeparators;
       }
     });
+  }
+
+  // [2.26.0]
+  changeShowUpdateNotificationDefaultToFalse() {
+    this.cfg.showUpdateNotification = WebConfig._defaults.showUpdateNotification;
   }
 }

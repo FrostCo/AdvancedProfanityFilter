@@ -4,7 +4,7 @@ export default class Logger {
   level: number;
   prefix: string;
 
-  static readonly app = 'APF'
+  static readonly app = 'APF';
   static readonly debugLevel = 0;
   static readonly debugName = 'debug';
   static readonly errorLevel = 3;
