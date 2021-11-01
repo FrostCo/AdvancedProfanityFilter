@@ -176,7 +176,7 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 
 #statsWordContainer {
   overflow: auto;
-  max-height: 500px;
+  max-height: 465px;
   margin-bottom: 8px;
 }
 
