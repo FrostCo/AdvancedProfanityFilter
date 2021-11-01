@@ -94,12 +94,6 @@ div#wordsPage input#substitutionText {
   display: inline;
 }
 
-/* Audio */
-.updateYouTubeAutoLimits {
-  width: 70px;
-  text-align: right;
-}
-
 /* Bookmarklet */
 a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited {
   color: #fff;
@@ -157,6 +151,11 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 
 .disabled {
   cursor: not-allowed !important;
+}
+
+.extraSmallInput {
+  width: 70px;
+  text-align: right;
 }
 
 .notes {
