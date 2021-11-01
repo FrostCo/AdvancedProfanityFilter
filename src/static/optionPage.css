@@ -94,12 +94,6 @@ div#wordsPage input#substitutionText {
   display: inline;
 }
 
-/* Audio */
-.updateYouTubeAutoLimits {
-  width: 70px;
-  text-align: right;
-}
-
 /* Bookmarklet */
 a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited {
   color: #fff;
@@ -159,6 +153,11 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   cursor: not-allowed !important;
 }
 
+.extraSmallInput {
+  width: 70px;
+  text-align: right;
+}
+
 .notes {
   margin-left: 16px;
   padding-top: 5px;
@@ -177,7 +176,7 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 
 #statsWordContainer {
   overflow: auto;
-  max-height: 500px;
+  max-height: 465px;
   margin-bottom: 8px;
 }
 
