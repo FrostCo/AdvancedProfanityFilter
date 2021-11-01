@@ -405,7 +405,7 @@ export default class OptionPage {
     }
   }
 
-  confirm(evt, action) {
+  async confirm(evt: Event, action: string) {
     const ok = document.getElementById('confirmModalOK');
     ok.removeEventListener('click', bulkEditorSave);
     ok.removeEventListener('click', importConfig);
@@ -415,6 +415,7 @@ export default class OptionPage {
     ok.removeEventListener('click', statsReset);
     let content;
     let italics;
+    let validated = true;
 
     switch(action) {
       case 'bulkEditorSave':
@@ -440,6 +441,20 @@ export default class OptionPage {
         OptionPage.configureConfirmModal({ }, content);
         ok.addEventListener('click', removeAllWords);
         break;
+      case 'removeLessUsedWords':
+        validated = this.validateLessUsedWordsNumber();
+        if (validated) {
+          await option.prepareLessUsedWords();
+          if (Object.keys(lessUsedWords).length) {
+            OptionPage.configureConfirmModal({ backup: true, content: `Are you sure you want to remove ${Object.keys(lessUsedWords).length} words?` });
+            ok.addEventListener('click', removeLessUsedWords);
+          } else {
+            OptionPage.configureConfirmModal(
+              { content: 'All words have been filtered more times than the provided number.\n\nTry increasing the number to include more words.' }
+            );
+          }
+        }
+        break;
       case 'statsReset':
         OptionPage.configureConfirmModal({ content: 'Are you sure you want to reset filter statistics?' });
         ok.addEventListener('click', statsReset);
@@ -460,7 +475,9 @@ export default class OptionPage {
       }
     }
 
-    OptionPage.openModal('confirmModal');
+    if (validated) {
+      OptionPage.openModal('confirmModal');
+    }
   }
 
   confirmModalBackup() {
@@ -1003,6 +1020,22 @@ export default class OptionPage {
     this.populateWord();
   }
 
+  async prepareLessUsedWords() {
+    const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
+    const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
+    const lessThan = parseInt(lessUsedWordsNumber.value);
+    lessUsedWords = {};
+
+    const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
+    allWords.forEach((word) => {
+      const wordStats = stats.words[word];
+      const total = wordStats ? (wordStats.audio + wordStats.text) : 0;
+      if (total < lessThan) {
+        lessUsedWords[word] = total;
+      }
+    });
+  }
+
   removeAllWords(evt) {
     this.cfg.words = {};
     const wordList = document.getElementById('wordList') as HTMLSelectElement;
@@ -1025,6 +1058,14 @@ export default class OptionPage {
         return false;
       }
     }
+  }
+
+  async removeLessUsedWords() {
+    Object.keys(lessUsedWords).forEach(((word) => {
+      this.cfg.removeWord(word);
+    }));
+    await this.cfg.save('words');
+    this.populateOptions();
   }
 
   async removeWhitelist(evt) {
@@ -1599,10 +1640,24 @@ export default class OptionPage {
       OptionPage.showInputError(target, 'Please enter a valid number of seconds.');
     }
   }
+
+  validateLessUsedWordsNumber() {
+    const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
+    let valid = false;
+    OptionPage.hideInputError(lessUsedWordsNumber);
+    if (lessUsedWordsNumber.value.match(/^\d+$/) && parseInt(lessUsedWordsNumber.value) > 0) {
+      valid = true;
+    } else {
+      OptionPage.showInputError(lessUsedWordsNumber, 'Enter a positive whole number.');
+    }
+
+    return valid;
+  }
 }
 
 const filter = new Filter;
 const option = new OptionPage;
+let lessUsedWords = {};
 
 ////
 // Events
@@ -1610,6 +1665,7 @@ const option = new OptionPage;
 function bulkEditorSave(e) { option.bulkEditorSave(); }
 function importConfig(e) { option.importConfig(e); }
 function removeAllWords(e) { option.removeAllWords(e); }
+function removeLessUsedWords(e) { option.removeLessUsedWords(); }
 function restoreDefaults(e) { option.restoreDefaults(e); }
 function setPassword(e) { option.auth.setPassword(option); }
 function statsReset(e) { option.statsReset(); }
@@ -1697,5 +1753,7 @@ document.getElementById('testText').addEventListener('input', (e) => { option.po
 // Stats
 document.getElementById('collectStats').addEventListener('click', (e) => { option.saveOptions(e); });
 document.getElementById('statsReset').addEventListener('click', (e) => { option.confirm(e, 'statsReset'); });
+document.getElementById('lessUsedWordsNumber').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
+document.getElementById('removeLessUsedWords').addEventListener('click', (e) => { option.confirm(e, 'removeLessUsedWords'); });
 // Other
 document.getElementsByClassName('themes')[0].addEventListener('click', (e) => { option.toggleTheme(); });
