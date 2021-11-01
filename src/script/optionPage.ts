@@ -1036,8 +1036,9 @@ export default class OptionPage {
     });
   }
 
-  removeAllWords(evt) {
+  async removeAllWords(evt) {
     this.cfg.words = {};
+    await this.cfg.save('words');
     const wordList = document.getElementById('wordList') as HTMLSelectElement;
     wordList.selectedIndex = 0;
     filter.rebuildWordlists();
