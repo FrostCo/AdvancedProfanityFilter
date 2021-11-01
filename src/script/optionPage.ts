@@ -741,7 +741,7 @@ export default class OptionPage {
 
   async populateStats() {
     try {
-      filter.buildWordlist(Constants.ALL_WORDS_WORDLIST_ID);
+      filter.buildWordlist(Constants.ALL_WORDS_WORDLIST_ID, true);
       const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
 
       // Prepare data (collect totals, add words without stats, sort output)
