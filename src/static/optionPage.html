@@ -437,10 +437,10 @@
 
         <br>
         <label>YouTube muting min:
-          <input id="audioYouTubeAutoSubsMin" class="w3-input w3-border updateYouTubeAutoLimits" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
+          <input id="audioYouTubeAutoSubsMin" class="w3-input w3-border extraSmallInput" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
         </label>
         <label>max:
-          <input id="audioYouTubeAutoSubsMax" class="w3-input w3-border updateYouTubeAutoLimits" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
+          <input id="audioYouTubeAutoSubsMax" class="w3-input w3-border extraSmallInput" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
         </label>
         <span class="notes">(Only for auto captions; 0.5 = half second)</span>
       </div>
@@ -510,7 +510,7 @@
     <span class="notes">(Only stored locally)</span>
   </label>
 
-  <button id="statsReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESET</button>
+  <button id="statsReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESET STATS</button>
 
   <h4 class="sectionHeader">Summary</h4>
   <div id="statsSummaryContainer">
@@ -546,6 +546,13 @@
       <tbody></tbody>
     </table>
   </div>
+
+  <label>
+    Remove words filtered less than
+    <input id="lessUsedWordsNumber" class="w3-input w3-border extraSmallInput" style="display:inline;">
+    times
+  </label>
+  <button id="removeLessUsedWords" class="w3-btn w3-round-large w3-flat-pomegranate" pattern="">REMOVE WORDS</button>
 </div>
 
 <div id="testPage" class="w3-container w3-hide">
@@ -560,7 +567,7 @@
   <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
   <a href="https://github.com/richardfrost/AdvancedProfanityFilter/issues" target="_blank">Support</a>
   <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Created by Richard Frost</a>
-  <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank" class="w3-right" id="helpVersion">2.24.2</a>
+  <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank" class="w3-right" id="helpVersion">2.26.0</a>
   <br>
 
   <div id="helpContainer">
@@ -713,6 +720,8 @@
     <p>Here you can write/paste text into the test area and see the filtered output in real time. This provides a way to test new changes without having to leave settings.</p>
     <h1 id="stats">Stats</h1>
     <p>View filtering statistics such as how many words have been filtered, and how many times audio has been muted while watching a video. You can also disable gathering statistics on this page, or choose to reset them. Statistics are only stored locally (they never leave your device), and are not included in a configuration backup.</p>
+    <p>The &quot;Remove words&quot; feature, found under the stats table, allows the user to specify a threshold for removing words that don&#39;t get filtered often. To use the feature, provide a number and all words that have been filtered less than that number can be removed. This can be helpful to help clear words from your wordlist that may not be necessary.</p>
+    <p><em>TIP: Before making batch changes it&#39;s recommended to save a backup, which you can do from the prompt before confirming the action.</em></p>
     <h1 id="popup">Popup</h1>
     <p>The popup provides access to some quick settings:</p>
     <ul>

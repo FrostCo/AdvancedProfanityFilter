@@ -2,7 +2,7 @@ import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
-import { getGlobalVariable, hmsToSeconds, makeRequest, secondsToHMS } from './lib/helper';
+import { getGlobalVariable, getParent, hmsToSeconds, makeRequest, secondsToHMS } from './lib/helper';
 import Logger from './lib/logger';
 const logger = new Logger();
 
@@ -157,6 +157,12 @@ export default class WebAudio {
 
         this.lastFilteredNode = subtitle;
         this.lastFilteredText = subtitle[textMethod];
+      }
+
+      // Final check to see if we already filtered this text
+      // Reason: Hide/show for Funimation (ignoreMutations didn't fix the issue, but no issue if filterSubtitles = false)
+      if (!filtered && this.lastFilteredNode == subtitle && this.lastFilteredText == subtitle[textMethod]) {
+        filtered = true;
       }
     });
 
@@ -931,28 +937,28 @@ export default class WebAudio {
       if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
       const data: WatcherData = { initialCall: true };
       let captions;
+      let parents;
 
-      if (rule.parentSelectorAll) { // TODO: Only tested with HBO Max
-        const parents = Array.from(document.querySelectorAll(rule.parentSelectorAll)).filter((result) => {
-          return rule._dynamic && result.textContent !== rule.dynamicTextKey;
-        }) as HTMLElement[];
+      if (rule.parentSelectorAll) { // Tested on: HBO Max
+        if (rule._dynamic) {
+          parents = Array.from(document.querySelectorAll(rule.parentSelectorAll)).filter((result) => {
+            return result.textContent !== rule.dynamicTextKey;
+          }) as HTMLElement[];
 
-        if (
-          !rule._displayElement
-          && parents[0]
-          && parents[0].parentElement
-          && parents[0].parentElement.parentElement
-          && parents[0].parentElement.parentElement.parentElement
-        ) {
-          rule._displayElement = parents[0].parentElement.parentElement.parentElement;
+          if (!rule._displayElement) {
+            rule._displayElement = getParent(parents[0], rule.getParentLevel);
+          }
+        } else {
+          parents = Array.from(document.querySelectorAll(rule.parentSelectorAll)) as HTMLElement[];
         }
+
         captions = parents.map((parent) => parent.querySelector(rule.subtitleSelector));
         if (captions.length) {
           instance.processWatcherCaptionsArray(rule, captions, data);
         } else { // If there are no captions/subtitles: unmute and hide
           instance.watcherSimpleUnmute(rule, video);
         }
-      } else if (rule.subtitleSelector) {
+      } else if (rule.subtitleSelector) { // Tested on: Amazon
         captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
         if (captions && captions.textContent && captions.textContent.trim()) {
           instance.processWatcherCaptions(rule, captions, data);
@@ -962,6 +968,7 @@ export default class WebAudio {
       }
 
       if (data.skipped) { return false; }
+
       const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
       shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
       if (data.filtered) { instance.filter.updateCounterBadge(); }

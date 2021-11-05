@@ -4,7 +4,8 @@
     "allowJs": true,
     "target": "esnext",
     "noEmit": true,
-    "lib": ["es2017", "dom", "dom.iterable"]
+    "lib": ["es2017", "dom", "dom.iterable"],
+    "skipLibCheck": true
   },
   "include": [
     "./src/script/**/*.ts"

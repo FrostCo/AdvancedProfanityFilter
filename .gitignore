@@ -14,13 +14,16 @@
 /test/coverage/*
 
 # Built shared libs
-/src/script/lib/*.js
-
-# Xcode
-*.swp
-xcuserdata/
+/dist-lib
 
 # General
 # MacOS
 .DS_Store
 .Trashes
+# Xcode
+*.swp
+xcuserdata/
+
+# Windows
+Thumbs.db
+[Dd]esktop.ini

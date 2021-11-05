@@ -23,6 +23,7 @@ interface AudioRule {
   externalSubURLKey?: string;                    // [Cue] [BETA]: Key name for caption/subtitle URL (Default: 'url')
   externalSubVar?: string;                       // [Cue] [BETA]: Global variable to find available caption/subtitle data
   filterSubtitles?: boolean;                     // [All] Filter subtitle text (Default: true)
+  getParentLevel?: number;                       // [Dynamic,Watcher] Number of levels (ancestors) to go up to when looking for container
   hasChildrenElements?: boolean;                 // [Element] node.childElementCount > 0 [Not commonly used]
   iframe?: boolean | undefined;                  // [All] Pages to run on (true: only iframes, false: no iframes, undefined: all)
   ignoreMutations?: boolean;                     // [Element,ElementChild,Text,Watcher] Ignore mutations when filtering captions/subtitles

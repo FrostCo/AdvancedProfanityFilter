@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import Constants from '../built/lib/constants';
-import { booleanToNumber, formatNumber, getVersion, hmsToSeconds, isVersionOlder, numberToBoolean, removeFromArray, secondsToHMS } from '../built/lib/helper';
+import { booleanToNumber, formatNumber, getParent, getVersion, hmsToSeconds, isVersionOlder, numberToBoolean, removeFromArray, secondsToHMS } from '../built/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 
@@ -31,6 +31,48 @@ describe('Helper', function() {
       expect(formatNumber(999999999)).to.eql('999M');
       expect(formatNumber(1000000000)).to.eql('1G+');
       expect(formatNumber(9999999999)).to.eql('1G+');
+    });
+  });
+
+  describe('getParent()', function() {
+    const elements = {
+      textContent: 'child',
+      parentElement: {
+        textContent: 'parent',
+        parentElement: {
+          textContent: 'grandparent',
+          parentElement: {
+            textContent: 'great-grandparent',
+            parentElement: {
+              textContent: 'great-great-grandparent',
+            },
+          },
+        },
+      },
+    };
+    const child = elements;
+
+    it('Get parent', function() {
+      expect(child.textContent == 'child');
+      expect(getParent(child).textContent).to.eql('parent');
+      expect(getParent(child, 1).textContent).to.eql('parent');
+    });
+
+    it('Get grandparent', function() {
+      expect(getParent(child, 2).textContent).to.eql('grandparent');
+    });
+
+    it('Get great-grandparent', function() {
+      expect(getParent(child, 3).textContent).to.eql('great-grandparent');
+    });
+
+    it('Get great-great-grandparent', function() {
+      expect(getParent(child, 4).textContent).to.eql('great-great-grandparent');
+    });
+
+    it('no parent', function() {
+      expect(getParent(child, 5)).to.be.null;
+      expect(getParent(child, 6)).to.be.null;
     });
   });
 

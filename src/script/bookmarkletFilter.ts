@@ -21,7 +21,7 @@ export default class BookmarkletFilter extends Filter {
   audio: WebAudio;
   audioOnly: boolean;
   audioWordlistId: number;
-  cfg: WebConfig;
+  declare cfg: WebConfig;
   domain: Domain;
   extension: boolean;
   filterText: boolean;

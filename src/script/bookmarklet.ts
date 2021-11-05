@@ -1,5 +1,5 @@
 export default class Bookmarklet {
-  hostedUrl: string
+  hostedUrl: string;
 
   static readonly _defaultBookmarklet = 'https://raw.githubusercontent.com/richardfrost/AdvancedProfanityFilter/master/bookmarklet.js';
   static readonly _defaultFilename = 'apfBookmarklet.js';
