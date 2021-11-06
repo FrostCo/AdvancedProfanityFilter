@@ -492,7 +492,7 @@ export default class WebAudio {
         case Constants.MUTE_METHODS.TAB:
           chrome.runtime.sendMessage({ mute: true });
           break;
-        case Constants.MUTE_METHODS.VIDEO:
+        case Constants.MUTE_METHODS.VIDEO_VOLUME:
           if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
           if (video && video.volume != null) {
             this.volume = video.volume; // Save original volume
@@ -918,7 +918,7 @@ export default class WebAudio {
         case Constants.MUTE_METHODS.TAB:
           chrome.runtime.sendMessage({ mute: false });
           break;
-        case Constants.MUTE_METHODS.VIDEO:
+        case Constants.MUTE_METHODS.VIDEO_VOLUME:
           if (this.fillerAudio) { this.stopFillerAudio(); }
           if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
           if (video && video.volume != null) {

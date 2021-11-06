@@ -8,7 +8,7 @@ export default class WebAudioSites {
   static sites: { [site: string]: AudioRule[] } = {
     'abc.com': [
       { className: 'akamai-caption-text', mode: 'element', tagName: 'DIV' },
-      { className: 'amp-caption-area', displaySelector: 'div.amp-caption-area', mode: 'element', muteMethod: Constants.MUTE_METHODS.VIDEO, subtitleSelector: 'div.amp-caption > p', tagName: 'DIV' },
+      { className: 'amp-caption-area', displaySelector: 'div.amp-caption-area', mode: 'element', muteMethod: Constants.MUTE_METHODS.VIDEO_VOLUME, subtitleSelector: 'div.amp-caption > p', tagName: 'DIV' },
     ],
     'acorn.tv': [
       {
