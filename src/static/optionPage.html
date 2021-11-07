@@ -88,7 +88,7 @@
     </label>
     <br />
     <label>Censor character:
-      <select id="censorCharacterSelect" class="w3-select w3-border small" style="margin-top:8px;">
+      <select id="censorCharacterSelect" class="w3-select w3-border small textInput" style="margin-top:8px;">
         <option value="*">*</option>
         <option value="&">&amp;</option>
         <option value="$">$</option>
@@ -101,7 +101,7 @@
     </label>
     <br />
     <label>Fixed length:
-      <select id="censorFixedLengthSelect" class="w3-select w3-border small" style="margin-top:8px;">
+      <select id="censorFixedLengthSelect" class="w3-select w3-border small textInput" style="margin-top:8px;">
         <option value="0">Original</option>
         <option value="1">1</option>
         <option value="2">2</option>
@@ -171,7 +171,7 @@
     </label>
     <div id="defaultMatchMethod" style="padding-top:8px;">
       <label>Match Method
-        <select id="defaultWordMatchMethodSelect" class="w3-select w3-border small"></select>
+        <select id="defaultWordMatchMethodSelect" class="w3-select w3-border small textInput"></select>
       </label>
     </div>
   </div>
@@ -180,7 +180,7 @@
 <div id="wordsPage" class="w3-container w3-hide">
   <div class="w3-half">
     <h4 class="sectionHeader">Words & Phrases</h4>
-    <select id="wordList" class="w3-select w3-border small"></select>
+    <select id="wordList" class="w3-select w3-border small textInput"></select>
     <label><input id="filterWordList" type="checkbox" class="w3-check">  Filter</label>
 
     <h4 class="sectionHeader">Word/Phrase</h4>
@@ -249,7 +249,7 @@
 <div id="listsPage" class="w3-container w3-hide">
   <div class="w3-half w3">
     <h4 class="sectionHeader">Whitelist</h4>
-    <select id="whitelist" class="w3-select w3-border small"></select><span class="notes">(* Case-sensitive)</span>
+    <select id="whitelist" class="w3-select w3-border small textInput"></select><span class="notes">(* Case-sensitive)</span>
 
     <h4 class="sectionHeader">Word/Phrase</h4>
     <input id="whitelistText" class="w3-input w3-border small" type="text" pattern=".+">
@@ -280,18 +280,18 @@
     </label>
 
     <div id="wordlistContainer" class="w3-hide">
-      <select id="wordlistSelect" class="w3-select w3-border small"></select>
+      <select id="wordlistSelect" class="w3-select w3-border small textInput"></select>
 
       <h4 class="sectionHeader">Name</h4>
       <input id="wordlistText" class="w3-input w3-border small" type="text" pattern="^\S.*" required style="display: inline; margin-right: 8px;">
       <button id="wordlistRename" class="w3-btn w3-round-large w3-flat-peter-river">RENAME</button>
 
       <h4 class="sectionHeader">Default Text Wordlist</h4>
-      <select id="textWordlistSelect" class="w3-select w3-border small"></select><span class="notes"></span>
+      <select id="textWordlistSelect" class="w3-select w3-border small textInput"></select><span class="notes"></span>
 
       <div id="audioWordlistDiv" class="w3-hide">
         <h4 class="sectionHeader">Default Audio Wordlist</h4>
-        <select id="audioWordlistSelect" class="w3-select w3-border small"></select><span class="notes"></span>
+        <select id="audioWordlistSelect" class="w3-select w3-border small textInput"></select><span class="notes"></span>
       </div>
     </div>
   </div>
@@ -319,7 +319,7 @@
 
   <div id="domainRightContainer" class="w3-half w3-right">
     <h4 class="sectionHeader">Domains</h4>
-    <select id="domainSelect" class="w3-select w3-border small" style="display:block"></select>
+    <select id="domainSelect" class="w3-select w3-border small textInput" style="display:block"></select>
     <h4 class="sectionHeader">Domain</h4>
     <input id="domainText" class="w3-input w3-border small" type="text" pattern="^[a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+$"/>
     <span class="notes">Example: "google.com" or "mail.google.com"</span>
@@ -336,16 +336,16 @@
         <span class="notes">Filter pages on this domain</span>
       </label>
       <h4 class="sectionHeader">Mode</h4>
-      <select id="domainModeSelect" class="w3-select w3-border small"></select>
+      <select id="domainModeSelect" class="w3-select w3-border small textInput"></select>
     </div>
 
     <div id="domainWordlistContainer" class="w3-hide">
       <h4 class="sectionHeader">Text Wordlist</h4>
-      <select id="domainWordlistSelect" class="w3-select w3-border small"></select><span class="notes"></span>
+      <select id="domainWordlistSelect" class="w3-select w3-border small textInput"></select><span class="notes"></span>
 
       <div id="domainAudioWordlistContainer" class="w3-hide">
         <h4 class="sectionHeader">Audio Wordlist</h4>
-        <select id="domainAudioWordlistSelect" class="w3-select w3-border small"></select><span class="notes"></span>
+        <select id="domainAudioWordlistSelect" class="w3-select w3-border small textInput"></select><span class="notes"></span>
       </div>
     </div>
 
@@ -424,7 +424,7 @@
       <div id="audioOther">
         <label>
           Filler audio
-          <select id="fillerAudioSelect" class="w3-select w3-border small">
+          <select id="fillerAudioSelect" class="w3-select w3-border small textInput">
             <option value="">None</option>
             <option value="beep">Beep</option>
             <option value="crickets">Crickets</option>
@@ -828,7 +828,7 @@
       <div class="w3-container">
         <div id="modalContentLeft" class="w3-half">
           <h4 class="sectionHeader">Sites</h4>
-          <select id="siteSelect"></select>
+          <select id="siteSelect" class="textInput"></select>
         </div>
         <div id="modalContentRight" class="w3-half w3-right">
           <h4 class="sectionHeader">Site Config</h4>

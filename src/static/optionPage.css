@@ -35,6 +35,11 @@ h4.sectionHeader {
   color: var(--blue);
 }
 
+/* General */
+.textInput {
+  height: 40px;
+}
+
 /* || Header & Navigation */
 
 #header h2 {
