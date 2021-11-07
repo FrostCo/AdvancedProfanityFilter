@@ -194,7 +194,7 @@ export default class BookmarkletFilter extends Filter {
     this.cfg = new WebConfig(config);
     this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
-    this.cfg.muteMethod = Constants.MUTE_METHODS.VIDEO; // Bookmarklet: Force video volume mute method
+    this.cfg.muteMethod = Constants.MUTE_METHODS.VIDEO_VOLUME; // Bookmarklet: Force video volume mute method
 
     // Use domain-specific settings
     const message: Message = { disabled: (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
