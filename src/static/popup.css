@@ -65,6 +65,7 @@ h4 {
 }
 
 .smallSelect {
+  height: 40px;
   width: 150px;
   float: right;
   margin-right: 25px;
