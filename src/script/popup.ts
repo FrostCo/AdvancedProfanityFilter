@@ -33,8 +33,13 @@ class Popup {
   static async load(instance: Popup) {
     instance.cfg = await WebConfig.build(Popup._requiredConfig);
     instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
-    instance.url = new URL(instance.tab.url);
-    instance.domain = Domain.byHostname(instance.url.hostname, instance.cfg.domains);
+    if (instance.tab.url) {
+      instance.url = new URL(instance.tab.url);
+      instance.domain = Domain.byHostname(instance.url.hostname, instance.cfg.domains);
+    } else { // No URL (can be blank in Safari new tab)
+      instance.url = null;
+      instance.domain = new Domain('');
+    }
     instance.filterToggleProp = instance.cfg.enabledDomainsOnly ? 'enabled' : 'disabled';
     return instance;
   }
@@ -130,7 +135,11 @@ class Popup {
     }
 
     // Restricted pages
-    if (Page.disabledProtocols.test(this.url.protocol) || this.domain.hostname == 'chrome.google.com') {
+    if (
+      !this.domain.hostname
+      || Page.disabledProtocols.test(this.url.protocol)
+      || this.domain.hostname == 'chrome.google.com'
+    ) {
       domainFilter.checked = false;
       Popup.disable(domainFilter);
       Popup.disable(domainToggle);
