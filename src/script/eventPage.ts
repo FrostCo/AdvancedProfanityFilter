@@ -64,17 +64,19 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
     runUpdateMigrations(details.previousVersion);
 
     // Display update notification
-    chrome.storage.sync.get({ showUpdateNotification: true }, (data) => {
-      if (data.showUpdateNotification) {
-        chrome.notifications.create('extensionUpdate', {
-          'type': 'basic',
-          'title': 'Advanced Profanity Filter',
-          'message': 'Update installed, click for changelog.',
-          'iconUrl': 'img/icon64.png',
-          'isClickable': true,
-        });
-      }
-    });
+    if (chrome.notifications != null) { // Not available in Safari
+      chrome.storage.sync.get({ showUpdateNotification: true }, (data) => {
+        if (data.showUpdateNotification) {
+          chrome.notifications.create('extensionUpdate', {
+            'type': 'basic',
+            'title': 'Advanced Profanity Filter',
+            'message': 'Update installed, click for changelog.',
+            'iconUrl': 'img/icon64.png',
+            'isClickable': true,
+          });
+        }
+      });
+    }
   }
 }
 
@@ -256,8 +258,10 @@ chrome.contextMenus.removeAll(() => {
 // Listeners
 //
 chrome.contextMenus.onClicked.addListener((info, tab) => { contextMenusOnClick(info, tab); });
-chrome.notifications.onClicked.addListener((notificationId) => { notificationsOnClick(notificationId); });
 chrome.runtime.onInstalled.addListener((details) => { onInstalled(details); });
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { onMessage(request, sender, sendResponse); });
 chrome.tabs.onActivated.addListener((tab) => { tabsOnActivated(tab); });
 chrome.tabs.onRemoved.addListener((tabId) => { tabsOnRemoved(tabId); });
+if (chrome.notifications != null) { // Not available in Safari
+  chrome.notifications.onClicked.addListener((notificationId) => { notificationsOnClick(notificationId); });
+}
