@@ -135,7 +135,7 @@ export default class WebAudioSites {
         tagName: 'DIV',
       },
     ],
-    'www.paramountplus.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
+    'www.paramountplus.com': [{ mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'play.google.com': [{ className: 'lava-timed-text-window', mode: 'element', subtitleSelector: 'span.lava-timed-text-caption', tagName: 'DIV' }],
     'play.hbomax.com': [{ displayVisibility: true, mode: 'watcher', parentSelectorAll: 'div.default.class1.class2 > span', showSubtitles: Constants.SHOW_SUBTITLES.ALL, subtitleSelector: 'span' }],
     'www.hulu.com': [
@@ -161,7 +161,9 @@ export default class WebAudioSites {
     'pluto.tv': [{ mode: 'cue', videoCueHideCues: true, videoCueRequireShowing: false }],
     'www.redbox.com': [{ mode: 'elementChild', parentSelector: 'div.rb-text-container', subtitleSelector: 'SPAN', tagName: 'DIV' }],
     'watch.redeemtv.com': [{ convertBreaks: true, displaySelector: 'div.vp-captions', mode: 'elementChild', parentSelector: 'div.vp-captions', tagName: 'SPAN' }],
+    'therokuchannel.roku.com': [{ mode: 'element', subtitleSelector: 'div.vjs-text-track-cue > div', tagName: 'DIV' }],
     'www.showmax.com': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.contentWrapper > div.subtitles--3EXhT', simpleUnmute: true, tagName: '#text' }],
+    'www.showtime.com': [{ mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'play.stan.com.au': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'www.starz.com': [{ mode: 'elementChild', parentSelector: 'starz-captions > div.cue-list', tagName: 'SPAN' }],
     'www.syfy.com': [{ className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
