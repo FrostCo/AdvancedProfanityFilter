@@ -85,6 +85,7 @@ export default class WebFilter extends Filter {
           || node.contains(this.audio.lastFilteredNode)
           || (
             rule.simpleUnmute
+            && node.textContent
             && this.audio.lastFilteredText
             && this.audio.lastFilteredText.includes(node.textContent)
           )
