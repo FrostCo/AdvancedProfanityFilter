@@ -4,6 +4,7 @@ import Config from './lib/config';
 export default class WebConfig extends Config {
   _splitContainerKeys: { [key: string]: string[] };
   audioWordlistId: number;
+  collectStats: boolean;
   customAudioSites: { [site: string]: AudioRule[] };
   darkMode: boolean;
   domains: { [site: string]: DomainCfg };
@@ -16,12 +17,12 @@ export default class WebConfig extends Config {
   password: string;
   showSubtitles: number;
   showUpdateNotification: boolean;
-  collectStats: boolean;
   youTubeAutoSubsMax: number;
   youTubeAutoSubsMin: number;
 
   static readonly _classDefaults = {
     audioWordlistId: 0,
+    collectStats: true,
     customAudioSites: null,
     darkMode: false,
     domains: {},
@@ -33,7 +34,6 @@ export default class WebConfig extends Config {
     muteMethod: Constants.MUTE_METHODS.TAB,
     password: null,
     showSubtitles: Constants.SHOW_SUBTITLES.ALL,
-    collectStats: true,
     showUpdateNotification: false,
     youTubeAutoSubsMax: 0,
     youTubeAutoSubsMin: 0,
