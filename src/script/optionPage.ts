@@ -1023,19 +1023,24 @@ export default class OptionPage {
   }
 
   async prepareLessUsedWords() {
-    const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
-    const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
-    const lessThan = parseInt(lessUsedWordsNumber.value);
-    lessUsedWords = {};
+    try {
+      const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
+      const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
+      const lessThan = parseInt(lessUsedWordsNumber.value);
+      lessUsedWords = {};
 
-    const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
-    allWords.forEach((word) => {
-      const wordStats = stats.words[word];
-      const total = wordStats ? (wordStats.audio + wordStats.text) : 0;
-      if (total < lessThan) {
-        lessUsedWords[word] = total;
-      }
-    });
+      const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
+      allWords.forEach((word) => {
+        const wordStats = stats.words[word];
+        const total = wordStats ? (wordStats.audio + wordStats.text) : 0;
+        if (total < lessThan) {
+          lessUsedWords[word] = total;
+        }
+      });
+    } catch (e) {
+      logger.warn('Error while prepapring less-used words: ', e);
+      return {};
+    }
   }
 
   async removeAllWords(evt) {
