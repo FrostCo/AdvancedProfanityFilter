@@ -31,7 +31,7 @@ class Popup {
   ];
 
   static async load(instance: Popup) {
-    instance.cfg = await WebConfig.build(Popup._requiredConfig);
+    instance.cfg = await WebConfig.load(Popup._requiredConfig);
     instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
     if (instance.tab.url) {
       instance.url = new URL(instance.tab.url);

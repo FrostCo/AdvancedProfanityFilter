@@ -128,7 +128,7 @@ function onMessage(request: Message, sender, sendResponse) {
 
 // Add selected word/phrase and reload page (unless already present)
 async function processSelection(action: string, selection: string) {
-  const cfg = await WebConfig.build('words');
+  const cfg = await WebConfig.load('words');
   const result = cfg[action](selection);
 
   if (result) {
@@ -143,7 +143,7 @@ async function processSelection(action: string, selection: string) {
 
 async function runUpdateMigrations(previousVersion) {
   if (DataMigration.migrationNeeded(previousVersion)) {
-    const cfg = await WebConfig.build();
+    const cfg = await WebConfig.load();
     const migration = new DataMigration(cfg);
     const migrated = migration.byVersion(previousVersion);
     if (migrated) cfg.save();
@@ -177,7 +177,7 @@ function tabsOnRemoved(tabId: number) {
 }
 
 async function toggleDomain(hostname: string, action: string) {
-  const cfg = await WebConfig.build(['domains', 'enabledDomainsOnly']);
+  const cfg = await WebConfig.load(['domains', 'enabledDomainsOnly']);
   const domain = Domain.byHostname(hostname, cfg.domains);
 
   switch(action) {

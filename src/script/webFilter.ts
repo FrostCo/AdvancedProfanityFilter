@@ -203,7 +203,7 @@ export default class WebFilter extends Filter {
   }
 
   async cleanPage() {
-    this.cfg = await WebConfig.build();
+    this.cfg = await WebConfig.load();
     this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
     logger.info('Config loaded', this.cfg);
@@ -356,7 +356,7 @@ export default class WebFilter extends Filter {
     try {
       const words = Object.keys(filter.stats.words);
       if (words.length) {
-        const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
+        const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
         const storedWords = stats.words;
 
         words.forEach((word) => {
@@ -370,7 +370,7 @@ export default class WebFilter extends Filter {
         stats.mutes += filter.stats.mutes;
         if (stats.startedAt == null) { stats.startedAt = Date.now(); }
 
-        await WebConfig.saveLocalStoragePromise({ stats: stats });
+        await WebConfig.saveLocalStorage({ stats: stats });
         filter.stats = { mutes: 0, words: {} };
       }
     } catch (e) {

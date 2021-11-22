@@ -25,7 +25,7 @@ export default class DataMigration {
   }
 
   static async build() {
-    const cfg = await WebConfig.build();
+    const cfg = await WebConfig.load();
     return new DataMigration(cfg);
   }
 

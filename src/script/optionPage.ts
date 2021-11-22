@@ -546,7 +546,7 @@ export default class OptionPage {
   }
 
   async init() {
-    this.cfg = await WebConfig.build();
+    this.cfg = await WebConfig.load();
     if (!this.auth) this.auth = new OptionAuth(this.cfg.password);
     filter.cfg = this.cfg;
     filter.init();
@@ -599,6 +599,8 @@ export default class OptionPage {
   }
 
   populateConfig() {
+    const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
+    configSyncLargeKeys.checked = this.cfg.syncLargeKeys;
     this.auth.setPasswordButton(option);
   }
 
@@ -759,7 +761,7 @@ export default class OptionPage {
   async populateStats() {
     try {
       filter.buildWordlist(Constants.ALL_WORDS_WORDLIST_ID, true);
-      const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
+      const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
 
       // Prepare data (collect totals, add words without stats, sort output)
       let totalFiltered = 0;
@@ -1021,7 +1023,7 @@ export default class OptionPage {
   }
 
   async prepareLessUsedWords() {
-    const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
+    const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
     const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
     const lessThan = parseInt(lessUsedWordsNumber.value);
     lessUsedWords = {};
@@ -1093,14 +1095,17 @@ export default class OptionPage {
     const wordList = document.getElementById('wordList') as HTMLSelectElement;
     const word = wordList.value;
 
-    let result = this.cfg.removeWord(word);
+    const result = this.cfg.removeWord(word);
     if (result) {
-      result = await this.saveOptions(evt);
-      if (result) {
+      try {
+        await this.cfg.save('words');
         // Update states and Reset word form
         wordList.selectedIndex = 0;
         filter.rebuildWordlists();
         this.populateOptions();
+      } catch(e) {
+        logger.warn('Failed to remove word.', e);
+        OptionPage.showErrorModal('Failed to remove word. [Error: ${e}]');
       }
     }
   }
@@ -1188,13 +1193,13 @@ export default class OptionPage {
       };
       const domain = new Domain(newKey, newDomainCfg);
       domain.updateFromModeIndex(domainModeSelect.selectedIndex);
-      const error = await domain.save(this.cfg);
 
-      if (error) {
+      try {
+        await domain.save(this.cfg);
+        this.populateDomainPage();
+      } catch(e) {
         OptionPage.showErrorModal();
         return false;
-      } else {
-        this.populateDomainPage();
       }
     } else {
       OptionPage.showInputError(domainText, 'Valid domain example: google.com or www.google.com');
@@ -1518,7 +1523,7 @@ export default class OptionPage {
 
   async statsReset() {
     try {
-      await WebConfig.removeLocalStoragePromise('stats');
+      await WebConfig.removeLocalStorage('stats');
       this.populateStats();
     } catch(e) {
       logger.warn('Failed to reset stats.', e);
@@ -1621,6 +1626,34 @@ export default class OptionPage {
         OptionPage.showInputError(input, invalidMessage);
         return false;
       }
+    }
+  }
+
+  async convertStorageLocation() {
+    const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
+    option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
+    const keys = ['syncLargeKeys'].concat(WebConfig._splittingKeys);
+
+    try {
+      await option.cfg.save(keys);
+
+      try {
+        if (option.cfg.syncLargeKeys) {
+          await WebConfig.removeLocalStorage(WebConfig._splittingKeys);
+        } else {
+          let removeKeys = [];
+          WebConfig._splittingKeys.forEach((splittingKey) => {
+            removeKeys = removeKeys.concat(WebConfig.splitKeyNames(splittingKey));
+          });
+          await WebConfig.removeSyncStorage(removeKeys);
+        }
+      } catch(e) {
+        logger.warn('Failed to convert storage.', e);
+        OptionPage.showErrorModal(`Failed to convert storage. [Error: ${e}]`);
+      }
+    } catch(e) {
+      logger.warn('Failed to update storage preference.', e);
+      OptionPage.showErrorModal(`Failed to update storage preference. [Error: ${e}]`);
     }
   }
 
@@ -1742,6 +1775,7 @@ document.getElementById('bookmarkletFile').addEventListener('click', (e) => { op
 document.getElementById('bookmarkletHostedURL').addEventListener('input', (e) => { option.updateHostedBookmarklet(); });
 document.getElementById('bookmarkletLink').addEventListener('click', (e) => { e.preventDefault(); });
 // Config
+document.getElementById('configSyncLargeKeys').addEventListener('click', (e) => { option.convertStorageLocation(); });
 document.getElementById('configInlineInput').addEventListener('click', (e) => { option.configInlineToggle(); });
 document.getElementById('importFileInput').addEventListener('change', (e) => { option.importConfigFile(e); });
 document.getElementById('configReset').addEventListener('click', (e) => { option.confirm(e, 'restoreDefaults'); });
