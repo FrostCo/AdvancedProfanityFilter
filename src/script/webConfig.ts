@@ -362,6 +362,16 @@ export default class WebConfig extends Config {
     }
   }
 
+  async resetPreserveStats() {
+    try {
+      await WebConfig.resetSyncStorage();
+      await WebConfig.removeLocalStorage(WebConfig._splittingKeys);
+    } catch(e) {
+      logger.error('Failed to clear storage: ', e);
+      throw(`Failed to clear storage: ${e}`);
+    }
+  }
+
   async save(keys: string | string[] = []) {
     if (typeof keys === 'string') { keys = [keys]; }
     const syncData = {};

@@ -1142,7 +1142,7 @@ export default class OptionPage {
 
   async restoreDefaults(evt, silent = false) {
     try {
-      await this.cfg.reset();
+      await this.cfg.resetPreserveStats();
       if (!silent) OptionPage.showStatusModal('Default settings restored.');
       this.init();
       return true;
