@@ -54,24 +54,24 @@ export default class WebConfig extends Config {
     return !!(chrome && chrome.storage && chrome.storage.sync && chrome.storage.local);
   }
 
-  // Combine all ._[prop]* into .[prop]
-  static combineData(data, prop: string): string[] {
-    data[prop] = {};
-    if (data[`_${prop}0`] !== undefined) {
-      const dataKeys = WebConfig.getDataContainerKeys(data, prop);
+  // Combine all ._[key]* into .[key]
+  static combineData(data, key: string): string[] {
+    data[key] = {};
+    if (data[`_${key}0`] !== undefined) {
+      const dataKeys = WebConfig.getDataContainerKeys(data, key);
 
-      // Add all _[prop]* to .[prop] and remove _[prop]*
-      dataKeys.forEach((key) => {
-        Object.assign(data[prop], data[key]);
-        delete data[key];
+      // Add all _[key]* to .[key] and remove _[key]*
+      dataKeys.forEach((dataKey) => {
+        Object.assign(data[key], data[dataKey]);
+        delete data[dataKey];
       });
       return dataKeys;
     }
   }
 
-  // Find all _[prop]* to combine
-  static getDataContainerKeys(data, prop) {
-    const pattern = new RegExp(`^_${prop}\\d+`);
+  // Find all _[key]* to combine
+  static getDataContainerKeys(data, key) {
+    const pattern = new RegExp(`^_${key}\\d+`);
     const containerKeys = Object.keys(data).filter((key) => pattern.test(key));
     return containerKeys.sort();
   }
@@ -332,8 +332,8 @@ export default class WebConfig extends Config {
           await WebConfig.removeLocalStorage(localKeys);
         }
 
-        keys.forEach((prop) => {
-          delete this[prop];
+        keys.forEach((key) => {
+          delete this[key];
         });
       } catch(e) {
         logger.error('Failed to remove items: ', keys, e);
