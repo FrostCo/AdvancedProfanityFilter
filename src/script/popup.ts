@@ -24,6 +24,7 @@ class Popup {
     'enabledDomainsOnly',
     'filterMethod',
     'muteAudio',
+    'muteAudioOnly',
     'password',
     'wordlistId',
     'wordlists',
@@ -101,6 +102,7 @@ class Popup {
     const wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
+    let audioPage = false;
     dynamicList(Constants.orderedArray(Constants.DOMAIN_MODES), domainModeSelect, true);
     domainModeSelect.selectedIndex = this.domain.getModeIndex();
     dynamicList(Constants.orderedArray(Constants.FILTER_METHODS), filterMethodSelect, true);
@@ -114,6 +116,7 @@ class Popup {
       if (this.cfg.muteAudio) {
         this.audioSiteKeys = Object.keys(WebAudioSites.combineSites(this.cfg.customAudioSites));
         if (this.audioSiteKeys.includes(this.domain.cfgKey)) {
+          audioPage = true;
           const audioWordlistIndex = this.domain.audioWordlistId >= 0 ? this.domain.audioWordlistId + 1 : 0;
           dynamicList(wordlists, audioWordlistSelect);
           audioWordlistSelect.selectedIndex = audioWordlistIndex;
@@ -139,6 +142,7 @@ class Popup {
       !this.domain.hostname
       || Page.disabledProtocols.test(this.url.protocol)
       || this.domain.hostname == 'chrome.google.com'
+      || (this.cfg.muteAudio && this.cfg.muteAudioOnly && !audioPage)
     ) {
       domainFilter.checked = false;
       Popup.disable(domainFilter);
