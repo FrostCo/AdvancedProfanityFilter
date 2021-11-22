@@ -382,8 +382,10 @@ export default class WebConfig extends Config {
           // Check for any unused splitContainers
           if (this._lastSplitKeys) {
             const newMaxSplitKey = WebConfig.getMaxSplitKeyFromData(syncData, key);
-            if (this._lastSplitKeys[key] > newMaxSplitKey) {
-              unusedSplitKeys = unusedSplitKeys.concat(WebConfig.splitKeyNames(key, newMaxSplitKey));
+            if (this._lastSplitKeys[key] > newMaxSplitKey) { // Split data was reduced
+              unusedSplitKeys = unusedSplitKeys.concat(WebConfig.splitKeyNames(key, newMaxSplitKey + 1));
+            } else if (this._lastSplitKeys[key] < newMaxSplitKey) { // Split data was increased
+              this._lastSplitKeys[key] = newMaxSplitKey;
             }
           }
         } else {
