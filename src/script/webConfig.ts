@@ -220,16 +220,6 @@ export default class WebConfig extends Config {
   }
 
   static removeLocalStorage(keys: string | string[]) {
-    if (keys === 'ALL') {
-      return new Promise((resolve, reject) => {
-        chrome.storage.local.clear(() => {
-          chrome.runtime.lastError
-            ? reject(chrome.runtime.lastError.message)
-            : resolve(0);
-        });
-      });
-    }
-
     if (typeof keys === 'string') { keys = [keys]; }
 
     return new Promise((resolve, reject) => {
