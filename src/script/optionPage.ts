@@ -452,10 +452,9 @@ export default class OptionPage {
       case 'removeAllWords':
         content = document.createElement('span');
         italics = document.createElement('i');
-        content.textContent = 'Are you sure you want to remove all words?\n\n';
-        italics.textContent = '(Note: The default words will return if no words are added)';
+        content.textContent = 'Are you sure you want to remove all words?';
         content.appendChild(italics);
-        OptionPage.configureConfirmModal({ }, content);
+        OptionPage.configureConfirmModal({ backup: true }, content);
         ok.addEventListener('click', removeAllWords);
         break;
       case 'removeLessUsedWords':

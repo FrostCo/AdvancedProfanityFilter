@@ -204,6 +204,12 @@ export default class WebFilter extends Filter {
 
   async cleanPage() {
     this.cfg = await WebConfig.load();
+
+    if (Object.keys(this.cfg.words).length === 0) {
+      logger.warn('No words to filter. Exiting.');
+      return false;
+    }
+
     this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
     logger.info('Config loaded', this.cfg);
