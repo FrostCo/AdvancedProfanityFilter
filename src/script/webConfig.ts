@@ -72,7 +72,7 @@ export default class WebConfig extends Config {
   // Find all _[key]* to combine
   static getDataContainerKeys(data, key) {
     const pattern = new RegExp(`^_${key}\\d+`);
-    const containerKeys = Object.keys(data).filter((key) => pattern.test(key));
+    const containerKeys = Object.keys(data).filter((dataKey) => pattern.test(dataKey));
     return containerKeys.sort();
   }
 
