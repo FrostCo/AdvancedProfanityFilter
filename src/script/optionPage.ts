@@ -406,8 +406,11 @@ export default class OptionPage {
   }
 
   async confirm(evt: Event, action: string) {
+    const cancel = document.getElementById('confirmModalCancel');
+    cancel.removeEventListener('click', populateConfig);
     const ok = document.getElementById('confirmModalOK');
     ok.removeEventListener('click', bulkEditorSave);
+    ok.removeEventListener('click', convertStorageLocation);
     ok.removeEventListener('click', importConfig);
     ok.removeEventListener('click', removeAllWords);
     ok.removeEventListener('click', restoreDefaults);
@@ -426,6 +429,20 @@ export default class OptionPage {
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: true }, content);
         ok.addEventListener('click', bulkEditorSave);
+        break;
+      case 'convertStorageLocation':
+        content = document.createElement('span');
+        italics = document.createElement('i');
+        if (option.cfg.syncLargeKeys) {
+          content.textContent = 'This will prevent large settings like words and domains from syncing, but allow you to store more.\n\n';
+        } else {
+          content.textContent = 'This will allow large settings like words and domains to sync, but has stricter limits on how much you can store.\n\n';
+        }
+        italics.textContent = 'Make sure you have a backup first!';
+        content.appendChild(italics);
+        OptionPage.configureConfirmModal({ backup: true }, content);
+        cancel.addEventListener('click', populateConfig);
+        ok.addEventListener('click', option.convertStorageLocation);
         break;
       case 'importConfig': {
         OptionPage.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
@@ -1703,6 +1720,8 @@ let lessUsedWords = {};
 // Functions
 function bulkEditorSave(e) { option.bulkEditorSave(); }
 function importConfig(e) { option.importConfig(e); }
+function populateConfig(e) { option.populateOptions(); }
+function convertStorageLocation(e) { option.convertStorageLocation(); }
 function removeAllWords(e) { option.removeAllWords(e); }
 function removeLessUsedWords(e) { option.removeLessUsedWords(); }
 function restoreDefaults(e) { option.restoreDefaults(e); }
@@ -1780,7 +1799,7 @@ document.getElementById('bookmarkletFile').addEventListener('click', (e) => { op
 document.getElementById('bookmarkletHostedURL').addEventListener('input', (e) => { option.updateHostedBookmarklet(); });
 document.getElementById('bookmarkletLink').addEventListener('click', (e) => { e.preventDefault(); });
 // Config
-document.getElementById('configSyncLargeKeys').addEventListener('click', (e) => { option.convertStorageLocation(); });
+document.getElementById('configSyncLargeKeys').addEventListener('click', (e) => { option.confirm(e, 'convertStorageLocation'); });
 document.getElementById('configInlineInput').addEventListener('click', (e) => { option.configInlineToggle(); });
 document.getElementById('importFileInput').addEventListener('change', (e) => { option.importConfigFile(e); });
 document.getElementById('configReset').addEventListener('click', (e) => { option.confirm(e, 'restoreDefaults'); });
