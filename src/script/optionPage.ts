@@ -924,6 +924,7 @@ export default class OptionPage {
           index == (this.cfg.wordlistId - 1)
           || (
             this.cfg.muteAudio
+            && this.cfg.muteAudioOnly
             && index == (this.cfg.audioWordlistId - 1)
           )
         );
