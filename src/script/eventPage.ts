@@ -133,7 +133,7 @@ async function processSelection(action: string, selection: string) {
 
   if (result) {
     try {
-      await cfg.save();
+      await cfg.save('words');
       chrome.tabs.reload();
     } catch(e) {
       logger.errorTime(`Failed to process selection '${selection}'.`, e);
