@@ -70,7 +70,7 @@ export default class WebConfig extends Config {
   }
 
   // Find all _[key]* to combine
-  static getDataContainerKeys(data, key) {
+  static getDataContainerKeys(data, key: string): string[] {
     const pattern = new RegExp(`^_${key}\\d+`);
     const containerKeys = Object.keys(data).filter((dataKey) => pattern.test(dataKey));
     return containerKeys.sort();
@@ -101,7 +101,7 @@ export default class WebConfig extends Config {
     }
   }
 
-  static getMaxSplitKeyFromData(data, key): number {
+  static getMaxSplitKeyFromData(data, key: string): number {
     const keys = WebConfig.getDataContainerKeys(data, key);
     return WebConfig.getMaxSplitKeyFromArray(keys);
   }
@@ -283,7 +283,7 @@ export default class WebConfig extends Config {
     });
   }
 
-  static splitKeyNames(key: string, start: number = 0) {
+  static splitKeyNames(key: string, start: number = 0): string[] {
     return Array(this._maxSplitKeys - start).fill(1).map((item, index) => '_' + key + (index + start));
   }
 
