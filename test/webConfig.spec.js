@@ -11,9 +11,9 @@ describe('WebConfig', function() {
     it('should combine _domain# data', function() {
       const config = new WebConfig(WebConfig._defaults);
       delete config.domains;
-      config._splitContainerKeys = ['domains'];
       config._domains0 = { 'www.example0.com': { 'adv': true } };
       config._domains1 = { 'www.example1.com': { 'adv': true } };
+      config._lastSplitKeys = { domains: 1 };
       expect(config.domain).to.not.exist;
       const combinedKeys = WebConfig.combineData(config, 'domains');
       expect(combinedKeys).to.eql(['_domains0', '_domains1']);
@@ -27,7 +27,7 @@ describe('WebConfig', function() {
       const config = new WebConfig(WebConfig._defaults);
       config._words0 = WebConfig._defaultWords;
       config._words1 = { 'test': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'tset' } };
-      config._splitContainerKeys = ['words'];
+      config._lastSplitKeys = { words: 1 };
       expect(config.words).to.not.exist;
       const combinedKeys = WebConfig.combineData(config, 'words');
       expect(combinedKeys).to.eql(['_words0', '_words1']);
@@ -57,8 +57,9 @@ describe('WebConfig', function() {
   describe('ordered()', function() {
     it('remove "_" prefix values', function() {
       const config = new WebConfig(WebConfig._defaults);
-      expect(config._splitContainerKeys).to.exist;
-      expect(config.ordered()._splitContainerKeys).to.not.exist;
+      config._lastSplitKeys = {};
+      expect(config._lastSplitKeys).to.exist;
+      expect(config.ordered()._lastSplitKeys).to.not.exist;
     });
   });
 
