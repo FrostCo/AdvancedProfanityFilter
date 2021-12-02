@@ -1670,12 +1670,20 @@ export default class OptionPage {
           await WebConfig.removeSyncStorage(removeKeys);
         }
       } catch(e) {
-        logger.warn('Failed to convert storage.', e);
-        OptionPage.showErrorModal(`Failed to convert storage. [Error: ${e}]`);
+        // Revert UI and export a backup of config.
+        option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
+        option.backupConfig();
+        logger.error('Failed to cleanup old storage, backup automatically exported.', e);
+        OptionPage.showErrorModal(`Failed to cleanup old storage, backup automatically exported. [Error: ${e}]`);
+        await option.cfg.save('syncLargeKeys');
+        option.populateConfig();
       }
     } catch(e) {
-      logger.warn('Failed to update storage preference.', e);
+      // Revert UI
+      logger.error('Failed to update storage preference.', e);
       OptionPage.showErrorModal(`Failed to update storage preference. [Error: ${e}]`);
+      option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
+      option.populateConfig();
     }
   }
 
@@ -1720,7 +1728,7 @@ let lessUsedWords = {};
 // Functions
 function bulkEditorSave(e) { option.bulkEditorSave(); }
 function importConfig(e) { option.importConfig(e); }
-function populateConfig(e) { option.populateOptions(); }
+function populateConfig(e) { option.populateConfig(); }
 function convertStorageLocation(e) { option.convertStorageLocation(); }
 function removeAllWords(e) { option.removeAllWords(e); }
 function removeLessUsedWords(e) { option.removeLessUsedWords(); }
