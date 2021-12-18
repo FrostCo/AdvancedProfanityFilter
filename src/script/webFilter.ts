@@ -217,6 +217,7 @@ export default class WebFilter extends Filter {
       || (
         this.cfg.enabledDomainsOnly
         && !this.domain.enabled
+        && !this.cfg.muteAudioOnly
       )
       || this.domain.disabled
     ) {
