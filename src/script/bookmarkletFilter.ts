@@ -197,8 +197,15 @@ export default class BookmarkletFilter extends Filter {
     this.cfg.muteMethod = Constants.MUTE_METHODS.VIDEO_VOLUME; // Bookmarklet: Force video volume mute method
 
     // Use domain-specific settings
-    const message: Message = { disabled: (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
-    if (message.disabled) {
+    const message: Message = {};
+    if (
+      (
+        this.cfg.enabledDomainsOnly
+        && !this.domain.enabled
+      )
+      || this.domain.disabled
+    ) {
+      message.disabled = true;
       chrome.runtime.sendMessage(message);
       return false;
     }

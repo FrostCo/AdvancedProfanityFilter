@@ -211,8 +211,16 @@ export default class WebFilter extends Filter {
     const backgroundData: BackgroundData = await this.getBackgroundData();
 
     // Use domain-specific settings
-    const message: Message = { disabled: backgroundData.disabledTab || (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
-    if (message.disabled) {
+    const message: Message = {};
+    if (
+      backgroundData.disabledTab
+      || (
+        this.cfg.enabledDomainsOnly
+        && !this.domain.enabled
+      )
+      || this.domain.disabled
+    ) {
+      message.disabled = true;
       logger.info(`Disabled for page '${this.hostname}'.`);
       chrome.runtime.sendMessage(message);
       return false;
