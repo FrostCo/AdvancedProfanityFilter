@@ -7,11 +7,6 @@ import WebConfig from './webConfig';
 import Wordlist from './lib/wordlist';
 import './vendor/findAndReplaceDOMText';
 
-// NO-OP for chrome.* API
-const chrome = {} as any;
-chrome.runtime = {};
-chrome.runtime.sendMessage = (obj) => {};
-
 /* @preserve - Start User Config */
 const config = WebConfig._defaults as any;
 config.words = WebConfig._defaultWords;
@@ -211,7 +206,6 @@ export default class BookmarkletFilter extends Filter {
       || this.domain.disabled
     ) {
       message.disabled = true;
-      chrome.runtime.sendMessage(message);
       return false;
     }
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
@@ -231,7 +225,6 @@ export default class BookmarkletFilter extends Filter {
     // Disable if muteAudioOnly mode is active and this is not a suported page
     if (this.cfg.muteAudioOnly && !this.mutePage) {
       message.disabled = true;
-      chrome.runtime.sendMessage(message);
       return false;
     }
 
@@ -295,8 +288,6 @@ export default class BookmarkletFilter extends Filter {
     observer.disconnect();
     if (mutations) { this.processMutations(mutations); }
   }
-
-  updateCounterBadge() {} // NO-OP
 }
 
 const filter = new BookmarkletFilter;
