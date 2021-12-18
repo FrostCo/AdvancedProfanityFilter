@@ -216,6 +216,13 @@ export default class BookmarkletFilter extends Filter {
       }
     }
 
+    // Disable if muteAudioOnly mode is active and this is not a suported page
+    if (this.cfg.muteAudioOnly && !this.mutePage) {
+      message.disabled = true;
+      chrome.runtime.sendMessage(message);
+      return false;
+    }
+
     // Remove profanity from the main document and watch for new nodes
     this.init();
     if (!this.audioOnly) { this.processNode(document, this.wordlistId); }
