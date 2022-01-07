@@ -7,11 +7,6 @@ import WebConfig from './webConfig';
 import Wordlist from './lib/wordlist';
 import './vendor/findAndReplaceDOMText';
 
-// NO-OP for chrome.* API
-const chrome = {} as any;
-chrome.runtime = {};
-chrome.runtime.sendMessage = (obj) => {};
-
 /* @preserve - Start User Config */
 const config = WebConfig._defaults as any;
 config.words = WebConfig._defaultWords;
@@ -194,12 +189,23 @@ export default class BookmarkletFilter extends Filter {
     this.cfg = new WebConfig(config);
     this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
-    this.cfg.muteMethod = Constants.MUTE_METHODS.VIDEO_VOLUME; // Bookmarklet: Force video volume mute method
+
+    // Bookmarklet: Force video volume mute method
+    if (this.cfg.muteMethod === Constants.MUTE_METHODS.TAB) {
+      this.cfg.muteMethod === Constants.MUTE_METHODS.VIDEO_VOLUME;
+    }
 
     // Use domain-specific settings
-    const message: Message = { disabled: (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
-    if (message.disabled) {
-      chrome.runtime.sendMessage(message);
+    const message: Message = {};
+    if (
+      (
+        this.cfg.enabledDomainsOnly
+        && !this.domain.enabled
+        && !this.cfg.muteAudioOnly
+      )
+      || this.domain.disabled
+    ) {
+      message.disabled = true;
       return false;
     }
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
@@ -214,6 +220,12 @@ export default class BookmarkletFilter extends Filter {
           this.wordlists[this.audio.wordlistId] = new Wordlist(this.cfg, this.audio.wordlistId);
         }
       }
+    }
+
+    // Disable if muteAudioOnly mode is active and this is not a suported page
+    if (this.cfg.muteAudioOnly && !this.mutePage) {
+      message.disabled = true;
+      return false;
     }
 
     // Remove profanity from the main document and watch for new nodes
@@ -276,8 +288,6 @@ export default class BookmarkletFilter extends Filter {
     observer.disconnect();
     if (mutations) { this.processMutations(mutations); }
   }
-
-  updateCounterBadge() {} // NO-OP
 }
 
 const filter = new BookmarkletFilter;
