@@ -949,7 +949,7 @@ export default class WebAudio {
       let captions;
       let parents;
 
-      if (rule.parentSelectorAll) { // Tested on: HBO Max
+      if (rule.parentSelectorAll) { // Tested on: HBO Max (No longer working)
         if (rule._dynamic) {
           parents = Array.from(document.querySelectorAll(rule.parentSelectorAll)).filter((result) => {
             return result.textContent !== rule.dynamicTextKey;
@@ -972,6 +972,16 @@ export default class WebAudio {
         captions = document.querySelector(rule.parentSelector) as HTMLElement;
         if (captions && captions.textContent && captions.textContent.trim()) {
           instance.processWatcherCaptions(rule, captions, data);
+        } else { // If there are no captions/subtitles: unmute and hide
+          instance.watcherSimpleUnmute(rule, video);
+        }
+      } else if (rule.subtitleSelector) { // Working on: HBO max (1/13/2022)
+        captions = Array.from(document.querySelectorAll(rule.subtitleSelector)) as HTMLElement[];
+        if (captions && captions.length) {
+          if (!rule._displayElement || !document.body.contains(rule._displayElement)) {
+            rule._displayElement = getParent(captions[0], rule.getParentLevelDisplay);
+          }
+          instance.processWatcherCaptionsArray(rule, captions, data);
         } else { // If there are no captions/subtitles: unmute and hide
           instance.watcherSimpleUnmute(rule, video);
         }
