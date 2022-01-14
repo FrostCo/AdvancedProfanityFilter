@@ -29,6 +29,7 @@ export default class BookmarkletFilter extends Filter {
   processNode: (node: HTMLElement | Document | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
   shadowObserver: MutationObserver;
   stats?: Statistics; // Bookmarklet: Not used
+  updateCounterBadge: () => void; // Bookmarklet: Not used - Needed to match signature of WebFilter
 
   constructor() {
     super();
