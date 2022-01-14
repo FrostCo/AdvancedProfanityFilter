@@ -37,7 +37,7 @@ interface AudioRule {
   rootNode?: boolean;                            // [Element,ElementChild] Use getRootNode() or assume document (Default: false)
   showSubtitles?: number;                        // [All] Override global showSubtitles (0: all, 1: filtered, 2: unfiltered, 3: none)
   simpleUnmute?: boolean;                        // [Element,ElementChild,Text+,Watcher+] Simplify requirements for unmuting (should be first rule)
-  subtitleSelector?: string;                     // [Element,ElementChild,Watcher] *Used for Filtering*: node.querySelector()
+  subtitleSelector?: string;                     // [Element,ElementChild,Watcher] *Used for Filtering*: node.querySelectorAll()
   tagName?: string;                              // [Element*,ElementChild*] node.nodeName
   unmuteDelay?: number;                          // [Element,ElementChild,Watcher] Positive number (in ms) to delay unmuting
   videoCueHideCues?: boolean;                    // [Cue] Remove/hide cues instead of setting textTrack.mode = 'hidden'
