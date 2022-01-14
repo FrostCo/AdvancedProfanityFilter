@@ -968,8 +968,8 @@ export default class WebAudio {
         } else { // If there are no captions/subtitles: unmute and hide
           instance.watcherSimpleUnmute(rule, video);
         }
-      } else if (rule.subtitleSelector) { // Tested on: Amazon
-        captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
+      } else if (rule.parentSelector) { // Tested on: Amazon
+        captions = document.querySelector(rule.parentSelector) as HTMLElement;
         if (captions && captions.textContent && captions.textContent.trim()) {
           instance.processWatcherCaptions(rule, captions, data);
         } else { // If there are no captions/subtitles: unmute and hide

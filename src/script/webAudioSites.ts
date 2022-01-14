@@ -27,8 +27,7 @@ export default class WebAudioSites {
         displayShow: '',
         iframe: false,
         mode: 'watcher',
-        parentSelector: 'div.webPlayerContainer div p > span',
-        subtitleSelector: 'div.webPlayerContainer div span > span',
+        parentSelector: 'div.webPlayerContainer div span > span',
         videoSelector: 'div.webPlayerElement video[src]',
       }
     ],
