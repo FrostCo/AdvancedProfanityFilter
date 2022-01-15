@@ -794,7 +794,6 @@ export default class WebAudio {
     }
 
     captions.forEach((caption) => {
-      rule.displayVisibility = true; // Requires .textContent()
       // Don't process empty/whitespace nodes
       if (caption.textContent && caption.textContent.trim()) {
         const result = this.replaceTextResult(caption.textContent);
@@ -806,6 +805,8 @@ export default class WebAudio {
       }
     });
 
+    const shouldBeShown = this.subtitlesShouldBeShown(rule, data.filtered);
+    shouldBeShown ? this.showSubtitles(rule) : this.hideSubtitles(rule);
     this.lastProcessedText = captions.map((caption) => caption.textContent).join(' ');
   }
 
@@ -949,13 +950,13 @@ export default class WebAudio {
       let captions;
       let parents;
 
-      if (rule.parentSelectorAll) { // Tested on: HBO Max
+      if (rule.parentSelectorAll) { // Tested on: HBO Max (No longer working)
         if (rule._dynamic) {
           parents = Array.from(document.querySelectorAll(rule.parentSelectorAll)).filter((result) => {
             return result.textContent !== rule.dynamicTextKey;
           }) as HTMLElement[];
 
-          if (!rule._displayElement) {
+          if (rule.displayVisibility && (!rule._displayElement || !document.body.contains(rule._displayElement))) {
             rule._displayElement = getParent(parents[0], rule.getParentLevel);
           }
         } else {
@@ -968,10 +969,20 @@ export default class WebAudio {
         } else { // If there are no captions/subtitles: unmute and hide
           instance.watcherSimpleUnmute(rule, video);
         }
-      } else if (rule.subtitleSelector) { // Tested on: Amazon
-        captions = document.querySelector(rule.subtitleSelector) as HTMLElement;
+      } else if (rule.parentSelector) { // Tested on: Amazon
+        captions = document.querySelector(rule.parentSelector) as HTMLElement;
         if (captions && captions.textContent && captions.textContent.trim()) {
           instance.processWatcherCaptions(rule, captions, data);
+        } else { // If there are no captions/subtitles: unmute and hide
+          instance.watcherSimpleUnmute(rule, video);
+        }
+      } else if (rule.subtitleSelector) { // Working on: HBO max (1/13/2022)
+        captions = Array.from(document.querySelectorAll(rule.subtitleSelector)) as HTMLElement[];
+        if (captions && captions.length) {
+          if (rule.displayVisibility && (!rule._displayElement || !document.body.contains(rule._displayElement))) {
+            rule._displayElement = getParent(captions[0], rule.displayElementLevels);
+          }
+          instance.processWatcherCaptionsArray(rule, captions, data);
         } else { // If there are no captions/subtitles: unmute and hide
           instance.watcherSimpleUnmute(rule, video);
         }
@@ -1053,7 +1064,7 @@ export default class WebAudio {
 
   watcherSimpleUnmute(rule: AudioRule, video: HTMLVideoElement) {
     this.unmute(rule, video);
-    if (rule.showSubtitles > 0) { this.hideSubtitles(rule, rule._displayElement); }
+    if (rule.showSubtitles > Constants.SHOW_SUBTITLES.ALL) { this.hideSubtitles(rule); }
   }
 
   youTubeAutoSubsCurrentRow(node): boolean {

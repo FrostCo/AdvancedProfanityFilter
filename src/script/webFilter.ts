@@ -217,8 +217,17 @@ export default class WebFilter extends Filter {
     const backgroundData: BackgroundData = await this.getBackgroundData();
 
     // Use domain-specific settings
-    const message: Message = { disabled: backgroundData.disabledTab || (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled };
-    if (message.disabled) {
+    const message: Message = {};
+    if (
+      backgroundData.disabledTab
+      || (
+        this.cfg.enabledDomainsOnly
+        && !this.domain.enabled
+        && !this.cfg.muteAudioOnly
+      )
+      || this.domain.disabled
+    ) {
+      message.disabled = true;
       logger.info(`Disabled for page '${this.hostname}'.`);
       chrome.runtime.sendMessage(message);
       return false;
@@ -240,15 +249,11 @@ export default class WebFilter extends Filter {
     }
 
     // Disable if muteAudioOnly mode is active and this is not a suported page
-    if (this.cfg.muteAudioOnly) {
-      if (this.mutePage) {
-        this.audioOnly = true;
-      } else {
-        message.disabled = true;
-        logger.info(`'${this.hostname}' is not an audio page and audio only mode is enabled. Exiting.`);
-        chrome.runtime.sendMessage(message);
-        return false;
-      }
+    if (this.cfg.muteAudioOnly && !this.mutePage) {
+      message.disabled = true;
+      logger.info(`'${this.hostname}' is not an audio page and audio only mode is enabled. Exiting.`);
+      chrome.runtime.sendMessage(message);
+      return false;
     }
 
     this.sendInitState(message);
