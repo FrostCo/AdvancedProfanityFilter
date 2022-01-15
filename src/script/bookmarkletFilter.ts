@@ -228,7 +228,7 @@ export default class BookmarkletFilter extends Filter {
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
     if (node.childElementCount > 0) {
       const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
-      while(treeWalker.nextNode()) {
+      while (treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
           treeWalker.currentNode.childNodes.forEach((childNode) => {
             this.cleanText(childNode, wordlistId, statsType);
@@ -297,7 +297,7 @@ if (typeof window !== 'undefined') {
     filter.iframe = document.location;
     try {
       filter.hostname = window.parent.location.hostname;
-    } catch(e) {
+    } catch (e) {
       if (document.referrer) {
         filter.hostname = new URL(document.referrer).hostname;
       } else {

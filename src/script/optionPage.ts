@@ -100,7 +100,7 @@ export default class OptionPage {
     element.classList.remove('w3-border-red');
     try {
       element.setCustomValidity('');
-    } catch(e) {
+    } catch (e) {
       // If HTML5 validation not supported, the modal will suffice
     }
   }
@@ -130,7 +130,7 @@ export default class OptionPage {
       try {
         element.setCustomValidity(message);
         element.reportValidity();
-      } catch(e) {
+      } catch (e) {
         OptionPage.showWarningModal(message);
       }
     }
@@ -331,7 +331,7 @@ export default class OptionPage {
       OptionPage.showStatusModal('Words saved successfully.');
       filter.rebuildWordlists();
       this.populateOptions();
-    } catch(e) {
+    } catch (e) {
       logger.warn('Failed to save.', e);
       OptionPage.showErrorModal(`Failed to save. [Error: ${e.message}]`);
     }
@@ -420,7 +420,7 @@ export default class OptionPage {
     let italics;
     let validated = true;
 
-    switch(action) {
+    switch (action) {
       case 'bulkEditorSave':
         content = document.createElement('span');
         italics = document.createElement('i');
@@ -551,12 +551,12 @@ export default class OptionPage {
           await this.cfg.save();
           OptionPage.showStatusModal('Settings imported successfully.');
           this.init();
-        } catch(e) {
+        } catch (e) {
           logger.warn('Failed to import settings.', e);
           OptionPage.showErrorModal(`Failed to import settings. [Error: ${e.message}]`);
         }
       }
-    } catch(e) {
+    } catch (e) {
       OptionPage.showErrorModal(`Failed to process new settings: [Error: ${e.message}]`);
     }
   }
@@ -835,7 +835,7 @@ export default class OptionPage {
       statsSummaryMutes.textContent = numberWithCommas(stats.mutes);
       const statsSummarySince = document.querySelector('table#statsSummaryTable td#statsSummarySince') as HTMLTableDataCellElement;
       statsSummarySince.textContent = stats.startedAt ? new Date(stats.startedAt).toLocaleString() : '';
-    } catch(e) {
+    } catch (e) {
       logger.warn('Failed to populate stats.', e);
       OptionPage.showErrorModal(`Failed to populate stats. [Error: ${e.message}]`);
     }
@@ -1077,7 +1077,7 @@ export default class OptionPage {
       try {
         await this.cfg.save('domains');
         this.populateDomainPage();
-      } catch(e) {
+      } catch (e) {
         logger.warn(`Failed to remove domain '${domainsSelect.value}'.`, e);
         OptionPage.showErrorModal(`Failed to remove domain '${domainsSelect.value}'. [Error: ${e.message}]`);
         return false;
@@ -1105,7 +1105,7 @@ export default class OptionPage {
       await this.cfg.save(originalListName);
       filter.init();
       this.populateOptions();
-    } catch(e) {
+    } catch (e) {
       logger.warn(`Failed to remove '${originalWord}' from whitelist.`, e);
       OptionPage.showErrorModal(`Failed to remove '${originalWord}' from whitelist. [Error: ${e.message}]`);
       return false;
@@ -1125,7 +1125,7 @@ export default class OptionPage {
         wordList.selectedIndex = 0;
         filter.rebuildWordlists();
         this.populateOptions();
-      } catch(e) {
+      } catch (e) {
         logger.warn('Failed to remove word.', e);
         OptionPage.showErrorModal(`Failed to remove word. [Error: ${e.message}]`);
       }
@@ -1163,7 +1163,7 @@ export default class OptionPage {
       if (!silent) OptionPage.showStatusModal('Default settings restored.');
       this.init();
       return true;
-    } catch(e) {
+    } catch (e) {
       logger.warn('Error restoring defaults.', e);
       OptionPage.showErrorModal(`Error restoring defaults. [Error: ${e.message}]`);
       return false;
@@ -1179,7 +1179,7 @@ export default class OptionPage {
         customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
         OptionPage.showStatusModal('Custom Audio Sites saved.');
       }
-    } catch(e) {
+    } catch (e) {
       OptionPage.showErrorModal('Failed to save custom audio sites. Please make sure it is valid JSON.');
     }
   }
@@ -1219,7 +1219,7 @@ export default class OptionPage {
       try {
         await domain.save(this.cfg);
         this.populateDomainPage();
-      } catch(e) {
+      } catch (e) {
         OptionPage.showErrorModal();
         return false;
       }
@@ -1283,7 +1283,7 @@ export default class OptionPage {
       await this.cfg.save();
       this.init();
       return true;
-    } catch(e) {
+    } catch (e) {
       logger.warn('Settings not saved! Please try again.', e);
       OptionPage.showErrorModal(`Settings not saved! Please try again. [Error: ${e.message}]`);
       return false;
@@ -1294,7 +1294,7 @@ export default class OptionPage {
     try {
       await this.cfg.save(prop);
       return true;
-    } catch(e) {
+    } catch (e) {
       logger.warn(`Failed to save '${prop}'.`, e);
       OptionPage.showErrorModal(`Failed to save '${prop}'. [Error: ${e.message}]`);
       return false;
@@ -1346,7 +1346,7 @@ export default class OptionPage {
           await this.cfg.save(propsToSave);
           filter.init();
           this.populateOptions();
-        } catch(e) {
+        } catch (e) {
           logger.warn('Failed to update whitelist.', e);
           OptionPage.showErrorModal(`Failed to update whitelist. [Error: ${e.message}]`);
           return false;
@@ -1453,7 +1453,7 @@ export default class OptionPage {
           // Update states and Reset word form
           filter.rebuildWordlists();
           this.populateOptions();
-        } catch(e) {
+        } catch (e) {
           logger.warn(`Failed to update word '${word}'.`, e);
           OptionPage.showErrorModal(`Failed to update word '${word}'. [Error: ${e.message}]`);
           this.cfg.removeWord(word);
@@ -1547,7 +1547,7 @@ export default class OptionPage {
     try {
       await WebConfig.removeLocalStorage('stats');
       this.populateStats();
-    } catch(e) {
+    } catch (e) {
       logger.warn('Failed to reset stats.', e);
       OptionPage.showErrorModal(`Failed to reset stats. [Error: ${e.message}]`);
     }
@@ -1603,7 +1603,7 @@ export default class OptionPage {
 
   updateFilterOptions() {
     // Show/hide options as needed
-    switch(this.cfg.filterMethod) {
+    switch (this.cfg.filterMethod) {
       case Constants.FILTER_METHODS.CENSOR:
         OptionPage.show(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
@@ -1669,7 +1669,7 @@ export default class OptionPage {
           });
           await WebConfig.removeSyncStorage(removeKeys);
         }
-      } catch(e) {
+      } catch (e) {
         // Revert UI and export a backup of config.
         option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
         option.backupConfig();
@@ -1678,7 +1678,7 @@ export default class OptionPage {
         await option.cfg.save('syncLargeKeys');
         option.populateConfig();
       }
-    } catch(e) {
+    } catch (e) {
       // Revert UI
       logger.error('Failed to update storage preference.', e);
       OptionPage.showErrorModal(`Failed to update storage preference. [Error: ${e.message}]`);

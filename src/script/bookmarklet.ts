@@ -89,9 +89,9 @@ export default class Bookmarklet {
       if (lowerCaseLettersRegExp.test(variable)) {
         return code.replace(configRegExp, `${prefix}\nconst ${variable}=${JSON.stringify(config)}\n${postfix}`);
       } else {
-        throw('Unable to set user config - using defaults');
+        throw ('Unable to set user config - using defaults');
       }
-    } catch(e) {
+    } catch (e) {
       window.alert('Unable to read config - using defaults');
       return code;
     }

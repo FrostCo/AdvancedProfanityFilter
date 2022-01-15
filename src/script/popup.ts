@@ -86,7 +86,7 @@ class Popup {
     try {
       await this.cfg.save('filterMethod');
       chrome.tabs.reload();
-    } catch(e) {
+    } catch (e) {
       logger.error('Failed to update selected filter method.', e);
     }
   }
@@ -202,7 +202,7 @@ class Popup {
       try {
         await this.domain.save(this.cfg);
         chrome.tabs.reload();
-      } catch(e) {
+      } catch (e) {
         logger.error(`Failed to toggle domain '${this.domain.hostname}'.`, e);
       }
     }
@@ -215,7 +215,7 @@ class Popup {
       try {
         await this.domain.save(this.cfg);
         chrome.tabs.reload();
-      } catch(e) {
+      } catch (e) {
         logger.error(`Failed to update mode for domain '${this.domain.hostname}'.`, e);
       }
     }
@@ -228,7 +228,7 @@ class Popup {
     try {
       await this.domain.save(this.cfg);
       chrome.tabs.reload();
-    } catch(e) {
+    } catch (e) {
       logger.error(`Failed to select wordlist for domain ${this.domain.hostname}.`, e);
     }
   }

@@ -277,7 +277,7 @@ export default class WebFilter extends Filter {
     if (node.childElementCount > 0) {
       const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
       // Note: This while loop skips processing on first node
-      while(treeWalker.nextNode()) {
+      while (treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
           treeWalker.currentNode.childNodes.forEach((childNode) => {
             this.cleanText(childNode, wordlistId, statsType);
@@ -327,7 +327,7 @@ export default class WebFilter extends Filter {
       }
 
       if (this.filterText) {
-        switch(statsType) {
+        switch (statsType) {
           case Constants.STATS_TYPE_AUDIO: wordStats[word.value].audio++; break;
           case Constants.STATS_TYPE_TEXT: wordStats[word.value].text++; break;
         }
@@ -456,7 +456,7 @@ if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptG
     filter.iframe = document.location;
     try { // same domain
       filter.hostname = window.parent.location.hostname;
-    } catch(e) { // different domain
+    } catch (e) { // different domain
       if (document.referrer) {
         filter.hostname = new URL(document.referrer).hostname;
       } else {

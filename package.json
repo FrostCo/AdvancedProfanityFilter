@@ -129,6 +129,7 @@
           "SwitchCase": 1
         }
       ],
+      "keyword-spacing": "warn",
       "no-console": "warn",
       "no-control-regex": [
         "off"

@@ -13,7 +13,7 @@ const backgroundStorage: BackgroundStorage = {
 // Functions
 //
 function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
-  switch(info.menuItemId) {
+  switch (info.menuItemId) {
     case 'addSelection':
       processSelection('addWord', info.selectionText); break;
     case 'disableTabOnce':
@@ -41,7 +41,7 @@ function getTabOptions(id: number): TabStorageOptions {
 }
 
 function notificationsOnClick(notificationId: string) {
-  switch(notificationId) {
+  switch (notificationId) {
     case 'extensionUpdate':
       chrome.notifications.clear('extensionUpdate');
       chrome.tabs.create({ url: 'https://github.com/richardfrost/AdvancedProfanityFilter/releases' });
@@ -135,7 +135,7 @@ async function processSelection(action: string, selection: string) {
     try {
       await cfg.save('words');
       chrome.tabs.reload();
-    } catch(e) {
+    } catch (e) {
       logger.errorTime(`Failed to process selection '${selection}'.`, e);
     }
   }
@@ -180,7 +180,7 @@ async function toggleDomain(hostname: string, action: string) {
   const cfg = await WebConfig.load(['domains', 'enabledDomainsOnly']);
   const domain = Domain.byHostname(hostname, cfg.domains);
 
-  switch(action) {
+  switch (action) {
     case 'disable':
       cfg.enabledDomainsOnly ? domain.enabled = !domain.enabled : domain.disabled = !domain.disabled; break;
     case 'advanced':
@@ -190,7 +190,7 @@ async function toggleDomain(hostname: string, action: string) {
   try {
     await domain.save(cfg);
     chrome.tabs.reload();
-  } catch(e) {
+  } catch (e) {
     logger.error(`Failed to modify '${action}' for domain '${domain.cfgKey}'.`, e, domain);
   }
 }

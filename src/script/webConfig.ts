@@ -335,9 +335,9 @@ export default class WebConfig extends Config {
         keys.forEach((key) => {
           delete this[key];
         });
-      } catch(e) {
+      } catch (e) {
         logger.error('Failed to remove items: ', keys, e);
-        throw(`Failed to remove items: [${keys}]. ${e.message}`);
+        throw (`Failed to remove items: [${keys}]. ${e.message}`);
       }
     }
   }
@@ -346,9 +346,9 @@ export default class WebConfig extends Config {
     try {
       await WebConfig.resetSyncStorage();
       await WebConfig.resetLocalStorage();
-    } catch(e) {
+    } catch (e) {
       logger.error('Failed to clear storage.', e);
-      throw(`Failed to clear storage: ${e.message}`);
+      throw (`Failed to clear storage: ${e.message}`);
     }
   }
 
@@ -356,9 +356,9 @@ export default class WebConfig extends Config {
     try {
       await WebConfig.resetSyncStorage();
       await WebConfig.removeLocalStorage(WebConfig._splittingKeys);
-    } catch(e) {
+    } catch (e) {
       logger.error('Failed to clear storage.', e);
-      throw(`Failed to clear storage: ${e.message}`);
+      throw (`Failed to clear storage: ${e.message}`);
     }
   }
 
