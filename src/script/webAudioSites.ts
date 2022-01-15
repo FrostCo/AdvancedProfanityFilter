@@ -27,8 +27,7 @@ export default class WebAudioSites {
         displayShow: '',
         iframe: false,
         mode: 'watcher',
-        parentSelector: 'div.webPlayerContainer div p > span',
-        subtitleSelector: 'div.webPlayerContainer div span > span',
+        parentSelector: 'div.webPlayerContainer div span > span',
         videoSelector: 'div.webPlayerElement video[src]',
       }
     ],
@@ -137,7 +136,7 @@ export default class WebAudioSites {
     ],
     'www.paramountplus.com': [{ mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'play.google.com': [{ className: 'lava-timed-text-window', mode: 'element', subtitleSelector: 'span.lava-timed-text-caption', tagName: 'DIV' }],
-    'play.hbomax.com': [{ displayVisibility: true, mode: 'watcher', parentSelectorAll: 'div.default.class1.class2 > span', showSubtitles: Constants.SHOW_SUBTITLES.ALL, subtitleSelector: 'span' }],
+    'play.hbomax.com': [{ displayElementLevels: 5, displayVisibility: true, mode: 'watcher', showSubtitles: Constants.SHOW_SUBTITLES.ALL, subtitleSelector: "span[style^='font-family: font']" }],
     'www.hulu.com': [
       { className: 'caption-text-box', displaySelector: 'div.caption-text-box', mode: 'element', subtitleSelector: 'p', tagName: 'DIV' },
       { displaySelector: 'div.CaptionBox', mode: 'elementChild', parentSelector: 'div.CaptionBox', tagName: 'P' }
@@ -159,7 +158,7 @@ export default class WebAudioSites {
       { containsSelector: 'div[data-dialogue-id]', mode: 'element', subtitleSelector: 'span > span', tagName: 'DIV' },
     ],
     'pluto.tv': [{ mode: 'cue', videoCueHideCues: true, videoCueRequireShowing: false }],
-    'www.redbox.com': [{ mode: 'elementChild', parentSelector: 'div.rb-text-container', subtitleSelector: 'SPAN', tagName: 'DIV' }],
+    'www.redbox.com': [{ mode: 'elementChild', parentSelector: 'div.rb-text-container', subtitleSelector: 'SPAN > SPAN', tagName: 'DIV' }],
     'watch.redeemtv.com': [{ convertBreaks: true, displaySelector: 'div.vp-captions', mode: 'elementChild', parentSelector: 'div.vp-captions', tagName: 'SPAN' }],
     'therokuchannel.roku.com': [{ mode: 'element', subtitleSelector: 'div.vjs-text-track-cue > div', tagName: 'DIV' }],
     'www.showmax.com': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.contentWrapper > div.subtitles--3EXhT', simpleUnmute: true, tagName: '#text' }],
