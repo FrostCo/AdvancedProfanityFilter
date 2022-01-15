@@ -333,7 +333,7 @@ export default class OptionPage {
       this.populateOptions();
     } catch(e) {
       logger.warn('Failed to save.', e);
-      OptionPage.showErrorModal(`Failed to save. [Error: ${e}]`);
+      OptionPage.showErrorModal(`Failed to save. [Error: ${e.message}]`);
     }
   }
 
@@ -553,11 +553,11 @@ export default class OptionPage {
           this.init();
         } catch(e) {
           logger.warn('Failed to import settings.', e);
-          OptionPage.showErrorModal(`Failed to import settings. [Error: ${e}]`);
+          OptionPage.showErrorModal(`Failed to import settings. [Error: ${e.message}]`);
         }
       }
     } catch(e) {
-      OptionPage.showErrorModal('Failed to import settings.');
+      OptionPage.showErrorModal(`Failed to process new settings: [Error: ${e.message}]`);
     }
   }
 
@@ -837,7 +837,7 @@ export default class OptionPage {
       statsSummarySince.textContent = stats.startedAt ? new Date(stats.startedAt).toLocaleString() : '';
     } catch(e) {
       logger.warn('Failed to populate stats.', e);
-      OptionPage.showErrorModal(`Failed to populate stats. [Error: ${e}]`);
+      OptionPage.showErrorModal(`Failed to populate stats. [Error: ${e.message}]`);
     }
   }
 
@@ -1055,7 +1055,7 @@ export default class OptionPage {
         }
       });
     } catch (e) {
-      logger.warn('Error while prepapring less-used words: ', e);
+      logger.warn('Error while prepapring less-used words.', e);
       return {};
     }
   }
@@ -1079,7 +1079,7 @@ export default class OptionPage {
         this.populateDomainPage();
       } catch(e) {
         logger.warn(`Failed to remove domain '${domainsSelect.value}'.`, e);
-        OptionPage.showErrorModal(`Failed to remove domain '${domainsSelect.value}'. [Error: ${e}]`);
+        OptionPage.showErrorModal(`Failed to remove domain '${domainsSelect.value}'. [Error: ${e.message}]`);
         return false;
       }
     }
@@ -1106,8 +1106,8 @@ export default class OptionPage {
       filter.init();
       this.populateOptions();
     } catch(e) {
-      logger.warn(`Failed to remove '${originalWord} from whitelist.`, e);
-      OptionPage.showErrorModal(`Failed to remove '${originalWord} from whitelist. [Error: ${e}]`);
+      logger.warn(`Failed to remove '${originalWord}' from whitelist.`, e);
+      OptionPage.showErrorModal(`Failed to remove '${originalWord}' from whitelist. [Error: ${e.message}]`);
       return false;
     }
   }
@@ -1127,7 +1127,7 @@ export default class OptionPage {
         this.populateOptions();
       } catch(e) {
         logger.warn('Failed to remove word.', e);
-        OptionPage.showErrorModal('Failed to remove word. [Error: ${e}]');
+        OptionPage.showErrorModal(`Failed to remove word. [Error: ${e.message}]`);
       }
     }
   }
@@ -1165,7 +1165,7 @@ export default class OptionPage {
       return true;
     } catch(e) {
       logger.warn('Error restoring defaults.', e);
-      OptionPage.showErrorModal(`Error restoring defaults. [Error: ${e}]`);
+      OptionPage.showErrorModal(`Error restoring defaults. [Error: ${e.message}]`);
       return false;
     }
   }
@@ -1285,7 +1285,7 @@ export default class OptionPage {
       return true;
     } catch(e) {
       logger.warn('Settings not saved! Please try again.', e);
-      OptionPage.showErrorModal(`Settings not saved! Please try again. [Error: ${e}]`);
+      OptionPage.showErrorModal(`Settings not saved! Please try again. [Error: ${e.message}]`);
       return false;
     }
   }
@@ -1296,7 +1296,7 @@ export default class OptionPage {
       return true;
     } catch(e) {
       logger.warn(`Failed to save '${prop}'.`, e);
-      OptionPage.showErrorModal(`Failed to save '${prop}'. [Error: ${e}]`);
+      OptionPage.showErrorModal(`Failed to save '${prop}'. [Error: ${e.message}]`);
       return false;
     }
   }
@@ -1348,7 +1348,7 @@ export default class OptionPage {
           this.populateOptions();
         } catch(e) {
           logger.warn('Failed to update whitelist.', e);
-          OptionPage.showErrorModal(`Failed to update whitelist. [Error: ${e}]`);
+          OptionPage.showErrorModal(`Failed to update whitelist. [Error: ${e.message}]`);
           return false;
         }
       }
@@ -1455,7 +1455,7 @@ export default class OptionPage {
           this.populateOptions();
         } catch(e) {
           logger.warn(`Failed to update word '${word}'.`, e);
-          OptionPage.showErrorModal(`Failed to update word '${word}'. [Error: ${e}]`);
+          OptionPage.showErrorModal(`Failed to update word '${word}'. [Error: ${e.message}]`);
           this.cfg.removeWord(word);
           return false;
         }
@@ -1549,7 +1549,7 @@ export default class OptionPage {
       this.populateStats();
     } catch(e) {
       logger.warn('Failed to reset stats.', e);
-      OptionPage.showErrorModal(`Failed to reset stats. [Error: ${e}]`);
+      OptionPage.showErrorModal(`Failed to reset stats. [Error: ${e.message}]`);
     }
   }
 
@@ -1674,14 +1674,14 @@ export default class OptionPage {
         option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
         option.backupConfig();
         logger.error('Failed to cleanup old storage, backup automatically exported.', e);
-        OptionPage.showErrorModal(`Failed to cleanup old storage, backup automatically exported. [Error: ${e}]`);
+        OptionPage.showErrorModal(`Failed to cleanup old storage, backup automatically exported. [Error: ${e.message}]`);
         await option.cfg.save('syncLargeKeys');
         option.populateConfig();
       }
     } catch(e) {
       // Revert UI
       logger.error('Failed to update storage preference.', e);
-      OptionPage.showErrorModal(`Failed to update storage preference. [Error: ${e}]`);
+      OptionPage.showErrorModal(`Failed to update storage preference. [Error: ${e.message}]`);
       option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
       option.populateConfig();
     }

@@ -82,7 +82,7 @@ export default class WebConfig extends Config {
     return new Promise((resolve, reject) => {
       chrome.storage.local.get(keys, (data) => {
         chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
+          ? reject(chrome.runtime.lastError)
           : resolve(data);
       });
     });
@@ -112,7 +112,7 @@ export default class WebConfig extends Config {
     return new Promise((resolve, reject) => {
       chrome.storage.sync.get(keys, (data) => {
         chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
+          ? reject(chrome.runtime.lastError)
           : resolve(data);
       });
     });
@@ -225,7 +225,7 @@ export default class WebConfig extends Config {
     return new Promise((resolve, reject) => {
       chrome.storage.local.remove(keys, () => {
         chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
+          ? reject(chrome.runtime.lastError)
           : resolve(0);
       });
     });
@@ -237,7 +237,7 @@ export default class WebConfig extends Config {
     return new Promise((resolve, reject) => {
       chrome.storage.sync.remove(keys, () => {
         chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
+          ? reject(chrome.runtime.lastError)
           : resolve(0);
       });
     });
@@ -247,7 +247,7 @@ export default class WebConfig extends Config {
     return new Promise((resolve, reject) => {
       chrome.storage.local.clear(() => {
         chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
+          ? reject(chrome.runtime.lastError)
           : resolve(0);
       });
     });
@@ -257,7 +257,7 @@ export default class WebConfig extends Config {
     return new Promise((resolve, reject) => {
       chrome.storage.sync.clear(() => {
         chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
+          ? reject(chrome.runtime.lastError)
           : resolve(0);
       });
     });
@@ -267,7 +267,7 @@ export default class WebConfig extends Config {
     return new Promise((resolve, reject) => {
       chrome.storage.local.set(data, () => {
         chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
+          ? reject(chrome.runtime.lastError)
           : resolve(0);
       });
     });
@@ -277,7 +277,7 @@ export default class WebConfig extends Config {
     return new Promise((resolve, reject) => {
       chrome.storage.sync.set(data, () => {
         chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
+          ? reject(chrome.runtime.lastError)
           : resolve(0);
       });
     });
@@ -337,7 +337,7 @@ export default class WebConfig extends Config {
         });
       } catch(e) {
         logger.error('Failed to remove items: ', keys, e);
-        throw(`Failed to remove items: [${keys}]. ${e}`);
+        throw(`Failed to remove items: [${keys}]. ${e.message}`);
       }
     }
   }
@@ -347,8 +347,8 @@ export default class WebConfig extends Config {
       await WebConfig.resetSyncStorage();
       await WebConfig.resetLocalStorage();
     } catch(e) {
-      logger.error('Failed to clear storage: ', e);
-      throw(`Failed to clear storage: ${e}`);
+      logger.error('Failed to clear storage.', e);
+      throw(`Failed to clear storage: ${e.message}`);
     }
   }
 
@@ -357,8 +357,8 @@ export default class WebConfig extends Config {
       await WebConfig.resetSyncStorage();
       await WebConfig.removeLocalStorage(WebConfig._splittingKeys);
     } catch(e) {
-      logger.error('Failed to clear storage: ', e);
-      throw(`Failed to clear storage: ${e}`);
+      logger.error('Failed to clear storage.', e);
+      throw(`Failed to clear storage: ${e.message}`);
     }
   }
 
