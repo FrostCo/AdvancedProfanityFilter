@@ -212,7 +212,7 @@ export default class WebFilter extends Filter {
 
     this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
-    logger.info('Config loaded', this.cfg);
+    logger.info('Config loaded.', this.cfg);
 
     const backgroundData: BackgroundData = await this.getBackgroundData();
 
@@ -432,7 +432,7 @@ export default class WebFilter extends Filter {
         if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
       } catch (e) {
         if (e.message !== 'Extension context invalidated.') {
-          logger.warn('Failed to sendMessage', e);
+          logger.warn('Failed to sendMessage.', e);
         }
       }
     }
