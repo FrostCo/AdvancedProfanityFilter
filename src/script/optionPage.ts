@@ -1661,11 +1661,11 @@ export default class OptionPage {
 
       try {
         if (option.cfg.syncLargeKeys) {
-          await WebConfig.removeLocalStorage(WebConfig._splittingKeys);
+          await WebConfig.removeLocalStorage(WebConfig._largeKeys);
         } else {
           let removeKeys = [];
-          WebConfig._splittingKeys.forEach((splittingKey) => {
-            removeKeys = removeKeys.concat(WebConfig.splitKeyNames(splittingKey));
+          WebConfig._largeKeys.forEach((largeKey) => {
+            removeKeys = removeKeys.concat(WebConfig.splitKeyNames(largeKey));
           });
           await WebConfig.removeSyncStorage(removeKeys);
         }

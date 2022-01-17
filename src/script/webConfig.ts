@@ -49,7 +49,7 @@ export default class WebConfig extends Config {
   static readonly _localConfigKeys = ['domains', 'syncLargeKeys', 'words'];
   static readonly _maxBytes = 8000;
   static readonly _maxSplitKeys = 64;
-  static readonly _splittingKeys = ['domains', 'words'];
+  static readonly _largeKeys = ['domains', 'words'];
 
   static chromeStorageAvailable(): boolean {
     return !!(chrome && chrome.storage && chrome.storage.sync && chrome.storage.local);
@@ -120,7 +120,7 @@ export default class WebConfig extends Config {
   }
 
   static includesLargeKeys(keys: string[]) {
-    return keys.some((key) => { return WebConfig._splittingKeys.includes(key); });
+    return keys.some((key) => { return WebConfig._largeKeys.includes(key); });
   }
 
   // keys: Requested keys (defaults to all)
@@ -185,11 +185,11 @@ export default class WebConfig extends Config {
     if (syncKeys.length) {
       // Prepare to get large keys from sync storage if needed
       let syncKeysSplit = [].concat(syncKeys);
-      WebConfig._splittingKeys.forEach((splittingKey) => {
-        if (syncKeys.includes(splittingKey)) {
+      WebConfig._largeKeys.forEach((largeKey) => {
+        if (syncKeys.includes(largeKey)) {
           // Prepare to get split large keys (_words0..N)
-          syncKeysSplit.splice(syncKeysSplit.indexOf(splittingKey), 1);
-          syncKeysSplit = syncKeysSplit.concat(WebConfig.splitKeyNames(splittingKey));
+          syncKeysSplit.splice(syncKeysSplit.indexOf(largeKey), 1);
+          syncKeysSplit = syncKeysSplit.concat(WebConfig.splitKeyNames(largeKey));
         }
       });
 
@@ -198,7 +198,7 @@ export default class WebConfig extends Config {
 
       syncKeys.forEach((key) => {
         // If we are getting large keys from sync storage combine them
-        if (WebConfig._splittingKeys.includes(key)) {
+        if (WebConfig._largeKeys.includes(key)) {
           // Add values for large keys or fill in defaults
           const splitKeys = WebConfig.combineData(syncData, key);
           if (splitKeys) {
@@ -323,7 +323,7 @@ export default class WebConfig extends Config {
         if (key == 'syncLargeKeys') {
           // syncLargeKeys is always stored in local storage
           localKeys.push(key);
-        } else if (WebConfig._splittingKeys.includes(key)) {
+        } else if (WebConfig._largeKeys.includes(key)) {
           if (this.syncLargeKeys) {
             // Remove large keys from sync storage
             syncKeys = syncKeys.concat(WebConfig.splitKeyNames(key));
@@ -389,7 +389,7 @@ export default class WebConfig extends Config {
       if (key == 'syncLargeKeys') {
         // syncLargeKeys is always stored in local storage
         localData[key] = this[key];
-      } else if (WebConfig._splittingKeys.includes(key)) {
+      } else if (WebConfig._largeKeys.includes(key)) {
         if (this.syncLargeKeys) {
           Object.assign(syncData, this.splitData(key));
 
