@@ -555,7 +555,7 @@ export default class WebAudio {
       if (lines[i].indexOf('-->') >= 0) {
         const splitted = lines[i].split(/[ \t]+-->[ \t]+/);
         if (splitted.length != 2) {
-          throw 'Error when splitting "-->": ' + lines[i];
+          throw new Error(`Error when splitting "-->": ${lines[i]}.`);
         }
         start = splitted[0];
         end = splitted[1];
@@ -705,7 +705,7 @@ export default class WebAudio {
         const subsData = getGlobalVariable(rule.externalSubVar);
         if (Array.isArray(subsData)) {
           const found = subsData.find((subtitle) => subtitle.language === rule.videoCueLanguage);
-          if (!found) { throw (`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
+          if (!found) { throw new Error(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
           this.fetching = true;
           const subs = await makeRequest('GET', found[rule.externalSubURLKey]) as string;
           if (typeof subs == 'string' && subs) {
@@ -715,7 +715,7 @@ export default class WebAudio {
               case 'srt': parsedCues = this.parseSRT(subs); break;
               case 'vtt': parsedCues = this.parseVTT(subs); break;
               default:
-                throw (`Unsupported subtitle type: ${found[rule.externalSubFormatKey]}`);
+                throw new Error(`Unsupported subtitle type: ${found[rule.externalSubFormatKey]}.`);
             }
             if (parsedCues) {
               const track = this.newTextTrack(rule, video, parsedCues);
@@ -730,10 +730,10 @@ export default class WebAudio {
               }
             }
           } else {
-            throw (`Failed to download external subtitles from '${found[rule.externalSubURLKey]}'.`);
+            throw new Error(`Failed to download external subtitles from '${found[rule.externalSubURLKey]}'.`);
           }
         } else {
-          throw (`Failed to find subtitle variable: ${rule.externalSubVar}`);
+          throw new Error(`Failed to find subtitle variable: ${rule.externalSubVar}.`);
         }
       } catch (e) {
         logger.error(`[Audio] Error using external subtitles for ${this.siteKey}.`, e);
