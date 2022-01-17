@@ -140,90 +140,95 @@ export default class WebConfig extends Config {
       keys.push('words'); // words is not part of _defaults
     }
 
-    if (WebConfig.includesLargeKeys(keys)) {
-      // Add syncLargeKeys if any largeKeys were requested
-      if (!keys.includes('syncLargeKeys')) {
-        keys.push('syncLargeKeys');
-      }
-
-      // Load large keys from LocalStorage if necessary
-      WebConfig._localConfigKeys.forEach((localKey) => {
-        if (keys.includes(localKey)) {
-          localKeys.push(localKey);
+    try {
+      if (WebConfig.includesLargeKeys(keys)) {
+        // Add syncLargeKeys if any largeKeys were requested
+        if (!keys.includes('syncLargeKeys')) {
+          keys.push('syncLargeKeys');
         }
-      });
-      localData = await WebConfig.getLocalStorage(localKeys);
-      data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : WebConfig._defaults.syncLargeKeys;
 
-      if (data.syncLargeKeys === false) { // Use local storage for large keys
-        // Add large keys from local storage to data
-        localKeys.forEach((localKey) => {
-          // Ensure defaults
-          if (localData[localKey] === undefined) {
-            // 'words' are not included in Webconfig._defaults
-            if (localKey === 'words') {
-              data[localKey] = WebConfig._defaultWords;
-            } else {
-              data[localKey] = WebConfig._defaults[localKey];
-            }
-          } else {
-            data[localKey] = localData[localKey];
+        // Load large keys from LocalStorage if necessary
+        WebConfig._localConfigKeys.forEach((localKey) => {
+          if (keys.includes(localKey)) {
+            localKeys.push(localKey);
           }
         });
+        localData = await WebConfig.getLocalStorage(localKeys);
+        data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : WebConfig._defaults.syncLargeKeys;
 
-        // Get all keys from sync storage except the ones found in local storage
-        syncKeys = keys.filter((key) => { return !WebConfig._localConfigKeys.includes(key); });
-      } else { // Use sync storage for large keys
+        if (data.syncLargeKeys === false) { // Use local storage for large keys
+          // Add large keys from local storage to data
+          localKeys.forEach((localKey) => {
+            // Ensure defaults
+            if (localData[localKey] === undefined) {
+              // 'words' are not included in Webconfig._defaults
+              if (localKey === 'words') {
+                data[localKey] = WebConfig._defaultWords;
+              } else {
+                data[localKey] = WebConfig._defaults[localKey];
+              }
+            } else {
+              data[localKey] = localData[localKey];
+            }
+          });
+
+          // Get all keys from sync storage except the ones found in local storage
+          syncKeys = keys.filter((key) => { return !WebConfig._localConfigKeys.includes(key); });
+        } else { // Use sync storage for large keys
+          // Get all keys from sync storage (except syncLargeKeys)
+          syncKeys = keys.filter((key) => { return key !== 'syncLargeKeys'; });
+        }
+      } else {
         // Get all keys from sync storage (except syncLargeKeys)
         syncKeys = keys.filter((key) => { return key !== 'syncLargeKeys'; });
       }
-    } else {
-      // Get all keys from sync storage (except syncLargeKeys)
-      syncKeys = keys.filter((key) => { return key !== 'syncLargeKeys'; });
-    }
 
-    if (syncKeys.length) {
-      // Prepare to get large keys from sync storage if needed
-      let syncKeysSplit = [].concat(syncKeys);
-      WebConfig._largeKeys.forEach((largeKey) => {
-        if (syncKeys.includes(largeKey)) {
-          // Prepare to get split large keys (_words0..N)
-          syncKeysSplit.splice(syncKeysSplit.indexOf(largeKey), 1);
-          syncKeysSplit = syncKeysSplit.concat(WebConfig.splitKeyNames(largeKey));
-        }
-      });
+      if (syncKeys.length) {
+        // Prepare to get large keys from sync storage if needed
+        let syncKeysSplit = [].concat(syncKeys);
+        WebConfig._largeKeys.forEach((largeKey) => {
+          if (syncKeys.includes(largeKey)) {
+            // Prepare to get split large keys (_words0..N)
+            syncKeysSplit.splice(syncKeysSplit.indexOf(largeKey), 1);
+            syncKeysSplit = syncKeysSplit.concat(WebConfig.splitKeyNames(largeKey));
+          }
+        });
 
-      const syncData = await WebConfig.getSyncStorage(syncKeysSplit);
-      data._lastSplitKeys = {};
+        const syncData = await WebConfig.getSyncStorage(syncKeysSplit);
+        data._lastSplitKeys = {};
 
-      syncKeys.forEach((key) => {
-        // If we are getting large keys from sync storage combine them
-        if (WebConfig._largeKeys.includes(key)) {
-          // Add values for large keys or fill in defaults
-          const splitKeys = WebConfig.combineData(syncData, key);
-          if (splitKeys) {
-            data._lastSplitKeys[key] = WebConfig.getMaxSplitKeyFromArray(splitKeys);
-            data[key] = syncData[key];
-          } else { // Add defaults if nothing was returned
-            data._lastSplitKeys[key] = 0;
-            if (key === 'words') {
-              data[key] = WebConfig._defaultWords;
-            } else {
+        syncKeys.forEach((key) => {
+          // If we are getting large keys from sync storage combine them
+          if (WebConfig._largeKeys.includes(key)) {
+            // Add values for large keys or fill in defaults
+            const splitKeys = WebConfig.combineData(syncData, key);
+            if (splitKeys) {
+              data._lastSplitKeys[key] = WebConfig.getMaxSplitKeyFromArray(splitKeys);
+              data[key] = syncData[key];
+            } else { // Add defaults if nothing was returned
+              data._lastSplitKeys[key] = 0;
+              if (key === 'words') {
+                data[key] = WebConfig._defaultWords;
+              } else {
+                data[key] = WebConfig._defaults[key];
+              }
+            }
+          } else {
+            // Assign values to data and fill in defaults for missing keys
+            if (syncData[key] === undefined) {
               data[key] = WebConfig._defaults[key];
+            } else {
+              data[key] = syncData[key];
             }
           }
-        } else {
-          // Assign values to data and fill in defaults for missing keys
-          if (syncData[key] === undefined) {
-            data[key] = WebConfig._defaults[key];
-          } else {
-            data[key] = syncData[key];
-          }
-        }
-      });
-    }
+        });
+      }
 
-    return new WebConfig(data);
+      return new WebConfig(data);
+    } catch (e) {
+      logger.error('Failed to load items: ', keys, e);
+      throw new Error(`Failed to load items [${keys}]: [${e.message}]`);
+    }
   }
 
   static removeLocalStorage(keys: string | string[]) {
@@ -410,14 +415,19 @@ export default class WebConfig extends Config {
       }
     });
 
-    if (Object.keys(syncData).length) {
-      await WebConfig.saveSyncStorage(syncData);
-    }
-    if (Object.keys(localData).length) {
-      await WebConfig.saveLocalStorage(localData);
-    }
-    if (unusedSplitKeys.length) {
-      await this.remove(unusedSplitKeys);
+    try {
+      if (Object.keys(syncData).length) {
+        await WebConfig.saveSyncStorage(syncData);
+      }
+      if (Object.keys(localData).length) {
+        await WebConfig.saveLocalStorage(localData);
+      }
+      if (unusedSplitKeys.length) {
+        await this.remove(unusedSplitKeys);
+      }
+    } catch (e) {
+      logger.error('Failed to save items: ', keys, e);
+      throw new Error(`Failed to save items [${keys}]: [${e.message}]`);
     }
   }
 
