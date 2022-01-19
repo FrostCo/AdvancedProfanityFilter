@@ -581,6 +581,13 @@ export default class OptionPage {
 
     this.applyTheme();
     this.populateOptions();
+
+    // Route to page based on URL
+    const routePage = window.location.hash.slice(1);
+    const tab = document.querySelector(`#menu a[href="#${routePage}"]`) as HTMLAnchorElement;
+    if (tab) {
+      tab.click();
+    }
   }
 
   populateAudio() {
