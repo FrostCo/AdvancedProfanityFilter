@@ -1,5 +1,6 @@
 import Constants from './lib/constants';
 import Config from './lib/config';
+import { stringArray } from './lib/helper';
 import Logger from './lib/logger';
 const logger = new Logger();
 
@@ -128,7 +129,7 @@ export default class WebConfig extends Config {
   // localKeys: Keys to get from browser.storage.local
   // Note: syncLargeKeys will be returned when required
   static async load(keys: string | string[] = []) {
-    if (typeof keys === 'string') { keys = [keys]; }
+    keys = stringArray(keys);
     const data = {} as any;
     let localData;
     const localKeys = [];
@@ -232,7 +233,7 @@ export default class WebConfig extends Config {
   }
 
   static removeLocalStorage(keys: string | string[]) {
-    if (typeof keys === 'string') { keys = [keys]; }
+    keys = stringArray(keys);
 
     return new Promise((resolve, reject) => {
       chrome.storage.local.remove(keys, () => {
@@ -244,7 +245,7 @@ export default class WebConfig extends Config {
   }
 
   static removeSyncStorage(keys: string | string[]) {
-    if (typeof keys === 'string') { keys = [keys]; }
+    keys = stringArray(keys);
 
     return new Promise((resolve, reject) => {
       chrome.storage.sync.remove(keys, () => {
@@ -319,7 +320,7 @@ export default class WebConfig extends Config {
 
   // Note: Defaults are not automatically loaded after removing an item
   async remove(keys: string | string[]) {
-    if (typeof keys === 'string') { keys = [keys]; }
+    keys = stringArray(keys);
     let syncKeys = [];
     const localKeys = [];
 
@@ -379,7 +380,7 @@ export default class WebConfig extends Config {
   }
 
   async save(keys: string | string[] = []) {
-    if (typeof keys === 'string') { keys = [keys]; }
+    keys = stringArray(keys);
     const syncData = {};
     const localData = {};
 

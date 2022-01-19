@@ -185,6 +185,14 @@ export function secondsToHMS(seconds: number): string {
   return new Date(seconds * 1000).toISOString().substr(11, 12);
 }
 
+export function stringArray(data: string | string[]): string[] {
+  if (typeof data === 'string') {
+    data = [data];
+  }
+
+  return data;
+}
+
 export function upperCaseFirst(str: string, lowerCaseRest: boolean = true): string {
   let value = str.charAt(0).toUpperCase();
   value += lowerCaseRest ? str.toLowerCase().slice(1) : str.slice(1);
