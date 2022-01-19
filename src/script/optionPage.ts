@@ -1,5 +1,5 @@
 import Constants from './lib/constants';
-import { booleanToNumber, dynamicList, exportToFile, numberToBoolean, numberWithCommas, readFile, removeChildren, removeFromArray, upperCaseFirst } from './lib/helper';
+import { booleanToNumber, dynamicList, exportToFile, numberToBoolean, numberWithCommas, readFile, removeChildren, removeFromArray, stringArray, upperCaseFirst } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
 import Domain from './domain';
@@ -68,17 +68,21 @@ export default class OptionPage {
     }
   }
 
-  static configureStatusModal(content: string, title: string, titleColor: string) {
+  static configureStatusModal(content: string | string[], title: string, titleColor: string) {
     const modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
     const modalContent = document.getElementById('statusModalContent') as HTMLElement;
     const modalHeader = document.querySelector('#statusModal header') as HTMLElement;
-    const contentElement = document.createElement('span');
     removeChildren(modalContent);
 
-    modalTitle.textContent = title;
-    contentElement.textContent = content;
-    modalContent.appendChild(contentElement);
     modalHeader.className = `w3-container ${titleColor}`;
+    modalTitle.textContent = title;
+
+    content = stringArray(content);
+    content.forEach((textPart) => {
+      const contentElement = document.createElement('p') as HTMLParagraphElement;
+      contentElement.textContent = textPart;
+      modalContent.appendChild(contentElement);
+    });
   }
 
   static disableBtn(element: HTMLElement) {
@@ -119,7 +123,7 @@ export default class OptionPage {
     element.classList.add('w3-show');
   }
 
-  static showErrorModal(content = 'The requested action failed. Please try again or contact support.', title = 'Error', titleColor = 'w3-red') {
+  static showErrorModal(content: string | string[] = ['The requested action failed. Please try again or contact support.'], title = 'Error', titleColor = 'w3-red') {
     this.configureStatusModal(content, title, titleColor);
     OptionPage.openModal('statusModal');
   }
@@ -136,12 +140,12 @@ export default class OptionPage {
     }
   }
 
-  static showStatusModal(content = 'Status updated.', title = 'Status', titleColor = 'w3-flat-peter-river') {
+  static showStatusModal(content: string | string[] = ['Status updated.'], title = 'Status', titleColor = 'w3-flat-peter-river') {
     this.configureStatusModal(content, title, titleColor);
     OptionPage.openModal('statusModal');
   }
 
-  static showWarningModal(content = 'Invalid input.', title = 'Warning', titleColor = 'w3-orange') {
+  static showWarningModal(content: string | string[] = ['Invalid input.'], title = 'Warning', titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
     OptionPage.openModal('statusModal');
   }
