@@ -1673,6 +1673,7 @@ export default class OptionPage {
           });
           await WebConfig.removeSyncStorage(removeKeys);
         }
+        OptionPage.showStatusModal('Storage converted successfully.');
       } catch (e) {
         // Revert UI and export a backup of config.
         option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
