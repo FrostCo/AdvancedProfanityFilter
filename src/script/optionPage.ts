@@ -1658,7 +1658,7 @@ export default class OptionPage {
   async convertStorageLocation() {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
-    const keys = ['syncLargeKeys'].concat(WebConfig._splittingKeys);
+    const keys = WebConfig._localConfigKeys;
 
     try {
       await option.cfg.save(keys);
