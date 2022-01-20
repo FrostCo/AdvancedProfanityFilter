@@ -95,6 +95,16 @@ export default class OptionPage {
     element.classList.remove('w3-flat-silver');
   }
 
+  static handleError(message: string, error?: Error) {
+    if (error) {
+      logger.error(message, error);
+      OptionPage.showErrorModal([message, `Error: ${error.message}`]);
+    } else {
+      logger.error(message);
+      OptionPage.showErrorModal([message]);
+    }
+  }
+
   static hide(element: HTMLElement) {
     element.classList.remove('w3-show');
     element.classList.add('w3-hide');
@@ -1157,11 +1167,12 @@ export default class OptionPage {
       }
 
       this.cfg.wordlists[index] = name;
-      if (await this.saveProp('wordlists')) {
+      try {
+        await this.cfg.save('wordlists');
         this.populateWordlists(index);
         this.populateWordPage();
-      } else {
-        OptionPage.showErrorModal('Failed to save name.');
+      } catch (e) {
+        OptionPage.handleError('Failed to save wordlist name.', e);
       }
     } else {
       OptionPage.showInputError(wordlistText, 'Please enter a valid name.');
@@ -1186,12 +1197,11 @@ export default class OptionPage {
     try {
       const text = customAudioSitesTextArea.value;
       this.cfg.customAudioSites = text == '' ? null : JSON.parse(text);
-      if (await this.saveProp('customAudioSites')) {
-        customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
-        OptionPage.showStatusModal('Custom Audio Sites saved.');
-      }
+      await this.cfg.save('customAudioSites');
+      customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
+      OptionPage.showStatusModal('Custom Audio Sites saved.');
     } catch (e) {
-      OptionPage.showErrorModal('Failed to save custom audio sites. Please make sure it is valid JSON.');
+      OptionPage.handleError('Failed to save custom audio sites. Please make sure it is valid JSON.', e);
     }
   }
 
@@ -1297,17 +1307,6 @@ export default class OptionPage {
     } catch (e) {
       logger.warn('Settings not saved! Please try again.', e);
       OptionPage.showErrorModal(['Settings not saved! Please try again.', `Error: ${e.message}`]);
-      return false;
-    }
-  }
-
-  async saveProp(prop: string) {
-    try {
-      await this.cfg.save(prop);
-      return true;
-    } catch (e) {
-      logger.warn(`Failed to save '${prop}'.`, e);
-      OptionPage.showErrorModal([`Failed to save '${prop}'.`, `Error: ${e.message}`]);
       return false;
     }
   }
@@ -1480,9 +1479,12 @@ export default class OptionPage {
 
   async selectFilterMethod(evt) {
     this.cfg.filterMethod = Constants.FILTER_METHODS[evt.target.value];
-    if (await this.saveProp('filterMethod')) {
+    try {
+      await this.cfg.save('filterMethod');
       filter.rebuildWordlists();
       this.populateOptions();
+    } catch (e) {
+      OptionPage.handleError('Failed to set filter method.', e);
     }
   }
 
@@ -1490,12 +1492,12 @@ export default class OptionPage {
     const prop = element.id === 'textWordlistSelect' ? 'wordlistId' : 'audioWordlistId';
     this.cfg[prop] = element.selectedIndex;
 
-    if (!await this.saveProp(prop)) {
-      OptionPage.showErrorModal('Failed to update defult wordlist.');
-      return false;
+    try {
+      await this.cfg.save(prop);
+      this.populateOptions();
+    } catch (e) {
+      OptionPage.showErrorModal('Failed to update defult wordlist.', e);
     }
-
-    this.populateOptions();
   }
 
   showBulkWordEditor() {
@@ -1685,15 +1687,13 @@ export default class OptionPage {
         // Revert UI and export a backup of config.
         option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
         option.backupConfig();
-        logger.error('Failed to cleanup old storage, backup automatically exported.', e);
-        OptionPage.showErrorModal(['Failed to cleanup old storage, backup automatically exported.', `Error: ${e.message}`]);
+        OptionPage.handleError('Failed to cleanup old storage, backup automatically exported.', e);
         await option.cfg.save('syncLargeKeys');
         option.populateConfig();
       }
     } catch (e) {
       // Revert UI
-      logger.error('Failed to update storage preference.', e);
-      OptionPage.showErrorModal(['Failed to update storage preference.', `Error: ${e.message}`]);
+      OptionPage.handleError('Failed to update storage preference.', e);
       option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
       option.populateConfig();
     }
@@ -1709,8 +1709,12 @@ export default class OptionPage {
         OptionPage.showInputError(target, 'Min must be less than max.');
       } else {
         const prop = updateMin ? 'youTubeAutoSubsMin' : 'youTubeAutoSubsMax';
-        this.cfg[prop] = parseFloat(target.value);
-        await this.saveProp(prop);
+        try {
+          this.cfg[prop] = parseFloat(target.value);
+          await this.cfg.save(prop);
+        } catch (e) {
+          OptionPage.handleError(`Failed to save '${prop}'.`, e);
+        }
       }
     } else {
       OptionPage.showInputError(target, 'Please enter a valid number of seconds.');

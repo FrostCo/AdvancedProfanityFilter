@@ -20,12 +20,16 @@ export default class OptionAuth {
     this.authenticated = false;
   }
 
-  setPassword(optionPage: OptionPage) {
+  async setPassword(optionPage: OptionPage) {
     const password = document.getElementById('setPassword') as HTMLInputElement;
     optionPage.cfg.password = password.value;
-    optionPage.saveProp('password');
-    password.value = '';
-    this.setPasswordButton(optionPage);
+    try {
+      await optionPage.cfg.save('password');
+      password.value = '';
+      this.setPasswordButton(optionPage);
+    } catch (e) {
+      OptionPage.handleError('Failed to update password.', e);
+    }
   }
 
   setPasswordButton(optionPage: OptionPage) {
