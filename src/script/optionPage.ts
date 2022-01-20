@@ -458,11 +458,10 @@ export default class OptionPage {
         cancel.addEventListener('click', populateConfig);
         ok.addEventListener('click', option.convertStorageLocation);
         break;
-      case 'importConfig': {
+      case 'importConfig':
         OptionPage.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
         ok.addEventListener('click', importConfig);
         break;
-      }
       case 'removeAllWords':
         content = document.createElement('span');
         italics = document.createElement('i');
