@@ -563,7 +563,7 @@ export default class OptionPage {
           this.cfg = importedCfg;
           await this.cfg.save();
           OptionPage.showStatusModal('Settings imported successfully.');
-          this.init();
+          await this.init();
         } catch (e) {
           logger.warn('Failed to import settings.', e);
           OptionPage.showErrorModal(['Failed to import settings.', `Error: ${e.message}`]);
@@ -1182,7 +1182,7 @@ export default class OptionPage {
     try {
       await this.cfg.resetPreserveStats();
       if (!silent) OptionPage.showStatusModal('Default settings restored.');
-      this.init();
+      await this.init();
       return true;
     } catch (e) {
       logger.warn('Failed to restore defaults.', e);
@@ -1301,7 +1301,7 @@ export default class OptionPage {
     // Save settings
     try {
       await this.cfg.save();
-      this.init();
+      await this.init();
       return true;
     } catch (e) {
       logger.warn('Settings not saved! Please try again.', e);
