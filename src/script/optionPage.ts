@@ -346,8 +346,23 @@ export default class OptionPage {
       filter.rebuildWordlists();
       this.populateOptions();
     } catch (e) {
-      logger.warn('Failed to save.', e);
-      OptionPage.showErrorModal(['Failed to save.', `Error: ${e.message}`]);
+      if (e.message.includes('QUOTA_BYTES quota exceeded') && this.cfg.syncLargeKeys) {
+        this.confirm(new Event('z'), 'bulkEditorSaveRetry');
+      } else {
+        logger.warn('Failed to save.', e);
+        OptionPage.showErrorModal(['Failed to save.', `Error: ${e.message}`]);
+      }
+    }
+  }
+
+  async bulkEditorSaveRetry() {
+    const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
+    configSyncLargeKeys.checked = false;
+    try {
+      await this.convertStorageLocation();
+      await this.bulkEditorSave();
+    } catch (e) {
+      OptionPage.handleError('Failed to save.', e);
     }
   }
 
@@ -424,8 +439,10 @@ export default class OptionPage {
     cancel.removeEventListener('click', populateConfig);
     const ok = document.getElementById('confirmModalOK');
     ok.removeEventListener('click', bulkEditorSave);
+    ok.removeEventListener('click', bulkEditorSaveRetry);
     ok.removeEventListener('click', convertStorageLocation);
     ok.removeEventListener('click', importConfig);
+    ok.removeEventListener('click', importConfigRetry);
     ok.removeEventListener('click', removeAllWords);
     ok.removeEventListener('click', restoreDefaults);
     ok.removeEventListener('click', setPassword);
@@ -444,6 +461,15 @@ export default class OptionPage {
         OptionPage.configureConfirmModal({ backup: true }, content);
         ok.addEventListener('click', bulkEditorSave);
         break;
+      case 'bulkEditorSaveRetry':
+        content = document.createElement('span');
+        italics = document.createElement('i');
+        content.textContent = 'Failed to save changes because they were too large to be stored. Retry using local storage?\n\n';
+        italics.textContent = 'Local storage can store more, but things like words and domains will no longer sync between devices.';
+        content.appendChild(italics);
+        OptionPage.configureConfirmModal({ backup: true, titleClass: 'w3-red' }, content);
+        ok.addEventListener('click', bulkEditorSaveRetry);
+        break;
       case 'convertStorageLocation':
         content = document.createElement('span');
         italics = document.createElement('i');
@@ -461,6 +487,15 @@ export default class OptionPage {
       case 'importConfig':
         OptionPage.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
         ok.addEventListener('click', importConfig);
+        break;
+      case 'importConfigRetry':
+        content = document.createElement('span');
+        italics = document.createElement('i');
+        content.textContent = 'Import failed due to storage limitations. Would you like to try again using local storage?\n\n';
+        italics.textContent = 'Local storage can store more, but things like words and domains will no longer sync between devices.';
+        content.appendChild(italics);
+        OptionPage.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
+        ok.addEventListener('click', importConfigRetry);
         break;
       case 'removeAllWords':
         content = document.createElement('span');
@@ -552,6 +587,19 @@ export default class OptionPage {
     importFileInput.value = '';
   }
 
+  async importConfigRetry() {
+    const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
+    configSyncLargeKeys.checked = false;
+    try {
+      await this.convertStorageLocation();
+      await this.cfg.save();
+      OptionPage.showStatusModal('Settings imported successfully.');
+      await this.init();
+    } catch (e) {
+      OptionPage.handleError('Failed to import config.', e);
+    }
+  }
+
   async importConfigText(cfg: string) {
     try {
       const importedCfg = new WebConfig(JSON.parse(cfg));
@@ -565,8 +613,11 @@ export default class OptionPage {
           OptionPage.showStatusModal('Settings imported successfully.');
           await this.init();
         } catch (e) {
-          logger.warn('Failed to import settings.', e);
-          OptionPage.showErrorModal(['Failed to import settings.', `Error: ${e.message}`]);
+          if (e.message.includes('QUOTA_BYTES quota exceeded') && this.cfg.syncLargeKeys) {
+            this.confirm(new Event('z'), 'importConfigRetry');
+          } else {
+            OptionPage.handleError('Failed to import settings.', e);
+          }
         }
       }
     } catch (e) {
@@ -1742,7 +1793,9 @@ let lessUsedWords = {};
 // Events
 // Functions
 function bulkEditorSave(e) { option.bulkEditorSave(); }
+function bulkEditorSaveRetry() { option.bulkEditorSaveRetry(); }
 function importConfig(e) { option.importConfig(e); }
+function importConfigRetry() { option.importConfigRetry(); }
 function populateConfig(e) { option.populateConfig(); }
 function convertStorageLocation(e) { option.convertStorageLocation(); }
 function removeAllWords(e) { option.removeAllWords(e); }
