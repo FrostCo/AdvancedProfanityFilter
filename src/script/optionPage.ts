@@ -134,6 +134,21 @@ export default class OptionPage {
     OptionPage.hide(notificationPanel);
   }
 
+  static isStorageError(error: Error): boolean {
+    if (error.message) {
+      const chromeQuotaError = '[QUOTA_BYTES quota exceeded]';
+      const firefoxQuotaError = '[QuotaExceededError: storage.sync API call exceeded its quota limitations.]';
+      const safariQuotaError = 'Storage quota exceeded.';
+      return (
+        error.message.includes(chromeQuotaError)
+        || error.message.includes(firefoxQuotaError)
+        || error.message.includes(safariQuotaError)
+      );
+    }
+
+    return false;
+  }
+
   static openModal(id: string) {
     OptionPage.show(document.getElementById(id));
   }
@@ -356,7 +371,7 @@ export default class OptionPage {
       filter.rebuildWordlists();
       this.populateOptions();
     } catch (e) {
-      if (e.message.includes('QUOTA_BYTES quota exceeded') && this.cfg.syncLargeKeys) {
+      if (OptionPage.isStorageError(e) && this.cfg.syncLargeKeys) {
         this.confirm(new Event('z'), 'bulkEditorSaveRetry');
       } else {
         logger.warn('Failed to save.', e);
@@ -623,7 +638,7 @@ export default class OptionPage {
           OptionPage.showStatusModal('Settings imported successfully.');
           await this.init();
         } catch (e) {
-          if (e.message.includes('QUOTA_BYTES quota exceeded') && this.cfg.syncLargeKeys) {
+          if (OptionPage.isStorageError(e) && this.cfg.syncLargeKeys) {
             this.confirm(new Event('z'), 'importConfigRetry');
           } else {
             OptionPage.handleError('Failed to import settings.', e);
