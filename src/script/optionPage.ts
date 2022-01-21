@@ -1,5 +1,4 @@
 import Constants from './lib/constants';
-import { booleanToNumber, dynamicList, exportToFile, numberToBoolean, numberWithCommas, readFile, removeChildren, removeFromArray, stringArray, upperCaseFirst } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
 import Domain from './domain';
@@ -8,6 +7,18 @@ import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
 import WebAudioSites from './webAudioSites';
 import Logger from './lib/logger';
+import {
+  booleanToNumber,
+  dynamicList,
+  exportToFile,
+  numberToBoolean,
+  numberWithCommas,
+  readFile,
+  removeChildren,
+  removeFromArray,
+  stringArray,
+  upperCaseFirst
+} from './lib/helper';
 const logger = new Logger();
 
 export default class OptionPage {
