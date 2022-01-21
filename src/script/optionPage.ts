@@ -19,7 +19,6 @@ import {
   stringArray,
   upperCaseFirst
 } from './lib/helper';
-const logger = new Logger();
 
 export default class OptionPage {
   auth: OptionAuth;
@@ -1796,6 +1795,7 @@ export default class OptionPage {
   }
 }
 
+const logger = new Logger();
 const filter = new Filter;
 const option = new OptionPage;
 let lessUsedWords = {};
