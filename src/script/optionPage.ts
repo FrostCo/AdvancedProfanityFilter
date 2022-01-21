@@ -372,7 +372,7 @@ export default class OptionPage {
       this.populateOptions();
     } catch (err) {
       if (OptionPage.isStorageError(err) && this.cfg.syncLargeKeys) {
-        this.confirm(new Event('z'), 'bulkEditorSaveRetry');
+        this.confirm('bulkEditorSaveRetry');
       } else {
         logger.warn('Failed to save.', err);
         OptionPage.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
@@ -384,7 +384,7 @@ export default class OptionPage {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     configSyncLargeKeys.checked = false;
     try {
-      await this.convertStorageLocation(noopEvent, true);
+      await this.convertStorageLocation(true);
       await this.bulkEditorSave();
     } catch (err) {
       OptionPage.handleError('Failed to save.', err);
@@ -463,7 +463,7 @@ export default class OptionPage {
     }
   }
 
-  async confirm(evt: Event, action: string) {
+  async confirm(action: string) {
     const cancel = document.getElementById('confirmModalCancel');
     cancel.removeEventListener('click', populateConfig);
     cancel.removeEventListener('click', importConfigRetryCancel);
@@ -512,7 +512,7 @@ export default class OptionPage {
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: true }, content);
         cancel.addEventListener('click', populateConfig);
-        ok.addEventListener('click', option.convertStorageLocation);
+        ok.addEventListener('click', convertStorageLocation);
         break;
       case 'importConfig':
         OptionPage.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
@@ -622,7 +622,7 @@ export default class OptionPage {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     configSyncLargeKeys.checked = false;
     try {
-      await this.convertStorageLocation(noopEvent, true);
+      await this.convertStorageLocation(true);
       await this.cfg.save();
       OptionPage.showStatusModal('Settings imported successfully.');
       await this.init();
@@ -645,7 +645,7 @@ export default class OptionPage {
           await this.init();
         } catch (err) {
           if (OptionPage.isStorageError(err) && this.cfg.syncLargeKeys) {
-            this.confirm(new Event('z'), 'importConfigRetry');
+            this.confirm('importConfigRetry');
           } else {
             OptionPage.handleError('Failed to import settings.', err);
           }
@@ -1745,7 +1745,7 @@ export default class OptionPage {
     }
   }
 
-  async convertStorageLocation(event?: Event, silent = false) {
+  async convertStorageLocation(silent = false) {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
     const keys = WebConfig._localConfigKeys;
@@ -1828,18 +1828,18 @@ let lessUsedWords = {};
 ////
 // Events
 // Functions for confirm() to have access to `this`
-function bulkEditorSave(e) { option.bulkEditorSave(); }
+function bulkEditorSave() { option.bulkEditorSave(); }
 function bulkEditorSaveRetry() { option.bulkEditorSaveRetry(); }
-function importConfig(e) { option.importConfig(e); }
+function importConfig() { option.importConfig(); }
 function importConfigRetry() { option.importConfigRetry(); }
-function importConfigRetryCancel(evt) { option.importConfigRetryCancel(); }
-function populateConfig(e) { option.populateConfig(); }
-function convertStorageLocation(e) { option.convertStorageLocation(); }
-function removeAllWords(e) { option.removeAllWords(e); }
-function removeLessUsedWords(e) { option.removeLessUsedWords(); }
-function restoreDefaults(e) { option.restoreDefaults(e); }
-function setPassword(e) { option.auth.setPassword(); }
-function statsReset(e) { option.statsReset(); }
+function importConfigRetryCancel() { option.importConfigRetryCancel(); }
+function populateConfig() { option.populateConfig(); }
+function convertStorageLocation() { option.convertStorageLocation(); }
+function removeAllWords() { option.removeAllWords(); }
+function removeLessUsedWords() { option.removeLessUsedWords(); }
+function restoreDefaults() { option.restoreDefaults(); }
+function setPassword() { option.auth.setPassword(); }
+function statsReset() { option.statsReset(); }
 // Add event listeners to DOM
 window.addEventListener('load', (e) => { option.init(); });
 document.querySelectorAll('#menu a').forEach((el) => { el.addEventListener('click', (e) => { option.switchPage(e); }); });
@@ -1854,7 +1854,7 @@ document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListe
 document.querySelector('#bulkWordEditorModal button.modalAddWord').addEventListener('click', (e) => { option.bulkEditorAddRow(); });
 document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEventListener('click', (e) => { option.bulkEditorAddWords(); });
 document.querySelector('#bulkWordEditorModal button.modalCancel').addEventListener('click', (e) => { OptionPage.closeModal('bulkWordEditorModal'); });
-document.querySelector('#bulkWordEditorModal button.modalSave').addEventListener('click', (e) => { option.confirm(e, 'bulkEditorSave'); });
+document.querySelector('#bulkWordEditorModal button.modalSave').addEventListener('click', (e) => { option.confirm('bulkEditorSave'); });
 // Settings
 document.querySelectorAll('#filterMethod input').forEach((el) => { el.addEventListener('click', (e) => { option.selectFilterMethod(e); }); });
 document.getElementById('censorCharacterSelect').addEventListener('change', (e) => { option.saveOptions(e); });
@@ -1877,7 +1877,7 @@ document.getElementById('wordText').addEventListener('input', (e) => { OptionPag
 document.getElementById('substitutionText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
 document.getElementById('wordSave').addEventListener('click', (e) => { option.saveWord(e); });
 document.getElementById('wordRemove').addEventListener('click', (e) => { option.removeWord(e); });
-document.getElementById('wordRemoveAll').addEventListener('click', (e) => { option.confirm(e, 'removeAllWords'); });
+document.getElementById('wordRemoveAll').addEventListener('click', (e) => { option.confirm('removeAllWords'); });
 document.getElementById('bulkWordEditorButton').addEventListener('click', (e) => { option.showBulkWordEditor(); });
 // Lists
 document.getElementById('whitelist').addEventListener('change', (e) => { option.populateWhitelistWord(); });
@@ -1912,20 +1912,20 @@ document.getElementById('bookmarkletFile').addEventListener('click', (e) => { op
 document.getElementById('bookmarkletHostedURL').addEventListener('input', (e) => { option.updateHostedBookmarklet(); });
 document.getElementById('bookmarkletLink').addEventListener('click', (e) => { e.preventDefault(); });
 // Config
-document.getElementById('configSyncLargeKeys').addEventListener('click', (e) => { option.confirm(e, 'convertStorageLocation'); });
+document.getElementById('configSyncLargeKeys').addEventListener('click', (e) => { option.confirm('convertStorageLocation'); });
 document.getElementById('configInlineInput').addEventListener('click', (e) => { option.configInlineToggle(); });
 document.getElementById('importFileInput').addEventListener('change', (e) => { option.importConfigFile(e); });
-document.getElementById('configReset').addEventListener('click', (e) => { option.confirm(e, 'restoreDefaults'); });
+document.getElementById('configReset').addEventListener('click', (e) => { option.confirm('restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', (e) => { option.exportConfig(); });
-document.getElementById('configImport').addEventListener('click', (e) => { option.confirm(e, 'importConfig'); });
+document.getElementById('configImport').addEventListener('click', (e) => { option.confirm('importConfig'); });
 document.getElementById('setPassword').addEventListener('input', (e) => { option.auth.setPasswordButton(); });
-document.getElementById('setPasswordBtn').addEventListener('click', (e) => { option.confirm(e, 'setPassword'); });
+document.getElementById('setPasswordBtn').addEventListener('click', (e) => { option.confirm('setPassword'); });
 // Test
 document.getElementById('testText').addEventListener('input', (e) => { option.populateTest(); });
 // Stats
 document.getElementById('collectStats').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('statsReset').addEventListener('click', (e) => { option.confirm(e, 'statsReset'); });
+document.getElementById('statsReset').addEventListener('click', (e) => { option.confirm('statsReset'); });
 document.getElementById('lessUsedWordsNumber').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
-document.getElementById('removeLessUsedWords').addEventListener('click', (e) => { option.confirm(e, 'removeLessUsedWords'); });
+document.getElementById('removeLessUsedWords').addEventListener('click', (e) => { option.confirm('removeLessUsedWords'); });
 // Other
 document.getElementsByClassName('themes')[0].addEventListener('click', (e) => { option.toggleTheme(); });
