@@ -1877,7 +1877,7 @@ document.getElementById('muteAudioOnly').addEventListener('click', (e) => { opti
 document.getElementById('muteCueRequireShowing').addEventListener('click', (e) => { option.saveOptions(); });
 document.querySelectorAll('#audioMuteMethod input').forEach((el) => { el.addEventListener('click', (e) => { option.saveOptions(); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach((el) => { el.addEventListener('click', (e) => { option.saveOptions(); }); });
-document.querySelectorAll('input.updateYouTubeAutoLimits').forEach((el) => { el.addEventListener('input', (e) => { option.updateYouTubeAutoLimits(e.target as HTMLInputElement); }); });
+document.querySelectorAll('input.audioYouTubeAutoSubs').forEach((el) => { el.addEventListener('input', (e) => { option.updateYouTubeAutoLimits(e.target as HTMLInputElement); }); });
 document.getElementById('customAudioSitesSave').addEventListener('click', (e) => { option.saveCustomAudioSites(); });
 // Bookmarklet
 document.querySelectorAll('#bookmarkletConfigInputs input').forEach((el) => { el.addEventListener('click', (e) => { option.populateBookmarkletPage(); }); });
