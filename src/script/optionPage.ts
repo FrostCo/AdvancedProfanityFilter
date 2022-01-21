@@ -1717,34 +1717,6 @@ export default class OptionPage {
     }
   }
 
-  updateItemList(evt, input, attr: string, invalidMessage: string, original = ''): boolean {
-    const item = input.value.trim().toLowerCase();
-    if (item == '') { // No data
-      OptionPage.showInputError(input, 'Please enter a value.');
-      return false;
-    } else {
-      if (input.checkValidity()) {
-        OptionPage.hideInputError(input);
-        if (!this.cfg[attr].includes(item)) {
-          if (original != '' && this.cfg[attr].includes(original)) {
-            // Update existing record (remove it before adding the new record)
-            this.cfg[attr].splice(this.cfg[attr].indexOf(original), 1);
-          }
-          // Save new record
-          this.cfg[attr].push(item);
-          this.cfg[attr] = this.cfg[attr].sort();
-          return true;
-        } else {
-          OptionPage.showInputError(input, 'Already in list.');
-          return false;
-        }
-      } else {
-        OptionPage.showInputError(input, invalidMessage);
-        return false;
-      }
-    }
-  }
-
   async convertStorageLocation(silent = false) {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
