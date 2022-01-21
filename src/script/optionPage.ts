@@ -1741,17 +1741,17 @@ export default class OptionPage {
         if (!silent) {
           OptionPage.showStatusModal('Storage converted successfully.');
         }
-      } catch (e) {
+      } catch (err) {
         // Revert UI and export a backup of config.
         option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
         option.backupConfig();
-        OptionPage.handleError('Failed to cleanup old storage, backup automatically exported.', e);
+        OptionPage.handleError('Failed to cleanup old storage, backup automatically exported.', err);
         await option.cfg.save('syncLargeKeys');
         option.populateConfig();
       }
-    } catch (e) {
+    } catch (err) {
       // Revert UI
-      OptionPage.handleError('Failed to update storage preference.', e);
+      OptionPage.handleError('Failed to update storage preference.', err);
       option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
       option.populateConfig();
     }
@@ -1770,8 +1770,8 @@ export default class OptionPage {
         try {
           this.cfg[prop] = parseFloat(input.value);
           await this.cfg.save(prop);
-        } catch (e) {
-          OptionPage.handleError(`Failed to save '${prop}'.`, e);
+        } catch (err) {
+          OptionPage.handleError(`Failed to save '${prop}'.`, err);
         }
       }
     } else {
