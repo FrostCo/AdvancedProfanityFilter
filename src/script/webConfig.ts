@@ -45,12 +45,19 @@ export default class WebConfig extends Config {
   };
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  static readonly QUOTA_BYTES_PER_ITEM = 8192; // https://developer.chrome.com/apps/storage chrome.storage.sync.QUOTA_BYTES_PER_ITEM
   static readonly _defaults = Object.assign({}, Config._defaults, WebConfig._classDefaults);
   static readonly _localConfigKeys = ['domains', 'syncLargeKeys', 'words'];
-  static readonly _maxBytes = 8000;
   static readonly _maxSplitKeys = 64;
   static readonly _largeKeys = ['domains', 'words'];
+
+  static get _maxBytes() {
+    try {
+      return Math.round(chrome.storage.sync.QUOTA_BYTES_PER_ITEM * .98);
+    } catch (e) {
+      // 8192 https://developer.chrome.com/apps/storage
+      return 8028;
+    }
+  }
 
   static chromeStorageAvailable(): boolean {
     return !!(chrome && chrome.storage && chrome.storage.sync && chrome.storage.local);
