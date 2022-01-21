@@ -391,6 +391,10 @@ export default class OptionPage {
     }
   }
 
+  async importConfigRetryCancel() {
+    await option.init();
+  }
+
   bulkEditorWordlistCheckbox(event) {
     const checked = (event.target as HTMLInputElement).checked;
     document.querySelectorAll(`#bulkWordEditorModal table td input.wordlistData[data-col="${event.target.dataset.col}"]`).forEach((box: HTMLInputElement) => {
@@ -462,6 +466,7 @@ export default class OptionPage {
   async confirm(evt: Event, action: string) {
     const cancel = document.getElementById('confirmModalCancel');
     cancel.removeEventListener('click', populateConfig);
+    cancel.removeEventListener('click', option.importConfigRetryCancel);
     const ok = document.getElementById('confirmModalOK');
     ok.removeEventListener('click', bulkEditorSave);
     ok.removeEventListener('click', bulkEditorSaveRetry);
@@ -521,6 +526,7 @@ export default class OptionPage {
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
         ok.addEventListener('click', importConfigRetry);
+        cancel.addEventListener('click', option.importConfigRetryCancel);
         break;
       case 'removeAllWords':
         content = document.createElement('span');
