@@ -27,8 +27,8 @@ export default class OptionAuth {
       await optionPage.cfg.save('password');
       password.value = '';
       this.setPasswordButton(optionPage);
-    } catch (e) {
-      OptionPage.handleError('Failed to update password.', e);
+    } catch (err) {
+      OptionPage.handleError('Failed to update password.', err);
     }
   }
 

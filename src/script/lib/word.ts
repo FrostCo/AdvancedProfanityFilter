@@ -138,8 +138,8 @@ export default class Word {
             }
           }
       }
-    } catch (e) {
-      throw new Error('Failed to create RegExp for "' + this.value + '" - ' + e.name + ' ' + e.message);
+    } catch (err) {
+      throw new Error(`Failed to create RegExp for '${this.value}'. [${err.name}: ${err.message}]`);
     }
   }
 

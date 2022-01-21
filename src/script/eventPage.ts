@@ -135,8 +135,8 @@ async function processSelection(action: string, selection: string) {
     try {
       await cfg.save('words');
       chrome.tabs.reload();
-    } catch (e) {
-      logger.errorTime(`Failed to process selection '${selection}'.`, e);
+    } catch (err) {
+      logger.errorTime(`Failed to process selection '${selection}'.`, err);
     }
   }
 }
@@ -190,8 +190,8 @@ async function toggleDomain(hostname: string, action: string) {
   try {
     await domain.save(cfg);
     chrome.tabs.reload();
-  } catch (e) {
-    logger.error(`Failed to modify '${action}' for domain '${domain.cfgKey}'.`, e, domain);
+  } catch (err) {
+    logger.error(`Failed to modify '${action}' for domain '${domain.cfgKey}'.`, err, domain);
   }
 }
 

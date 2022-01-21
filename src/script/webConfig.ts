@@ -53,7 +53,7 @@ export default class WebConfig extends Config {
   static get _maxBytes() {
     try {
       return Math.round(chrome.storage.sync.QUOTA_BYTES_PER_ITEM * .98);
-    } catch (e) {
+    } catch (err) {
       // 8192 https://developer.chrome.com/apps/storage
       return 8028;
     }
@@ -233,9 +233,9 @@ export default class WebConfig extends Config {
       }
 
       return new WebConfig(data);
-    } catch (e) {
-      logger.error('Failed to load items: ', keys, e);
-      throw new Error(`Failed to load items [${keys}]: [${e.message}]`);
+    } catch (err) {
+      logger.error('Failed to load items: ', keys, err);
+      throw new Error(`Failed to load items [${keys}]: [${err.message}]`);
     }
   }
 
@@ -310,7 +310,7 @@ export default class WebConfig extends Config {
   // Call load() to create a new instance
   constructor(config) {
     if (typeof config === 'undefined') {
-      throw new Error('Cannot be called directly. call load()');
+      throw new Error('Cannot be called directly, call load() instead.');
     }
 
     super(); // Get the Config defaults
@@ -359,9 +359,9 @@ export default class WebConfig extends Config {
         keys.forEach((key) => {
           delete this[key];
         });
-      } catch (e) {
-        logger.error('Failed to remove items: ', keys, e);
-        throw new Error(`Failed to remove items: [${keys}]. ${e.message}`);
+      } catch (err) {
+        logger.error('Failed to remove items: ', keys, err);
+        throw new Error(`Failed to remove items [${keys}]: ${err.message}`);
       }
     }
   }
@@ -370,9 +370,9 @@ export default class WebConfig extends Config {
     try {
       await WebConfig.resetSyncStorage();
       await WebConfig.resetLocalStorage();
-    } catch (e) {
-      logger.error('Failed to clear storage.', e);
-      throw new Error(`Failed to clear storage: ${e.message}`);
+    } catch (err) {
+      logger.error('Failed to clear storage.', err);
+      throw new Error(`Failed to clear storage. ${err.message}`);
     }
   }
 
@@ -380,9 +380,9 @@ export default class WebConfig extends Config {
     try {
       await WebConfig.resetSyncStorage();
       await WebConfig.removeLocalStorage(WebConfig._localConfigKeys);
-    } catch (e) {
-      logger.error('Failed to clear storage.', e);
-      throw new Error(`Failed to clear storage: ${e.message}`);
+    } catch (err) {
+      logger.error('Failed to clear storage.', err);
+      throw new Error(`Failed to clear storage. ${err.message}`);
     }
   }
 
@@ -433,9 +433,9 @@ export default class WebConfig extends Config {
       if (unusedSplitKeys.length) {
         await this.remove(unusedSplitKeys);
       }
-    } catch (e) {
-      logger.error('Failed to save items: ', keys, e);
-      throw new Error(`Failed to save items [${keys}]: [${e.message}]`);
+    } catch (err) {
+      logger.error('Failed to save items: ', keys, err);
+      throw new Error(`Failed to save items [${keys.toString()}]: [${err.message}]`);
     }
   }
 

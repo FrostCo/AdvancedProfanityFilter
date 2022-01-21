@@ -27,8 +27,8 @@ export default class Wordlist {
           this.list.push(wordStr);
           this.all.push(word);
           this.regExps.push(word.regExp);
-        } catch (e) {
-          logger.warn(`Failed to add '${wordStr}' to wordlist.`, e);
+        } catch (err) {
+          logger.warn(`Failed to add '${wordStr}' to wordlist.`, err);
         }
       }
     });

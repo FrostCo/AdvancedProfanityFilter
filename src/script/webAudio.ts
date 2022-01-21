@@ -519,8 +519,8 @@ export default class WebAudio {
       if (options.line) { cue.line = this.parseLineAndPositionSetting(options.line); }
       if (options.position) { cue.position = this.parseLineAndPositionSetting(options.position); }
       return cue;
-    } catch (e) {
-      logger.error(`[Audio] Failed to add cue: ( start: ${start}, end: ${end}, text: ${text} )`, e);
+    } catch (err) {
+      logger.error(`[Audio] Failed to add cue: ( start: ${start}, end: ${end}, text: ${text} )`, err);
     }
   }
 
@@ -735,8 +735,8 @@ export default class WebAudio {
         } else {
           throw new Error(`Failed to find subtitle variable: ${rule.externalSubVar}.`);
         }
-      } catch (e) {
-        logger.error(`[Audio] Error using external subtitles for ${this.siteKey}.`, e);
+      } catch (err) {
+        logger.error(`[Audio] Error using external subtitles for ${this.siteKey}.`, err);
       }
     }
   }

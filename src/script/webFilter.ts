@@ -384,8 +384,8 @@ export default class WebFilter extends Filter {
         await WebConfig.saveLocalStorage({ stats: stats });
         filter.stats = { mutes: 0, words: {} };
       }
-    } catch (e) {
-      logger.warn('Failed to save stats.', e);
+    } catch (err) {
+      logger.warn('Failed to save stats.', err);
     }
   }
 
@@ -435,9 +435,9 @@ export default class WebFilter extends Filter {
       try {
         if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter });
         if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
-      } catch (e) {
-        if (e.message !== 'Extension context invalidated.') {
-          logger.warn('Failed to sendMessage.', e);
+      } catch (err) {
+        if (err.message !== 'Extension context invalidated.') {
+          logger.warn('Failed to sendMessage.', err);
         }
       }
     }
@@ -461,7 +461,7 @@ if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptG
     filter.iframe = document.location;
     try { // same domain
       filter.hostname = window.parent.location.hostname;
-    } catch (e) { // different domain
+    } catch (err) { // different domain
       if (document.referrer) {
         filter.hostname = new URL(document.referrer).hostname;
       } else {

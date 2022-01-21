@@ -91,8 +91,8 @@ export default class Bookmarklet {
       } else {
         throw new Error('Unable to set user config - using defaults.');
       }
-    } catch (e) {
-      window.alert(e.message);
+    } catch (err) {
+      window.alert(err.message);
       return code;
     }
   }

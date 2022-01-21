@@ -308,7 +308,7 @@ if (typeof window !== 'undefined') {
     filter.iframe = document.location;
     try {
       filter.hostname = window.parent.location.hostname;
-    } catch (e) {
+    } catch (err) {
       if (document.referrer) {
         filter.hostname = new URL(document.referrer).hostname;
       } else {
