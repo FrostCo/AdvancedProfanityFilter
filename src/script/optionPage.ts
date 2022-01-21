@@ -392,7 +392,7 @@ export default class OptionPage {
   }
 
   async importConfigRetryCancel() {
-    await option.init();
+    await this.init();
   }
 
   bulkEditorWordlistCheckbox(event) {
@@ -466,7 +466,7 @@ export default class OptionPage {
   async confirm(evt: Event, action: string) {
     const cancel = document.getElementById('confirmModalCancel');
     cancel.removeEventListener('click', populateConfig);
-    cancel.removeEventListener('click', option.importConfigRetryCancel);
+    cancel.removeEventListener('click', importConfigRetryCancel);
     const ok = document.getElementById('confirmModalOK');
     ok.removeEventListener('click', bulkEditorSave);
     ok.removeEventListener('click', bulkEditorSaveRetry);
@@ -526,7 +526,7 @@ export default class OptionPage {
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
         ok.addEventListener('click', importConfigRetry);
-        cancel.addEventListener('click', option.importConfigRetryCancel);
+        cancel.addEventListener('click', importConfigRetryCancel);
         break;
       case 'removeAllWords':
         content = document.createElement('span');
@@ -1827,11 +1827,12 @@ let lessUsedWords = {};
 
 ////
 // Events
-// Functions
+// Functions for confirm() to have access to `this`
 function bulkEditorSave(e) { option.bulkEditorSave(); }
 function bulkEditorSaveRetry() { option.bulkEditorSaveRetry(); }
 function importConfig(e) { option.importConfig(e); }
 function importConfigRetry() { option.importConfigRetry(); }
+function importConfigRetryCancel(evt) { option.importConfigRetryCancel(); }
 function populateConfig(e) { option.populateConfig(); }
 function convertStorageLocation(e) { option.convertStorageLocation(); }
 function removeAllWords(e) { option.removeAllWords(e); }
