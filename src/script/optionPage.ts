@@ -658,7 +658,7 @@ export default class OptionPage {
 
   async init() {
     this.cfg = await WebConfig.load();
-    if (!this.auth) this.auth = new OptionAuth(this.cfg.password);
+    if (!this.auth) this.auth = new OptionAuth(this, this.cfg.password);
     filter.cfg = this.cfg;
     filter.init();
 
@@ -719,7 +719,7 @@ export default class OptionPage {
   populateConfig() {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     configSyncLargeKeys.checked = this.cfg.syncLargeKeys;
-    this.auth.setPasswordButton(option);
+    this.auth.setPasswordButton();
   }
 
   populateDomain() {
@@ -1837,7 +1837,7 @@ function convertStorageLocation(e) { option.convertStorageLocation(); }
 function removeAllWords(e) { option.removeAllWords(e); }
 function removeLessUsedWords(e) { option.removeLessUsedWords(); }
 function restoreDefaults(e) { option.restoreDefaults(e); }
-function setPassword(e) { option.auth.setPassword(option); }
+function setPassword(e) { option.auth.setPassword(); }
 function statsReset(e) { option.statsReset(); }
 // Add event listeners to DOM
 window.addEventListener('load', (e) => { option.init(); });
@@ -1917,7 +1917,7 @@ document.getElementById('importFileInput').addEventListener('change', (e) => { o
 document.getElementById('configReset').addEventListener('click', (e) => { option.confirm(e, 'restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', (e) => { option.exportConfig(); });
 document.getElementById('configImport').addEventListener('click', (e) => { option.confirm(e, 'importConfig'); });
-document.getElementById('setPassword').addEventListener('input', (e) => { option.auth.setPasswordButton(option); });
+document.getElementById('setPassword').addEventListener('input', (e) => { option.auth.setPasswordButton(); });
 document.getElementById('setPasswordBtn').addEventListener('click', (e) => { option.confirm(e, 'setPassword'); });
 // Test
 document.getElementById('testText').addEventListener('input', (e) => { option.populateTest(); });
