@@ -120,7 +120,7 @@ export default class OptionPage {
     element.classList.add('w3-hide');
   }
 
-  static hideInputError(element) {
+  static hideInputError(element: HTMLInputElement) {
     element.classList.remove('w3-border-red');
     try {
       element.setCustomValidity('');
@@ -235,7 +235,7 @@ export default class OptionPage {
 
     const removeButton = document.createElement('button');
     removeButton.textContent = 'X';
-    removeButton.addEventListener('click', (e) => { this.bulkEditorRemoveRow(e); });
+    removeButton.addEventListener('click', (e) => { this.bulkEditorRemoveRow(e.target as HTMLButtonElement); });
     cellRemoveRow.appendChild(removeButton);
 
     const wordInput = document.createElement('input');
@@ -330,9 +330,9 @@ export default class OptionPage {
     this.bulkEditorAddRow();
   }
 
-  bulkEditorRemoveRow(event) {
+  bulkEditorRemoveRow(button: HTMLButtonElement) {
     const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
-    const row = event.target.parentElement.parentElement;
+    const row = button.parentElement.parentElement as HTMLTableRowElement;
     table.deleteRow(row.rowIndex);
   }
 
@@ -395,9 +395,9 @@ export default class OptionPage {
     await this.init();
   }
 
-  bulkEditorWordlistCheckbox(event) {
-    const checked = (event.target as HTMLInputElement).checked;
-    document.querySelectorAll(`#bulkWordEditorModal table td input.wordlistData[data-col="${event.target.dataset.col}"]`).forEach((box: HTMLInputElement) => {
+  bulkEditorWordlistCheckbox(checkbox: HTMLInputElement) {
+    const checked = checkbox.checked;
+    document.querySelectorAll(`#bulkWordEditorModal table td input.wordlistData[data-col="${checkbox.dataset.col}"]`).forEach((box: HTMLInputElement) => {
       box.checked = checked;
     });
   }
@@ -610,8 +610,8 @@ export default class OptionPage {
     }
   }
 
-  async importConfigFile(e) {
-    const file = e.target.files[0];
+  async importConfigFile(files: FileList) {
+    const file = files[0];
     const importFileInput = document.getElementById('importFileInput') as HTMLInputElement;
     const fileText = await readFile(file) as string;
     this.importConfigText(fileText);
@@ -1214,8 +1214,9 @@ export default class OptionPage {
     }
   }
 
-  async removeWord(evt) {
-    if (evt.target.classList.contains('disabled')) return false;
+  async removeWord(button: HTMLButtonElement) {
+    if (button.classList.contains('disabled')) return false;
+
     const wordList = document.getElementById('wordList') as HTMLSelectElement;
     const word = wordList.value;
 
@@ -1558,8 +1559,8 @@ export default class OptionPage {
     }
   }
 
-  async selectFilterMethod(evt) {
-    this.cfg.filterMethod = Constants.FILTER_METHODS[evt.target.value];
+  async selectFilterMethod(filterMethodInput: HTMLInputElement) {
+    this.cfg.filterMethod = Constants.FILTER_METHODS[filterMethodInput.value];
     try {
       await this.cfg.save('filterMethod');
       filter.rebuildWordlists();
@@ -1601,7 +1602,9 @@ export default class OptionPage {
       });
     }
 
-    tableContainer.querySelectorAll('th input.wordlistHeader').forEach((el) => { el.addEventListener('click', (e) => { this.bulkEditorWordlistCheckbox(e); }); });
+    tableContainer.querySelectorAll('th input.wordlistHeader').forEach((el) => {
+      el.addEventListener('click', (e) => { this.bulkEditorWordlistCheckbox(e.target as HTMLInputElement); });
+    });
     OptionPage.openModal(modalId);
   }
 
@@ -1647,9 +1650,8 @@ export default class OptionPage {
     }
   }
 
-  switchPage(evt) {
+  switchPage(newTab: HTMLAnchorElement) {
     const currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
-    const newTab = evt.target as HTMLElement;
 
     currentTab.classList.remove(OptionPage.activeClass);
     newTab.classList.add(OptionPage.activeClass);
@@ -1755,25 +1757,25 @@ export default class OptionPage {
     }
   }
 
-  async updateYouTubeAutoLimits(target) {
-    OptionPage.hideInputError(target);
-    if (target.checkValidity()) {
-      const updateMin = target.id === 'audioYouTubeAutoSubsMin';
-      const min = parseFloat(updateMin ? target.value : (document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement).value);
-      const max = parseFloat(updateMin ? (document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement).value : target.value);
+  async updateYouTubeAutoLimits(input: HTMLInputElement) {
+    OptionPage.hideInputError(input);
+    if (input.checkValidity()) {
+      const updateMin = input.id === 'audioYouTubeAutoSubsMin';
+      const min = parseFloat(updateMin ? input.value : (document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement).value);
+      const max = parseFloat(updateMin ? (document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement).value : input.value);
       if (min != 0 && max != 0 && min > max) {
-        OptionPage.showInputError(target, 'Min must be less than max.');
+        OptionPage.showInputError(input, 'Min must be less than max.');
       } else {
         const prop = updateMin ? 'youTubeAutoSubsMin' : 'youTubeAutoSubsMax';
         try {
-          this.cfg[prop] = parseFloat(target.value);
+          this.cfg[prop] = parseFloat(input.value);
           await this.cfg.save(prop);
         } catch (e) {
           OptionPage.handleError(`Failed to save '${prop}'.`, e);
         }
       }
     } else {
-      OptionPage.showInputError(target, 'Please enter a valid number of seconds.');
+      OptionPage.showInputError(input, 'Please enter a valid number of seconds.');
     }
   }
 
@@ -1813,9 +1815,9 @@ function setPassword() { option.auth.setPassword(); }
 function statsReset() { option.statsReset(); }
 // Add event listeners to DOM
 window.addEventListener('load', (e) => { option.init(); });
-document.querySelectorAll('#menu a').forEach((el) => { el.addEventListener('click', (e) => { option.switchPage(e); }); });
+document.querySelectorAll('#menu a').forEach((el) => { el.addEventListener('click', (e) => { option.switchPage(e.target as HTMLAnchorElement); }); });
 // Modals
-document.getElementById('submitPassword').addEventListener('click', (e) => { option.auth.authenticate(e); });
+document.getElementById('submitPassword').addEventListener('click', (e) => { option.auth.authenticate(e.target as HTMLButtonElement); });
 document.getElementById('confirmModalBackup').addEventListener('click', (e) => { option.confirmModalBackup(); });
 document.getElementById('confirmModalOK').addEventListener('click', (e) => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('confirmModalCancel').addEventListener('click', (e) => { OptionPage.closeModal('confirmModal'); });
@@ -1827,7 +1829,7 @@ document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEvent
 document.querySelector('#bulkWordEditorModal button.modalCancel').addEventListener('click', (e) => { OptionPage.closeModal('bulkWordEditorModal'); });
 document.querySelector('#bulkWordEditorModal button.modalSave').addEventListener('click', (e) => { option.confirm('bulkEditorSave'); });
 // Settings
-document.querySelectorAll('#filterMethod input').forEach((el) => { el.addEventListener('click', (e) => { option.selectFilterMethod(e); }); });
+document.querySelectorAll('#filterMethod input').forEach((el) => { el.addEventListener('click', (e) => { option.selectFilterMethod(e.target as HTMLInputElement); }); });
 document.getElementById('censorCharacterSelect').addEventListener('change', (e) => { option.saveOptions(); });
 document.getElementById('censorFixedLengthSelect').addEventListener('change', (e) => { option.saveOptions(); });
 document.getElementById('defaultWordMatchMethodSelect').addEventListener('change', (e) => { option.saveOptions(); });
@@ -1844,27 +1846,27 @@ document.getElementById('substitutionMark').addEventListener('click', (e) => { o
 document.getElementById('defaultWordSubstitutionText').addEventListener('change', (e) => { option.saveOptions(); });
 // Words/Phrases
 document.getElementById('wordList').addEventListener('change', (e) => { option.populateWord(); });
-document.getElementById('wordText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
-document.getElementById('substitutionText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
+document.getElementById('wordText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target as HTMLInputElement); });
+document.getElementById('substitutionText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target as HTMLInputElement); });
 document.getElementById('wordSave').addEventListener('click', (e) => { option.saveWord(); });
-document.getElementById('wordRemove').addEventListener('click', (e) => { option.removeWord(e); });
+document.getElementById('wordRemove').addEventListener('click', (e) => { option.removeWord(e.target as HTMLButtonElement); });
 document.getElementById('wordRemoveAll').addEventListener('click', (e) => { option.confirm('removeAllWords'); });
 document.getElementById('bulkWordEditorButton').addEventListener('click', (e) => { option.showBulkWordEditor(); });
 // Lists
 document.getElementById('whitelist').addEventListener('change', (e) => { option.populateWhitelistWord(); });
-document.getElementById('whitelistText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
+document.getElementById('whitelistText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target as HTMLInputElement); });
 document.getElementById('whitelistSave').addEventListener('click', (e) => { option.saveWhitelist(); });
 document.getElementById('whitelistRemove').addEventListener('click', (e) => { option.removeWhitelist(); });
 document.getElementById('wordlistsEnabled').addEventListener('click', (e) => { option.saveOptions(); });
 document.getElementById('wordlistRename').addEventListener('click', (e) => { option.renameWordlist(); });
 document.getElementById('wordlistSelect').addEventListener('change', (e) => { option.populateWordlist(); });
-document.getElementById('wordlistText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
+document.getElementById('wordlistText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target as HTMLInputElement); });
 document.getElementById('textWordlistSelect').addEventListener('change', (e) => { option.setDefaultWordlist(e.target as HTMLSelectElement); });
 document.getElementById('audioWordlistSelect').addEventListener('change', (e) => { option.setDefaultWordlist(e.target as HTMLSelectElement); });
 // Domains
 document.querySelectorAll('#domainMode input').forEach((el) => { el.addEventListener('click', (e) => { option.saveOptions(); }); });
 document.getElementById('domainSelect').addEventListener('change', (e) => { option.populateDomain(); });
-document.getElementById('domainText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
+document.getElementById('domainText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target as HTMLInputElement); });
 document.getElementById('domainSave').addEventListener('click', (e) => { option.saveDomain(); });
 document.getElementById('domainRemove').addEventListener('click', (e) => { option.removeDomain(); });
 // Audio
@@ -1875,7 +1877,7 @@ document.getElementById('muteAudioOnly').addEventListener('click', (e) => { opti
 document.getElementById('muteCueRequireShowing').addEventListener('click', (e) => { option.saveOptions(); });
 document.querySelectorAll('#audioMuteMethod input').forEach((el) => { el.addEventListener('click', (e) => { option.saveOptions(); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach((el) => { el.addEventListener('click', (e) => { option.saveOptions(); }); });
-document.querySelectorAll('input.updateYouTubeAutoLimits').forEach((el) => { el.addEventListener('input', (e) => { option.updateYouTubeAutoLimits(e.target); }); });
+document.querySelectorAll('input.updateYouTubeAutoLimits').forEach((el) => { el.addEventListener('input', (e) => { option.updateYouTubeAutoLimits(e.target as HTMLInputElement); }); });
 document.getElementById('customAudioSitesSave').addEventListener('click', (e) => { option.saveCustomAudioSites(); });
 // Bookmarklet
 document.querySelectorAll('#bookmarkletConfigInputs input').forEach((el) => { el.addEventListener('click', (e) => { option.populateBookmarkletPage(); }); });
@@ -1885,7 +1887,7 @@ document.getElementById('bookmarkletLink').addEventListener('click', (e) => { e.
 // Config
 document.getElementById('configSyncLargeKeys').addEventListener('click', (e) => { option.confirm('convertStorageLocation'); });
 document.getElementById('configInlineInput').addEventListener('click', (e) => { option.configInlineToggle(); });
-document.getElementById('importFileInput').addEventListener('change', (e) => { option.importConfigFile(e); });
+document.getElementById('importFileInput').addEventListener('change', (e) => { option.importConfigFile((e.target as HTMLInputElement).files); });
 document.getElementById('configReset').addEventListener('click', (e) => { option.confirm('restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', (e) => { option.exportConfig(); });
 document.getElementById('configImport').addEventListener('click', (e) => { option.confirm('importConfig'); });
@@ -1896,7 +1898,7 @@ document.getElementById('testText').addEventListener('input', (e) => { option.po
 // Stats
 document.getElementById('collectStats').addEventListener('click', (e) => { option.saveOptions(); });
 document.getElementById('statsReset').addEventListener('click', (e) => { option.confirm('statsReset'); });
-document.getElementById('lessUsedWordsNumber').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
+document.getElementById('lessUsedWordsNumber').addEventListener('input', (e) => { OptionPage.hideInputError(e.target as HTMLInputElement); });
 document.getElementById('removeLessUsedWords').addEventListener('click', (e) => { option.confirm('removeLessUsedWords'); });
 // Other
 document.getElementsByClassName('themes')[0].addEventListener('click', (e) => { option.toggleTheme(); });
