@@ -384,7 +384,7 @@ export default class OptionPage {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     configSyncLargeKeys.checked = false;
     try {
-      await this.convertStorageLocation();
+      await this.convertStorageLocation(noopEvent, true);
       await this.bulkEditorSave();
     } catch (e) {
       OptionPage.handleError('Failed to save.', e);
@@ -622,7 +622,7 @@ export default class OptionPage {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     configSyncLargeKeys.checked = false;
     try {
-      await this.convertStorageLocation();
+      await this.convertStorageLocation(noopEvent, true);
       await this.cfg.save();
       OptionPage.showStatusModal('Settings imported successfully.');
       await this.init();
@@ -1745,7 +1745,7 @@ export default class OptionPage {
     }
   }
 
-  async convertStorageLocation() {
+  async convertStorageLocation(event?: Event, silent = false) {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
     const keys = WebConfig._localConfigKeys;
@@ -1763,7 +1763,10 @@ export default class OptionPage {
           });
           await WebConfig.removeSyncStorage(removeKeys);
         }
-        OptionPage.showStatusModal('Storage converted successfully.');
+
+        if (!silent) {
+          OptionPage.showStatusModal('Storage converted successfully.');
+        }
       } catch (e) {
         // Revert UI and export a backup of config.
         option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
@@ -1819,6 +1822,7 @@ export default class OptionPage {
 const logger = new Logger();
 const filter = new Filter;
 const option = new OptionPage;
+const noopEvent = new Event('noop');
 let lessUsedWords = {};
 
 ////
