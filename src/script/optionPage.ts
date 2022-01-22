@@ -477,38 +477,36 @@ export default class OptionPage {
     ok.removeEventListener('click', restoreDefaults);
     ok.removeEventListener('click', setPassword);
     ok.removeEventListener('click', statsReset);
-    let content;
-    let italics;
+    const content = document.createElement('span');
+    const paragraph = document.createElement('p');
+    const italics = document.createElement('i');
     let validated = true;
 
     switch (action) {
       case 'bulkEditorSave':
-        content = document.createElement('span');
-        italics = document.createElement('i');
-        content.textContent = 'Are you sure you want to save these changes?\n\n';
+        paragraph.textContent = 'Are you sure you want to save these changes?';
         italics.textContent = 'Make sure you have a backup first!';
+        content.appendChild(paragraph);
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: true }, content);
         ok.addEventListener('click', bulkEditorSave);
         break;
       case 'bulkEditorSaveRetry':
-        content = document.createElement('span');
-        italics = document.createElement('i');
-        content.textContent = 'Failed to save changes because they were too large to be stored. Retry using local storage?\n\n';
+        paragraph.textContent = 'Failed to save changes because they were too large to be stored. Retry using local storage?';
         italics.textContent = 'Local storage can store more, but things like words and domains will no longer sync between devices.';
+        content.appendChild(paragraph);
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: true, titleClass: 'w3-red' }, content);
         ok.addEventListener('click', bulkEditorSaveRetry);
         break;
       case 'convertStorageLocation':
-        content = document.createElement('span');
-        italics = document.createElement('i');
         if (option.cfg.syncLargeKeys) {
-          content.textContent = 'This will prevent large settings like words and domains from syncing, but allow you to store more.\n\n';
+          paragraph.textContent = 'This will prevent large settings like words and domains from syncing, but allow you to store more.';
         } else {
-          content.textContent = 'This will allow large settings like words and domains to sync, but has stricter limits on how much you can store.\n\n';
+          paragraph.textContent = 'This will allow large settings like words and domains to sync, but has stricter limits on how much you can store.';
         }
         italics.textContent = 'Make sure you have a backup first!';
+        content.appendChild(paragraph);
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: true }, content);
         cancel.addEventListener('click', populateConfig);
@@ -519,20 +517,17 @@ export default class OptionPage {
         ok.addEventListener('click', importConfig);
         break;
       case 'importConfigRetry':
-        content = document.createElement('span');
-        italics = document.createElement('i');
-        content.textContent = 'Import failed due to storage limitations. Would you like to try again using local storage?\n\n';
+        paragraph.textContent = 'Import failed due to storage limitations. Would you like to try again using local storage?';
         italics.textContent = 'Local storage can store more, but things like words and domains will no longer sync between devices.';
+        content.appendChild(paragraph);
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
         ok.addEventListener('click', importConfigRetry);
         cancel.addEventListener('click', importConfigRetryCancel);
         break;
       case 'removeAllWords':
-        content = document.createElement('span');
-        italics = document.createElement('i');
-        content.textContent = 'Are you sure you want to remove all words?';
-        content.appendChild(italics);
+        paragraph.textContent = 'Are you sure you want to remove all words?';
+        content.appendChild(paragraph);
         OptionPage.configureConfirmModal({ backup: true }, content);
         ok.addEventListener('click', removeAllWords);
         break;
