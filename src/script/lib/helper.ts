@@ -161,6 +161,10 @@ export function numberWithCommas(number: number | string): string {
   }
 }
 
+export function prettyPrintArray(array: string[]) {
+  return `[${array.toString().replace(/,/g, ', ')}]`;
+}
+
 export function readFile(file) {
   return new Promise((resolve, reject) => {
     const fr = new FileReader();

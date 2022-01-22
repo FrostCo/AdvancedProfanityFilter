@@ -1,6 +1,6 @@
 import Constants from './lib/constants';
 import Config from './lib/config';
-import { stringArray } from './lib/helper';
+import { prettyPrintArray, stringArray } from './lib/helper';
 import Logger from './lib/logger';
 const logger = new Logger();
 
@@ -234,8 +234,8 @@ export default class WebConfig extends Config {
 
       return new WebConfig(data);
     } catch (err) {
-      logger.error('Failed to load items: ', keys, err);
-      throw new Error(`Failed to load items [${keys}]: [${err.message}]`);
+      logger.error('Failed to load items.', keys, err);
+      throw new Error(`Failed to load items: ${prettyPrintArray(keys)}. [${err.message}]`);
     }
   }
 
@@ -360,8 +360,8 @@ export default class WebConfig extends Config {
           delete this[key];
         });
       } catch (err) {
-        logger.error('Failed to remove items: ', keys, err);
-        throw new Error(`Failed to remove items [${keys}]: ${err.message}`);
+        logger.error('Failed to remove items.', keys, err);
+        throw new Error(`Failed to remove items: ${prettyPrintArray(keys)}. ${err.message}`);
       }
     }
   }
@@ -434,8 +434,8 @@ export default class WebConfig extends Config {
         await this.remove(unusedSplitKeys);
       }
     } catch (err) {
-      logger.error('Failed to save items: ', keys, err);
-      throw new Error(`Failed to save items [${keys.toString()}]: [${err.message}]`);
+      logger.error('Failed to save items.', keys, err);
+      throw new Error(`Failed to save items: ${prettyPrintArray(keys)}. [${err.message}]`);
     }
   }
 
