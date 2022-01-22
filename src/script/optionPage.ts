@@ -1758,20 +1758,22 @@ export default class OptionPage {
   }
 
   async updateYouTubeAutoLimits(input: HTMLInputElement) {
-    OptionPage.hideInputError(input);
+    const max = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
+    const min = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
+    OptionPage.hideInputError(max);
+    OptionPage.hideInputError(min);
     if (input.checkValidity()) {
-      const updateMin = input.id === 'audioYouTubeAutoSubsMin';
-      const min = parseFloat(updateMin ? input.value : (document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement).value);
-      const max = parseFloat(updateMin ? (document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement).value : input.value);
-      if (min != 0 && max != 0 && min > max) {
+      const maxValue = parseFloat(max.value);
+      const minValue = parseFloat(min.value);
+      if (minValue != 0 && maxValue != 0 && minValue > maxValue) {
         OptionPage.showInputError(input, 'Min must be less than max.');
       } else {
-        const prop = updateMin ? 'youTubeAutoSubsMin' : 'youTubeAutoSubsMax';
         try {
-          this.cfg[prop] = parseFloat(input.value);
-          await this.cfg.save(prop);
+          this.cfg.youTubeAutoSubsMax = maxValue;
+          this.cfg.youTubeAutoSubsMin = minValue;
+          await this.cfg.save(['youTubeAutoSubsMax', 'youTubeAutoSubsMin']);
         } catch (err) {
-          OptionPage.handleError(`Failed to save '${prop}'.`, err);
+          OptionPage.handleError('Failed to update YouTube muting min/max values.', err);
         }
       }
     } else {
@@ -1877,7 +1879,7 @@ document.getElementById('muteAudioOnly').addEventListener('click', (evt) => { op
 document.getElementById('muteCueRequireShowing').addEventListener('click', (evt) => { option.saveOptions(); });
 document.querySelectorAll('#audioMuteMethod input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
-document.querySelectorAll('input.audioYouTubeAutoSubs').forEach((el) => { el.addEventListener('input', (evt) => { option.updateYouTubeAutoLimits(evt.target as HTMLInputElement); }); });
+document.querySelectorAll('input.audioYouTubeAutoSubs').forEach((el) => { el.addEventListener('change', (evt) => { option.updateYouTubeAutoLimits(evt.target as HTMLInputElement); }); });
 document.getElementById('customAudioSitesSave').addEventListener('click', (evt) => { option.saveCustomAudioSites(); });
 // Bookmarklet
 document.querySelectorAll('#bookmarkletConfigInputs input').forEach((el) => { el.addEventListener('click', (evt) => { option.populateBookmarkletPage(); }); });
