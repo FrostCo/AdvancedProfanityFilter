@@ -91,7 +91,7 @@ class Popup {
     }
   }
 
-  async populateOptions(event?: Event) {
+  async populateOptions() {
     await Popup.load(popup);
     if (this.cfg.darkMode) { this.applyTheme(); }
 
@@ -221,10 +221,9 @@ class Popup {
     }
   }
 
-  async wordlistSelect(event) {
-    const element = event.target;
-    const type = element.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
-    this.domain[type] = element.selectedIndex > 0 ? element.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
+  async wordlistSelect(select: HTMLSelectElement) {
+    const type = select.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
+    this.domain[type] = select.selectedIndex > 0 ? select.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
     try {
       await this.domain.save(this.cfg);
       chrome.tabs.reload();
@@ -252,10 +251,10 @@ const popup = new Popup;
 
 ////
 // Listeners
-window.addEventListener('load', (e) => { popup.populateOptions(); });
-document.getElementById('domainFilter').addEventListener('change', (e) => { popup.toggle(popup.filterToggleProp); });
-document.getElementById('domainModeSelect').addEventListener('change', (e) => { popup.updateDomainMode(); });
-document.getElementById('filterMethodSelect').addEventListener('change', (e) => { popup.filterMethodSelect(); });
-document.getElementById('wordlistSelect').addEventListener('change', (e) => { popup.wordlistSelect(e); });
-document.getElementById('audioWordlistSelect').addEventListener('change', (e) => { popup.wordlistSelect(e); });
-document.getElementById('options').addEventListener('click', (e) => { chrome.runtime.openOptionsPage(); });
+window.addEventListener('load', (evt) => { popup.populateOptions(); });
+document.getElementById('domainFilter').addEventListener('change', (evt) => { popup.toggle(popup.filterToggleProp); });
+document.getElementById('domainModeSelect').addEventListener('change', (evt) => { popup.updateDomainMode(); });
+document.getElementById('filterMethodSelect').addEventListener('change', (evt) => { popup.filterMethodSelect(); });
+document.getElementById('wordlistSelect').addEventListener('change', (evt) => { popup.wordlistSelect(evt.target as HTMLSelectElement); });
+document.getElementById('audioWordlistSelect').addEventListener('change', (evt) => { popup.wordlistSelect(evt.target as HTMLSelectElement); });
+document.getElementById('options').addEventListener('click', (evt) => { chrome.runtime.openOptionsPage(); });
