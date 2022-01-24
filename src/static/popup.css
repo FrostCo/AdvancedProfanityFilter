@@ -1,5 +1,4 @@
-/* || HTML Elements */
-
+/* #region HTML Elements */
 html {
   --blue: #3498db; /* .w3-flat-peter-river */
 }
@@ -32,9 +31,9 @@ a:hover, a:active {
 h4 {
   margin-bottom: 5px;
 }
+/* #endregion */
 
-/* || Page */
-
+/* #region Page */
 #logo {
   width: 64px;
   height: 64px;
@@ -131,9 +130,9 @@ h4 {
   width: 200px;
   margin: auto;
 }
+/* #endregion */
 
-/* || Slider (enabled/disabled) */
-
+/* #region Slider (enable/disable filter) */
 /* Hide default HTML checkbox */
 .switch input {
   display: none;
@@ -191,9 +190,9 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+/* #endregion */
 
-/* || Utility */
-
+/* #region Utility */
 .disabled {
   cursor: not-allowed !important;
 }
@@ -217,3 +216,4 @@ input:checked + .slider:before {
 #uncaughtErrors P:first-child {
   font-weight: bolder;
 }
+/* #endregion */

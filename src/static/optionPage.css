@@ -5,8 +5,7 @@ w3-border-grey
 w3-flat-silver
 w3-flat-pomegranate */
 
-/* || HTML Elements */
-
+/* #region HTML Elements */
 body {
   background: #f1f1f1; /* w3-light-grey */
   color: #000;
@@ -39,9 +38,9 @@ h4.sectionHeader {
 .textInput {
   height: 40px;
 }
+/* #endregion */
 
-/* || Header & Navigation */
-
+/* #region Header & Navigation */
 #header h2 {
   display: inline;
   line-height: 50px;
@@ -83,9 +82,9 @@ div.themes div.sun {
   color: #fff !important;
   background-color: var(--blue) !important;
 }
+/* #endregion */
 
-/* || Pages */
-
+/* #region Pages */
 #main {
   padding-bottom: 16px;
 }
@@ -109,9 +108,9 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   overflow-y: scroll;
   height: 800px;
 } */
+/* #endregion */
 
-/* || Modals */
-
+/* #region Modals */
 #confirmModal, #passwordModal, #statusModal {
   z-index: 900;
 }
@@ -147,9 +146,10 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   z-index: 10;
   vertical-align: middle;
 }
+/* #endregion */
 
-/* || Utility */
 
+/* #region Utility */
 .disabled {
   cursor: not-allowed !important;
 }
@@ -193,8 +193,9 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   left: 0;
   bottom: 18px
 }
+/* #endregion */
 
-/* Uncaught Errors */
+/* #region Uncaught Errors */
 #uncaughtErrors P {
   color: red;
 }
@@ -202,3 +203,4 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 #uncaughtErrors P:first-child {
   font-weight: bolder;
 }
+/* #endregion */
