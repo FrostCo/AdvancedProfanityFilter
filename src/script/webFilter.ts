@@ -203,10 +203,16 @@ export default class WebFilter extends Filter {
   }
 
   async cleanPage() {
-    this.cfg = await WebConfig.build();
+    this.cfg = await WebConfig.load();
+
+    if (Object.keys(this.cfg.words).length === 0) {
+      logger.warn('No words to filter. Exiting.');
+      return false;
+    }
+
     this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
-    logger.info('Config loaded', this.cfg);
+    logger.info('Config loaded.', this.cfg);
 
     const backgroundData: BackgroundData = await this.getBackgroundData();
 
@@ -276,7 +282,7 @@ export default class WebFilter extends Filter {
     if (node.childElementCount > 0) {
       const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
       // Note: This while loop skips processing on first node
-      while(treeWalker.nextNode()) {
+      while (treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
           treeWalker.currentNode.childNodes.forEach((childNode) => {
             this.cleanText(childNode, wordlistId, statsType);
@@ -326,7 +332,7 @@ export default class WebFilter extends Filter {
       }
 
       if (this.filterText) {
-        switch(statsType) {
+        switch (statsType) {
           case Constants.STATS_TYPE_AUDIO: wordStats[word.value].audio++; break;
           case Constants.STATS_TYPE_TEXT: wordStats[word.value].text++; break;
         }
@@ -361,7 +367,7 @@ export default class WebFilter extends Filter {
     try {
       const words = Object.keys(filter.stats.words);
       if (words.length) {
-        const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
+        const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
         const storedWords = stats.words;
 
         words.forEach((word) => {
@@ -375,11 +381,11 @@ export default class WebFilter extends Filter {
         stats.mutes += filter.stats.mutes;
         if (stats.startedAt == null) { stats.startedAt = Date.now(); }
 
-        await WebConfig.saveLocalStoragePromise({ stats: stats });
+        await WebConfig.saveLocalStorage({ stats: stats });
         filter.stats = { mutes: 0, words: {} };
       }
-    } catch (e) {
-      logger.warn('Failed to save stats.', e);
+    } catch (err) {
+      logger.warn('Failed to save stats.', err);
     }
   }
 
@@ -429,9 +435,9 @@ export default class WebFilter extends Filter {
       try {
         if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter });
         if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
-      } catch (e) {
-        if (e.message !== 'Extension context invalidated.') {
-          logger.warn('Failed to sendMessage', e);
+      } catch (err) {
+        if (err.message !== 'Extension context invalidated.') {
+          logger.warn('Failed to sendMessage.', err);
         }
       }
     }
@@ -455,7 +461,7 @@ if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptG
     filter.iframe = document.location;
     try { // same domain
       filter.hostname = window.parent.location.hostname;
-    } catch(e) { // different domain
+    } catch (err) { // different domain
       if (document.referrer) {
         filter.hostname = new URL(document.referrer).hostname;
       } else {

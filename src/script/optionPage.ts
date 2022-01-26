@@ -1,5 +1,4 @@
 import Constants from './lib/constants';
-import { booleanToNumber, dynamicList, exportToFile, numberToBoolean, numberWithCommas, readFile, removeChildren, removeFromArray, upperCaseFirst } from './lib/helper';
 import WebConfig from './webConfig';
 import Filter from './lib/filter';
 import Domain from './domain';
@@ -8,7 +7,18 @@ import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
 import WebAudioSites from './webAudioSites';
 import Logger from './lib/logger';
-const logger = new Logger();
+import {
+  booleanToNumber,
+  dynamicList,
+  exportToFile,
+  numberToBoolean,
+  numberWithCommas,
+  readFile,
+  removeChildren,
+  removeFromArray,
+  stringArray,
+  upperCaseFirst
+} from './lib/helper';
 
 export default class OptionPage {
   auth: OptionAuth;
@@ -68,17 +78,21 @@ export default class OptionPage {
     }
   }
 
-  static configureStatusModal(content: string, title: string, titleColor: string) {
+  static configureStatusModal(content: string | string[], title: string, titleColor: string) {
     const modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
     const modalContent = document.getElementById('statusModalContent') as HTMLElement;
     const modalHeader = document.querySelector('#statusModal header') as HTMLElement;
-    const contentElement = document.createElement('span');
     removeChildren(modalContent);
 
-    modalTitle.textContent = title;
-    contentElement.textContent = content;
-    modalContent.appendChild(contentElement);
     modalHeader.className = `w3-container ${titleColor}`;
+    modalTitle.textContent = title;
+
+    content = stringArray(content);
+    content.forEach((textPart) => {
+      const contentElement = document.createElement('p') as HTMLParagraphElement;
+      contentElement.textContent = textPart;
+      modalContent.appendChild(contentElement);
+    });
   }
 
   static disableBtn(element: HTMLElement) {
@@ -91,16 +105,26 @@ export default class OptionPage {
     element.classList.remove('w3-flat-silver');
   }
 
+  static handleError(message: string, error?: Error) {
+    if (error) {
+      logger.error(message, error);
+      OptionPage.showErrorModal([message, `Error: ${error.message}`]);
+    } else {
+      logger.error(message);
+      OptionPage.showErrorModal([message]);
+    }
+  }
+
   static hide(element: HTMLElement) {
     element.classList.remove('w3-show');
     element.classList.add('w3-hide');
   }
 
-  static hideInputError(element) {
+  static hideInputError(element: HTMLInputElement) {
     element.classList.remove('w3-border-red');
     try {
       element.setCustomValidity('');
-    } catch(e) {
+    } catch (err) {
       // If HTML5 validation not supported, the modal will suffice
     }
   }
@@ -108,6 +132,21 @@ export default class OptionPage {
   static hideStatus() {
     const notificationPanel = document.getElementById('notificationPanel') as HTMLElement;
     OptionPage.hide(notificationPanel);
+  }
+
+  static isStorageError(error: Error): boolean {
+    if (error.message) {
+      const chromeQuotaError = '[QUOTA_BYTES quota exceeded]';
+      const firefoxQuotaError = '[QuotaExceededError: storage.sync API call exceeded its quota limitations.]';
+      const safariQuotaError = 'Storage quota exceeded.';
+      return (
+        error.message.includes(chromeQuotaError)
+        || error.message.includes(firefoxQuotaError)
+        || error.message.includes(safariQuotaError)
+      );
+    }
+
+    return false;
   }
 
   static openModal(id: string) {
@@ -119,7 +158,7 @@ export default class OptionPage {
     element.classList.add('w3-show');
   }
 
-  static showErrorModal(content = 'The requested action failed. Please try again or contact support.', title = 'Error', titleColor = 'w3-red') {
+  static showErrorModal(content: string | string[] = ['The requested action failed. Please try again or contact support.'], title = 'Error', titleColor = 'w3-red') {
     this.configureStatusModal(content, title, titleColor);
     OptionPage.openModal('statusModal');
   }
@@ -130,18 +169,18 @@ export default class OptionPage {
       try {
         element.setCustomValidity(message);
         element.reportValidity();
-      } catch(e) {
+      } catch (err) {
         OptionPage.showWarningModal(message);
       }
     }
   }
 
-  static showStatusModal(content = 'Status updated.', title = 'Status', titleColor = 'w3-flat-peter-river') {
+  static showStatusModal(content: string | string[] = ['Status updated.'], title = 'Status', titleColor = 'w3-flat-peter-river') {
     this.configureStatusModal(content, title, titleColor);
     OptionPage.openModal('statusModal');
   }
 
-  static showWarningModal(content = 'Invalid input.', title = 'Warning', titleColor = 'w3-orange') {
+  static showWarningModal(content: string | string[] = ['Invalid input.'], title = 'Warning', titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
     OptionPage.openModal('statusModal');
   }
@@ -196,7 +235,7 @@ export default class OptionPage {
 
     const removeButton = document.createElement('button');
     removeButton.textContent = 'X';
-    removeButton.addEventListener('click', (e) => { this.bulkEditorRemoveRow(e); });
+    removeButton.addEventListener('click', (evt) => { this.bulkEditorRemoveRow(evt.target as HTMLButtonElement); });
     cellRemoveRow.appendChild(removeButton);
 
     const wordInput = document.createElement('input');
@@ -291,9 +330,9 @@ export default class OptionPage {
     this.bulkEditorAddRow();
   }
 
-  bulkEditorRemoveRow(event) {
+  bulkEditorRemoveRow(button: HTMLButtonElement) {
     const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
-    const row = event.target.parentElement.parentElement;
+    const row = button.parentElement.parentElement as HTMLTableRowElement;
     table.deleteRow(row.rowIndex);
   }
 
@@ -331,15 +370,34 @@ export default class OptionPage {
       OptionPage.showStatusModal('Words saved successfully.');
       filter.rebuildWordlists();
       this.populateOptions();
-    } catch(e) {
-      logger.warn('Failed to save.', e);
-      OptionPage.showErrorModal(`Failed to save. [Error: ${e}]`);
+    } catch (err) {
+      if (OptionPage.isStorageError(err) && this.cfg.syncLargeKeys) {
+        this.confirm('bulkEditorSaveRetry');
+      } else {
+        logger.warn('Failed to save.', err);
+        OptionPage.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
+      }
     }
   }
 
-  bulkEditorWordlistCheckbox(event) {
-    const checked = (event.target as HTMLInputElement).checked;
-    document.querySelectorAll(`#bulkWordEditorModal table td input.wordlistData[data-col="${event.target.dataset.col}"]`).forEach((box: HTMLInputElement) => {
+  async bulkEditorSaveRetry() {
+    const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
+    configSyncLargeKeys.checked = false;
+    try {
+      await this.convertStorageLocation(true);
+      await this.bulkEditorSave();
+    } catch (err) {
+      OptionPage.handleError('Failed to save.', err);
+    }
+  }
+
+  async importConfigRetryCancel() {
+    await this.init();
+  }
+
+  bulkEditorWordlistCheckbox(checkbox: HTMLInputElement) {
+    const checked = checkbox.checked;
+    document.querySelectorAll(`#bulkWordEditorModal table td input.wordlistData[data-col="${checkbox.dataset.col}"]`).forEach((box: HTMLInputElement) => {
       box.checked = checked;
     });
   }
@@ -359,7 +417,7 @@ export default class OptionPage {
     const removeButton = document.createElement('button');
     removeButton.textContent = 'X';
     removeButton.id = 'bulkEditorRemoveAll';
-    removeButton.addEventListener('click', (e) => { this.bulkEditorRemoveAll(); });
+    removeButton.addEventListener('click', (evt) => { this.bulkEditorRemoveAll(); });
     const removeSpan = document.createElement('span');
     removeSpan.textContent = ' Remove';
     removeCell.appendChild(removeButton);
@@ -405,40 +463,72 @@ export default class OptionPage {
     }
   }
 
-  async confirm(evt: Event, action: string) {
+  async confirm(action: string) {
+    const cancel = document.getElementById('confirmModalCancel');
+    cancel.removeEventListener('click', populateConfig);
+    cancel.removeEventListener('click', importConfigRetryCancel);
     const ok = document.getElementById('confirmModalOK');
     ok.removeEventListener('click', bulkEditorSave);
+    ok.removeEventListener('click', bulkEditorSaveRetry);
+    ok.removeEventListener('click', convertStorageLocation);
     ok.removeEventListener('click', importConfig);
+    ok.removeEventListener('click', importConfigRetry);
     ok.removeEventListener('click', removeAllWords);
     ok.removeEventListener('click', restoreDefaults);
     ok.removeEventListener('click', setPassword);
     ok.removeEventListener('click', statsReset);
-    let content;
-    let italics;
+    const content = document.createElement('span');
+    const paragraph = document.createElement('p');
+    const italics = document.createElement('i');
     let validated = true;
 
-    switch(action) {
+    switch (action) {
       case 'bulkEditorSave':
-        content = document.createElement('span');
-        italics = document.createElement('i');
-        content.textContent = 'Are you sure you want to save these changes?\n\n';
+        paragraph.textContent = 'Are you sure you want to save these changes?';
         italics.textContent = 'Make sure you have a backup first!';
+        content.appendChild(paragraph);
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: true }, content);
         ok.addEventListener('click', bulkEditorSave);
         break;
-      case 'importConfig': {
+      case 'bulkEditorSaveRetry':
+        paragraph.textContent = 'Failed to save changes because they were too large to be stored. Retry using local storage?';
+        italics.textContent = 'Local storage can store more, but things like words and domains will no longer sync between devices.';
+        content.appendChild(paragraph);
+        content.appendChild(italics);
+        OptionPage.configureConfirmModal({ backup: true, titleClass: 'w3-red' }, content);
+        ok.addEventListener('click', bulkEditorSaveRetry);
+        break;
+      case 'convertStorageLocation':
+        if (option.cfg.syncLargeKeys) {
+          paragraph.textContent = 'This will prevent large settings like words and domains from syncing, but allow you to store more.';
+        } else {
+          paragraph.textContent = 'This will allow large settings like words and domains to sync, but has stricter limits on how much you can store.';
+        }
+        italics.textContent = 'Make sure you have a backup first!';
+        content.appendChild(paragraph);
+        content.appendChild(italics);
+        OptionPage.configureConfirmModal({ backup: true }, content);
+        cancel.addEventListener('click', populateConfig);
+        ok.addEventListener('click', convertStorageLocation);
+        break;
+      case 'importConfig':
         OptionPage.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
         ok.addEventListener('click', importConfig);
         break;
-      }
-      case 'removeAllWords':
-        content = document.createElement('span');
-        italics = document.createElement('i');
-        content.textContent = 'Are you sure you want to remove all words?\n\n';
-        italics.textContent = '(Note: The default words will return if no words are added)';
+      case 'importConfigRetry':
+        paragraph.textContent = 'Import failed due to storage limitations. Would you like to try again using local storage?';
+        italics.textContent = 'Local storage can store more, but things like words and domains will no longer sync between devices.';
+        content.appendChild(paragraph);
         content.appendChild(italics);
-        OptionPage.configureConfirmModal({ }, content);
+        OptionPage.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
+        ok.addEventListener('click', importConfigRetry);
+        cancel.addEventListener('click', importConfigRetryCancel);
+        break;
+      case 'removeAllWords':
+        paragraph.textContent = 'Are you sure you want to remove all words?';
+        content.appendChild(paragraph);
+        OptionPage.configureConfirmModal({ backup: true }, content);
         ok.addEventListener('click', removeAllWords);
         break;
       case 'removeLessUsedWords':
@@ -504,7 +594,7 @@ export default class OptionPage {
     }
   }
 
-  importConfig(e) {
+  importConfig() {
     const input = document.getElementById('configInlineInput') as HTMLInputElement;
     if (input.checked) { // inline editor
       const configText = document.getElementById('configText') as HTMLTextAreaElement;
@@ -515,12 +605,25 @@ export default class OptionPage {
     }
   }
 
-  async importConfigFile(e) {
-    const file = e.target.files[0];
+  async importConfigFile(files: FileList) {
+    const file = files[0];
     const importFileInput = document.getElementById('importFileInput') as HTMLInputElement;
     const fileText = await readFile(file) as string;
     this.importConfigText(fileText);
     importFileInput.value = '';
+  }
+
+  async importConfigRetry() {
+    const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
+    configSyncLargeKeys.checked = false;
+    try {
+      await this.convertStorageLocation(true);
+      await this.cfg.save();
+      OptionPage.showStatusModal('Settings imported successfully.');
+      await this.init();
+    } catch (err) {
+      OptionPage.handleError('Failed to import config.', err);
+    }
   }
 
   async importConfigText(cfg: string) {
@@ -528,26 +631,29 @@ export default class OptionPage {
       const importedCfg = new WebConfig(JSON.parse(cfg));
       const migration = new DataMigration(importedCfg);
       migration.runImportMigrations();
-      const resetSuccess = await this.restoreDefaults(null, true);
+      const resetSuccess = await this.restoreDefaults(true);
       if (resetSuccess) {
         try {
           this.cfg = importedCfg;
           await this.cfg.save();
           OptionPage.showStatusModal('Settings imported successfully.');
-          this.init();
-        } catch(e) {
-          logger.warn('Failed to import settings.', e);
-          OptionPage.showErrorModal(`Failed to import settings. [Error: ${e}]`);
+          await this.init();
+        } catch (err) {
+          if (OptionPage.isStorageError(err) && this.cfg.syncLargeKeys) {
+            this.confirm('importConfigRetry');
+          } else {
+            OptionPage.handleError('Failed to import settings.', err);
+          }
         }
       }
-    } catch(e) {
-      OptionPage.showErrorModal('Failed to import settings.');
+    } catch (err) {
+      OptionPage.showErrorModal(['Failed to process new settings.', `Error: ${err.message}`]);
     }
   }
 
   async init() {
-    this.cfg = await WebConfig.build();
-    if (!this.auth) this.auth = new OptionAuth(this.cfg.password);
+    this.cfg = await WebConfig.load();
+    if (!this.auth) this.auth = new OptionAuth(this, this.cfg.password);
     filter.cfg = this.cfg;
     filter.init();
 
@@ -561,6 +667,13 @@ export default class OptionPage {
 
     this.applyTheme();
     this.populateOptions();
+
+    // Route to page based on URL
+    const routePage = window.location.hash.slice(1);
+    const tab = document.querySelector(`#menu a[href="#${routePage}"]`) as HTMLAnchorElement;
+    if (tab) {
+      tab.click();
+    }
   }
 
   populateAudio() {
@@ -599,7 +712,9 @@ export default class OptionPage {
   }
 
   populateConfig() {
-    this.auth.setPasswordButton(option);
+    const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
+    configSyncLargeKeys.checked = this.cfg.syncLargeKeys;
+    this.auth.setPasswordButton();
   }
 
   populateDomain() {
@@ -759,7 +874,7 @@ export default class OptionPage {
   async populateStats() {
     try {
       filter.buildWordlist(Constants.ALL_WORDS_WORDLIST_ID, true);
-      const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
+      const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
 
       // Prepare data (collect totals, add words without stats, sort output)
       let totalFiltered = 0;
@@ -817,9 +932,9 @@ export default class OptionPage {
       statsSummaryMutes.textContent = numberWithCommas(stats.mutes);
       const statsSummarySince = document.querySelector('table#statsSummaryTable td#statsSummarySince') as HTMLTableDataCellElement;
       statsSummarySince.textContent = stats.startedAt ? new Date(stats.startedAt).toLocaleString() : '';
-    } catch(e) {
-      logger.warn('Failed to populate stats.', e);
-      OptionPage.showErrorModal(`Failed to populate stats. [Error: ${e}]`);
+    } catch (err) {
+      logger.warn('Failed to populate stats.', err);
+      OptionPage.showErrorModal(['Failed to populate stats.', `Error: ${err.message}`]);
     }
   }
 
@@ -905,6 +1020,7 @@ export default class OptionPage {
           index == (this.cfg.wordlistId - 1)
           || (
             this.cfg.muteAudio
+            && this.cfg.muteAudioOnly
             && index == (this.cfg.audioWordlistId - 1)
           )
         );
@@ -1021,22 +1137,27 @@ export default class OptionPage {
   }
 
   async prepareLessUsedWords() {
-    const { stats }: { stats: Statistics } = await WebConfig.getLocalStoragePromise({ stats: { mutes: 0, words: {} } }) as any;
-    const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
-    const lessThan = parseInt(lessUsedWordsNumber.value);
-    lessUsedWords = {};
+    try {
+      const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
+      const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
+      const lessThan = parseInt(lessUsedWordsNumber.value);
+      lessUsedWords = {};
 
-    const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
-    allWords.forEach((word) => {
-      const wordStats = stats.words[word];
-      const total = wordStats ? (wordStats.audio + wordStats.text) : 0;
-      if (total < lessThan) {
-        lessUsedWords[word] = total;
-      }
-    });
+      const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
+      allWords.forEach((word) => {
+        const wordStats = stats.words[word];
+        const total = wordStats ? (wordStats.audio + wordStats.text) : 0;
+        if (total < lessThan) {
+          lessUsedWords[word] = total;
+        }
+      });
+    } catch (err) {
+      logger.warn('Error while prepapring less-used words.', err);
+      return {};
+    }
   }
 
-  async removeAllWords(evt) {
+  async removeAllWords() {
     this.cfg.words = {};
     await this.cfg.save('words');
     const wordList = document.getElementById('wordList') as HTMLSelectElement;
@@ -1045,7 +1166,7 @@ export default class OptionPage {
     this.populateOptions();
   }
 
-  async removeDomain(event) {
+  async removeDomain() {
     const domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
     if (domainsSelect.value) {
       delete this.cfg.domains[domainsSelect.value];
@@ -1053,9 +1174,9 @@ export default class OptionPage {
       try {
         await this.cfg.save('domains');
         this.populateDomainPage();
-      } catch(e) {
-        logger.warn(`Failed to remove domain '${domainsSelect.value}'.`, e);
-        OptionPage.showErrorModal(`Failed to remove domain '${domainsSelect.value}'. [Error: ${e}]`);
+      } catch (err) {
+        logger.warn(`Failed to remove domain '${domainsSelect.value}'.`, err);
+        OptionPage.showErrorModal([`Failed to remove domain '${domainsSelect.value}'.`, `Error: ${err.message}`]);
         return false;
       }
     }
@@ -1069,7 +1190,7 @@ export default class OptionPage {
     this.populateOptions();
   }
 
-  async removeWhitelist(evt) {
+  async removeWhitelist() {
     const whitelist = document.getElementById('whitelist') as HTMLSelectElement;
     const selected = whitelist.selectedOptions[0];
     const originalWord = selected.value;
@@ -1081,26 +1202,30 @@ export default class OptionPage {
       await this.cfg.save(originalListName);
       filter.init();
       this.populateOptions();
-    } catch(e) {
-      logger.warn(`Failed to remove '${originalWord} from whitelist.`, e);
-      OptionPage.showErrorModal(`Failed to remove '${originalWord} from whitelist. [Error: ${e}]`);
+    } catch (err) {
+      logger.warn(`Failed to remove '${originalWord}' from whitelist.`, err);
+      OptionPage.showErrorModal([`Failed to remove '${originalWord}' from whitelist.`, `Error: ${err.message}`]);
       return false;
     }
   }
 
-  async removeWord(evt) {
-    if (evt.target.classList.contains('disabled')) return false;
+  async removeWord(button: HTMLButtonElement) {
+    if (button.classList.contains('disabled')) return false;
+
     const wordList = document.getElementById('wordList') as HTMLSelectElement;
     const word = wordList.value;
 
-    let result = this.cfg.removeWord(word);
+    const result = this.cfg.removeWord(word);
     if (result) {
-      result = await this.saveOptions(evt);
-      if (result) {
+      try {
+        await this.cfg.save('words');
         // Update states and Reset word form
         wordList.selectedIndex = 0;
         filter.rebuildWordlists();
         this.populateOptions();
+      } catch (err) {
+        logger.warn(`Failed to remove '${word}'.`, err);
+        OptionPage.showErrorModal([`Failed to remove '${word}'.`, `Error: ${err.message}`]);
       }
     }
   }
@@ -1119,26 +1244,27 @@ export default class OptionPage {
       }
 
       this.cfg.wordlists[index] = name;
-      if (await this.saveProp('wordlists')) {
+      try {
+        await this.cfg.save('wordlists');
         this.populateWordlists(index);
         this.populateWordPage();
-      } else {
-        OptionPage.showErrorModal('Failed to save name.');
+      } catch (err) {
+        OptionPage.handleError('Failed to save wordlist name.', err);
       }
     } else {
       OptionPage.showInputError(wordlistText, 'Please enter a valid name.');
     }
   }
 
-  async restoreDefaults(evt, silent = false) {
+  async restoreDefaults(silent = false) {
     try {
-      await this.cfg.reset();
+      await this.cfg.resetPreserveStats();
       if (!silent) OptionPage.showStatusModal('Default settings restored.');
-      this.init();
+      await this.init();
       return true;
-    } catch(e) {
-      logger.warn('Error restoring defaults.', e);
-      OptionPage.showErrorModal(`Error restoring defaults. [Error: ${e}]`);
+    } catch (err) {
+      logger.warn('Failed to restore defaults.', err);
+      OptionPage.showErrorModal(['Failed to restore defaults.', `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1148,16 +1274,15 @@ export default class OptionPage {
     try {
       const text = customAudioSitesTextArea.value;
       this.cfg.customAudioSites = text == '' ? null : JSON.parse(text);
-      if (await this.saveProp('customAudioSites')) {
-        customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
-        OptionPage.showStatusModal('Custom Audio Sites saved.');
-      }
-    } catch(e) {
-      OptionPage.showErrorModal('Failed to save custom audio sites. Please make sure it is valid JSON.');
+      await this.cfg.save('customAudioSites');
+      customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
+      OptionPage.showStatusModal('Custom Audio Sites saved.');
+    } catch (err) {
+      OptionPage.handleError('Failed to save custom audio sites. Please make sure it is valid JSON.', err);
     }
   }
 
-  async saveDomain(event) {
+  async saveDomain() {
     const domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
     const domainText = document.getElementById('domainText') as HTMLInputElement;
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
@@ -1188,13 +1313,13 @@ export default class OptionPage {
       };
       const domain = new Domain(newKey, newDomainCfg);
       domain.updateFromModeIndex(domainModeSelect.selectedIndex);
-      const error = await domain.save(this.cfg);
 
-      if (error) {
-        OptionPage.showErrorModal();
-        return false;
-      } else {
+      try {
+        await domain.save(this.cfg);
         this.populateDomainPage();
+      } catch (err) {
+        OptionPage.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
+        return false;
       }
     } else {
       OptionPage.showInputError(domainText, 'Valid domain example: google.com or www.google.com');
@@ -1202,7 +1327,7 @@ export default class OptionPage {
     }
   }
 
-  async saveOptions(evt) {
+  async saveOptions() {
     // Gather current settings
     const censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
     const censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
@@ -1254,27 +1379,16 @@ export default class OptionPage {
     // Save settings
     try {
       await this.cfg.save();
-      this.init();
+      await this.init();
       return true;
-    } catch(e) {
-      logger.warn('Settings not saved! Please try again.', e);
-      OptionPage.showErrorModal(`Settings not saved! Please try again. [Error: ${e}]`);
+    } catch (err) {
+      logger.warn('Settings not saved! Please try again.', err);
+      OptionPage.showErrorModal(['Settings not saved! Please try again.', `Error: ${err.message}`]);
       return false;
     }
   }
 
-  async saveProp(prop: string) {
-    try {
-      await this.cfg.save(prop);
-      return true;
-    } catch(e) {
-      logger.warn(`Failed to save '${prop}'.`, e);
-      OptionPage.showErrorModal(`Failed to save '${prop}'. [Error: ${e}]`);
-      return false;
-    }
-  }
-
-  async saveWhitelist(evt) {
+  async saveWhitelist() {
     const whitelist = document.getElementById('whitelist') as HTMLSelectElement;
     const selected = whitelist.selectedOptions[0];
     const selectedCase = document.querySelector('input[name="whitelistCase"]:checked') as HTMLInputElement;
@@ -1319,9 +1433,9 @@ export default class OptionPage {
           await this.cfg.save(propsToSave);
           filter.init();
           this.populateOptions();
-        } catch(e) {
-          logger.warn('Failed to update whitelist.', e);
-          OptionPage.showErrorModal(`Failed to update whitelist. [Error: ${e}]`);
+        } catch (err) {
+          logger.warn('Failed to update whitelist.', err);
+          OptionPage.showErrorModal(['Failed to update whitelist.', `Error: ${err.message}`]);
           return false;
         }
       }
@@ -1330,7 +1444,7 @@ export default class OptionPage {
     }
   }
 
-  async saveWord(evt) {
+  async saveWord() {
     const wordList = document.getElementById('wordList') as HTMLSelectElement;
     const wordText = document.getElementById('wordText') as HTMLInputElement;
     const wordMatchRepeated = document.getElementById('wordMatchRepeated') as HTMLInputElement;
@@ -1422,13 +1536,13 @@ export default class OptionPage {
 
       if (added) {
         try {
-          await this.saveOptions(evt);
+          await this.saveOptions();
           // Update states and Reset word form
           filter.rebuildWordlists();
           this.populateOptions();
-        } catch(e) {
-          logger.warn(`Failed to update word '${word}'.`, e);
-          OptionPage.showErrorModal(`Failed to update word '${word}'. [Error: ${e}]`);
+        } catch (err) {
+          logger.warn(`Failed to update word '${word}'.`, err);
+          OptionPage.showErrorModal([`Failed to update word '${word}'.`, `Error: ${err.message}`]);
           this.cfg.removeWord(word);
           return false;
         }
@@ -1440,11 +1554,14 @@ export default class OptionPage {
     }
   }
 
-  async selectFilterMethod(evt) {
-    this.cfg.filterMethod = Constants.FILTER_METHODS[evt.target.value];
-    if (await this.saveProp('filterMethod')) {
+  async selectFilterMethod(filterMethodInput: HTMLInputElement) {
+    this.cfg.filterMethod = Constants.FILTER_METHODS[filterMethodInput.value];
+    try {
+      await this.cfg.save('filterMethod');
       filter.rebuildWordlists();
       this.populateOptions();
+    } catch (err) {
+      OptionPage.handleError('Failed to set filter method.', err);
     }
   }
 
@@ -1452,12 +1569,12 @@ export default class OptionPage {
     const prop = element.id === 'textWordlistSelect' ? 'wordlistId' : 'audioWordlistId';
     this.cfg[prop] = element.selectedIndex;
 
-    if (!await this.saveProp(prop)) {
-      OptionPage.showErrorModal('Failed to update defult wordlist.');
-      return false;
+    try {
+      await this.cfg.save(prop);
+      this.populateOptions();
+    } catch (err) {
+      OptionPage.showErrorModal('Failed to update defult wordlist.', err);
     }
-
-    this.populateOptions();
   }
 
   showBulkWordEditor() {
@@ -1480,7 +1597,9 @@ export default class OptionPage {
       });
     }
 
-    tableContainer.querySelectorAll('th input.wordlistHeader').forEach((el) => { el.addEventListener('click', (e) => { this.bulkEditorWordlistCheckbox(e); }); });
+    tableContainer.querySelectorAll('th input.wordlistHeader').forEach((el) => {
+      el.addEventListener('click', (evt) => { this.bulkEditorWordlistCheckbox(evt.target as HTMLInputElement); });
+    });
     OptionPage.openModal(modalId);
   }
 
@@ -1518,17 +1637,16 @@ export default class OptionPage {
 
   async statsReset() {
     try {
-      await WebConfig.removeLocalStoragePromise('stats');
+      await WebConfig.removeLocalStorage('stats');
       this.populateStats();
-    } catch(e) {
-      logger.warn('Failed to reset stats.', e);
-      OptionPage.showErrorModal(`Failed to reset stats. [Error: ${e}]`);
+    } catch (err) {
+      logger.warn('Failed to reset stats.', err);
+      OptionPage.showErrorModal(['Failed to reset stats.', `Error: ${err.message}`]);
     }
   }
 
-  switchPage(evt) {
+  switchPage(newTab: HTMLAnchorElement) {
     const currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
-    const newTab = evt.target as HTMLElement;
 
     currentTab.classList.remove(OptionPage.activeClass);
     newTab.classList.add(OptionPage.activeClass);
@@ -1576,7 +1694,7 @@ export default class OptionPage {
 
   updateFilterOptions() {
     // Show/hide options as needed
-    switch(this.cfg.filterMethod) {
+    switch (this.cfg.filterMethod) {
       case Constants.FILTER_METHODS.CENSOR:
         OptionPage.show(document.getElementById('censorSettings'));
         OptionPage.hide(document.getElementById('substitutionSettings'));
@@ -1596,49 +1714,65 @@ export default class OptionPage {
     }
   }
 
-  updateItemList(evt, input, attr: string, invalidMessage: string, original = ''): boolean {
-    const item = input.value.trim().toLowerCase();
-    if (item == '') { // No data
-      OptionPage.showInputError(input, 'Please enter a value.');
-      return false;
-    } else {
-      if (input.checkValidity()) {
-        OptionPage.hideInputError(input);
-        if (!this.cfg[attr].includes(item)) {
-          if (original != '' && this.cfg[attr].includes(original)) {
-            // Update existing record (remove it before adding the new record)
-            this.cfg[attr].splice(this.cfg[attr].indexOf(original), 1);
-          }
-          // Save new record
-          this.cfg[attr].push(item);
-          this.cfg[attr] = this.cfg[attr].sort();
-          return true;
+  async convertStorageLocation(silent = false) {
+    const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
+    option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
+    const keys = WebConfig._localConfigKeys;
+
+    try {
+      await option.cfg.save(keys);
+
+      try {
+        if (option.cfg.syncLargeKeys) {
+          await WebConfig.removeLocalStorage(WebConfig._largeKeys);
         } else {
-          OptionPage.showInputError(input, 'Already in list.');
-          return false;
+          let removeKeys = [];
+          WebConfig._largeKeys.forEach((largeKey) => {
+            removeKeys = removeKeys.concat(WebConfig.splitKeyNames(largeKey));
+          });
+          await WebConfig.removeSyncStorage(removeKeys);
         }
-      } else {
-        OptionPage.showInputError(input, invalidMessage);
-        return false;
+
+        if (!silent) {
+          OptionPage.showStatusModal('Storage converted successfully.');
+        }
+      } catch (err) {
+        // Revert UI and export a backup of config.
+        option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
+        option.backupConfig();
+        OptionPage.handleError('Failed to cleanup old storage, backup automatically exported.', err);
+        await option.cfg.save('syncLargeKeys');
+        option.populateConfig();
       }
+    } catch (err) {
+      // Revert UI
+      OptionPage.handleError('Failed to update storage preference.', err);
+      option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
+      option.populateConfig();
     }
   }
 
-  async updateYouTubeAutoLimits(target) {
-    OptionPage.hideInputError(target);
-    if (target.checkValidity()) {
-      const updateMin = target.id === 'audioYouTubeAutoSubsMin';
-      const min = parseFloat(updateMin ? target.value : (document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement).value);
-      const max = parseFloat(updateMin ? (document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement).value : target.value);
-      if (min != 0 && max != 0 && min > max) {
-        OptionPage.showInputError(target, 'Min must be less than max.');
+  async updateYouTubeAutoLimits(input: HTMLInputElement) {
+    const max = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
+    const min = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
+    OptionPage.hideInputError(max);
+    OptionPage.hideInputError(min);
+    if (input.checkValidity()) {
+      const maxValue = parseFloat(max.value);
+      const minValue = parseFloat(min.value);
+      if (minValue != 0 && maxValue != 0 && minValue > maxValue) {
+        OptionPage.showInputError(input, 'Min must be less than max.');
       } else {
-        const prop = updateMin ? 'youTubeAutoSubsMin' : 'youTubeAutoSubsMax';
-        this.cfg[prop] = parseFloat(target.value);
-        await this.saveProp(prop);
+        try {
+          this.cfg.youTubeAutoSubsMax = maxValue;
+          this.cfg.youTubeAutoSubsMin = minValue;
+          await this.cfg.save(['youTubeAutoSubsMax', 'youTubeAutoSubsMin']);
+        } catch (err) {
+          OptionPage.handleError('Failed to update YouTube muting min/max values.', err);
+        }
       }
     } else {
-      OptionPage.showInputError(target, 'Please enter a valid number of seconds.');
+      OptionPage.showInputError(input, 'Please enter a valid number of seconds.');
     }
   }
 
@@ -1656,105 +1790,112 @@ export default class OptionPage {
   }
 }
 
+const logger = new Logger();
 const filter = new Filter;
 const option = new OptionPage;
 let lessUsedWords = {};
 
 ////
 // Events
-// Functions
-function bulkEditorSave(e) { option.bulkEditorSave(); }
-function importConfig(e) { option.importConfig(e); }
-function removeAllWords(e) { option.removeAllWords(e); }
-function removeLessUsedWords(e) { option.removeLessUsedWords(); }
-function restoreDefaults(e) { option.restoreDefaults(e); }
-function setPassword(e) { option.auth.setPassword(option); }
-function statsReset(e) { option.statsReset(); }
+// Functions for confirm() to have access to `this`
+function bulkEditorSave() { option.bulkEditorSave(); }
+function bulkEditorSaveRetry() { option.bulkEditorSaveRetry(); }
+function importConfig() { option.importConfig(); }
+function importConfigRetry() { option.importConfigRetry(); }
+function importConfigRetryCancel() { option.importConfigRetryCancel(); }
+function populateConfig() { option.populateConfig(); }
+function convertStorageLocation() { option.convertStorageLocation(); }
+function removeAllWords() { option.removeAllWords(); }
+function removeLessUsedWords() { option.removeLessUsedWords(); }
+function restoreDefaults() { option.restoreDefaults(); }
+function setPassword() { option.auth.setPassword(); }
+function statsReset() { option.statsReset(); }
 // Add event listeners to DOM
-window.addEventListener('load', (e) => { option.init(); });
-document.querySelectorAll('#menu a').forEach((el) => { el.addEventListener('click', (e) => { option.switchPage(e); }); });
+window.addEventListener('load', (evt) => { option.init(); });
+document.querySelectorAll('#menu a').forEach((el) => { el.addEventListener('click', (evt) => { option.switchPage(evt.target as HTMLAnchorElement); }); });
 // Modals
-document.getElementById('submitPassword').addEventListener('click', (e) => { option.auth.authenticate(e); });
-document.getElementById('confirmModalBackup').addEventListener('click', (e) => { option.confirmModalBackup(); });
-document.getElementById('confirmModalOK').addEventListener('click', (e) => { OptionPage.closeModal('confirmModal'); });
-document.getElementById('confirmModalCancel').addEventListener('click', (e) => { OptionPage.closeModal('confirmModal'); });
-document.getElementById('statusModalOK').addEventListener('click', (e) => { OptionPage.closeModal('statusModal'); });
-document.querySelector('#supportedAudioSitesModal #siteSelect').addEventListener('change', (e) => { option.showSupportedAudioSiteConfig(); });
-document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', (e) => { OptionPage.closeModal('supportedAudioSitesModal'); });
-document.querySelector('#bulkWordEditorModal button.modalAddWord').addEventListener('click', (e) => { option.bulkEditorAddRow(); });
-document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEventListener('click', (e) => { option.bulkEditorAddWords(); });
-document.querySelector('#bulkWordEditorModal button.modalCancel').addEventListener('click', (e) => { OptionPage.closeModal('bulkWordEditorModal'); });
-document.querySelector('#bulkWordEditorModal button.modalSave').addEventListener('click', (e) => { option.confirm(e, 'bulkEditorSave'); });
+document.getElementById('submitPassword').addEventListener('click', (evt) => { option.auth.authenticate(evt.target as HTMLButtonElement); });
+document.getElementById('confirmModalBackup').addEventListener('click', (evt) => { option.confirmModalBackup(); });
+document.getElementById('confirmModalOK').addEventListener('click', (evt) => { OptionPage.closeModal('confirmModal'); });
+document.getElementById('confirmModalCancel').addEventListener('click', (evt) => { OptionPage.closeModal('confirmModal'); });
+document.getElementById('statusModalOK').addEventListener('click', (evt) => { OptionPage.closeModal('statusModal'); });
+document.querySelector('#supportedAudioSitesModal #siteSelect').addEventListener('change', (evt) => { option.showSupportedAudioSiteConfig(); });
+document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', (evt) => { OptionPage.closeModal('supportedAudioSitesModal'); });
+document.querySelector('#bulkWordEditorModal button.modalAddWord').addEventListener('click', (evt) => { option.bulkEditorAddRow(); });
+document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEventListener('click', (evt) => { option.bulkEditorAddWords(); });
+document.querySelector('#bulkWordEditorModal button.modalCancel').addEventListener('click', (evt) => { OptionPage.closeModal('bulkWordEditorModal'); });
+document.querySelector('#bulkWordEditorModal button.modalSave').addEventListener('click', (evt) => { option.confirm('bulkEditorSave'); });
 // Settings
-document.querySelectorAll('#filterMethod input').forEach((el) => { el.addEventListener('click', (e) => { option.selectFilterMethod(e); }); });
-document.getElementById('censorCharacterSelect').addEventListener('change', (e) => { option.saveOptions(e); });
-document.getElementById('censorFixedLengthSelect').addEventListener('change', (e) => { option.saveOptions(e); });
-document.getElementById('defaultWordMatchMethodSelect').addEventListener('change', (e) => { option.saveOptions(e); });
-document.getElementById('defaultWordRepeat').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('defaultWordSeparators').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('preserveCase').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('preserveFirst').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('preserveLast').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('showCounter').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('showSummary').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('showUpdateNotification').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('filterWordList').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('substitutionMark').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('defaultWordSubstitutionText').addEventListener('change', (e) => { option.saveOptions(e); });
+document.querySelectorAll('#filterMethod input').forEach((el) => { el.addEventListener('click', (evt) => { option.selectFilterMethod(evt.target as HTMLInputElement); }); });
+document.getElementById('censorCharacterSelect').addEventListener('change', (evt) => { option.saveOptions(); });
+document.getElementById('censorFixedLengthSelect').addEventListener('change', (evt) => { option.saveOptions(); });
+document.getElementById('defaultWordMatchMethodSelect').addEventListener('change', (evt) => { option.saveOptions(); });
+document.getElementById('defaultWordRepeat').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('defaultWordSeparators').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('preserveCase').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('preserveFirst').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('preserveLast').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('showCounter').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('showSummary').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('showUpdateNotification').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('filterWordList').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('substitutionMark').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('defaultWordSubstitutionText').addEventListener('change', (evt) => { option.saveOptions(); });
 // Words/Phrases
-document.getElementById('wordList').addEventListener('change', (e) => { option.populateWord(); });
-document.getElementById('wordText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
-document.getElementById('substitutionText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
-document.getElementById('wordSave').addEventListener('click', (e) => { option.saveWord(e); });
-document.getElementById('wordRemove').addEventListener('click', (e) => { option.removeWord(e); });
-document.getElementById('wordRemoveAll').addEventListener('click', (e) => { option.confirm(e, 'removeAllWords'); });
-document.getElementById('bulkWordEditorButton').addEventListener('click', (e) => { option.showBulkWordEditor(); });
+document.getElementById('wordList').addEventListener('change', (evt) => { option.populateWord(); });
+document.getElementById('wordText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
+document.getElementById('substitutionText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
+document.getElementById('wordSave').addEventListener('click', (evt) => { option.saveWord(); });
+document.getElementById('wordRemove').addEventListener('click', (evt) => { option.removeWord(evt.target as HTMLButtonElement); });
+document.getElementById('wordRemoveAll').addEventListener('click', (evt) => { option.confirm('removeAllWords'); });
+document.getElementById('bulkWordEditorButton').addEventListener('click', (evt) => { option.showBulkWordEditor(); });
 // Lists
-document.getElementById('whitelist').addEventListener('change', (e) => { option.populateWhitelistWord(); });
-document.getElementById('whitelistText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
-document.getElementById('whitelistSave').addEventListener('click', (e) => { option.saveWhitelist(e); });
-document.getElementById('whitelistRemove').addEventListener('click', (e) => { option.removeWhitelist(e); });
-document.getElementById('wordlistsEnabled').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('wordlistRename').addEventListener('click', (e) => { option.renameWordlist(); });
-document.getElementById('wordlistSelect').addEventListener('change', (e) => { option.populateWordlist(); });
-document.getElementById('wordlistText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
-document.getElementById('textWordlistSelect').addEventListener('change', (e) => { option.setDefaultWordlist(e.target as HTMLSelectElement); });
-document.getElementById('audioWordlistSelect').addEventListener('change', (e) => { option.setDefaultWordlist(e.target as HTMLSelectElement); });
+document.getElementById('whitelist').addEventListener('change', (evt) => { option.populateWhitelistWord(); });
+document.getElementById('whitelistText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
+document.getElementById('whitelistSave').addEventListener('click', (evt) => { option.saveWhitelist(); });
+document.getElementById('whitelistRemove').addEventListener('click', (evt) => { option.removeWhitelist(); });
+document.getElementById('wordlistsEnabled').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('wordlistRename').addEventListener('click', (evt) => { option.renameWordlist(); });
+document.getElementById('wordlistSelect').addEventListener('change', (evt) => { option.populateWordlist(); });
+document.getElementById('wordlistText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
+document.getElementById('textWordlistSelect').addEventListener('change', (evt) => { option.setDefaultWordlist(evt.target as HTMLSelectElement); });
+document.getElementById('audioWordlistSelect').addEventListener('change', (evt) => { option.setDefaultWordlist(evt.target as HTMLSelectElement); });
 // Domains
-document.querySelectorAll('#domainMode input').forEach((el) => { el.addEventListener('click', (e) => { option.saveOptions(e); }); });
-document.getElementById('domainSelect').addEventListener('change', (e) => { option.populateDomain(); });
-document.getElementById('domainText').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
-document.getElementById('domainSave').addEventListener('click', (e) => { option.saveDomain(e); });
-document.getElementById('domainRemove').addEventListener('click', (e) => { option.removeDomain(e); });
+document.querySelectorAll('#domainMode input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
+document.getElementById('domainSelect').addEventListener('change', (evt) => { option.populateDomain(); });
+document.getElementById('domainText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
+document.getElementById('domainSave').addEventListener('click', (evt) => { option.saveDomain(); });
+document.getElementById('domainRemove').addEventListener('click', (evt) => { option.removeDomain(); });
 // Audio
-document.getElementById('muteAudio').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('supportedAudioSites').addEventListener('click', (e) => { option.showSupportedAudioSites(); });
-document.getElementById('fillerAudioSelect').addEventListener('change', (e) => { option.saveOptions(e); });
-document.getElementById('muteAudioOnly').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('muteCueRequireShowing').addEventListener('click', (e) => { option.saveOptions(e); });
-document.querySelectorAll('#audioMuteMethod input').forEach((el) => { el.addEventListener('click', (e) => { option.saveOptions(e); }); });
-document.querySelectorAll('#audioSubtitleSelection input').forEach((el) => { el.addEventListener('click', (e) => { option.saveOptions(e); }); });
-document.querySelectorAll('input.updateYouTubeAutoLimits').forEach((el) => { el.addEventListener('input', (e) => { option.updateYouTubeAutoLimits(e.target); }); });
-document.getElementById('customAudioSitesSave').addEventListener('click', (e) => { option.saveCustomAudioSites(); });
+document.getElementById('muteAudio').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('supportedAudioSites').addEventListener('click', (evt) => { option.showSupportedAudioSites(); });
+document.getElementById('fillerAudioSelect').addEventListener('change', (evt) => { option.saveOptions(); });
+document.getElementById('muteAudioOnly').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('muteCueRequireShowing').addEventListener('click', (evt) => { option.saveOptions(); });
+document.querySelectorAll('#audioMuteMethod input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
+document.querySelectorAll('#audioSubtitleSelection input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
+document.querySelectorAll('input.audioYouTubeAutoSubs').forEach((el) => { el.addEventListener('change', (evt) => { option.updateYouTubeAutoLimits(evt.target as HTMLInputElement); }); });
+document.getElementById('customAudioSitesSave').addEventListener('click', (evt) => { option.saveCustomAudioSites(); });
 // Bookmarklet
-document.querySelectorAll('#bookmarkletConfigInputs input').forEach((el) => { el.addEventListener('click', (e) => { option.populateBookmarkletPage(); }); });
-document.getElementById('bookmarkletFile').addEventListener('click', (e) => { option.exportBookmarkletFile(); });
-document.getElementById('bookmarkletHostedURL').addEventListener('input', (e) => { option.updateHostedBookmarklet(); });
-document.getElementById('bookmarkletLink').addEventListener('click', (e) => { e.preventDefault(); });
+document.querySelectorAll('#bookmarkletConfigInputs input').forEach((el) => { el.addEventListener('click', (evt) => { option.populateBookmarkletPage(); }); });
+document.getElementById('bookmarkletFile').addEventListener('click', (evt) => { option.exportBookmarkletFile(); });
+document.getElementById('bookmarkletHostedURL').addEventListener('input', (evt) => { option.updateHostedBookmarklet(); });
+document.getElementById('bookmarkletLink').addEventListener('click', (evt) => { evt.preventDefault(); });
 // Config
-document.getElementById('configInlineInput').addEventListener('click', (e) => { option.configInlineToggle(); });
-document.getElementById('importFileInput').addEventListener('change', (e) => { option.importConfigFile(e); });
-document.getElementById('configReset').addEventListener('click', (e) => { option.confirm(e, 'restoreDefaults'); });
-document.getElementById('configExport').addEventListener('click', (e) => { option.exportConfig(); });
-document.getElementById('configImport').addEventListener('click', (e) => { option.confirm(e, 'importConfig'); });
-document.getElementById('setPassword').addEventListener('input', (e) => { option.auth.setPasswordButton(option); });
-document.getElementById('setPasswordBtn').addEventListener('click', (e) => { option.confirm(e, 'setPassword'); });
+document.getElementById('configSyncLargeKeys').addEventListener('click', (evt) => { option.confirm('convertStorageLocation'); });
+document.getElementById('configInlineInput').addEventListener('click', (evt) => { option.configInlineToggle(); });
+document.getElementById('importFileInput').addEventListener('change', (evt) => { option.importConfigFile((evt.target as HTMLInputElement).files); });
+document.getElementById('configReset').addEventListener('click', (evt) => { option.confirm('restoreDefaults'); });
+document.getElementById('configExport').addEventListener('click', (evt) => { option.exportConfig(); });
+document.getElementById('configImport').addEventListener('click', (evt) => { option.confirm('importConfig'); });
+document.getElementById('setPassword').addEventListener('input', (evt) => { option.auth.setPasswordButton(); });
+document.getElementById('setPasswordBtn').addEventListener('click', (evt) => { option.confirm('setPassword'); });
 // Test
-document.getElementById('testText').addEventListener('input', (e) => { option.populateTest(); });
+document.getElementById('testText').addEventListener('input', (evt) => { option.populateTest(); });
 // Stats
-document.getElementById('collectStats').addEventListener('click', (e) => { option.saveOptions(e); });
-document.getElementById('statsReset').addEventListener('click', (e) => { option.confirm(e, 'statsReset'); });
-document.getElementById('lessUsedWordsNumber').addEventListener('input', (e) => { OptionPage.hideInputError(e.target); });
-document.getElementById('removeLessUsedWords').addEventListener('click', (e) => { option.confirm(e, 'removeLessUsedWords'); });
+document.getElementById('collectStats').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('statsReset').addEventListener('click', (evt) => { option.confirm('statsReset'); });
+document.getElementById('lessUsedWordsNumber').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
+document.getElementById('removeLessUsedWords').addEventListener('click', (evt) => { option.confirm('removeLessUsedWords'); });
 // Other
-document.getElementsByClassName('themes')[0].addEventListener('click', (e) => { option.toggleTheme(); });
+document.getElementsByClassName('themes')[0].addEventListener('click', (evt) => { option.toggleTheme(); });

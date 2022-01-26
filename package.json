@@ -29,7 +29,7 @@
     "package:webpack": "webpack --config bin/webpack.config.js",
     "package": "npm run build && npm run package:bookmarklet && npm run package:extension",
     "test:addon": "npx addons-linter ./extension-firefox.zip",
-    "test:all": "npm run test && npm run test:lint:tests && npm run test:addon",
+    "test:all": "npm run test && npm run test:lint:tests",
     "test:cov": "npm run build:test && nyc --reporter=lcov --reporter=text node_modules/mocha/bin/_mocha",
     "test:debug": "node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
     "test:lint:all": "npm run test:lint && npm run test:lint:bin && npm run test:lint:tests",
@@ -39,7 +39,7 @@
     "test:lint": "eslint \"src/**/*.ts\"",
     "test:nocov": "node_modules/mocha/bin/_mocha",
     "test:types": "tsc --noEmit",
-    "test": "npm run test:lint && npm run test:types && npm run test:cov",
+    "test": "npm run test:lint && npm run test:types && npm run test:addon && npm run test:cov",
     "type-check:watch": "npm run type-check -- --watch",
     "update:help": "node bin/update-help.mjs",
     "update:deps": "npx npm-check-updates --concurrency 10 --timeout 600000 --upgrade",
@@ -129,6 +129,7 @@
           "SwitchCase": 1
         }
       ],
+      "keyword-spacing": "warn",
       "no-console": "warn",
       "no-control-regex": [
         "off"

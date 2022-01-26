@@ -161,6 +161,10 @@ export function numberWithCommas(number: number | string): string {
   }
 }
 
+export function prettyPrintArray(array: string[]) {
+  return `[${array.toString().replace(/,/g, ', ')}]`;
+}
+
 export function readFile(file) {
   return new Promise((resolve, reject) => {
     const fr = new FileReader();
@@ -183,6 +187,14 @@ export function removeFromArray(array: string[], element: string) {
 
 export function secondsToHMS(seconds: number): string {
   return new Date(seconds * 1000).toISOString().substr(11, 12);
+}
+
+export function stringArray(data: string | string[]): string[] {
+  if (typeof data === 'string') {
+    data = [data];
+  }
+
+  return data;
 }
 
 export function upperCaseFirst(str: string, lowerCaseRest: boolean = true): string {

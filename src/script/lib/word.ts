@@ -79,7 +79,7 @@ export default class Word {
 
   buildRegExp(): RegExp {
     try {
-      switch(this.matchMethod) {
+      switch (this.matchMethod) {
         case Constants.MATCH_METHODS.PARTIAL:
           if (this._filterMethod === Constants.FILTER_METHODS.REMOVE) {
             // Match entire word that contains sub-string and surrounding whitespace
@@ -138,8 +138,8 @@ export default class Word {
             }
           }
       }
-    } catch(e) {
-      throw new Error('Failed to create RegExp for "' + this.value + '" - ' + e.name + ' ' + e.message);
+    } catch (err) {
+      throw new Error(`Failed to create RegExp for '${this.value}'. [${err.name}: ${err.message}]`);
     }
   }
 

@@ -415,7 +415,7 @@ export default class WebAudio {
       // Ensure proper rule values
       if (rule.tagName != null && rule.tagName != '#text') { rule.tagName = rule.tagName.toUpperCase(); }
 
-      switch(rule.mode) {
+      switch (rule.mode) {
         case 'cue':
           this.initCueRule(rule);
           if (!rule.disabled) { this.cueRuleIds.push(ruleId); }
@@ -462,7 +462,7 @@ export default class WebAudio {
   }
 
   initYouTube() {
-    if(['m.youtube.com', 'tv.youtube.com', 'www.youtube.com'].includes(this.siteKey)) {
+    if (['m.youtube.com', 'tv.youtube.com', 'www.youtube.com'].includes(this.siteKey)) {
       this.youTube = true;
       // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
       const youTubeAutoCensor = '[ __ ]';
@@ -488,7 +488,7 @@ export default class WebAudio {
         this.filter.stats.mutes++;
       }
 
-      switch(rule.muteMethod) {
+      switch (rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
           chrome.runtime.sendMessage({ mute: true });
           break;
@@ -519,8 +519,8 @@ export default class WebAudio {
       if (options.line) { cue.line = this.parseLineAndPositionSetting(options.line); }
       if (options.position) { cue.position = this.parseLineAndPositionSetting(options.position); }
       return cue;
-    } catch (e) {
-      logger.error(`[Audio] Failed to add cue: ( start: ${start}, end: ${end}, text: ${text} )`, e);
+    } catch (err) {
+      logger.error(`[Audio] Failed to add cue: ( start: ${start}, end: ${end}, text: ${text} )`, err);
     }
   }
 
@@ -555,7 +555,7 @@ export default class WebAudio {
       if (lines[i].indexOf('-->') >= 0) {
         const splitted = lines[i].split(/[ \t]+-->[ \t]+/);
         if (splitted.length != 2) {
-          throw 'Error when splitting "-->": ' + lines[i];
+          throw new Error(`Error when splitting "-->": ${lines[i]}.`);
         }
         start = splitted[0];
         end = splitted[1];
@@ -567,7 +567,7 @@ export default class WebAudio {
           end = null;
           text = null;
         }
-      } else if(start && end) {
+      } else if (start && end) {
         if (text == null) {
           text = lines[i];
         } else {
@@ -705,17 +705,17 @@ export default class WebAudio {
         const subsData = getGlobalVariable(rule.externalSubVar);
         if (Array.isArray(subsData)) {
           const found = subsData.find((subtitle) => subtitle.language === rule.videoCueLanguage);
-          if (!found) { throw(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
+          if (!found) { throw new Error(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
           this.fetching = true;
           const subs = await makeRequest('GET', found[rule.externalSubURLKey]) as string;
           if (typeof subs == 'string' && subs) {
             let parsedCues;
-            switch(found[rule.externalSubFormatKey]) {
+            switch (found[rule.externalSubFormatKey]) {
               case 'ass': parsedCues = this.parseSSA(subs); break;
               case 'srt': parsedCues = this.parseSRT(subs); break;
               case 'vtt': parsedCues = this.parseVTT(subs); break;
               default:
-                throw(`Unsupported subtitle type: ${found[rule.externalSubFormatKey]}`);
+                throw new Error(`Unsupported subtitle type: ${found[rule.externalSubFormatKey]}.`);
             }
             if (parsedCues) {
               const track = this.newTextTrack(rule, video, parsedCues);
@@ -730,13 +730,13 @@ export default class WebAudio {
               }
             }
           } else {
-            throw(`Failed to download external subtitles from '${found[rule.externalSubURLKey]}'.`);
+            throw new Error(`Failed to download external subtitles from '${found[rule.externalSubURLKey]}'.`);
           }
         } else {
-          throw(`Failed to find subtitle variable: ${rule.externalSubVar}`);
+          throw new Error(`Failed to find subtitle variable: ${rule.externalSubVar}.`);
         }
-      } catch(e) {
-        logger.error(`[Audio] Error using external subtitles for ${this.siteKey}.`, e);
+      } catch (err) {
+        logger.error(`[Audio] Error using external subtitles for ${this.siteKey}.`, err);
       }
     }
   }
@@ -833,7 +833,7 @@ export default class WebAudio {
   }
 
   subtitlesShouldBeShown(rule, filtered: boolean = false): boolean {
-    switch(rule.showSubtitles) {
+    switch (rule.showSubtitles) {
       case Constants.SHOW_SUBTITLES.ALL: return true;
       case Constants.SHOW_SUBTITLES.FILTERED: return filtered;
       case Constants.SHOW_SUBTITLES.UNFILTERED: return !filtered;
@@ -848,7 +848,7 @@ export default class WebAudio {
       const ruleId = this.enabledRuleIds[i];
       const rule = this.rules[ruleId];
 
-      switch(rule.mode) {
+      switch (rule.mode) {
         case 'element':
           if (node.nodeName == rule.tagName) {
             let failed = false;
@@ -920,7 +920,7 @@ export default class WebAudio {
       }
 
       this.muted = false;
-      switch(rule.muteMethod) {
+      switch (rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
           chrome.runtime.sendMessage({ mute: false });
           break;

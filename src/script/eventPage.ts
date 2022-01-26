@@ -13,7 +13,7 @@ const backgroundStorage: BackgroundStorage = {
 // Functions
 //
 function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
-  switch(info.menuItemId) {
+  switch (info.menuItemId) {
     case 'addSelection':
       processSelection('addWord', info.selectionText); break;
     case 'disableTabOnce':
@@ -41,7 +41,7 @@ function getTabOptions(id: number): TabStorageOptions {
 }
 
 function notificationsOnClick(notificationId: string) {
-  switch(notificationId) {
+  switch (notificationId) {
     case 'extensionUpdate':
       chrome.notifications.clear('extensionUpdate');
       chrome.tabs.create({ url: 'https://github.com/richardfrost/AdvancedProfanityFilter/releases' });
@@ -55,7 +55,7 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
     chrome.runtime.openOptionsPage();
   } else if (details.reason == 'update') {
     const thisVersion = chrome.runtime.getManifest().version;
-    logger.info(`Updated from ${details.previousVersion} to ${thisVersion}`);
+    logger.info(`Updated from ${details.previousVersion} to ${thisVersion}.`);
 
     // Open options page to show new features
     // chrome.runtime.openOptionsPage();
@@ -128,22 +128,22 @@ function onMessage(request: Message, sender, sendResponse) {
 
 // Add selected word/phrase and reload page (unless already present)
 async function processSelection(action: string, selection: string) {
-  const cfg = await WebConfig.build('words');
+  const cfg = await WebConfig.load('words');
   const result = cfg[action](selection);
 
   if (result) {
     try {
-      await cfg.save();
+      await cfg.save('words');
       chrome.tabs.reload();
-    } catch(e) {
-      logger.errorTime(`Failed to process selection '${selection}'.`, e);
+    } catch (err) {
+      logger.errorTime(`Failed to process selection '${selection}'.`, err);
     }
   }
 }
 
 async function runUpdateMigrations(previousVersion) {
   if (DataMigration.migrationNeeded(previousVersion)) {
-    const cfg = await WebConfig.build();
+    const cfg = await WebConfig.load();
     const migration = new DataMigration(cfg);
     const migrated = migration.byVersion(previousVersion);
     if (migrated) cfg.save();
@@ -177,10 +177,10 @@ function tabsOnRemoved(tabId: number) {
 }
 
 async function toggleDomain(hostname: string, action: string) {
-  const cfg = await WebConfig.build(['domains', 'enabledDomainsOnly']);
+  const cfg = await WebConfig.load(['domains', 'enabledDomainsOnly']);
   const domain = Domain.byHostname(hostname, cfg.domains);
 
-  switch(action) {
+  switch (action) {
     case 'disable':
       cfg.enabledDomainsOnly ? domain.enabled = !domain.enabled : domain.disabled = !domain.disabled; break;
     case 'advanced':
@@ -190,8 +190,8 @@ async function toggleDomain(hostname: string, action: string) {
   try {
     await domain.save(cfg);
     chrome.tabs.reload();
-  } catch(e) {
-    logger.error(`Failed to modify '${action}' for domain '${domain.cfgKey}'.`, e, domain);
+  } catch (err) {
+    logger.error(`Failed to modify '${action}' for domain '${domain.cfgKey}'.`, err, domain);
   }
 }
 
