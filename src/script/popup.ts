@@ -45,10 +45,6 @@ class Popup {
     return instance;
   }
 
-  constructor() {
-    this.protected = false;
-  }
-
   ////
   // Functions for Popup
   static disable(element) {
@@ -69,6 +65,10 @@ class Popup {
   static show(element: HTMLElement) {
     element.classList.remove('w3-hide');
     element.classList.add('w3-show');
+  }
+
+  constructor() {
+    this.protected = false;
   }
 
   applyTheme() {
