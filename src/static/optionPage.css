@@ -183,6 +183,10 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 }
 
 /* Bulk Word Editor */
+#bulkWordEditorModal div.w3-modal-content {
+  width: 98%;
+}
+
 #bulkWordEditorModal div.tableContainer {
   overflow: auto;
   height: 600px;
