@@ -5,25 +5,82 @@ w3-border-grey
 w3-flat-silver
 w3-flat-pomegranate */
 
-/* #region HTML Elements */
-body {
-  background: #f1f1f1; /* w3-light-grey */
-  color: #000;
+/* #region Themes */
+:root {
+  color-scheme: light dark; /* both themes supported */
 }
 
-body.dark {
-  background: #202020;
-  color: #fff;
-}
-
-div.dark {
-  background: #121212;
-  color: #fff;
-}
-
+/* Variables */
 html {
   --blue: #2980b9; /* belize-hole */
+  --dark-dark: #121212;
+  --dark-light: #202020;
+  --dark-text: #fff;
+  --light-dark: #f1f1f1; /* w3-light-grey */
+  --light-light: #eee;
+  --light-text: #000;
   --silver: #bdc3c7;
+}
+
+/* Light theme variables (default) */
+body {
+  --background-color: var(--light-light);
+  --text-color: var(--light-text);
+}
+
+/* Dark theme variables */
+body.dark {
+  --background-color: var(--dark-light);
+  --text-color: var(--light-light);
+}
+div#main.dark {
+  --background-color: var(--dark-dark);
+}
+div.w3-modal.dark > div {
+  --background-color: var(--dark-light);
+}
+
+/* Adjust variables based on system preference */
+@media (prefers-color-scheme: dark) {
+  /* Dark theme (default) */
+  body {
+    --background-color: var(--dark-light);
+    --text-color: var(--dark-text);
+  }
+  div#main {
+    --background-color: var(--dark-dark);
+  }
+  div.w3-modal > div {
+    --background-color: var(--dark-light);
+  }
+
+  /* Light theme */
+  body.light {
+    --background-color: var(--light-dark);
+    --text-color: var(--light-text);
+  }
+  div#main.light {
+    --background-color: var(--light-dark);
+  }
+  div.w3-modal.light > div {
+    --background-color: var(--light-dark);
+  }
+}
+/* #endregion */
+
+/* #region HTML Elements */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+div#main {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+div.w3-modal > div {
+  background-color: var(--background-color);
 }
 
 a:hover {
