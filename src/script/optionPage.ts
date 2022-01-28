@@ -32,7 +32,6 @@ export default class OptionPage {
   static readonly themeElementSelectors = [
     'body',
     'div#page',
-    'div#main',
     'div.w3-modal',
   ];
 

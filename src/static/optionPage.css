@@ -35,7 +35,7 @@ body.dark {
   --background-color: var(--dark-light);
   --text-color: var(--light-light);
 }
-div#main.dark {
+div#page.dark {
   --background-color: var(--dark-dark);
 }
 div.w3-modal.dark > div {
@@ -49,7 +49,7 @@ div.w3-modal.dark > div {
     --background-color: var(--dark-light);
     --text-color: var(--dark-text);
   }
-  div#main {
+  div#page {
     --background-color: var(--dark-dark);
   }
   div.w3-modal > div {
@@ -61,7 +61,7 @@ div.w3-modal.dark > div {
     --background-color: var(--light-dark);
     --text-color: var(--light-text);
   }
-  div#main.light {
+  div#page.light {
     --background-color: var(--light-dark);
   }
   div.w3-modal.light > div {
@@ -76,7 +76,7 @@ body {
   color: var(--text-color);
 }
 
-div#main {
+div#page {
   background-color: var(--background-color);
   color: var(--text-color);
 }
