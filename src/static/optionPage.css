@@ -213,11 +213,14 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   vertical-align: middle;
 }
 
-#bulkWordEditorModal table th button,input,span {
+#bulkWordEditorModal table th button,
+#bulkWordEditorModal table th input,
+#bulkWordEditorModal table th span {
   vertical-align: middle;
 }
 
-#bulkWordEditorModal table th button,input {
+#bulkWordEditorModal table th button,
+#bulkWordEditorModal table th input {
   margin-right: 5px;
 }
 
