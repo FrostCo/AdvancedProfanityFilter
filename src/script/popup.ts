@@ -12,8 +12,10 @@ class Popup {
   cfg: WebConfig;
   domain: Domain;
   filterToggleProp: string;
+  prefersDarkScheme: boolean;
   protected: boolean;
   tab: chrome.tabs.Tab;
+  themeElements: Element[];
   url: URL;
 
   static readonly _requiredConfig = [
@@ -66,16 +68,37 @@ class Popup {
   }
 
   constructor() {
+    this.prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
     this.protected = false;
+    this.themeElements = [document.body, document.querySelector('#footer')];
+  }
+
+  applyDarkTheme() {
+    document.documentElement.style.setProperty('color-scheme', 'dark');
+    const summaryTable = document.querySelector('#summary > table') as HTMLTableElement;
+    summaryTable.classList.remove('w3-striped');
+    this.themeElements.forEach((element) => {
+      element.classList.add('dark');
+      element.classList.remove('light');
+    });
+  }
+
+  applyLightTheme() {
+    document.documentElement.style.setProperty('color-scheme', 'light');
+    const summaryTable = document.querySelector('#summary > table') as HTMLTableElement;
+    summaryTable.classList.add('w3-striped');
+    this.themeElements.forEach((element) => {
+      element.classList.remove('dark');
+      element.classList.add('light');
+    });
   }
 
   applyTheme() {
-    const elements = [];
-    elements.push(document.querySelector('body'));
-    elements.push(document.querySelector('#footer'));
-    elements.forEach((element) => { element.classList.toggle('dark'); });
-    const table = document.querySelector('#summary > table');
-    table.classList.toggle('w3-striped');
+    if (this.cfg.darkMode == null) {
+      this.prefersDarkScheme ? this.applyDarkTheme() : this.applyLightTheme();
+    } else {
+      this.cfg.darkMode ?  this.applyDarkTheme() : this.applyLightTheme();
+    }
   }
 
   async filterMethodSelect() {
@@ -91,7 +114,7 @@ class Popup {
 
   async populateOptions() {
     await Popup.load(popup);
-    if (this.cfg.darkMode) { this.applyTheme(); }
+    this.applyTheme();
 
     const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
     const domainToggle = document.getElementById('domainToggle') as HTMLInputElement;

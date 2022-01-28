@@ -1,39 +1,94 @@
-/* #region HTML Elements */
-html {
-  --blue: #3498db; /* .w3-flat-peter-river */
+/* #region Themes */
+:root {
+  color-scheme: light dark; /* both supported */
 }
 
+html {
+  --blue: #3498db; /* .w3-flat-peter-river */
+  --dark-dark: #121212;
+  --dark-light: #202020;
+  --dark-text: #fff;
+  --light-dark: #f1f1f1; /* w3-light-grey */
+  --light-darker: #ccc;
+  --light-light: #eee;
+  --light-text: #000;
+}
+
+/* Light theme variables (default) */
+body {
+  --background-color: var(--light-light);
+  --text-color: var(--light-text);
+}
+
+/* Dark theme variables */
+body.dark {
+  --background-color: var(--dark-light);
+  --text-color: var(--dark-text);
+}
+#footer.dark {
+  --background-color: var(--dark-dark);
+  /* --text-color: var(--dark-text); */
+}
+#footer.dark a {
+  --text-color: var(--dark-text);
+}
+
+/* Adjust variables based on system preference */
+@media (prefers-color-scheme: dark) {
+  /* Dark theme (default) */
+  body {
+    --background-color: var(--dark-light);
+    --text-color: var(--dark-text);
+  }
+  #footer {
+    --background-color: var(--dark-dark);
+    /* --text-color: var(--dark-text); */
+  }
+  #footer a {
+    --text-color: var(--dark-text);
+  }
+
+  /* Light theme */
+  body.light {
+    --background-color: var(--light-light);
+    --text-color: var(--light-text);
+  }
+  #footer.light {
+    --background-color: var(--light-darker);
+    --text-color: var(--light-text);
+  }
+  #footer.light a {
+    --text-color: var(--light-text);
+  }
+}
+/* #endregion */
+
+/* #region HTML Elements */
 body {
   font-family: Arial;
   width: 250px;
   height: 100%;
   max-height: 600px;
-  background-color: #eee;
+  background-color: var(--background-color);
   padding: 0;
   margin: auto;
 }
 
-body.dark {
-  background: #202020;
-  color: #fff;
+#footer {
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
-a:link, a:visited {
-  color: #333;
-  font-size: 10px;
-}
-
-a:hover, a:active {
-  color: #222;
+#footer a {
+  background-color: var(--background-color);
+  color: var(--text-color);
   font-size: 10px;
 }
 
 h4 {
   margin-bottom: 5px;
 }
-/* #endregion */
 
-/* #region Page */
 #logo {
   width: 64px;
   height: 64px;
@@ -106,21 +161,11 @@ h4 {
 #footer {
   width: 100%;
   padding: 15px 0;
-  background: #ccc;
   text-align: center;
   margin-top: 8px;
 }
 
-#footer.dark {
-  background: #202020;
-  color: #fff;
-}
-
-#footer.dark a {
-  color: #fff;
-}
-
-#gettingStarted {
+#footer a#gettingStarted {
   color: var(--blue);
   font-weight: bold;
 }
@@ -132,7 +177,7 @@ h4 {
 }
 /* #endregion */
 
-/* #region Slider (enable/disable filter) */
+/* #region Slider */
 /* Hide default HTML checkbox */
 .switch input {
   display: none;
