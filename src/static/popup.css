@@ -4,7 +4,7 @@
 }
 
 html {
-  --blue: #3498db; /* .w3-flat-peter-river */
+  --blue: #2980b9; /* belize-hole */
   --dark-dark: #121212;
   --dark-light: #202020;
   --dark-text: #fff;
@@ -130,6 +130,11 @@ h4 {
   overflow: auto;
   max-height: 180px;
   margin-bottom: 8px;
+}
+
+#summary table thead tr {
+  background-color: var(--blue);
+  color: var(--dark-text);
 }
 
 #summary table tbody .summaryTooltip {
