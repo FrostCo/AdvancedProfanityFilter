@@ -31,22 +31,6 @@ class Popup {
     'wordlistsEnabled',
   ];
 
-  static async load(instance: Popup) {
-    instance.cfg = await WebConfig.load(Popup._requiredConfig);
-    instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
-    if (instance.tab.url) {
-      instance.url = new URL(instance.tab.url);
-      instance.domain = Domain.byHostname(instance.url.hostname, instance.cfg.domains);
-    } else { // No URL (can be blank in Safari new tab)
-      instance.url = null;
-      instance.domain = new Domain('');
-    }
-    instance.filterToggleProp = instance.cfg.enabledDomainsOnly ? 'enabled' : 'disabled';
-    return instance;
-  }
-
-  ////
-  // Functions for Popup
   static disable(element) {
     element.disabled = true;
     element.classList.add('disabled');
@@ -60,6 +44,20 @@ class Popup {
   static hide(element: HTMLElement) {
     element.classList.remove('w3-show');
     element.classList.add('w3-hide');
+  }
+
+  static async load(instance: Popup) {
+    instance.cfg = await WebConfig.load(Popup._requiredConfig);
+    instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
+    if (instance.tab.url) {
+      instance.url = new URL(instance.tab.url);
+      instance.domain = Domain.byHostname(instance.url.hostname, instance.cfg.domains);
+    } else { // No URL (can be blank in Safari new tab)
+      instance.url = null;
+      instance.domain = new Domain('');
+    }
+    instance.filterToggleProp = instance.cfg.enabledDomainsOnly ? 'enabled' : 'disabled';
+    return instance;
   }
 
   static show(element: HTMLElement) {
