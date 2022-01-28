@@ -460,7 +460,7 @@ export default class OptionPage {
     removeButton.id = 'bulkEditorRemoveAll';
     removeButton.addEventListener('click', (evt) => { this.bulkEditorRemoveAll(); });
     const removeSpan = document.createElement('span');
-    removeSpan.textContent = ' Remove';
+    removeSpan.textContent = 'Remove';
     removeCell.appendChild(removeButton);
     removeCell.appendChild(removeSpan);
     row.appendChild(removeCell);
@@ -482,7 +482,7 @@ export default class OptionPage {
       input.type = 'checkbox';
       input.classList.add('wordlistHeader');
       input.dataset.col = (i + 1).toString();
-      span.textContent = ` ${wordlist}`; // TODO: Fix spacing
+      span.textContent = `${wordlist}`;
       inputLabel.appendChild(input);
       inputLabel.appendChild(span);
       cell.appendChild(inputLabel);
