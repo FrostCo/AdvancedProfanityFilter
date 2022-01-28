@@ -371,6 +371,10 @@ export default class OptionPage {
     const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
     const row = button.parentElement.parentElement as HTMLTableRowElement;
     table.deleteRow(row.rowIndex);
+    if (table.rows.length == 1) {
+      // Add a new row if that was the last row (ignoring header)
+      this.bulkEditorAddRow();
+    }
   }
 
   async bulkEditorSave() {
