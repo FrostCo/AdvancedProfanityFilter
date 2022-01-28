@@ -12,10 +12,12 @@ w3-flat-pomegranate */
 
 /* Variables */
 html {
+  --blue-darker: #2c3e50; /* midnight-blue */
   --blue: #2980b9; /* belize-hole */
   --dark-dark: #121212;
   --dark-light: #202020;
   --dark-text: #fff;
+  --green: #16a085; /* green-sea */
   --light-dark: #f1f1f1; /* w3-light-grey */
   --light-light: #eee;
   --light-text: #000;
@@ -193,19 +195,31 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 }
 
 #bulkWordEditorModal table {
-  border: none; /* Fix small gap on sticky header from .w3-table-all */
-}
-
-#bulkWordEditorModal table th input,span {
-  vertical-align: middle;
+  border-collapse: separate !important; /* Don't collapse */
+  border-spacing: 0;
+  border-style: solid;
+  border-width: 0 1px;
+  text-align: center;
+  width: 100%;
 }
 
 #bulkWordEditorModal table th {
-  background-color: var(--silver);
+  /* Apply both top and bottom borders to the <th> */
+  background-color: var(--green);
+  border-bottom: 1px solid;
+  border-top: 1px solid;
   position: sticky;
   top: 0;
-  z-index: 10;
   vertical-align: middle;
+}
+
+#bulkWordEditorModal table th button,input,span {
+  vertical-align: middle;
+}
+
+#bulkWordEditorModal table td {
+  /* For cells, apply the border to one of each side only (right but not left, bottom but not top) */
+  border-bottom: 1px solid;
 }
 /* #endregion */
 
