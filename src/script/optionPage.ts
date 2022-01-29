@@ -185,7 +185,7 @@ export default class OptionPage {
     this.themeElements = OptionPage.themeElementSelectors.map((selector) => {
       return Array.from(document.querySelectorAll(selector));
     }).flat();
-    this.prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
   }
 
   applyDarkTheme(allElements = true) {
