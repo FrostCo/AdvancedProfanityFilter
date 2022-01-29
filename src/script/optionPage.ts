@@ -618,6 +618,44 @@ export default class OptionPage {
     }
   }
 
+  async convertStorageLocation(silent = false) {
+    const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
+    option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
+    const keys = WebConfig._localConfigKeys;
+
+    try {
+      await option.cfg.save(keys);
+
+      try {
+        if (option.cfg.syncLargeKeys) {
+          await WebConfig.removeLocalStorage(WebConfig._largeKeys);
+        } else {
+          let removeKeys = [];
+          WebConfig._largeKeys.forEach((largeKey) => {
+            removeKeys = removeKeys.concat(WebConfig.splitKeyNames(largeKey));
+          });
+          await WebConfig.removeSyncStorage(removeKeys);
+        }
+
+        if (!silent) {
+          OptionPage.showStatusModal('Storage converted successfully.');
+        }
+      } catch (err) {
+        // Revert UI and export a backup of config.
+        option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
+        option.backupConfig();
+        OptionPage.handleError('Failed to cleanup old storage, backup automatically exported.', err);
+        await option.cfg.save('syncLargeKeys');
+        option.populateConfig();
+      }
+    } catch (err) {
+      // Revert UI
+      OptionPage.handleError('Failed to update storage preference.', err);
+      option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
+      option.populateConfig();
+    }
+  }
+
   async exportBookmarkletFile() {
     const code = await Bookmarklet.injectConfig(this.cfg.ordered());
     exportToFile(code, 'apfBookmarklet.js');
@@ -1770,44 +1808,6 @@ export default class OptionPage {
         OptionPage.hide(document.getElementById('substitutionSettings'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
-    }
-  }
-
-  async convertStorageLocation(silent = false) {
-    const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
-    option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
-    const keys = WebConfig._localConfigKeys;
-
-    try {
-      await option.cfg.save(keys);
-
-      try {
-        if (option.cfg.syncLargeKeys) {
-          await WebConfig.removeLocalStorage(WebConfig._largeKeys);
-        } else {
-          let removeKeys = [];
-          WebConfig._largeKeys.forEach((largeKey) => {
-            removeKeys = removeKeys.concat(WebConfig.splitKeyNames(largeKey));
-          });
-          await WebConfig.removeSyncStorage(removeKeys);
-        }
-
-        if (!silent) {
-          OptionPage.showStatusModal('Storage converted successfully.');
-        }
-      } catch (err) {
-        // Revert UI and export a backup of config.
-        option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
-        option.backupConfig();
-        OptionPage.handleError('Failed to cleanup old storage, backup automatically exported.', err);
-        await option.cfg.save('syncLargeKeys');
-        option.populateConfig();
-      }
-    } catch (err) {
-      // Revert UI
-      OptionPage.handleError('Failed to update storage preference.', err);
-      option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
-      option.populateConfig();
     }
   }
 
