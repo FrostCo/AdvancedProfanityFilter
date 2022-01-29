@@ -220,12 +220,12 @@ export default class OptionPage {
     }
   }
 
-  applyTheme(force = false) {
+  applyTheme(refresh = false) {
     if (this.cfg.darkMode == null) {
       if (this.prefersDarkScheme) {
-        this.applyDarkTheme(force);
+        this.applyDarkTheme(refresh);
       } else {
-        this.applyLightTheme(force);
+        this.applyLightTheme(refresh);
       }
     } else {
       if (this.cfg.darkMode) {
