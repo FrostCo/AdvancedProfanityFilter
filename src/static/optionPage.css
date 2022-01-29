@@ -99,7 +99,7 @@ h4.sectionHeader {
 }
 /* #endregion */
 
-/* #region Header & Navigation */
+/* #region Header */
 #header {
   display: block;
   height: 40px;
@@ -118,7 +118,9 @@ h4.sectionHeader {
 #header img.discord {
   height: 31px;
 }
+/* #endregion */
 
+/* #region Navigation */
 #menu {
   height: 40px;
   line-height: 24px;
