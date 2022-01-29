@@ -866,11 +866,13 @@ export default class OptionPage {
 
     // Settings
     const selectedFilter = document.getElementById(`filter${Constants.filterMethodName(this.cfg.filterMethod)}`) as HTMLInputElement;
+    const useDeviceTheme = document.getElementById('useDeviceTheme') as HTMLInputElement;
     const showCounter = document.getElementById('showCounter') as HTMLInputElement;
     const showSummary = document.getElementById('showSummary') as HTMLInputElement;
     const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
     const filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     selectedFilter.checked = true;
+    useDeviceTheme.checked = this.cfg.darkMode == null;
     showCounter.checked = this.cfg.showCounter;
     showSummary.checked = this.cfg.showSummary;
     showUpdateNotification.checked = this.cfg.showUpdateNotification;
@@ -1719,6 +1721,9 @@ export default class OptionPage {
     } else {
       this.cfg.darkMode = !this.cfg.darkMode;
     }
+    const useDeviceTheme = document.getElementById('useDeviceTheme') as HTMLInputElement;
+    useDeviceTheme.checked = this.cfg.darkMode == null;
+
     await this.cfg.save('darkMode');
     this.applyTheme();
   }
@@ -1806,6 +1811,16 @@ export default class OptionPage {
     }
   }
 
+  async updateUseSystemTheme(useDeviceThemeInput: HTMLInputElement) {
+    try {
+      this.cfg.darkMode = useDeviceThemeInput.checked ? null : this.prefersDarkScheme;
+      await this.cfg.save('darkMode');
+      this.applyTheme(true);
+    } catch (err) {
+      OptionPage.handleError('Failed to update theme selection.', err);
+    }
+  }
+
   async updateYouTubeAutoLimits(input: HTMLInputElement) {
     const max = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
     const min = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
@@ -1889,6 +1904,7 @@ document.getElementById('defaultWordSeparators').addEventListener('click', (evt)
 document.getElementById('preserveCase').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('preserveFirst').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('preserveLast').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('useDeviceTheme').addEventListener('click', (evt) => { option.updateUseSystemTheme(evt.target as HTMLInputElement); });
 document.getElementById('showCounter').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('showSummary').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('showUpdateNotification').addEventListener('click', (evt) => { option.saveOptions(); });
