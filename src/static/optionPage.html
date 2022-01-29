@@ -20,13 +20,13 @@
 </div>
 
 <div id="menu" class="w3-bar w3-card w3-flat-peter-river">
-  <a href="#" class="w3-bar-item w3-button w3-flat-belize-hole">Settings</a>
-  <a href="#" class="w3-bar-item w3-button">Words</a>
-  <a href="#" class="w3-bar-item w3-button">Lists</a>
-  <a href="#" class="w3-bar-item w3-button">Domains</a>
-  <a href="#" class="w3-bar-item w3-button">Audio</a>
-  <a href="#" class="w3-bar-item w3-button">Bookmarklet</a>
-  <a href="#" class="w3-bar-item w3-button">Config</a>
+  <a href="#/" class="w3-bar-item w3-button w3-flat-belize-hole">Settings</a>
+  <a href="#/words" class="w3-bar-item w3-button">Words</a>
+  <a href="#/lists" class="w3-bar-item w3-button">Lists</a>
+  <a href="#/domains" class="w3-bar-item w3-button">Domains</a>
+  <a href="#/audio" class="w3-bar-item w3-button">Audio</a>
+  <a href="#/bookmarklet" class="w3-bar-item w3-button">Bookmarklet</a>
+  <a href="#/config" class="w3-bar-item w3-button">Config</a>
   <div class="w3-bar-item w3-button w3-right themes">
     <div class="sun w3-hide">
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
@@ -39,9 +39,9 @@
       </svg>
     </div>
   </div>
-  <a href="#" class="w3-bar-item w3-button w3-right">Help</a>
-  <a href="#" class="w3-bar-item w3-button w3-right">Stats</a>
-  <a href="#" class="w3-bar-item w3-button w3-right">Test</a>
+  <a href="#/help" class="w3-bar-item w3-button w3-right">Help</a>
+  <a href="#/stats" class="w3-bar-item w3-button w3-right">Stats</a>
+  <a href="#/test" class="w3-bar-item w3-button w3-right">Test</a>
 </div>
 
 <div id="main" class="w3-hide">
@@ -458,10 +458,10 @@
 
         <br>
         <label>YouTube muting min:
-          <input id="audioYouTubeAutoSubsMin" class="w3-input w3-border extraSmallInput" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
+          <input id="audioYouTubeAutoSubsMin" class="audioYouTubeAutoSubs w3-input w3-border extraSmallInput" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
         </label>
         <label>max:
-          <input id="audioYouTubeAutoSubsMax" class="w3-input w3-border extraSmallInput" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
+          <input id="audioYouTubeAutoSubsMax" class="audioYouTubeAutoSubs w3-input w3-border extraSmallInput" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
         </label>
         <span class="notes">(Only for auto captions; 0.5 = half second)</span>
       </div>
@@ -515,6 +515,10 @@
     <button id="configReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESTORE DEFAULTS</button>
   </div>
   <textarea id="configText" class="w3-input w3-border w3-card w3-hide" style="width:500px;height:550px;font-size:11px;" spellcheck="false"></textarea>
+
+  <h4 class="sectionHeader">Storage</h4>
+  <label><input id="configSyncLargeKeys" type="checkbox" class="w3-check">  Sync large settings</label>
+  <span class="notes">Words, domains, etc. Disable if you run out of space</span>
 
   <div id="setPasswordContainer" style="width:500px;">
     <h4 class="sectionHeader">Password</h4>
@@ -588,7 +592,7 @@
   <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
   <a href="https://github.com/richardfrost/AdvancedProfanityFilter/issues" target="_blank">Support</a>
   <a href="mailto:richard@richardfrost.info?Subject=Advanced%20Profanity%20Filter">Created by Richard Frost</a>
-  <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank" class="w3-right" id="helpVersion">2.28.0</a>
+  <a href="https://github.com/richardfrost/AdvancedProfanityFilter/releases" target="_blank" class="w3-right" id="helpVersion">2.30.0</a>
   <br>
 
   <div id="helpContainer">
@@ -725,11 +729,13 @@
     <h1 id="config">Config</h1>
     <p>This tab allows you to control your configuration for the filter.</p>
     <ul>
-    <li><strong>Export</strong> - Export your current settings as a JSON object. Useful if you want to backup your settings or share them with others.</li>
-    <li><strong>Import</strong> - Import settings as a JSON object. This is a full replace of your config, so I <strong>strongly</strong> recommend taking a backup (Export) before doing this. </li>
+    <li><strong>Export</strong> - Export your current settings. Useful if you want to backup your settings or share them with others. </li>
+    <li><strong>Import</strong> - Import settings. This will replace of your config, so I <strong>strongly</strong> recommend taking a backup (Export) before doing this. </li>
     <li><strong>Restore Defaults</strong> - This restores all settings back to their defaults.</li>
     </ul>
     <p><em>NOTE: Importing or Restoring defaults will export your current config, just in case you forgot to. You will need to copy and save it elsewhere if you want it.</em></p>
+    <h3 id="storage">Storage</h3>
+    <p>By default, the filter will try to sync your settings between devices using the browser&#39;s syncing functionality. There are limits on how much can be synced though. If you run into those limits you can turn off the syncing of large settings (such as words, and domain options). When this option is disabled, these settings will only be available to the current device. You can still export and import your settings if you&#39;d like to as a manual way to &quot;share&quot; settings between devices.</p>
     <h3 id="password">Password</h3>
     <p>At the bottom of the page there is a prompt for you to set a password to protect the Options and Pop-up pages. This may be useful to keep others from modifying your settings for the extension. This does not prevent a user from disabling or removing the extension. This is not a secure mechanism. Your password is stored in plain-text, so do not reuse an established password.</p>
     <ul>

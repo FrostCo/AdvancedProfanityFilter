@@ -106,7 +106,7 @@ export default class Filter {
     wordlistId = this.buildWordlist(wordlistId);
     const wordlist = this.wordlists[wordlistId];
 
-    switch(this.cfg.filterMethod) {
+    switch (this.cfg.filterMethod) {
       case Constants.FILTER_METHODS.OFF:
       case Constants.FILTER_METHODS.CENSOR:
         wordlist.regExps.forEach((regExp, index) => {

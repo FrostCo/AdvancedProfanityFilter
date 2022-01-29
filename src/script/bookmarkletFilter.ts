@@ -29,6 +29,7 @@ export default class BookmarkletFilter extends Filter {
   processNode: (node: HTMLElement | Document | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
   shadowObserver: MutationObserver;
   stats?: Statistics; // Bookmarklet: Not used
+  updateCounterBadge: () => void; // Bookmarklet: Not used - Needed to match signature of WebFilter
 
   constructor() {
     super();
@@ -77,6 +78,7 @@ export default class BookmarkletFilter extends Filter {
           || node.contains(this.audio.lastFilteredNode)
           || (
             rule.simpleUnmute
+            && node.textContent
             && this.audio.lastFilteredText
             && this.audio.lastFilteredText.includes(node.textContent)
           )
@@ -239,7 +241,7 @@ export default class BookmarkletFilter extends Filter {
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
     if (node.childElementCount > 0) {
       const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
-      while(treeWalker.nextNode()) {
+      while (treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
           treeWalker.currentNode.childNodes.forEach((childNode) => {
             this.cleanText(childNode, wordlistId, statsType);
@@ -306,7 +308,7 @@ if (typeof window !== 'undefined') {
     filter.iframe = document.location;
     try {
       filter.hostname = window.parent.location.hostname;
-    } catch(e) {
+    } catch (err) {
       if (document.referrer) {
         filter.hostname = new URL(document.referrer).hostname;
       } else {

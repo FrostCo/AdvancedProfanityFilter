@@ -111,7 +111,7 @@ export default class Domain {
   }
 
   updateFromModeIndex(index: number) {
-    switch(index) {
+    switch (index) {
       case Constants.DOMAIN_MODES.NORMAL: this.advanced = false; this.deep = false; break;
       case Constants.DOMAIN_MODES.ADVANCED: this.advanced = true; this.deep = false; break;
       case Constants.DOMAIN_MODES.DEEP: this.advanced = false; this.deep = true; break;

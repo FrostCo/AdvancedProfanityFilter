@@ -24,6 +24,7 @@ class Popup {
     'enabledDomainsOnly',
     'filterMethod',
     'muteAudio',
+    'muteAudioOnly',
     'password',
     'wordlistId',
     'wordlists',
@@ -31,7 +32,7 @@ class Popup {
   ];
 
   static async load(instance: Popup) {
-    instance.cfg = await WebConfig.build(Popup._requiredConfig);
+    instance.cfg = await WebConfig.load(Popup._requiredConfig);
     instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
     if (instance.tab.url) {
       instance.url = new URL(instance.tab.url);
@@ -85,12 +86,12 @@ class Popup {
     try {
       await this.cfg.save('filterMethod');
       chrome.tabs.reload();
-    } catch(e) {
-      logger.error('Failed to update selected filter method.', e);
+    } catch (err) {
+      logger.error('Failed to update selected filter method.', err);
     }
   }
 
-  async populateOptions(event?: Event) {
+  async populateOptions() {
     await Popup.load(popup);
     if (this.cfg.darkMode) { this.applyTheme(); }
 
@@ -101,6 +102,7 @@ class Popup {
     const wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
+    let audioPage = false;
     dynamicList(Constants.orderedArray(Constants.DOMAIN_MODES), domainModeSelect, true);
     domainModeSelect.selectedIndex = this.domain.getModeIndex();
     dynamicList(Constants.orderedArray(Constants.FILTER_METHODS), filterMethodSelect, true);
@@ -114,6 +116,7 @@ class Popup {
       if (this.cfg.muteAudio) {
         this.audioSiteKeys = Object.keys(WebAudioSites.combineSites(this.cfg.customAudioSites));
         if (this.audioSiteKeys.includes(this.domain.cfgKey)) {
+          audioPage = true;
           const audioWordlistIndex = this.domain.audioWordlistId >= 0 ? this.domain.audioWordlistId + 1 : 0;
           dynamicList(wordlists, audioWordlistSelect);
           audioWordlistSelect.selectedIndex = audioWordlistIndex;
@@ -139,6 +142,7 @@ class Popup {
       !this.domain.hostname
       || Page.disabledProtocols.test(this.url.protocol)
       || this.domain.hostname == 'chrome.google.com'
+      || (this.cfg.muteAudio && this.cfg.muteAudioOnly && !audioPage)
     ) {
       domainFilter.checked = false;
       Popup.disable(domainFilter);
@@ -198,8 +202,8 @@ class Popup {
       try {
         await this.domain.save(this.cfg);
         chrome.tabs.reload();
-      } catch(e) {
-        logger.error(`Failed to toggle domain '${this.domain.hostname}'.`, e);
+      } catch (err) {
+        logger.error(`Failed to toggle domain '${this.domain.hostname}'.`, err);
       }
     }
   }
@@ -211,21 +215,20 @@ class Popup {
       try {
         await this.domain.save(this.cfg);
         chrome.tabs.reload();
-      } catch(e) {
-        logger.error(`Failed to update mode for domain '${this.domain.hostname}'.`, e);
+      } catch (err) {
+        logger.error(`Failed to update mode for domain '${this.domain.hostname}'.`, err);
       }
     }
   }
 
-  async wordlistSelect(event) {
-    const element = event.target;
-    const type = element.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
-    this.domain[type] = element.selectedIndex > 0 ? element.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
+  async wordlistSelect(select: HTMLSelectElement) {
+    const type = select.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
+    this.domain[type] = select.selectedIndex > 0 ? select.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
     try {
       await this.domain.save(this.cfg);
       chrome.tabs.reload();
-    } catch(e) {
-      logger.error(`Failed to select wordlist for domain ${this.domain.hostname}.`, e);
+    } catch (err) {
+      logger.error(`Failed to select wordlist for domain ${this.domain.hostname}.`, err);
     }
   }
 }
@@ -248,10 +251,10 @@ const popup = new Popup;
 
 ////
 // Listeners
-window.addEventListener('load', (e) => { popup.populateOptions(); });
-document.getElementById('domainFilter').addEventListener('change', (e) => { popup.toggle(popup.filterToggleProp); });
-document.getElementById('domainModeSelect').addEventListener('change', (e) => { popup.updateDomainMode(); });
-document.getElementById('filterMethodSelect').addEventListener('change', (e) => { popup.filterMethodSelect(); });
-document.getElementById('wordlistSelect').addEventListener('change', (e) => { popup.wordlistSelect(e); });
-document.getElementById('audioWordlistSelect').addEventListener('change', (e) => { popup.wordlistSelect(e); });
-document.getElementById('options').addEventListener('click', (e) => { chrome.runtime.openOptionsPage(); });
+window.addEventListener('load', (evt) => { popup.populateOptions(); });
+document.getElementById('domainFilter').addEventListener('change', (evt) => { popup.toggle(popup.filterToggleProp); });
+document.getElementById('domainModeSelect').addEventListener('change', (evt) => { popup.updateDomainMode(); });
+document.getElementById('filterMethodSelect').addEventListener('change', (evt) => { popup.filterMethodSelect(); });
+document.getElementById('wordlistSelect').addEventListener('change', (evt) => { popup.wordlistSelect(evt.target as HTMLSelectElement); });
+document.getElementById('audioWordlistSelect').addEventListener('change', (evt) => { popup.wordlistSelect(evt.target as HTMLSelectElement); });
+document.getElementById('options').addEventListener('click', (evt) => { chrome.runtime.openOptionsPage(); });

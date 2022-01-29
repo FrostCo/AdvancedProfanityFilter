@@ -1,6 +1,7 @@
 import OptionPage from './optionPage';
 export default class OptionAuth {
   authenticated: boolean;
+  optionPage: OptionPage;
   password: string;
 
   authenticate(evt) {
@@ -15,24 +16,29 @@ export default class OptionAuth {
     }
   }
 
-  constructor(password?: string) {
+  constructor(optionPage: OptionPage, password?: string) {
+    this.optionPage = optionPage;
     this.password = password;
     this.authenticated = false;
   }
 
-  setPassword(optionPage: OptionPage) {
+  async setPassword() {
     const password = document.getElementById('setPassword') as HTMLInputElement;
-    optionPage.cfg.password = password.value;
-    optionPage.saveProp('password');
-    password.value = '';
-    this.setPasswordButton(optionPage);
+    this.optionPage.cfg.password = password.value;
+    try {
+      await this.optionPage.cfg.save('password');
+      password.value = '';
+      this.setPasswordButton();
+    } catch (err) {
+      OptionPage.handleError('Failed to update password.', err);
+    }
   }
 
-  setPasswordButton(optionPage: OptionPage) {
+  setPasswordButton() {
     const passwordText = document.getElementById('setPassword') as HTMLInputElement;
     const passwordBtn = document.getElementById('setPasswordBtn') as HTMLButtonElement;
 
-    if (optionPage.cfg.password) { // Password already set
+    if (this.optionPage.cfg.password) { // Password already set
       OptionPage.enableBtn(passwordBtn);
       if (passwordText.value) { // Password field filled
         passwordBtn.innerText = 'SET';

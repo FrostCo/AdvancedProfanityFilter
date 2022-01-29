@@ -1,9 +1,13 @@
 import Constants from './lib/constants';
 import Config from './lib/config';
+import { prettyPrintArray, stringArray } from './lib/helper';
+import Logger from './lib/logger';
+const logger = new Logger();
 
 export default class WebConfig extends Config {
-  _splitContainerKeys: { [key: string]: string[] };
+  _lastSplitKeys: { [key: string]: number };
   audioWordlistId: number;
+  collectStats: boolean;
   customAudioSites: { [site: string]: AudioRule[] };
   darkMode: boolean;
   domains: { [site: string]: DomainCfg };
@@ -16,12 +20,13 @@ export default class WebConfig extends Config {
   password: string;
   showSubtitles: number;
   showUpdateNotification: boolean;
-  collectStats: boolean;
+  syncLargeKeys: boolean;
   youTubeAutoSubsMax: number;
   youTubeAutoSubsMin: number;
 
   static readonly _classDefaults = {
     audioWordlistId: 0,
+    collectStats: true,
     customAudioSites: null,
     darkMode: false,
     domains: {},
@@ -33,154 +38,283 @@ export default class WebConfig extends Config {
     muteMethod: Constants.MUTE_METHODS.TAB,
     password: null,
     showSubtitles: Constants.SHOW_SUBTITLES.ALL,
-    collectStats: true,
     showUpdateNotification: false,
+    syncLargeKeys: true,
     youTubeAutoSubsMax: 0,
     youTubeAutoSubsMin: 0,
   };
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  static readonly QUOTA_BYTES_PER_ITEM = 8192; // https://developer.chrome.com/apps/storage chrome.storage.sync.QUOTA_BYTES_PER_ITEM
   static readonly _defaults = Object.assign({}, Config._defaults, WebConfig._classDefaults);
-  static readonly _splittingKeys = ['domains', 'words'];
-  static readonly _maxBytes = 8000;
+  static readonly _localConfigKeys = ['domains', 'syncLargeKeys', 'words'];
+  static readonly _maxSplitKeys = 64;
+  static readonly _largeKeys = ['domains', 'words'];
 
-  static async build(keys: string | string[] = []) {
-    if (typeof keys === 'string') { keys = [keys]; }
-    const asyncResult = await WebConfig.getConfig(keys);
-    const instance = new WebConfig(asyncResult);
-    return instance;
-  }
-
-  // Call build() to create a new instance
-  constructor(asyncParam) {
-    if (typeof asyncParam === 'undefined') {
-      throw new Error('Cannot be called directly. call build()');
+  static get _maxBytes() {
+    try {
+      return Math.round(chrome.storage.sync.QUOTA_BYTES_PER_ITEM * .98);
+    } catch (err) {
+      // 8192 https://developer.chrome.com/apps/storage
+      return 8028;
     }
-
-    super(); // Get the Config defaults
-    this._splitContainerKeys = {};
-    Object.assign(this, WebConfig._classDefaults, asyncParam); // Separate due to _defineProperty()
   }
 
   static chromeStorageAvailable(): boolean {
     return !!(chrome && chrome.storage && chrome.storage.sync && chrome.storage.local);
   }
 
-  // Combine all ._[prop]* into .[prop]
-  static combineData(data, prop: string): string[] {
-    data[prop] = {};
-    if (data[`_${prop}0`] !== undefined) {
-      const dataKeys = WebConfig.getDataContainerKeys(data, prop);
+  // Combine all ._[key]* into .[key]
+  static combineData(data, key: string): string[] {
+    data[key] = {};
+    if (data[`_${key}0`] !== undefined) {
+      const dataKeys = WebConfig.getDataContainerKeys(data, key);
 
-      // Add all _[prop]* to .[prop] and remove _[prop]*
-      dataKeys.forEach((key) => {
-        Object.assign(data[prop], data[key]);
-        delete data[key];
+      // Add all _[key]* to .[key] and remove _[key]*
+      dataKeys.forEach((dataKey) => {
+        Object.assign(data[key], data[dataKey]);
+        delete data[dataKey];
       });
       return dataKeys;
     }
   }
 
-  // Async call to get provided keys (or default keys) from chrome storage
-  static getConfig(keys: string[]) {
-    return new Promise((resolve, reject) => {
-      if (chrome.runtime.lastError) { reject(chrome.runtime.lastError.message); }
-
-      let request = null; // Get all data from storage
-
-      if (keys.length > 0 && ! keys.some((key) => WebConfig._splittingKeys.includes(key))) {
-        request = {};
-        keys.forEach((key) => { request[key] = WebConfig._defaults[key]; });
-      }
-
-      chrome.storage.sync.get(request, (items) => {
-        // Add internal tracker for split keys
-        items._splitContainerKeys = {};
-
-        // Ensure defaults for undefined settings
-        Object.keys(WebConfig._defaults).forEach((defaultKey) => {
-          if ((request == null || keys.includes(defaultKey)) && items[defaultKey] === undefined) {
-            items[defaultKey] = WebConfig._defaults[defaultKey];
-          }
-        });
-
-        // Add words if requested, and provide _defaultWords if needed
-        if (keys.length === 0 || keys.includes('words')) {
-          // Use default words if none were provided
-          if (items._words0 === undefined || Object.keys(items._words0).length == 0) {
-            items._words0 = Config._defaultWords;
-          }
-        }
-
-        WebConfig._splittingKeys.forEach((splittingKey) => {
-          const splitKeys = WebConfig.combineData(items, splittingKey);
-          if (splitKeys) { items._splitContainerKeys[splittingKey] = splitKeys; }
-        });
-
-        // Remove keys we didn't request (Required when requests for specific keys include ones that supports splitting)
-        if (request !== null && keys.length > 0) {
-          Object.keys(items).forEach((item) => {
-            if (!keys.includes(item)) {
-              delete items[item];
-            }
-          });
-        }
-
-        resolve(items);
-      });
-    });
+  // Find all _[key]* to combine
+  static getDataContainerKeys(data, key: string): string[] {
+    const pattern = new RegExp(`^_${key}\\d+`);
+    const containerKeys = Object.keys(data).filter((dataKey) => pattern.test(dataKey));
+    return containerKeys.sort();
   }
 
-  // Find all _[prop]* to combine
-  static getDataContainerKeys(data, prop) {
-    const pattern = new RegExp(`^_${prop}\\d+`);
-    const containerKeys = Object.keys(data).filter((key) => pattern.test(key));
-    return containerKeys;
-  }
-
-  static getLocalStoragePromise(keys: string | string[] | Record<string, unknown>) {
+  static getLocalStorage(keys: string | string[] | Record<string, unknown>) {
     if (typeof keys === 'string') { keys = [keys]; }
 
     return new Promise((resolve, reject) => {
       chrome.storage.local.get(keys, (data) => {
         chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
+          ? reject(chrome.runtime.lastError)
           : resolve(data);
       });
     });
   }
 
-  static removeLocalStoragePromise(keys: string | string[]) {
-    if (keys === 'ALL') {
-      return new Promise((resolve, reject) => {
-        chrome.storage.local.clear(() => {
-          chrome.runtime.lastError
-            ? reject(chrome.runtime.lastError.message)
-            : resolve(0);
-        });
+  static getMaxSplitKeyFromArray(splitKeys: string[] = []): number {
+    if (Array.isArray(splitKeys)) {
+      const maxKey = splitKeys.sort()[splitKeys.length - 1];
+      if (maxKey) {
+        const pattern = new RegExp('\\d+$');
+        const result = maxKey.match(pattern);
+        if (result) {
+          return parseInt(result[0]);
+        }
+      }
+    }
+  }
+
+  static getMaxSplitKeyFromData(data, key: string): number {
+    const keys = WebConfig.getDataContainerKeys(data, key);
+    return WebConfig.getMaxSplitKeyFromArray(keys);
+  }
+
+  static getSyncStorage(keys: string | string[] | Record<string, unknown>) {
+    if (typeof keys === 'string') { keys = [keys]; }
+
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.get(keys, (data) => {
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError)
+          : resolve(data);
       });
+    });
+  }
+
+  static includesLargeKeys(keys: string[]) {
+    return keys.some((key) => { return WebConfig._largeKeys.includes(key); });
+  }
+
+  // keys: Requested keys (defaults to all)
+  // syncKeys: Keys to get from browser.storage.sync
+  // localKeys: Keys to get from browser.storage.local
+  // Note: syncLargeKeys will be returned when required
+  static async load(keys: string | string[] = []) {
+    keys = stringArray(keys);
+    const data = {} as any;
+    let localData;
+    const localKeys = [];
+    let syncKeys = [];
+
+    // No keys provided, load everything
+    if (keys.length === 0) {
+      keys = Object.keys(WebConfig._defaults);
+      keys.push('words'); // words is not part of _defaults
     }
 
-    if (typeof keys === 'string') { keys = [keys]; }
+    try {
+      if (WebConfig.includesLargeKeys(keys)) {
+        // Add syncLargeKeys if any largeKeys were requested
+        if (!keys.includes('syncLargeKeys')) {
+          keys.push('syncLargeKeys');
+        }
+
+        // Load large keys from LocalStorage if necessary
+        WebConfig._localConfigKeys.forEach((localKey) => {
+          if (keys.includes(localKey)) {
+            localKeys.push(localKey);
+          }
+        });
+        localData = await WebConfig.getLocalStorage(localKeys);
+        data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : WebConfig._defaults.syncLargeKeys;
+
+        if (data.syncLargeKeys === false) { // Use local storage for large keys
+          // Add large keys from local storage to data
+          localKeys.forEach((localKey) => {
+            // Ensure defaults
+            if (localData[localKey] === undefined) {
+              // 'words' are not included in Webconfig._defaults
+              if (localKey === 'words') {
+                data[localKey] = WebConfig._defaultWords;
+              } else {
+                data[localKey] = WebConfig._defaults[localKey];
+              }
+            } else {
+              data[localKey] = localData[localKey];
+            }
+          });
+
+          // Get all keys from sync storage except the ones found in local storage
+          syncKeys = keys.filter((key) => { return !WebConfig._localConfigKeys.includes(key); });
+        } else { // Use sync storage for large keys
+          // Get all keys from sync storage (except syncLargeKeys)
+          syncKeys = keys.filter((key) => { return key !== 'syncLargeKeys'; });
+        }
+      } else {
+        // Get all keys from sync storage (except syncLargeKeys)
+        syncKeys = keys.filter((key) => { return key !== 'syncLargeKeys'; });
+      }
+
+      if (syncKeys.length) {
+        // Prepare to get large keys from sync storage if needed
+        let syncKeysSplit = [].concat(syncKeys);
+        WebConfig._largeKeys.forEach((largeKey) => {
+          if (syncKeys.includes(largeKey)) {
+            // Prepare to get split large keys (_words0..N)
+            syncKeysSplit.splice(syncKeysSplit.indexOf(largeKey), 1);
+            syncKeysSplit = syncKeysSplit.concat(WebConfig.splitKeyNames(largeKey));
+          }
+        });
+
+        const syncData = await WebConfig.getSyncStorage(syncKeysSplit);
+        data._lastSplitKeys = {};
+
+        syncKeys.forEach((key) => {
+          // If we are getting large keys from sync storage combine them
+          if (WebConfig._largeKeys.includes(key)) {
+            // Add values for large keys or fill in defaults
+            const splitKeys = WebConfig.combineData(syncData, key);
+            if (splitKeys) {
+              data._lastSplitKeys[key] = WebConfig.getMaxSplitKeyFromArray(splitKeys);
+              data[key] = syncData[key];
+            } else { // Add defaults if nothing was returned
+              data._lastSplitKeys[key] = 0;
+              if (key === 'words') {
+                data[key] = WebConfig._defaultWords;
+              } else {
+                data[key] = WebConfig._defaults[key];
+              }
+            }
+          } else {
+            // Assign values to data and fill in defaults for missing keys
+            if (syncData[key] === undefined) {
+              data[key] = WebConfig._defaults[key];
+            } else {
+              data[key] = syncData[key];
+            }
+          }
+        });
+      }
+
+      return new WebConfig(data);
+    } catch (err) {
+      logger.error('Failed to load items.', keys, err);
+      throw new Error(`Failed to load items: ${prettyPrintArray(keys)}. [${err.message}]`);
+    }
+  }
+
+  static removeLocalStorage(keys: string | string[]) {
+    keys = stringArray(keys);
 
     return new Promise((resolve, reject) => {
       chrome.storage.local.remove(keys, () => {
         chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
+          ? reject(chrome.runtime.lastError)
           : resolve(0);
       });
     });
   }
 
-  static saveLocalStoragePromise(data: Record<string, unknown>) {
+  static removeSyncStorage(keys: string | string[]) {
+    keys = stringArray(keys);
+
     return new Promise((resolve, reject) => {
-      chrome.storage.local.set(data, () => {
+      chrome.storage.sync.remove(keys, () => {
         chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
+          ? reject(chrome.runtime.lastError)
           : resolve(0);
       });
     });
+  }
+
+  static resetLocalStorage() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.clear(() => {
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError)
+          : resolve(0);
+      });
+    });
+  }
+
+  static resetSyncStorage() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.clear(() => {
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError)
+          : resolve(0);
+      });
+    });
+  }
+
+  static saveLocalStorage(data) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(data, () => {
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError)
+          : resolve(0);
+      });
+    });
+  }
+
+  static saveSyncStorage(data) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.set(data, () => {
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError)
+          : resolve(0);
+      });
+    });
+  }
+
+  static splitKeyNames(key: string, start: number = 0): string[] {
+    return Array(this._maxSplitKeys - start).fill(1).map((item, index) => '_' + key + (index + start));
+  }
+
+  // Call load() to create a new instance
+  constructor(config) {
+    if (typeof config === 'undefined') {
+      throw new Error('Cannot be called directly, call load() instead.');
+    }
+
+    super(); // Get the Config defaults
+    Object.assign(this, WebConfig._classDefaults, config); // Separate due to _defineProperty()
   }
 
   // Order and remove `_` prefixed values
@@ -191,66 +325,118 @@ export default class WebConfig extends Config {
     }, {});
   }
 
-  remove(props: string | string[]) {
-    if (typeof props === 'string') { props = [props]; }
-    chrome.storage.sync.remove(props);
-    props.forEach((prop) => {
-      delete this[prop];
-    });
-  }
+  // Note: Defaults are not automatically loaded after removing an item
+  async remove(keys: string | string[]) {
+    keys = stringArray(keys);
+    let syncKeys = [];
+    const localKeys = [];
 
-  reset() {
-    return new Promise((resolve, reject) => {
-      chrome.storage.sync.clear(() => {
-        chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
-          : resolve(0);
+    if (keys.length > 0) {
+      keys.forEach((key) => {
+        if (key == 'syncLargeKeys') {
+          // syncLargeKeys is always stored in local storage
+          localKeys.push(key);
+        } else if (WebConfig._largeKeys.includes(key)) {
+          if (this.syncLargeKeys) {
+            // Remove large keys from sync storage
+            syncKeys = syncKeys.concat(WebConfig.splitKeyNames(key));
+          } else {
+            localKeys.push(key);
+          }
+        } else {
+          syncKeys.push(key);
+        }
       });
-    });
+
+      try {
+        if (syncKeys.length) {
+          await WebConfig.removeSyncStorage(syncKeys);
+        }
+        if (localKeys.length) {
+          await WebConfig.removeLocalStorage(localKeys);
+        }
+
+        keys.forEach((key) => {
+          delete this[key];
+        });
+      } catch (err) {
+        logger.error('Failed to remove items.', keys, err);
+        throw new Error(`Failed to remove items: ${prettyPrintArray(keys)}. ${err.message}`);
+      }
+    }
   }
 
-  // Pass a key or array of keys to save, or save everything
-  save(props: string | string[] = []) {
-    if (typeof props === 'string') { props = [props]; }
-    const data = {};
+  async reset() {
+    try {
+      await WebConfig.resetSyncStorage();
+      await WebConfig.resetLocalStorage();
+    } catch (err) {
+      logger.error('Failed to clear storage.', err);
+      throw new Error(`Failed to clear storage. ${err.message}`);
+    }
+  }
 
-    // Save everything
-    if (props.length === 0) {
-      props = Object.keys(WebConfig._defaults);
-      props.push('words'); // words is not part of _defaults
+  async resetPreserveStats() {
+    try {
+      await WebConfig.resetSyncStorage();
+      await WebConfig.removeLocalStorage(WebConfig._localConfigKeys);
+    } catch (err) {
+      logger.error('Failed to clear storage.', err);
+      throw new Error(`Failed to clear storage. ${err.message}`);
+    }
+  }
+
+  async save(keys: string | string[] = []) {
+    keys = stringArray(keys);
+    const syncData = {};
+    const localData = {};
+
+    // No keys provided, save everything
+    if (keys.length === 0) {
+      keys = Object.keys(WebConfig._defaults);
+      keys.push('words'); // words is not part of _defaults
     }
 
-    props.forEach((prop) => {
-      if (WebConfig._splittingKeys.includes(prop)) {
-        Object.assign(data, this.splitData(prop));
+    let unusedSplitKeys = [];
+    keys.forEach((key) => {
+      if (key == 'syncLargeKeys') {
+        // syncLargeKeys is always stored in local storage
+        localData[key] = this[key];
+      } else if (WebConfig._largeKeys.includes(key)) {
+        if (this.syncLargeKeys) {
+          Object.assign(syncData, this.splitData(key));
+
+          // Check for any unused splitContainers
+          if (this._lastSplitKeys) {
+            const newMaxSplitKey = WebConfig.getMaxSplitKeyFromData(syncData, key);
+            if (this._lastSplitKeys[key] > newMaxSplitKey) { // Split data was reduced
+              unusedSplitKeys = unusedSplitKeys.concat(WebConfig.splitKeyNames(key, newMaxSplitKey + 1));
+            } else if (this._lastSplitKeys[key] < newMaxSplitKey) { // Split data was increased
+              this._lastSplitKeys[key] = newMaxSplitKey;
+            }
+          }
+        } else {
+          localData[key] = this[key];
+        }
       } else {
-        data[prop] = this[prop];
+        syncData[key] = this[key];
       }
     });
 
-    // If we have more containers in storage than are needed, remove them
-    if (Object.keys(this._splitContainerKeys).length !== 0 && props.some((prop) => WebConfig._splittingKeys.includes(prop))) {
-      WebConfig._splittingKeys.forEach((splittingKey) => {
-        if (props.includes(splittingKey)) {
-          const newContainerKeys = WebConfig.getDataContainerKeys(data, splittingKey);
-          if (this._splitContainerKeys[splittingKey]) {
-            const containersToRemove = this._splitContainerKeys[splittingKey].filter((oldKey) => !newContainerKeys.includes(oldKey));
-            if (containersToRemove.length !== 0) {
-              this.remove(containersToRemove);
-              this._splitContainerKeys[splittingKey] = newContainerKeys;
-            }
-          }
-        }
-      });
+    try {
+      if (Object.keys(syncData).length) {
+        await WebConfig.saveSyncStorage(syncData);
+      }
+      if (Object.keys(localData).length) {
+        await WebConfig.saveLocalStorage(localData);
+      }
+      if (unusedSplitKeys.length) {
+        await this.remove(unusedSplitKeys);
+      }
+    } catch (err) {
+      logger.error('Failed to save items.', keys, err);
+      throw new Error(`Failed to save items: ${prettyPrintArray(keys)}. [${err.message}]`);
     }
-
-    return new Promise((resolve, reject) => {
-      chrome.storage.sync.set(data, () => {
-        chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError.message)
-          : resolve(0);
-      });
-    });
   }
 
   splitData(key: string) {
