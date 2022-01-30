@@ -644,17 +644,19 @@
     </li>
     </ul>
     <h3 id="general-settings">General Settings</h3>
-    <p>These settings apply to both the <strong>Censor</strong> and <strong>Substitution</strong> filter modes:</p>
     <ul>
-    <li><strong>Show number of filtered words</strong> - Show a counter on the extension button with the number of filtered words on the current page.<ul>
+    <li><strong>Use device theme</strong>: Use the system&#39;s default theme (light/dark mode).<ul>
+    <li>You can also choose your theme by clicking the sun/moon icon in the menu.</li>
+    </ul>
+    </li>
+    <li><strong>Show number of filtered words</strong>: Show a counter on the extension button with the number of filtered words on the current page.<ul>
     <li><strong>Blue</strong>: Normal mode</li>
     <li><strong>Red</strong>: Advanced mode</li>
     <li><strong>Green</strong>: Audio Muting mode (Shows even when no words have been filtered)</li>
     </ul>
     </li>
-    <li><strong>Show summary of filtered words</strong> - Show a summary of the words filtered on the current page.</li>
-    <li><strong>Filter word list in Options</strong> - This option will filter the word list in the options page.</li>
-    <li><strong>Show update notification</strong> - Show a notification when the extension gets updated.</li>
+    <li><strong>Show summary of filtered words</strong>: Show a summary of the words filtered on the current page.</li>
+    <li><strong>Show update notification</strong>: Show a notification when the extension gets updated.</li>
     </ul>
     <h3 id="default-settings-for-new-wordphrases">Default Settings (for new word/phrases)</h3>
     <ul>
@@ -677,6 +679,7 @@
     <li>Match repeated characters - Match words with repeated characters (must still be in same order).</li>
     <li>Match separators - Words/phrases that contain (<code>&#39;-&#39;, &#39;_&#39; &amp; &#39; &#39;</code>) inside them will be filtered.</li>
     </ul>
+    <p><em>Note: The <code>Filter</code> checkbox next to the words dropdown controls whether the dropdown list should be filtered.</em></p>
     <h3 id="bulk-editor">Bulk Editor</h3>
     <p>The bulk editor lets you see all your words and their options in a table format, and make multiple changes at once. This is also the easiest way to assign words to wordlists. In this view you can remove words, add words, or adjust the options for words. If you have several words you would like to add to the Filter, there is a box in the bottom-left corner that you can put one word/phrase per line to import. Once you have made your desired modifications, click the save button. A prompt will appear asking to confirm the action. When you click OK, all of words will be replaced with what is in the bulk editor. Because this is a big operation, the prompt also includes a &quot;Backup&quot; button, which will create a backup of your settings before any changes are made. Its recommended to have a backup, just in case. Once you have confirmed that everything looks right, and you&#39;re happy with the changes feel free to delete the backup file.</p>
     <h1 id="lists">Lists</h1>
@@ -740,11 +743,13 @@
     <h1 id="config">Config</h1>
     <p>This tab allows you to control your configuration for the filter.</p>
     <ul>
-    <li><strong>Export</strong> - Export your current settings as a JSON object. Useful if you want to backup your settings or share them with others.</li>
-    <li><strong>Import</strong> - Import settings as a JSON object. This is a full replace of your config, so I <strong>strongly</strong> recommend taking a backup (Export) before doing this. </li>
+    <li><strong>Export</strong> - Export your current settings. Useful if you want to backup your settings or share them with others. </li>
+    <li><strong>Import</strong> - Import settings. This will replace of your config, so I <strong>strongly</strong> recommend taking a backup (Export) before doing this. </li>
     <li><strong>Restore Defaults</strong> - This restores all settings back to their defaults.</li>
     </ul>
     <p><em>NOTE: Importing or Restoring defaults will export your current config, just in case you forgot to. You will need to copy and save it elsewhere if you want it.</em></p>
+    <h3 id="storage">Storage</h3>
+    <p>By default, the filter will try to sync your settings between devices using the browser&#39;s syncing functionality. There are limits on how much can be synced though. If you run into those limits you can turn off the syncing of large settings (such as words, and domain options). When this option is disabled, these settings will only be available to the current device. You can still export and import your settings if you&#39;d like to as a manual way to &quot;share&quot; settings between devices.</p>
     <h3 id="password">Password</h3>
     <p>At the bottom of the page there is a prompt for you to set a password to protect the Options and Pop-up pages. This may be useful to keep others from modifying your settings for the extension. This does not prevent a user from disabling or removing the extension. This is not a secure mechanism. Your password is stored in plain-text, so do not reuse an established password.</p>
     <ul>
