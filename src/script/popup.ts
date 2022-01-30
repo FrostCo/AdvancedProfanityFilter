@@ -12,8 +12,10 @@ class Popup {
   cfg: WebConfig;
   domain: Domain;
   filterToggleProp: string;
+  prefersDarkScheme: boolean;
   protected: boolean;
   tab: chrome.tabs.Tab;
+  themeElements: Element[];
   url: URL;
 
   static readonly _requiredConfig = [
@@ -31,26 +33,6 @@ class Popup {
     'wordlistsEnabled',
   ];
 
-  static async load(instance: Popup) {
-    instance.cfg = await WebConfig.load(Popup._requiredConfig);
-    instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
-    if (instance.tab.url) {
-      instance.url = new URL(instance.tab.url);
-      instance.domain = Domain.byHostname(instance.url.hostname, instance.cfg.domains);
-    } else { // No URL (can be blank in Safari new tab)
-      instance.url = null;
-      instance.domain = new Domain('');
-    }
-    instance.filterToggleProp = instance.cfg.enabledDomainsOnly ? 'enabled' : 'disabled';
-    return instance;
-  }
-
-  constructor() {
-    this.protected = false;
-  }
-
-  ////
-  // Functions for Popup
   static disable(element) {
     element.disabled = true;
     element.classList.add('disabled');
@@ -66,18 +48,57 @@ class Popup {
     element.classList.add('w3-hide');
   }
 
+  static async load(instance: Popup) {
+    instance.cfg = await WebConfig.load(Popup._requiredConfig);
+    instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
+    if (instance.tab.url) {
+      instance.url = new URL(instance.tab.url);
+      instance.domain = Domain.byHostname(instance.url.hostname, instance.cfg.domains);
+    } else { // No URL (can be blank in Safari new tab)
+      instance.url = null;
+      instance.domain = new Domain('');
+    }
+    instance.filterToggleProp = instance.cfg.enabledDomainsOnly ? 'enabled' : 'disabled';
+    return instance;
+  }
+
   static show(element: HTMLElement) {
     element.classList.remove('w3-hide');
     element.classList.add('w3-show');
   }
 
+  constructor() {
+    this.prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    this.protected = false;
+    this.themeElements = [document.body, document.querySelector('#footer')];
+  }
+
+  applyDarkTheme() {
+    document.documentElement.style.setProperty('color-scheme', 'dark');
+    const summaryTable = document.querySelector('#summary > table') as HTMLTableElement;
+    summaryTable.classList.remove('w3-striped');
+    this.themeElements.forEach((element) => {
+      element.classList.add('dark');
+      element.classList.remove('light');
+    });
+  }
+
+  applyLightTheme() {
+    document.documentElement.style.setProperty('color-scheme', 'light');
+    const summaryTable = document.querySelector('#summary > table') as HTMLTableElement;
+    summaryTable.classList.add('w3-striped');
+    this.themeElements.forEach((element) => {
+      element.classList.remove('dark');
+      element.classList.add('light');
+    });
+  }
+
   applyTheme() {
-    const elements = [];
-    elements.push(document.querySelector('body'));
-    elements.push(document.querySelector('#footer'));
-    elements.forEach((element) => { element.classList.toggle('dark'); });
-    const table = document.querySelector('#summary > table');
-    table.classList.toggle('w3-striped');
+    if (this.cfg.darkMode == null) {
+      this.prefersDarkScheme ? this.applyDarkTheme() : this.applyLightTheme();
+    } else {
+      this.cfg.darkMode ?  this.applyDarkTheme() : this.applyLightTheme();
+    }
   }
 
   async filterMethodSelect() {
@@ -93,7 +114,7 @@ class Popup {
 
   async populateOptions() {
     await Popup.load(popup);
-    if (this.cfg.darkMode) { this.applyTheme(); }
+    this.applyTheme();
 
     const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
     const domainToggle = document.getElementById('domainToggle') as HTMLInputElement;

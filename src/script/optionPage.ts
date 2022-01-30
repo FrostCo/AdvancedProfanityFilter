@@ -23,22 +23,16 @@ import {
 export default class OptionPage {
   auth: OptionAuth;
   cfg: WebConfig;
-  themeButtons: Element[];
+  darkModeButton: Element;
+  lightModeButton: Element;
+  prefersDarkScheme: boolean;
   themeElements: Element[];
 
   static readonly activeClass = 'w3-flat-belize-hole';
-  static readonly themeButtonSelectors = [
-    'div.themes > div.moon',
-    'div.themes > div.sun',
-  ];
   static readonly themeElementSelectors = [
     'body',
     'div#page',
-    '#bulkWordEditorModal > div',
-    '#confirmModal > div',
-    '#passwordModal > div',
-    '#statusModal > div',
-    '#supportedAudioSitesModal > div',
+    'div.w3-modal',
   ];
 
   static closeModal(id: string) {
@@ -186,17 +180,59 @@ export default class OptionPage {
   }
 
   constructor() {
-    this.themeButtons = OptionPage.themeButtonSelectors.map((selector) => { return document.querySelector(selector); });
-    this.themeElements = OptionPage.themeElementSelectors.map((selector) => { return document.querySelector(selector); });
+    this.darkModeButton = document.querySelector('div.themes > div.moon');
+    this.lightModeButton = document.querySelector('div.themes > div.sun');
+    this.themeElements = OptionPage.themeElementSelectors.map((selector) => {
+      return Array.from(document.querySelectorAll(selector));
+    }).flat();
+    this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
   }
 
-  applyTheme() {
-    const darkApplied = this.themeElements[0].classList.contains('dark');
-    if (darkApplied != this.cfg.darkMode) {
-      this.themeElements.forEach((element) => { element.classList.toggle('dark'); });
-      this.themeButtons.forEach((element) => { element.classList.toggle('w3-hide'); });
-      const statsWordTable = document.querySelector('table#statsWordTable') as HTMLTableElement;
-      statsWordTable.classList.toggle('w3-striped');
+  applyDarkTheme(allElements = true) {
+    document.documentElement.style.setProperty('color-scheme', 'dark');
+    const statsWordTable = document.querySelector('table#statsWordTable') as HTMLTableElement;
+    const bulkWordEditorTable = document.querySelector('table#bulkWordEditorTable') as HTMLTableElement;
+    statsWordTable.classList.remove('w3-striped');
+    bulkWordEditorTable.classList.remove('w3-striped');
+    this.setThemeButton(true);
+
+    if (allElements) {
+      this.themeElements.forEach((element) => {
+        element.classList.add('dark');
+        element.classList.remove('light');
+      });
+    }
+  }
+
+  applyLightTheme(allElements = true) {
+    document.documentElement.style.setProperty('color-scheme', 'light');
+    const statsWordTable = document.querySelector('table#statsWordTable') as HTMLTableElement;
+    const bulkWordEditorTable = document.querySelector('table#bulkWordEditorTable') as HTMLTableElement;
+    statsWordTable.classList.add('w3-striped');
+    bulkWordEditorTable.classList.add('w3-striped');
+    this.setThemeButton(false);
+
+    if (allElements) {
+      this.themeElements.forEach((element) => {
+        element.classList.remove('dark');
+        element.classList.add('light');
+      });
+    }
+  }
+
+  applyTheme(refresh = false) {
+    if (this.cfg.darkMode == null) {
+      if (this.prefersDarkScheme) {
+        this.applyDarkTheme(refresh);
+      } else {
+        this.applyLightTheme(refresh);
+      }
+    } else {
+      if (this.cfg.darkMode) {
+        this.applyDarkTheme();
+      } else {
+        this.applyLightTheme();
+      }
     }
   }
 
@@ -334,6 +370,10 @@ export default class OptionPage {
     const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
     const row = button.parentElement.parentElement as HTMLTableRowElement;
     table.deleteRow(row.rowIndex);
+    if (table.rows.length == 1) {
+      // Add a new row if that was the last row (ignoring header)
+      this.bulkEditorAddRow();
+    }
   }
 
   async bulkEditorSave() {
@@ -419,7 +459,7 @@ export default class OptionPage {
     removeButton.id = 'bulkEditorRemoveAll';
     removeButton.addEventListener('click', (evt) => { this.bulkEditorRemoveAll(); });
     const removeSpan = document.createElement('span');
-    removeSpan.textContent = ' Remove';
+    removeSpan.textContent = 'Remove';
     removeCell.appendChild(removeButton);
     removeCell.appendChild(removeSpan);
     row.appendChild(removeCell);
@@ -441,7 +481,7 @@ export default class OptionPage {
       input.type = 'checkbox';
       input.classList.add('wordlistHeader');
       input.dataset.col = (i + 1).toString();
-      span.textContent = ` ${wordlist}`; // TODO: Fix spacing
+      span.textContent = `${wordlist}`;
       inputLabel.appendChild(input);
       inputLabel.appendChild(span);
       cell.appendChild(inputLabel);
@@ -578,6 +618,44 @@ export default class OptionPage {
     }
   }
 
+  async convertStorageLocation(silent = false) {
+    const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
+    option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
+    const keys = WebConfig._localConfigKeys;
+
+    try {
+      await option.cfg.save(keys);
+
+      try {
+        if (option.cfg.syncLargeKeys) {
+          await WebConfig.removeLocalStorage(WebConfig._largeKeys);
+        } else {
+          let removeKeys = [];
+          WebConfig._largeKeys.forEach((largeKey) => {
+            removeKeys = removeKeys.concat(WebConfig.splitKeyNames(largeKey));
+          });
+          await WebConfig.removeSyncStorage(removeKeys);
+        }
+
+        if (!silent) {
+          OptionPage.showStatusModal('Storage converted successfully.');
+        }
+      } catch (err) {
+        // Revert UI and export a backup of config.
+        option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
+        option.backupConfig();
+        OptionPage.handleError('Failed to cleanup old storage, backup automatically exported.', err);
+        await option.cfg.save('syncLargeKeys');
+        option.populateConfig();
+      }
+    } catch (err) {
+      // Revert UI
+      OptionPage.handleError('Failed to update storage preference.', err);
+      option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
+      option.populateConfig();
+    }
+  }
+
   async exportBookmarkletFile() {
     const code = await Bookmarklet.injectConfig(this.cfg.ordered());
     exportToFile(code, 'apfBookmarklet.js');
@@ -637,7 +715,7 @@ export default class OptionPage {
           this.cfg = importedCfg;
           await this.cfg.save();
           OptionPage.showStatusModal('Settings imported successfully.');
-          await this.init();
+          await this.init(true);
         } catch (err) {
           if (OptionPage.isStorageError(err) && this.cfg.syncLargeKeys) {
             this.confirm('importConfigRetry');
@@ -651,8 +729,9 @@ export default class OptionPage {
     }
   }
 
-  async init() {
+  async init(refreshTheme = false) {
     this.cfg = await WebConfig.load();
+    this.applyTheme(refreshTheme);
     if (!this.auth) this.auth = new OptionAuth(this, this.cfg.password);
     filter.cfg = this.cfg;
     filter.init();
@@ -665,7 +744,6 @@ export default class OptionPage {
       OptionPage.show(document.getElementById('main'));
     }
 
-    this.applyTheme();
     this.populateOptions();
 
     // Route to page based on URL
@@ -826,11 +904,13 @@ export default class OptionPage {
 
     // Settings
     const selectedFilter = document.getElementById(`filter${Constants.filterMethodName(this.cfg.filterMethod)}`) as HTMLInputElement;
+    const useDeviceTheme = document.getElementById('useDeviceTheme') as HTMLInputElement;
     const showCounter = document.getElementById('showCounter') as HTMLInputElement;
     const showSummary = document.getElementById('showSummary') as HTMLInputElement;
     const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
     const filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     selectedFilter.checked = true;
+    useDeviceTheme.checked = this.cfg.darkMode == null;
     showCounter.checked = this.cfg.showCounter;
     showSummary.checked = this.cfg.showSummary;
     showUpdateNotification.checked = this.cfg.showUpdateNotification;
@@ -1260,7 +1340,7 @@ export default class OptionPage {
     try {
       await this.cfg.resetPreserveStats();
       if (!silent) OptionPage.showStatusModal('Default settings restored.');
-      await this.init();
+      await this.init(true);
       return true;
     } catch (err) {
       logger.warn('Failed to restore defaults.', err);
@@ -1577,6 +1657,16 @@ export default class OptionPage {
     }
   }
 
+  setThemeButton(darkTheme: boolean) {
+    if (darkTheme) {
+      this.darkModeButton.classList.add('w3-hide');
+      this.lightModeButton.classList.remove('w3-hide');
+    } else {
+      this.darkModeButton.classList.remove('w3-hide');
+      this.lightModeButton.classList.add('w3-hide');
+    }
+  }
+
   showBulkWordEditor() {
     const modalId = 'bulkWordEditorModal';
     const title = document.querySelector(`#${modalId} h5.modalTitle`) as HTMLHeadingElement;
@@ -1664,7 +1754,14 @@ export default class OptionPage {
   }
 
   async toggleTheme() {
-    this.cfg.darkMode = !this.cfg.darkMode;
+    if (this.cfg.darkMode == null) {
+      this.cfg.darkMode = !this.prefersDarkScheme;
+    } else {
+      this.cfg.darkMode = !this.cfg.darkMode;
+    }
+    const useDeviceTheme = document.getElementById('useDeviceTheme') as HTMLInputElement;
+    useDeviceTheme.checked = this.cfg.darkMode == null;
+
     await this.cfg.save('darkMode');
     this.applyTheme();
   }
@@ -1714,41 +1811,13 @@ export default class OptionPage {
     }
   }
 
-  async convertStorageLocation(silent = false) {
-    const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
-    option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
-    const keys = WebConfig._localConfigKeys;
-
+  async updateUseSystemTheme(useDeviceThemeInput: HTMLInputElement) {
     try {
-      await option.cfg.save(keys);
-
-      try {
-        if (option.cfg.syncLargeKeys) {
-          await WebConfig.removeLocalStorage(WebConfig._largeKeys);
-        } else {
-          let removeKeys = [];
-          WebConfig._largeKeys.forEach((largeKey) => {
-            removeKeys = removeKeys.concat(WebConfig.splitKeyNames(largeKey));
-          });
-          await WebConfig.removeSyncStorage(removeKeys);
-        }
-
-        if (!silent) {
-          OptionPage.showStatusModal('Storage converted successfully.');
-        }
-      } catch (err) {
-        // Revert UI and export a backup of config.
-        option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
-        option.backupConfig();
-        OptionPage.handleError('Failed to cleanup old storage, backup automatically exported.', err);
-        await option.cfg.save('syncLargeKeys');
-        option.populateConfig();
-      }
+      this.cfg.darkMode = useDeviceThemeInput.checked ? null : this.prefersDarkScheme;
+      await this.cfg.save('darkMode');
+      this.applyTheme(true);
     } catch (err) {
-      // Revert UI
-      OptionPage.handleError('Failed to update storage preference.', err);
-      option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
-      option.populateConfig();
+      OptionPage.handleError('Failed to update theme selection.', err);
     }
   }
 
@@ -1835,6 +1904,7 @@ document.getElementById('defaultWordSeparators').addEventListener('click', (evt)
 document.getElementById('preserveCase').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('preserveFirst').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('preserveLast').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('useDeviceTheme').addEventListener('click', (evt) => { option.updateUseSystemTheme(evt.target as HTMLInputElement); });
 document.getElementById('showCounter').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('showSummary').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('showUpdateNotification').addEventListener('click', (evt) => { option.saveOptions(); });

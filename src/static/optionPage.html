@@ -11,11 +11,16 @@
 <div id="page">
 
 <div id="header" class="w3-container">
-  <h2><img class="logo" src="img/icon38.png"/> Advanced Profanity Filter</h2>
-  <div class="w3-right donations">
-    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XFL36QJY752R6&source=url" target="_blank"><img class="donation" src="./img/donate.gif"></a>
-    <a href="https://www.patreon.com/richardfrost" target="_blank"><img class="patreon" src="./img/patreon-small.png"></a>
-    <a href="https://discord.gg/MpE5Z3f" target="_blank"><img class="discord" src="./img/discord.png"></a>
+  <img class="logo" src="img/icon38.png"/>
+  <span class="title">Advanced Profanity Filter</span>
+  <div class="w3-right">
+    <span class="donations">
+      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XFL36QJY752R6&source=url" target="_blank"><img class="paypal" src="./img/donate.gif"></a>
+      <a href="https://www.patreon.com/richardfrost" target="_blank"><img class="patreon" src="./img/patreon-small.png"></a>
+    </span>
+    <span class="social">
+      <a href="https://discord.gg/MpE5Z3f" target="_blank"><img class="discord" src="./img/discord.png"></a>
+    </span>
   </div>
 </div>
 
@@ -147,6 +152,12 @@
 
   <div id="generalOptions">
     <h4 class="sectionHeader">General Settings</h4>
+    <label>
+      <input id="useDeviceTheme" type="checkbox" class="w3-check">
+      Use device theme
+      <span class="notes">(Light/dark mode)</span>
+    </label>
+    <br>
     <label>
       <input id="showCounter" type="checkbox" class="w3-check">
       Show number of filtered words
@@ -633,17 +644,19 @@
     </li>
     </ul>
     <h3 id="general-settings">General Settings</h3>
-    <p>These settings apply to both the <strong>Censor</strong> and <strong>Substitution</strong> filter modes:</p>
     <ul>
-    <li><strong>Show number of filtered words</strong> - Show a counter on the extension button with the number of filtered words on the current page.<ul>
+    <li><strong>Use device theme</strong>: Use the system&#39;s default theme (light/dark mode).<ul>
+    <li>You can also choose your theme by clicking the sun/moon icon in the menu.</li>
+    </ul>
+    </li>
+    <li><strong>Show number of filtered words</strong>: Show a counter on the extension button with the number of filtered words on the current page.<ul>
     <li><strong>Blue</strong>: Normal mode</li>
     <li><strong>Red</strong>: Advanced mode</li>
     <li><strong>Green</strong>: Audio Muting mode (Shows even when no words have been filtered)</li>
     </ul>
     </li>
-    <li><strong>Show summary of filtered words</strong> - Show a summary of the words filtered on the current page.</li>
-    <li><strong>Filter word list in Options</strong> - This option will filter the word list in the options page.</li>
-    <li><strong>Show update notification</strong> - Show a notification when the extension gets updated.</li>
+    <li><strong>Show summary of filtered words</strong>: Show a summary of the words filtered on the current page.</li>
+    <li><strong>Show update notification</strong>: Show a notification when the extension gets updated.</li>
     </ul>
     <h3 id="default-settings-for-new-wordphrases">Default Settings (for new word/phrases)</h3>
     <ul>
@@ -666,6 +679,7 @@
     <li>Match repeated characters - Match words with repeated characters (must still be in same order).</li>
     <li>Match separators - Words/phrases that contain (<code>&#39;-&#39;, &#39;_&#39; &amp; &#39; &#39;</code>) inside them will be filtered.</li>
     </ul>
+    <p><em>Note: The <code>Filter</code> checkbox next to the words dropdown controls whether the dropdown list should be filtered.</em></p>
     <h3 id="bulk-editor">Bulk Editor</h3>
     <p>The bulk editor lets you see all your words and their options in a table format, and make multiple changes at once. This is also the easiest way to assign words to wordlists. In this view you can remove words, add words, or adjust the options for words. If you have several words you would like to add to the Filter, there is a box in the bottom-left corner that you can put one word/phrase per line to import. Once you have made your desired modifications, click the save button. A prompt will appear asking to confirm the action. When you click OK, all of words will be replaced with what is in the bulk editor. Because this is a big operation, the prompt also includes a &quot;Backup&quot; button, which will create a backup of your settings before any changes are made. Its recommended to have a backup, just in case. Once you have confirmed that everything looks right, and you&#39;re happy with the changes feel free to delete the backup file.</p>
     <h1 id="lists">Lists</h1>
@@ -776,11 +790,11 @@
 </div> <!-- /div#page -->
 
 <div id="bulkWordEditorModal" class="w3-modal">
-  <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="width: 98%;">
+  <div class="w3-modal-content w3-card-4 w3-animate-opacity">
     <header class="w3-container w3-flat-peter-river"><h5 class="modalTitle"></h5></header>
     <div class="w3-container w3-margin w3-padding">
       <div class="tableContainer w3-card">
-        <table id="bulkWordEditorTable" class="w3-table-all w3-tiny w3-hoverable">
+        <table id="bulkWordEditorTable" class="w3-table w3-striped w3-centered w3-tiny w3-hoverable">
           <thead></thead>
           <tbody></tbody>
         </table>

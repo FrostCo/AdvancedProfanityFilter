@@ -28,7 +28,7 @@ export default class WebConfig extends Config {
     audioWordlistId: 0,
     collectStats: true,
     customAudioSites: null,
-    darkMode: false,
+    darkMode: null,
     domains: {},
     enabledDomainsOnly: false,
     fillerAudio: '',
