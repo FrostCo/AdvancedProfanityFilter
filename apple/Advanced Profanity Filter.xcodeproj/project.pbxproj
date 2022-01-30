@@ -690,7 +690,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Advanced Profanity Filter Extension (iOS).entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8HSM6SBN4Q;
+				DEVELOPMENT_TEAM = DevTeamID;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Advanced Profanity Filter Extension";
@@ -706,7 +706,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.frostco.advanced-profanity-filter.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter.Extension";
 				PRODUCT_NAME = "Advanced Profanity Filter Extension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -723,7 +723,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Advanced Profanity Filter Extension (iOS).entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8HSM6SBN4Q;
+				DEVELOPMENT_TEAM = DevTeamID;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Advanced Profanity Filter Extension";
@@ -739,7 +739,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.frostco.advanced-profanity-filter.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter.Extension";
 				PRODUCT_NAME = "Advanced Profanity Filter Extension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -760,7 +760,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Advanced Profanity Filter (iOS).entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8HSM6SBN4Q;
+				DEVELOPMENT_TEAM = DevTeamID;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (App)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Advanced Profanity Filter";
@@ -781,7 +781,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.frostco.advanced-profanity-filter";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter";
 				PRODUCT_NAME = "Advanced Profanity Filter";
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
@@ -800,7 +800,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Advanced Profanity Filter (iOS).entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8HSM6SBN4Q;
+				DEVELOPMENT_TEAM = DevTeamID;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (App)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Advanced Profanity Filter";
@@ -821,7 +821,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.frostco.advanced-profanity-filter";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter";
 				PRODUCT_NAME = "Advanced Profanity Filter";
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
@@ -855,7 +855,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.frostco.advanced-profanity-filter.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter.Extension";
 				PRODUCT_NAME = "Advanced Profanity Filter Extension";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -871,7 +871,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8HSM6SBN4Q;
+				DEVELOPMENT_TEAM = DevTeamID;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
@@ -888,7 +888,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.frostco.advanced-profanity-filter.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter.Extension";
 				PRODUCT_NAME = "Advanced Profanity Filter Extension";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -925,7 +925,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.frostco.advanced-profanity-filter";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter";
 				PRODUCT_NAME = "Advanced Profanity Filter";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -943,7 +943,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8HSM6SBN4Q;
+				DEVELOPMENT_TEAM = DevTeamID;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (App)/Info.plist";
@@ -962,7 +962,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.frostco.advanced-profanity-filter";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter";
 				PRODUCT_NAME = "Advanced Profanity Filter";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
