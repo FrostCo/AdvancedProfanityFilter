@@ -16,7 +16,7 @@ import SafariServices
 typealias PlatformViewController = NSViewController
 #endif
 
-let extensionBundleIdentifier = "com.yourCompany.Advanced-Profanity-Filter.Extension"
+let extensionBundleIdentifier = "dev.frostco.Advanced-Profanity-Filter.Extension"
 
 class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMessageHandler {
 
