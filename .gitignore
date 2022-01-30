@@ -1,6 +1,9 @@
 # Dev Dependencies
 /node_modules/*
 
+# Ignore git-filter scripts (clean/smudge)
+bin/git-filters/*.js
+
 # Packaged extensions
 /dist/*
 /*.zip
