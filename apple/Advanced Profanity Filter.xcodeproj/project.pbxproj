@@ -1,0 +1,1024 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		792F150E270C1BAC00C8CD6A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F150D270C1BAC00C8CD6A /* AppDelegate.swift */; };
+		792F1510270C1BAC00C8CD6A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F150F270C1BAC00C8CD6A /* SceneDelegate.swift */; };
+		792F1513270C1BAC00C8CD6A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 792F1511270C1BAC00C8CD6A /* LaunchScreen.storyboard */; };
+		792F1516270C1BAC00C8CD6A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 792F1514270C1BAC00C8CD6A /* Main.storyboard */; };
+		792F151F270C1BAC00C8CD6A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F151E270C1BAC00C8CD6A /* AppDelegate.swift */; };
+		792F1522270C1BAC00C8CD6A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 792F1520270C1BAC00C8CD6A /* Main.storyboard */; };
+		792F152A270C1BAC00C8CD6A /* Advanced Profanity Filter Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 792F1529270C1BAC00C8CD6A /* Advanced Profanity Filter Extension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		792F1534270C1BAC00C8CD6A /* Advanced Profanity Filter Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 792F1533270C1BAC00C8CD6A /* Advanced Profanity Filter Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		792F153A270C1BAC00C8CD6A /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 792F14FD270C1BAB00C8CD6A /* Main.html */; };
+		792F153B270C1BAC00C8CD6A /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 792F14FD270C1BAB00C8CD6A /* Main.html */; };
+		792F153C270C1BAC00C8CD6A /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 792F14FF270C1BAB00C8CD6A /* Icon.png */; };
+		792F153D270C1BAC00C8CD6A /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 792F14FF270C1BAB00C8CD6A /* Icon.png */; };
+		792F153E270C1BAC00C8CD6A /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F1500270C1BAB00C8CD6A /* Style.css */; };
+		792F153F270C1BAC00C8CD6A /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F1500270C1BAB00C8CD6A /* Style.css */; };
+		792F1540270C1BAC00C8CD6A /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1501270C1BAB00C8CD6A /* Script.js */; };
+		792F1541270C1BAC00C8CD6A /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1501270C1BAB00C8CD6A /* Script.js */; };
+		792F1542270C1BAC00C8CD6A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F1502270C1BAB00C8CD6A /* ViewController.swift */; };
+		792F1543270C1BAC00C8CD6A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F1502270C1BAB00C8CD6A /* ViewController.swift */; };
+		792F1544270C1BAC00C8CD6A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 792F1503270C1BAC00C8CD6A /* Assets.xcassets */; };
+		792F1545270C1BAC00C8CD6A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 792F1503270C1BAC00C8CD6A /* Assets.xcassets */; };
+		792F1546270C1BAC00C8CD6A /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F1505270C1BAC00C8CD6A /* SafariWebExtensionHandler.swift */; };
+		792F1547270C1BAC00C8CD6A /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F1505270C1BAC00C8CD6A /* SafariWebExtensionHandler.swift */; };
+		792F1567270C1BAC00C8CD6A /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1559270C1BAC00C8CD6A /* popup.js */; };
+		792F1568270C1BAC00C8CD6A /* w3-color-flat.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F155A270C1BAC00C8CD6A /* w3-color-flat.css */; };
+		792F1569270C1BAC00C8CD6A /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 792F155B270C1BAC00C8CD6A /* popup.html */; };
+		792F156A270C1BAC00C8CD6A /* optionPage.html in Resources */ = {isa = PBXBuildFile; fileRef = 792F155C270C1BAC00C8CD6A /* optionPage.html */; };
+		792F156B270C1BAC00C8CD6A /* optionPage.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F155D270C1BAC00C8CD6A /* optionPage.js */; };
+		792F156C270C1BAC00C8CD6A /* img in Resources */ = {isa = PBXBuildFile; fileRef = 792F155E270C1BAC00C8CD6A /* img */; };
+		792F156D270C1BAC00C8CD6A /* showErrors.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F155F270C1BAC00C8CD6A /* showErrors.js */; };
+		792F156E270C1BAC00C8CD6A /* audio in Resources */ = {isa = PBXBuildFile; fileRef = 792F1560270C1BAC00C8CD6A /* audio */; };
+		792F156F270C1BAC00C8CD6A /* w3.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F1561270C1BAC00C8CD6A /* w3.css */; };
+		792F1570270C1BAC00C8CD6A /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 792F1562270C1BAC00C8CD6A /* manifest.json */; };
+		792F1571270C1BAC00C8CD6A /* webFilter.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1563270C1BAC00C8CD6A /* webFilter.js */; };
+		792F1572270C1BAC00C8CD6A /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F1564270C1BAC00C8CD6A /* popup.css */; };
+		792F1573270C1BAC00C8CD6A /* optionPage.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F1565270C1BAC00C8CD6A /* optionPage.css */; };
+		792F1574270C1BAC00C8CD6A /* eventPage.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1566270C1BAC00C8CD6A /* eventPage.js */; };
+		792F1575270C1BAC00C8CD6A /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1559270C1BAC00C8CD6A /* popup.js */; };
+		792F1576270C1BAC00C8CD6A /* w3-color-flat.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F155A270C1BAC00C8CD6A /* w3-color-flat.css */; };
+		792F1577270C1BAC00C8CD6A /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 792F155B270C1BAC00C8CD6A /* popup.html */; };
+		792F1578270C1BAC00C8CD6A /* optionPage.html in Resources */ = {isa = PBXBuildFile; fileRef = 792F155C270C1BAC00C8CD6A /* optionPage.html */; };
+		792F1579270C1BAC00C8CD6A /* optionPage.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F155D270C1BAC00C8CD6A /* optionPage.js */; };
+		792F157A270C1BAC00C8CD6A /* img in Resources */ = {isa = PBXBuildFile; fileRef = 792F155E270C1BAC00C8CD6A /* img */; };
+		792F157B270C1BAC00C8CD6A /* showErrors.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F155F270C1BAC00C8CD6A /* showErrors.js */; };
+		792F157C270C1BAC00C8CD6A /* audio in Resources */ = {isa = PBXBuildFile; fileRef = 792F1560270C1BAC00C8CD6A /* audio */; };
+		792F157D270C1BAC00C8CD6A /* w3.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F1561270C1BAC00C8CD6A /* w3.css */; };
+		792F157E270C1BAC00C8CD6A /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 792F1562270C1BAC00C8CD6A /* manifest.json */; };
+		792F157F270C1BAC00C8CD6A /* webFilter.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1563270C1BAC00C8CD6A /* webFilter.js */; };
+		792F1580270C1BAC00C8CD6A /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F1564270C1BAC00C8CD6A /* popup.css */; };
+		792F1581270C1BAC00C8CD6A /* optionPage.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F1565270C1BAC00C8CD6A /* optionPage.css */; };
+		792F1582270C1BAC00C8CD6A /* eventPage.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1566270C1BAC00C8CD6A /* eventPage.js */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		792F152B270C1BAC00C8CD6A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 792F14F7270C1BAB00C8CD6A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 792F1528270C1BAC00C8CD6A;
+			remoteInfo = "Advanced Profanity Filter Extension (iOS)";
+		};
+		792F1535270C1BAC00C8CD6A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 792F14F7270C1BAB00C8CD6A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 792F1532270C1BAC00C8CD6A;
+			remoteInfo = "Advanced Profanity Filter Extension (macOS)";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		792F154D270C1BAC00C8CD6A /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				792F152A270C1BAC00C8CD6A /* Advanced Profanity Filter Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		792F1554270C1BAC00C8CD6A /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				792F1534270C1BAC00C8CD6A /* Advanced Profanity Filter Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		791C8C222712945B00A33245 /* Advanced Profanity Filter (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Advanced Profanity Filter (iOS).entitlements"; sourceTree = "<group>"; };
+		791C8C232712945B00A33245 /* Advanced Profanity Filter Extension (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Advanced Profanity Filter Extension (iOS).entitlements"; sourceTree = "<group>"; };
+		792F14FE270C1BAB00C8CD6A /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = ../Base.lproj/Main.html; sourceTree = "<group>"; };
+		792F14FF270C1BAB00C8CD6A /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		792F1500270C1BAB00C8CD6A /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		792F1501270C1BAB00C8CD6A /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		792F1502270C1BAB00C8CD6A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		792F1503270C1BAC00C8CD6A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		792F1505270C1BAC00C8CD6A /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		792F150A270C1BAC00C8CD6A /* Advanced Profanity Filter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Advanced Profanity Filter.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		792F150D270C1BAC00C8CD6A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		792F150F270C1BAC00C8CD6A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		792F1512270C1BAC00C8CD6A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		792F1515270C1BAC00C8CD6A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		792F1517270C1BAC00C8CD6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		792F151C270C1BAC00C8CD6A /* Advanced Profanity Filter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Advanced Profanity Filter.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		792F151E270C1BAC00C8CD6A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		792F1521270C1BAC00C8CD6A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		792F1523270C1BAC00C8CD6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		792F1524270C1BAC00C8CD6A /* Advanced Profanity Filter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Advanced Profanity Filter.entitlements"; sourceTree = "<group>"; };
+		792F1529270C1BAC00C8CD6A /* Advanced Profanity Filter Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Advanced Profanity Filter Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		792F152E270C1BAC00C8CD6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		792F1533270C1BAC00C8CD6A /* Advanced Profanity Filter Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Advanced Profanity Filter Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		792F1538270C1BAC00C8CD6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		792F1539270C1BAC00C8CD6A /* Advanced Profanity Filter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Advanced Profanity Filter.entitlements"; sourceTree = "<group>"; };
+		792F1559270C1BAC00C8CD6A /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = ../../dist/popup.js; sourceTree = "<group>"; };
+		792F155A270C1BAC00C8CD6A /* w3-color-flat.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = "w3-color-flat.css"; path = "../../dist/w3-color-flat.css"; sourceTree = "<group>"; };
+		792F155B270C1BAC00C8CD6A /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../dist/popup.html; sourceTree = "<group>"; };
+		792F155C270C1BAC00C8CD6A /* optionPage.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = optionPage.html; path = ../../dist/optionPage.html; sourceTree = "<group>"; };
+		792F155D270C1BAC00C8CD6A /* optionPage.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = optionPage.js; path = ../../dist/optionPage.js; sourceTree = "<group>"; };
+		792F155E270C1BAC00C8CD6A /* img */ = {isa = PBXFileReference; lastKnownFileType = folder; name = img; path = ../../dist/img; sourceTree = "<group>"; };
+		792F155F270C1BAC00C8CD6A /* showErrors.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = showErrors.js; path = ../../dist/showErrors.js; sourceTree = "<group>"; };
+		792F1560270C1BAC00C8CD6A /* audio */ = {isa = PBXFileReference; lastKnownFileType = folder; name = audio; path = ../../dist/audio; sourceTree = "<group>"; };
+		792F1561270C1BAC00C8CD6A /* w3.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = w3.css; path = ../../dist/w3.css; sourceTree = "<group>"; };
+		792F1562270C1BAC00C8CD6A /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../dist/manifest.json; sourceTree = "<group>"; };
+		792F1563270C1BAC00C8CD6A /* webFilter.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = webFilter.js; path = ../../dist/webFilter.js; sourceTree = "<group>"; };
+		792F1564270C1BAC00C8CD6A /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = ../../dist/popup.css; sourceTree = "<group>"; };
+		792F1565270C1BAC00C8CD6A /* optionPage.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = optionPage.css; path = ../../dist/optionPage.css; sourceTree = "<group>"; };
+		792F1566270C1BAC00C8CD6A /* eventPage.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = eventPage.js; path = ../../dist/eventPage.js; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		792F1507270C1BAC00C8CD6A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		792F1519270C1BAC00C8CD6A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		792F1526270C1BAC00C8CD6A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		792F1530270C1BAC00C8CD6A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		792F14F6270C1BAB00C8CD6A = {
+			isa = PBXGroup;
+			children = (
+				791C8C232712945B00A33245 /* Advanced Profanity Filter Extension (iOS).entitlements */,
+				791C8C222712945B00A33245 /* Advanced Profanity Filter (iOS).entitlements */,
+				792F14FB270C1BAB00C8CD6A /* Shared (App) */,
+				792F1504270C1BAC00C8CD6A /* Shared (Extension) */,
+				792F150C270C1BAC00C8CD6A /* iOS (App) */,
+				792F151D270C1BAC00C8CD6A /* macOS (App) */,
+				792F152D270C1BAC00C8CD6A /* iOS (Extension) */,
+				792F1537270C1BAC00C8CD6A /* macOS (Extension) */,
+				792F150B270C1BAC00C8CD6A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		792F14FB270C1BAB00C8CD6A /* Shared (App) */ = {
+			isa = PBXGroup;
+			children = (
+				792F1502270C1BAB00C8CD6A /* ViewController.swift */,
+				792F1503270C1BAC00C8CD6A /* Assets.xcassets */,
+				792F14FC270C1BAB00C8CD6A /* Resources */,
+			);
+			path = "Shared (App)";
+			sourceTree = "<group>";
+		};
+		792F14FC270C1BAB00C8CD6A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				792F14FD270C1BAB00C8CD6A /* Main.html */,
+				792F14FF270C1BAB00C8CD6A /* Icon.png */,
+				792F1500270C1BAB00C8CD6A /* Style.css */,
+				792F1501270C1BAB00C8CD6A /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		792F1504270C1BAC00C8CD6A /* Shared (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				792F1558270C1BAC00C8CD6A /* Resources */,
+				792F1505270C1BAC00C8CD6A /* SafariWebExtensionHandler.swift */,
+			);
+			path = "Shared (Extension)";
+			sourceTree = "<group>";
+		};
+		792F150B270C1BAC00C8CD6A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				792F150A270C1BAC00C8CD6A /* Advanced Profanity Filter.app */,
+				792F151C270C1BAC00C8CD6A /* Advanced Profanity Filter.app */,
+				792F1529270C1BAC00C8CD6A /* Advanced Profanity Filter Extension.appex */,
+				792F1533270C1BAC00C8CD6A /* Advanced Profanity Filter Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		792F150C270C1BAC00C8CD6A /* iOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				792F150D270C1BAC00C8CD6A /* AppDelegate.swift */,
+				792F150F270C1BAC00C8CD6A /* SceneDelegate.swift */,
+				792F1511270C1BAC00C8CD6A /* LaunchScreen.storyboard */,
+				792F1514270C1BAC00C8CD6A /* Main.storyboard */,
+				792F1517270C1BAC00C8CD6A /* Info.plist */,
+			);
+			path = "iOS (App)";
+			sourceTree = "<group>";
+		};
+		792F151D270C1BAC00C8CD6A /* macOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				792F151E270C1BAC00C8CD6A /* AppDelegate.swift */,
+				792F1520270C1BAC00C8CD6A /* Main.storyboard */,
+				792F1523270C1BAC00C8CD6A /* Info.plist */,
+				792F1524270C1BAC00C8CD6A /* Advanced Profanity Filter.entitlements */,
+			);
+			path = "macOS (App)";
+			sourceTree = "<group>";
+		};
+		792F152D270C1BAC00C8CD6A /* iOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				792F152E270C1BAC00C8CD6A /* Info.plist */,
+			);
+			path = "iOS (Extension)";
+			sourceTree = "<group>";
+		};
+		792F1537270C1BAC00C8CD6A /* macOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				792F1538270C1BAC00C8CD6A /* Info.plist */,
+				792F1539270C1BAC00C8CD6A /* Advanced Profanity Filter.entitlements */,
+			);
+			path = "macOS (Extension)";
+			sourceTree = "<group>";
+		};
+		792F1558270C1BAC00C8CD6A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				792F1559270C1BAC00C8CD6A /* popup.js */,
+				792F155A270C1BAC00C8CD6A /* w3-color-flat.css */,
+				792F155B270C1BAC00C8CD6A /* popup.html */,
+				792F155C270C1BAC00C8CD6A /* optionPage.html */,
+				792F155D270C1BAC00C8CD6A /* optionPage.js */,
+				792F155E270C1BAC00C8CD6A /* img */,
+				792F155F270C1BAC00C8CD6A /* showErrors.js */,
+				792F1560270C1BAC00C8CD6A /* audio */,
+				792F1561270C1BAC00C8CD6A /* w3.css */,
+				792F1562270C1BAC00C8CD6A /* manifest.json */,
+				792F1563270C1BAC00C8CD6A /* webFilter.js */,
+				792F1564270C1BAC00C8CD6A /* popup.css */,
+				792F1565270C1BAC00C8CD6A /* optionPage.css */,
+				792F1566270C1BAC00C8CD6A /* eventPage.js */,
+			);
+			name = Resources;
+			path = "Shared (Extension)";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		792F1509270C1BAC00C8CD6A /* Advanced Profanity Filter (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 792F154E270C1BAC00C8CD6A /* Build configuration list for PBXNativeTarget "Advanced Profanity Filter (iOS)" */;
+			buildPhases = (
+				792F1506270C1BAC00C8CD6A /* Sources */,
+				792F1507270C1BAC00C8CD6A /* Frameworks */,
+				792F1508270C1BAC00C8CD6A /* Resources */,
+				792F154D270C1BAC00C8CD6A /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				792F152C270C1BAC00C8CD6A /* PBXTargetDependency */,
+			);
+			name = "Advanced Profanity Filter (iOS)";
+			productName = "Advanced Profanity Filter (iOS)";
+			productReference = 792F150A270C1BAC00C8CD6A /* Advanced Profanity Filter.app */;
+			productType = "com.apple.product-type.application";
+		};
+		792F151B270C1BAC00C8CD6A /* Advanced Profanity Filter (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 792F1555270C1BAC00C8CD6A /* Build configuration list for PBXNativeTarget "Advanced Profanity Filter (macOS)" */;
+			buildPhases = (
+				792F1518270C1BAC00C8CD6A /* Sources */,
+				792F1519270C1BAC00C8CD6A /* Frameworks */,
+				792F151A270C1BAC00C8CD6A /* Resources */,
+				792F1554270C1BAC00C8CD6A /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				792F1536270C1BAC00C8CD6A /* PBXTargetDependency */,
+			);
+			name = "Advanced Profanity Filter (macOS)";
+			productName = "Advanced Profanity Filter (macOS)";
+			productReference = 792F151C270C1BAC00C8CD6A /* Advanced Profanity Filter.app */;
+			productType = "com.apple.product-type.application";
+		};
+		792F1528270C1BAC00C8CD6A /* Advanced Profanity Filter Extension (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 792F154A270C1BAC00C8CD6A /* Build configuration list for PBXNativeTarget "Advanced Profanity Filter Extension (iOS)" */;
+			buildPhases = (
+				792F1525270C1BAC00C8CD6A /* Sources */,
+				792F1526270C1BAC00C8CD6A /* Frameworks */,
+				792F1527270C1BAC00C8CD6A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Advanced Profanity Filter Extension (iOS)";
+			productName = "Advanced Profanity Filter Extension (iOS)";
+			productReference = 792F1529270C1BAC00C8CD6A /* Advanced Profanity Filter Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		792F1532270C1BAC00C8CD6A /* Advanced Profanity Filter Extension (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 792F1551270C1BAC00C8CD6A /* Build configuration list for PBXNativeTarget "Advanced Profanity Filter Extension (macOS)" */;
+			buildPhases = (
+				792F152F270C1BAC00C8CD6A /* Sources */,
+				792F1530270C1BAC00C8CD6A /* Frameworks */,
+				792F1531270C1BAC00C8CD6A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Advanced Profanity Filter Extension (macOS)";
+			productName = "Advanced Profanity Filter Extension (macOS)";
+			productReference = 792F1533270C1BAC00C8CD6A /* Advanced Profanity Filter Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		792F14F7270C1BAB00C8CD6A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1300;
+				LastUpgradeCheck = 1310;
+				TargetAttributes = {
+					792F1509270C1BAC00C8CD6A = {
+						CreatedOnToolsVersion = 13.0;
+					};
+					792F151B270C1BAC00C8CD6A = {
+						CreatedOnToolsVersion = 13.0;
+					};
+					792F1528270C1BAC00C8CD6A = {
+						CreatedOnToolsVersion = 13.0;
+					};
+					792F1532270C1BAC00C8CD6A = {
+						CreatedOnToolsVersion = 13.0;
+					};
+				};
+			};
+			buildConfigurationList = 792F14FA270C1BAB00C8CD6A /* Build configuration list for PBXProject "Advanced Profanity Filter" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 792F14F6270C1BAB00C8CD6A;
+			productRefGroup = 792F150B270C1BAC00C8CD6A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				792F1509270C1BAC00C8CD6A /* Advanced Profanity Filter (iOS) */,
+				792F151B270C1BAC00C8CD6A /* Advanced Profanity Filter (macOS) */,
+				792F1528270C1BAC00C8CD6A /* Advanced Profanity Filter Extension (iOS) */,
+				792F1532270C1BAC00C8CD6A /* Advanced Profanity Filter Extension (macOS) */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		792F1508270C1BAC00C8CD6A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				792F153C270C1BAC00C8CD6A /* Icon.png in Resources */,
+				792F1513270C1BAC00C8CD6A /* LaunchScreen.storyboard in Resources */,
+				792F153A270C1BAC00C8CD6A /* Main.html in Resources */,
+				792F1540270C1BAC00C8CD6A /* Script.js in Resources */,
+				792F1544270C1BAC00C8CD6A /* Assets.xcassets in Resources */,
+				792F1516270C1BAC00C8CD6A /* Main.storyboard in Resources */,
+				792F153E270C1BAC00C8CD6A /* Style.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		792F151A270C1BAC00C8CD6A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				792F153D270C1BAC00C8CD6A /* Icon.png in Resources */,
+				792F153F270C1BAC00C8CD6A /* Style.css in Resources */,
+				792F1522270C1BAC00C8CD6A /* Main.storyboard in Resources */,
+				792F1541270C1BAC00C8CD6A /* Script.js in Resources */,
+				792F1545270C1BAC00C8CD6A /* Assets.xcassets in Resources */,
+				792F153B270C1BAC00C8CD6A /* Main.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		792F1527270C1BAC00C8CD6A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				792F157B270C1BAC00C8CD6A /* showErrors.js in Resources */,
+				792F157A270C1BAC00C8CD6A /* img in Resources */,
+				792F157E270C1BAC00C8CD6A /* manifest.json in Resources */,
+				792F1579270C1BAC00C8CD6A /* optionPage.js in Resources */,
+				792F157D270C1BAC00C8CD6A /* w3.css in Resources */,
+				792F157F270C1BAC00C8CD6A /* webFilter.js in Resources */,
+				792F1578270C1BAC00C8CD6A /* optionPage.html in Resources */,
+				792F1576270C1BAC00C8CD6A /* w3-color-flat.css in Resources */,
+				792F1580270C1BAC00C8CD6A /* popup.css in Resources */,
+				792F1577270C1BAC00C8CD6A /* popup.html in Resources */,
+				792F1575270C1BAC00C8CD6A /* popup.js in Resources */,
+				792F157C270C1BAC00C8CD6A /* audio in Resources */,
+				792F1582270C1BAC00C8CD6A /* eventPage.js in Resources */,
+				792F1581270C1BAC00C8CD6A /* optionPage.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		792F1531270C1BAC00C8CD6A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				792F156D270C1BAC00C8CD6A /* showErrors.js in Resources */,
+				792F156C270C1BAC00C8CD6A /* img in Resources */,
+				792F1570270C1BAC00C8CD6A /* manifest.json in Resources */,
+				792F156B270C1BAC00C8CD6A /* optionPage.js in Resources */,
+				792F156F270C1BAC00C8CD6A /* w3.css in Resources */,
+				792F1571270C1BAC00C8CD6A /* webFilter.js in Resources */,
+				792F156A270C1BAC00C8CD6A /* optionPage.html in Resources */,
+				792F1568270C1BAC00C8CD6A /* w3-color-flat.css in Resources */,
+				792F1572270C1BAC00C8CD6A /* popup.css in Resources */,
+				792F1569270C1BAC00C8CD6A /* popup.html in Resources */,
+				792F1567270C1BAC00C8CD6A /* popup.js in Resources */,
+				792F156E270C1BAC00C8CD6A /* audio in Resources */,
+				792F1574270C1BAC00C8CD6A /* eventPage.js in Resources */,
+				792F1573270C1BAC00C8CD6A /* optionPage.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		792F1506270C1BAC00C8CD6A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				792F1542270C1BAC00C8CD6A /* ViewController.swift in Sources */,
+				792F150E270C1BAC00C8CD6A /* AppDelegate.swift in Sources */,
+				792F1510270C1BAC00C8CD6A /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		792F1518270C1BAC00C8CD6A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				792F1543270C1BAC00C8CD6A /* ViewController.swift in Sources */,
+				792F151F270C1BAC00C8CD6A /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		792F1525270C1BAC00C8CD6A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				792F1546270C1BAC00C8CD6A /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		792F152F270C1BAC00C8CD6A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				792F1547270C1BAC00C8CD6A /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		792F152C270C1BAC00C8CD6A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = 792F1528270C1BAC00C8CD6A /* Advanced Profanity Filter Extension (iOS) */;
+			targetProxy = 792F152B270C1BAC00C8CD6A /* PBXContainerItemProxy */;
+		};
+		792F1536270C1BAC00C8CD6A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 792F1532270C1BAC00C8CD6A /* Advanced Profanity Filter Extension (macOS) */;
+			targetProxy = 792F1535270C1BAC00C8CD6A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		792F14FD270C1BAB00C8CD6A /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				792F14FE270C1BAB00C8CD6A /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		792F1511270C1BAC00C8CD6A /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				792F1512270C1BAC00C8CD6A /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		792F1514270C1BAC00C8CD6A /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				792F1515270C1BAC00C8CD6A /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		792F1520270C1BAC00C8CD6A /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				792F1521270C1BAC00C8CD6A /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		792F1548270C1BAC00C8CD6A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		792F1549270C1BAC00C8CD6A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		792F154B270C1BAC00C8CD6A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Advanced Profanity Filter Extension (iOS).entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DevTeamID;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Advanced Profanity Filter Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter.Extension";
+				PRODUCT_NAME = "Advanced Profanity Filter Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,6";
+			};
+			name = Debug;
+		};
+		792F154C270C1BAC00C8CD6A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Advanced Profanity Filter Extension (iOS).entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DevTeamID;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Advanced Profanity Filter Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter.Extension";
+				PRODUCT_NAME = "Advanced Profanity Filter Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,6";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		792F154F270C1BAC00C8CD6A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Advanced Profanity Filter (iOS).entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DevTeamID;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Advanced Profanity Filter";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter";
+				PRODUCT_NAME = "Advanced Profanity Filter";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		792F1550270C1BAC00C8CD6A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Advanced Profanity Filter (iOS).entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DevTeamID;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Advanced Profanity Filter";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter";
+				PRODUCT_NAME = "Advanced Profanity Filter";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		792F1552270C1BAC00C8CD6A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Advanced Profanity Filter.entitlements";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Advanced Profanity Filter Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter.Extension";
+				PRODUCT_NAME = "Advanced Profanity Filter Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		792F1553270C1BAC00C8CD6A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Advanced Profanity Filter.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DevTeamID;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Advanced Profanity Filter Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter.Extension";
+				PRODUCT_NAME = "Advanced Profanity Filter Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		792F1556270C1BAC00C8CD6A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Advanced Profanity Filter.entitlements";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Advanced Profanity Filter";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter";
+				PRODUCT_NAME = "Advanced Profanity Filter";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		792F1557270C1BAC00C8CD6A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Advanced Profanity Filter.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DevTeamID;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Advanced Profanity Filter";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourCompany.advanced-profanity-filter";
+				PRODUCT_NAME = "Advanced Profanity Filter";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		792F14FA270C1BAB00C8CD6A /* Build configuration list for PBXProject "Advanced Profanity Filter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				792F1548270C1BAC00C8CD6A /* Debug */,
+				792F1549270C1BAC00C8CD6A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		792F154A270C1BAC00C8CD6A /* Build configuration list for PBXNativeTarget "Advanced Profanity Filter Extension (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				792F154B270C1BAC00C8CD6A /* Debug */,
+				792F154C270C1BAC00C8CD6A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		792F154E270C1BAC00C8CD6A /* Build configuration list for PBXNativeTarget "Advanced Profanity Filter (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				792F154F270C1BAC00C8CD6A /* Debug */,
+				792F1550270C1BAC00C8CD6A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		792F1551270C1BAC00C8CD6A /* Build configuration list for PBXNativeTarget "Advanced Profanity Filter Extension (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				792F1552270C1BAC00C8CD6A /* Debug */,
+				792F1553270C1BAC00C8CD6A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		792F1555270C1BAC00C8CD6A /* Build configuration list for PBXNativeTarget "Advanced Profanity Filter (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				792F1556270C1BAC00C8CD6A /* Debug */,
+				792F1557270C1BAC00C8CD6A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 792F14F7270C1BAB00C8CD6A /* Project object */;
+}

@@ -17,6 +17,13 @@
 /dist-lib
 
 # General
+# MacOS
+.DS_Store
+.Trashes
+# Xcode
+*.swp
+xcuserdata/
+
 # Windows
 Thumbs.db
 [Dd]esktop.ini
