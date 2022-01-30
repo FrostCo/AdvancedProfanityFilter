@@ -81,8 +81,10 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
 }
 
 function onMessage(request: Message, sender, sendResponse) {
+  // Support manifest V2/V3
+  const chromeAction = chrome.action || chrome.browserAction;
   if (request.disabled === true) {
-    chrome.browserAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
+    chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
   } else if (request.backgroundData === true) {
     const response: BackgroundData = { disabledTab: false };
     const tabOptions = getTabOptions(sender.tab.id);
@@ -93,22 +95,22 @@ function onMessage(request: Message, sender, sendResponse) {
     sendResponse(response);
   } else {
     // Set badge color
-    // chrome.browserAction.setBadgeBackgroundColor({ color: [138, 43, 226, 255], tabId: sender.tab.id }); // Blue Violet
-    // chrome.browserAction.setBadgeBackgroundColor({ color: [85, 85, 85, 255], tabId: sender.tab.id }); // Grey (Default)
-    // chrome.browserAction.setBadgeBackgroundColor({ color: [236, 147, 41, 255], tabId: sender.tab.id }); // Orange
+    // chromeAction.setBadgeBackgroundColor({ color: [138, 43, 226, 255], tabId: sender.tab.id }); // Blue Violet
+    // chromeAction.setBadgeBackgroundColor({ color: [85, 85, 85, 255], tabId: sender.tab.id }); // Grey (Default)
+    // chromeAction.setBadgeBackgroundColor({ color: [236, 147, 41, 255], tabId: sender.tab.id }); // Orange
     if (request.setBadgeColor) {
       if (request.mutePage) {
-        chrome.browserAction.setBadgeBackgroundColor({ color: [34, 139, 34, 255], tabId: sender.tab.id }); // Forest Green - Audio
+        chromeAction.setBadgeBackgroundColor({ color: [34, 139, 34, 255], tabId: sender.tab.id }); // Forest Green - Audio
       } else if (request.advanced) {
-        chrome.browserAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255], tabId: sender.tab.id }); // Red - Advanced
+        chromeAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255], tabId: sender.tab.id }); // Red - Advanced
       } else {
-        chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255], tabId: sender.tab.id }); // Blue - Normal
+        chromeAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255], tabId: sender.tab.id }); // Blue - Normal
       }
     }
 
     // Show count of words filtered on badge
     if (request.counter != undefined) {
-      chrome.browserAction.setBadgeText({ text: formatNumber(request.counter), tabId: sender.tab.id });
+      chromeAction.setBadgeText({ text: formatNumber(request.counter), tabId: sender.tab.id });
     }
 
     // Set mute state for tab
