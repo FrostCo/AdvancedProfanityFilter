@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import fse from 'fs-extra';
 import path from 'path';
-import marked from 'marked';
+import { marked } from 'marked';
 import download from 'download';
 
 const readmeURI = 'https://raw.githubusercontent.com/wiki/richardfrost/AdvancedProfanityFilter/Home.md';
