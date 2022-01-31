@@ -9,3 +9,7 @@ text eol=lf
 /src/static/w3-color-flat.css linguist-vendored
 /store/* linguist-vendored
 /test/* linguist-documentation
+
+# Filters (clean/smudge)
+"apple/Advanced Profanity Filter.xcodeproj/project.pbxproj" filter=appleProject
+"apple/Shared (App)/ViewController.swift" filter=appleProject
