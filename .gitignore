@@ -1,6 +1,9 @@
 # Dev Dependencies
 /node_modules/*
 
+# Ignore git-filter scripts (clean/smudge)
+bin/git-filters/*.js
+
 # Packaged extensions
 /dist/*
 /*.zip
@@ -17,6 +20,13 @@
 /dist-lib
 
 # General
+# MacOS
+.DS_Store
+.Trashes
+# Xcode
+*.swp
+xcuserdata/
+
 # Windows
 Thumbs.db
 [Dd]esktop.ini
