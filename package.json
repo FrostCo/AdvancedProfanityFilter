@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
   "scripts": {
+    "build:apple": "npm run clean && npm run build:static && npm run package:webpack && node bin/build-apple.mjs",
     "build:libs": "tsc -p ./src/script/lib/tsconfig.json",
     "build:static": "node bin/copy-static.mjs",
     "build:test-sm": "babel src/script --out-dir built --extensions \".ts,.tsx\" --source-maps inline",
