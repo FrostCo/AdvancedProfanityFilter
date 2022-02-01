@@ -2,8 +2,10 @@
   "compilerOptions": {
     "allowJs": true,
     "lib": ["es2017", "dom", "dom.iterable"],
+    "moduleResolution": "node",
     "noEmit": true,
     "outDir": "./dist",
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "target": "esnext"
   },

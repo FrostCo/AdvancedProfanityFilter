@@ -2,6 +2,7 @@ import Constants from './lib/constants';
 import Config from './lib/config';
 import { prettyPrintArray, stringArray } from './lib/helper';
 import Logger from './lib/logger';
+import * as Build from '../../.build.json';
 const logger = new Logger();
 
 export default class WebConfig extends Config {
@@ -24,6 +25,7 @@ export default class WebConfig extends Config {
   youTubeAutoSubsMax: number;
   youTubeAutoSubsMin: number;
 
+  static readonly BUILD = Build;
   static readonly _classDefaults = {
     audioWordlistId: 0,
     collectStats: true,
@@ -35,7 +37,7 @@ export default class WebConfig extends Config {
     muteAudio: false,
     muteAudioOnly: false,
     muteCueRequireShowing: false,
-    muteMethod: Constants.MUTE_METHODS.TAB,
+    muteMethod: WebConfig.BUILD.config.muteMethod || Constants.MUTE_METHODS.TAB,
     password: null,
     showSubtitles: Constants.SHOW_SUBTITLES.ALL,
     showUpdateNotification: false,
