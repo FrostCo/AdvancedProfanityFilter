@@ -8,6 +8,7 @@ const manifestV3Path = path.join('dist', 'manifestV3.json');
 
 function common() {
   handleManifestVersion();
+  handleVersion();
 }
 
 function handleManifestVersion() {
@@ -19,6 +20,16 @@ function handleManifestVersion() {
   }
 }
 
+function handleVersion() {
+  const manifest = loadJSONFile(manifestPath);
+
+  if (manifest.version != buildData.version) {
+    console.log(`Updating manifest.json version (${manifest.version} -> ${buildData.version})`);
+    manifest.version = buildData.version;
+    writeJSONFile(manifestPath, manifest);
+  }
+}
+
 function loadJSONFile(file) {
   try {
     return JSON.parse(fse.readFileSync(file));
@@ -26,6 +37,11 @@ function loadJSONFile(file) {
     console.error(err.message);
     throw err;
   }
+}
+
+function writeJSONFile(file, object) {
+  const content = JSON.stringify(object, null, 2);
+  fse.writeFileSync(file, content);
 }
 
 function main() {
