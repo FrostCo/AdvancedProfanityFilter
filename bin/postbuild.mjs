@@ -2,6 +2,10 @@
 import fse from 'fs-extra';
 import path from 'path';
 
+const buildDataPath = path.join('.build.json');
+const manifestPath = path.join('dist', 'manifest.json');
+const manifestV3Path = path.join('dist', 'manifestV3.json');
+
 function common() {
   handleManifestVersion();
 }
@@ -9,14 +13,19 @@ function common() {
 function handleManifestVersion() {
   console.log('Handling manfiest file');
   if (buildData.manifestVersion == 3) {
-    fse.renameSync(path.join('dist', 'manifestV3.json'), path.join('dist', 'manifest.json'));
+    fse.renameSync(manifestV3Path, manifestPath);
   } else {
-    fse.removeSync(path.join('dist', 'manifestV3.json'));
+    fse.removeSync(manifestV3Path);
   }
 }
 
-function loadBuildData() {
-  return JSON.parse(fse.readFileSync(path.join('.build.json')));
+function loadJSONFile(file) {
+  try {
+    return JSON.parse(fse.readFileSync(file));
+  } catch (err) {
+    console.error(err.message);
+    throw err;
+  }
 }
 
 function main() {
@@ -89,5 +98,5 @@ function usage() {
   `);
 }
 
-const buildData = loadBuildData();
+const buildData = loadJSONFile(buildDataPath);
 main();
