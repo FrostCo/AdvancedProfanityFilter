@@ -2,6 +2,23 @@
 import fse from 'fs-extra';
 import path from 'path';
 
+function common() {
+  handleManifestVersion();
+}
+
+function handleManifestVersion() {
+  console.log('Handling manfiest file');
+  if (buildData.manifestVersion == 3) {
+    fse.renameSync(path.join('dist', 'manifestV3.json'), path.join('dist', 'manifest.json'));
+  } else {
+    fse.removeSync(path.join('dist', 'manifestV3.json'));
+  }
+}
+
+function loadBuildData() {
+  return JSON.parse(fse.readFileSync(path.join('.build.json')));
+}
+
 function main() {
   try {
     // argv[0] = process (node)
@@ -9,6 +26,7 @@ function main() {
     // argv[2] = first argument
     if (process.argv.length >= 2) {
       const args = process.argv.slice(2);
+      common();
       switch (args[0]) {
         case '--apple':
           postbuildApple();
@@ -71,4 +89,5 @@ function usage() {
   `);
 }
 
+const buildData = loadBuildData();
 main();
