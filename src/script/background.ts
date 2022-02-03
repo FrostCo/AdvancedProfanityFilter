@@ -5,10 +5,6 @@ import { formatNumber } from './lib/helper';
 import Logger from './lib/logger';
 const logger = new Logger();
 
-const backgroundStorage: BackgroundStorage = {
-  tabs: {},
-};
-
 ////
 // Functions
 //
@@ -31,13 +27,21 @@ function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.
   }
 }
 
-function disableTabOnce(id: number): void {
-  saveTabOptions(id, { disabledOnce: true });
-  chrome.tabs.reload();
+async function disableTabOnce(tabId: number) {
+  const storage = await loadBackgroundStorage();
+  const tabOptions = await getTabOptions(storage, tabId);
+  tabOptions.disabledOnce = true;
+  await saveBackgroundStorage(storage);
+  chrome.tabs.reload(tabId);
 }
 
-function getTabOptions(id: number): TabStorageOptions {
-  return storedTab(id) ? backgroundStorage.tabs[id] : saveNewTabOptions(id);
+function getTabOptions(storage: BackgroundStorage, tabId: number): TabStorageOptions {
+  return storage.tabs[tabId] || newTabOptions(storage, tabId);
+}
+
+async function loadBackgroundStorage(): Promise<BackgroundStorage> {
+  const data = await WebConfig.getLocalStorage({ background: { tabs: {} } });
+  return data['background'] as BackgroundStorage;
 }
 
 function notificationsOnClick(notificationId: string) {
@@ -152,30 +156,25 @@ async function runUpdateMigrations(previousVersion) {
   }
 }
 
-function saveNewTabOptions(id: number, options: TabStorageOptions = {}): TabStorageOptions {
+function newTabOptions(storage: BackgroundStorage, tabId: number, options: TabStorageOptions = {}): TabStorageOptions {
   const _defaults: TabStorageOptions = { disabled: false, disabledOnce: false };
   const tabOptions = Object.assign({}, _defaults, options) as TabStorageOptions;
-  tabOptions.id = id;
+  tabOptions.id = tabId;
   tabOptions.registeredAt = new Date().getTime();
-  backgroundStorage.tabs[id] = tabOptions;
-  return tabOptions;
+  storage.tabs[tabId] = tabOptions;
+  return storage.tabs[tabId];
 }
 
-function saveTabOptions(id: number, options: TabStorageOptions = {}): TabStorageOptions {
-  return storedTab(id) ? Object.assign(getTabOptions(id), options) : saveNewTabOptions(id, options);
+async function saveBackgroundStorage(storage: BackgroundStorage) {
+  await WebConfig.saveLocalStorage({ background: storage });
 }
 
-function storedTab(id: number): boolean {
-  return backgroundStorage.tabs.hasOwnProperty(id);
-}
-
-function tabsOnActivated(tab: chrome.tabs.TabActiveInfo) {
-  const tabId = tab ? tab.tabId : chrome.tabs.TAB_ID_NONE;
-  if (!storedTab(tabId)) { saveTabOptions(tabId); }
-}
-
-function tabsOnRemoved(tabId: number) {
-  if (storedTab(tabId)) { delete backgroundStorage.tabs[tabId]; }
+async function tabsOnRemoved(tabId: number) {
+  const storage = await loadBackgroundStorage();
+  if (storage.tabs[tabId]) {
+    delete storage.tabs[tabId];
+    await saveBackgroundStorage(storage);
+  }
 }
 
 async function toggleDomain(hostname: string, action: string) {
@@ -197,10 +196,12 @@ async function toggleDomain(hostname: string, action: string) {
   }
 }
 
-function toggleTabDisable(id: number) {
-  const tabOptions = getTabOptions(id);
+async function toggleTabDisable(tabId: number) {
+  const storage = await loadBackgroundStorage();
+  const tabOptions = getTabOptions(storage, tabId);
   tabOptions.disabled = !tabOptions.disabled;
-  chrome.tabs.reload();
+  await saveBackgroundStorage(storage);
+  chrome.tabs.reload(tabId);
 }
 
 ////
@@ -262,7 +263,6 @@ chrome.contextMenus.removeAll(() => {
 chrome.contextMenus.onClicked.addListener((info, tab) => { contextMenusOnClick(info, tab); });
 chrome.runtime.onInstalled.addListener((details) => { onInstalled(details); });
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { onMessage(request, sender, sendResponse); });
-chrome.tabs.onActivated.addListener((tab) => { tabsOnActivated(tab); });
 chrome.tabs.onRemoved.addListener((tabId) => { tabsOnRemoved(tabId); });
 if (chrome.notifications != null) { // Not available in Safari
   chrome.notifications.onClicked.addListener((notificationId) => { notificationsOnClick(notificationId); });
