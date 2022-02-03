@@ -186,6 +186,7 @@ export default class OptionPage {
       return Array.from(document.querySelectorAll(selector));
     }).flat();
     this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
+    this.setHelpVersion();
   }
 
   applyDarkTheme(allElements = true) {
@@ -1655,6 +1656,11 @@ export default class OptionPage {
     } catch (err) {
       OptionPage.showErrorModal('Failed to update defult wordlist.', err);
     }
+  }
+
+  setHelpVersion() {
+    const helpVersion = document.getElementById('helpVersion') as HTMLAnchorElement;
+    helpVersion.textContent = WebConfig.BUILD.version;
   }
 
   setThemeButton(darkTheme: boolean) {

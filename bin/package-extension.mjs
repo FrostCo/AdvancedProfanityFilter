@@ -69,55 +69,12 @@ function prepareZip() {
   return zip;
 }
 
-function updateManifestFile(file, obj) {
-  const content = JSON.stringify(obj, null, 2);
-  fse.writeFileSync(file, content);
-}
-
 function updateManifestFileInZip(zip, obj) {
   const content = JSON.stringify(obj, null, 2);
   zip.updateFile('manifest.json', Buffer.alloc(content.length, content));
 }
 
-function updateManifestVersion(manifest, newVersion) {
-  console.log('Updating manifest.json version...');
-  manifest.version = newVersion;
-  updateManifestFile(manifestPath, manifest);
-  fse.copyFileSync(manifestPath, path.join(dist, 'manifest.json'));
-}
-
-function updateOptionPageVersion(newVersion) {
-  const filename = 'optionPage.html';
-  const optionPage = path.join(staticDir, filename);
-  const optionPageHTML = fse.readFileSync(optionPage).toString();
-  let foundMatch = false;
-
-  const newOptionPageHTML = optionPageHTML.replace(/id="helpVersion">.*?<\/a>/, function(match) {
-    foundMatch = true;
-    return `id="helpVersion">${newVersion}</a>`;
-  });
-
-  if (foundMatch) {
-    console.log(`Updating ${filename} version...`);
-    fse.writeFileSync(optionPage, newOptionPageHTML); // Update src version
-    fse.copyFileSync(optionPage, path.join(dist, filename)); // Copy src to dist
-  } else {
-    throw `Failed to update ${optionPage}`;
-  }
-}
-
-function updateVersions() {
-  const manifest = getManifestJSON();
-  if (manifest.version != process.env.npm_package_version) {
-    const newVersion = process.env.npm_package_version;
-    console.log('Version number is being updated: ' + manifest.version + ' -> ' + newVersion);
-    updateManifestVersion(manifest, newVersion);
-    updateOptionPageVersion(newVersion);
-  }
-}
-
 const dist = './dist/';
 const staticDir = './src/static/';
 const manifestPath = path.join(staticDir, 'manifest.json');
-updateVersions();
 buildAll();
