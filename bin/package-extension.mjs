@@ -5,7 +5,6 @@ import AdmZip from 'adm-zip';
 
 function buildAll() {
   build(prepareZip());
-  buildEdgeLegacy(getManifestJSON(), prepareZip());
   buildFirefox(getManifestJSON(), prepareZip());
   buildBookmarklet();
 }
@@ -20,33 +19,6 @@ function build(zip, name = '') {
 
 function buildBookmarklet() {
   fse.copyFileSync(path.join(dist, 'bookmarkletFilter.js'), './bookmarklet.js');
-}
-
-function buildEdgeLegacy(manifest, zip) {
-  const packagePath = './extension-edge-legacy.zip';
-  console.log(`Building ${packagePath}`);
-
-  if (!fse.existsSync('./store/edge')) {
-    console.log('Error! Missing Edge legacy polyfills.');
-    return false;
-  }
-
-  const msPreload = {
-    backgroundScript: 'backgroundScriptsAPIBridge.js',
-    contentScript: 'contentScriptsAPIBridge.js'
-  };
-
-  // Fix options_page
-  manifest.options_page = manifest.options_ui.page;
-  delete manifest.options_ui;
-
-  // Add ms-proload polyfills
-  manifest['-ms-preload'] = msPreload;
-  updateManifestFileInZip(zip, manifest);
-  zip.addLocalFile('./store/edge/src/backgroundScriptsAPIBridge.js', null);
-  zip.addLocalFile('./store/edge/src/contentScriptsAPIBridge.js', null);
-  fse.removeSync(packagePath);
-  zip.writeZip(packagePath);
 }
 
 function buildFirefox(manifest, zip) {
