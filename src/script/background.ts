@@ -39,6 +39,20 @@ function getTabOptions(storage: BackgroundStorage, tabId: number): TabStorageOpt
   return storage.tabs[tabId] || newTabOptions(storage, tabId);
 }
 
+async function handleBackgroundDataRequest(tabId: number, sendResponse) {
+  const storage = await loadBackgroundStorage();
+  const response: BackgroundData = { disabledTab: false };
+  const tabOptions = getTabOptions(storage, tabId);
+  if (tabOptions.disabled || tabOptions.disabledOnce) {
+    response.disabledTab = true;
+  }
+  sendResponse(response);
+  if (tabOptions.disabledOnce) {
+    tabOptions.disabledOnce = false;
+    await saveBackgroundStorage(storage);
+  }
+}
+
 async function loadBackgroundStorage(): Promise<BackgroundStorage> {
   const data = await WebConfig.getLocalStorage({ background: { tabs: {} } });
   return data['background'] as BackgroundStorage;
@@ -90,13 +104,8 @@ function onMessage(request: Message, sender, sendResponse) {
   if (request.disabled === true) {
     chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
   } else if (request.backgroundData === true) {
-    const response: BackgroundData = { disabledTab: false };
-    const tabOptions = getTabOptions(sender.tab.id);
-    if (tabOptions.disabled || tabOptions.disabledOnce) {
-      response.disabledTab = true;
-      if (tabOptions.disabledOnce) { tabOptions.disabledOnce = false; }
-    }
-    sendResponse(response);
+    handleBackgroundDataRequest(sender.tab.id, sendResponse);
+    return true; // return true when waiting on an async call
   } else {
     // Set badge color
     // chromeAction.setBadgeBackgroundColor({ color: [138, 43, 226, 255], tabId: sender.tab.id }); // Blue Violet
@@ -262,7 +271,7 @@ chrome.contextMenus.removeAll(() => {
 //
 chrome.contextMenus.onClicked.addListener((info, tab) => { contextMenusOnClick(info, tab); });
 chrome.runtime.onInstalled.addListener((details) => { onInstalled(details); });
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { onMessage(request, sender, sendResponse); });
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { return onMessage(request, sender, sendResponse); });
 chrome.tabs.onRemoved.addListener((tabId) => { tabsOnRemoved(tabId); });
 if (chrome.notifications != null) { // Not available in Safari
   chrome.notifications.onClicked.addListener((notificationId) => { notificationsOnClick(notificationId); });
