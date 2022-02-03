@@ -11,6 +11,16 @@ function common() {
   handleVersion();
 }
 
+function firefoxBuild() {
+  const manifest = loadJSONFile(manifestPath);
+  manifest.applications = {
+    gecko: {
+      id: '{853d1586-e2ab-4387-a7fd-1f7f894d2651}'
+    }
+  };
+  writeJSONFile(manifestPath, manifest);
+}
+
 function handleManifestVersion() {
   if (buildData.manifestVersion == 3) {
     fse.renameSync(manifestV3Path, manifestPath);
@@ -30,24 +40,19 @@ function handleVersion() {
 }
 
 function loadJSONFile(file) {
-  try {
-    return JSON.parse(fse.readFileSync(file));
-  } catch (err) {
-    console.error(err.message);
-    throw err;
-  }
+  return JSON.parse(fse.readFileSync(file));
 }
 
 function main() {
-  try {
-    buildData = loadJSONFile(buildDataPath);
-    common();
+  buildData = loadJSONFile(buildDataPath);
+  common();
 
-    if (buildData.target == 'safari') {
-      safariBuild();
-    }
-  } catch (error) {
-    console.log(error);
+  if (buildData.target == 'firefox') {
+    firefoxBuild();
+  }
+
+  if (buildData.target == 'safari') {
+    safariBuild();
   }
 }
 

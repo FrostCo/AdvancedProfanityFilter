@@ -26,42 +26,38 @@ function firefoxBuild() {
 }
 
 function main() {
-  try {
-    // argv[0] = process (node)
-    // argv[1] = script (this file)
-    // argv[2] = first argument
-    if (process.argv.length == 2 || process.argv.length == 3) {
-      const arg = process.argv.slice(2)[0];
-      // Exit if no arg passed and .build.json already exists
-      console.log(arg);
-      if (!arg && fse.existsSync(buildFilePath)) {
-        return;
-      }
-
-      common();
-
-      switch (arg) {
-        case '--firefox':
-          firefoxBuild();
-          break;
-        case '--manifestV2':
-          manifestV2Build();
-          break;
-        case '--manifestV3':
-          manifestV3Build();
-          break;
-        case '--safari':
-          safariBuild();
-          break;
-        default:
-          defaultBuild();
-      }
-      writeData();
-    } else {
-      console.log('Incorrect number of arguments.');
+  // argv[0] = process (node)
+  // argv[1] = script (this file)
+  // argv[2] = first argument
+  if (process.argv.length == 2 || process.argv.length == 3) {
+    const arg = process.argv.slice(2)[0];
+    // Exit if no arg passed and .build.json already exists
+    console.log(arg);
+    if (!arg && fse.existsSync(buildFilePath)) {
+      return;
     }
-  } catch (error) {
-    console.log(error);
+
+    common();
+
+    switch (arg) {
+      case '--firefox':
+        firefoxBuild();
+        break;
+      case '--manifestV2':
+        manifestV2Build();
+        break;
+      case '--manifestV3':
+        manifestV3Build();
+        break;
+      case '--safari':
+        safariBuild();
+        break;
+      default:
+        defaultBuild();
+    }
+    writeData();
+  } else {
+    throw (new Error('Incorrect number of arguments.'));
   }
 }
 
