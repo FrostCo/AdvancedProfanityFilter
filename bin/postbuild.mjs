@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-console */
 import fse from 'fs-extra';
 import path from 'path';
 
 const buildDataPath = path.join('.build.json');
 const manifestPath = path.join('dist', 'manifest.json');
-const manifestV3Path = path.join('dist', 'manifestV3.json');
 
 function common() {
   handleManifestVersion();
@@ -23,10 +23,29 @@ function firefoxBuild() {
 }
 
 function handleManifestVersion() {
-  if (buildData.manifestVersion == 3) {
-    fse.renameSync(manifestV3Path, manifestPath);
-  } else {
-    fse.removeSync(manifestV3Path);
+  if (buildData.manifestVersion == 2) {
+    const manifest = loadJSONFile(manifestPath);
+    manifest.action = undefined;
+    manifest.manifest_version = buildData.manifestVersion;
+    manifest.options_ui = {
+      chrome_style: false,
+      open_in_tab: true,
+      page: 'optionPage.html',
+    };
+    manifest.background = {
+      persistent: false,
+      scripts: ['background.js'],
+    };
+    manifest.browser_action = {
+      default_icon: {
+        '19': 'img/icon19.png',
+        '38': 'img/icon38.png',
+      },
+      default_popup: 'popup.html',
+      default_title: 'Advanced Profanity Filter',
+    };
+    manifest.web_accessible_resources = ['audio/*.mp3'];
+    writeJSONFile(manifestPath, manifest);
   }
 }
 
