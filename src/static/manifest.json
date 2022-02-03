@@ -16,9 +16,6 @@
     "storage",
     "tabs"
   ],
-  "optional_permissions": [
-    "file://*/*"
-  ],
   "options_ui": {
     "chrome_style": false,
     "open_in_tab": true,
