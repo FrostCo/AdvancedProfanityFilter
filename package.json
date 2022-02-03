@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
   "scripts": {
-    "build:apple": "npm run build:static && npm run package:webpack",
+    "build:apple": "npm run clean:dist && node bin/prebuild.mjs --apple && npm run build",
     "build:libs": "tsc -p ./src/script/lib/tsconfig.json",
     "build:static": "node bin/copy-static.mjs",
     "build:test-sm": "babel src/script --out-dir built --extensions \".ts,.tsx\" --source-maps inline",
@@ -32,7 +32,6 @@
     "package:webpack": "webpack --config bin/webpack.config.js",
     "package": "npm run build && npm run package:bookmarklet && npm run package:extension",
     "postbuild": "node bin/postbuild.mjs",
-    "prebuild:apple": "npm run clean:dist && node bin/prebuild.mjs --apple",
     "prebuild": "node bin/prebuild.mjs",
     "test:addon": "npx addons-linter ./extension-firefox.zip",
     "test:all": "npm run test && npm run test:lint:tests",
