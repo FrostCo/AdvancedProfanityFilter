@@ -46,25 +46,14 @@ function writeJSONFile(file, object) {
 
 function main() {
   try {
-    // argv[0] = process (node)
-    // argv[1] = script (this file)
-    // argv[2] = first argument
-    if (process.argv.length >= 2) {
-      const args = process.argv.slice(2);
-      common();
-      switch (args[0]) {
-        case '--apple':
-          postbuildApple();
-          break;
-        default:
-          postbuildDefault();
-      }
-    } else {
-      usage();
+    buildData = loadJSONFile(buildDataPath);
+    common();
+
+    if (buildData.target == 'Safari') {
+      postbuildApple();
     }
   } catch (error) {
     console.log(error);
-    usage();
   }
 }
 
@@ -77,10 +66,6 @@ function postbuildApple() {
 
   removeOptionPageDonations();
   removeFiles(files);
-}
-
-function postbuildDefault() {
-
 }
 
 function removeOptionPageDonations() {
@@ -107,12 +92,5 @@ function removeFiles(files) {
   });
 }
 
-function usage() {
-  console.log(`usage:
-      npm run postbuild
-      npm run postbuild:apple
-  `);
-}
-
-const buildData = loadJSONFile(buildDataPath);
+let buildData;
 main();

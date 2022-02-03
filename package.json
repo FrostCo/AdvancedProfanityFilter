@@ -31,7 +31,6 @@
     "package:extension": "node bin/package-extension.mjs",
     "package:webpack": "webpack --config bin/webpack.config.js",
     "package": "npm run build && npm run package:bookmarklet && npm run package:extension",
-    "postbuild:apple": "node bin/postbuild.mjs --apple",
     "postbuild": "node bin/postbuild.mjs",
     "prebuild:apple": "npm run clean:dist && node bin/prebuild.mjs --apple",
     "prebuild": "node bin/prebuild.mjs",
