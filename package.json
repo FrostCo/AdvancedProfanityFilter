@@ -19,7 +19,10 @@
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
   "scripts": {
     "build:apple": "npm run clean:dist && node bin/prebuild.mjs --apple && npm run build",
+    "build:firefox": "npm run clean:dist && node bin/prebuild.mjs --firefox && npm run build",
     "build:libs": "tsc -p ./src/script/lib/tsconfig.json",
+    "build:manifestV2": "npm run clean:dist && node bin/prebuild.mjs --manifestV2 && npm run build",
+    "build:manifestV3": "npm run clean:dist && node bin/prebuild.mjs --manifestV3 && npm run build",
     "build:static": "node bin/copy-static.mjs",
     "build:test-sm": "babel src/script --out-dir built --extensions \".ts,.tsx\" --source-maps inline",
     "build:test": "babel src/script --out-dir ./test/built --extensions \".ts,.tsx,.js\"",

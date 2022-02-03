@@ -18,12 +18,20 @@ function appleBuild() {
   data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
 }
 
-function chromeBuild() {
-
+function defaultBuild() {
+  manifestV3Build();
 }
 
-function defaultBuild() {
+function firefoxBuild() {
+  data.target = 'Firefox';
+}
 
+function manifestV2Build() {
+  data.manifestVersion = 2;
+}
+
+function manifestV3Build() {
+  data.manifestVersion = 3;
 }
 
 function common() {
@@ -54,8 +62,14 @@ function main() {
         case '--apple':
           appleBuild();
           break;
-        case '--chrome':
-          chromeBuild();
+        case '--firefox':
+          firefoxBuild();
+          break;
+        case '--manifestV2':
+          manifestV2Build();
+          break;
+        case '--manifestV3':
+          manifestV3Build();
           break;
         default:
           defaultBuild();
