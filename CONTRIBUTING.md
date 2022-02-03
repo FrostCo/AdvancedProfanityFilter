@@ -1,6 +1,6 @@
 # Contributing
 
-Welcome! Thanks for your interest in helping to make the project better. Before making a contribution, please read through this document fully to be aware of what is expected. If you have any questions, please feel free to open an [issue](https://github.com/richardfrost/AdvancedProfanityFilter/issues/new), or reach out to the community on [Discord](https://discord.gg/MpE5Z3f).
+Welcome! Thanks for your interest in helping to make the project better. Before making a contribution, please read through this document fully to be aware of what is expected. If you have any questions, please feel free to open an [issue](https://github.com/richardfrost/AdvancedProfanityFilter/issues/new), or reach out to the community on [Discord](https://discord.com/invite/dsnY5nzT).
 
 Contributions to this project are released to the public under the [project's open source license](LICENSE). By participating in this project you agree to abide by its terms, and agree to donate your contributions to the project.
 
