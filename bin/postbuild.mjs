@@ -18,6 +18,7 @@ function firefoxBuild() {
       id: '{853d1586-e2ab-4387-a7fd-1f7f894d2651}'
     }
   };
+  manifest.background.persistent = true; // Event pages are not currently supported.
   writeJSONFile(manifestPath, manifest);
 }
 
