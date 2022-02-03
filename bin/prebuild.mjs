@@ -9,7 +9,7 @@ const data = {
     muteMethod: null,
   },
   manifestVersion: 2,
-  target: 'Chrome',
+  target: 'chrome',
   version: '1.0.0',
 };
 
@@ -22,7 +22,7 @@ function defaultBuild() {
 }
 
 function firefoxBuild() {
-  data.target = 'Firefox';
+  data.target = 'firefox';
 }
 
 function main() {
@@ -74,7 +74,7 @@ function manifestV3Build() {
 }
 
 function safariBuild() {
-  data.target = 'Safari';
+  data.target = 'safari';
   data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
 }
 

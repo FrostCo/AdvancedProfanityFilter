@@ -12,7 +12,6 @@ function common() {
 }
 
 function handleManifestVersion() {
-  console.log('Handling manfiest file');
   if (buildData.manifestVersion == 3) {
     fse.renameSync(manifestV3Path, manifestPath);
   } else {
@@ -44,7 +43,7 @@ function main() {
     buildData = loadJSONFile(buildDataPath);
     common();
 
-    if (buildData.target == 'Safari') {
+    if (buildData.target == 'safari') {
       safariBuild();
     }
   } catch (error) {
