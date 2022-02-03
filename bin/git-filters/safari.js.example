@@ -6,8 +6,8 @@ Setup:
 
 1. Update `REPLACE_CONTENT` with desired values
 2. Setup the git filter:
-git config filter.appleProject.smudge "node bin/git-filters/appleProject.js --smudge"
-git config filter.appleProject.clean "node bin/git-filters/appleProject.js --clean"
+git config filter.safari.smudge "node bin/git-filters/safari.js --smudge"
+git config filter.safari.clean "node bin/git-filters/safari.js --clean"
 */
 
 const REPLACE_CONTENT = {

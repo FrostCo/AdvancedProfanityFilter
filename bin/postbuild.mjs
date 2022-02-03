@@ -50,22 +50,11 @@ function main() {
     common();
 
     if (buildData.target == 'Safari') {
-      postbuildApple();
+      safariBuild();
     }
   } catch (error) {
     console.log(error);
   }
-}
-
-function postbuildApple() {
-  const files = [
-    path.join('dist', 'img', 'donate.gif'),
-    path.join('dist', 'img', 'patreon-small.png'),
-    path.join('dist', 'img', 'patreon.png'),
-  ];
-
-  removeOptionPageDonations();
-  removeFiles(files);
 }
 
 function removeOptionPageDonations() {
@@ -90,6 +79,17 @@ function removeFiles(files) {
     console.log(`Removing ${file}`);
     fse.removeSync(file);
   });
+}
+
+function safariBuild() {
+  const files = [
+    path.join('dist', 'img', 'donate.gif'),
+    path.join('dist', 'img', 'patreon-small.png'),
+    path.join('dist', 'img', 'patreon.png'),
+  ];
+
+  removeOptionPageDonations();
+  removeFiles(files);
 }
 
 let buildData;

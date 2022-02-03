@@ -13,11 +13,6 @@ const data = {
   version: '1.0.0',
 };
 
-function appleBuild() {
-  data.target = 'Safari';
-  data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
-}
-
 function defaultBuild() {
   manifestV3Build();
 }
@@ -36,6 +31,11 @@ function manifestV3Build() {
 
 function common() {
   data.version = process.env.npm_package_version;
+}
+
+function safariBuild() {
+  data.target = 'Safari';
+  data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
 }
 
 function writeData() {
@@ -59,9 +59,6 @@ function main() {
       common();
 
       switch (arg) {
-        case '--apple':
-          appleBuild();
-          break;
         case '--firefox':
           firefoxBuild();
           break;
@@ -70,6 +67,9 @@ function main() {
           break;
         case '--manifestV3':
           manifestV3Build();
+          break;
+        case '--safari':
+          safariBuild();
           break;
         default:
           defaultBuild();
