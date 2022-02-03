@@ -47,8 +47,8 @@
     "test:types": "tsc --noEmit",
     "test": "npm run test:lint && npm run test:types && npm run test:addon && npm run test:cov",
     "type-check:watch": "npm run type-check -- --watch",
-    "update:help": "node bin/update-help.mjs",
     "update:deps": "npx npm-check-updates --concurrency 10 --timeout 600000 --upgrade",
+    "update:help": "node bin/update-help.mjs",
     "watch": "node bin/watch.js"
   },
   "devDependencies": {
