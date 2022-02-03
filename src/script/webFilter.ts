@@ -385,7 +385,9 @@ export default class WebFilter extends Filter {
         filter.stats = { mutes: 0, words: {} };
       }
     } catch (err) {
-      logger.warn('Failed to save stats.', err);
+      if (err.message !== 'Extension context invalidated.') {
+        logger.warn('Failed to save stats.', err);
+      }
     }
   }
 
