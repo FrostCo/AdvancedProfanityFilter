@@ -3,78 +3,49 @@ import fse from 'fs-extra';
 import path from 'path';
 import AdmZip from 'adm-zip';
 
-function buildAll() {
-  build(prepareZip());
-  buildFirefox(getManifestJSON(), prepareZip());
-  buildBookmarklet();
-}
+const buildDataPath = path.join('.build.json');
+const dist = './dist/';
+let buildData;
 
-function build(zip, name = '') {
-  if (name) { name = '-' + name; }
-  const packagePath = `./extension${name}.zip`;
-  console.log(`Building ${packagePath}`);
-  fse.removeSync(packagePath);
-  zip.writeZip(packagePath);
-}
-
-function buildBookmarklet() {
-  fse.copyFileSync(path.join(dist, 'bookmarkletFilter.js'), './bookmarklet.js');
-}
-
-function buildFirefox(manifest, zip) {
-  const packagePath = './extension-firefox.zip';
-  console.log(`Building ${packagePath}`);
-  const firefoxManifest = {
-    applications: {
-      gecko: {
-        id: '{853d1586-e2ab-4387-a7fd-1f7f894d2651}'
-      }
-    }
-  };
-  manifest.applications = firefoxManifest.applications;
-  updateManifestFileInZip(zip, manifest);
-  fse.removeSync(packagePath);
-  zip.writeZip(packagePath);
-
-  packageSource(); // Required due to bundled code
-}
-
-function getManifestJSON() {
-  return JSON.parse(fse.readFileSync(manifestPath));
-}
-
-function packageSource() {
-  fse.removeSync('./extension-source.zip');
-  console.log('Building ./extension-source.zip');
-  console.log('Build from source: npm install && npm run package');
-
-  const sourceZip = new AdmZip();
-  const files = [
-    'LICENSE',
-    'package.json',
-    'package-lock.json',
-    'README.md',
-    'tsconfig.json'
-  ];
-  sourceZip.addLocalFolder('./bin', 'bin');
-  sourceZip.addLocalFolder('./src', 'src');
-  sourceZip.addLocalFolder('./test', 'test');
-  files.forEach((file) => { sourceZip.addLocalFile(path.join('./', file), null); });
-  sourceZip.writeZip('./extension-source.zip');
-}
-
-function prepareZip() {
+function buildArchive() {
   const zip = new AdmZip();
   zip.addLocalFolder(dist, null);
   return zip;
 }
 
-function updateManifestFileInZip(zip, obj) {
-  const content = JSON.stringify(obj, null, 2);
-  zip.updateFile('manifest.json', Buffer.alloc(content.length, content));
+function loadJSONFile(file) {
+  try {
+    return JSON.parse(fse.readFileSync(file));
+  } catch (err) {
+    console.error(err.message);
+    throw err;
+  }
 }
 
-const dist = './dist/';
-const staticDir = './src/static/';
-const manifestPath = path.join(staticDir, 'manifest.json');
-buildAll();
+function main() {
+  try {
+    buildData = loadJSONFile(buildDataPath);
+    const zip = buildArchive();
+    const packagePath = `./${zipName()}.zip`;
+    console.log(`Building ${packagePath}`);
+    fse.removeSync(packagePath);
+    zip.writeZip(packagePath);
+  } catch (err) {
+    console.error(err.message);
+    throw (err);
+  }
+}
+
+function zipName() {
+  let name;
+
+  if (buildData.target == 'chrome') {
+    name = `extension-v${buildData.manifestVersion}`;
+  } else {
+    name = `extension-${buildData.target}`;
+  }
+
+  return name;
+}
+
+main();
