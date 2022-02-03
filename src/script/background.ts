@@ -141,6 +141,11 @@ function onMessage(request: Message, sender, sendResponse) {
   }
 }
 
+async function onStartup() {
+  // Clear background storage on startup
+  await saveBackgroundStorage({ tabs: {} });
+}
+
 // Add selected word/phrase and reload page (unless already present)
 async function processSelection(action: string, selection: string) {
   const cfg = await WebConfig.load('words');
@@ -272,6 +277,7 @@ chrome.contextMenus.removeAll(() => {
 chrome.contextMenus.onClicked.addListener((info, tab) => { contextMenusOnClick(info, tab); });
 chrome.runtime.onInstalled.addListener((details) => { onInstalled(details); });
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { return onMessage(request, sender, sendResponse); });
+chrome.runtime.onStartup.addListener(() => { onStartup(); });
 chrome.tabs.onRemoved.addListener((tabId) => { tabsOnRemoved(tabId); });
 if (chrome.notifications != null) { // Not available in Safari
   chrome.notifications.onClicked.addListener((notificationId) => { notificationsOnClick(notificationId); });
