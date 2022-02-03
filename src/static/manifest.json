@@ -16,6 +16,19 @@
     "storage",
     "tabs"
   ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "webFilter.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true
+    }
+  ],
   "options_ui": {
     "chrome_style": false,
     "open_in_tab": true,
@@ -35,19 +48,6 @@
     "default_title": "Advanced Profanity Filter",
     "default_popup": "popup.html"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "webFilter.js"
-      ],
-      "run_at": "document_start",
-      "all_frames": true,
-      "match_about_blank": true
-    }
-  ],
   "web_accessible_resources": [
     "audio/*.mp3"
   ]
