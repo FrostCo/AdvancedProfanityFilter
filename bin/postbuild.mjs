@@ -39,11 +39,6 @@ function loadJSONFile(file) {
   }
 }
 
-function writeJSONFile(file, object) {
-  const content = JSON.stringify(object, null, 2);
-  fse.writeFileSync(file, content);
-}
-
 function main() {
   try {
     buildData = loadJSONFile(buildDataPath);
@@ -55,6 +50,17 @@ function main() {
   } catch (error) {
     console.log(error);
   }
+}
+
+function removeFiles(files) {
+  if (typeof files === 'string') {
+    files = [files];
+  }
+
+  files.forEach((file) => {
+    console.log(`Removing ${file}`);
+    fse.removeSync(file);
+  });
 }
 
 function removeOptionPageDonations() {
@@ -70,17 +76,6 @@ function removeOptionPageDonations() {
   fse.writeFileSync(optionPage, newOptionPageHTML);
 }
 
-function removeFiles(files) {
-  if (typeof files === 'string') {
-    files = [files];
-  }
-
-  files.forEach((file) => {
-    console.log(`Removing ${file}`);
-    fse.removeSync(file);
-  });
-}
-
 function safariBuild() {
   const files = [
     path.join('dist', 'img', 'donate.gif'),
@@ -90,6 +85,11 @@ function safariBuild() {
 
   removeOptionPageDonations();
   removeFiles(files);
+}
+
+function writeJSONFile(file, object) {
+  const content = JSON.stringify(object, null, 2);
+  fse.writeFileSync(file, content);
 }
 
 let buildData;

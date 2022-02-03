@@ -13,34 +13,16 @@ const data = {
   version: '1.0.0',
 };
 
+function common() {
+  data.version = process.env.npm_package_version;
+}
+
 function defaultBuild() {
   manifestV3Build();
 }
 
 function firefoxBuild() {
   data.target = 'Firefox';
-}
-
-function manifestV2Build() {
-  data.manifestVersion = 2;
-}
-
-function manifestV3Build() {
-  data.manifestVersion = 3;
-}
-
-function common() {
-  data.version = process.env.npm_package_version;
-}
-
-function safariBuild() {
-  data.target = 'Safari';
-  data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
-}
-
-function writeData() {
-  const content = JSON.stringify(data, null, 2);
-  fse.writeFileSync(buildFilePath, content);
 }
 
 function main() {
@@ -81,6 +63,24 @@ function main() {
   } catch (error) {
     console.log(error);
   }
+}
+
+function manifestV2Build() {
+  data.manifestVersion = 2;
+}
+
+function manifestV3Build() {
+  data.manifestVersion = 3;
+}
+
+function safariBuild() {
+  data.target = 'Safari';
+  data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
+}
+
+function writeData() {
+  const content = JSON.stringify(data, null, 2);
+  fse.writeFileSync(buildFilePath, content);
 }
 
 main();
