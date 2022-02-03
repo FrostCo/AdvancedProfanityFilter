@@ -32,7 +32,6 @@ function main() {
   if (process.argv.length == 2 || process.argv.length == 3) {
     const arg = process.argv.slice(2)[0];
     // Exit if no arg passed and .build.json already exists
-    console.log(arg);
     if (!arg && fse.existsSync(buildFilePath)) {
       return;
     }
