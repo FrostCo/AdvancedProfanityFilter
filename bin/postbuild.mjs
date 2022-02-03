@@ -67,6 +67,19 @@ function removeFiles(files) {
   });
 }
 
+function removeOptionPageBookmarklet() {
+  console.log("Removing Bookmarklet tab from Option's page");
+  const optionPage = path.join('dist', 'optionPage.html');
+  const optionPageHTML = fse.readFileSync(optionPage).toString();
+
+  // Remove div#menu a[href='#/bookmarklet']
+  // const donationsRegex = new RegExp();
+  const newOptionPageHTML = optionPageHTML.replace('  <a href="#/bookmarklet" class="w3-bar-item w3-button">Bookmarklet</a>', '');
+
+  // Save changes
+  fse.writeFileSync(optionPage, newOptionPageHTML);
+}
+
 function removeOptionPageDonations() {
   console.log("Removing donations from Option's page");
   const optionPage = path.join('dist', 'optionPage.html');
@@ -87,6 +100,7 @@ function safariBuild() {
     path.join('dist', 'img', 'patreon.png'),
   ];
 
+  removeOptionPageBookmarklet();
   removeOptionPageDonations();
   removeFiles(files);
 }

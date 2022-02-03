@@ -31,7 +31,6 @@
     "clean:dist": "node bin/clean.mjs --dist",
     "clean": "node bin/clean.mjs --all",
     "package:firefox": "npm run build:firefox && npm run package",
-    "package:safari": "npm run build:safari && npm run build:bookmarklet",
     "package:v2": "npm run build:v2 && npm run package",
     "package:v3": "npm run build:v3 && npm run package",
     "package": "npm run build:bookmarklet && node bin/package-extension.mjs",
