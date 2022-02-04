@@ -42,7 +42,7 @@
 		792F1571270C1BAC00C8CD6A /* webFilter.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1563270C1BAC00C8CD6A /* webFilter.js */; };
 		792F1572270C1BAC00C8CD6A /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F1564270C1BAC00C8CD6A /* popup.css */; };
 		792F1573270C1BAC00C8CD6A /* optionPage.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F1565270C1BAC00C8CD6A /* optionPage.css */; };
-		792F1574270C1BAC00C8CD6A /* eventPage.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1566270C1BAC00C8CD6A /* eventPage.js */; };
+		792F1574270C1BAC00C8CD6A /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1566270C1BAC00C8CD6A /* background.js */; };
 		792F1575270C1BAC00C8CD6A /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1559270C1BAC00C8CD6A /* popup.js */; };
 		792F1576270C1BAC00C8CD6A /* w3-color-flat.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F155A270C1BAC00C8CD6A /* w3-color-flat.css */; };
 		792F1577270C1BAC00C8CD6A /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 792F155B270C1BAC00C8CD6A /* popup.html */; };
@@ -56,7 +56,7 @@
 		792F157F270C1BAC00C8CD6A /* webFilter.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1563270C1BAC00C8CD6A /* webFilter.js */; };
 		792F1580270C1BAC00C8CD6A /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F1564270C1BAC00C8CD6A /* popup.css */; };
 		792F1581270C1BAC00C8CD6A /* optionPage.css in Resources */ = {isa = PBXBuildFile; fileRef = 792F1565270C1BAC00C8CD6A /* optionPage.css */; };
-		792F1582270C1BAC00C8CD6A /* eventPage.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1566270C1BAC00C8CD6A /* eventPage.js */; };
+		792F1582270C1BAC00C8CD6A /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 792F1566270C1BAC00C8CD6A /* background.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -140,7 +140,7 @@
 		792F1563270C1BAC00C8CD6A /* webFilter.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = webFilter.js; path = ../../dist/webFilter.js; sourceTree = "<group>"; };
 		792F1564270C1BAC00C8CD6A /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = ../../dist/popup.css; sourceTree = "<group>"; };
 		792F1565270C1BAC00C8CD6A /* optionPage.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = optionPage.css; path = ../../dist/optionPage.css; sourceTree = "<group>"; };
-		792F1566270C1BAC00C8CD6A /* eventPage.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = eventPage.js; path = ../../dist/eventPage.js; sourceTree = "<group>"; };
+		792F1566270C1BAC00C8CD6A /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = ../../dist/background.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -287,7 +287,7 @@
 				792F1563270C1BAC00C8CD6A /* webFilter.js */,
 				792F1564270C1BAC00C8CD6A /* popup.css */,
 				792F1565270C1BAC00C8CD6A /* optionPage.css */,
-				792F1566270C1BAC00C8CD6A /* eventPage.js */,
+				792F1566270C1BAC00C8CD6A /* background.js */,
 			);
 			name = Resources;
 			path = "Shared (Extension)";
@@ -457,7 +457,7 @@
 				792F1577270C1BAC00C8CD6A /* popup.html in Resources */,
 				792F1575270C1BAC00C8CD6A /* popup.js in Resources */,
 				792F157C270C1BAC00C8CD6A /* audio in Resources */,
-				792F1582270C1BAC00C8CD6A /* eventPage.js in Resources */,
+				792F1582270C1BAC00C8CD6A /* background.js in Resources */,
 				792F1581270C1BAC00C8CD6A /* optionPage.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -478,7 +478,7 @@
 				792F1569270C1BAC00C8CD6A /* popup.html in Resources */,
 				792F1567270C1BAC00C8CD6A /* popup.js in Resources */,
 				792F156E270C1BAC00C8CD6A /* audio in Resources */,
-				792F1574270C1BAC00C8CD6A /* eventPage.js in Resources */,
+				792F1574270C1BAC00C8CD6A /* background.js in Resources */,
 				792F1573270C1BAC00C8CD6A /* optionPage.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
