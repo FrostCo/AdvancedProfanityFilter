@@ -909,12 +909,14 @@ export default class OptionPage {
     const showCounter = document.getElementById('showCounter') as HTMLInputElement;
     const showSummary = document.getElementById('showSummary') as HTMLInputElement;
     const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
+    const showContextMenu = document.getElementById('showContextMenu') as HTMLInputElement;
     const filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     selectedFilter.checked = true;
     useDeviceTheme.checked = this.cfg.darkMode == null;
     showCounter.checked = this.cfg.showCounter;
     showSummary.checked = this.cfg.showSummary;
     showUpdateNotification.checked = this.cfg.showUpdateNotification;
+    showContextMenu.checked = this.cfg.contextMenu;
     filterWordList.checked = this.cfg.filterWordList;
 
     // Censor Settings
@@ -1779,6 +1781,12 @@ export default class OptionPage {
     OptionPage.enableBtn(bookmarkletLink);
   }
 
+  async updateContextMenu(input: HTMLInputElement) {
+    this.cfg.contextMenu = input.checked;
+    await this.cfg.save('contextMenu');
+    chrome.runtime.sendMessage({ updateContextMenus: this.cfg.contextMenu });
+  }
+
   updateHostedBookmarklet() {
     const bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
     const bookmarkletHostedURLInput = document.getElementById('bookmarkletHostedURL') as HTMLInputElement;
@@ -1911,6 +1919,7 @@ document.getElementById('preserveCase').addEventListener('click', (evt) => { opt
 document.getElementById('preserveFirst').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('preserveLast').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('useDeviceTheme').addEventListener('click', (evt) => { option.updateUseSystemTheme(evt.target as HTMLInputElement); });
+document.getElementById('showContextMenu').addEventListener('click', (evt) => { option.updateContextMenu(evt.target as HTMLInputElement); });
 document.getElementById('showCounter').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('showSummary').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('showUpdateNotification').addEventListener('click', (evt) => { option.saveOptions(); });

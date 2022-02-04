@@ -8,6 +8,72 @@ const logger = new Logger();
 ////
 // Functions
 //
+function contextMenuRemoveAll() {
+  return new Promise((resolve, reject) => {
+    chrome.contextMenus.removeAll(() => {
+      resolve(false);
+    });
+  });
+}
+
+async function contextMenuSetup(enabled?: boolean) {
+  await contextMenuRemoveAll();
+
+  if (enabled == null) {
+    enabled = (await WebConfig.getSyncStorage({ contextMenu: WebConfig._defaults.contextMenu }) as WebConfig).contextMenu;
+  }
+
+  if (enabled) {
+    chrome.contextMenus.create({
+      id: 'addSelection',
+      title: 'Add selection to filter',
+      contexts: ['selection'],
+      documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
+      id: 'removeSelection',
+      title: 'Remove selection from filter',
+      contexts: ['selection'],
+      documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
+      id: 'disableTabOnce',
+      title: 'Disable once',
+      contexts: ['all'],
+      documentUrlPatterns: ['http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
+      id: 'toggleTabDisable',
+      title: 'Toggle for tab',
+      contexts: ['all'],
+      documentUrlPatterns: ['http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
+      id: 'toggleForDomain',
+      title: 'Toggle for domain',
+      contexts: ['all'],
+      documentUrlPatterns: ['http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
+      id: 'toggleAdvancedForDomain',
+      title: 'Toggle advanced for domain',
+      contexts: ['all'],
+      documentUrlPatterns: ['http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
+      id: 'options',
+      title: 'Options',
+      contexts: ['all']
+    });
+  }
+}
+
 function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
   switch (info.menuItemId) {
     case 'addSelection':
@@ -72,6 +138,7 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
   if (details.reason == 'install') {
     chrome.runtime.openOptionsPage();
   } else if (details.reason == 'update') {
+    contextMenuSetup();
     const thisVersion = chrome.runtime.getManifest().version;
     logger.info(`Updated from ${details.previousVersion} to ${thisVersion}.`);
 
@@ -106,6 +173,8 @@ function onMessage(request: Message, sender, sendResponse) {
   } else if (request.backgroundData === true) {
     handleBackgroundDataRequest(sender.tab.id, sendResponse);
     return true; // return true when waiting on an async call
+  } else if (request.updateContextMenus != null) {
+    contextMenuSetup(request.updateContextMenus);
   } else {
     // Set badge color
     // chromeAction.setBadgeBackgroundColor({ color: [138, 43, 226, 255], tabId: sender.tab.id }); // Blue Violet
@@ -142,6 +211,8 @@ function onMessage(request: Message, sender, sendResponse) {
 }
 
 async function onStartup() {
+  contextMenuSetup();
+
   // Clear background storage on startup
   await saveBackgroundStorage({ tabs: {} });
 }
@@ -217,59 +288,6 @@ async function toggleTabDisable(tabId: number) {
   await saveBackgroundStorage(storage);
   chrome.tabs.reload(tabId);
 }
-
-////
-// Context menu
-//
-chrome.contextMenus.removeAll(() => {
-  chrome.contextMenus.create({
-    id: 'addSelection',
-    title: 'Add selection to filter',
-    contexts: ['selection'],
-    documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'removeSelection',
-    title: 'Remove selection from filter',
-    contexts: ['selection'],
-    documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'disableTabOnce',
-    title: 'Disable once',
-    contexts: ['all'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'toggleTabDisable',
-    title: 'Toggle for tab',
-    contexts: ['all'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'toggleForDomain',
-    title: 'Toggle for domain',
-    contexts: ['all'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'toggleAdvancedForDomain',
-    title: 'Toggle advanced for domain',
-    contexts: ['all'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'options',
-    title: 'Options',
-    contexts: ['all']
-  });
-});
 
 ////
 // Listeners

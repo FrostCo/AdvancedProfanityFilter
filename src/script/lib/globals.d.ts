@@ -94,6 +94,7 @@ interface Message {
   popup?: boolean;
   setBadgeColor?: boolean;
   summary?: Summary;
+  updateContextMenus?: boolean;
 }
 
 interface Migration {
