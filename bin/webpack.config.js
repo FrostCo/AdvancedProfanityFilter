@@ -1,6 +1,6 @@
 module.exports = {
   entry: {
-    eventPage: './src/script/eventPage.ts',
+    background: './src/script/background.ts',
     optionPage: './src/script/optionPage.ts',
     popup: './src/script/popup.ts',
     showErrors: '/src/script/showErrors.ts',

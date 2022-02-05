@@ -11,5 +11,5 @@ text eol=lf
 /test/* linguist-documentation
 
 # Filters (clean/smudge)
-"apple/Advanced Profanity Filter.xcodeproj/project.pbxproj" filter=appleProject
-"apple/Shared (App)/ViewController.swift" filter=appleProject
+"safari/Advanced Profanity Filter.xcodeproj/project.pbxproj" filter=safari
+"safari/Shared (App)/ViewController.swift" filter=safari

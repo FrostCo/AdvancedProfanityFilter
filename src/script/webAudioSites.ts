@@ -10,6 +10,7 @@ export default class WebAudioSites {
       { className: 'akamai-caption-text', mode: 'element', tagName: 'DIV' },
       { className: 'amp-caption-area', displaySelector: 'div.amp-caption-area', mode: 'element', muteMethod: Constants.MUTE_METHODS.VIDEO_VOLUME, subtitleSelector: 'div.amp-caption > p', tagName: 'DIV' },
     ],
+    'iview.abc.net.au': [{mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'div' }],
     'acorn.tv': [
       {
         iframe: true,
@@ -59,6 +60,7 @@ export default class WebAudioSites {
     ],
     'www.att.tv': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
     'www.attwatchtv.com': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
+    'www.bbc.co.uk': [{ mode: 'element', subtitleSelector: 'div.p_cueDirUniWrapper span', tagName: 'div' }],
     'www.britbox.com': [
       { className: 'bmpui-ui-subtitle-label', mode: 'element', tagName: 'SPAN' },
       { className: 'bmpui-subtitle-region-container', mode: 'element', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' },

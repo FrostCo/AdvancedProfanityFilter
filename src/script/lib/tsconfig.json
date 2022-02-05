@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "outDir": "../../../dist-lib",
     "allowJs": true,
-    "target": "es6",
-    "noEmit": false,
     "lib": ["es2017", "dom", "dom.iterable"],
-    "skipLibCheck": true
+    "noEmit": false,
+    "outDir": "../../../dist-lib",
+    "skipLibCheck": true,
+    "target": "es6"
   },
   "include": [
     "*.ts"

@@ -186,6 +186,7 @@ export default class OptionPage {
       return Array.from(document.querySelectorAll(selector));
     }).flat();
     this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
+    this.setHelpVersion();
   }
 
   applyDarkTheme(allElements = true) {
@@ -908,12 +909,14 @@ export default class OptionPage {
     const showCounter = document.getElementById('showCounter') as HTMLInputElement;
     const showSummary = document.getElementById('showSummary') as HTMLInputElement;
     const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
+    const showContextMenu = document.getElementById('showContextMenu') as HTMLInputElement;
     const filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     selectedFilter.checked = true;
     useDeviceTheme.checked = this.cfg.darkMode == null;
     showCounter.checked = this.cfg.showCounter;
     showSummary.checked = this.cfg.showSummary;
     showUpdateNotification.checked = this.cfg.showUpdateNotification;
+    showContextMenu.checked = this.cfg.contextMenu;
     filterWordList.checked = this.cfg.filterWordList;
 
     // Censor Settings
@@ -1657,6 +1660,11 @@ export default class OptionPage {
     }
   }
 
+  setHelpVersion() {
+    const helpVersion = document.getElementById('helpVersion') as HTMLAnchorElement;
+    helpVersion.textContent = WebConfig.BUILD.version;
+  }
+
   setThemeButton(darkTheme: boolean) {
     if (darkTheme) {
       this.darkModeButton.classList.add('w3-hide');
@@ -1771,6 +1779,12 @@ export default class OptionPage {
     const bookmarklet = new Bookmarklet(url);
     bookmarkletLink.href = bookmarklet.destination();
     OptionPage.enableBtn(bookmarkletLink);
+  }
+
+  async updateContextMenu(input: HTMLInputElement) {
+    this.cfg.contextMenu = input.checked;
+    await this.cfg.save('contextMenu');
+    chrome.runtime.sendMessage({ updateContextMenus: this.cfg.contextMenu });
   }
 
   updateHostedBookmarklet() {
@@ -1905,6 +1919,7 @@ document.getElementById('preserveCase').addEventListener('click', (evt) => { opt
 document.getElementById('preserveFirst').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('preserveLast').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('useDeviceTheme').addEventListener('click', (evt) => { option.updateUseSystemTheme(evt.target as HTMLInputElement); });
+document.getElementById('showContextMenu').addEventListener('click', (evt) => { option.updateContextMenu(evt.target as HTMLInputElement); });
 document.getElementById('showCounter').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('showSummary').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('showUpdateNotification').addEventListener('click', (evt) => { option.saveOptions(); });

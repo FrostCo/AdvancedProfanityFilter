@@ -2,7 +2,7 @@
   "name": "Advanced Profanity Filter",
   "short_name": "Profanity Filter",
   "author": "Richard Frost",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "version": "2.30.0",
   "description": "Advanced Profanity Filter helps to clean up bad language on the websites you and your family visit.",
   "icons": {
@@ -16,28 +16,6 @@
     "storage",
     "tabs"
   ],
-  "optional_permissions": [
-    "file://*/*"
-  ],
-  "options_ui": {
-    "chrome_style": false,
-    "open_in_tab": true,
-    "page": "optionPage.html"
-  },
-  "background": {
-    "scripts": [
-      "eventPage.js"
-    ],
-    "persistent": false
-  },
-  "browser_action": {
-    "default_icon": {
-      "19": "img/icon19.png",
-      "38": "img/icon38.png"
-    },
-    "default_title": "Advanced Profanity Filter",
-    "default_popup": "popup.html"
-  },
   "content_scripts": [
     {
       "matches": [
@@ -51,7 +29,25 @@
       "match_about_blank": true
     }
   ],
+  "options_ui": {
+    "open_in_tab": true,
+    "page": "optionPage.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_icon": {
+      "19": "img/icon19.png",
+      "38": "img/icon38.png"
+    },
+    "default_title": "Advanced Profanity Filter",
+    "default_popup": "popup.html"
+  },
   "web_accessible_resources": [
-    "audio/*.mp3"
+    {
+      "resources": [ "audio/*.mp3" ],
+      "matches": [ "<all_urls>" ]
+    }
   ]
 }

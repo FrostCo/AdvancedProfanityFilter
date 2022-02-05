@@ -2,12 +2,14 @@ import Constants from './lib/constants';
 import Config from './lib/config';
 import { prettyPrintArray, stringArray } from './lib/helper';
 import Logger from './lib/logger';
+import * as Build from '../../.build.json';
 const logger = new Logger();
 
 export default class WebConfig extends Config {
   _lastSplitKeys: { [key: string]: number };
   audioWordlistId: number;
   collectStats: boolean;
+  contextMenu: boolean;
   customAudioSites: { [site: string]: AudioRule[] };
   darkMode: boolean;
   domains: { [site: string]: DomainCfg };
@@ -24,9 +26,11 @@ export default class WebConfig extends Config {
   youTubeAutoSubsMax: number;
   youTubeAutoSubsMin: number;
 
+  static readonly BUILD = Build;
   static readonly _classDefaults = {
     audioWordlistId: 0,
     collectStats: true,
+    contextMenu: true,
     customAudioSites: null,
     darkMode: null,
     domains: {},
@@ -35,7 +39,7 @@ export default class WebConfig extends Config {
     muteAudio: false,
     muteAudioOnly: false,
     muteCueRequireShowing: false,
-    muteMethod: Constants.MUTE_METHODS.TAB,
+    muteMethod: WebConfig.BUILD.config.muteMethod || Constants.MUTE_METHODS.TAB,
     password: null,
     showSubtitles: Constants.SHOW_SUBTITLES.ALL,
     showUpdateNotification: false,
@@ -47,6 +51,7 @@ export default class WebConfig extends Config {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   static readonly _defaults = Object.assign({}, Config._defaults, WebConfig._classDefaults);
   static readonly _localConfigKeys = ['domains', 'syncLargeKeys', 'words'];
+  static readonly _localOnlyKeys = ['background', 'stats'];
   static readonly _maxSplitKeys = 64;
   static readonly _largeKeys = ['domains', 'words'];
 

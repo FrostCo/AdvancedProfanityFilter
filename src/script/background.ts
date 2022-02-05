@@ -5,13 +5,75 @@ import { formatNumber } from './lib/helper';
 import Logger from './lib/logger';
 const logger = new Logger();
 
-const backgroundStorage: BackgroundStorage = {
-  tabs: {},
-};
-
 ////
 // Functions
 //
+function contextMenuRemoveAll() {
+  return new Promise((resolve, reject) => {
+    chrome.contextMenus.removeAll(() => {
+      resolve(false);
+    });
+  });
+}
+
+async function contextMenuSetup(enabled?: boolean) {
+  await contextMenuRemoveAll();
+
+  if (enabled == null) {
+    enabled = (await WebConfig.getSyncStorage({ contextMenu: WebConfig._defaults.contextMenu }) as WebConfig).contextMenu;
+  }
+
+  if (enabled) {
+    chrome.contextMenus.create({
+      id: 'addSelection',
+      title: 'Add selection to filter',
+      contexts: ['selection'],
+      documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
+      id: 'removeSelection',
+      title: 'Remove selection from filter',
+      contexts: ['selection'],
+      documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
+      id: 'disableTabOnce',
+      title: 'Disable once',
+      contexts: ['all'],
+      documentUrlPatterns: ['http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
+      id: 'toggleTabDisable',
+      title: 'Toggle for tab',
+      contexts: ['all'],
+      documentUrlPatterns: ['http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
+      id: 'toggleForDomain',
+      title: 'Toggle for domain',
+      contexts: ['all'],
+      documentUrlPatterns: ['http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
+      id: 'toggleAdvancedForDomain',
+      title: 'Toggle advanced for domain',
+      contexts: ['all'],
+      documentUrlPatterns: ['http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
+      id: 'options',
+      title: 'Options',
+      contexts: ['all']
+    });
+  }
+}
+
 function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
   switch (info.menuItemId) {
     case 'addSelection':
@@ -31,13 +93,35 @@ function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.
   }
 }
 
-function disableTabOnce(id: number): void {
-  saveTabOptions(id, { disabledOnce: true });
-  chrome.tabs.reload();
+async function disableTabOnce(tabId: number) {
+  const storage = await loadBackgroundStorage();
+  const tabOptions = await getTabOptions(storage, tabId);
+  tabOptions.disabledOnce = true;
+  await saveBackgroundStorage(storage);
+  chrome.tabs.reload(tabId);
 }
 
-function getTabOptions(id: number): TabStorageOptions {
-  return storedTab(id) ? backgroundStorage.tabs[id] : saveNewTabOptions(id);
+function getTabOptions(storage: BackgroundStorage, tabId: number): TabStorageOptions {
+  return storage.tabs[tabId] || newTabOptions(storage, tabId);
+}
+
+async function handleBackgroundDataRequest(tabId: number, sendResponse) {
+  const storage = await loadBackgroundStorage();
+  const response: BackgroundData = { disabledTab: false };
+  const tabOptions = getTabOptions(storage, tabId);
+  if (tabOptions.disabled || tabOptions.disabledOnce) {
+    response.disabledTab = true;
+  }
+  sendResponse(response);
+  if (tabOptions.disabledOnce) {
+    tabOptions.disabledOnce = false;
+    await saveBackgroundStorage(storage);
+  }
+}
+
+async function loadBackgroundStorage(): Promise<BackgroundStorage> {
+  const data = await WebConfig.getLocalStorage({ background: { tabs: {} } });
+  return data['background'] as BackgroundStorage;
 }
 
 function notificationsOnClick(notificationId: string) {
@@ -54,6 +138,7 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
   if (details.reason == 'install') {
     chrome.runtime.openOptionsPage();
   } else if (details.reason == 'update') {
+    contextMenuSetup();
     const thisVersion = chrome.runtime.getManifest().version;
     logger.info(`Updated from ${details.previousVersion} to ${thisVersion}.`);
 
@@ -81,34 +166,33 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
 }
 
 function onMessage(request: Message, sender, sendResponse) {
+  // Support manifest V2/V3
+  const chromeAction = chrome.action || chrome.browserAction;
   if (request.disabled === true) {
-    chrome.browserAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
+    chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
   } else if (request.backgroundData === true) {
-    const response: BackgroundData = { disabledTab: false };
-    const tabOptions = getTabOptions(sender.tab.id);
-    if (tabOptions.disabled || tabOptions.disabledOnce) {
-      response.disabledTab = true;
-      if (tabOptions.disabledOnce) { tabOptions.disabledOnce = false; }
-    }
-    sendResponse(response);
+    handleBackgroundDataRequest(sender.tab.id, sendResponse);
+    return true; // return true when waiting on an async call
+  } else if (request.updateContextMenus != null) {
+    contextMenuSetup(request.updateContextMenus);
   } else {
     // Set badge color
-    // chrome.browserAction.setBadgeBackgroundColor({ color: [138, 43, 226, 255], tabId: sender.tab.id }); // Blue Violet
-    // chrome.browserAction.setBadgeBackgroundColor({ color: [85, 85, 85, 255], tabId: sender.tab.id }); // Grey (Default)
-    // chrome.browserAction.setBadgeBackgroundColor({ color: [236, 147, 41, 255], tabId: sender.tab.id }); // Orange
+    // chromeAction.setBadgeBackgroundColor({ color: [138, 43, 226, 255], tabId: sender.tab.id }); // Blue Violet
+    // chromeAction.setBadgeBackgroundColor({ color: [85, 85, 85, 255], tabId: sender.tab.id }); // Grey (Default)
+    // chromeAction.setBadgeBackgroundColor({ color: [236, 147, 41, 255], tabId: sender.tab.id }); // Orange
     if (request.setBadgeColor) {
       if (request.mutePage) {
-        chrome.browserAction.setBadgeBackgroundColor({ color: [34, 139, 34, 255], tabId: sender.tab.id }); // Forest Green - Audio
+        chromeAction.setBadgeBackgroundColor({ color: [34, 139, 34, 255], tabId: sender.tab.id }); // Forest Green - Audio
       } else if (request.advanced) {
-        chrome.browserAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255], tabId: sender.tab.id }); // Red - Advanced
+        chromeAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255], tabId: sender.tab.id }); // Red - Advanced
       } else {
-        chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255], tabId: sender.tab.id }); // Blue - Normal
+        chromeAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255], tabId: sender.tab.id }); // Blue - Normal
       }
     }
 
     // Show count of words filtered on badge
     if (request.counter != undefined) {
-      chrome.browserAction.setBadgeText({ text: formatNumber(request.counter), tabId: sender.tab.id });
+      chromeAction.setBadgeText({ text: formatNumber(request.counter), tabId: sender.tab.id });
     }
 
     // Set mute state for tab
@@ -124,6 +208,13 @@ function onMessage(request: Message, sender, sendResponse) {
       }
     }
   }
+}
+
+async function onStartup() {
+  contextMenuSetup();
+
+  // Clear background storage on startup
+  await saveBackgroundStorage({ tabs: {} });
 }
 
 // Add selected word/phrase and reload page (unless already present)
@@ -150,30 +241,25 @@ async function runUpdateMigrations(previousVersion) {
   }
 }
 
-function saveNewTabOptions(id: number, options: TabStorageOptions = {}): TabStorageOptions {
+function newTabOptions(storage: BackgroundStorage, tabId: number, options: TabStorageOptions = {}): TabStorageOptions {
   const _defaults: TabStorageOptions = { disabled: false, disabledOnce: false };
   const tabOptions = Object.assign({}, _defaults, options) as TabStorageOptions;
-  tabOptions.id = id;
+  tabOptions.id = tabId;
   tabOptions.registeredAt = new Date().getTime();
-  backgroundStorage.tabs[id] = tabOptions;
-  return tabOptions;
+  storage.tabs[tabId] = tabOptions;
+  return storage.tabs[tabId];
 }
 
-function saveTabOptions(id: number, options: TabStorageOptions = {}): TabStorageOptions {
-  return storedTab(id) ? Object.assign(getTabOptions(id), options) : saveNewTabOptions(id, options);
+async function saveBackgroundStorage(storage: BackgroundStorage) {
+  await WebConfig.saveLocalStorage({ background: storage });
 }
 
-function storedTab(id: number): boolean {
-  return backgroundStorage.tabs.hasOwnProperty(id);
-}
-
-function tabsOnActivated(tab: chrome.tabs.TabActiveInfo) {
-  const tabId = tab ? tab.tabId : chrome.tabs.TAB_ID_NONE;
-  if (!storedTab(tabId)) { saveTabOptions(tabId); }
-}
-
-function tabsOnRemoved(tabId: number) {
-  if (storedTab(tabId)) { delete backgroundStorage.tabs[tabId]; }
+async function tabsOnRemoved(tabId: number) {
+  const storage = await loadBackgroundStorage();
+  if (storage.tabs[tabId]) {
+    delete storage.tabs[tabId];
+    await saveBackgroundStorage(storage);
+  }
 }
 
 async function toggleDomain(hostname: string, action: string) {
@@ -195,72 +281,21 @@ async function toggleDomain(hostname: string, action: string) {
   }
 }
 
-function toggleTabDisable(id: number) {
-  const tabOptions = getTabOptions(id);
+async function toggleTabDisable(tabId: number) {
+  const storage = await loadBackgroundStorage();
+  const tabOptions = getTabOptions(storage, tabId);
   tabOptions.disabled = !tabOptions.disabled;
-  chrome.tabs.reload();
+  await saveBackgroundStorage(storage);
+  chrome.tabs.reload(tabId);
 }
-
-////
-// Context menu
-//
-chrome.contextMenus.removeAll(() => {
-  chrome.contextMenus.create({
-    id: 'addSelection',
-    title: 'Add selection to filter',
-    contexts: ['selection'],
-    documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'removeSelection',
-    title: 'Remove selection from filter',
-    contexts: ['selection'],
-    documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'disableTabOnce',
-    title: 'Disable once',
-    contexts: ['all'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'toggleTabDisable',
-    title: 'Toggle for tab',
-    contexts: ['all'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'toggleForDomain',
-    title: 'Toggle for domain',
-    contexts: ['all'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'toggleAdvancedForDomain',
-    title: 'Toggle advanced for domain',
-    contexts: ['all'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
-  });
-
-  chrome.contextMenus.create({
-    id: 'options',
-    title: 'Options',
-    contexts: ['all']
-  });
-});
 
 ////
 // Listeners
 //
 chrome.contextMenus.onClicked.addListener((info, tab) => { contextMenusOnClick(info, tab); });
 chrome.runtime.onInstalled.addListener((details) => { onInstalled(details); });
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { onMessage(request, sender, sendResponse); });
-chrome.tabs.onActivated.addListener((tab) => { tabsOnActivated(tab); });
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { return onMessage(request, sender, sendResponse); });
+chrome.runtime.onStartup.addListener(() => { onStartup(); });
 chrome.tabs.onRemoved.addListener((tabId) => { tabsOnRemoved(tabId); });
 if (chrome.notifications != null) { // Not available in Safari
   chrome.notifications.onClicked.addListener((notificationId) => { notificationsOnClick(notificationId); });
