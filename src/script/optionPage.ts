@@ -906,17 +906,17 @@ export default class OptionPage {
     // Settings
     const selectedFilter = document.getElementById(`filter${Constants.filterMethodName(this.cfg.filterMethod)}`) as HTMLInputElement;
     const useDeviceTheme = document.getElementById('useDeviceTheme') as HTMLInputElement;
+    const showContextMenu = document.getElementById('showContextMenu') as HTMLInputElement;
     const showCounter = document.getElementById('showCounter') as HTMLInputElement;
     const showSummary = document.getElementById('showSummary') as HTMLInputElement;
     const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
-    const showContextMenu = document.getElementById('showContextMenu') as HTMLInputElement;
     const filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     selectedFilter.checked = true;
     useDeviceTheme.checked = this.cfg.darkMode == null;
+    showContextMenu.checked = this.cfg.contextMenu;
     showCounter.checked = this.cfg.showCounter;
     showSummary.checked = this.cfg.showSummary;
     showUpdateNotification.checked = this.cfg.showUpdateNotification;
-    showContextMenu.checked = this.cfg.contextMenu;
     filterWordList.checked = this.cfg.filterWordList;
 
     // Censor Settings
