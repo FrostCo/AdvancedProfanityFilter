@@ -429,6 +429,20 @@ export default class WebConfig extends Config {
     });
 
     try {
+      // Safari won't store null values
+      if (Build.target === 'safari') {
+        const nullLocalKeys = Object.keys(localData).filter((key) => localData[key] == null);
+        const nullSyncKeys = Object.keys(syncData).filter((key) => syncData[key] == null);
+        if (nullLocalKeys.length) {
+          await WebConfig.removeLocalStorage(nullLocalKeys);
+          nullLocalKeys.forEach((key) => delete localData[key]);
+        }
+        if (nullSyncKeys.length) {
+          await WebConfig.removeSyncStorage(nullSyncKeys);
+          nullSyncKeys.forEach((key) => delete syncData[key]);
+        }
+      }
+
       if (Object.keys(syncData).length) {
         await WebConfig.saveSyncStorage(syncData);
       }
