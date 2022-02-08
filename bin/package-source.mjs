@@ -7,7 +7,7 @@ import AdmZip from 'adm-zip';
 function packageSource() {
   fse.removeSync('./extension-source.zip');
   console.log('Building ./extension-source.zip');
-  console.log('Build from source: npm install && npm run package');
+  console.log('Build from source: npm install && npm run package:firefox');
 
   const sourceZip = new AdmZip();
   const files = [
