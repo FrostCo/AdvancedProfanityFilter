@@ -21,6 +21,28 @@ export default class WebAudioSites {
         tagName: 'DIV',
       }
     ],
+    'smile.amazon.com': [
+      {
+        displayHide: 'none',
+        displaySelector: 'div.webPlayerContainer div.f35bt6a',
+        displayShow: '',
+        iframe: false,
+        mode: 'watcher',
+        parentSelector: 'div.webPlayerContainer div span > span',
+        videoSelector: 'div.webPlayerElement video[src]',
+      }
+    ],
+    'www.amazon.co.uk': [
+      {
+        displayHide: 'none',
+        displaySelector: 'div.webPlayerContainer div.f35bt6a',
+        displayShow: '',
+        iframe: false,
+        mode: 'watcher',
+        parentSelector: 'div.webPlayerContainer div span > span',
+        videoSelector: 'div.webPlayerElement video[src]',
+      }
+    ],
     'www.amazon.com': [
       {
         displayHide: 'none',
