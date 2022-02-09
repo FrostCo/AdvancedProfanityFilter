@@ -386,6 +386,16 @@ describe('Filter', () => {
           filter.init();
           expect(filter.replaceText('Have you ever been cut by a Cat?')).to.equal('Have you ever been bit by a Bit?');
         });
+
+        it('Should support backreferences in replace', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({ words: Object.assign({}, testWords), filterMethod: Constants.FILTER_METHODS.SUBSTITUTE });
+          filter.cfg.words['pee([ed]{0,2}[ ]?\\w*?) off'] = { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: Constants.FALSE, sub: 'tick\\1 off' };
+          filter.cfg.words['scare([ ]?\\w*) off'] = { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: Constants.FALSE, sub: 'spook\\1 off' };
+          filter.init();
+          expect(filter.replaceText('Try not to pee John off.')).to.equal('Try not to tick John off.');
+          expect(filter.replaceText('Try not to scare John off.')).to.equal('Try not to spook John off.');
+        });
       });
 
       describe('whitelist', () => {
