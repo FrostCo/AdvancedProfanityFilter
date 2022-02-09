@@ -10,7 +10,7 @@ export default class WebAudioSites {
       { className: 'akamai-caption-text', mode: 'element', tagName: 'DIV' },
       { className: 'amp-caption-area', displaySelector: 'div.amp-caption-area', mode: 'element', muteMethod: Constants.MUTE_METHODS.VIDEO_VOLUME, subtitleSelector: 'div.amp-caption > p', tagName: 'DIV' },
     ],
-    'iview.abc.net.au': [{mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'div' }],
+    'iview.abc.net.au': [{ mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'div' }],
     'acorn.tv': [
       {
         iframe: true,
