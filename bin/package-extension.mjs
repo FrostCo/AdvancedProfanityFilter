@@ -3,9 +3,10 @@ import fse from 'fs-extra';
 import path from 'path';
 import AdmZip from 'adm-zip';
 
+let buildData;
 const buildDataPath = path.join('.build.json');
 const dist = './dist/';
-let buildData;
+const releaseFilePath = path.join('.release.json');
 
 function buildArchive() {
   const zip = new AdmZip();
@@ -24,7 +25,13 @@ function loadJSONFile(file) {
 
 function main() {
   try {
-    buildData = loadJSONFile(buildDataPath);
+    // Load .release.json if present, otherwise load .build.json
+    if (fse.existsSync(releaseFilePath)) {
+      buildData = loadJSONFile(releaseFilePath);
+    } else {
+      buildData = loadJSONFile(buildDataPath);
+    }
+
     const zip = buildArchive();
     const packagePath = `./${zipName()}.zip`;
     console.log(`Building ${packagePath}`);

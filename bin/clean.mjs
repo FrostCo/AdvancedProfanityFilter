@@ -12,14 +12,18 @@ const dist = [
   path.join('dist-lib'),
 ];
 
+const release = [
+  path.join('./.release.json'),
+];
+
 const test = [
   path.join('test', 'built'),
 ];
 
-function clean(folders) {
-  folders.forEach((folder) => {
-    console.log(`Cleaning ${folder}...`);
-    fse.removeSync(folder);
+function clean(items) {
+  items.forEach((item) => {
+    console.log(`Cleaning ${item}...`);
+    fse.removeSync(item);
   });
 }
 
@@ -29,26 +33,29 @@ function main() {
     // argv[1] = script (this file)
     // argv[2] = first argument
     if (process.argv.length >= 2) {
-      const args = process.argv.slice(2);
-      let folders = [];
-
+      let args = process.argv.slice(2);
       if (args.length == 0 || args.includes('--all')) {
-        folders = folders.concat(built).concat(dist).concat(test);
-      } else {
-        if (args.includes('--built')) {
-          folders = folders.concat(built);
-        }
-
-        if (args.includes('--dist')) {
-          folders = folders.concat(dist);
-        }
-
-        if (args.includes('--test')) {
-          folders = folders.concat(test);
-        }
+        args = ['--built', '--dist', '--release', '--test'];
       }
 
-      clean(folders);
+      let toRemove = [];
+      if (args.includes('--built')) {
+        toRemove = toRemove.concat(built);
+      }
+
+      if (args.includes('--dist')) {
+        toRemove = toRemove.concat(dist);
+      }
+
+      if (args.includes('--release')) {
+        toRemove = toRemove.concat(release);
+      }
+
+      if (args.includes('--test')) {
+        toRemove = toRemove.concat(test);
+      }
+
+      clean(toRemove);
     } else {
       usage();
     }
@@ -61,7 +68,10 @@ function main() {
 function usage() {
   console.log(`usage:
       npm run clean
+      npm run clean:built
       npm run clean:dist
+      npm run clean:release
+      npm run clean:test
   `);
 }
 
