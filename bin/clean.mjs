@@ -16,10 +16,10 @@ const test = [
   path.join('test', 'built'),
 ];
 
-function clean(folders) {
-  folders.forEach((folder) => {
-    console.log(`Cleaning ${folder}...`);
-    fse.removeSync(folder);
+function clean(items) {
+  items.forEach((item) => {
+    console.log(`Cleaning ${item}...`);
+    fse.removeSync(item);
   });
 }
 
@@ -30,25 +30,29 @@ function main() {
     // argv[2] = first argument
     if (process.argv.length >= 2) {
       const args = process.argv.slice(2);
-      let folders = [];
+      let toRemove = [];
 
       if (args.length == 0 || args.includes('--all')) {
-        folders = folders.concat(built).concat(dist).concat(test);
+        toRemove = toRemove.concat(built).concat(dist).concat(test);
       } else {
         if (args.includes('--built')) {
-          folders = folders.concat(built);
+          toRemove = toRemove.concat(built);
         }
 
         if (args.includes('--dist')) {
-          folders = folders.concat(dist);
+          toRemove = toRemove.concat(dist);
+        }
+
+        if (args.includes('--release')) {
+          toRemove = toRemove.concat(release);
         }
 
         if (args.includes('--test')) {
-          folders = folders.concat(test);
+          toRemove = toRemove.concat(test);
         }
       }
 
-      clean(folders);
+      clean(toRemove);
     } else {
       usage();
     }
