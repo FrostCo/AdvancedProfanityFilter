@@ -3,8 +3,10 @@
 import fse from 'fs-extra';
 import path from 'path';
 
+let buildData;
 const buildDataPath = path.join('.build.json');
 const manifestPath = path.join('dist', 'manifest.json');
+const releaseFilePath = path.join('.release.json');
 
 function common() {
   handleManifestVersion();
@@ -64,7 +66,15 @@ function loadJSONFile(file) {
 }
 
 function main() {
-  buildData = loadJSONFile(buildDataPath);
+  // Load .release.json if present, otherwise load .build.json
+  if (fse.existsSync(releaseFilePath)) {
+    console.log('postbuild -- release');
+    buildData = loadJSONFile(releaseFilePath);
+  } else {
+    buildData = loadJSONFile(buildDataPath);
+  }
+
+  // Perform postbuild actions
   common();
 
   if (buildData.target == 'firefox') {
@@ -130,5 +140,4 @@ function writeJSONFile(file, object) {
   fse.writeFileSync(file, content);
 }
 
-let buildData;
 main();

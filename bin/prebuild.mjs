@@ -12,6 +12,7 @@ const data = {
   target: 'chrome',
   version: '1.0.0',
 };
+const releaseFilePath = path.join('.release.json');
 
 function common() {
   data.version = process.env.npm_package_version;
@@ -29,8 +30,17 @@ function main() {
   // argv[0] = process (node)
   // argv[1] = script (this file)
   // argv[2] = first argument
-  if (process.argv.length == 2 || process.argv.length == 3) {
-    const target = process.argv.slice(2)[0];
+  if (process.argv.length >= 2 && process.argv.length <= 4) {
+    const args = process.argv.slice(2);
+    const release = args.includes('--release');
+    if (release) {
+      args.splice(args.indexOf('--release'), 1);
+    } else if (fse.existsSync(releaseFilePath)) {
+      // Remove .release.json if it exists when not prepareing for a release build
+      fse.removeSync(releaseFilePath);
+    }
+    const target = args[0];
+
     // Exit if no target was passed and .build.json already exists (preserve current build target)
     if (!target && fse.existsSync(buildFilePath)) {
       return;
@@ -54,7 +64,7 @@ function main() {
       default:
         defaultBuild();
     }
-    writeData();
+    writeData(release);
   } else {
     throw (new Error('Incorrect number of arguments.'));
   }
@@ -73,9 +83,10 @@ function safariBuild() {
   data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
 }
 
-function writeData() {
+function writeData(release = false) {
+  const filePath = release ? releaseFilePath : buildFilePath;
   const content = JSON.stringify(data, null, 2);
-  fse.writeFileSync(buildFilePath, content);
+  fse.writeFileSync(filePath, content);
 }
 
 main();

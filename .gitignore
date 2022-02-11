@@ -6,6 +6,7 @@ bin/git-filters/*.js
 
 # Build state file
 /.build.json
+/.release.json
 
 # Packaged extensions
 /dist/*

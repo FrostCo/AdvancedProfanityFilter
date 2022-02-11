@@ -12,6 +12,10 @@ const dist = [
   path.join('dist-lib'),
 ];
 
+const release = [
+  path.join('./.release.json'),
+];
+
 const test = [
   path.join('test', 'built'),
 ];
@@ -43,6 +47,10 @@ function main() {
         toRemove = toRemove.concat(dist);
       }
 
+      if (args.includes('--release')) {
+        toRemove = toRemove.concat(release);
+      }
+
       if (args.includes('--test')) {
         toRemove = toRemove.concat(test);
       }
@@ -62,6 +70,7 @@ function usage() {
       npm run clean
       npm run clean:built
       npm run clean:dist
+      npm run clean:release
       npm run clean:test
   `);
 }
