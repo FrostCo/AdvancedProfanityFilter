@@ -74,7 +74,6 @@ function loadJSONFile(file) {
 function main() {
   // Load .release.json if present, otherwise load .build.json
   if (fse.existsSync(releaseFilePath)) {
-    console.log('postbuild -- release');
     buildData = loadJSONFile(releaseFilePath);
   } else {
     buildData = loadJSONFile(buildDataPath);
