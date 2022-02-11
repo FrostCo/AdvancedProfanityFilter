@@ -52,14 +52,61 @@ For a detailed overview of the features and settings, please see the [Getting St
 If you would like to help with development, but don't have experience coding, its very helpful to have users test a release candidate before actually publishing it to everyone. If you are interested in testing new versions see [this page](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Beta-Testing) for more information.
 
 ## Development
-This project is written in TypeScript, and during the build/package process it will be converted to JS. Please see `package.json`'s scripts for more info on the process.
+### Quick Start
+After downloading/cloning the repository, run the following commands to get started:
 
-Getting started
-```
+```sh
+# Install dependencies
 npm install
-```
 
-To Build the extension
+# Build the extension for the default target browser for local development
+# See table below for supported targets
+npm run build
 ```
-npm run package
-```
+Once the extension has been built, you can load the unpacked extension (found in `dist/`) in your browser.
+
+### Stages
+| Stage   | Output                   | Description                                       |
+|---------|--------------------------|---------------------------------------------------|
+| build   | `dist/`                | Build/compile the extension for local development |
+| package | `extension-target.zip` | Package the files for the target browser          |
+| release | `extension-target.zip` | Create an official release for a target browser   |
+
+### Targets
+| Target  | Browser            |
+|---------|--------------------|
+| v3*     | Chrome, Edge, etc. |
+| v2      | Chrome, Edge, etc. |
+| firefox | Firefox            |
+| safari  | Safari (MacOS/iOS) |
+
+_* = default target_
+
+### Scripts
+For all scripts, please see `package.json`.
+
+#### Commonly used scripts
+| Target  | Stage   | Script                   | Description                       |
+|---------|---------|--------------------------|-----------------------------------|
+| v3      | build   | `npm run build:v3`       | Development build for Manifest V3 |
+| v2      | build   | `npm run build:v2`       | Development build for Manifest V2 |
+| firefox | build   | `npm run build:firefox`  | Development build for Firefox     |
+| safari  | build   | `npm run build:safari`   | Development build for Safari      |
+| safari  | release | `npm run package:safari` | Official release for safari       |
+|         | release | `npm run release:all`    | Official relase for all targets   |
+
+### State files
+The state files hold the details about the current build. These files are managed by `bin/prebuild.mjs`.
+
+- `.build.json`
+  - Current development target details
+  - This is used for active development, and allows the developer to run simple commands such as `npm run build` to rebuild the project for the target specified in the file
+- `.release.json`
+  - Current release target details
+  - Takes precedence over `.build.json`, but gets removed after release is finished
+
+#### Details contained in state files:
+- `config`: Overrides for the target
+- `manifestVersion`: Manifest version from `src/static/manifest.json`
+- `target`: Target browser
+- `version`: Build version from `package.json`
