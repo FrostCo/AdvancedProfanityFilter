@@ -10,7 +10,7 @@ A browser extension to filter profanity from webpages.
 
 For an overview of features and options, please head to the [wiki](https://github.com/richardfrost/AdvancedProfanityFilter/wiki).
 
-### Installation
+## Installation
 | Browser | Download |
 |---------|----------|
 | Chrome  | [Chrome Web Store](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh) |
@@ -22,7 +22,7 @@ For an overview of features and options, please head to the [wiki](https://githu
 | iOS/Other | [Bookmarklet Info](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Bookmarklet) |
 | TV Cast | [Instructions](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio#watch-on-tv) - [Discussion](https://github.com/richardfrost/AdvancedProfanityFilter/issues/206) |
 
-### Features
+## Features
 * Filter modes
     * Censor - Hide offending words
     * Substitute - Replace offensive words
@@ -44,14 +44,14 @@ For an overview of features and options, please head to the [wiki](https://githu
 
 For a detailed overview of the features and settings, please see the [Getting Started page](https://github.com/richardfrost/AdvancedProfanityFilter/wiki).
 
-### Issues, Suggestions or Feedback?
+## Issues, Suggestions or Feedback?
 * Found a bug? Please open an [issue](https://github.com/richardfrost/AdvancedProfanityFilter/issues/new).
 * Have a great idea to improve the project? Want to share some feedback? Head over [here](https://goo.gl/forms/LTqFpJ0mCTsrgGgf2).
 
-### Beta Testing
+## Beta Testing
 If you would like to help with development, but don't have experience coding, its very helpful to have users test a release candidate before actually publishing it to everyone. If you are interested in testing new versions see [this page](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Beta-Testing) for more information.
 
-### Development
+## Development
 This project is written in TypeScript, and during the build/package process it will be converted to JS. Please see `package.json`'s scripts for more info on the process.
 
 Getting started
