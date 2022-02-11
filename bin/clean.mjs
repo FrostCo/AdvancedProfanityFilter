@@ -29,27 +29,22 @@ function main() {
     // argv[1] = script (this file)
     // argv[2] = first argument
     if (process.argv.length >= 2) {
-      const args = process.argv.slice(2);
-      let toRemove = [];
-
+      let args = process.argv.slice(2);
       if (args.length == 0 || args.includes('--all')) {
-        toRemove = toRemove.concat(built).concat(dist).concat(test);
-      } else {
-        if (args.includes('--built')) {
-          toRemove = toRemove.concat(built);
-        }
+        args = ['--built', '--dist', '--release', '--test'];
+      }
 
-        if (args.includes('--dist')) {
-          toRemove = toRemove.concat(dist);
-        }
+      let toRemove = [];
+      if (args.includes('--built')) {
+        toRemove = toRemove.concat(built);
+      }
 
-        if (args.includes('--release')) {
-          toRemove = toRemove.concat(release);
-        }
+      if (args.includes('--dist')) {
+        toRemove = toRemove.concat(dist);
+      }
 
-        if (args.includes('--test')) {
-          toRemove = toRemove.concat(test);
-        }
+      if (args.includes('--test')) {
+        toRemove = toRemove.concat(test);
       }
 
       clean(toRemove);
