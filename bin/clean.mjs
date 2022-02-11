@@ -60,7 +60,9 @@ function main() {
 function usage() {
   console.log(`usage:
       npm run clean
+      npm run clean:built
       npm run clean:dist
+      npm run clean:test
   `);
 }
 
