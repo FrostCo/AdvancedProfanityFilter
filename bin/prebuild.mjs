@@ -30,15 +30,15 @@ function main() {
   // argv[1] = script (this file)
   // argv[2] = first argument
   if (process.argv.length == 2 || process.argv.length == 3) {
-    const arg = process.argv.slice(2)[0];
-    // Exit if no arg passed and .build.json already exists
-    if (!arg && fse.existsSync(buildFilePath)) {
+    const target = process.argv.slice(2)[0];
+    // Exit if no target was passed and .build.json already exists (preserve current build target)
+    if (!target && fse.existsSync(buildFilePath)) {
       return;
     }
 
     common();
 
-    switch (arg) {
+    switch (target) {
       case '--firefox':
         firefoxBuild();
         break;
