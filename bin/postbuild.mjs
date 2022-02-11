@@ -7,6 +7,7 @@ let buildData;
 const buildDataPath = path.join('.build.json');
 const manifestPath = path.join('dist', 'manifest.json');
 const releaseFilePath = path.join('.release.json');
+const srcManifestPath = path.join('src', 'static', 'manifest.json');
 
 function common() {
   handleManifestVersion();
@@ -58,6 +59,11 @@ function handleVersion() {
     console.log(`Updating manifest.json version (${manifest.version} -> ${buildData.version})`);
     manifest.version = buildData.version;
     writeJSONFile(manifestPath, manifest);
+
+    // Update source manfiest.json
+    const srcManifest = loadJSONFile(srcManifestPath);
+    srcManifest.version = buildData.version;
+    writeJSONFile(srcManifestPath, srcManifest);
   }
 }
 
