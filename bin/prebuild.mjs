@@ -43,11 +43,15 @@ function main() {
     }
 
     // Use existing buildFile as starting point if no target was passed
-    const target = argv.arguments[0];
-    if (!target && data.release && fse.existsSync(releaseBuildFilePath)) {
-      data = loadJSONFile(releaseBuildFilePath);
-    } else if (!target && !data.release && fse.existsSync(devBuildFilePath)) {
-      data = loadJSONFile(devBuildFilePath);
+    let target = argv.arguments[0];
+    if (!target) {
+      if (data.release && fse.existsSync(releaseBuildFilePath)) {
+        data = loadJSONFile(releaseBuildFilePath);
+        target = targetFromData();
+      } else if (!data.release && fse.existsSync(devBuildFilePath)) {
+        data = loadJSONFile(devBuildFilePath);
+        target = targetFromData();
+      }
     }
 
     common();
@@ -92,6 +96,17 @@ function manifestV3Build() {
 function safariBuild() {
   data.target = 'safari';
   data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
+}
+
+function targetFromData() {
+  switch (data.target) {
+    case 'chrome':
+      return `--manifestV${data.manifestVersion}`;
+    case 'bookmarklet':
+    case 'firefox:':
+    case 'safari':
+      return `--${data.target}`;
+  }
 }
 
 main();
