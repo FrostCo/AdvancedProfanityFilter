@@ -2,12 +2,16 @@
 /* eslint-disable no-console */
 import fse from 'fs-extra';
 import path from 'path';
+import {
+  buildFilePath,
+  distManifestPath,
+  loadJSONFile,
+  removeFiles,
+  srcManifestPath,
+  writeJSONFile
+} from './lib.mjs';
 
 let buildData;
-const buildDataPath = path.join('.build.json');
-const manifestPath = path.join('dist', 'manifest.json');
-const releaseFilePath = path.join('.release.json');
-const srcManifestPath = path.join('src', 'static', 'manifest.json');
 
 function common() {
   handleManifestVersion();
@@ -15,19 +19,19 @@ function common() {
 }
 
 function firefoxBuild() {
-  const manifest = loadJSONFile(manifestPath);
+  const manifest = loadJSONFile(distManifestPath);
   manifest.applications = {
     gecko: {
       id: '{853d1586-e2ab-4387-a7fd-1f7f894d2651}'
     }
   };
   manifest.background.persistent = true; // Event pages are not currently supported.
-  writeJSONFile(manifestPath, manifest);
+  writeJSONFile(distManifestPath, manifest);
 }
 
 function handleManifestVersion() {
   if (buildData.manifestVersion == 2) {
-    const manifest = loadJSONFile(manifestPath);
+    const manifest = loadJSONFile(distManifestPath);
     manifest.action = undefined;
     manifest.manifest_version = buildData.manifestVersion;
     manifest.options_ui = {
@@ -48,17 +52,17 @@ function handleManifestVersion() {
       default_title: 'Advanced Profanity Filter',
     };
     manifest.web_accessible_resources = ['audio/*.mp3'];
-    writeJSONFile(manifestPath, manifest);
+    writeJSONFile(distManifestPath, manifest);
   }
 }
 
 function handleVersion() {
-  const manifest = loadJSONFile(manifestPath);
+  const manifest = loadJSONFile(distManifestPath);
 
   if (manifest.version != buildData.version) {
     console.log(`Updating manifest.json version (${manifest.version} -> ${buildData.version})`);
     manifest.version = buildData.version;
-    writeJSONFile(manifestPath, manifest);
+    writeJSONFile(distManifestPath, manifest);
 
     // Update source manfiest.json
     const srcManifest = loadJSONFile(srcManifestPath);
@@ -67,17 +71,8 @@ function handleVersion() {
   }
 }
 
-function loadJSONFile(file) {
-  return JSON.parse(fse.readFileSync(file));
-}
-
 function main() {
-  // Load .release.json if present, otherwise load .build.json
-  if (fse.existsSync(releaseFilePath)) {
-    buildData = loadJSONFile(releaseFilePath);
-  } else {
-    buildData = loadJSONFile(buildDataPath);
-  }
+  buildData = loadJSONFile(buildFilePath);
 
   // Perform postbuild actions
   common();
@@ -89,17 +84,6 @@ function main() {
   if (buildData.target == 'safari') {
     safariBuild();
   }
-}
-
-function removeFiles(files) {
-  if (typeof files === 'string') {
-    files = [files];
-  }
-
-  files.forEach((file) => {
-    console.log(`Removing ${file}`);
-    fse.removeSync(file);
-  });
 }
 
 function removeOptionPageBookmarklet() {
@@ -138,11 +122,6 @@ function safariBuild() {
   removeOptionPageBookmarklet();
   removeOptionPageDonations();
   removeFiles(files);
-}
-
-function writeJSONFile(file, object) {
-  const content = JSON.stringify(object, null, 2);
-  fse.writeFileSync(file, content);
 }
 
 main();

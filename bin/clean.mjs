@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import fse from 'fs-extra';
 import path from 'path';
+import { parseArgv, removeFiles } from './lib.mjs';
 
 const built = [
   path.join('extension'),
@@ -12,50 +12,32 @@ const dist = [
   path.join('dist-lib'),
 ];
 
-const release = [
-  path.join('./.release.json'),
-];
-
 const test = [
   path.join('test', 'built'),
 ];
 
-function clean(items) {
-  items.forEach((item) => {
-    console.log(`Cleaning ${item}...`);
-    fse.removeSync(item);
-  });
-}
-
 function main() {
   try {
-    // argv[0] = process (node)
-    // argv[1] = script (this file)
-    // argv[2] = first argument
-    if (process.argv.length >= 2) {
-      let args = process.argv.slice(2);
-      if (args.length == 0 || args.includes('--all')) {
-        args = ['--built', '--dist', '--release', '--test'];
+    const argv = parseArgv(process.argv);
+    if (argv.count >= 2) {
+      if (argv.arguments.length == 0 || argv.arguments.includes('--all')) {
+        argv.arguments = ['--built', '--dist', '--test'];
       }
 
       let toRemove = [];
-      if (args.includes('--built')) {
+      if (argv.arguments.includes('--built')) {
         toRemove = toRemove.concat(built);
       }
 
-      if (args.includes('--dist')) {
+      if (argv.arguments.includes('--dist')) {
         toRemove = toRemove.concat(dist);
       }
 
-      if (args.includes('--release')) {
-        toRemove = toRemove.concat(release);
-      }
-
-      if (args.includes('--test')) {
+      if (argv.arguments.includes('--test')) {
         toRemove = toRemove.concat(test);
       }
 
-      clean(toRemove);
+      removeFiles(toRemove);
     } else {
       usage();
     }
@@ -70,7 +52,6 @@ function usage() {
       npm run clean
       npm run clean:built
       npm run clean:dist
-      npm run clean:release
       npm run clean:test
   `);
 }

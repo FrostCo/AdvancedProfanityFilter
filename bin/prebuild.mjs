@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 import fse from 'fs-extra';
-import path from 'path';
 // import Constants from '../src/script/lib/constants'; // Temp?
+import { buildFilePath, devBuildFilePath, loadJSONFile, parseArgv, releaseBuildFilePath, writeJSONFile } from './lib.mjs';
 
-const buildFilePath = path.join('.build.json');
-const data = {
+let data = {
+  release: false,
   config: {
     muteMethod: null,
   },
@@ -12,14 +12,22 @@ const data = {
   target: 'chrome',
   version: '1.0.0',
 };
-const releaseFilePath = path.join('.release.json');
+
+function activateBuildFile(sourceFile) {
+  fse.copyFileSync(sourceFile, buildFilePath);
+}
+
+function bookmarkletBuild() {
+  data.target = 'bookmarklet';
+  data.manifestVersion = 0;
+}
 
 function common() {
   data.version = process.env.npm_package_version;
 }
 
 function defaultBuild() {
-  manifestV3Build();
+  manifestV2Build();
 }
 
 function firefoxBuild() {
@@ -27,28 +35,34 @@ function firefoxBuild() {
 }
 
 function main() {
-  // argv[0] = process (node)
-  // argv[1] = script (this file)
-  // argv[2] = first argument
-  if (process.argv.length >= 2 && process.argv.length <= 4) {
-    const args = process.argv.slice(2);
-    const release = args.includes('--release');
-    if (release) {
-      args.splice(args.indexOf('--release'), 1);
-    } else if (fse.existsSync(releaseFilePath)) {
-      // Remove .release.json if it exists when not prepareing for a release build
-      fse.removeSync(releaseFilePath);
+  const argv = parseArgv(process.argv);
+  if (argv.count >= 2 && argv.count <= 4) {
+    data.release = argv.arguments.includes('--release');
+    if (data.release) {
+      argv.arguments.splice(argv.arguments.indexOf('--release'), 1);
     }
-    const target = args[0];
+    let target = argv.arguments[0];
 
-    // Exit if no target was passed and .build.json already exists (preserve current build target)
-    if (!target && fse.existsSync(buildFilePath)) {
-      return;
+    // Only show build details if no target was passed or if this is a release
+    const showBuildDetails = (!target || data.release);
+
+    // Use existing buildFile as starting point if no target was passed
+    if (!target) {
+      if (data.release && fse.existsSync(releaseBuildFilePath)) {
+        data = loadJSONFile(releaseBuildFilePath);
+        target = targetFromData();
+      } else if (!data.release && fse.existsSync(devBuildFilePath)) {
+        data = loadJSONFile(devBuildFilePath);
+        target = targetFromData();
+      }
     }
 
     common();
 
     switch (target) {
+      case '--bookmarklet':
+        bookmarkletBuild();
+        break;
       case '--firefox':
         firefoxBuild();
         break;
@@ -64,7 +78,13 @@ function main() {
       default:
         defaultBuild();
     }
-    writeData(release);
+
+    const filePath = data.release ? releaseBuildFilePath : devBuildFilePath;
+    writeJSONFile(filePath, data);
+    activateBuildFile(filePath);
+    if (showBuildDetails) {
+      console.log(`Build details:\n${JSON.stringify(data, null, 2)}`);
+    }
   } else {
     throw (new Error('Incorrect number of arguments.'));
   }
@@ -83,10 +103,15 @@ function safariBuild() {
   data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
 }
 
-function writeData(release = false) {
-  const filePath = release ? releaseFilePath : buildFilePath;
-  const content = JSON.stringify(data, null, 2);
-  fse.writeFileSync(filePath, content);
+function targetFromData() {
+  switch (data.target) {
+    case 'chrome':
+      return `--manifestV${data.manifestVersion}`;
+    case 'bookmarklet':
+    case 'firefox:':
+    case 'safari':
+      return `--${data.target}`;
+  }
 }
 
 main();
