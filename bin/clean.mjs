@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import path from 'path';
-import { removeFiles } from './lib.mjs';
+import { parseArgv, removeFiles } from './lib.mjs';
 
 const built = [
   path.join('extension'),
@@ -22,29 +22,26 @@ const test = [
 
 function main() {
   try {
-    // argv[0] = process (node)
-    // argv[1] = script (this file)
-    // argv[2] = first argument
-    if (process.argv.length >= 2) {
-      let args = process.argv.slice(2);
-      if (args.length == 0 || args.includes('--all')) {
-        args = ['--built', '--dist', '--release', '--test'];
+    const argv = parseArgv(process.argv);
+    if (argv.count >= 2) {
+      if (argv.arguments.length == 0 || argv.arguments.includes('--all')) {
+        argv.arguments = ['--built', '--dist', '--release', '--test'];
       }
 
       let toRemove = [];
-      if (args.includes('--built')) {
+      if (argv.arguments.includes('--built')) {
         toRemove = toRemove.concat(built);
       }
 
-      if (args.includes('--dist')) {
+      if (argv.arguments.includes('--dist')) {
         toRemove = toRemove.concat(dist);
       }
 
-      if (args.includes('--release')) {
+      if (argv.arguments.includes('--release')) {
         toRemove = toRemove.concat(release);
       }
 
-      if (args.includes('--test')) {
+      if (argv.arguments.includes('--test')) {
         toRemove = toRemove.concat(test);
       }
 

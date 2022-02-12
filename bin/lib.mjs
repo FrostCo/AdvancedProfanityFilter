@@ -12,6 +12,15 @@ export function loadJSONFile(file) {
   return JSON.parse(fse.readFileSync(file));
 }
 
+export function parseArgv(argv) {
+  const parsed = {};
+  parsed.count = argv.length;
+  parsed.process = argv[0]; // process (node)
+  parsed.script = argv[1]; // script
+  parsed.arguments = argv.slice(2);
+  return parsed;
+}
+
 export function removeFiles(files, silent = false) {
   if (typeof files === 'string') {
     files = [files];

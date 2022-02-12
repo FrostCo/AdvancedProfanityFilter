@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import fse from 'fs-extra';
 // import Constants from '../src/script/lib/constants'; // Temp?
-import { buildFilePath, releaseFilePath, removeFiles, writeJSONFile } from './lib.mjs';
+import { buildFilePath, parseArgv, releaseFilePath, removeFiles, writeJSONFile } from './lib.mjs';
 
 const data = {
   config: {
@@ -25,19 +25,16 @@ function firefoxBuild() {
 }
 
 function main() {
-  // argv[0] = process (node)
-  // argv[1] = script (this file)
-  // argv[2] = first argument
-  if (process.argv.length >= 2 && process.argv.length <= 4) {
-    const args = process.argv.slice(2);
-    const release = args.includes('--release');
+  const argv = parseArgv(process.argv);
+  if (argv.count >= 2 && argv.count <= 4) {
+    const release = argv.arguments.includes('--release');
     if (release) {
-      args.splice(args.indexOf('--release'), 1);
+      argv.arguments.splice(argv.arguments.indexOf('--release'), 1);
     } else if (fse.existsSync(releaseFilePath)) {
       // Remove .release.json if it exists when not prepareing for a release build
       removeFiles(releaseFilePath);
     }
-    const target = args[0];
+    const target = argv.arguments[0];
 
     // Exit if no target was passed and .build.json already exists (preserve current build target)
     if (!target && fse.existsSync(buildFilePath)) {
