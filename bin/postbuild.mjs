@@ -74,11 +74,8 @@ function handleVersion() {
 
 function main() {
   // Load .release.json if present, otherwise load .build.json
-  if (fse.existsSync(releaseFilePath)) {
-    buildData = loadJSONFile(releaseFilePath);
-  } else {
-    buildData = loadJSONFile(buildFilePath);
-  }
+  const filePath = fse.existsSync(releaseFilePath) ? releaseFilePath : buildFilePath;
+  buildData = loadJSONFile(filePath);
 
   // Perform postbuild actions
   common();
