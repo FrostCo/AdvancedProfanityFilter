@@ -41,9 +41,12 @@ function main() {
     if (data.release) {
       argv.arguments.splice(argv.arguments.indexOf('--release'), 1);
     }
+    let target = argv.arguments[0];
+
+    // Only show build details if no target was passed or if this is a release
+    const showBuildDetails = (!target || data.release);
 
     // Use existing buildFile as starting point if no target was passed
-    let target = argv.arguments[0];
     if (!target) {
       if (data.release && fse.existsSync(releaseBuildFilePath)) {
         data = loadJSONFile(releaseBuildFilePath);
@@ -79,7 +82,9 @@ function main() {
     const filePath = data.release ? releaseBuildFilePath : devBuildFilePath;
     writeJSONFile(filePath, data);
     activateBuildFile(filePath);
-    console.log(`Build details:\n${JSON.stringify(data, null, 2)}`);
+    if (showBuildDetails) {
+      console.log(`Build details:\n${JSON.stringify(data, null, 2)}`);
+    }
   } else {
     throw (new Error('Incorrect number of arguments.'));
   }
