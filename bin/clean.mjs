@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import fse from 'fs-extra';
 import path from 'path';
+import { removeFiles } from './lib.mjs';
 
 const built = [
   path.join('extension'),
@@ -19,13 +19,6 @@ const release = [
 const test = [
   path.join('test', 'built'),
 ];
-
-function clean(items) {
-  items.forEach((item) => {
-    console.log(`Cleaning ${item}...`);
-    fse.removeSync(item);
-  });
-}
 
 function main() {
   try {
@@ -55,7 +48,7 @@ function main() {
         toRemove = toRemove.concat(test);
       }
 
-      clean(toRemove);
+      removeFiles(toRemove);
     } else {
       usage();
     }

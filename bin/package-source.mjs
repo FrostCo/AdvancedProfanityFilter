@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
-import fse from 'fs-extra';
 import Path from 'path';
 import AdmZip from 'adm-zip';
+import { removeFiles } from './lib.mjs';
 
-// Required due to bundled code
+// Required for Firefox due to bundled code
 function packageSource() {
-  fse.removeSync('./extension-source.zip');
+  removeFiles('./extension-source.zip');
   console.log('Building ./extension-source.zip');
   console.log('Build from source: npm install && npm run build:bookmarklet && npm run package:firefox');
   console.log('  Unpacked: ./dist');

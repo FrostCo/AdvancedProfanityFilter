@@ -1,9 +1,8 @@
 /* eslint-disable no-console */
 import fse from 'fs-extra';
-import path from 'path';
 // import Constants from '../src/script/lib/constants'; // Temp?
+import { buildFilePath, releaseFilePath, removeFiles, writeJSONFile } from './lib.mjs';
 
-const buildFilePath = path.join('.build.json');
 const data = {
   config: {
     muteMethod: null,
@@ -12,7 +11,6 @@ const data = {
   target: 'chrome',
   version: '1.0.0',
 };
-const releaseFilePath = path.join('.release.json');
 
 function common() {
   data.version = process.env.npm_package_version;
@@ -37,7 +35,7 @@ function main() {
       args.splice(args.indexOf('--release'), 1);
     } else if (fse.existsSync(releaseFilePath)) {
       // Remove .release.json if it exists when not prepareing for a release build
-      fse.removeSync(releaseFilePath);
+      removeFiles(releaseFilePath);
     }
     const target = args[0];
 
@@ -64,7 +62,9 @@ function main() {
       default:
         defaultBuild();
     }
-    writeData(release);
+
+    const filePath = release ? releaseFilePath : buildFilePath;
+    writeJSONFile(filePath, data);
   } else {
     throw (new Error('Incorrect number of arguments.'));
   }
@@ -81,12 +81,6 @@ function manifestV3Build() {
 function safariBuild() {
   data.target = 'safari';
   data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
-}
-
-function writeData(release = false) {
-  const filePath = release ? releaseFilePath : buildFilePath;
-  const content = JSON.stringify(data, null, 2);
-  fse.writeFileSync(filePath, content);
 }
 
 main();

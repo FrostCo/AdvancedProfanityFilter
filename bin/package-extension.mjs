@@ -2,6 +2,7 @@
 import fse from 'fs-extra';
 import path from 'path';
 import AdmZip from 'adm-zip';
+import { loadJSONFile, removeFiles } from './lib.mjs';
 
 let buildData;
 const buildDataPath = path.join('.build.json');
@@ -12,15 +13,6 @@ function buildArchive() {
   const zip = new AdmZip();
   zip.addLocalFolder(dist, null);
   return zip;
-}
-
-function loadJSONFile(file) {
-  try {
-    return JSON.parse(fse.readFileSync(file));
-  } catch (err) {
-    console.error(err.message);
-    throw err;
-  }
 }
 
 function main() {
@@ -35,7 +27,7 @@ function main() {
     const zip = buildArchive();
     const packagePath = `./${zipName()}.zip`;
     console.log(`Building ${packagePath}`);
-    fse.removeSync(packagePath);
+    removeFiles(packagePath);
     zip.writeZip(packagePath);
   } catch (err) {
     console.error(err.message);
