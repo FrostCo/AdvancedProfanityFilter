@@ -39,7 +39,7 @@ function main() {
 
     // Use existing buildFile as starting point if no target was passed
     const target = argv.arguments[0];
-    if (data.release && fse.existsSync(releaseBuildFilePath)) {
+    if (!target && data.release && fse.existsSync(releaseBuildFilePath)) {
       data = loadJSONFile(releaseBuildFilePath);
     } else if (!target && !data.release && fse.existsSync(devBuildFilePath)) {
       data = loadJSONFile(devBuildFilePath);
