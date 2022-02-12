@@ -66,8 +66,8 @@ npm run build
 Once the extension has been built, you can load the unpacked extension (found in `dist/`) in your browser.
 
 ### Stages
-| Stage   | Output                   | Description                                       |
-|---------|--------------------------|---------------------------------------------------|
+| Stage   | Output                 | Description                                       |
+|---------|------------------------|---------------------------------------------------|
 | build   | `dist/`                | Build/compile the extension for local development |
 | package | `extension-target.zip` | Package the files for the target browser          |
 | release | `extension-target.zip` | Create an official release for a target browser   |
@@ -97,13 +97,15 @@ For all scripts, please see `package.json`.
 
 ### State files
 The state files hold the details about the current build. These files are managed by `bin/prebuild.mjs`.
-
 - `.build.json`
-  - Current development target details
-  - This is used for active development, and allows the developer to run simple commands such as `npm run build` to rebuild the project for the target specified in the file
-- `.release.json`
-  - Current release target details
-  - Takes precedence over `.build.json`, but gets removed after release is finished
+  - Active build state file that is referenced when building/packaging/releasing
+  - Gets replaced by the dev or release build files outlined below
+- `.build.dev.json`
+  - Holds the development build details and allows the developer to omit the target from commands such as `npm run build` to rebuild the project for the target specified in the file
+  - Overwrites `.build.json` when `--release` is **not** passed to `bin/prebuild.mjs`
+- `.build.release.json`
+  - Holds the release build details
+  - Overwrites `.build.json` when `--release` **is** passed to `bin/prebuild.mjs`
 
 #### Details contained in state files:
 - `config`: Overrides for the target
