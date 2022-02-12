@@ -1,13 +1,9 @@
 /* eslint-disable no-console */
-import fse from 'fs-extra';
-import path from 'path';
 import AdmZip from 'adm-zip';
-import { loadJSONFile, removeFiles } from './lib.mjs';
+import { buildFilePath, loadJSONFile, removeFiles } from './lib.mjs';
 
 let buildData;
-const buildDataPath = path.join('.build.json');
 const dist = './dist/';
-const releaseFilePath = path.join('.release.json');
 
 function buildArchive() {
   const zip = new AdmZip();
@@ -17,17 +13,12 @@ function buildArchive() {
 
 function main() {
   try {
-    // Load .release.json if present, otherwise load .build.json
-    if (fse.existsSync(releaseFilePath)) {
-      buildData = loadJSONFile(releaseFilePath);
-    } else {
-      buildData = loadJSONFile(buildDataPath);
-    }
+    buildData = loadJSONFile(buildFilePath);
 
     const zip = buildArchive();
     const packagePath = `./${zipName()}.zip`;
+    removeFiles(packagePath, true);
     console.log(`Building ${packagePath}`);
-    removeFiles(packagePath);
     zip.writeZip(packagePath);
   } catch (err) {
     console.error(err.message);

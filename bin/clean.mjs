@@ -12,10 +12,6 @@ const dist = [
   path.join('dist-lib'),
 ];
 
-const release = [
-  path.join('./.release.json'),
-];
-
 const test = [
   path.join('test', 'built'),
 ];
@@ -25,7 +21,7 @@ function main() {
     const argv = parseArgv(process.argv);
     if (argv.count >= 2) {
       if (argv.arguments.length == 0 || argv.arguments.includes('--all')) {
-        argv.arguments = ['--built', '--dist', '--release', '--test'];
+        argv.arguments = ['--built', '--dist', '--test'];
       }
 
       let toRemove = [];
@@ -35,10 +31,6 @@ function main() {
 
       if (argv.arguments.includes('--dist')) {
         toRemove = toRemove.concat(dist);
-      }
-
-      if (argv.arguments.includes('--release')) {
-        toRemove = toRemove.concat(release);
       }
 
       if (argv.arguments.includes('--test')) {
@@ -60,7 +52,6 @@ function usage() {
       npm run clean
       npm run clean:built
       npm run clean:dist
-      npm run clean:release
       npm run clean:test
   `);
 }

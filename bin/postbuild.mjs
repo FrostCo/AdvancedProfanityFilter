@@ -6,7 +6,6 @@ import {
   buildFilePath,
   distManifestPath,
   loadJSONFile,
-  releaseFilePath,
   removeFiles,
   srcManifestPath,
   writeJSONFile
@@ -73,9 +72,7 @@ function handleVersion() {
 }
 
 function main() {
-  // Load .release.json if present, otherwise load .build.json
-  const filePath = fse.existsSync(releaseFilePath) ? releaseFilePath : buildFilePath;
-  buildData = loadJSONFile(filePath);
+  buildData = loadJSONFile(buildFilePath);
 
   // Perform postbuild actions
   common();

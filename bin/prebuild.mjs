@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
 import fse from 'fs-extra';
 // import Constants from '../src/script/lib/constants'; // Temp?
-import { buildFilePath, parseArgv, releaseFilePath, removeFiles, writeJSONFile } from './lib.mjs';
+import { buildFilePath, devBuildFilePath, loadJSONFile, parseArgv, releaseBuildFilePath, writeJSONFile } from './lib.mjs';
 
-const data = {
+let data = {
+  release: false,
   config: {
     muteMethod: null,
   },
@@ -11,6 +12,10 @@ const data = {
   target: 'chrome',
   version: '1.0.0',
 };
+
+function activateBuildFile(sourceFile) {
+  fse.copyFileSync(sourceFile, buildFilePath);
+}
 
 function common() {
   data.version = process.env.npm_package_version;
@@ -27,18 +32,17 @@ function firefoxBuild() {
 function main() {
   const argv = parseArgv(process.argv);
   if (argv.count >= 2 && argv.count <= 4) {
-    const release = argv.arguments.includes('--release');
-    if (release) {
+    data.release = argv.arguments.includes('--release');
+    if (data.release) {
       argv.arguments.splice(argv.arguments.indexOf('--release'), 1);
-    } else if (fse.existsSync(releaseFilePath)) {
-      // Remove .release.json if it exists when not prepareing for a release build
-      removeFiles(releaseFilePath);
     }
-    const target = argv.arguments[0];
 
-    // Exit if no target was passed and .build.json already exists (preserve current build target)
-    if (!target && fse.existsSync(buildFilePath)) {
-      return;
+    // Use existing buildFile as starting point if no target was passed
+    const target = argv.arguments[0];
+    if (data.release && fse.existsSync(releaseBuildFilePath)) {
+      data = loadJSONFile(releaseBuildFilePath);
+    } else if (!target && !data.release && fse.existsSync(devBuildFilePath)) {
+      data = loadJSONFile(devBuildFilePath);
     }
 
     common();
@@ -60,8 +64,9 @@ function main() {
         defaultBuild();
     }
 
-    const filePath = release ? releaseFilePath : buildFilePath;
+    const filePath = data.release ? releaseBuildFilePath : devBuildFilePath;
     writeJSONFile(filePath, data);
+    activateBuildFile(filePath);
   } else {
     throw (new Error('Incorrect number of arguments.'));
   }

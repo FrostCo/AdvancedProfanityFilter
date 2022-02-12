@@ -4,8 +4,9 @@ import path from 'path';
 // Paths are relative from the project root
 // Should be correct when running with `npm run ...`
 export const buildFilePath = path.join('.build.json');
+export const devBuildFilePath = path.join('.build.dev.json');
 export const distManifestPath = path.join('dist', 'manifest.json');
-export const releaseFilePath = path.join('.release.json');
+export const releaseBuildFilePath = path.join('.build.release.json');
 export const srcManifestPath = path.join('src', 'static', 'manifest.json');
 
 export function loadJSONFile(file) {

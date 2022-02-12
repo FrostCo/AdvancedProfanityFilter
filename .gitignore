@@ -4,9 +4,8 @@
 # Ignore git-filter scripts (clean/smudge)
 bin/git-filters/*.js
 
-# Build state file
-/.build.json
-/.release.json
+# Build state files
+/.build.*json
 
 # Packaged extensions
 /dist/*
