@@ -75,8 +75,8 @@ Once the extension has been built, you can load the unpacked extension (found in
 ### Targets
 | Target  | Browser            |
 |---------|--------------------|
-| v3*     | Chrome, Edge, etc. |
-| v2      | Chrome, Edge, etc. |
+| v3      | Chrome, Edge, etc. |
+| v2*     | Chrome, Edge, etc. |
 | firefox | Firefox            |
 | safari  | Safari (MacOS/iOS) |
 

@@ -27,7 +27,7 @@ function common() {
 }
 
 function defaultBuild() {
-  manifestV3Build();
+  manifestV2Build();
 }
 
 function firefoxBuild() {

@@ -40,7 +40,7 @@
     "postrelease:firefox": "node bin/package-source.mjs",
     "prebuild": "node bin/prebuild.mjs",
     "prerelease:all": "npm run clean && npm run package:bookmarklet",
-    "release:all": "npm run release:v3 && npm run release:v2 && npm run release:firefox",
+    "release:all": "npm run release:v2 && npm run release:v3 && npm run release:firefox",
     "release:build": "npm run build:static && webpack --config bin/webpack.config.js",
     "release:firefox": "npm run package:firefox",
     "release:safari": "npm run clean && node bin/prebuild.mjs --release --safari && npm run release:build",
