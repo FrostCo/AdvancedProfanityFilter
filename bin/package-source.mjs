@@ -7,7 +7,7 @@ import { removeFiles } from './lib.mjs';
 function packageSource() {
   removeFiles('./extension-source.zip');
   console.log('Building ./extension-source.zip');
-  console.log('Build from source: npm install && npm run build:bookmarklet && npm run package:firefox');
+  console.log('Build from source: npm install && npm run package:bookmarklet && npm run package:firefox');
   console.log('  Unpacked: ./dist');
   console.log('  Packed: ./extension-firefox.zip');
 

@@ -17,6 +17,11 @@ function activateBuildFile(sourceFile) {
   fse.copyFileSync(sourceFile, buildFilePath);
 }
 
+function bookmarkletBuild() {
+  data.target = 'bookmarklet';
+  data.manifestVersion = 0;
+}
+
 function common() {
   data.version = process.env.npm_package_version;
 }
@@ -48,6 +53,9 @@ function main() {
     common();
 
     switch (target) {
+      case '--bookmarklet':
+        bookmarkletBuild();
+        break;
       case '--firefox':
         firefoxBuild();
         break;
