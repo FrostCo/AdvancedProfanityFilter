@@ -67,6 +67,7 @@ function main() {
     const filePath = data.release ? releaseBuildFilePath : devBuildFilePath;
     writeJSONFile(filePath, data);
     activateBuildFile(filePath);
+    console.log(`Build details:\n${JSON.stringify(data, null, 2)}`);
   } else {
     throw (new Error('Incorrect number of arguments.'));
   }
