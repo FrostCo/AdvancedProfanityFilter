@@ -5,7 +5,7 @@ import { removeFiles } from './lib.mjs';
 
 // Required for Firefox due to bundled code
 function packageSource() {
-  removeFiles('./extension-source.zip');
+  removeFiles('./extension-source.zip', true);
   console.log('Building ./extension-source.zip');
   console.log('Build from source: npm install && npm run package:bookmarklet && npm run package:firefox');
   console.log('  Unpacked: ./dist');
