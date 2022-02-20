@@ -89,6 +89,7 @@ export default class WebAudioSites {
     ],
     'gem.cbc.ca': [{ className: 'jw-text-track-container', mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
     'www.cbs.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
+    'www.channel4.com': [{ displaySelector: 'div.subtitles-container', mode: 'elementChild', parentSelector: 'div.subtitles-container', tagName: 'SPAN' }],
     'www.crackle.com': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'www.criterionchannel.com': [{ iframe: true, mode: 'cue', videoCueHideCues: true, videoCueRequireShowing: false }],
     'beta.crunchyroll.com': [
