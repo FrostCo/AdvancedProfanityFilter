@@ -165,6 +165,7 @@ export default class WebAudioSites {
       { className: 'caption-text-box', displaySelector: 'div.caption-text-box', mode: 'element', subtitleSelector: 'p', tagName: 'DIV' },
       { displaySelector: 'div.CaptionBox', mode: 'elementChild', parentSelector: 'div.CaptionBox', tagName: 'P' }
     ],
+    'www.itv.com': [{ mode: 'cue', videoCueLanguage: 'en' }],
     'www.nbc.com': [
       { className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
       { mode: 'cue', videoCueLanguage: 'en' },
