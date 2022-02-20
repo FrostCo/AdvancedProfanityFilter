@@ -89,6 +89,7 @@ export default class WebAudioSites {
     ],
     'gem.cbc.ca': [{ className: 'jw-text-track-container', mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
     'www.cbs.com': [{ mode: 'cue', videoCueLanguage: 'en', videoCueRequireShowing: false }],
+    'www.channel4.com': [{ displaySelector: 'div.subtitles-container', mode: 'elementChild', parentSelector: 'div.subtitles-container', tagName: 'SPAN' }],
     'www.crackle.com': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'www.criterionchannel.com': [{ iframe: true, mode: 'cue', videoCueHideCues: true, videoCueRequireShowing: false }],
     'beta.crunchyroll.com': [
@@ -158,18 +159,19 @@ export default class WebAudioSites {
         tagName: 'DIV',
       },
     ],
-    'www.paramountplus.com': [{ mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'play.google.com': [{ className: 'lava-timed-text-window', mode: 'element', subtitleSelector: 'span.lava-timed-text-caption', tagName: 'DIV' }],
     'play.hbomax.com': [{ displayElementLevels: 5, displayVisibility: true, mode: 'watcher', showSubtitles: Constants.SHOW_SUBTITLES.ALL, subtitleSelector: "span[style^='font-family: font']" }],
     'www.hulu.com': [
       { className: 'caption-text-box', displaySelector: 'div.caption-text-box', mode: 'element', subtitleSelector: 'p', tagName: 'DIV' },
       { displaySelector: 'div.CaptionBox', mode: 'elementChild', parentSelector: 'div.CaptionBox', tagName: 'P' }
     ],
+    'www.itv.com': [{ mode: 'cue', videoCueLanguage: 'en' }],
     'www.nbc.com': [
       { className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
       { mode: 'cue', videoCueLanguage: 'en' },
     ],
     'www.netflix.com': [{ className: 'player-timedtext-text-container', mode: 'element', subtitleSelector: 'span', tagName: 'DIV' }],
+    'www.paramountplus.com': [{ mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false }],
     'www.pbs.org': [{ iframe: true, mode: 'element', subtitleSelector: 'div.vjs-text-track-cue > div', tagName: 'DIV' }],
     'www.peacocktv.com': [
       { displaySelector: 'div.video-player__subtitles', mode: 'elementChild', parentSelector: 'div.video-player__subtitles > div', simpleUnmute: true, tagName: '#text' },
