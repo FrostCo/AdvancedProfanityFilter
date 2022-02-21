@@ -57,7 +57,11 @@ export default class WebConfig extends Config {
 
   static get _maxBytes() {
     try {
-      return Math.round(chrome.storage.sync.QUOTA_BYTES_PER_ITEM * .98);
+      if (chrome.storage.sync.QUOTA_BYTES_PER_ITEM) {
+        return Math.round(chrome.storage.sync.QUOTA_BYTES_PER_ITEM * .98);
+      } else {
+        throw 'QUOTA_BYTES_PER_ITEM not defined, using default';
+      }
     } catch (err) {
       // 8192 https://developer.chrome.com/apps/storage
       return 8028;
