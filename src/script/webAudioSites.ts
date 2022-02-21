@@ -184,6 +184,17 @@ export default class WebAudioSites {
       { containsSelector: 'div[data-dialogue-id]', mode: 'element', subtitleSelector: 'span > span', tagName: 'DIV' },
     ],
     'pluto.tv': [{ mode: 'cue', videoCueHideCues: true, videoCueRequireShowing: false }],
+    'www.primevideo.com': [
+      {
+        displayHide: 'none',
+        displaySelector: 'div.webPlayerContainer div.f35bt6a',
+        displayShow: '',
+        iframe: false,
+        mode: 'watcher',
+        parentSelector: 'div.webPlayerContainer div span > span',
+        videoSelector: 'div.webPlayerElement video[src]',
+      }
+    ],
     'www.redbox.com': [{ mode: 'elementChild', parentSelector: 'div.rb-text-container', subtitleSelector: 'SPAN > SPAN', tagName: 'DIV' }],
     'watch.redeemtv.com': [{ convertBreaks: true, displaySelector: 'div.vp-captions', mode: 'elementChild', parentSelector: 'div.vp-captions', tagName: 'SPAN' }],
     'therokuchannel.roku.com': [{ mode: 'element', subtitleSelector: 'div.vjs-text-track-cue > div', tagName: 'DIV' }],
