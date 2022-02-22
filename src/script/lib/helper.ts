@@ -54,6 +54,14 @@ export function getGlobalVariable(code: string, id: string = 'APFData') {
   return JSON.parse(result);
 }
 
+export function getGlobalVariableFromBackground(globalVariable: string) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage({ globalVariable: globalVariable }, (response) => {
+      resolve(response);
+    });
+  });
+}
+
 export function getParent(node: HTMLElement, level: number = 1): HTMLElement {
   if (!node) {
     return null;

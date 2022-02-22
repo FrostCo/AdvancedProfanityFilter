@@ -32,6 +32,7 @@ function firefoxBuild() {
 function handleManifestVersion() {
   if (buildData.manifestVersion == 2) {
     const manifest = loadJSONFile(distManifestPath);
+    manifest.permissions.splice(manifest.permissions.indexOf('scripting'), 1);
     manifest.action = undefined;
     manifest.manifest_version = buildData.manifestVersion;
     manifest.options_ui = {
@@ -51,6 +52,7 @@ function handleManifestVersion() {
       default_popup: 'popup.html',
       default_title: 'Advanced Profanity Filter',
     };
+    manifest.host_permissions = undefined;
     manifest.web_accessible_resources = ['audio/*.mp3'];
     writeJSONFile(distManifestPath, manifest);
   }

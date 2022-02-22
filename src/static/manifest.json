@@ -13,6 +13,7 @@
   "permissions": [
     "contextMenus",
     "notifications",
+    "scripting",
     "storage",
     "tabs"
   ],
@@ -44,6 +45,10 @@
     "default_title": "Advanced Profanity Filter",
     "default_popup": "popup.html"
   },
+  "host_permissions": [
+    "https://*.crunchyroll.com/",
+    "https://*.vrv.co/"
+  ],
   "web_accessible_resources": [
     {
       "resources": [

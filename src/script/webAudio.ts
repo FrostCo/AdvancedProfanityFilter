@@ -2,8 +2,9 @@ import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
-import { getGlobalVariable, getParent, hmsToSeconds, makeRequest, secondsToHMS } from './lib/helper';
+import { getParent, getGlobalVariable, getGlobalVariableFromBackground, hmsToSeconds, makeRequest, secondsToHMS } from './lib/helper';
 import Logger from './lib/logger';
+import WebConfig from './webConfig';
 const logger = new Logger();
 
 export default class WebAudio {
@@ -702,7 +703,13 @@ export default class WebAudio {
     const textTrack = this.getVideoTextTrack(video.textTracks, rule, 'externalSubTrackLabel');
     if (!this.fetching && !textTrack) {
       try {
-        const subsData = getGlobalVariable(rule.externalSubVar);
+        let subsData;
+        if (WebConfig.BUILD.manifestVersion > 2) {
+          subsData = await getGlobalVariableFromBackground(rule.externalSubVar);
+        } else {
+          subsData = getGlobalVariable(rule.externalSubVar);
+        }
+
         if (Array.isArray(subsData)) {
           const found = subsData.find((subtitle) => subtitle.language === rule.videoCueLanguage);
           if (!found) { throw new Error(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
