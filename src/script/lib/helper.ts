@@ -26,6 +26,14 @@ export function exportToFile(dataStr, fileName = 'data.txt') {
   linkElement.remove();
 }
 
+export function fetchFromBackground(url: string, method: string = 'GET') {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage({ fetch: url, fetchMethod: method.toUpperCase() }, (response) => {
+      resolve(response);
+    });
+  });
+}
+
 // Format numbers up to 1B to be 4 characters or less
 export function formatNumber(number: number): string {
   const length = number.toString().length;

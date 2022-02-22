@@ -185,6 +185,12 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
   }
 }
 
+async function fetchUrl(url: string, method: string = 'GET', sendResponse) {
+  const response = await fetch(url, { method: method });
+  const data = await response.text();
+  sendResponse(data);
+}
+
 function onMessage(request: Message, sender, sendResponse) {
   // Support manifest V2/V3
   const chromeAction = chrome.action || chrome.browserAction;
@@ -192,6 +198,9 @@ function onMessage(request: Message, sender, sendResponse) {
     chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
   } else if (request.backgroundData === true) {
     handleBackgroundDataRequest(sender.tab.id, sendResponse);
+    return true; // return true when waiting on an async call
+  } else if (request.fetch) {
+    fetchUrl(request.fetch, request.fetchMethod, sendResponse);
     return true; // return true when waiting on an async call
   } else if (request.globalVariable) {
     getGlobalVariable(request.globalVariable, sender, sendResponse);
