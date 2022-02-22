@@ -26,14 +26,6 @@ export function exportToFile(dataStr, fileName = 'data.txt') {
   linkElement.remove();
 }
 
-export function fetchFromBackground(url: string, method: string = 'GET') {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage({ fetch: url, fetchMethod: method.toUpperCase() }, (response) => {
-      resolve(response);
-    });
-  });
-}
-
 // Format numbers up to 1B to be 4 characters or less
 export function formatNumber(number: number): string {
   const length = number.toString().length;
@@ -121,7 +113,25 @@ export function isVersionOlder(version: Version, minimum: Version): boolean {
   return false;
 }
 
-export function makeRequest(method: string, url: string) {
+export function makeBackgroundRequest(url: string, method: string) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage({ fetch: url, fetchMethod: method.toUpperCase() }, (response) => {
+      resolve(response);
+    });
+  });
+}
+
+export async function makeFetchRequest(url: string, method: string = 'GET') {
+  const response = await fetch(url, { method: method });
+  const data = await response.text();
+  return data;
+}
+
+export async function makeRequest(url: string, method: string) {
+  return fetch ? await makeFetchRequest(url, method) : await makeXMLHttpRequest(url, method) ;
+}
+
+export function makeXMLHttpRequest(url: string, method: string) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open(method, url);

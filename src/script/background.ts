@@ -1,7 +1,7 @@
 import DataMigration from './dataMigration';
 import Domain from './domain';
 import WebConfig from './webConfig';
-import { formatNumber } from './lib/helper';
+import { formatNumber, makeRequest } from './lib/helper';
 import Logger from './lib/logger';
 const logger = new Logger();
 
@@ -139,6 +139,11 @@ async function handleBackgroundDataRequest(tabId: number, sendResponse) {
   }
 }
 
+async function handleRequest(url: string, method: string = 'GET', sendResponse) {
+  const response = await makeRequest(url, method);
+  sendResponse(response);
+}
+
 async function loadBackgroundStorage(): Promise<BackgroundStorage> {
   const data = await WebConfig.getLocalStorage({ background: { tabs: {} } });
   return data['background'] as BackgroundStorage;
@@ -185,12 +190,6 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
   }
 }
 
-async function fetchUrl(url: string, method: string = 'GET', sendResponse) {
-  const response = await fetch(url, { method: method });
-  const data = await response.text();
-  sendResponse(data);
-}
-
 function onMessage(request: Message, sender, sendResponse) {
   // Support manifest V2/V3
   const chromeAction = chrome.action || chrome.browserAction;
@@ -200,7 +199,7 @@ function onMessage(request: Message, sender, sendResponse) {
     handleBackgroundDataRequest(sender.tab.id, sendResponse);
     return true; // return true when waiting on an async call
   } else if (request.fetch) {
-    fetchUrl(request.fetch, request.fetchMethod, sendResponse);
+    handleRequest(request.fetch, request.fetchMethod, sendResponse);
     return true; // return true when waiting on an async call
   } else if (request.globalVariable) {
     getGlobalVariable(request.globalVariable, sender, sendResponse);

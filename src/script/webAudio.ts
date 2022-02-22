@@ -2,7 +2,7 @@ import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
-import { fetchFromBackground, getGlobalVariable, getGlobalVariableFromBackground, getParent, hmsToSeconds, makeRequest, secondsToHMS } from './lib/helper';
+import { getGlobalVariable, getGlobalVariableFromBackground, getParent, hmsToSeconds, makeRequest, secondsToHMS } from './lib/helper';
 import Logger from './lib/logger';
 import WebConfig from './webConfig';
 const logger = new Logger();
@@ -714,8 +714,7 @@ export default class WebAudio {
           const found = subsData.find((subtitle) => subtitle.language === rule.videoCueLanguage);
           if (!found) { throw new Error(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
           this.fetching = true;
-          // const subs = await makeRequest('GET', found[rule.externalSubURLKey]) as string;
-          const subs = await fetchFromBackground(found[rule.externalSubURLKey], 'GET') as string;
+          const subs = await makeRequest(found[rule.externalSubURLKey], 'GET') as string;
           if (typeof subs == 'string' && subs) {
             let parsedCues;
             switch (found[rule.externalSubFormatKey]) {
