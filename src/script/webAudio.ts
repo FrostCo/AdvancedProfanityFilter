@@ -273,7 +273,7 @@ export default class WebAudio {
 
     for (let i = 0; i < textTracks.length; i++) {
       const textTrack = textTracks[i];
-      if (textTrack.cues.length === 0) { continue; }
+      if (!textTrack.cues || textTrack.cues.length === 0) { continue; }
       if (rule.videoCueRequireShowing && textTrack.mode !== 'showing') { continue; }
 
       let currentScore = 0;
