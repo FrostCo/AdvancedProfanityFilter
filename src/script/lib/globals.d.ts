@@ -89,6 +89,9 @@ interface Message {
   clearMute?: boolean;
   counter?: number;
   disabled?: boolean;
+  fetch?: string;
+  fetchMethod?: string;
+  globalVariable?: string;
   mute?: boolean;
   mutePage?: boolean;
   popup?: boolean;

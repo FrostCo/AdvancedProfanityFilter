@@ -1,7 +1,7 @@
 import DataMigration from './dataMigration';
 import Domain from './domain';
 import WebConfig from './webConfig';
-import { formatNumber } from './lib/helper';
+import { formatNumber, makeRequest } from './lib/helper';
 import Logger from './lib/logger';
 const logger = new Logger();
 
@@ -101,8 +101,28 @@ async function disableTabOnce(tabId: number) {
   chrome.tabs.reload(tabId);
 }
 
+async function getGlobalVariable(variableName: string, sender, sendResponse) {
+  const [{ result }] = await chrome.scripting.executeScript({
+    func: getWindowVariable,
+    args: [variableName],
+    target: { tabId: sender.tab.id, frameIds: [sender.frameId] },
+    world: 'MAIN',
+  });
+  sendResponse(result);
+}
+
 function getTabOptions(storage: BackgroundStorage, tabId: number): TabStorageOptions {
   return storage.tabs[tabId] || newTabOptions(storage, tabId);
+}
+
+// variableName Supports '.' notation for nested values: window.nested.value
+function getWindowVariable(variableName: string) {
+  try {
+    const properties = variableName.split('.');
+    return properties.reduce((prev, curr) => prev && prev[curr], window);
+  } catch {
+    return null;
+  }
 }
 
 async function handleBackgroundDataRequest(tabId: number, sendResponse) {
@@ -117,6 +137,11 @@ async function handleBackgroundDataRequest(tabId: number, sendResponse) {
     tabOptions.disabledOnce = false;
     await saveBackgroundStorage(storage);
   }
+}
+
+async function handleRequest(url: string, method: string = 'GET', sendResponse) {
+  const response = await makeRequest(url, method);
+  sendResponse(response);
 }
 
 async function loadBackgroundStorage(): Promise<BackgroundStorage> {
@@ -172,6 +197,12 @@ function onMessage(request: Message, sender, sendResponse) {
     chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
   } else if (request.backgroundData === true) {
     handleBackgroundDataRequest(sender.tab.id, sendResponse);
+    return true; // return true when waiting on an async call
+  } else if (request.fetch) {
+    handleRequest(request.fetch, request.fetchMethod, sendResponse);
+    return true; // return true when waiting on an async call
+  } else if (request.globalVariable) {
+    getGlobalVariable(request.globalVariable, sender, sendResponse);
     return true; // return true when waiting on an async call
   } else if (request.updateContextMenus != null) {
     contextMenuSetup(request.updateContextMenus);

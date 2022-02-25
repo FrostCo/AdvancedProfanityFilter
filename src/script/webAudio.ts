@@ -2,8 +2,9 @@ import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
-import { getGlobalVariable, getParent, hmsToSeconds, makeRequest, secondsToHMS } from './lib/helper';
+import { getGlobalVariable, getGlobalVariableFromBackground, getParent, hmsToSeconds, makeRequest, makeBackgroundRequest, secondsToHMS } from './lib/helper';
 import Logger from './lib/logger';
+import WebConfig from './webConfig';
 const logger = new Logger();
 
 export default class WebAudio {
@@ -272,7 +273,7 @@ export default class WebAudio {
 
     for (let i = 0; i < textTracks.length; i++) {
       const textTrack = textTracks[i];
-      if (textTrack.cues.length === 0) { continue; }
+      if (!textTrack.cues || textTrack.cues.length === 0) { continue; }
       if (rule.videoCueRequireShowing && textTrack.mode !== 'showing') { continue; }
 
       let currentScore = 0;
@@ -702,12 +703,23 @@ export default class WebAudio {
     const textTrack = this.getVideoTextTrack(video.textTracks, rule, 'externalSubTrackLabel');
     if (!this.fetching && !textTrack) {
       try {
-        const subsData = getGlobalVariable(rule.externalSubVar);
+        let subsData;
+        if (WebConfig.BUILD.manifestVersion == 3) {
+          subsData = await getGlobalVariableFromBackground(rule.externalSubVar);
+        } else {
+          subsData = getGlobalVariable(rule.externalSubVar);
+        }
+
         if (Array.isArray(subsData)) {
           const found = subsData.find((subtitle) => subtitle.language === rule.videoCueLanguage);
           if (!found) { throw new Error(`Failed to find subtitle for language: ${rule.videoCueLanguage}.`); }
           this.fetching = true;
-          const subs = await makeRequest('GET', found[rule.externalSubURLKey]) as string;
+          let subs;
+          if (WebConfig.BUILD.target == 'bookmarklet') {
+            subs = await makeRequest(found[rule.externalSubURLKey], 'GET') as string;
+          } else {
+            subs = await makeBackgroundRequest(found[rule.externalSubURLKey], 'GET') as string;
+          }
           if (typeof subs == 'string' && subs) {
             let parsedCues;
             switch (found[rule.externalSubFormatKey]) {
