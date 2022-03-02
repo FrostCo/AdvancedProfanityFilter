@@ -792,6 +792,9 @@ export default class OptionPage {
 
   populateConfig() {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
+    const configLoggingLevelSelect = document.getElementById('configLoggingLevelSelect') as HTMLSelectElement;
+    dynamicList(Constants.orderedArray(Constants.LOGGING_LEVELS), configLoggingLevelSelect, true);
+    configLoggingLevelSelect.selectedIndex = this.cfg.loggingLevel;
     configSyncLargeKeys.checked = this.cfg.syncLargeKeys;
     this.auth.setPasswordButton();
   }
@@ -1435,6 +1438,7 @@ export default class OptionPage {
     const showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
     const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
     const collectStats = document.getElementById('collectStats') as HTMLInputElement;
+    const configLoggingLevelSelect = document.getElementById('configLoggingLevelSelect') as HTMLSelectElement;
     this.cfg.censorCharacter = censorCharacterSelect.value;
     this.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
     this.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
@@ -1458,6 +1462,7 @@ export default class OptionPage {
     this.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
     this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
     this.cfg.collectStats = collectStats.checked;
+    this.cfg.loggingLevel = Constants.LOGGING_LEVELS[configLoggingLevelSelect.value.toUpperCase()];
 
     // Save settings
     try {
@@ -1973,6 +1978,7 @@ document.getElementById('importFileInput').addEventListener('change', (evt) => {
 document.getElementById('configReset').addEventListener('click', (evt) => { option.confirm('restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', (evt) => { option.exportConfig(); });
 document.getElementById('configImport').addEventListener('click', (evt) => { option.confirm('importConfig'); });
+document.getElementById('configLoggingLevelSelect').addEventListener('change', (evt) => { option.saveOptions(); });
 document.getElementById('setPassword').addEventListener('input', (evt) => { option.auth.setPasswordButton(); });
 document.getElementById('setPasswordBtn').addEventListener('click', (evt) => { option.confirm('setPassword'); });
 // Test

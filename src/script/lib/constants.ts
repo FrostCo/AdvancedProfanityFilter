@@ -7,6 +7,7 @@ export default class Constants {
   static readonly DOMAIN_MODES = { NORMAL: 0, ADVANCED: 1, DEEP: 2 };
   static readonly FALSE = 0;
   static readonly FILTER_METHODS = { CENSOR: 0, SUBSTITUTE: 1, REMOVE: 2, OFF: 3 };
+  static readonly LOGGING_LEVELS = { DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3, NONE: 4 };
   static readonly MATCH_METHODS = { EXACT: 0, PARTIAL: 1, WHOLE: 2, REGEX: 3 };
   static readonly MUTE_METHODS = { TAB: 0, VIDEO_VOLUME: 1, VIDEO_MUTE: 2, NONE: 9 };
   static readonly SHOW_SUBTITLES = { ALL: 0, FILTERED: 1, UNFILTERED: 2, NONE: 3 };
