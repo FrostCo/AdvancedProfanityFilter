@@ -30,7 +30,7 @@ function zipName() {
   let name;
 
   if (buildData.target == 'chrome') {
-    name = `extension-v${buildData.manifestVersion}`;
+    name = `extension-mv${buildData.manifestVersion}`;
   } else {
     name = `extension-${buildData.target}`;
   }
