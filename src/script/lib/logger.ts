@@ -53,13 +53,13 @@ export default class Logger {
     if (tag) { this.prefix = `[${tag}] `; }
   }
 
-  debug(message: string, ...data: any[]) { if (Logger.debugLevel >= this.level) { Logger.debug(`${this.prefix}${message}`, data); } }
-  debugTime(message: string, ...data: any[]) { if (Logger.debugLevel >= this.level) { Logger.debugTime(`${this.prefix}${message}`, data); } }
-  error(message: string, ...data: any[]) { if (Logger.errorLevel >= this.level) { Logger.error(`${this.prefix}${message}`, data); } }
-  errorTime(message: string, ...data: any[]) { if (Logger.errorLevel >= this.level) { Logger.errorTime(`${this.prefix}${message}`, data); } }
-  info(message: string, ...data: any[]) { if (Logger.infoLevel >= this.level) { Logger.info(`${this.prefix}${message}`, data); } }
-  infoTime(message: string, ...data: any[]) { if (Logger.infoLevel >= this.level) { Logger.infoTime(`${this.prefix}${message}`, data); } }
+  debug(message: string, ...data: any[]) { if (Logger.debugLevel >= this.level) { Logger.log(Logger.debugName, `${this.prefix}${message}`, data); } }
+  debugTime(message: string, ...data: any[]) { if (Logger.debugLevel >= this.level) { Logger.logTime(Logger.debugName, `${this.prefix}${message}`, data); } }
+  error(message: string, ...data: any[]) { if (Logger.errorLevel >= this.level) { Logger.log(Logger.errorName, `${this.prefix}${message}`, data); } }
+  errorTime(message: string, ...data: any[]) { if (Logger.errorLevel >= this.level) { Logger.logTime(Logger.errorName, `${this.prefix}${message}`, data); } }
+  info(message: string, ...data: any[]) { if (Logger.infoLevel >= this.level) { Logger.log(Logger.infoName, `${this.prefix}${message}`, data); } }
+  infoTime(message: string, ...data: any[]) { if (Logger.infoLevel >= this.level) { Logger.logTime(Logger.infoName, `${this.prefix}${message}`, data); } }
   setLevel(levelId: number) { this.level = levelId; }
-  warn(message: string, ...data: any[]) { if (Logger.warnLevel >= this.level) { Logger.warn(`${this.prefix}${message}`, data); } }
-  warnTime(message: string, ...data: any[]) { if (Logger.warnLevel >= this.level) { Logger.warnTime(`${this.prefix}${message}`, data); } }
+  warn(message: string, ...data: any[]) { if (Logger.warnLevel >= this.level) { Logger.log(Logger.warnName, `${this.prefix}${message}`, data); } }
+  warnTime(message: string, ...data: any[]) { if (Logger.warnLevel >= this.level) { Logger.logTime(Logger.warnName, `${this.prefix}${message}`, data); } }
 }
