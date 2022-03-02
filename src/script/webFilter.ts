@@ -8,7 +8,7 @@ import Word from './lib/word';
 import Wordlist from './lib/wordlist';
 import './vendor/findAndReplaceDOMText';
 import Logger from './lib/logger';
-const logger = new Logger();
+const logger = new Logger('WebFilter');
 
 export default class WebFilter extends Filter {
   audio: WebAudio;
@@ -204,6 +204,7 @@ export default class WebFilter extends Filter {
 
   async cleanPage() {
     this.cfg = await WebConfig.load();
+    logger.setLevel(this.cfg.loggingLevel);
 
     if (Object.keys(this.cfg.words).length === 0) {
       logger.warn('No words to filter. Exiting.');
@@ -251,7 +252,7 @@ export default class WebFilter extends Filter {
     // Disable if muteAudioOnly mode is active and this is not a suported page
     if (this.cfg.muteAudioOnly && !this.mutePage) {
       message.disabled = true;
-      logger.info(`'${this.hostname}' is not an audio page and audio only mode is enabled. Exiting.`);
+      logger.info(`'[Audio] ${this.hostname}' is not an audio page and audio only mode is enabled. Exiting.`);
       chrome.runtime.sendMessage(message);
       return false;
     }
@@ -439,7 +440,7 @@ export default class WebFilter extends Filter {
         if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
       } catch (err) {
         if (err.message !== 'Extension context invalidated.') {
-          logger.warn('Failed to sendMessage.', err);
+          logger.warn('Failed to sendMessage to update counter.', err);
         }
       }
     }

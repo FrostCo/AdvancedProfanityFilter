@@ -2,7 +2,7 @@ import Constants from './constants';
 import Word from './word';
 import Config from './config';
 import Logger from './logger';
-const logger = new Logger();
+const logger = new Logger('Wordlist');
 
 export default class Wordlist {
   all: Word[];
@@ -13,6 +13,7 @@ export default class Wordlist {
     this.all = [];
     this.list = [];
     this.regExps = [];
+    logger.setLevel(cfg.loggingLevel);
 
     // Sort the words array by longest (most-specific) first
     const sorted = Object.keys(cfg.words).sort((a, b) => {

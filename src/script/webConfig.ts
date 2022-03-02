@@ -3,7 +3,7 @@ import Config from './lib/config';
 import { prettyPrintArray, stringArray } from './lib/helper';
 import Logger from './lib/logger';
 import * as Build from '../../.build.json';
-const logger = new Logger();
+const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
   _lastSplitKeys: { [key: string]: number };

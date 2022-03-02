@@ -3,7 +3,6 @@ import Domain from './domain';
 import WebConfig from './webConfig';
 import { formatNumber, makeRequest } from './lib/helper';
 import Logger from './lib/logger';
-const logger = new Logger();
 
 ////
 // Functions
@@ -99,6 +98,7 @@ async function disableTabOnce(tabId: number) {
   tabOptions.disabledOnce = true;
   await saveBackgroundStorage(storage);
   chrome.tabs.reload(tabId);
+  Logger.info('[Background] disabling tab once.', tabId);
 }
 
 async function getGlobalVariable(variableName: string, sender, sendResponse) {
@@ -165,7 +165,7 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
   } else if (details.reason == 'update') {
     contextMenuSetup();
     const thisVersion = chrome.runtime.getManifest().version;
-    logger.info(`Updated from ${details.previousVersion} to ${thisVersion}.`);
+    Logger.info(`[Background] Updated from ${details.previousVersion} to ${thisVersion}.`);
 
     // Open options page to show new features
     // chrome.runtime.openOptionsPage();
@@ -258,7 +258,7 @@ async function processSelection(action: string, selection: string) {
       await cfg.save('words');
       chrome.tabs.reload();
     } catch (err) {
-      logger.errorTime(`Failed to process selection '${selection}'.`, err);
+      Logger.errorTime(`[Background] Failed to process selection '${selection}'.`, err);
     }
   }
 }
@@ -308,7 +308,7 @@ async function toggleDomain(hostname: string, action: string) {
     await domain.save(cfg);
     chrome.tabs.reload();
   } catch (err) {
-    logger.error(`Failed to modify '${action}' for domain '${domain.cfgKey}'.`, err, domain);
+    Logger.error(`[Background] Failed to modify '${action}' for domain '${domain.cfgKey}'.`, err, domain);
   }
 }
 

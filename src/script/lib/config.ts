@@ -10,6 +10,7 @@ export default class Config {
   filterMethod: number;
   filterWordList: boolean;
   iWordWhitelist: string[];
+  loggingLevel: number;
   preserveCase: boolean;
   preserveFirst: boolean;
   preserveLast: boolean;
@@ -34,6 +35,7 @@ export default class Config {
     filterMethod: Constants.FILTER_METHODS.SUBSTITUTE,
     filterWordList: true,
     iWordWhitelist: [],
+    loggingLevel: Constants.LOGGING_LEVELS.WARN,
     preserveCase: true,
     preserveFirst: true,
     preserveLast: false,

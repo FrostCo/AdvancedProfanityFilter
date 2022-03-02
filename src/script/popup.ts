@@ -5,7 +5,7 @@ import WebConfig from './webConfig';
 import Domain from './domain';
 import Page from './page';
 import Logger from './lib/logger';
-const logger = new Logger();
+const logger = new Logger('Popup');
 
 class Popup {
   audioSiteKeys: string[];
@@ -25,6 +25,7 @@ class Popup {
     'domains',
     'enabledDomainsOnly',
     'filterMethod',
+    'loggingLevel',
     'muteAudio',
     'muteAudioOnly',
     'password',
@@ -50,6 +51,7 @@ class Popup {
 
   static async load(instance: Popup) {
     instance.cfg = await WebConfig.load(Popup._requiredConfig);
+    logger.setLevel(instance.cfg.loggingLevel);
     instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
     if (instance.tab.url) {
       instance.url = new URL(instance.tab.url);
