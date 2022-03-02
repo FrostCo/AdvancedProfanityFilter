@@ -5,7 +5,7 @@ import WebAudioSites from './webAudioSites';
 import { getGlobalVariable, getGlobalVariableFromBackground, getParent, hmsToSeconds, makeRequest, makeBackgroundRequest, secondsToHMS } from './lib/helper';
 import Logger from './lib/logger';
 import WebConfig from './webConfig';
-const logger = new Logger();
+const logger = new Logger('WebAudio');
 
 export default class WebAudio {
   cueRuleIds: number[];
@@ -59,6 +59,7 @@ export default class WebAudio {
 
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.filter = filter;
+    logger.setLevel(this.filter.cfg.loggingLevel);
     this.cueRuleIds = [];
     this.enabledRuleIds = [];
     this.watcherRuleIds = [];
@@ -507,6 +508,7 @@ export default class WebAudio {
           if (this.fillerAudio) { this.playFillerAudio(video); }
           break;
       }
+      logger.debugTime('mute()');
     }
 
     // If we called mute and there is a delayedUnmute planned, clear it
@@ -521,7 +523,7 @@ export default class WebAudio {
       if (options.position) { cue.position = this.parseLineAndPositionSetting(options.position); }
       return cue;
     } catch (err) {
-      logger.error(`[Audio] Failed to add cue: ( start: ${start}, end: ${end}, text: ${text} )`, err);
+      logger.error(`Failed to add cue: ( start: ${start}, end: ${end}, text: ${text} )`, err);
     }
   }
 
@@ -748,7 +750,7 @@ export default class WebAudio {
           throw new Error(`Failed to find subtitle variable: ${rule.externalSubVar}.`);
         }
       } catch (err) {
-        logger.error(`[Audio] Error using external subtitles for ${this.siteKey}.`, err);
+        logger.error(`Error using external subtitles for ${this.siteKey}.`, err);
       }
     }
   }
@@ -949,6 +951,7 @@ export default class WebAudio {
           }
           break;
       }
+      logger.debugTime('unmute()');
     }
   }
 

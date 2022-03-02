@@ -732,6 +732,7 @@ export default class OptionPage {
 
   async init(refreshTheme = false) {
     this.cfg = await WebConfig.load();
+    logger.setLevel(this.cfg.loggingLevel);
     this.applyTheme(refreshTheme);
     if (!this.auth) this.auth = new OptionAuth(this, this.cfg.password);
     filter.cfg = this.cfg;
@@ -1878,7 +1879,7 @@ export default class OptionPage {
   }
 }
 
-const logger = new Logger();
+const logger = new Logger('OptionPage');
 const filter = new Filter;
 const option = new OptionPage;
 let lessUsedWords = {};
