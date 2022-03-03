@@ -1066,6 +1066,13 @@ export default class WebAudio {
               }
             } else { // No active cues
               instance.unmute(rule, video);
+
+              if (rule.apfCaptions) {
+                // Remove APF captions because there are no active cues
+                const container = document.getElementById(rule.apfCaptionsSelector);
+                const oldLines = container.querySelector('div.APF-subtitles');
+                if (oldLines) { oldLines.remove(); }
+              }
             }
           };
 
