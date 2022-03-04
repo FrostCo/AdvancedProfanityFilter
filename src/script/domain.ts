@@ -48,9 +48,12 @@ export default class Domain {
   }
 
   static sortedKeys(domains: { [site: string]: DomainCfg }) {
+    const domainRegExp = new RegExp('(\\w+?[.]|)\\w+?$');
     return Object.keys(domains).sort((a, b) => {
-      const domainA = a.match(/\w*\.\w*$/)[0];
-      const domainB = b.match(/\w*\.\w*$/)[0];
+      const domainAMatch = a.match(domainRegExp);
+      const domainBMatch = b.match(domainRegExp);
+      const domainA = domainAMatch ? domainAMatch[0] : a;
+      const domainB = domainBMatch ? domainBMatch[0] : b;
       return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
     });
   }
