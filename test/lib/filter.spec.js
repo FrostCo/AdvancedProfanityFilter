@@ -407,6 +407,15 @@ describe('Filter', () => {
           expect(filter.replaceText('B')).to.equal('[you typed: B]');
         });
 
+        it('Should not preserveCase when false using backreferences in replace', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({ filterMethod: Constants.FILTER_METHODS.SUBSTITUTE, preserveCase: false, words: {} });
+          filter.cfg.words['(a)'] = { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: Constants.FALSE, sub: 'you typed: \\1' };
+          filter.cfg.words['(b)'] = { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: Constants.FALSE, sub: 'you typed: \\1' };
+          filter.init();
+          expect(filter.replaceText('a')).to.equal('you typed: a');
+          expect(filter.replaceText('B')).to.equal('you typed: b');
+        });
       });
 
       describe('whitelist', () => {

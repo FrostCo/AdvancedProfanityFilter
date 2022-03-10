@@ -144,7 +144,10 @@ export default class Filter {
 
             // Support backreferences for REGEX match method (only checks for 1 capture group)
             if (word.matchMethod == Constants.MATCH_METHODS.REGEX && captureGroups.length && word.sub.includes('\\1')) {
-              captureGroups.forEach((captureGroup, i) => { sub = sub.replace(`\\${i + 1}`, captureGroup); });
+              // Use captureGroup.toLowerCase() when not preserving case
+              captureGroups.forEach((captureGroup, i) => {
+                sub = sub.replace(`\\${i + 1}`, this.cfg.preserveCase ? captureGroup : captureGroup.toLowerCase());
+              });
 
               // Only return if something was substituted
               if (sub !== word.sub) {
