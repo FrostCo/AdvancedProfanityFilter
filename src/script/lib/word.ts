@@ -38,7 +38,7 @@ export default class Word {
   }
 
   static capitalizeFirst(string: string): string {
-    return string.charAt(0).toUpperCase() + string.substr(1);
+    return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
   static containsDoubleByte(str): boolean {
