@@ -140,22 +140,27 @@ export default class Filter {
             const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
             if (this.checkWhitelist(match, string, matchStartIndex, word)) { return match; } // Check for whitelisted match
             if (statsType) { this.foundMatch(word, statsType); }
+            let sub = word.sub || this.cfg.defaultSubstitution;
 
             // Support backreferences for REGEX match method (only checks for 1 capture group)
             if (word.matchMethod == Constants.MATCH_METHODS.REGEX && captureGroups.length && word.sub.includes('\\1')) {
-              let sub = word.sub;
-              captureGroups.forEach((captureGroup, i) => { sub = sub.replace(`\\${i + 1}`, captureGroup); });
+              // Use captureGroup.toLowerCase() when not preserving case
+              captureGroups.forEach((captureGroup, i) => {
+                sub = sub.replace(`\\${i + 1}`, this.cfg.preserveCase ? captureGroup : captureGroup.toLowerCase());
+              });
+
+              // Only return if something was substituted
               if (sub !== word.sub) {
-                // Only return if something was substituted
+                if (this.cfg.substitutionMark) {
+                  sub = '[' + sub + ']';
+                }
+
                 return sub;
               }
             }
 
-            // Filter
-            let sub = word.sub || this.cfg.defaultSubstitution;
-
             // Make substitution match case of original match
-            if (!word.case && this.cfg.preserveCase) {
+            if (word.case == Constants.FALSE && this.cfg.preserveCase) {
               if (Word.allUpperCase(match)) {
                 sub = sub.toUpperCase();
               } else if (Word.eachWordCapitalized(match)) {

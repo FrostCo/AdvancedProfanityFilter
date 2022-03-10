@@ -34,11 +34,11 @@ export function formatNumber(number: number): string {
   } else if (length <= 6) { // 1,000 - 999,999
     const n = (number/1000).toPrecision();
     const index = n.indexOf('.');
-    return ((index >= -1 && index <= 1) ? n.substr(0, 3) : n.substr(0, index)) + 'k';
+    return ((index >= -1 && index <= 1) ? n.slice(0, 3) : n.slice(0, index)) + 'k';
   } else if (length <= 9) { // 1,000,000 - 999,999,999
     const n = (number/1000000).toPrecision();
     const index = n.indexOf('.');
-    return ((index >= -1 && index <= 1) ? n.substr(0, 3) : n.substr(0, index)) + 'M';
+    return ((index >= -1 && index <= 1) ? n.slice(0, 3) : n.slice(0, index)) + 'M';
   } else { // >= 1,000,000,000
     return '1G+';
   }
@@ -212,7 +212,7 @@ export function removeFromArray(array: string[], element: string) {
 }
 
 export function secondsToHMS(seconds: number): string {
-  return new Date(seconds * 1000).toISOString().substr(11, 12);
+  return new Date(seconds * 1000).toISOString().slice(11, (11 + 12));
 }
 
 export function stringArray(data: string | string[]): string[] {
