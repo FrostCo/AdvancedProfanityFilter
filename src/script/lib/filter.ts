@@ -160,7 +160,7 @@ export default class Filter {
             }
 
             // Make substitution match case of original match
-            if (!word.case && this.cfg.preserveCase) {
+            if (word.case == Constants.FALSE && this.cfg.preserveCase) {
               if (Word.allUpperCase(match)) {
                 sub = sub.toUpperCase();
               } else if (Word.eachWordCapitalized(match)) {
