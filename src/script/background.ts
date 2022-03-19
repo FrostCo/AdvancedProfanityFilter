@@ -239,6 +239,8 @@ function onMessage(request: Message, sender, sendResponse) {
       }
     }
   }
+
+  sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
 }
 
 async function onStartup() {

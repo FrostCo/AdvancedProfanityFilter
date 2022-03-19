@@ -399,6 +399,7 @@ export default class WebFilter extends Filter {
       if (this.cfg.showSummary && request.popup && (this.counter > 0 || this.mutePage)) {
         chrome.runtime.sendMessage({ mutePage: this.mutePage, summary: this.summary });
       }
+      sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
     });
   }
 

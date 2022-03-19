@@ -263,6 +263,7 @@ chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) =>
       if (sender.tab.id == tabs[0].id) { popup.populateSummary(request.summary); }
     });
   }
+  sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
 });
 
 // Initial data request
