@@ -276,6 +276,24 @@ describe('Filter', () => {
           expect(filter.replaceText('!ANOTHER! so cool!')).to.equal('$ZNOTHER# so cool!');
         });
 
+        it('Begin/end with dashes (-)', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            filterMethod: Constants.FILTER_METHODS.SUBSTITUTE,
+            substitutionMark: false,
+            preserveCase: true,
+            words: {
+              '-this': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE, sub: 'that' },
+              'this-': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'that' },
+              '-this-': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE, sub: 'that' }
+            },
+          });
+          filter.init();
+          expect(filter.replaceText('Can you believe -this?')).to.equal('Can you believe that?');
+          expect(filter.replaceText('So crazy, this- thing')).to.equal('So crazy, that thing');
+          expect(filter.replaceText('What is -this-?!')).to.equal('What is that?!');
+        });
+
         describe('Words and phrases with both case sensitivities', () => {
           const filter = new Filter;
           filter.cfg = new Config({

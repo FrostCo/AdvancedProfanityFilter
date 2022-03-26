@@ -28,6 +28,14 @@ describe('Word', function() {
         expect(word.regExp).to.eql(/(^|\s)(word!)(\s|$)/gi);
       });
 
+      it('should build RegExp with ending dash (-)', function() {
+        const word = new Word('word-', { matchMethod: Constants.MATCH_METHODS.EXACT }, Config._defaults);
+        expect(word.unicode).to.eql(true);
+        expect(word.regExp).to.eql(
+          new RegExp('(^|[\\s.,\'"+!?|-]+)(word-)([\\s.,\'"+!?|-]+|$)', 'giu')
+        );
+      });
+
       it('should build RegExp with matchSeparators and matchRepeated', function() {
         const word = new Word('word', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.TRUE }, Config._defaults);
         expect(word.regExp).to.eql(/\bw+[-_ ]*o+[-_ ]*r+[-_ ]*d+\b/gi);

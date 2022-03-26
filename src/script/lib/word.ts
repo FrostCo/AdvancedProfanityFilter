@@ -60,7 +60,8 @@ export default class Word {
   }
 
   static firstCapitalized(string: string): boolean {
-    return string.charAt(0).toUpperCase() === string.charAt(0);
+    const firstChar = string.charAt(0);
+    return firstChar === firstChar.toUpperCase() && firstChar !== firstChar.toLowerCase();
   }
 
   constructor(word: string, options: WordOptions, cfg: Config) {
@@ -112,6 +113,13 @@ export default class Word {
           return new RegExp(this.value, this.regexOptions());
         case Constants.MATCH_METHODS.EXACT:
         default:
+          // If begins or ends with '-', mark unicode to work around word boundaries
+          if (!this.unicode) {
+            if (this.value[0] == '-' || this.value[this.value.length - 1] == '-') {
+              this.unicode = true;
+            }
+          }
+
           // Match entire word that contains sub-string and surrounding whitespace
           // /\s?\bword\b\s?/gi
           if (this._filterMethod === Constants.FILTER_METHODS.REMOVE) {
