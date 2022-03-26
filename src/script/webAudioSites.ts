@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import Constants from './lib/constants';
 
 export default class WebAudioSites {
