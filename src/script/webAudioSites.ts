@@ -159,6 +159,7 @@ export default class WebAudioSites {
         tagName: 'DIV',
       },
     ],
+    'fxnow.fxnetworks.com': [{ iframe: true, mode: 'cue', videoSelector: 'video' }],
     'play.google.com': [{ className: 'lava-timed-text-window', mode: 'element', subtitleSelector: 'span.lava-timed-text-caption', tagName: 'DIV' }],
     'play.hbomax.com': [{ displayElementLevels: 5, displayVisibility: true, mode: 'watcher', showSubtitles: Constants.SHOW_SUBTITLES.ALL, subtitleSelector: "span[style^='font-family: font']" }],
     'www.hulu.com': [
