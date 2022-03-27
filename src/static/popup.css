@@ -19,6 +19,9 @@ body {
   --background-color: var(--light-light);
   --text-color: var(--light-text);
 }
+#footer {
+  --background-color: var(--light-darker);
+}
 
 /* Dark theme variables */
 body.dark {
