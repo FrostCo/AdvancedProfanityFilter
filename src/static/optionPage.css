@@ -29,6 +29,12 @@ body {
   --background-color: var(--light-light);
   --text-color: var(--light-text);
 }
+div#page {
+  --background-color: var(--light-dark);
+}
+div.w3-modal.light > div {
+  --background-color: var(--light-dark);
+}
 
 /* Dark theme variables */
 body.dark {
