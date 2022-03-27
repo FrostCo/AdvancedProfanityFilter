@@ -27,10 +27,6 @@ body.dark {
 }
 #footer.dark {
   --background-color: var(--dark-dark);
-  /* --text-color: var(--dark-text); */
-}
-#footer.dark a {
-  --text-color: var(--dark-text);
 }
 
 /* Adjust variables based on system preference */
@@ -42,10 +38,6 @@ body.dark {
   }
   #footer {
     --background-color: var(--dark-dark);
-    /* --text-color: var(--dark-text); */
-  }
-  #footer a {
-    --text-color: var(--dark-text);
   }
 
   /* Light theme */
@@ -55,10 +47,6 @@ body.dark {
   }
   #footer.light {
     --background-color: var(--light-darker);
-    --text-color: var(--light-text);
-  }
-  #footer.light a {
-    --text-color: var(--light-text);
   }
 }
 /* #endregion */
