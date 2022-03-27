@@ -33,7 +33,7 @@ body {
 /* Dark theme variables */
 body.dark {
   --background-color: var(--dark-light);
-  --text-color: var(--light-light);
+  --text-color: var(--dark-text);
 }
 div#page.dark {
   --background-color: var(--dark-dark);
