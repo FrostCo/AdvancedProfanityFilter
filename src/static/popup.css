@@ -61,8 +61,15 @@ body {
   height: 100%;
   max-height: 600px;
   background-color: var(--background-color);
+  color: var(--text-color);
   padding: 0;
   margin: auto;
+}
+
+select {
+  /* Needed for Safari */
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 #footer {
