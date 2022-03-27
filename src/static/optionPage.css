@@ -58,7 +58,7 @@ div.w3-modal.dark > div {
 
   /* Light theme */
   body.light {
-    --background-color: var(--light-dark);
+    --background-color: var(--light-light);
     --text-color: var(--light-text);
   }
   div#page.light {
