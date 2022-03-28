@@ -29,11 +29,17 @@ body {
   --background-color: var(--light-light);
   --text-color: var(--light-text);
 }
+div#page {
+  --background-color: var(--light-dark);
+}
+div.w3-modal.light > div {
+  --background-color: var(--light-dark);
+}
 
 /* Dark theme variables */
 body.dark {
   --background-color: var(--dark-light);
-  --text-color: var(--light-light);
+  --text-color: var(--dark-text);
 }
 div#page.dark {
   --background-color: var(--dark-dark);
@@ -58,7 +64,7 @@ div.w3-modal.dark > div {
 
   /* Light theme */
   body.light {
-    --background-color: var(--light-dark);
+    --background-color: var(--light-light);
     --text-color: var(--light-text);
   }
   div#page.light {
