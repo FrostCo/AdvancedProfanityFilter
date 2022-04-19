@@ -124,6 +124,17 @@ function safariBuild() {
   removeOptionPageBookmarklet();
   removeOptionPageDonations();
   removeFiles(files);
+  updateSafariXcodeVersion();
+}
+
+function updateSafariXcodeVersion() {
+  const projectFilePath = path.join('safari', 'Advanced Profanity Filter.xcodeproj', 'project.pbxproj');
+  const projectFileText = fse.readFileSync(projectFilePath).toString();
+  const updatedProjectFileText = projectFileText.replace(/MARKETING_VERSION = \d+\.\d+\.\d+;$/gm, `MARKETING_VERSION = ${buildData.version};`);
+  if (projectFileText !== updatedProjectFileText) {
+    console.log('Updating Xcode project version...');
+    fse.writeFileSync(projectFilePath, updatedProjectFileText);
+  }
 }
 
 main();
