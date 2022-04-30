@@ -2,7 +2,17 @@ import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
-import { getGlobalVariable, getGlobalVariableFromBackground, getParent, hmsToSeconds, makeRequest, makeBackgroundRequest, secondsToHMS } from './lib/helper';
+import {
+  getElement,
+  getElements,
+  getGlobalVariable,
+  getGlobalVariableFromBackground,
+  getParent,
+  hmsToSeconds,
+  makeBackgroundRequest,
+  makeRequest,
+  secondsToHMS,
+} from './lib/helper';
 import Logger from './lib/logger';
 import WebConfig from './webConfig';
 const logger = new Logger('WebAudio');
@@ -316,7 +326,7 @@ export default class WebAudio {
     } else if (rule.displaySelector) {
       const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
-        const container = root.querySelector(rule.displaySelector) as HTMLElement;
+        const container = getElement(rule.displaySelector, root);
         if (container) {
           // Save the original display style if none was included in the rule
           if (
@@ -835,7 +845,7 @@ export default class WebAudio {
     } else if (rule.displaySelector) {
       const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
-        const container = root.querySelector(rule.displaySelector);
+        const container = getElement(rule.displaySelector, root);
         if (container) { container.style.setProperty('display', rule.displayShow); }
       }
     }
@@ -897,9 +907,9 @@ export default class WebAudio {
           }
           break;
         case 'watcher':
-          if (node.parentElement && node.parentElement == document.querySelector(rule.subtitleSelector)) { return ruleId; }
+          if (node.parentElement && node.parentElement == getElement(rule.subtitleSelector)) { return ruleId; }
           if (rule.parentSelector != null) {
-            const parent = document.querySelector(rule.parentSelector);
+            const parent = getElement(rule.parentSelector);
             if (parent && parent.contains(node)) { return ruleId; }
           }
           break;
@@ -957,7 +967,7 @@ export default class WebAudio {
 
   watcher(instance: WebAudio, ruleId = 0) {
     const rule = instance.rules[ruleId];
-    const video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
+    const video = getElement(rule.videoSelector) as HTMLVideoElement;
 
     if (video && instance.playing(video)) {
       if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
@@ -992,7 +1002,7 @@ export default class WebAudio {
           instance.watcherSimpleUnmute(rule, video);
         }
       } else if (rule.subtitleSelector) { // Working on: HBO max (1/13/2022)
-        captions = Array.from(document.querySelectorAll(rule.subtitleSelector)) as HTMLElement[];
+        captions = getElements(rule.subtitleSelector);
         if (captions && captions.length) {
           if (rule.displayVisibility && (!rule._displayElement || !document.body.contains(rule._displayElement))) {
             rule._displayElement = getParent(captions[0], rule.displayElementLevels);

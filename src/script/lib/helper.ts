@@ -44,6 +44,69 @@ export function formatNumber(number: number): string {
   }
 }
 
+// Returns the element found by selector string
+//   Supports querying through a shadow DOM using '>>>'
+export function getElement(selector: string, root: Document | ShadowRoot | HTMLElement = document): HTMLElement {
+  let element;
+  const selectors = selector.split('>>>');
+
+  // No shadowRoot in selector: return native querySelector
+  if (selectors.length == 1) {
+    return root.querySelector(selector);
+  }
+
+  // shadowRoot in selector: return querySelector through shadowRoot(s)
+  while (selectors.length) {
+    if (root) {
+      element = root.querySelector(selectors.shift().trim());
+
+      if (element) {
+        if (selectors.length == 0) {
+          return element;
+        } else {
+          root = element.shadowRoot;
+        }
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+}
+
+// Returns the elements found by selector string
+//   Supports querying through a shadow DOM using '>>>'
+export function getElements(selector: string, root: Document | HTMLElement | ShadowRoot  = document): NodeListOf<HTMLElement> {
+  let element;
+  const selectors = selector.split('>>>');
+
+  // No shadowRoot in selector: return native querySelectorAll
+  if (selectors.length == 1) {
+    return root.querySelectorAll(selector);
+  }
+
+  // shadowRoot in selector: return querySelectorAll through shadowRoot(s)
+  while (selectors.length) {
+    if (root) {
+      const currentSelector = selectors.shift().trim();
+
+      if (selectors.length == 0) {
+        return root.querySelectorAll(currentSelector);
+      } else {
+        element = root.querySelector(currentSelector);
+        if (element) {
+          root = element.shadowRoot;
+        } else {
+          return null;
+        }
+      }
+    } else {
+      return null;
+    }
+  }
+}
+
 export function getGlobalVariable(code: string, id: string = 'APFData') {
   const script = document.createElement('script');
   script.id = id;
