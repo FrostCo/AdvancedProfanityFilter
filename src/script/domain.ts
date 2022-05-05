@@ -47,15 +47,42 @@ export default class Domain {
     });
   }
 
-  static sortedKeys(domains: { [site: string]: DomainCfg }) {
-    const domainRegExp = new RegExp('(\\w+?[.]|)\\w+?$');
+  static sortedKeys(domains: { [site: string]: any }) {
     return Object.keys(domains).sort((a, b) => {
-      const domainAMatch = a.match(domainRegExp);
-      const domainBMatch = b.match(domainRegExp);
-      const domainA = domainAMatch ? domainAMatch[0] : a;
-      const domainB = domainBMatch ? domainBMatch[0] : b;
+      const domainA = Domain.sortingKey(a);
+      const domainB = Domain.sortingKey(b);
+      if (domainA == domainB) {
+        // Same domain, sort using full domain
+        return a < b ? -1 : a > b ? 1 : 0;
+      }
       return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
     });
+  }
+
+  static sortingKey(domain: string) {
+    const split = domain.split('.');
+
+    switch (split.length) {
+      case 1:
+      case 2:
+        return split[0];
+      case 3:
+        return split[1];
+      case 4:
+        // IP Address/number
+        if (split[1].match(/^\d+$/)) {
+          return domain;
+        }
+
+        // When 2 character TLD
+        if (split[3].length) {
+          return split[1];
+        }
+
+        return split[2];
+      default:
+        return split[2];
+    }
   }
 
   constructor(key: string, domainCfg?: DomainCfg) {

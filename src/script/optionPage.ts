@@ -1722,12 +1722,7 @@ export default class OptionPage {
     const select = contentLeft.querySelector('#siteSelect') as HTMLSelectElement;
     removeChildren(select);
 
-    const sortedSites = Object.keys(WebAudioSites.sites).sort((a, b) => {
-      const domainA = a.match(/\w*\.\w*$/)[0];
-      const domainB = b.match(/\w*\.\w*$/)[0];
-      return domainA < domainB ? -1 : domainA > domainB ? 1 : 0;
-    });
-
+    const sortedSites = Domain.sortedKeys(WebAudioSites.sites);
     sortedSites.forEach((site) => {
       const optionElement = document.createElement('option');
       optionElement.value = site;
