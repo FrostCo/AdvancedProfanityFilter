@@ -174,7 +174,7 @@ export default class WebAudioSites {
       { mode: 'cue', videoCueLanguage: 'en' },
     ],
     'www.netflix.com': [
-      { className: 'player-timedtext-text-container', mode: 'element', subtitleSelector: 'span > span', tagName: 'DIV' },
+      { className: 'player-timedtext-text-container', mode: 'element', note: 'Fallback compatibility', subtitleSelector: 'span > span', tagName: 'DIV' },
       { className: 'player-timedtext-text-container', mode: 'element', subtitleSelector: 'span', tagName: 'DIV' },
     ],
     'www.paramountplus.com': [{ mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false }],
