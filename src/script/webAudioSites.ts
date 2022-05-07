@@ -163,6 +163,7 @@ export default class WebAudioSites {
     'fxnow.fxnetworks.com': [{ iframe: true, mode: 'cue', videoSelector: 'video' }],
     'play.google.com': [{ className: 'lava-timed-text-window', mode: 'element', subtitleSelector: 'span.lava-timed-text-caption', tagName: 'DIV' }],
     'play.hbomax.com': [{ displayElementLevels: 5, displayVisibility: true, mode: 'watcher', showSubtitles: Constants.SHOW_SUBTITLES.ALL, subtitleSelector: "span[style^='font-family: font']" }],
+    'www.hidive.com': [{ className: 'rmp-cc-container', mode: 'element', subtitleSelector: 'div.rmp-cc-cue > span', tagName: 'DIV' }],
     'www.hulu.com': [
       { className: 'caption-text-box', displaySelector: 'div.caption-text-box', mode: 'element', subtitleSelector: 'p', tagName: 'DIV' },
       { displaySelector: 'div.CaptionBox', mode: 'elementChild', parentSelector: 'div.CaptionBox', tagName: 'P' }
