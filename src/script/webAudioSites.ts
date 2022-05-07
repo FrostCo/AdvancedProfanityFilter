@@ -163,6 +163,7 @@ export default class WebAudioSites {
     'fxnow.fxnetworks.com': [{ iframe: true, mode: 'cue', videoSelector: 'video' }],
     'play.google.com': [{ className: 'lava-timed-text-window', mode: 'element', subtitleSelector: 'span.lava-timed-text-caption', tagName: 'DIV' }],
     'play.hbomax.com': [{ displayElementLevels: 5, displayVisibility: true, mode: 'watcher', showSubtitles: Constants.SHOW_SUBTITLES.ALL, subtitleSelector: "span[style^='font-family: font']" }],
+    'www.hidive.com': [{ className: 'rmp-cc-container', mode: 'element', subtitleSelector: 'div.rmp-cc-cue > span', tagName: 'DIV' }],
     'www.hulu.com': [
       { className: 'caption-text-box', displaySelector: 'div.caption-text-box', mode: 'element', subtitleSelector: 'p', tagName: 'DIV' },
       { displaySelector: 'div.CaptionBox', mode: 'elementChild', parentSelector: 'div.CaptionBox', tagName: 'P' }
@@ -173,7 +174,7 @@ export default class WebAudioSites {
       { mode: 'cue', videoCueLanguage: 'en' },
     ],
     'www.netflix.com': [
-      { className: 'player-timedtext-text-container', mode: 'element', subtitleSelector: 'span > span', tagName: 'DIV' },
+      { className: 'player-timedtext-text-container', mode: 'element', note: 'Fallback compatibility', subtitleSelector: 'span > span', tagName: 'DIV' },
       { className: 'player-timedtext-text-container', mode: 'element', subtitleSelector: 'span', tagName: 'DIV' },
     ],
     'www.paramountplus.com': [{ mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false }],
@@ -206,6 +207,7 @@ export default class WebAudioSites {
     'www.sbs.com.au': [{ className: 'bmpui-subtitle-region-container', mode: 'element', subtitleSelector: 'DIV.bmpui-container-wrapper > SPAN.bmpui-ui-subtitle-label > SPAN', tagName: 'DIV' }],
     'www.showmax.com': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.contentWrapper > div.subtitles--3EXhT', simpleUnmute: true, tagName: '#text' }],
     'www.showtime.com': [{ mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false }],
+    'watch.sling.com': [{ className: 'bmpui-subtitle-region-container', mode: 'element', subtitleSelector: 'DIV.bmpui-container-wrapper > SPAN.bmpui-ui-subtitle-label', tagName: 'DIV' }],
     'play.stan.com.au': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'www.starz.com': [{ mode: 'elementChild', parentSelector: 'starz-captions > div.cue-list', tagName: 'SPAN' }],
     'www.syfy.com': [{ className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
@@ -213,6 +215,8 @@ export default class WebAudioSites {
     'tubitv.com': [{ mode: 'elementChild', parentSelector: 'div#captionsComponent', tagName: 'SPAN' }],
     'www.universalkids.com': [{ mode: 'element', subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' }],
     'www.usanetwork.com': [{ className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
+    'vimeo.com': [{ mode: 'element', tagName: 'SPAN', note: 'Only tested with single-line captions', className: 'vp-captions-line', displaySelector: 'div.vp-captions > span.vp-captions-window' }],
+    'player.vimeo.com': [{ mode: 'element', tagName: 'SPAN', note: 'For embedded videos', className: 'vp-captions-line', displaySelector: 'div.vp-captions > span.vp-captions-window' }],
     'www.vudu.com': [{ mode: 'element', subtitleSelector: 'span.subtitles', tagName: 'DIV' }],
     'vrv.co': [
       { displaySelector: 'div.libassjs-canvas-parent', externalSub: true, externalSubVar: 'window.vilos.content.captions', iframe: true, mode: 'cue', videoCueLanguage: 'en-US', videoCueRequireShowing: false },
