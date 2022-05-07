@@ -1989,5 +1989,7 @@ document.getElementById('collectStats').addEventListener('click', (evt) => { opt
 document.getElementById('statsReset').addEventListener('click', (evt) => { option.confirm('statsReset'); });
 document.getElementById('lessUsedWordsNumber').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
 document.getElementById('removeLessUsedWords').addEventListener('click', (evt) => { option.confirm('removeLessUsedWords'); });
+// Help
+document.querySelectorAll('div#helpContainer a').forEach((anchor) => { anchor.setAttribute('target', '_blank'); });
 // Other
 document.getElementsByClassName('themes')[0].addEventListener('click', (evt) => { option.toggleTheme(); });
