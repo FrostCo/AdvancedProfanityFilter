@@ -215,6 +215,8 @@ export default class WebAudioSites {
     'tubitv.com': [{ mode: 'elementChild', parentSelector: 'div#captionsComponent', tagName: 'SPAN' }],
     'www.universalkids.com': [{ mode: 'element', subtitleSelector: 'div.gwt-HTML', tagName: 'DIV' }],
     'www.usanetwork.com': [{ className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
+    'vimeo.com': [{ mode: 'element', tagName: 'SPAN', note: 'Only tested with single-line captions', className: 'vp-captions-line', displaySelector: 'div.vp-captions > span.vp-captions-window' }],
+    'player.vimeo.com': [{ mode: 'element', tagName: 'SPAN', note: 'For embedded videos', className: 'vp-captions-line', displaySelector: 'div.vp-captions > span.vp-captions-window' }],
     'www.vudu.com': [{ mode: 'element', subtitleSelector: 'span.subtitles', tagName: 'DIV' }],
     'vrv.co': [
       { displaySelector: 'div.libassjs-canvas-parent', externalSub: true, externalSubVar: 'window.vilos.content.captions', iframe: true, mode: 'cue', videoCueLanguage: 'en-US', videoCueRequireShowing: false },
