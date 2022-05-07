@@ -207,6 +207,7 @@ export default class WebAudioSites {
     'www.sbs.com.au': [{ className: 'bmpui-subtitle-region-container', mode: 'element', subtitleSelector: 'DIV.bmpui-container-wrapper > SPAN.bmpui-ui-subtitle-label > SPAN', tagName: 'DIV' }],
     'www.showmax.com': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.contentWrapper > div.subtitles--3EXhT', simpleUnmute: true, tagName: '#text' }],
     'www.showtime.com': [{ mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false }],
+    'watch.sling.com': [{ className: 'bmpui-subtitle-region-container', mode: 'element', subtitleSelector: 'DIV.bmpui-container-wrapper > SPAN.bmpui-ui-subtitle-label', tagName: 'DIV' }],
     'play.stan.com.au': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
     'www.starz.com': [{ mode: 'elementChild', parentSelector: 'starz-captions > div.cue-list', tagName: 'SPAN' }],
     'www.syfy.com': [{ className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
