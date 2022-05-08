@@ -353,7 +353,6 @@ export default class WebAudio {
 
   initCueRule(rule: AudioRule) {
     if (rule.apfCaptions === true) { rule.videoCueHideCues = true; }
-    if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.defaultVideoSelector; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
     if (rule.externalSub) {
       if (rule.externalSubTrackMode === undefined) { rule.externalSubTrackMode = 'showing'; }
@@ -418,6 +417,7 @@ export default class WebAudio {
       // Setup rule defaults
       if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
       if (this.filter.filterText == false) { rule.filterSubtitles = false; }
+      if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.defaultVideoSelector; }
       this.initDisplaySelector(rule);
 
       // Allow rules to override global settings
@@ -470,7 +470,6 @@ export default class WebAudio {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
     if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
     if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
-    if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.defaultVideoSelector; }
   }
 
   initYouTube() {
@@ -505,12 +504,12 @@ export default class WebAudio {
           chrome.runtime.sendMessage({ mute: true });
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
-          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
+          if (!video) { video = document.querySelector(rule.videoSelector) as HTMLVideoElement; }
           if (video && !video.muted) { video.muted = true; } // TODO: Do I need this?
           if (this.fillerAudio) { this.playFillerAudio(video); }
           break;
         case Constants.MUTE_METHODS.VIDEO_VOLUME:
-          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
+          if (!video) { video = document.querySelector(rule.videoSelector) as HTMLVideoElement; }
           if (video && video.volume != null) {
             this.volume = video.volume; // Save original volume
             video.volume = 0;
@@ -952,12 +951,12 @@ export default class WebAudio {
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
           if (this.fillerAudio) { this.stopFillerAudio(); }
-          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
+          if (!video) { video = document.querySelector(rule.videoSelector) as HTMLVideoElement; }
           if (video && video.muted) { video.muted = false; }
           break;
         case Constants.MUTE_METHODS.VIDEO_VOLUME:
           if (this.fillerAudio) { this.stopFillerAudio(); }
-          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
+          if (!video) { video = document.querySelector(rule.videoSelector) as HTMLVideoElement; }
           if (video && video.volume != null) {
             video.volume = this.volume;
           }
