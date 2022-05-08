@@ -505,7 +505,7 @@ export default class WebAudio {
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
           if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
-          if (video && !video.muted) { video.muted = true; } // TODO: Do I need this?
+          if (video && !video.muted) { video.muted = true; }
           if (this.fillerAudio) { this.playFillerAudio(video); }
           break;
         case Constants.MUTE_METHODS.VIDEO_VOLUME:
