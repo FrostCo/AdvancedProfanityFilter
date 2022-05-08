@@ -504,12 +504,12 @@ export default class WebAudio {
           chrome.runtime.sendMessage({ mute: true });
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
-          if (!video) { video = document.querySelector(rule.videoSelector) as HTMLVideoElement; }
+          if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
           if (video && !video.muted) { video.muted = true; } // TODO: Do I need this?
           if (this.fillerAudio) { this.playFillerAudio(video); }
           break;
         case Constants.MUTE_METHODS.VIDEO_VOLUME:
-          if (!video) { video = document.querySelector(rule.videoSelector) as HTMLVideoElement; }
+          if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
           if (video && video.volume != null) {
             this.volume = video.volume; // Save original volume
             video.volume = 0;
@@ -951,12 +951,12 @@ export default class WebAudio {
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
           if (this.fillerAudio) { this.stopFillerAudio(); }
-          if (!video) { video = document.querySelector(rule.videoSelector) as HTMLVideoElement; }
+          if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
           if (video && video.muted) { video.muted = false; }
           break;
         case Constants.MUTE_METHODS.VIDEO_VOLUME:
           if (this.fillerAudio) { this.stopFillerAudio(); }
-          if (!video) { video = document.querySelector(rule.videoSelector) as HTMLVideoElement; }
+          if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
           if (video && video.volume != null) {
             video.volume = this.volume;
           }
