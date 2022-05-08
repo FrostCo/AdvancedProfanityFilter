@@ -907,7 +907,9 @@ export default class WebAudio {
           }
           break;
         case 'watcher':
-          if (node.parentElement && node.parentElement == getElement(rule.subtitleSelector)) { return ruleId; }
+          if (rule.subtitleSelector != null && node.parentElement && node.parentElement == getElement(rule.subtitleSelector)) {
+            return ruleId;
+          }
           if (rule.parentSelector != null) {
             const parent = getElement(rule.parentSelector);
             if (parent && parent.contains(node)) { return ruleId; }
@@ -1002,8 +1004,9 @@ export default class WebAudio {
           instance.watcherSimpleUnmute(rule, video);
         }
       } else if (rule.subtitleSelector) { // Working on: HBO max (1/13/2022)
-        captions = getElements(rule.subtitleSelector);
+        captions = Array.from(getElements(rule.subtitleSelector));
         if (captions && captions.length) {
+          logger.debug('[Watcher] Found captions to process', captions);
           if (rule.displayVisibility && (!rule._displayElement || !document.body.contains(rule._displayElement))) {
             rule._displayElement = getParent(captions[0], rule.displayElementLevels);
           }
@@ -1026,7 +1029,7 @@ export default class WebAudio {
   watchForVideo(instance: WebAudio) {
     for (let x = 0; x < instance.cueRuleIds.length; x++) {
       const rule = instance.rules[x] as AudioRule;
-      const video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
+      const video = getElement(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
         if (rule.externalSub) { instance.processExternalSub(video, rule); }
         const textTrack = instance.getVideoTextTrack(video.textTracks, rule);
