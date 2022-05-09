@@ -1005,7 +1005,6 @@ export default class WebAudio {
       } else if (rule.subtitleSelector) { // Working on: HBO max (1/13/2022)
         captions = Array.from(getElements(rule.subtitleSelector));
         if (captions && captions.length) {
-          logger.debug('[Watcher] Found captions to process', captions);
           if (rule.displayVisibility && (!rule._displayElement || !document.body.contains(rule._displayElement))) {
             rule._displayElement = getParent(captions[0], rule.displayElementLevels);
           }

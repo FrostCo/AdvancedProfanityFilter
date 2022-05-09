@@ -90,7 +90,7 @@ export default class WebAudioSites {
         mode: 'watcher',
         subtitleSelector: 'smp-toucan-player >>> smp-video-layout >>> smp-subtitles >>> div[lang] p span span',
         videoSelector: 'smp-toucan-player >>> smp-playback >>> video'
-      }
+      },
     ],
     'www.britbox.com': [
       { className: 'bmpui-ui-subtitle-label', mode: 'element', tagName: 'SPAN' },
