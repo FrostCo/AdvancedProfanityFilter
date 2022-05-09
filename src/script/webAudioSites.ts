@@ -83,7 +83,15 @@ export default class WebAudioSites {
     ],
     'www.att.tv': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
     'www.attwatchtv.com': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
-    'www.bbc.co.uk': [{ mode: 'element', subtitleSelector: 'div.p_cueDirUniWrapper span', tagName: 'div' }],
+    'www.bbc.co.uk': [
+      {
+        displaySelector: 'smp-toucan-player >>> smp-video-layout >>> smp-subtitles >>> div',
+        iframe: false,
+        mode: 'watcher',
+        subtitleSelector: 'smp-toucan-player >>> smp-video-layout >>> smp-subtitles >>> div[lang] p span span',
+        videoSelector: 'smp-toucan-player >>> smp-playback >>> video'
+      },
+    ],
     'www.britbox.com': [
       { className: 'bmpui-ui-subtitle-label', mode: 'element', tagName: 'SPAN' },
       { className: 'bmpui-subtitle-region-container', mode: 'element', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' },

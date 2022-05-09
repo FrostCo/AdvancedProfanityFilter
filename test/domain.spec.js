@@ -3,10 +3,13 @@ import Domain from './built/domain';
 import WebConfig from './built/webConfig';
 
 const domains = {
+  '192.168.0.1': { disabled: false },
   'another.com': { adv: true },
   'a.example.com': { enabled: true },
   'www.example.com': { disabled: true },
-  'abc.zoo.edu': { disabled: true }
+  'www.example.co.uk': { disabled: true },
+  'localhost': { disabled: false },
+  'abc.zoo.edu': { disabled: true },
 };
 
 describe('Domain', function() {
@@ -99,7 +102,15 @@ describe('Domain', function() {
   describe('.sortedKeys()', function() {
     const cfg = new WebConfig({ domains: domains });
     it('should sort domains by parent', function() {
-      expect(Domain.sortedKeys(cfg.domains)).to.eql(['another.com', 'a.example.com', 'www.example.com', 'abc.zoo.edu']);
+      expect(Domain.sortedKeys(cfg.domains)).to.eql([
+        '192.168.0.1',
+        'another.com',
+        'a.example.com',
+        'www.example.co.uk',
+        'www.example.com',
+        'localhost',
+        'abc.zoo.edu',
+      ]);
     });
   });
 

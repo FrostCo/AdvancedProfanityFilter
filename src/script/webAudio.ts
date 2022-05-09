@@ -2,7 +2,17 @@ import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
 import WebAudioSites from './webAudioSites';
-import { getGlobalVariable, getGlobalVariableFromBackground, getParent, hmsToSeconds, makeRequest, makeBackgroundRequest, secondsToHMS } from './lib/helper';
+import {
+  getElement,
+  getElements,
+  getGlobalVariable,
+  getGlobalVariableFromBackground,
+  getParent,
+  hmsToSeconds,
+  makeBackgroundRequest,
+  makeRequest,
+  secondsToHMS,
+} from './lib/helper';
 import Logger from './lib/logger';
 import WebConfig from './webConfig';
 const logger = new Logger('WebAudio');
@@ -316,7 +326,7 @@ export default class WebAudio {
     } else if (rule.displaySelector) {
       const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
-        const container = root.querySelector(rule.displaySelector) as HTMLElement;
+        const container = getElement(rule.displaySelector, root);
         if (container) {
           // Save the original display style if none was included in the rule
           if (
@@ -343,7 +353,6 @@ export default class WebAudio {
 
   initCueRule(rule: AudioRule) {
     if (rule.apfCaptions === true) { rule.videoCueHideCues = true; }
-    if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.defaultVideoSelector; }
     if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
     if (rule.externalSub) {
       if (rule.externalSubTrackMode === undefined) { rule.externalSubTrackMode = 'showing'; }
@@ -408,6 +417,7 @@ export default class WebAudio {
       // Setup rule defaults
       if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
       if (this.filter.filterText == false) { rule.filterSubtitles = false; }
+      if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.defaultVideoSelector; }
       this.initDisplaySelector(rule);
 
       // Allow rules to override global settings
@@ -460,7 +470,6 @@ export default class WebAudio {
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
     if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
     if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
-    if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.defaultVideoSelector; }
   }
 
   initYouTube() {
@@ -495,12 +504,12 @@ export default class WebAudio {
           chrome.runtime.sendMessage({ mute: true });
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
-          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
-          if (video && !video.muted) { video.muted = true; } // TODO: Do I need this?
+          if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
+          if (video && !video.muted) { video.muted = true; }
           if (this.fillerAudio) { this.playFillerAudio(video); }
           break;
         case Constants.MUTE_METHODS.VIDEO_VOLUME:
-          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
+          if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
           if (video && video.volume != null) {
             this.volume = video.volume; // Save original volume
             video.volume = 0;
@@ -835,7 +844,7 @@ export default class WebAudio {
     } else if (rule.displaySelector) {
       const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
-        const container = root.querySelector(rule.displaySelector);
+        const container = getElement(rule.displaySelector, root);
         if (container) { container.style.setProperty('display', rule.displayShow); }
       }
     }
@@ -897,9 +906,11 @@ export default class WebAudio {
           }
           break;
         case 'watcher':
-          if (node.parentElement && node.parentElement == document.querySelector(rule.subtitleSelector)) { return ruleId; }
+          if (rule.subtitleSelector != null && node.parentElement && node.parentElement == getElement(rule.subtitleSelector)) {
+            return ruleId;
+          }
           if (rule.parentSelector != null) {
-            const parent = document.querySelector(rule.parentSelector);
+            const parent = getElement(rule.parentSelector);
             if (parent && parent.contains(node)) { return ruleId; }
           }
           break;
@@ -940,12 +951,12 @@ export default class WebAudio {
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
           if (this.fillerAudio) { this.stopFillerAudio(); }
-          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
+          if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
           if (video && video.muted) { video.muted = false; }
           break;
         case Constants.MUTE_METHODS.VIDEO_VOLUME:
           if (this.fillerAudio) { this.stopFillerAudio(); }
-          if (!video) { video = document.querySelector(rule && rule.videoSelector ? rule.videoSelector : WebAudio.defaultVideoSelector); }
+          if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
           if (video && video.volume != null) {
             video.volume = this.volume;
           }
@@ -957,7 +968,7 @@ export default class WebAudio {
 
   watcher(instance: WebAudio, ruleId = 0) {
     const rule = instance.rules[ruleId];
-    const video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
+    const video = getElement(rule.videoSelector) as HTMLVideoElement;
 
     if (video && instance.playing(video)) {
       if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
@@ -992,7 +1003,7 @@ export default class WebAudio {
           instance.watcherSimpleUnmute(rule, video);
         }
       } else if (rule.subtitleSelector) { // Working on: HBO max (1/13/2022)
-        captions = Array.from(document.querySelectorAll(rule.subtitleSelector)) as HTMLElement[];
+        captions = Array.from(getElements(rule.subtitleSelector));
         if (captions && captions.length) {
           if (rule.displayVisibility && (!rule._displayElement || !document.body.contains(rule._displayElement))) {
             rule._displayElement = getParent(captions[0], rule.displayElementLevels);
@@ -1016,7 +1027,7 @@ export default class WebAudio {
   watchForVideo(instance: WebAudio) {
     for (let x = 0; x < instance.cueRuleIds.length; x++) {
       const rule = instance.rules[x] as AudioRule;
-      const video = document.querySelector(rule.videoSelector) as HTMLVideoElement;
+      const video = getElement(rule.videoSelector) as HTMLVideoElement;
       if (video && video.textTracks && instance.playing(video)) {
         if (rule.externalSub) { instance.processExternalSub(video, rule); }
         const textTrack = instance.getVideoTextTrack(video.textTracks, rule);
