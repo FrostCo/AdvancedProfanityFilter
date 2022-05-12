@@ -4,6 +4,10 @@ export function booleanToNumber(value: boolean): number {
   return value ? Constants.TRUE : Constants.FALSE;
 }
 
+export function cloneWithJSON(object) {
+  return JSON.parse(JSON.stringify(object));
+}
+
 /* istanbul ignore next */
 export function dynamicList(list: string[], select: HTMLSelectElement, upperCaseFirstChar: boolean = false, title?: string) {
   removeChildren(select);
