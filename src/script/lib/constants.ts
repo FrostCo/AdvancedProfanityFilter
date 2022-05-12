@@ -4,6 +4,10 @@ import { upperCaseFirst } from './helper';
 export default class Constants {
   // Named Constants
   static readonly ALL_WORDS_WORDLIST_ID = 0;
+  static readonly BUILD_TARGET_BOOKMARKLET = 'bookmarklet';
+  static readonly BUILD_TARGET_CHROME = 'chrome';
+  static readonly BUILD_TARGET_FIREFOX = 'firefox';
+  static readonly BUILD_TARGET_SAFARI = 'safari';
   static readonly DOMAIN_MODES = { NORMAL: 0, ADVANCED: 1, DEEP: 2 };
   static readonly FALSE = 0;
   static readonly FILTER_METHODS = { CENSOR: 0, SUBSTITUTE: 1, REMOVE: 2, OFF: 3 };
