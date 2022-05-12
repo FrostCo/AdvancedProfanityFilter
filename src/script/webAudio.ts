@@ -1,7 +1,7 @@
 import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
-import WebAudioSites from './webAudioSites';
+import { defaultTargetConfig, supportedSites } from './webAudioSites';
 import {
   getElement,
   getElements,
@@ -67,6 +67,24 @@ export default class WebAudio {
     videoCueLanguage: 'language',
   };
 
+  static getBuildTargetConfig(buildTarget: string) {
+    switch (buildTarget) {
+      default:
+        return defaultTargetConfig;
+    }
+  }
+
+  static supportedSites(buildTarget: string): AudioSites {
+    const buildTargetConfig = WebAudio.getBuildTargetConfig(buildTarget);
+    const siteConfig = Object.assign({}, supportedSites, buildTargetConfig.sites);
+    buildTargetConfig.disabledSites.forEach((disabledSite) => { delete siteConfig[disabledSite]; });
+    return siteConfig;
+  }
+
+  static supportedAndCustomSites(buildTarget: string, customConfig: AudioSites) {
+    return Object.assign({}, WebAudio.supportedSites(buildTarget), customConfig);
+  }
+
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.filter = filter;
     logger.setLevel(this.filter.cfg.loggingLevel);
@@ -84,7 +102,7 @@ export default class WebAudio {
     ) {
       filter.cfg.customAudioSites = {};
     }
-    this.sites = WebAudioSites.combineSites(filter.cfg.customAudioSites);
+    this.sites = WebAudio.supportedAndCustomSites(WebConfig.BUILD.target, filter.cfg.customAudioSites);
     this.volume = 1;
     this.wordlistId = filter.audioWordlistId;
     this.youTubeAutoSubsMax = filter.cfg.youTubeAutoSubsMax * 1000;

@@ -64,6 +64,11 @@ interface BackgroundStorage {
   };
 }
 
+interface BuildTargetSites {
+  disabledSites: string[];
+  sites: AudioSites;
+}
+
 interface ConfirmModalSettings {
   backup?: boolean;
   content?: string;
