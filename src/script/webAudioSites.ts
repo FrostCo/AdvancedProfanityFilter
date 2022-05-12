@@ -6,6 +6,11 @@ export const defaultTargetConfig: BuildTargetSites = {
   disabledSites: [],
 };
 
+export const safariTargetConfig: BuildTargetSites = {
+  sites: {},
+  disabledSites: [],
+};
+
 export const supportedSites: AudioSites = {
   'abc.com': [
     { className: 'akamai-caption-text', mode: 'element', tagName: 'DIV' },
