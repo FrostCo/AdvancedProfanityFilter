@@ -50,6 +50,10 @@ interface AudioRule {
   videoSelector?: string;                        // [Cue,Watcher] Selector for video, also used for volume muteMethod (Default: 'video')
 }
 
+interface AudioSites {
+  [site: string]: AudioRule[];
+}
+
 interface BackgroundData {
   disabledTab?: boolean;
 }

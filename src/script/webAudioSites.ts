@@ -2,11 +2,11 @@
 import Constants from './lib/constants';
 
 export default class WebAudioSites {
-  static combineSites(sites: { [site: string]: AudioRule[] } = {}): { [site: string]: AudioRule[] } {
+  static combineSites(sites: AudioSites = {}): AudioSites {
     return Object.assign({}, WebAudioSites.sites, sites);
   }
 
-  static sites: { [site: string]: AudioRule[] } = {
+  static sites: AudioSites = {
     'abc.com': [
       { className: 'akamai-caption-text', mode: 'element', tagName: 'DIV' },
       { className: 'amp-caption-area', displaySelector: 'div.amp-caption-area', mode: 'element', muteMethod: Constants.MUTE_METHODS.VIDEO_VOLUME, subtitleSelector: 'div.amp-caption > p', tagName: 'DIV' },

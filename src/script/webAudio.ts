@@ -30,7 +30,7 @@ export default class WebAudio {
   lastProcessedText: string;
   muted: boolean;
   rules: AudioRule[];
-  sites: { [site: string]: AudioRule[] };
+  sites: AudioSites;
   siteKey: string;
   supportedPage: boolean;
   unmuteTimeout: number;
