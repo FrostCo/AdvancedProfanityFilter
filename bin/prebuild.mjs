@@ -34,6 +34,11 @@ function firefoxBuild() {
   data.target = 'firefox';
 }
 
+function iOSBuild() {
+  data.target = 'ios';
+  data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
+}
+
 function main() {
   const argv = parseArgv(process.argv);
   if (argv.count >= 2 && argv.count <= 4) {
@@ -65,6 +70,9 @@ function main() {
         break;
       case '--firefox':
         firefoxBuild();
+        break;
+      case '--ios':
+        iOSBuild();
         break;
       case '--manifestV2':
         manifestV2Build();
@@ -109,6 +117,7 @@ function targetFromData() {
       return `--manifestV${data.manifestVersion}`;
     case 'bookmarklet':
     case 'firefox:':
+    case 'ios':
     case 'safari':
       return `--${data.target}`;
   }

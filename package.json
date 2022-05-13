@@ -19,6 +19,7 @@
   "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
   "scripts": {
     "build:firefox": "node bin/prebuild.mjs --firefox && npm run build",
+    "build:ios": "node bin/prebuild.mjs --ios && npm run build",
     "build:libs": "tsc -p ./src/script/lib/tsconfig.json",
     "build:safari": "node bin/prebuild.mjs --safari && npm run build",
     "build:static": "node bin/copy-static.mjs",
@@ -43,6 +44,7 @@
     "release:all": "npm run release:mv2 && npm run release:mv3 && npm run release:firefox",
     "release:build": "npm run build:static && webpack --config bin/webpack.config.js",
     "release:firefox": "npm run package:firefox",
+    "release:ios": "npm run clean && node bin/prebuild.mjs --release --ios && npm run release:build",
     "release:safari": "npm run clean && node bin/prebuild.mjs --release --safari && npm run release:build",
     "release:mv2": "npm run package:mv2",
     "release:mv3": "npm run package:mv3",

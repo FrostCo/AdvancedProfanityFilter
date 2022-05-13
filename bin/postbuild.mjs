@@ -13,6 +13,22 @@ import {
 
 let buildData;
 
+function appleBuild(updateBuildNumber) {
+  const files = [
+    path.join('dist', 'img', 'donate.gif'),
+    path.join('dist', 'img', 'patreon-small.png'),
+    path.join('dist', 'img', 'patreon.png'),
+  ];
+
+  removeOptionPageBookmarklet();
+  removeOptionPageDonations();
+  removeFiles(files);
+
+  if (buildData.release) {
+    updateSafariXcodeVersion(updateBuildNumber);
+  }
+}
+
 function common() {
   handleManifestVersion();
   handleVersion();
@@ -73,6 +89,11 @@ function handleVersion() {
   }
 }
 
+function iOSBuild() {
+  const updateBuildNumber = false;
+  appleBuild(updateBuildNumber);
+}
+
 function main() {
   buildData = loadJSONFile(buildFilePath);
 
@@ -81,6 +102,10 @@ function main() {
 
   if (buildData.target == 'firefox') {
     firefoxBuild();
+  }
+
+  if (buildData.target == 'ios') {
+    iOSBuild();
   }
 
   if (buildData.target == 'safari') {
@@ -115,21 +140,11 @@ function removeOptionPageDonations() {
 }
 
 function safariBuild() {
-  const files = [
-    path.join('dist', 'img', 'donate.gif'),
-    path.join('dist', 'img', 'patreon-small.png'),
-    path.join('dist', 'img', 'patreon.png'),
-  ];
-
-  removeOptionPageBookmarklet();
-  removeOptionPageDonations();
-  removeFiles(files);
-  if (buildData.release) {
-    updateSafariXcodeVersion();
-  }
+  const updateBuildNumber = true;
+  appleBuild(updateBuildNumber);
 }
 
-function updateSafariXcodeVersion() {
+function updateSafariXcodeVersion(updateBuildNumber) {
   const projectFilePath = path.join('safari', 'Advanced Profanity Filter.xcodeproj', 'project.pbxproj');
   const projectFileText = fse.readFileSync(projectFilePath).toString();
   let updatedProjectFileText = projectFileText.replace(/MARKETING_VERSION = \d+\.\d+\.\d+;$/gm, `MARKETING_VERSION = ${buildData.version};`);
@@ -137,10 +152,12 @@ function updateSafariXcodeVersion() {
   // Increment the build version when running a Safari release
   // macOS Apps require the build number to be larger than the previous build number
   // https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleversion
-  const buildVersionMatch = projectFileText.match(/CURRENT_PROJECT_VERSION = (?<buildNumber>\d+);/);
-  if (buildVersionMatch.groups) {
-    const newBuildNumber = parseInt(buildVersionMatch.groups.buildNumber) + 1;
-    updatedProjectFileText = updatedProjectFileText.replace(/CURRENT_PROJECT_VERSION = (?<buildNumber>\d+);/gm, `CURRENT_PROJECT_VERSION = ${newBuildNumber};`);
+  if (updateBuildNumber) {
+    const buildVersionMatch = projectFileText.match(/CURRENT_PROJECT_VERSION = (?<buildNumber>\d+);/);
+    if (buildVersionMatch.groups) {
+      const newBuildNumber = parseInt(buildVersionMatch.groups.buildNumber) + 1;
+      updatedProjectFileText = updatedProjectFileText.replace(/CURRENT_PROJECT_VERSION = (?<buildNumber>\d+);/gm, `CURRENT_PROJECT_VERSION = ${newBuildNumber};`);
+    }
   }
 
   if (projectFileText !== updatedProjectFileText) {
