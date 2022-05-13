@@ -1723,7 +1723,7 @@ export default class OptionPage {
     const select = contentLeft.querySelector('#siteSelect') as HTMLSelectElement;
     removeChildren(select);
 
-    this.supportedAudioSites = WebAudio.supportedSites(WebConfig.BUILD.target);
+    this.supportedAudioSites = WebAudio.supportedSites();
     const sortedSites = Domain.sortedKeys(this.supportedAudioSites);
     sortedSites.forEach((site) => {
       const optionElement = document.createElement('option');

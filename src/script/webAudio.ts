@@ -67,8 +67,8 @@ export default class WebAudio {
     videoCueLanguage: 'language',
   };
 
-  static getBuildTargetConfig(buildTarget: string) {
-    switch (buildTarget) {
+  static getBuildTargetConfig() {
+    switch (WebConfig.BUILD.target) {
       case Constants.BUILD_TARGET_SAFARI:
         return safariTargetConfig;
       default:
@@ -98,16 +98,16 @@ export default class WebAudio {
     });
   }
 
-  static supportedSites(buildTarget: string, removeUnsupported: boolean = true): AudioSites {
-    const buildTargetConfig = WebAudio.getBuildTargetConfig(buildTarget);
+  static supportedSites(removeUnsupported: boolean = true): AudioSites {
+    const buildTargetConfig = WebAudio.getBuildTargetConfig();
     const siteConfig = Object.assign({}, supportedSites, buildTargetConfig.sites);
     buildTargetConfig.disabledSites.forEach((disabledSite) => { delete siteConfig[disabledSite]; });
     if (removeUnsupported) { WebAudio.removeUnsupportedSites(siteConfig); }
     return siteConfig;
   }
 
-  static supportedAndCustomSites(buildTarget: string, customConfig: AudioSites) {
-    const combinedSites = Object.assign({}, WebAudio.supportedSites(buildTarget, false), customConfig);
+  static supportedAndCustomSites(customConfig: AudioSites) {
+    const combinedSites = Object.assign({}, WebAudio.supportedSites(false), customConfig);
     WebAudio.removeUnsupportedSites(combinedSites);
     return combinedSites;
   }
@@ -129,7 +129,7 @@ export default class WebAudio {
     ) {
       filter.cfg.customAudioSites = {};
     }
-    this.sites = WebAudio.supportedAndCustomSites(WebConfig.BUILD.target, filter.cfg.customAudioSites);
+    this.sites = WebAudio.supportedAndCustomSites(filter.cfg.customAudioSites);
     this.volume = 1;
     this.wordlistId = filter.audioWordlistId;
     this.youTubeAutoSubsMax = filter.cfg.youTubeAutoSubsMax * 1000;
