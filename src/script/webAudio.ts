@@ -1,7 +1,7 @@
 import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
-import { defaultTargetConfig, safariTargetConfig, supportedSites } from './webAudioSites';
+import { defaultTargetConfig, iOSTargetConfig, safariTargetConfig, supportedSites } from './webAudioSites';
 import {
   getElement,
   getElements,
@@ -69,6 +69,8 @@ export default class WebAudio {
 
   static getBuildTargetConfig() {
     switch (WebConfig.BUILD.target) {
+      case Constants.BUILD_TARGET_IOS:
+        return iOSTargetConfig;
       case Constants.BUILD_TARGET_SAFARI:
         return safariTargetConfig;
       default:

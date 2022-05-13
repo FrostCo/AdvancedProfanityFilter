@@ -6,6 +6,11 @@ export const defaultTargetConfig: BuildTargetSites = {
   disabledSites: [],
 };
 
+export const iOSTargetConfig: BuildTargetSites = {
+  sites: {},
+  disabledSites: [],
+};
+
 export const safariTargetConfig: BuildTargetSites = {
   sites: {},
   disabledSites: [],
