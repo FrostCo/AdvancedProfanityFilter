@@ -76,15 +76,40 @@ export default class WebAudio {
     }
   }
 
-  static supportedSites(buildTarget: string): AudioSites {
+  static removeUnsupportedSites(sites: AudioSites) {
+    Object.keys(sites).forEach((siteKey) => {
+      // Ensure site rules is an array
+      const siteRules = sites[siteKey];
+      if (!Array.isArray(siteRules)) {
+        sites[siteKey] = [siteRules];
+      }
+
+      // Remove any rules with a buildTarget that doesn't match
+      sites[siteKey] = sites[siteKey].filter((rule) => {
+        return rule.buildTarget == null || rule.buildTarget == WebConfig.BUILD.target;
+      });
+    });
+
+    // Remove sites without rules
+    Object.keys(sites).forEach((siteKey) => {
+      if (sites[siteKey].length == 0) {
+        delete sites[siteKey];
+      }
+    });
+  }
+
+  static supportedSites(buildTarget: string, removeUnsupported: boolean = true): AudioSites {
     const buildTargetConfig = WebAudio.getBuildTargetConfig(buildTarget);
     const siteConfig = Object.assign({}, supportedSites, buildTargetConfig.sites);
     buildTargetConfig.disabledSites.forEach((disabledSite) => { delete siteConfig[disabledSite]; });
+    if (removeUnsupported) { WebAudio.removeUnsupportedSites(siteConfig); }
     return siteConfig;
   }
 
   static supportedAndCustomSites(buildTarget: string, customConfig: AudioSites) {
-    return Object.assign({}, WebAudio.supportedSites(buildTarget), customConfig);
+    const combinedSites = Object.assign({}, WebAudio.supportedSites(buildTarget, false), customConfig);
+    WebAudio.removeUnsupportedSites(combinedSites);
+    return combinedSites;
   }
 
   constructor(filter: WebFilter | BookmarkletFilter) {
@@ -115,7 +140,6 @@ export default class WebAudio {
     this.siteKey = this.getSiteKey();
     this.rules = this.sites[this.siteKey];
     if (this.rules) {
-      if (!Array.isArray(this.rules)) { this.rules = [this.rules]; }
       this.rules.forEach((rule) => { this.initRule(rule); });
       if (this.enabledRuleIds.length > 0) {
         this.supportedPage = true;

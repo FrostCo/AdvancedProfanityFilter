@@ -3,6 +3,7 @@ interface AudioRule {
   _dynamic?: boolean;                            // [Dynamic] Set to true on a dynamic rule
   apfCaptions?: boolean;                         // [Cue] Display an HTML version of the caption/subtitle text: Requires videoCueHideCues = true
   apfCaptionsSelector?: string;                  // [Cue] Selector for container that will hold the custom HTML captions
+  buildTarget?: string;                          // [All] Only allow rule to run on a specific buildTarget
   checkInterval?: number;                        // [Watcher] Set a custom watch interval (in ms, Default: 20)
   className?: string;                            // [Element] node.className.includes()
   containsSelector?: string;                     // [Element] node.querySelector() [Not commonly used]
