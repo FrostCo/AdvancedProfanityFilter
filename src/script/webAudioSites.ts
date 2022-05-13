@@ -2,18 +2,18 @@
 import Constants from './lib/constants';
 
 export const defaultTargetConfig: BuildTargetSites = {
-  sites: {},
   disabledSites: [],
+  sites: {},
 };
 
 export const iOSTargetConfig: BuildTargetSites = {
-  sites: {},
   disabledSites: [],
+  sites: {},
 };
 
 export const safariTargetConfig: BuildTargetSites = {
-  sites: {},
   disabledSites: [],
+  sites: {},
 };
 
 export const supportedSites: AudioSites = {
