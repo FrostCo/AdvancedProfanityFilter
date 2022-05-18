@@ -494,6 +494,10 @@ export default class WebAudio {
           this.initWatcherRule(rule);
           if (!rule.disabled) { this.watcherRuleIds.push(ruleId); }
           break;
+        case 'ytauto':
+          // This rule doesn't run like other rules, and is marked as disabled
+          rule.disabled = true;
+          break;
       }
       if (!rule.disabled) {
         this.enabledRuleIds.push(ruleId);
@@ -534,7 +538,8 @@ export default class WebAudio {
       this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
 
       // Setup rule for YouTube Auto Subs
-      this.youTubeAutoSubsRule = { filterSubtitles: true, mode: 'ytauto', muteMethod: this.filter.cfg.muteMethod } as AudioRule;
+      this.youTubeAutoSubsRule = { mode: 'ytauto' } as AudioRule;
+      this.initRule(this.youTubeAutoSubsRule);
     }
   }
 
