@@ -7,7 +7,10 @@ export const defaultTargetConfig: BuildTargetSites = {
 };
 
 export const iOSTargetConfig: BuildTargetSites = {
-  disabledSites: [],
+  disabledSites: [
+    'www.hidive.com',
+    'watch.sling.com',
+  ],
   sites: {
     'play.stan.com.au': [{ mode: 'cue', videoCueLanguage: 'en' }],
   },
