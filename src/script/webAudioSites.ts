@@ -8,12 +8,16 @@ export const defaultTargetConfig: BuildTargetSites = {
 
 export const iOSTargetConfig: BuildTargetSites = {
   disabledSites: [],
-  sites: {},
+  sites: {
+    'play.stan.com.au': [{ mode: 'cue', videoCueLanguage: 'en' }],
+  },
 };
 
 export const safariTargetConfig: BuildTargetSites = {
   disabledSites: [],
-  sites: {},
+  sites: {
+    'play.stan.com.au': [{ mode: 'cue', videoCueLanguage: 'en' }],
+  },
 };
 
 export const supportedSites: AudioSites = {
@@ -226,7 +230,7 @@ export const supportedSites: AudioSites = {
   'www.showmax.com': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.contentWrapper > div.subtitles--3EXhT', simpleUnmute: true, tagName: '#text' }],
   'www.showtime.com': [{ mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false }],
   'watch.sling.com': [{ className: 'bmpui-subtitle-region-container', mode: 'element', subtitleSelector: 'DIV.bmpui-container-wrapper > SPAN.bmpui-ui-subtitle-label', tagName: 'DIV' }],
-  'play.stan.com.au': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.clpp-subtitles-container', simpleUnmute: true, tagName: '#text' }],
+  'play.stan.com.au': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.clpp-text-container', simpleUnmute: true, tagName: 'DIV' }],
   'www.starz.com': [{ mode: 'elementChild', parentSelector: 'starz-captions > div.cue-list', tagName: 'SPAN' }],
   'www.syfy.com': [{ className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
   'www.tntdrama.com': [{ mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video.top-media-element' }],
