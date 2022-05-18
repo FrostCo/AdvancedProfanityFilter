@@ -1,6 +1,6 @@
 import Constants from './lib/constants';
 import { dynamicList } from './lib/helper';
-import WebAudioSites from './webAudioSites';
+import WebAudio from './webAudio';
 import WebConfig from './webConfig';
 import Domain from './domain';
 import Page from './page';
@@ -137,7 +137,7 @@ class Popup {
       dynamicList(wordlists, wordlistSelect);
       wordlistSelect.selectedIndex = wordlistIndex;
       if (this.cfg.muteAudio) {
-        this.audioSiteKeys = Object.keys(WebAudioSites.combineSites(this.cfg.customAudioSites));
+        this.audioSiteKeys = Object.keys(WebAudio.supportedAndCustomSites(this.cfg.customAudioSites));
         if (this.audioSiteKeys.includes(this.domain.cfgKey)) {
           audioPage = true;
           const audioWordlistIndex = this.domain.audioWordlistId >= 0 ? this.domain.audioWordlistId + 1 : 0;

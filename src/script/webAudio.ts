@@ -1,7 +1,7 @@
 import Constants from './lib/constants';
 import WebFilter from './webFilter';
 import BookmarkletFilter from './bookmarkletFilter';
-import WebAudioSites from './webAudioSites';
+import { defaultTargetConfig, iOSTargetConfig, safariTargetConfig, supportedSites } from './webAudioSites';
 import {
   getElement,
   getElements,
@@ -30,7 +30,7 @@ export default class WebAudio {
   lastProcessedText: string;
   muted: boolean;
   rules: AudioRule[];
-  sites: { [site: string]: AudioRule[] };
+  sites: AudioSites;
   siteKey: string;
   supportedPage: boolean;
   unmuteTimeout: number;
@@ -67,6 +67,53 @@ export default class WebAudio {
     videoCueLanguage: 'language',
   };
 
+  static getBuildTargetConfig() {
+    switch (WebConfig.BUILD.target) {
+      case Constants.BUILD_TARGET_IOS:
+        return iOSTargetConfig;
+      case Constants.BUILD_TARGET_SAFARI:
+        return safariTargetConfig;
+      default:
+        return defaultTargetConfig;
+    }
+  }
+
+  static removeUnsupportedSites(sites: AudioSites) {
+    Object.keys(sites).forEach((siteKey) => {
+      // Ensure site rules is an array
+      const siteRules = sites[siteKey];
+      if (!Array.isArray(siteRules)) {
+        sites[siteKey] = [siteRules];
+      }
+
+      // Remove any rules with a buildTarget that doesn't match
+      sites[siteKey] = sites[siteKey].filter((rule) => {
+        return rule.buildTarget == null || rule.buildTarget == WebConfig.BUILD.target;
+      });
+    });
+
+    // Remove sites without rules
+    Object.keys(sites).forEach((siteKey) => {
+      if (sites[siteKey].length == 0) {
+        delete sites[siteKey];
+      }
+    });
+  }
+
+  static supportedSites(removeUnsupported: boolean = true): AudioSites {
+    const buildTargetConfig = WebAudio.getBuildTargetConfig();
+    const siteConfig = Object.assign({}, supportedSites, buildTargetConfig.sites);
+    buildTargetConfig.disabledSites.forEach((disabledSite) => { delete siteConfig[disabledSite]; });
+    if (removeUnsupported) { WebAudio.removeUnsupportedSites(siteConfig); }
+    return siteConfig;
+  }
+
+  static supportedAndCustomSites(customConfig: AudioSites) {
+    const combinedSites = Object.assign({}, WebAudio.supportedSites(false), customConfig);
+    WebAudio.removeUnsupportedSites(combinedSites);
+    return combinedSites;
+  }
+
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.filter = filter;
     logger.setLevel(this.filter.cfg.loggingLevel);
@@ -84,7 +131,7 @@ export default class WebAudio {
     ) {
       filter.cfg.customAudioSites = {};
     }
-    this.sites = WebAudioSites.combineSites(filter.cfg.customAudioSites);
+    this.sites = WebAudio.supportedAndCustomSites(filter.cfg.customAudioSites);
     this.volume = 1;
     this.wordlistId = filter.audioWordlistId;
     this.youTubeAutoSubsMax = filter.cfg.youTubeAutoSubsMax * 1000;
@@ -95,7 +142,6 @@ export default class WebAudio {
     this.siteKey = this.getSiteKey();
     this.rules = this.sites[this.siteKey];
     if (this.rules) {
-      if (!Array.isArray(this.rules)) { this.rules = [this.rules]; }
       this.rules.forEach((rule) => { this.initRule(rule); });
       if (this.enabledRuleIds.length > 0) {
         this.supportedPage = true;
@@ -448,6 +494,10 @@ export default class WebAudio {
           this.initWatcherRule(rule);
           if (!rule.disabled) { this.watcherRuleIds.push(ruleId); }
           break;
+        case 'ytauto':
+          // This rule doesn't run like other rules, and is marked as disabled
+          rule.disabled = true;
+          break;
       }
       if (!rule.disabled) {
         this.enabledRuleIds.push(ruleId);
@@ -488,7 +538,8 @@ export default class WebAudio {
       this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
 
       // Setup rule for YouTube Auto Subs
-      this.youTubeAutoSubsRule = { filterSubtitles: true, mode: 'ytauto', muteMethod: this.filter.cfg.muteMethod } as AudioRule;
+      this.youTubeAutoSubsRule = { mode: 'ytauto' } as AudioRule;
+      this.initRule(this.youTubeAutoSubsRule);
     }
   }
 

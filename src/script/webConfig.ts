@@ -10,7 +10,7 @@ export default class WebConfig extends Config {
   audioWordlistId: number;
   collectStats: boolean;
   contextMenu: boolean;
-  customAudioSites: { [site: string]: AudioRule[] };
+  customAudioSites: AudioSites;
   darkMode: boolean;
   domains: { [site: string]: DomainCfg };
   enabledDomainsOnly: boolean;

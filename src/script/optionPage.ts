@@ -5,7 +5,7 @@ import Domain from './domain';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
-import WebAudioSites from './webAudioSites';
+import WebAudio from './webAudio';
 import Logger from './lib/logger';
 import {
   booleanToNumber,
@@ -26,6 +26,7 @@ export default class OptionPage {
   darkModeButton: Element;
   lightModeButton: Element;
   prefersDarkScheme: boolean;
+  supportedAudioSites: AudioSites;
   themeElements: Element[];
 
   static readonly activeClass = 'w3-flat-belize-hole';
@@ -1711,7 +1712,7 @@ export default class OptionPage {
     const select = document.querySelector('#supportedAudioSitesModal select#siteSelect') as HTMLSelectElement;
     const textArea = document.querySelector('#supportedAudioSitesModal div#modalContentRight textarea') as HTMLTextAreaElement;
     const config = {};
-    config[select.value] = WebAudioSites.sites[select.value];
+    config[select.value] = this.supportedAudioSites[select.value];
     textArea.textContent = JSON.stringify(config, null, 2);
   }
 
@@ -1722,7 +1723,8 @@ export default class OptionPage {
     const select = contentLeft.querySelector('#siteSelect') as HTMLSelectElement;
     removeChildren(select);
 
-    const sortedSites = Domain.sortedKeys(WebAudioSites.sites);
+    this.supportedAudioSites = WebAudio.supportedSites();
+    const sortedSites = Domain.sortedKeys(this.supportedAudioSites);
     sortedSites.forEach((site) => {
       const optionElement = document.createElement('option');
       optionElement.value = site;
