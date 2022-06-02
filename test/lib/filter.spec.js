@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { expect } from 'chai';
 import Constants from '../built/lib/constants';
 import Config from '../built/lib/config';
