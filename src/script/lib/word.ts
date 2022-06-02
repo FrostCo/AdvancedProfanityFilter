@@ -14,7 +14,7 @@ export default class Word {
   unicode: boolean;
   value: string;
 
-  private static readonly _edgePunctuationRegExp = /(^[,.'"!?%$]|[,.'"!?%$]$)/;
+  private static readonly _edgePunctuationRegExp = /(^[,.'"!?%$+]|[,.'"!?%$+]$)/;
   private static readonly _escapeRegExp = /[\/\\^$*+?.()|[\]{}]/g;
   private static readonly _unicodeRegExp = /[^\u0000-\u00ff]/;
   private static readonly _unicodeWordBoundary = '[\\s.,\'"+!?|-]';

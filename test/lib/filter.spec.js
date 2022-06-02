@@ -96,6 +96,20 @@ describe('Filter', () => {
           filter.init();
           expect(filter.replaceText('A cool example sentence.')).to.equal('A cool ------- sentence.');
         });
+
+        it('Ending with punctuation', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            censorCharacter: '_',
+            filterMethod: Constants.FILTER_METHODS.CENSOR,
+            preserveFirst: false,
+            words:{
+              'A+': { matchMethod: Constants.MATCH_METHODS.EXACT },
+            },
+          });
+          filter.init();
+          expect(filter.replaceText('You deserve an A+')).to.equal('You deserve an __');
+        });
       });
 
       describe('Partial', () => {
@@ -119,10 +133,19 @@ describe('Filter', () => {
 
         it('Ending with punctuation', () => {
           const filter = new Filter;
-          filter.cfg = new Config({ words: { 'this!': { matchMethod: Constants.MATCH_METHODS.PARTIAL } }, filterMethod: Constants.FILTER_METHODS.CENSOR, censorCharacter: '_', preserveFirst: false });
+          filter.cfg = new Config({
+            censorCharacter: '_',
+            filterMethod: Constants.FILTER_METHODS.CENSOR,
+            preserveFirst: false,
+            words:{
+              'this!': { matchMethod: Constants.MATCH_METHODS.PARTIAL },
+              'that+': { matchMethod: Constants.MATCH_METHODS.PARTIAL },
+            },
+          });
           filter.init();
           expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love all_____ Do you?');
           expect(filter.replaceText('I love this! Do you?')).to.equal('I love _____ Do you?');
+          expect(filter.replaceText('I love allthat+')).to.equal('I love all_____');
         });
       });
 
@@ -138,10 +161,19 @@ describe('Filter', () => {
 
         it('Ending with punctuation', () => {
           const filter = new Filter;
-          filter.cfg = new Config({ words: { 'this!': { matchMethod: Constants.MATCH_METHODS.WHOLE } }, filterMethod: Constants.FILTER_METHODS.CENSOR, censorCharacter: '_', preserveFirst: false });
+          filter.cfg = new Config({
+            censorCharacter: '_',
+            filterMethod: Constants.FILTER_METHODS.CENSOR,
+            preserveFirst: false,
+            words: {
+              'this!': { matchMethod: Constants.MATCH_METHODS.WHOLE },
+              'think+': { matchMethod: Constants.MATCH_METHODS.WHOLE },
+            },
+          });
           filter.init();
           expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love ________ Do you?');
           expect(filter.replaceText('I love this! Do you?')).to.equal('I love _____ Do you?');
+          expect(filter.replaceText('What do you think+ about?')).to.equal('What do you ______ about?');
         });
       });
 
@@ -265,7 +297,8 @@ describe('Filter', () => {
             words: {
               'this!': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE, sub: 'that!' },
               '!bang': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: '!poof' },
-              '!another!': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE, sub: '$znother#' }
+              '!another!': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE, sub: '$znother#' },
+              '!again+': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE, sub: 'wow!' },
             },
           });
           filter.init();
@@ -274,6 +307,7 @@ describe('Filter', () => {
           expect(filter.replaceText('Go out with a !baangg')).to.equal('Go out with a !poof');
           expect(filter.replaceText('Go out with a !Bang!')).to.equal('Go out with a !Bang!');
           expect(filter.replaceText('!ANOTHER! so cool!')).to.equal('$ZNOTHER# so cool!');
+          expect(filter.replaceText('ANOTHER! !again+')).to.equal('ANOTHER! wow!');
         });
 
         it('Begin/end with dashes (-)', () => {
