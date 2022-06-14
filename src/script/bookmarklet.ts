@@ -79,15 +79,16 @@ export default class Bookmarklet {
     const postfix = '/* @preserve - End User Config */';
     const configRegExp = new RegExp(`${prefix.replace(/[\/\*]/g, '\\$&')}[\\S\\s]\*${postfix.replace(/[\/\*]/g, '\\$&')}`, 'm');
     const origURL = './bookmarkletFilter.js';
-    const lowerCaseLettersRegExp = new RegExp('^[a-z]$');
 
     const response = await fetch(origURL);
     const code = await response.text();
-    const cfgCode = code.match(configRegExp).toString();
+
     try {
-      const variable = cfgCode.match(/^const ([a-z])=/m)[1];
-      if (lowerCaseLettersRegExp.test(variable)) {
-        return code.replace(configRegExp, `${prefix}\nconst ${variable}=${JSON.stringify(config)}\n${postfix}`);
+      const cfgCode = code.match(configRegExp).toString();
+      const variableCode = cfgCode.match(/const ([a-z])=/m);
+      if (variableCode && variableCode[1]) {
+        const variableName = variableCode[1];
+        return code.replace(configRegExp, `${prefix}\nconst ${variableName}=${JSON.stringify(config)}\n${postfix}`);
       } else {
         throw new Error('Unable to set user config - using defaults.');
       }
