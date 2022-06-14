@@ -1,3 +1,4 @@
+import './vendor/findAndReplaceDOMText';
 import Constants from './lib/constants';
 import Domain from './domain';
 import Filter from './lib/filter';
@@ -5,7 +6,6 @@ import Page from './page';
 import WebAudio from './webAudio';
 import WebConfig from './webConfig';
 import Wordlist from './lib/wordlist';
-import './vendor/findAndReplaceDOMText';
 
 /* @preserve - Start User Config */
 const config = WebConfig._defaults as any;

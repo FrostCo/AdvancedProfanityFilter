@@ -1,3 +1,4 @@
+import './vendor/findAndReplaceDOMText';
 import Constants from './lib/constants';
 import Domain from './domain';
 import Filter from './lib/filter';
@@ -6,7 +7,6 @@ import WebAudio from './webAudio';
 import WebConfig from './webConfig';
 import Word from './lib/word';
 import Wordlist from './lib/wordlist';
-import './vendor/findAndReplaceDOMText';
 import Logger from './lib/logger';
 const logger = new Logger('WebFilter');
 
