@@ -202,7 +202,9 @@ export const supportedSites: AudioSites = {
     { className: 'player-timedtext-text-container', mode: 'element', note: 'Fallback compatibility', subtitleSelector: 'span > span', tagName: 'DIV' },
     { className: 'player-timedtext-text-container', mode: 'element', subtitleSelector: 'span', tagName: 'DIV' },
   ],
-  'www.paramountplus.com': [{ mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false }],
+  'www.paramountplus.com': [
+    { mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false, videoSelector: 'div[data-role=videoContainer] video' },
+  ],
   'www.pbs.org': [{ iframe: true, mode: 'element', subtitleSelector: 'div.vjs-text-track-cue > div', tagName: 'DIV' }],
   'www.peacocktv.com': [
     { displaySelector: 'div.video-player__subtitles', mode: 'elementChild', parentSelector: 'div.video-player__subtitles > div', simpleUnmute: true, tagName: '#text' },
