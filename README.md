@@ -1,5 +1,4 @@
 # Advanced Profanity Filter
-[![Build Status](https://flat.badgen.net/travis/richardfrost/AdvancedProfanityFilter/master)](https://travis-ci.com/richardfrost/AdvancedProfanityFilter)
 [![Chrome Web Store](https://flat.badgen.net/chrome-web-store/users/piajkpdbaniagacofgklljacgjhefjeh?color=blue)](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
 [![Chrome Web Store](https://flat.badgen.net/chrome-web-store/stars/piajkpdbaniagacofgklljacgjhefjeh?color=blue)](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
 [![Discord](https://flat.badgen.net/badge/icon/discord?icon=discord&label)](https://discord.com/invite/MpE5Z3f)
