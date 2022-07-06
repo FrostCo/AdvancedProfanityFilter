@@ -156,6 +156,18 @@ export const supportedSites: AudioSites = {
     { className: 'bmpui-ui-subtitle-label', mode: 'element', tagName: 'SPAN' },
     { className: 'bmpui-subtitle-region-container', mode: 'element', subtitleSelector: 'div.bmpui-container-wrapper > span.bmpui-ui-subtitle-label', tagName: 'div' },
   ],
+  'www.apps.disneyplus.com': [
+    {
+      displayHide: 'none',
+      displaySelector: 'div#video-container div.shaka-text-container',
+      displayShow: 'flex',
+      iframe: false,
+      mode: 'watcher',
+      note: 'South Africa',
+      subtitleSelector: 'div#video-container div.shaka-text-container > span',
+      videoSelector: 'div#video-container video'
+    },
+  ],
   'www.disneyplus.com': [{ className: 'dss-subtitle-renderer-wrapper', mode: 'element', subtitleSelector: 'div.dss-subtitle-renderer-cue-window span.dss-subtitle-renderer-line', tagName: 'DIV' }],
   'www.fox.com': [{ className: 'jw-text-track-container', mode: 'element', subtitleSelector: 'div.jw-text-track-cue', tagName: 'DIV' }],
   'www.fubo.tv': [
