@@ -240,6 +240,14 @@ export const supportedSites: AudioSites = {
       videoSelector: 'div.webPlayerElement video[src]',
     }
   ],
+  'www.raiplay.it': [
+    {
+      className: 'theoplayer-webvtt-region-default',
+      mode: 'element',
+      subtitleSelector: 'div span',
+      tagName: 'DIV'
+    },
+  ],
   'www.redbox.com': [{ mode: 'elementChild', parentSelector: 'div.rb-text-container', subtitleSelector: 'SPAN > SPAN', tagName: 'DIV' }],
   'watch.redeemtv.com': [{ convertBreaks: true, displaySelector: 'div.vp-captions', mode: 'elementChild', parentSelector: 'div.vp-captions', tagName: 'SPAN' }],
   'therokuchannel.roku.com': [{ mode: 'element', subtitleSelector: 'div.vjs-text-track-cue > div', tagName: 'DIV' }],
