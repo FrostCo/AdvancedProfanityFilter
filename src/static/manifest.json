@@ -1,6 +1,6 @@
 {
   "name": "Advanced Profanity Filter",
-  "short_name": "Profanity Filter",
+  "short_name": "Text Filter",
   "author": "Richard Frost",
   "manifest_version": 3,
   "version": "2.36.4",
