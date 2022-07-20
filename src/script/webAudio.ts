@@ -459,7 +459,9 @@ export default class WebAudio {
       rule.disabled = true;
     }
 
-    if (!rule.disabled) {
+    if (rule.disabled) {
+      logger.warn('Audio rule disabled', rule);
+    } else {
       // Setup rule defaults
       if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
       if (this.filter.filterText == false) { rule.filterSubtitles = false; }
@@ -499,7 +501,10 @@ export default class WebAudio {
           rule.disabled = true;
           break;
       }
-      if (!rule.disabled) {
+
+      if (rule.disabled) {
+        logger.warn('Audio rule disabled during initialization', rule);
+      } else {
         this.enabledRuleIds.push(ruleId);
 
         if (rule.mode == 'cue' && this.cueRuleIds.length === 1) { // Only for first rule
