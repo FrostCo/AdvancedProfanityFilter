@@ -8,8 +8,10 @@ describe('WebFilter', function() {
     const filter = new WebFilter;
     filter.cfg = new WebConfig({
       domains: {
+        /* eslint-disable @typescript-eslint/naming-convention */
         'example.com': { disabled: true },
         'sub.sample.com': { adv: true },
+        /* eslint-enable @typescript-eslint/naming-convention */
       }
     });
 

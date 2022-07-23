@@ -30,6 +30,7 @@ describe('DataMigration', function() {
           'test': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
           'another': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'tset' },
           'testWithList': { lists: [1, 3, 5], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
+          /* eslint-disable-next-line @typescript-eslint/naming-convention */
           '^myRegexp$': { lists: [1, 3, 5], matchMethod: 4, repeat: true, separators: false, sub: 'tset' },
         },
         globalMatchMethod: 3,

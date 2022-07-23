@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import Domain from './built/domain';
 import WebConfig from './built/webConfig';
 
+/* eslint-disable @typescript-eslint/naming-convention */
 const domains = {
   '192.168.0.1': { disabled: false },
   'another.com': { adv: true },
@@ -11,6 +12,7 @@ const domains = {
   'localhost': { disabled: false },
   'abc.zoo.edu': { disabled: true },
 };
+/* eslint-enable @typescript-eslint/naming-convention */
 
 describe('Domain', function() {
   describe('.byKey()', function() {

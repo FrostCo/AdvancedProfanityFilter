@@ -11,8 +11,10 @@ describe('WebConfig', function() {
     it('should combine _domain# data', function() {
       const config = new WebConfig(WebConfig._defaults);
       delete config.domains;
+      /* eslint-disable @typescript-eslint/naming-convention */
       config._domains0 = { 'www.example0.com': { 'adv': true } };
       config._domains1 = { 'www.example1.com': { 'adv': true } };
+      /* eslint-enable @typescript-eslint/naming-convention */
       config._lastSplitKeys = { domains: 1 };
       expect(config.domain).to.not.exist;
       const combinedKeys = WebConfig.combineData(config, 'domains');
@@ -43,8 +45,10 @@ describe('WebConfig', function() {
     it('should return all matches', function() {
       const config = new WebConfig(WebConfig._defaults);
       delete config.domains;
+      /* eslint-disable @typescript-eslint/naming-convention */
       config._domains0 = { 'www.example0.com': { 'adv': true } };
       config._domains1 = { 'www.example1.com': { 'adv': true } };
+      /* eslint-enable @typescript-eslint/naming-convention */
       expect(WebConfig.getDataContainerKeys(config, 'domains')).to.eql(['_domains0', '_domains1']);
     });
 
