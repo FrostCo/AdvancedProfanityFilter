@@ -945,7 +945,7 @@ export default class WebAudio {
             if (root) {
               if (rule.parentSelector) {
                 const parent = root.querySelector(rule.parentSelector);
-                if (parent && parent.contains(node)) { return ruleId; }
+                if (parent && (parent == node || parent.contains(node))) { return ruleId; }
               } else {
                 const parents = root.querySelectorAll(rule.parentSelectorAll);
                 for (let j = 0; j < parents.length; j++) {
