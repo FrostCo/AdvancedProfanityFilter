@@ -147,6 +147,10 @@ export default class WebAudio {
         this.supportedPage = true;
         this.initYouTube();
       }
+
+      if (this.cueRuleIds.length) {
+        setInterval(this.watchForVideo, 250, this);
+      }
     }
   }
 
@@ -507,9 +511,7 @@ export default class WebAudio {
       } else {
         this.enabledRuleIds.push(ruleId);
 
-        if (rule.mode == 'cue' && this.cueRuleIds.length === 1) { // Only for first rule
-          setInterval(this.watchForVideo, 250, this);
-        } else if (rule.mode == 'watcher') {
+        if (rule.mode == 'watcher') {
           setInterval(this.watcher, rule.checkInterval, this, ruleId);
         }
       }
