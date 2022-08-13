@@ -242,10 +242,10 @@ export const supportedSites: AudioSites = {
   ],
   'www.raiplay.it': [
     {
-      className: 'theoplayer-webvtt-region-default',
-      mode: 'element',
+      mode: 'elementChild',
+      parentSelector: 'div.theoplayer-texttracks div.theoplayer-webvtt-region-default',
       subtitleSelector: 'div span',
-      tagName: 'DIV'
+      tagName: 'DIV',
     },
   ],
   'www.redbox.com': [{ mode: 'elementChild', parentSelector: 'div.rb-text-container', subtitleSelector: 'SPAN > SPAN', tagName: 'DIV' }],
