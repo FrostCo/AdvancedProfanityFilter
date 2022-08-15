@@ -1956,7 +1956,7 @@ document.getElementById('domainSave').addEventListener('click', (evt) => { optio
 document.getElementById('domainRemove').addEventListener('click', (evt) => { option.removeDomain(); });
 // Audio
 document.getElementById('muteAudio').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('supportedAudioSites').addEventListener('click', (evt) => { option.showSupportedAudioSites(); });
+document.getElementById('supportedAudioSitesConfig').addEventListener('click', (evt) => { option.showSupportedAudioSites(); });
 document.getElementById('fillerAudioSelect').addEventListener('change', (evt) => { option.saveOptions(); });
 document.getElementById('muteAudioOnly').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('muteCueRequireShowing').addEventListener('click', (evt) => { option.saveOptions(); });

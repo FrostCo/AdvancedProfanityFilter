@@ -385,7 +385,8 @@
 <div id="audioPage" class="w3-container w3-hide">
   <p>Mute audio during video playback when a filtered word is detected in the captions/subtitles (which must be enabled). <i>Effectiveness is dependent on the quality/timing of the text accompanying the video.</i> <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio". target="_blank">Learn more</a>.</p>
 
-  <button id="supportedAudioSites" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-bottom: 15px; display: block;">View Supported Sites</button>
+  <a id="supportedAudioSitesStatus" href="https://apf.frostco.dev/status" target="_blank" class="w3-btn w3-round-large w3-flat-peter-river">Supported Sites Status</a>
+  <br />
 
   <label>
     <input id="muteAudio" type="checkbox" class="w3-check">
@@ -485,6 +486,7 @@
     </div>
     <div class="w3-third w3-right">
       <h4 class="sectionHeader">Custom Sites (Advanced)</h4>
+      <button id="supportedAudioSitesConfig" class="w3-btn w3-round-large w3-flat-peter-river">Supported Sites Config</button>
       <textarea id="customAudioSitesText" class="w3-input w3-border w3-card" style="width:300px;height:350px;font-size:11px;" spellcheck="false"></textarea>
       <button id="customAudioSitesSave" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top: 16px;">SAVE</button>
       <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site" class="notes" target="_blank">How to add a custom site</a>
