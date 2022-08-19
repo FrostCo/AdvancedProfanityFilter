@@ -1054,28 +1054,8 @@ export default class WebAudio {
       if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
       const data: WatcherData = { initialCall: true };
       let captions;
-      let parents;
 
-      if (rule.parentSelectorAll) { // Tested on: HBO Max (No longer working)
-        if (rule._dynamic) {
-          parents = Array.from(document.querySelectorAll(rule.parentSelectorAll)).filter((result) => {
-            return result.textContent !== rule.dynamicTextKey;
-          }) as HTMLElement[];
-
-          if (rule.displayVisibility && (!rule._displayElement || !document.body.contains(rule._displayElement))) {
-            rule._displayElement = getParent(parents[0], rule.getParentLevel);
-          }
-        } else {
-          parents = Array.from(document.querySelectorAll(rule.parentSelectorAll)) as HTMLElement[];
-        }
-
-        captions = parents.map((parent) => parent.querySelector(rule.subtitleSelector));
-        if (captions.length) {
-          instance.processWatcherCaptionsArray(rule, captions, data);
-        } else { // If there are no captions/subtitles: unmute and hide
-          instance.watcherSimpleUnmute(rule, video);
-        }
-      } else if (rule.parentSelector) { // Tested on: Amazon
+      if (rule.parentSelector) { // Tested on: Amazon
         captions = document.querySelector(rule.parentSelector) as HTMLElement;
         if (captions && captions.textContent && captions.textContent.trim()) {
           instance.processWatcherCaptions(rule, captions, data);
