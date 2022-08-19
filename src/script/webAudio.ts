@@ -519,8 +519,8 @@ export default class WebAudio {
           break;
       }
 
-      if (rule.disabled && rule.mode != 'ytauto') {
-        logger.warn('Audio rule disabled during initialization', rule);
+      if (rule.disabled) {
+        if (rule.mode != 'ytauto') logger.warn('Audio rule disabled during initialization', rule);
       } else {
         this.enabledRuleIds.push(ruleId);
 
