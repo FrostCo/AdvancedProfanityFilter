@@ -1270,6 +1270,20 @@ export default class WebAudio {
             const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
             if (!rule.videoCueHideCues) { textTrack.mode = shouldBeShown ? 'showing' : 'hidden'; }
           }
+        }  else {
+          // If there are no captions/subtitles: unmute and hide
+          instance.watcherSimpleUnmute(rule, video);
+
+          // Hide any activeCues
+          if (textTrack?.activeCues?.length) {
+            const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
+            // Because we don't have an endTime when we create the cues, this will set that to -1ms
+            activeCues.forEach((cue) => cue.endTime = currentTime - .001);
+          }
+
+          // Hide/show textTrack
+          const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
+          if (!rule.videoCueHideCues) textTrack.mode = shouldBeShown ? 'showing' : 'hidden';
         }
       }
 
