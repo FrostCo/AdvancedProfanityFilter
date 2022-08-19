@@ -284,7 +284,7 @@ export const supportedSites: AudioSites = {
   'www.usanetwork.com': [{ className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
   'vimeo.com': [{ mode: 'element', tagName: 'SPAN', note: 'Only tested with single-line captions', className: 'vp-captions-line', displaySelector: 'div.vp-captions > span.vp-captions-window' }],
   'player.vimeo.com': [{ mode: 'element', tagName: 'SPAN', note: 'For embedded videos', className: 'vp-captions-line', displaySelector: 'div.vp-captions > span.vp-captions-window' }],
-  'www.vudu.com': [{ mode: 'element', subtitleSelector: 'span.subtitles', tagName: 'DIV' }],
+  'www.vudu.com': [{ displaySelector: 'div#subtitleContainer > div', iframe: true, mode: 'element', subtitleSelector: 'span.subtitles', tagName: 'DIV' }],
   'vrv.co': [
     { displaySelector: 'div.libassjs-canvas-parent', externalSub: true, externalSubVar: 'window.vilos.content.captions', iframe: true, mode: 'cue', videoCueLanguage: 'en-US', videoCueRequireShowing: false },
     { displaySelector: 'div.libassjs-canvas-parent', externalSub: true, externalSubVar: 'window.vilos.content.subtitles', iframe: true, mode: 'cue', videoCueLanguage: 'en-US', videoCueRequireShowing: false },
