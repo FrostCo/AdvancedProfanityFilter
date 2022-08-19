@@ -584,7 +584,9 @@ export default class WebAudio {
 
   newCue(start, end, text, options: ParsedSubOptions = {}): VTTCue {
     try {
-      const cue = new VTTCue(hmsToSeconds(start), hmsToSeconds(end), text);
+      const startSeconds = typeof start === 'string' ? hmsToSeconds(start) : start;
+      const endSeconds = typeof end === 'string' ? hmsToSeconds(end) : end;
+      const cue = new VTTCue(startSeconds, endSeconds, text);
       if (options.align) { cue.align = options.align; }
       if (options.line) { cue.line = this.parseLineAndPositionSetting(options.line); }
       if (options.position) { cue.position = this.parseLineAndPositionSetting(options.position); }
