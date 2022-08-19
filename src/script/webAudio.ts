@@ -182,15 +182,13 @@ export default class WebAudio {
   }
 
   apfTextTrack(rule: AudioRule, video: HTMLVideoElement): TextTrack {
-    const label = 'APF'; // TODO: Cue initialize value in rule?
-
     if (video) {
       if (video.textTracks.length) {
-        const textTrack = Array.from(video.textTracks).find((track) => track.label == label);
+        const textTrack = Array.from(video.textTracks).find((track) => track.label == rule.apfCuesLabel);
         if (textTrack) return textTrack;
       }
 
-      return video.addTextTrack('captions', label, label) as TextTrack;
+      return video.addTextTrack('captions', rule.apfCuesLabel, rule.apfCuesLabel) as TextTrack;
     }
   }
 
@@ -555,6 +553,7 @@ export default class WebAudio {
   }
 
   initWatcherRule(rule: AudioRule) {
+    if (rule.apfCuesLabel === undefined) rule.apfCuesLabel = 'APF-Cues';
     if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
     if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
     if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
