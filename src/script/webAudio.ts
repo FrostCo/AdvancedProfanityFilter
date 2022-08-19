@@ -873,8 +873,9 @@ export default class WebAudio {
         if (result.modified) {
           this.mute(rule);
           data.filtered = true;
-          if (rule.filterSubtitles) { captions[textMethod] = result.filtered; }
+          if (rule.filterSubtitles && !rule.apfCaptions) { captions[textMethod] = result.filtered; }
         }
+        data.textResults.push(result);
       }
     }
 
@@ -902,8 +903,9 @@ export default class WebAudio {
         if (result.modified) {
           this.mute(rule);
           data.filtered = true;
-          if (rule.filterSubtitles) { caption.textContent = result.filtered; }
+          if (rule.filterSubtitles && !rule.apfCaptions) { caption.textContent = result.filtered; }
         }
+        data.textResults.push(result);
       }
     });
 
@@ -1052,7 +1054,7 @@ export default class WebAudio {
 
     if (video && instance.playing(video)) {
       if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
-      const data: WatcherData = { initialCall: true };
+      const data: WatcherData = { initialCall: true, textResults: [] };
       let captions;
 
       if (rule.parentSelector) { // Tested on: Amazon
@@ -1169,7 +1171,7 @@ export default class WebAudio {
       instance.hideSubtitles(rule); // Hide original captions/subtitles
       const textTrack = instance.apfTextTrack(rule, video);
       const currentTime = video.currentTime;
-      const data: WatcherData = { initialCall: true };
+      const data: WatcherData = { initialCall: true, textResults: [] };
       let captions;
 
       if (rule.subtitleSelector) {

@@ -160,6 +160,7 @@ interface WatcherData {
   filtered?: boolean;
   initialCall: boolean;
   skipped?: boolean;
+  textResults: ReplaceTextResult[];
 }
 
 interface WordOptions {
