@@ -1256,7 +1256,6 @@ export default class WebAudio {
             instance.unmute(rule, video);
             instance.lastProcessedText = originalText;
             data.filtered = false;
-            const apfLines = [];
 
             const duration = video.duration;
 
@@ -1275,34 +1274,13 @@ export default class WebAudio {
                 const cue = instance.newCue(currentTime, duration, cueText) as FilteredVTTCue;
                 cue.filtered = data.filtered;
                 cue.originalText = result.original;
-                // TODO! Does this work to add my custom props first?
-                // textTrack.addCue(cue);
-
-                // Add APF Captions line
-                if (rule.apfCaptions) {
-                  const text = result.modified && rule.filterSubtitles ? result.filtered : result.original;
-                  const line = instance.apfCaptionLine(rule, text);
-                  apfLines.unshift(line); // Cues seem to show up in reverse order
-                }
+                textTrack.addCue(cue);
               }
             });
 
             // Hide/show cues
             const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
             if (!rule.videoCueHideCues) { textTrack.mode = shouldBeShown ? 'showing' : 'hidden'; }
-
-            if (apfLines.length) {
-              // Clean up old APF caption lines
-              const container = getElement(rule.apfCaptionsSelector, document);
-              const oldLines = container.querySelector('div.APF-subtitles');
-              if (oldLines) { oldLines.remove(); }
-
-              // Add new APF caption lines (if they should be shown)
-              if (shouldBeShown) {
-                const apfCaptions = instance.apfCaptionLines(rule, apfLines);
-                container.appendChild(apfCaptions);
-              }
-            }
           }
         }
       }
