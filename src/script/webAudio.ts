@@ -853,10 +853,10 @@ export default class WebAudio {
       } else { // These are new captions, unmute if muted
         this.unmute(rule);
         this.lastProcessedText = '';
+        data.filtered = false;
       }
 
       data.initialCall = false;
-      data.filtered = false;
     }
 
     if (captions.hasChildNodes()) {
