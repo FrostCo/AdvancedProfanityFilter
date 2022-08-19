@@ -181,6 +181,19 @@ export default class WebAudio {
     return apfLines;
   }
 
+  apfTextTrack(rule: AudioRule, video: HTMLVideoElement): TextTrack {
+    const label = 'APF'; // TODO: Cue initialize value in rule?
+
+    if (video) {
+      if (video.textTracks.length) {
+        const textTrack = Array.from(video.textTracks).find((track) => track.label == label);
+        if (textTrack) return textTrack;
+      }
+
+      return video.addTextTrack('captions', label, label) as TextTrack;
+    }
+  }
+
   clean(subtitleContainer, ruleIndex = 0): void {
     const rule = this.rules[ruleIndex];
     if (rule.mode === 'watcher') { return; } // If this is for a watcher rule, leave the text alone
@@ -512,7 +525,12 @@ export default class WebAudio {
         this.enabledRuleIds.push(ruleId);
 
         if (rule.mode == 'watcher') {
-          setInterval(this.watcher, rule.checkInterval, this, ruleId);
+          // TODO: Cue make this better/smarter
+          if (rule.toCue) {
+            setInterval(this.watcherToCue, rule.checkInterval, this, ruleId);
+          } else {
+            setInterval(this.watcher, rule.checkInterval, this, ruleId);
+          }
         }
       }
     }
@@ -1158,6 +1176,77 @@ export default class WebAudio {
   watcherSimpleUnmute(rule: AudioRule, video: HTMLVideoElement) {
     this.unmute(rule, video);
     if (rule.showSubtitles > Constants.SHOW_SUBTITLES.ALL) { this.hideSubtitles(rule); }
+  }
+
+  watcherToCue(instance: WebAudio, ruleId = 0) {
+    const rule = instance.rules[ruleId];
+    const video = getElement(rule.videoSelector) as HTMLVideoElement;
+
+    if (video && instance.playing(video)) {
+      const textTrack = instance.apfTextTrack(rule, video);
+      const currentTime = video.currentTime;
+
+      // TODO: Cue Hide captions
+
+      if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
+      const data: WatcherData = { initialCall: true };
+      let captions;
+
+      if (rule.subtitleSelector) {
+        captions = Array.from(getElements(rule.subtitleSelector));
+        if (captions && captions.length) {
+          const originalText = captions.map((caption) => caption.textContent).join(' ');
+
+          // Don't process the same filter again
+          if (instance.lastProcessedText && instance.lastProcessedText === originalText) {
+            data.skipped = true;
+            return false;
+          } else {
+            // These are new captions
+            instance.unmute(rule, video);
+            instance.lastProcessedText = originalText;
+            data.filtered = false;
+
+            // TODO: Cue Handle skipping around? instance only works sequentially
+
+            // Hide current active cues (if any)
+            if (textTrack?.activeCues?.length) {
+              const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
+              activeCues.forEach((cue) => cue.endTime = currentTime - 1);
+            }
+
+            const duration = video.duration;
+
+            // Reverse captions when being added to video textTrack
+            captions.reverse();
+
+            captions.forEach((caption) => {
+              // Don't process empty/whitespace nodes
+              if (caption.textContent && caption.textContent.trim()) {
+                const result = instance.replaceTextResult(caption.textContent);
+                if (result.modified) {
+                  instance.mute(rule, video);
+                  data.filtered = true;
+                }
+                const cueText = rule.filterSubtitles ? result.filtered : result.original;
+                const cue = instance.newCue(currentTime, duration, cueText);
+                textTrack.addCue(cue);
+              }
+            });
+
+            // TODO: Cue Handle showing/hiding
+          }
+        }
+      }
+
+      if (data.skipped) { return false; }
+
+      const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
+      shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
+      if (data.filtered) { instance.filter.updateCounterBadge(); }
+    } else {
+      if (rule.ignoreMutations) { instance.filter.startObserving(); } // Start observing when video is not playing
+    }
   }
 
   youTubeAutoSubsCurrentRow(node): boolean {

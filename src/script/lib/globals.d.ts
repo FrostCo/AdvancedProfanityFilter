@@ -41,6 +41,7 @@ interface AudioRule {
   simpleUnmute?: boolean;                        // [Element,ElementChild,Text+,Watcher+] Simplify requirements for unmuting (should be first rule)
   subtitleSelector?: string;                     // [Element,ElementChild,Watcher] *Used for Filtering*: node.querySelectorAll()
   tagName?: string;                              // [Element*,ElementChild*] node.nodeName
+  toCue?: boolean;                               // [Watcher] [BETA]: Convert page element captions to video textTrack cues
   unmuteDelay?: number;                          // [Element,ElementChild,Watcher] Positive number (in ms) to delay unmuting
   videoCueHideCues?: boolean;                    // [Cue] Remove/hide cues instead of setting textTrack.mode = 'hidden'
   videoCueKind?: string;                         // [Cue] Kind of video TextTrack ('captions', 'subtitles', etc.)
