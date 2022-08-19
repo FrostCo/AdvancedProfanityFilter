@@ -304,6 +304,18 @@ export default class WebAudio {
     }
   }
 
+  cuesIncludingText(cues: FilteredVTTCue[], text: string, prop = 'text') {
+    return cues.filter((cue) => {
+      return text.includes(cue[prop]);
+    });
+  }
+
+  cuesInTimeRange(cues: FilteredVTTCue[], startTime: number, rangeEnd: number, padding = 0) {
+    return cues.filter((cue) => {
+      return cue.startTime >= (startTime - padding) && cue.endTime <= (rangeEnd + padding);
+    });
+  }
+
   delayedUnmute(instance: WebAudio, rule: AudioRule) {
     const delayed = true;
     instance.unmute(rule, null, delayed);
