@@ -894,7 +894,6 @@ export default class WebAudio {
     if (initialCall) { this.lastProcessedText = captions.textContent; }
   }
 
-  // TODO: Only tested with HBO Max
   processWatcherCaptionsArray(rule: AudioRule, captions: HTMLElement[], data: WatcherData) {
     const originalText = captions.map((caption) => caption.textContent).join(' ');
 
@@ -921,8 +920,6 @@ export default class WebAudio {
       }
     });
 
-    const shouldBeShown = this.subtitlesShouldBeShown(rule, data.filtered);
-    shouldBeShown ? this.showSubtitles(rule) : this.hideSubtitles(rule);
     this.lastProcessedText = captions.map((caption) => caption.textContent).join(' ');
   }
 
@@ -1090,6 +1087,7 @@ export default class WebAudio {
 
       if (data.skipped) { return false; }
 
+      // Hide/show caption text
       const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
       shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
       if (data.filtered) { instance.filter.updateCounterBadge(); }
