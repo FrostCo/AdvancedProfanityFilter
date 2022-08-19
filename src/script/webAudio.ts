@@ -159,7 +159,7 @@ export default class WebAudio {
     line.classList.add('APF-subtitle-line');
     line.style.background = 'black';
     line.style.color = 'white';
-    line.style.fontSize = '3.5vw';
+    line.style.fontSize = '3vw';
     line.style.paddingLeft = '4px';
     line.style.paddingRight = '4px';
     line.style.height = '18px';
@@ -170,7 +170,7 @@ export default class WebAudio {
   apfCaptionLines(rule: AudioRule, lines: HTMLSpanElement[]): HTMLDivElement {
     const apfLines = document.createElement('div');
     apfLines.classList.add('APF-subtitles');
-    apfLines.style.bottom = '10px';
+    apfLines.style.bottom = '50px';
     apfLines.style.position = 'absolute';
     apfLines.style.textAlign = 'center';
     apfLines.style.width = '100%';
