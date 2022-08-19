@@ -426,30 +426,30 @@ export default class WebAudio {
   }
 
   initCueRule(rule: AudioRule) {
-    if (rule.apfCaptions === true) { rule.videoCueHideCues = true; }
-    if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
+    if (rule.apfCaptions === true) rule.videoCueHideCues = true;
+    if (rule.videoCueRequireShowing === undefined) rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing;
     if (rule.externalSub) {
-      if (rule.externalSubTrackMode === undefined) { rule.externalSubTrackMode = 'showing'; }
-      if (rule.externalSubURLKey === undefined) { rule.externalSubURLKey = 'url'; }
-      if (rule.externalSubFormatKey === undefined) { rule.externalSubFormatKey = 'format'; }
-      if (rule.externalSubTrackLabel === undefined) { rule.externalSubTrackLabel = 'APF'; }
+      if (rule.externalSubTrackMode === undefined) rule.externalSubTrackMode = 'showing';
+      if (rule.externalSubURLKey === undefined) rule.externalSubURLKey = 'url';
+      if (rule.externalSubFormatKey === undefined) rule.externalSubFormatKey = 'format';
+      if (rule.externalSubTrackLabel === undefined) rule.externalSubTrackLabel = 'APF';
     }
   }
 
   initDisplaySelector(rule: AudioRule) {
     if (rule.displaySelector !== undefined) {
-      if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
-      if (rule.displayShow === undefined) { rule.displayShow = ''; }
+      if (rule.displayHide === undefined) rule.displayHide = 'none';
+      if (rule.displayShow === undefined) rule.displayShow = '';
     }
   }
 
   initDynamicRule(rule: AudioRule) {
     rule._dynamic = true;
-    if (rule.dynamicTargetMode == undefined) { rule.disabled == true; }
+    if (rule.dynamicTargetMode == undefined) rule.disabled == true;
   }
 
   initElementChildRule(rule: AudioRule) {
-    if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
+    if (!rule.parentSelector && !rule.parentSelectorAll) rule.disabled = true;
   }
 
   initElementRule(rule: AudioRule) { }
@@ -461,7 +461,7 @@ export default class WebAudio {
       const audioFiller = new Audio();
       audioFiller.src = url;
       audioFiller.loop = true;
-      if (fillerConfig.volume) { audioFiller.volume = fillerConfig.volume; }
+      if (fillerConfig.volume) audioFiller.volume = fillerConfig.volume;
       if (fillerConfig.loopAfter) {
         audioFiller.ontimeupdate = () => {
           if (audioFiller.currentTime > fillerConfig.loopAfter) {
@@ -491,22 +491,22 @@ export default class WebAudio {
       logger.warn('Audio rule disabled', rule);
     } else {
       // Setup rule defaults
-      if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
-      if (this.filter.filterText == false) { rule.filterSubtitles = false; }
-      if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.defaultVideoSelector; }
+      if (rule.filterSubtitles == null) rule.filterSubtitles = true;
+      if (this.filter.filterText == false) rule.filterSubtitles = false;
+      if (rule.videoSelector === undefined) rule.videoSelector = WebAudio.defaultVideoSelector;
       this.initDisplaySelector(rule);
 
       // Allow rules to override global settings
-      if (rule.muteMethod == null) { rule.muteMethod = this.filter.cfg.muteMethod; }
-      if (rule.showSubtitles == null) { rule.showSubtitles = this.filter.cfg.showSubtitles; }
+      if (rule.muteMethod == null) rule.muteMethod = this.filter.cfg.muteMethod;
+      if (rule.showSubtitles == null) rule.showSubtitles = this.filter.cfg.showSubtitles;
 
       // Ensure proper rule values
-      if (rule.tagName != null && rule.tagName != '#text') { rule.tagName = rule.tagName.toUpperCase(); }
+      if (rule.tagName != null && rule.tagName != '#text') rule.tagName = rule.tagName.toUpperCase();
 
       switch (rule.mode) {
         case 'cue':
           this.initCueRule(rule);
-          if (!rule.disabled) { this.cueRuleIds.push(ruleId); }
+          if (!rule.disabled) this.cueRuleIds.push(ruleId);
           break;
         case 'dynamic':
           this.initDynamicRule(rule);
@@ -522,7 +522,7 @@ export default class WebAudio {
           break;
         case 'watcher':
           this.initWatcherRule(rule);
-          if (!rule.disabled) { this.watcherRuleIds.push(ruleId); }
+          if (!rule.disabled) this.watcherRuleIds.push(ruleId);
           break;
         case 'ytauto':
           // This rule doesn't run like other rules, and is marked as disabled
@@ -548,14 +548,14 @@ export default class WebAudio {
 
   initTextRule(rule: AudioRule) {
     rule.tagName = '#text';
-    if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
+    if (rule.simpleUnmute === undefined) rule.simpleUnmute = true;
   }
 
   initWatcherRule(rule: AudioRule) {
     if (rule.apfCuesLabel === undefined) rule.apfCuesLabel = 'APF-Cues';
-    if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
-    if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
-    if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
+    if (rule.checkInterval === undefined) rule.checkInterval = 20;
+    if (rule.ignoreMutations === undefined) rule.ignoreMutations = true;
+    if (rule.simpleUnmute === undefined) rule.simpleUnmute = true;
   }
 
   initYouTube() {
