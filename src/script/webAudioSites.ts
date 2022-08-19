@@ -207,6 +207,24 @@ export const supportedSites: AudioSites = {
     { displaySelector: 'div.CaptionBox', mode: 'elementChild', parentSelector: 'div.CaptionBox', tagName: 'P' }
   ],
   'www.itv.com': [{ mode: 'cue', videoCueLanguage: 'en' }],
+  'mediasetinfinity.mediaset.it': [
+    {
+      ignoreMutations: true,
+      mode: 'elementChild',
+      parentSelector: 'div#playerContainer > div > div > div > div > div',
+      simpleUnmute: true,
+      tagName: '#text',
+      videoSelector: 'div#playerContainer video',
+    },
+    {
+      ignoreMutations: true,
+      mode: 'elementChild',
+      parentSelector: 'div#playerContainer > div > div > div > div > div > div > div > div > div > div',
+      simpleUnmute: true,
+      tagName: 'DIV',
+      videoSelector: 'div#playerContainer video',
+    },
+  ],
   'www.nbc.com': [
     { className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
     { mode: 'cue', videoCueLanguage: 'en' },
