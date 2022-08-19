@@ -1097,10 +1097,10 @@ export default class WebAudio {
       if (rule.apfCaptions) {
         let container;
         if (rule.apfCaptionsSelector) container = getElement(rule.apfCaptionsSelector);
-        if (!container) container = video.parentElement;
+        if (!container) container = video.parentElement; // Fall-back to video's parent
 
         // Clean up old APF Caption lines
-        const oldLines = getElement('div.APF-subtitles');
+        const oldLines = getElement('div.APF-subtitles', container);
         if (oldLines) oldLines.remove();
 
         // Show APF Caption lines if they should be shown
