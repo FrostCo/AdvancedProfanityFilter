@@ -1066,6 +1066,9 @@ export default class WebAudio {
       const data: WatcherData = { initialCall: true, textResults: [] };
       let captions;
 
+      // Always hide captions if using APF Captions
+      if (rule.apfCaptions && rule.displaySelector) instance.hideSubtitles(rule);
+
       if (rule.parentSelector) { // Tested on: Amazon
         captions = document.querySelector(rule.parentSelector) as HTMLElement;
         if (captions && captions.textContent && captions.textContent.trim()) {
@@ -1087,9 +1090,29 @@ export default class WebAudio {
 
       if (data.skipped) { return false; }
 
-      // Hide/show caption text
+      // Hide/show caption/subtitle text
       const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
-      shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
+
+      if (rule.apfCaptions) {
+        let container;
+        if (rule.apfCaptionsSelector) container = getElement(rule.apfCaptionsSelector);
+        if (!container) container = video.parentElement;
+
+        // Clean up old APF Caption lines
+        const oldLines = getElement('div.APF-subtitles');
+        if (oldLines) oldLines.remove();
+
+        // Show APF Caption lines if they should be shown
+        if (shouldBeShown && data.textResults.length) {
+          const captionLines = data.textResults.map((result) => rule.filterSubtitles && result.modified ? result.filtered : result.original);
+          const apfLines = captionLines.map((text) => instance.apfCaptionLine(rule, text));
+          const apfCaptions = instance.apfCaptionLines(rule, apfLines);
+          container.appendChild(apfCaptions);
+        }
+      } else {
+        shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
+      }
+
       if (data.filtered) { instance.filter.updateCounterBadge(); }
     } else {
       if (rule.ignoreMutations) { instance.filter.startObserving(); } // Start observing when video is not playing
