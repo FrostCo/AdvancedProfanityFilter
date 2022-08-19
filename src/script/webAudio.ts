@@ -1196,13 +1196,16 @@ export default class WebAudio {
     if (rule.showSubtitles > Constants.SHOW_SUBTITLES.ALL) { this.hideSubtitles(rule); }
   }
 
+  // [BETA]
+  // This method doesn't currently work when skipping around or seeking backwards
+  // NOTE: May want to use the onCueChange event function to handle muting? (cue.filtered, etc.)
   watcherToCue(instance: WebAudio, ruleId = 0) {
     const rule = instance.rules[ruleId];
     const video = getElement(rule.videoSelector) as HTMLVideoElement;
 
     if (video && instance.playing(video)) {
       if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
-      instance.hideSubtitles(rule); // Hide original captions/subtitles
+      instance.hideSubtitles(rule); // Always hide captions if using APF Cues
       const textTrack = instance.apfTextTrack(rule, video);
       const currentTime = video.currentTime;
       const data: WatcherData = { initialCall: true, textResults: [] };
@@ -1218,44 +1221,29 @@ export default class WebAudio {
             data.skipped = true;
             return false;
           } else {
-            // TODO Next: Try HTML Version
-            // TODO ALT: Test if things are working with filtered, original text etc.
-            // TODO Next: Try removing old ones and just have current ones?
-            // TODO Next: Clear on scrub? (maybe hard?)
-            // TODO: Cue Handle skipping around? instance only works sequentially
-
-            // Check if we already have these cues (video skipped around)
-            // TODO! make cues into filtered cues (with filter, originalText, etc.)
-            // TODO! Do we need to use the event cue change for muting?
-            // TODO! can you add multiple tracks with the same label?
-            if (textTrack?.activeCues?.length) {
-              // const allCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
-              // const textMatchCues = instance.cuesIncludingText(allCues, originalText, 'originalText');
-              // const timeMatchCues = instance.cuesInTimeRange(textMatchCues, currentTime, 10, (rule.checkInterval * 2) * 0.001);
-              // if (timeMatchCues.length == captions.length) { // ? right?
-              //   data.skipped = true;
-              //   return false;
-              // }
-
-              const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]).reverse();
-              // const activeCueText = activeCues.map(cue => cue.text).join(' ');
-
-              // Skip if these cues are already displayed (video skipped around)
-              // TODO: Function to get cues with a start time and end time around/within range?
-
-              // if (activeCueText == originalText) {
-              //   data.skipped = true;
-              //   return false;
-              // }
-
-              // Hide current active cues (if any)
-              activeCues.forEach((cue) => cue.endTime = currentTime - 1);
-            }
+            // NOTE: Attempt to determine if the current captions were already added (seek backwards/re-watching video)
+            // Deeper check to see if we've already processed these captions
+            // if (textTrack?.activeCues?.length) {
+            //   const allCues = Array.from(textTrack.cues as any as FilteredVTTCue[]);
+            //   const textMatchCues = instance.cuesIncludingText(allCues, originalText, 'originalText');
+            //   const timeMatchCues = instance.cuesInTimeRange(textMatchCues, currentTime, 10, (rule.checkInterval * 2) * 0.001);
+            //   if (timeMatchCues.length == captions.length) {
+            //     data.skipped = true;
+            //     return false;
+            //   }
+            // }
 
             // These are new captions
             instance.unmute(rule, video);
             instance.lastProcessedText = originalText;
             data.filtered = false;
+
+            // Hide current active cues (if any)
+            if (textTrack?.activeCues?.length) {
+              const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
+              // Because we don't have an endTime when we create the cues, this will set that to -1ms
+              activeCues.forEach((cue) => cue.endTime = currentTime - .001);
+            }
 
             const duration = video.duration;
 
