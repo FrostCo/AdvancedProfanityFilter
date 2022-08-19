@@ -536,7 +536,6 @@ export default class WebAudio {
         this.enabledRuleIds.push(ruleId);
 
         if (rule.mode == 'watcher') {
-          // TODO: Cue make this better/smarter
           if (rule.toCue) {
             setInterval(this.watcherToCue, rule.checkInterval, this, ruleId);
           } else {
@@ -1073,7 +1072,7 @@ export default class WebAudio {
         } else { // If there are no captions/subtitles: unmute and hide
           instance.watcherSimpleUnmute(rule, video);
         }
-      } else if (rule.subtitleSelector) { // Working on: HBO max (1/13/2022)
+      } else if (rule.subtitleSelector) {
         captions = Array.from(getElements(rule.subtitleSelector));
         if (captions && captions.length) {
           // TODO: displayVisibility support should be expanded or removed
