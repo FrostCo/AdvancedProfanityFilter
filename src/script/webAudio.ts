@@ -1266,10 +1266,13 @@ export default class WebAudio {
               // Don't process empty/whitespace nodes
               if (caption.textContent && caption.textContent.trim()) {
                 const result = instance.replaceTextResult(caption.textContent);
+                data.textResults.push(result);
                 if (result.modified) {
                   instance.mute(rule, video);
                   data.filtered = true;
                 }
+
+                // Add current caption text as APF Cue
                 const cueText = rule.filterSubtitles ? result.filtered : result.original;
                 const cue = instance.newCue(currentTime, duration, cueText) as FilteredVTTCue;
                 cue.filtered = data.filtered;
