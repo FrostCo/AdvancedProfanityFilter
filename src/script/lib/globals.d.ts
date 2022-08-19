@@ -13,6 +13,7 @@ interface AudioRule {
   displayElementLevels?: number;                 // [Watcher] Number of levels (ancestors) to get _displayElement
   displayHide?: string;                          // [Element,ElementChild,Watcher] Display style for hiding captions (Default: 'none')
   displaySelector?: string;                      // [Element,ElementChild,Watcher] Alternate selector to hide/show captions
+  displaySelectorParents?: number;               // [Element,ElementChild,Watcher] Number of levels to go above displaySelector's element
   displayShow?: string;                          // [Element,ElementChild,Watcher] Display style for showing captions (Default: '')
   displayVisibility?: boolean;                   // [Watcher*] Use visibility to show/hide caption container
   dynamicClasslist?: string;                     // [Dynamic] Set when a dynamicTextKey is found

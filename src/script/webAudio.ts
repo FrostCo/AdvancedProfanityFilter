@@ -389,7 +389,8 @@ export default class WebAudio {
     } else if (rule.displaySelector) {
       const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
-        const container = getElement(rule.displaySelector, root);
+        let container = getElement(rule.displaySelector, root);
+        if (container && rule.displaySelectorParents) container = getParent(container, rule.displaySelectorParents);
         if (container) {
           // Save the original display style if none was included in the rule
           if (
@@ -922,8 +923,9 @@ export default class WebAudio {
     } else if (rule.displaySelector) {
       const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
-        const container = getElement(rule.displaySelector, root);
-        if (container) { container.style.setProperty('display', rule.displayShow); }
+        let container = getElement(rule.displaySelector, root);
+        if (container && rule.displaySelectorParents) container = getParent(container, rule.displaySelectorParents);
+        if (container) container.style.setProperty('display', rule.displayShow);
       }
     }
   }
