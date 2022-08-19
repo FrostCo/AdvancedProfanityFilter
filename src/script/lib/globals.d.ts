@@ -157,7 +157,7 @@ interface Version {
 }
 
 interface WatcherData {
-  filtered?: boolean;
+  filtered: boolean;
   initialCall: boolean;
   skipped?: boolean;
   textResults: ReplaceTextResult[];

@@ -865,7 +865,6 @@ export default class WebAudio {
       } else { // These are new captions, unmute if muted
         this.unmute(rule);
         this.lastProcessedText = '';
-        data.filtered = false;
       }
 
       data.initialCall = false;
@@ -904,7 +903,6 @@ export default class WebAudio {
     } else { // These are new captions, unmute if muted
       this.unmute(rule);
       this.lastProcessedText = '';
-      data.filtered = false;
     }
 
     captions.forEach((caption) => {
@@ -1063,7 +1061,7 @@ export default class WebAudio {
 
     if (video && instance.playing(video)) {
       if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
-      const data: WatcherData = { initialCall: true, textResults: [] };
+      const data: WatcherData = { filtered: false, initialCall: true, textResults: [] };
       let captions;
 
       // Always hide captions if using APF Captions
@@ -1208,7 +1206,7 @@ export default class WebAudio {
       instance.hideSubtitles(rule); // Always hide captions if using APF Cues
       const textTrack = instance.apfTextTrack(rule, video);
       const currentTime = video.currentTime;
-      const data: WatcherData = { initialCall: true, textResults: [] };
+      const data: WatcherData = { filtered: false, initialCall: true, textResults: [] };
       let captions;
 
       if (rule.subtitleSelector) {
@@ -1236,7 +1234,6 @@ export default class WebAudio {
             // These are new captions
             instance.unmute(rule, video);
             instance.lastProcessedText = originalText;
-            data.filtered = false;
 
             // Hide current active cues (if any)
             if (textTrack?.activeCues?.length) {
