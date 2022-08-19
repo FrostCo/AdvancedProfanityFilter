@@ -424,12 +424,16 @@ export default class WebFilter extends Filter {
 
   startObserving(target: Node = document, observer: MutationObserver = this.observer) {
     observer.observe(target, observerConfig);
+    // TODO: Track shadowObserver nodes if we need to restart observing
   }
 
   stopObserving(observer: MutationObserver = this.observer) {
     const mutations = observer.takeRecords();
+    const shadowMutations = this.shadowObserver.takeRecords();
     observer.disconnect();
+    this.shadowObserver.disconnect();
     if (mutations) { this.processMutations(mutations); }
+    if (shadowMutations) this.processMutations(shadowMutations);
   }
 
   updateCounterBadge() {
