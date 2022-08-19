@@ -78,24 +78,11 @@ export const supportedSites: AudioSites = {
   ],
   'tv.apple.com': [
     {
-      displaySelector: 'div.video-container > div > div > div',
-      mode: 'elementChild',
-      muteMethod: Constants.MUTE_METHODS.TAB,
-      parentSelector: 'div.video-container',
-      preserveWhiteSpace: true,
-      rootNode: true,
-      subtitleSelector: 'div > div > div > div > div',
-      tagName: 'DIV',
-    },
-    {
-      displaySelector: 'div.video-container > div > div > div',
-      mode: 'elementChild',
-      muteMethod: Constants.MUTE_METHODS.TAB,
-      parentSelector: 'div.video-container',
-      preserveWhiteSpace: true,
-      rootNode: true,
-      subtitleSelector: 'div > div > div > div > span',
-      tagName: 'DIV',
+      apfCaptions: true,
+      displaySelector: 'apple-tv-plus-player >>> amp-video-player-internal >>> amp-video-player >>> div.video-container > div',
+      mode: 'watcher',
+      subtitleSelector: 'apple-tv-plus-player >>> amp-video-player-internal >>> amp-video-player >>> div.video-container > div > div > div > div',
+      videoSelector: 'apple-tv-plus-player >>> amp-video-player-internal >>> amp-video-player >>> div.video-container video',
     },
   ],
   'www.att.tv': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
@@ -151,6 +138,7 @@ export const supportedSites: AudioSites = {
     { className: 'ttr-container', convertBreaks: true, mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
     { className: 'ttr-line', convertBreaks: true, mode: 'element', note: '[CC]', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
   ],
+  'www.dailywire.com': [{ mode: 'cue' }],
   'www.discoveryplus.com': [{ displaySelector: 'div.cjRVXG', mode: 'cue', videoCueKind: 'captions', videoCueLanguage: 'en' }],
   'www.dishanywhere.com': [
     { className: 'bmpui-ui-subtitle-label', mode: 'element', tagName: 'SPAN' },
@@ -199,13 +187,40 @@ export const supportedSites: AudioSites = {
   ],
   'fxnow.fxnetworks.com': [{ iframe: true, mode: 'cue', videoSelector: 'video' }],
   'play.google.com': [{ className: 'lava-timed-text-window', mode: 'element', subtitleSelector: 'span.lava-timed-text-caption', tagName: 'DIV' }],
-  'play.hbomax.com': [{ displayElementLevels: 5, displayVisibility: true, mode: 'watcher', showSubtitles: Constants.SHOW_SUBTITLES.ALL, subtitleSelector: "span[style^='font-family: font']" }],
+  'play.hbomax.com': [
+    {
+      apfCaptions: true,
+      displaySelector: "div[data-testid='CueBoxContainer']",
+      displaySelectorParents: 1,
+      ignoreMutations: true,
+      mode: 'watcher',
+      subtitleSelector: "div[data-testid='CueBoxContainer'] > div > div > div",
+    },
+  ],
   'www.hidive.com': [{ className: 'rmp-cc-container', mode: 'element', subtitleSelector: 'div.rmp-cc-cue > span', tagName: 'DIV' }],
   'www.hulu.com': [
     { className: 'caption-text-box', displaySelector: 'div.caption-text-box', mode: 'element', subtitleSelector: 'p', tagName: 'DIV' },
     { displaySelector: 'div.CaptionBox', mode: 'elementChild', parentSelector: 'div.CaptionBox', tagName: 'P' }
   ],
   'www.itv.com': [{ mode: 'cue', videoCueLanguage: 'en' }],
+  'mediasetinfinity.mediaset.it': [
+    {
+      ignoreMutations: true,
+      mode: 'elementChild',
+      parentSelector: 'div#playerContainer > div > div > div > div > div',
+      simpleUnmute: true,
+      tagName: '#text',
+      videoSelector: 'div#playerContainer video',
+    },
+    {
+      ignoreMutations: true,
+      mode: 'elementChild',
+      parentSelector: 'div#playerContainer > div > div > div > div > div > div > div > div > div > div',
+      simpleUnmute: true,
+      tagName: 'DIV',
+      videoSelector: 'div#playerContainer video',
+    },
+  ],
   'www.nbc.com': [
     { className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
     { mode: 'cue', videoCueLanguage: 'en' },
@@ -265,7 +280,7 @@ export const supportedSites: AudioSites = {
   'www.usanetwork.com': [{ className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' }],
   'vimeo.com': [{ mode: 'element', tagName: 'SPAN', note: 'Only tested with single-line captions', className: 'vp-captions-line', displaySelector: 'div.vp-captions > span.vp-captions-window' }],
   'player.vimeo.com': [{ mode: 'element', tagName: 'SPAN', note: 'For embedded videos', className: 'vp-captions-line', displaySelector: 'div.vp-captions > span.vp-captions-window' }],
-  'www.vudu.com': [{ mode: 'element', subtitleSelector: 'span.subtitles', tagName: 'DIV' }],
+  'www.vudu.com': [{ displaySelector: 'div#subtitleContainer > div', iframe: true, mode: 'element', subtitleSelector: 'span.subtitles', tagName: 'DIV' }],
   'vrv.co': [
     { displaySelector: 'div.libassjs-canvas-parent', externalSub: true, externalSubVar: 'window.vilos.content.captions', iframe: true, mode: 'cue', videoCueLanguage: 'en-US', videoCueRequireShowing: false },
     { displaySelector: 'div.libassjs-canvas-parent', externalSub: true, externalSubVar: 'window.vilos.content.subtitles', iframe: true, mode: 'cue', videoCueLanguage: 'en-US', videoCueRequireShowing: false },

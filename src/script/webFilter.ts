@@ -415,7 +415,7 @@ export default class WebFilter extends Filter {
     if (this.cfg.muteAudio && this.cfg.muteMethod == Constants.MUTE_METHODS.TAB) { message.clearMute = true; }
 
     // Send page state to color icon badge
-    if (!this.iframe) { message.setBadgeColor = true; }
+    if (!this.iframe || this.mutePage) { message.setBadgeColor = true; }
     message.advanced = this.domain.advanced;
     message.mutePage = this.mutePage;
     if (this.mutePage && this.cfg.showCounter) { message.counter = this.counter; } // Always show counter when muting audio
@@ -424,12 +424,16 @@ export default class WebFilter extends Filter {
 
   startObserving(target: Node = document, observer: MutationObserver = this.observer) {
     observer.observe(target, observerConfig);
+    // TODO: Track shadowObserver nodes if we need to restart observing
   }
 
   stopObserving(observer: MutationObserver = this.observer) {
     const mutations = observer.takeRecords();
+    const shadowMutations = this.shadowObserver.takeRecords();
     observer.disconnect();
+    this.shadowObserver.disconnect();
     if (mutations) { this.processMutations(mutations); }
+    if (shadowMutations) this.processMutations(shadowMutations);
   }
 
   updateCounterBadge() {

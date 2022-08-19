@@ -147,6 +147,10 @@ export default class WebAudio {
         this.supportedPage = true;
         this.initYouTube();
       }
+
+      if (this.cueRuleIds.length) {
+        setInterval(this.watchForVideo, 250, this);
+      }
     }
   }
 
@@ -155,7 +159,7 @@ export default class WebAudio {
     line.classList.add('APF-subtitle-line');
     line.style.background = 'black';
     line.style.color = 'white';
-    line.style.fontSize = '3.5vw';
+    line.style.fontSize = '3vw';
     line.style.paddingLeft = '4px';
     line.style.paddingRight = '4px';
     line.style.height = '18px';
@@ -166,7 +170,7 @@ export default class WebAudio {
   apfCaptionLines(rule: AudioRule, lines: HTMLSpanElement[]): HTMLDivElement {
     const apfLines = document.createElement('div');
     apfLines.classList.add('APF-subtitles');
-    apfLines.style.bottom = '10px';
+    apfLines.style.bottom = '50px';
     apfLines.style.position = 'absolute';
     apfLines.style.textAlign = 'center';
     apfLines.style.width = '100%';
@@ -175,6 +179,17 @@ export default class WebAudio {
       apfLines.appendChild(document.createElement('br'));
     });
     return apfLines;
+  }
+
+  apfTextTrack(rule: AudioRule, video: HTMLVideoElement): TextTrack {
+    if (video) {
+      if (video.textTracks.length) {
+        const textTrack = Array.from(video.textTracks).find((track) => track.label == rule.apfCuesLabel);
+        if (textTrack) return textTrack;
+      }
+
+      return video.addTextTrack('captions', rule.apfCuesLabel, rule.apfCuesLabel) as TextTrack;
+    }
   }
 
   clean(subtitleContainer, ruleIndex = 0): void {
@@ -287,6 +302,18 @@ export default class WebAudio {
     }
   }
 
+  cuesIncludingText(cues: FilteredVTTCue[], text: string, prop = 'text') {
+    return cues.filter((cue) => {
+      return text.includes(cue[prop]);
+    });
+  }
+
+  cuesInTimeRange(cues: FilteredVTTCue[], startTime: number, rangeEnd: number, padding = 0) {
+    return cues.filter((cue) => {
+      return cue.startTime >= (startTime - padding) && cue.endTime <= (rangeEnd + padding);
+    });
+  }
+
   delayedUnmute(instance: WebAudio, rule: AudioRule) {
     const delayed = true;
     instance.unmute(rule, null, delayed);
@@ -372,7 +399,8 @@ export default class WebAudio {
     } else if (rule.displaySelector) {
       const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
-        const container = getElement(rule.displaySelector, root);
+        let container = getElement(rule.displaySelector, root);
+        if (container && rule.displaySelectorParents) container = getParent(container, rule.displaySelectorParents);
         if (container) {
           // Save the original display style if none was included in the rule
           if (
@@ -398,30 +426,30 @@ export default class WebAudio {
   }
 
   initCueRule(rule: AudioRule) {
-    if (rule.apfCaptions === true) { rule.videoCueHideCues = true; }
-    if (rule.videoCueRequireShowing === undefined) { rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing; }
+    if (rule.apfCaptions === true) rule.videoCueHideCues = true;
+    if (rule.videoCueRequireShowing === undefined) rule.videoCueRequireShowing = this.filter.cfg.muteCueRequireShowing;
     if (rule.externalSub) {
-      if (rule.externalSubTrackMode === undefined) { rule.externalSubTrackMode = 'showing'; }
-      if (rule.externalSubURLKey === undefined) { rule.externalSubURLKey = 'url'; }
-      if (rule.externalSubFormatKey === undefined) { rule.externalSubFormatKey = 'format'; }
-      if (rule.externalSubTrackLabel === undefined) { rule.externalSubTrackLabel = 'APF'; }
+      if (rule.externalSubTrackMode === undefined) rule.externalSubTrackMode = 'showing';
+      if (rule.externalSubURLKey === undefined) rule.externalSubURLKey = 'url';
+      if (rule.externalSubFormatKey === undefined) rule.externalSubFormatKey = 'format';
+      if (rule.externalSubTrackLabel === undefined) rule.externalSubTrackLabel = 'APF';
     }
   }
 
   initDisplaySelector(rule: AudioRule) {
     if (rule.displaySelector !== undefined) {
-      if (rule.displayHide === undefined) { rule.displayHide = 'none'; }
-      if (rule.displayShow === undefined) { rule.displayShow = ''; }
+      if (rule.displayHide === undefined) rule.displayHide = 'none';
+      if (rule.displayShow === undefined) rule.displayShow = '';
     }
   }
 
   initDynamicRule(rule: AudioRule) {
     rule._dynamic = true;
-    if (rule.dynamicTargetMode == undefined) { rule.disabled == true; }
+    if (rule.dynamicTargetMode == undefined) rule.disabled == true;
   }
 
   initElementChildRule(rule: AudioRule) {
-    if (!rule.parentSelector && !rule.parentSelectorAll) { rule.disabled = true; }
+    if (!rule.parentSelector && !rule.parentSelectorAll) rule.disabled = true;
   }
 
   initElementRule(rule: AudioRule) { }
@@ -433,7 +461,7 @@ export default class WebAudio {
       const audioFiller = new Audio();
       audioFiller.src = url;
       audioFiller.loop = true;
-      if (fillerConfig.volume) { audioFiller.volume = fillerConfig.volume; }
+      if (fillerConfig.volume) audioFiller.volume = fillerConfig.volume;
       if (fillerConfig.loopAfter) {
         audioFiller.ontimeupdate = () => {
           if (audioFiller.currentTime > fillerConfig.loopAfter) {
@@ -463,22 +491,22 @@ export default class WebAudio {
       logger.warn('Audio rule disabled', rule);
     } else {
       // Setup rule defaults
-      if (rule.filterSubtitles == null) { rule.filterSubtitles = true; }
-      if (this.filter.filterText == false) { rule.filterSubtitles = false; }
-      if (rule.videoSelector === undefined) { rule.videoSelector = WebAudio.defaultVideoSelector; }
+      if (rule.filterSubtitles == null) rule.filterSubtitles = true;
+      if (this.filter.filterText == false) rule.filterSubtitles = false;
+      if (rule.videoSelector === undefined) rule.videoSelector = WebAudio.defaultVideoSelector;
       this.initDisplaySelector(rule);
 
       // Allow rules to override global settings
-      if (rule.muteMethod == null) { rule.muteMethod = this.filter.cfg.muteMethod; }
-      if (rule.showSubtitles == null) { rule.showSubtitles = this.filter.cfg.showSubtitles; }
+      if (rule.muteMethod == null) rule.muteMethod = this.filter.cfg.muteMethod;
+      if (rule.showSubtitles == null) rule.showSubtitles = this.filter.cfg.showSubtitles;
 
       // Ensure proper rule values
-      if (rule.tagName != null && rule.tagName != '#text') { rule.tagName = rule.tagName.toUpperCase(); }
+      if (rule.tagName != null && rule.tagName != '#text') rule.tagName = rule.tagName.toUpperCase();
 
       switch (rule.mode) {
         case 'cue':
           this.initCueRule(rule);
-          if (!rule.disabled) { this.cueRuleIds.push(ruleId); }
+          if (!rule.disabled) this.cueRuleIds.push(ruleId);
           break;
         case 'dynamic':
           this.initDynamicRule(rule);
@@ -494,7 +522,7 @@ export default class WebAudio {
           break;
         case 'watcher':
           this.initWatcherRule(rule);
-          if (!rule.disabled) { this.watcherRuleIds.push(ruleId); }
+          if (!rule.disabled) this.watcherRuleIds.push(ruleId);
           break;
         case 'ytauto':
           // This rule doesn't run like other rules, and is marked as disabled
@@ -503,14 +531,16 @@ export default class WebAudio {
       }
 
       if (rule.disabled) {
-        logger.warn('Audio rule disabled during initialization', rule);
+        if (rule.mode != 'ytauto') logger.warn('Audio rule disabled during initialization', rule);
       } else {
         this.enabledRuleIds.push(ruleId);
 
-        if (rule.mode == 'cue' && this.cueRuleIds.length === 1) { // Only for first rule
-          setInterval(this.watchForVideo, 250, this);
-        } else if (rule.mode == 'watcher') {
-          setInterval(this.watcher, rule.checkInterval, this, ruleId);
+        if (rule.mode == 'watcher') {
+          if (rule.toCue) {
+            setInterval(this.watcherToCue, rule.checkInterval, this, ruleId);
+          } else {
+            setInterval(this.watcher, rule.checkInterval, this, ruleId);
+          }
         }
       }
     }
@@ -518,13 +548,14 @@ export default class WebAudio {
 
   initTextRule(rule: AudioRule) {
     rule.tagName = '#text';
-    if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
+    if (rule.simpleUnmute === undefined) rule.simpleUnmute = true;
   }
 
   initWatcherRule(rule: AudioRule) {
-    if (rule.checkInterval === undefined) { rule.checkInterval = 20; }
-    if (rule.ignoreMutations === undefined) { rule.ignoreMutations = true; }
-    if (rule.simpleUnmute === undefined) { rule.simpleUnmute = true; }
+    if (rule.apfCuesLabel === undefined) rule.apfCuesLabel = 'APF-Cues';
+    if (rule.checkInterval === undefined) rule.checkInterval = 20;
+    if (rule.ignoreMutations === undefined) rule.ignoreMutations = true;
+    if (rule.simpleUnmute === undefined) rule.simpleUnmute = true;
   }
 
   initYouTube() {
@@ -582,7 +613,9 @@ export default class WebAudio {
 
   newCue(start, end, text, options: ParsedSubOptions = {}): VTTCue {
     try {
-      const cue = new VTTCue(hmsToSeconds(start), hmsToSeconds(end), text);
+      const startSeconds = typeof start === 'string' ? hmsToSeconds(start) : start;
+      const endSeconds = typeof end === 'string' ? hmsToSeconds(end) : end;
+      const cue = new VTTCue(startSeconds, endSeconds, text);
       if (options.align) { cue.align = options.align; }
       if (options.line) { cue.line = this.parseLineAndPositionSetting(options.line); }
       if (options.position) { cue.position = this.parseLineAndPositionSetting(options.position); }
@@ -833,7 +866,6 @@ export default class WebAudio {
       }
 
       data.initialCall = false;
-      data.filtered = false;
     }
 
     if (captions.hasChildNodes()) {
@@ -850,15 +882,15 @@ export default class WebAudio {
         if (result.modified) {
           this.mute(rule);
           data.filtered = true;
-          if (rule.filterSubtitles) { captions[textMethod] = result.filtered; }
+          if (rule.filterSubtitles && !rule.apfCaptions) { captions[textMethod] = result.filtered; }
         }
+        data.textResults.push(result);
       }
     }
 
     if (initialCall) { this.lastProcessedText = captions.textContent; }
   }
 
-  // TODO: Only tested with HBO Max
   processWatcherCaptionsArray(rule: AudioRule, captions: HTMLElement[], data: WatcherData) {
     const originalText = captions.map((caption) => caption.textContent).join(' ');
 
@@ -869,7 +901,6 @@ export default class WebAudio {
     } else { // These are new captions, unmute if muted
       this.unmute(rule);
       this.lastProcessedText = '';
-      data.filtered = false;
     }
 
     captions.forEach((caption) => {
@@ -879,13 +910,12 @@ export default class WebAudio {
         if (result.modified) {
           this.mute(rule);
           data.filtered = true;
-          if (rule.filterSubtitles) { caption.textContent = result.filtered; }
+          if (rule.filterSubtitles && !rule.apfCaptions) { caption.textContent = result.filtered; }
         }
+        data.textResults.push(result);
       }
     });
 
-    const shouldBeShown = this.subtitlesShouldBeShown(rule, data.filtered);
-    shouldBeShown ? this.showSubtitles(rule) : this.hideSubtitles(rule);
     this.lastProcessedText = captions.map((caption) => caption.textContent).join(' ');
   }
 
@@ -900,8 +930,9 @@ export default class WebAudio {
     } else if (rule.displaySelector) {
       const root = rule.rootNode && subtitles && subtitles[0] ? subtitles[0].getRootNode() : document;
       if (root) {
-        const container = getElement(rule.displaySelector, root);
-        if (container) { container.style.setProperty('display', rule.displayShow); }
+        let container = getElement(rule.displaySelector, root);
+        if (container && rule.displaySelectorParents) container = getParent(container, rule.displaySelectorParents);
+        if (container) container.style.setProperty('display', rule.displayShow);
       }
     }
   }
@@ -945,7 +976,7 @@ export default class WebAudio {
             if (root) {
               if (rule.parentSelector) {
                 const parent = root.querySelector(rule.parentSelector);
-                if (parent && parent.contains(node)) { return ruleId; }
+                if (parent && (parent == node || parent.contains(node))) { return ruleId; }
               } else {
                 const parents = root.querySelectorAll(rule.parentSelectorAll);
                 for (let j = 0; j < parents.length; j++) {
@@ -1028,39 +1059,23 @@ export default class WebAudio {
 
     if (video && instance.playing(video)) {
       if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
-      const data: WatcherData = { initialCall: true };
+      const data: WatcherData = { filtered: false, initialCall: true, textResults: [] };
       let captions;
-      let parents;
 
-      if (rule.parentSelectorAll) { // Tested on: HBO Max (No longer working)
-        if (rule._dynamic) {
-          parents = Array.from(document.querySelectorAll(rule.parentSelectorAll)).filter((result) => {
-            return result.textContent !== rule.dynamicTextKey;
-          }) as HTMLElement[];
+      // Always hide captions if using APF Captions
+      if (rule.apfCaptions && rule.displaySelector) instance.hideSubtitles(rule);
 
-          if (rule.displayVisibility && (!rule._displayElement || !document.body.contains(rule._displayElement))) {
-            rule._displayElement = getParent(parents[0], rule.getParentLevel);
-          }
-        } else {
-          parents = Array.from(document.querySelectorAll(rule.parentSelectorAll)) as HTMLElement[];
-        }
-
-        captions = parents.map((parent) => parent.querySelector(rule.subtitleSelector));
-        if (captions.length) {
-          instance.processWatcherCaptionsArray(rule, captions, data);
-        } else { // If there are no captions/subtitles: unmute and hide
-          instance.watcherSimpleUnmute(rule, video);
-        }
-      } else if (rule.parentSelector) { // Tested on: Amazon
+      if (rule.parentSelector) { // Tested on: Amazon
         captions = document.querySelector(rule.parentSelector) as HTMLElement;
         if (captions && captions.textContent && captions.textContent.trim()) {
           instance.processWatcherCaptions(rule, captions, data);
         } else { // If there are no captions/subtitles: unmute and hide
           instance.watcherSimpleUnmute(rule, video);
         }
-      } else if (rule.subtitleSelector) { // Working on: HBO max (1/13/2022)
+      } else if (rule.subtitleSelector) {
         captions = Array.from(getElements(rule.subtitleSelector));
         if (captions && captions.length) {
+          // TODO: displayVisibility support should be expanded or removed
           if (rule.displayVisibility && (!rule._displayElement || !document.body.contains(rule._displayElement))) {
             rule._displayElement = getParent(captions[0], rule.displayElementLevels);
           }
@@ -1072,8 +1087,29 @@ export default class WebAudio {
 
       if (data.skipped) { return false; }
 
+      // Hide/show caption/subtitle text
       const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
-      shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
+
+      if (rule.apfCaptions) {
+        let container;
+        if (rule.apfCaptionsSelector) container = getElement(rule.apfCaptionsSelector);
+        if (!container) container = video.parentElement; // Fall-back to video's parent
+
+        // Clean up old APF Caption lines
+        const oldLines = getElement('div.APF-subtitles', container);
+        if (oldLines) oldLines.remove();
+
+        // Show APF Caption lines if they should be shown
+        if (shouldBeShown && data.textResults.length) {
+          const captionLines = data.textResults.map((result) => rule.filterSubtitles && result.modified ? result.filtered : result.original);
+          const apfLines = captionLines.map((text) => instance.apfCaptionLine(rule, text));
+          const apfCaptions = instance.apfCaptionLines(rule, apfLines);
+          container.appendChild(apfCaptions);
+        }
+      } else {
+        shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
+      }
+
       if (data.filtered) { instance.filter.updateCounterBadge(); }
     } else {
       if (rule.ignoreMutations) { instance.filter.startObserving(); } // Start observing when video is not playing
@@ -1154,6 +1190,106 @@ export default class WebAudio {
   watcherSimpleUnmute(rule: AudioRule, video: HTMLVideoElement) {
     this.unmute(rule, video);
     if (rule.showSubtitles > Constants.SHOW_SUBTITLES.ALL) { this.hideSubtitles(rule); }
+  }
+
+  // [BETA]
+  // This method doesn't currently work when skipping around or seeking backwards
+  // NOTE: May want to use the onCueChange event function to handle muting? (cue.filtered, etc.)
+  watcherToCue(instance: WebAudio, ruleId = 0) {
+    const rule = instance.rules[ruleId];
+    const video = getElement(rule.videoSelector) as HTMLVideoElement;
+
+    if (video && instance.playing(video)) {
+      if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
+      instance.hideSubtitles(rule); // Always hide captions if using APF Cues
+      const textTrack = instance.apfTextTrack(rule, video);
+      const currentTime = video.currentTime;
+      const data: WatcherData = { filtered: false, initialCall: true, textResults: [] };
+      let captions;
+
+      if (rule.subtitleSelector) {
+        captions = Array.from(getElements(rule.subtitleSelector));
+        if (captions && captions.length) {
+          const originalText = captions.map((caption) => caption.textContent).join(' ');
+
+          // Don't process the same filter again
+          if (instance.lastProcessedText && instance.lastProcessedText === originalText) {
+            data.skipped = true;
+            return false;
+          } else {
+            // NOTE: Attempt to determine if the current captions were already added (seek backwards/re-watching video)
+            // Deeper check to see if we've already processed these captions
+            // if (textTrack?.activeCues?.length) {
+            //   const allCues = Array.from(textTrack.cues as any as FilteredVTTCue[]);
+            //   const textMatchCues = instance.cuesIncludingText(allCues, originalText, 'originalText');
+            //   const timeMatchCues = instance.cuesInTimeRange(textMatchCues, currentTime, 10, (rule.checkInterval * 2) * 0.001);
+            //   if (timeMatchCues.length == captions.length) {
+            //     data.skipped = true;
+            //     return false;
+            //   }
+            // }
+
+            // These are new captions
+            instance.unmute(rule, video);
+            instance.lastProcessedText = originalText;
+
+            // Hide current active cues (if any)
+            if (textTrack?.activeCues?.length) {
+              const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
+              // Because we don't have an endTime when we create the cues, this will set that to -1ms
+              activeCues.forEach((cue) => cue.endTime = currentTime - .001);
+            }
+
+            const duration = video.duration;
+
+            // Reverse captions when being added to video textTrack
+            captions.reverse();
+
+            captions.forEach((caption) => {
+              // Don't process empty/whitespace nodes
+              if (caption.textContent && caption.textContent.trim()) {
+                const result = instance.replaceTextResult(caption.textContent);
+                data.textResults.push(result);
+                if (result.modified) {
+                  instance.mute(rule, video);
+                  data.filtered = true;
+                }
+
+                // Add current caption text as APF Cue
+                const cueText = rule.filterSubtitles ? result.filtered : result.original;
+                const cue = instance.newCue(currentTime, duration, cueText) as FilteredVTTCue;
+                cue.filtered = data.filtered;
+                cue.originalText = result.original;
+                textTrack.addCue(cue);
+              }
+            });
+
+            // Hide/show cues
+            const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
+            if (!rule.videoCueHideCues) { textTrack.mode = shouldBeShown ? 'showing' : 'hidden'; }
+          }
+        }  else {
+          // If there are no captions/subtitles: unmute and hide
+          instance.watcherSimpleUnmute(rule, video);
+
+          // Hide any activeCues
+          if (textTrack?.activeCues?.length) {
+            const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
+            // Because we don't have an endTime when we create the cues, this will set that to -1ms
+            activeCues.forEach((cue) => cue.endTime = currentTime - .001);
+          }
+
+          // Hide/show textTrack
+          const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
+          if (!rule.videoCueHideCues) textTrack.mode = shouldBeShown ? 'showing' : 'hidden';
+        }
+      }
+
+      if (data.skipped) { return false; } // TODO: Cue - Not needed when in same function
+      if (data.filtered) { instance.filter.updateCounterBadge(); }
+    } else {
+      if (rule.ignoreMutations) { instance.filter.startObserving(); } // Start observing when video is not playing
+    }
   }
 
   youTubeAutoSubsCurrentRow(node): boolean {

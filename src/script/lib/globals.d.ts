@@ -3,6 +3,7 @@ interface AudioRule {
   _dynamic?: boolean;                            // [Dynamic] Set to true on a dynamic rule
   apfCaptions?: boolean;                         // [Cue] Display an HTML version of the caption/subtitle text: Requires videoCueHideCues = true
   apfCaptionsSelector?: string;                  // [Cue] Selector for container that will hold the custom HTML captions
+  apfCuesLabel?: string;                         // [Watcher.toCue] TextTrack label for APF Cues (Default: 'APF-Cues')
   buildTarget?: string;                          // [All] Only allow rule to run on a specific buildTarget
   checkInterval?: number;                        // [Watcher] Set a custom watch interval (in ms, Default: 20)
   className?: string;                            // [Element] node.className.includes()
@@ -13,6 +14,7 @@ interface AudioRule {
   displayElementLevels?: number;                 // [Watcher] Number of levels (ancestors) to get _displayElement
   displayHide?: string;                          // [Element,ElementChild,Watcher] Display style for hiding captions (Default: 'none')
   displaySelector?: string;                      // [Element,ElementChild,Watcher] Alternate selector to hide/show captions
+  displaySelectorParents?: number;               // [Element,ElementChild,Watcher] Number of levels to go above displaySelector's element
   displayShow?: string;                          // [Element,ElementChild,Watcher] Display style for showing captions (Default: '')
   displayVisibility?: boolean;                   // [Watcher*] Use visibility to show/hide caption container
   dynamicClasslist?: string;                     // [Dynamic] Set when a dynamicTextKey is found
@@ -41,6 +43,7 @@ interface AudioRule {
   simpleUnmute?: boolean;                        // [Element,ElementChild,Text+,Watcher+] Simplify requirements for unmuting (should be first rule)
   subtitleSelector?: string;                     // [Element,ElementChild,Watcher] *Used for Filtering*: node.querySelectorAll()
   tagName?: string;                              // [Element*,ElementChild*] node.nodeName
+  toCue?: boolean;                               // [Watcher] [BETA]: Convert page element captions to video textTrack cues
   unmuteDelay?: number;                          // [Element,ElementChild,Watcher] Positive number (in ms) to delay unmuting
   videoCueHideCues?: boolean;                    // [Cue] Remove/hide cues instead of setting textTrack.mode = 'hidden'
   videoCueKind?: string;                         // [Cue] Kind of video TextTrack ('captions', 'subtitles', etc.)
@@ -155,9 +158,10 @@ interface Version {
 }
 
 interface WatcherData {
-  filtered?: boolean;
+  filtered: boolean;
   initialCall: boolean;
   skipped?: boolean;
+  textResults: ReplaceTextResult[];
 }
 
 interface WordOptions {
