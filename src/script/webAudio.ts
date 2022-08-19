@@ -1234,7 +1234,9 @@ export default class WebAudio {
               }
             });
 
-            // TODO: Cue Handle showing/hiding
+            // Hide/show cues
+            const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
+            if (!rule.videoCueHideCues) { textTrack.mode = shouldBeShown ? 'showing' : 'hidden'; }
           }
         }
       }
