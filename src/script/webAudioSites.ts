@@ -151,6 +151,7 @@ export const supportedSites: AudioSites = {
     { className: 'ttr-container', convertBreaks: true, mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
     { className: 'ttr-line', convertBreaks: true, mode: 'element', note: '[CC]', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
   ],
+  'www.dailywire.com': [{ mode: 'cue' }],
   'www.discoveryplus.com': [{ displaySelector: 'div.cjRVXG', mode: 'cue', videoCueKind: 'captions', videoCueLanguage: 'en' }],
   'www.dishanywhere.com': [
     { className: 'bmpui-ui-subtitle-label', mode: 'element', tagName: 'SPAN' },
