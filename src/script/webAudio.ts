@@ -1196,18 +1196,45 @@ export default class WebAudio {
             data.skipped = true;
             return false;
           } else {
+            // TODO Next: Try HTML Version
+            // TODO ALT: Test if things are working with filtered, original text etc.
+            // TODO Next: Try removing old ones and just have current ones?
+            // TODO Next: Clear on scrub? (maybe hard?)
+            // TODO: Cue Handle skipping around? instance only works sequentially
+
+            // Check if we already have these cues (video skipped around)
+            // TODO! make cues into filtered cues (with filter, originalText, etc.)
+            // TODO! Do we need to use the event cue change for muting?
+            // TODO! can you add multiple tracks with the same label?
+            if (textTrack?.activeCues?.length) {
+              // const allCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
+              // const textMatchCues = instance.cuesIncludingText(allCues, originalText, 'originalText');
+              // const timeMatchCues = instance.cuesInTimeRange(textMatchCues, currentTime, 10, (rule.checkInterval * 2) * 0.001);
+              // if (timeMatchCues.length == captions.length) { // ? right?
+              //   data.skipped = true;
+              //   return false;
+              // }
+
+              const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]).reverse();
+              // const activeCueText = activeCues.map(cue => cue.text).join(' ');
+
+              // Skip if these cues are already displayed (video skipped around)
+              // TODO: Function to get cues with a start time and end time around/within range?
+
+              // if (activeCueText == originalText) {
+              //   data.skipped = true;
+              //   return false;
+              // }
+
+              // Hide current active cues (if any)
+              activeCues.forEach((cue) => cue.endTime = currentTime - 1);
+            }
+
             // These are new captions
             instance.unmute(rule, video);
             instance.lastProcessedText = originalText;
             data.filtered = false;
-
-            // TODO: Cue Handle skipping around? instance only works sequentially
-
-            // Hide current active cues (if any)
-            if (textTrack?.activeCues?.length) {
-              const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
-              activeCues.forEach((cue) => cue.endTime = currentTime - 1);
-            }
+            const apfLines = [];
 
             const duration = video.duration;
 
@@ -1223,14 +1250,37 @@ export default class WebAudio {
                   data.filtered = true;
                 }
                 const cueText = rule.filterSubtitles ? result.filtered : result.original;
-                const cue = instance.newCue(currentTime, duration, cueText);
-                textTrack.addCue(cue);
+                const cue = instance.newCue(currentTime, duration, cueText) as FilteredVTTCue;
+                cue.filtered = data.filtered;
+                cue.originalText = result.original;
+                // TODO! Does this work to add my custom props first?
+                // textTrack.addCue(cue);
+
+                // Add APF Captions line
+                if (rule.apfCaptions) {
+                  const text = result.modified && rule.filterSubtitles ? result.filtered : result.original;
+                  const line = instance.apfCaptionLine(rule, text);
+                  apfLines.unshift(line); // Cues seem to show up in reverse order
+                }
               }
             });
 
             // Hide/show cues
             const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
             if (!rule.videoCueHideCues) { textTrack.mode = shouldBeShown ? 'showing' : 'hidden'; }
+
+            if (apfLines.length) {
+              // Clean up old APF caption lines
+              const container = getElement(rule.apfCaptionsSelector, document);
+              const oldLines = container.querySelector('div.APF-subtitles');
+              if (oldLines) { oldLines.remove(); }
+
+              // Add new APF caption lines (if they should be shown)
+              if (shouldBeShown) {
+                const apfCaptions = instance.apfCaptionLines(rule, apfLines);
+                container.appendChild(apfCaptions);
+              }
+            }
           }
         }
       }
