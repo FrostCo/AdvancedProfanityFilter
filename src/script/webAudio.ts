@@ -1183,12 +1183,10 @@ export default class WebAudio {
     const video = getElement(rule.videoSelector) as HTMLVideoElement;
 
     if (video && instance.playing(video)) {
+      if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
+      instance.hideSubtitles(rule); // Hide original captions/subtitles
       const textTrack = instance.apfTextTrack(rule, video);
       const currentTime = video.currentTime;
-
-      // TODO: Cue Hide captions
-
-      if (rule.ignoreMutations) { instance.filter.stopObserving(); } // Stop observing when video is playing
       const data: WatcherData = { initialCall: true };
       let captions;
 
@@ -1241,10 +1239,7 @@ export default class WebAudio {
         }
       }
 
-      if (data.skipped) { return false; }
-
-      const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
-      shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
+      if (data.skipped) { return false; } // TODO: Cue - Not needed when in same function
       if (data.filtered) { instance.filter.updateCounterBadge(); }
     } else {
       if (rule.ignoreMutations) { instance.filter.startObserving(); } // Start observing when video is not playing
