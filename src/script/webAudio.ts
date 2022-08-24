@@ -1219,7 +1219,7 @@ export default class WebAudio {
           } else {
             // NOTE: Attempt to determine if the current captions were already added (seek backwards/re-watching video)
             // Deeper check to see if we've already processed these captions
-            // if (textTrack?.activeCues?.length) {
+            // if (textTrack && textTrack.activeCues && textTrack.activeCues.length) {
             //   const allCues = Array.from(textTrack.cues as any as FilteredVTTCue[]);
             //   const textMatchCues = instance.cuesIncludingText(allCues, originalText, 'originalText');
             //   const timeMatchCues = instance.cuesInTimeRange(textMatchCues, currentTime, 10, (rule.checkInterval * 2) * 0.001);
@@ -1234,7 +1234,7 @@ export default class WebAudio {
             instance.lastProcessedText = originalText;
 
             // Hide current active cues (if any)
-            if (textTrack?.activeCues?.length) {
+            if (textTrack && textTrack.activeCues && textTrack.activeCues.length) {
               const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
               // Because we don't have an endTime when we create the cues, this will set that to -1ms
               activeCues.forEach((cue) => cue.endTime = currentTime - .001);
@@ -1273,7 +1273,7 @@ export default class WebAudio {
           instance.watcherSimpleUnmute(rule, video);
 
           // Hide any activeCues
-          if (textTrack?.activeCues?.length) {
+          if (textTrack && textTrack.activeCues && textTrack.activeCues.length) {
             const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
             // Because we don't have an endTime when we create the cues, this will set that to -1ms
             activeCues.forEach((cue) => cue.endTime = currentTime - .001);
