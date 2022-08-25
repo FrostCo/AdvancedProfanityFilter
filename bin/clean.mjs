@@ -2,6 +2,11 @@
 import path from 'path';
 import { parseArgv, removeFiles } from './lib.mjs';
 
+const build = [
+  path.join('dist', 'backgroundScriptsAPIBridge.js'),
+  path.join('dist', 'contentScriptsAPIBridge.js'),
+];
+
 const built = [
   path.join('extension'),
   path.join('extension-firefox'),
@@ -26,6 +31,10 @@ function main() {
       }
 
       let toRemove = [];
+      if (argv.arguments.includes('--build')) {
+        toRemove = toRemove.concat(build);
+      }
+
       if (argv.arguments.includes('--built')) {
         toRemove = toRemove.concat(built);
       }
