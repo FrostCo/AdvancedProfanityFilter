@@ -30,6 +30,10 @@ function defaultBuild() {
   manifestV2Build();
 }
 
+function edgeLegacyBuild() {
+  data.target = 'edgeLegacy';
+}
+
 function firefoxBuild() {
   data.target = 'firefox';
 }
@@ -67,6 +71,9 @@ function main() {
     switch (target) {
       case '--bookmarklet':
         bookmarkletBuild();
+        break;
+      case '--edgeLegacy':
+        edgeLegacyBuild();
         break;
       case '--firefox':
         firefoxBuild();

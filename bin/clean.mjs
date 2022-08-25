@@ -5,6 +5,7 @@ import { parseArgv, removeFiles } from './lib.mjs';
 const built = [
   path.join('extension'),
   path.join('extension-firefox'),
+  path.join('extension-edgeLegacy'),
 ];
 
 const dist = [

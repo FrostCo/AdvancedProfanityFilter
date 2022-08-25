@@ -34,6 +34,25 @@ function common() {
   handleVersion();
 }
 
+function edgeLegacyBuild() {
+  const manifest = loadJSONFile(distManifestPath);
+  const msPreload = {
+    backgroundScript: 'backgroundScriptsAPIBridge.js',
+    contentScript: 'contentScriptsAPIBridge.js'
+  };
+
+  // Fix options_page
+  manifest.options_page = manifest.options_ui.page;
+  delete manifest.options_ui;
+
+  // Add ms-proload polyfills
+  manifest['-ms-preload'] = msPreload;
+  fse.copyFileSync('./store/edge/src/backgroundScriptsAPIBridge.js', './dist/backgroundScriptsAPIBridge.js');
+  fse.copyFileSync('./store/edge/src/contentScriptsAPIBridge.js', './dist/contentScriptsAPIBridge.js');
+
+  writeJSONFile(distManifestPath, manifest);
+}
+
 function firefoxBuild() {
   const manifest = loadJSONFile(distManifestPath);
   manifest.applications = {
@@ -99,6 +118,10 @@ function main() {
 
   // Perform postbuild actions
   common();
+
+  if (buildData.target == 'edgeLegacy') {
+    edgeLegacyBuild();
+  }
 
   if (buildData.target == 'firefox') {
     firefoxBuild();
