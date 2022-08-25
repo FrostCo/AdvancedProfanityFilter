@@ -39,7 +39,8 @@ For an overview of features and options, please head to the [wiki](https://githu
     * Plex
     * Vudu
     * YouTube
-    * And more! You can even add your own! ([advanced](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site))
+    * And more! see [all supported sites here](https://apf.frostco.dev/status)
+    * You can even add your own! ([advanced](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site))
 
 For a detailed overview of the features and settings, please see the [Getting Started page](https://github.com/richardfrost/AdvancedProfanityFilter/wiki).
 
