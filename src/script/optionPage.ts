@@ -765,6 +765,7 @@ export default class OptionPage {
     const selectedMuteMethod = document.querySelector(`input[name=audioMuteMethod][value='${this.cfg.muteMethod}']`) as HTMLInputElement;
     const selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
     const muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
+    const audioYouTubeAutoMatchCensored = document.getElementById('audioYouTubeAutoMatchCensored') as HTMLInputElement;
     const audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
     const audioYouTubeAutoSubsMax = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
     const customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
@@ -775,6 +776,7 @@ export default class OptionPage {
     this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
     selectedMuteMethod.checked = true;
     selectedshowSubtitle.checked = true;
+    audioYouTubeAutoMatchCensored.checked = this.cfg.youTubeAutoMatchCensored;
     audioYouTubeAutoSubsMin.value = this.cfg.youTubeAutoSubsMin.toString();
     audioYouTubeAutoSubsMax.value = this.cfg.youTubeAutoSubsMax.toString();
     customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
@@ -1436,6 +1438,7 @@ export default class OptionPage {
     const fillerAudioSelect = document.getElementById('fillerAudioSelect') as HTMLSelectElement;
     const muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
     const muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
+    const audioYouTubeAutoMatchCensored = document.getElementById('audioYouTubeAutoMatchCensored') as HTMLInputElement;
     const muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
     const showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
     const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
@@ -1460,6 +1463,7 @@ export default class OptionPage {
     this.cfg.fillerAudio = fillerAudioSelect.value;
     this.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
     this.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
+    this.cfg.youTubeAutoMatchCensored = audioYouTubeAutoMatchCensored.checked;
     this.cfg.muteMethod = parseInt(muteMethodInput.value);
     this.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
     this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
@@ -1960,6 +1964,7 @@ document.getElementById('supportedAudioSitesConfig').addEventListener('click', (
 document.getElementById('fillerAudioSelect').addEventListener('change', (evt) => { option.saveOptions(); });
 document.getElementById('muteAudioOnly').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('muteCueRequireShowing').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('audioYouTubeAutoMatchCensored').addEventListener('click', (evt) => { option.saveOptions(); });
 document.querySelectorAll('#audioMuteMethod input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
 document.querySelectorAll('input.audioYouTubeAutoSubs').forEach((el) => { el.addEventListener('change', (evt) => { option.updateYouTubeAutoLimits(evt.target as HTMLInputElement); }); });

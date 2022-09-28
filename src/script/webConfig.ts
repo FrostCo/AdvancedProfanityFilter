@@ -23,6 +23,7 @@ export default class WebConfig extends Config {
   showSubtitles: number;
   showUpdateNotification: boolean;
   syncLargeKeys: boolean;
+  youTubeAutoMatchCensored: boolean;
   youTubeAutoSubsMax: number;
   youTubeAutoSubsMin: number;
 
@@ -44,6 +45,7 @@ export default class WebConfig extends Config {
     showSubtitles: Constants.SHOW_SUBTITLES.ALL,
     showUpdateNotification: false,
     syncLargeKeys: true,
+    youTubeAutoMatchCensored: true,
     youTubeAutoSubsMax: 0,
     youTubeAutoSubsMin: 0,
   };
