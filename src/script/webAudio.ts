@@ -27,6 +27,7 @@ export default class WebAudio {
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
+  lastProcessedNode: HTMLElement | ChildNode;
   lastProcessedText: string;
   muted: boolean;
   rules: AudioRule[];
@@ -237,6 +238,8 @@ export default class WebAudio {
       if (!filtered && this.lastFilteredNode == subtitle && this.lastFilteredText == subtitle[textMethod]) {
         filtered = true;
       }
+
+      this.lastProcessedNode = subtitle;
     });
 
     // When captions/subtitles are spread across multiple mutations, check to see if a filtered node is still present
