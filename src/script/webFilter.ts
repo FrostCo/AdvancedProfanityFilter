@@ -74,9 +74,9 @@ export default class WebFilter extends Filter {
       // else { logger.debug('Forbidden node', node); }
     });
 
-    // Check removed nodes to see if we should unmute
-    if (this.mutePage && this.audio.muted) {
-      this.handleRemovedNodesWhileMuted(mutation.removedNodes);
+    // Check removed nodes to see if we should unmute or remove APF Captions
+    if (this.mutePage && (this.audio.muted || this.audio.apfCaptionsEnabled)) {
+      this.handleRemovedNodesOnMutePage(mutation.removedNodes);
     }
 
     if (mutation.target) {
@@ -334,22 +334,34 @@ export default class WebFilter extends Filter {
     });
   }
 
-  handleRemovedNodesWhileMuted(removedNodes: NodeList) {
+  handleRemovedNodesOnMutePage(removedNodes: NodeList) {
     removedNodes.forEach((node) => {
-      const supported = this.audio.supportedNode(node);
-      const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
-      if (
-        supported !== false
-        || node == this.audio.lastFilteredNode
-        || node.contains(this.audio.lastFilteredNode)
-        || (
-          rule.simpleUnmute
-          && node.textContent
-          && this.audio.lastFilteredText
-          && this.audio.lastFilteredText.includes(node.textContent)
-        )
-      ) {
-        this.audio.unmute(rule);
+      // Remove APF Captions if the removed node was the last one we processed
+      if (this.audio.apfCaptionsEnabled) {
+        if (node == this.audio.lastProcessedNode || node.contains(this.audio.lastProcessedNode)) {
+          const apfCaptionRule = this.audio.rules[this.audio.apfCaptionRuleIds[0]];
+          this.audio.removeApfCaptions(apfCaptionRule);
+        }
+      }
+
+      // Check removed node to see if we should unmute
+      if (this.audio.muted) {
+        const supported = this.audio.supportedNode(node);
+        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
+        if (
+          supported !== false
+          || node == this.audio.lastFilteredNode
+          || node.contains(this.audio.lastFilteredNode)
+          || (
+            rule.simpleUnmute
+            && node.textContent
+            && this.audio.lastFilteredText
+            && this.audio.lastFilteredText.includes(node.textContent)
+          )
+        ) {
+          this.audio.unmute(rule);
+          if (rule.apfCaptions) this.audio.removeApfCaptions(rule);
+        }
       }
     });
   }

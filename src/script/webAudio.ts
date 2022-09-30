@@ -217,7 +217,12 @@ export default class WebAudio {
   clean(subtitleContainer, ruleIndex = 0): void {
     const rule = this.rules[ruleIndex];
     if (rule.mode === 'watcher') { return; } // If this is for a watcher rule, leave the text alone
+
+    // Always hide captions if using APF Captions (requires displaySelector)
+    if (rule.apfCaptions && rule.displaySelector) this.hideSubtitles(rule);
+
     let filtered = false;
+    const captionData = [];
 
     if (subtitleContainer.nodeName && subtitleContainer.nodeName === '#text' && subtitleContainer.parentElement) {
       subtitleContainer = subtitleContainer.parentElement;
@@ -239,11 +244,12 @@ export default class WebAudio {
         subtitle.textContent = subtitle.innerHTML.replace(WebAudio.brTagRegExp, '\n');
       }
       const result = this.replaceTextResult(subtitle[textMethod]);
+      captionData.push(result);
       if (result.modified) {
         filtered = true;
         this.mute(rule); // Mute the audio if we haven't already
 
-        if (rule.filterSubtitles) {
+        if (rule.filterSubtitles && !rule.apfCaptions) {
           if (rule.preserveWhiteSpace && subtitle.style.whiteSpace !== 'pre') { subtitle.style.whiteSpace = 'pre'; }
           if (rule.ignoreMutations) { this.filter.stopObserving(); }
           subtitle[textMethod] = result.filtered;
@@ -270,8 +276,13 @@ export default class WebAudio {
       }
     }
 
+    // Handle hiding/showing caption text
     const shouldBeShown = this.subtitlesShouldBeShown(rule, filtered);
-    shouldBeShown ? this.showSubtitles(rule, subtitles) : this.hideSubtitles(rule, subtitles);
+    if (rule.apfCaptions) {
+      this.displayApfCaptions(rule, captionData, shouldBeShown);
+    } else {
+      shouldBeShown ? this.showSubtitles(rule, subtitles) : this.hideSubtitles(rule, subtitles);
+    }
   }
 
   cleanYouTubeAutoSubs(node): void {
@@ -484,9 +495,16 @@ export default class WebAudio {
 
   initElementChildRule(rule: AudioRule) {
     if (!rule.parentSelector && !rule.parentSelectorAll) rule.disabled = true;
+    if (rule.apfCaptions) {
+      if (rule.displaySelector === undefined) rule.disabled = true;
+    }
   }
 
-  initElementRule(rule: AudioRule) { }
+  initElementRule(rule: AudioRule) {
+    if (rule.apfCaptions) {
+      if (rule.displaySelector === undefined) rule.disabled = true;
+    }
+  }
 
   initFillerAudio(name: string = ''): HTMLAudioElement {
     const fillerConfig = WebAudio.fillerConfig[name];
