@@ -76,23 +76,7 @@ export default class WebFilter extends Filter {
 
     // Check removed nodes to see if we should unmute
     if (this.mutePage && this.audio.muted) {
-      mutation.removedNodes.forEach((node) => {
-        const supported = this.audio.supportedNode(node);
-        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
-        if (
-          supported !== false
-          || node == this.audio.lastFilteredNode
-          || node.contains(this.audio.lastFilteredNode)
-          || (
-            rule.simpleUnmute
-            && node.textContent
-            && this.audio.lastFilteredText
-            && this.audio.lastFilteredText.includes(node.textContent)
-          )
-        ) {
-          this.audio.unmute(rule);
-        }
-      });
+      this.handleRemovedNodesWhileMuted(mutation.removedNodes);
     }
 
     if (mutation.target) {
@@ -347,6 +331,26 @@ export default class WebFilter extends Filter {
         if (!response) { response = { disabledTab: false }; }
         resolve(response);
       });
+    });
+  }
+
+  handleRemovedNodesWhileMuted(removedNodes: NodeList) {
+    removedNodes.forEach((node) => {
+      const supported = this.audio.supportedNode(node);
+      const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
+      if (
+        supported !== false
+        || node == this.audio.lastFilteredNode
+        || node.contains(this.audio.lastFilteredNode)
+        || (
+          rule.simpleUnmute
+          && node.textContent
+          && this.audio.lastFilteredText
+          && this.audio.lastFilteredText.includes(node.textContent)
+        )
+      ) {
+        this.audio.unmute(rule);
+      }
     });
   }
 
