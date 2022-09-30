@@ -1160,7 +1160,7 @@ export default class WebAudio {
           textTrack.oncuechange = () => {
             if (textTrack.activeCues && textTrack.activeCues.length > 0) {
               const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
-              const apfLines = [];
+              const captionData = [] as ReplaceTextResult[];
 
               // Process cues
               const processed = activeCues.some((activeCue) => activeCue.hasOwnProperty('filtered'));
@@ -1177,34 +1177,23 @@ export default class WebAudio {
                 const activeCue = activeCues[i];
                 if (!shouldBeShown && rule.videoCueHideCues) { instance.hideCue(rule, activeCue); }
                 if (rule.apfCaptions) {
-                  const text = filtered ? activeCue.text : activeCue.originalText;
-                  const line = instance.apfCaptionLine(rule, text);
-                  apfLines.unshift(line); // Cues seem to show up in reverse order
+                  // Cues seem to show up in reverse order
+                  captionData.unshift({ filtered: activeCue.filteredText, original: activeCue.originalText, modified: activeCue.filtered });
                 }
               }
 
-              if (apfLines.length) {
-                const container = document.getElementById(rule.apfCaptionsSelector);
-                const oldLines = container.querySelector('div.APF-subtitles');
-                if (oldLines) { oldLines.remove(); }
-                if (shouldBeShown) {
-                  const apfCaptions = instance.apfCaptionLines(rule, apfLines);
-                  container.appendChild(apfCaptions);
-                }
-              }
-
+              if (rule.apfCaptions) instance.displayApfCaptions(rule, captionData, shouldBeShown);
               if (!rule.videoCueHideCues) { textTrack.mode = shouldBeShown ? 'showing' : 'hidden'; }
-              if (rule.displaySelector) { // Hide original subtitles if using apfCaptions
-                apfLines.length || !shouldBeShown ? instance.hideSubtitles(rule) : instance.showSubtitles(rule);
+              if (rule.displaySelector) {
+                // Hide original subtitles if using apfCaptions
+                rule.apfCaptions || !shouldBeShown ? instance.hideSubtitles(rule) : instance.showSubtitles(rule);
               }
             } else { // No active cues
               instance.unmute(rule, video);
 
               if (rule.apfCaptions) {
                 // Remove APF captions because there are no active cues
-                const container = document.getElementById(rule.apfCaptionsSelector);
-                const oldLines = container.querySelector('div.APF-subtitles');
-                if (oldLines) { oldLines.remove(); }
+                instance.removeApfCaptions(rule);
               }
             }
           };
