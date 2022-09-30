@@ -18,6 +18,8 @@ import WebConfig from './webConfig';
 const logger = new Logger('WebAudio');
 
 export default class WebAudio {
+  apfCaptionRuleIds: number[];
+  apfCaptionsEnabled: boolean;
   cueRuleIds: number[];
   enabledRuleIds: number[];
   fetching: boolean;
@@ -118,6 +120,7 @@ export default class WebAudio {
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.filter = filter;
     logger.setLevel(this.filter.cfg.loggingLevel);
+    this.apfCaptionRuleIds = [];
     this.cueRuleIds = [];
     this.enabledRuleIds = [];
     this.watcherRuleIds = [];
@@ -149,6 +152,7 @@ export default class WebAudio {
         this.initYouTube();
       }
 
+      if (this.apfCaptionRuleIds.length) this.apfCaptionsEnabled = true;
       if (this.cueRuleIds.length) setInterval(this.watchForVideo, 250, this);
     }
   }
@@ -564,6 +568,7 @@ export default class WebAudio {
         if (rule.mode != 'ytauto') logger.warn('Audio rule disabled during initialization', rule);
       } else {
         this.enabledRuleIds.push(ruleId);
+        if (rule.apfCaptions) this.apfCaptionRuleIds.push(ruleId);
 
         if (rule.mode == 'watcher') {
           if (rule.toCue) {
