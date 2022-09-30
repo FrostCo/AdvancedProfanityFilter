@@ -155,6 +155,16 @@ export default class WebAudio {
     }
   }
 
+  apfCaptionContainer(rule: AudioRule, video?: HTMLVideoElement): HTMLElement {
+    let container;
+    if (rule.apfCaptionsSelector) container = getElement(rule.apfCaptionsSelector);
+    if (!container) { // Fall-back to video's parent
+      if (!video) video = getElement(rule.videoSelector) as HTMLVideoElement;
+      if (video && video.parentElement) container = video.parentElement;
+    }
+    return container;
+  }
+
   apfCaptionLine(rule: AudioRule, text: string): HTMLSpanElement {
     const line = document.createElement('span');
     line.classList.add('APF-subtitle-line');
@@ -190,6 +200,15 @@ export default class WebAudio {
       }
 
       return video.addTextTrack('captions', rule.apfCuesLabel, rule.apfCuesLabel) as TextTrack;
+    }
+  }
+
+  buildApfCaptions(rule: AudioRule, captionData: ReplaceTextResult[], container: HTMLElement) {
+    if (captionData.length) {
+      const captionLines = captionData.map((result) => rule.filterSubtitles && result.modified ? result.filtered : result.original);
+      const apfLines = captionLines.map((text) => this.apfCaptionLine(rule, text));
+      const apfCaptions = this.apfCaptionLines(rule, apfLines);
+      container.appendChild(apfCaptions);
     }
   }
 
@@ -321,6 +340,16 @@ export default class WebAudio {
     const delayed = true;
     instance.unmute(rule, null, delayed);
     this.unmuteTimeout = null;
+  }
+
+  displayApfCaptions(rule: AudioRule, captionData: ReplaceTextResult[], shouldBeShown: boolean) {
+    const container = this.apfCaptionContainer(rule);
+    if (container) {
+      this.removeApfCaptions(rule, container);
+      if (shouldBeShown) this.buildApfCaptions(rule, captionData, container);
+    } else {
+      logger.warn('Failed to find APF Captions container.');
+    }
   }
 
   fillerAudioHandlePause() {
@@ -925,6 +954,14 @@ export default class WebAudio {
     this.lastProcessedText = captions.map((caption) => caption.textContent).join(' ');
   }
 
+  removeApfCaptions(rule: AudioRule, container?: HTMLElement) {
+    if (!container) container = this.apfCaptionContainer(rule);
+    if (container) {
+      const oldLines = getElement('div.APF-subtitles', container);
+      if (oldLines) oldLines.remove();
+    }
+  }
+
   replaceTextResult(string: string, wordlistId: number = this.wordlistId, statsType: string | null = Constants.STATS_TYPE_AUDIO) {
     return this.filter.replaceTextResult(string, wordlistId, statsType);
   }
@@ -1097,21 +1134,7 @@ export default class WebAudio {
       const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
 
       if (rule.apfCaptions) {
-        let container;
-        if (rule.apfCaptionsSelector) container = getElement(rule.apfCaptionsSelector);
-        if (!container) container = video.parentElement; // Fall-back to video's parent
-
-        // Clean up old APF Caption lines
-        const oldLines = getElement('div.APF-subtitles', container);
-        if (oldLines) oldLines.remove();
-
-        // Show APF Caption lines if they should be shown
-        if (shouldBeShown && data.textResults.length) {
-          const captionLines = data.textResults.map((result) => rule.filterSubtitles && result.modified ? result.filtered : result.original);
-          const apfLines = captionLines.map((text) => instance.apfCaptionLine(rule, text));
-          const apfCaptions = instance.apfCaptionLines(rule, apfLines);
-          container.appendChild(apfCaptions);
-        }
+        this.displayApfCaptions(rule, data.textResults, shouldBeShown);
       } else {
         shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
       }
