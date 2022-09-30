@@ -828,7 +828,7 @@ export default class WebAudio {
       cue.filteredText = result.filtered;
       if (result.modified) {
         cue.filtered = true;
-        if (rule.filterSubtitles) { cue.text = result.filtered; }
+        if (rule.filterSubtitles && !rule.apfCaptions) { cue.text = result.filtered; }
       } else {
         cue.filtered = false;
       }
