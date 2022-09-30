@@ -24,7 +24,7 @@ export default class WebFilter extends Filter {
   mutePage: boolean;
   observer: MutationObserver;
   processMutationTarget: boolean;
-  processNode: (node: HTMLElement | Document | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
+  processNode: (node: Document | HTMLElement | Node | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
   shadowObserver: MutationObserver;
   stats: Statistics;
   summary: Summary;
@@ -59,7 +59,7 @@ export default class WebFilter extends Filter {
     }
   }
 
-  checkMutationForProfanity(mutation) {
+  checkMutationForProfanity(mutation: MutationRecord) {
     // console.count('[APF] this.checkMutationForProfanity() count'); // Benchmark: Filter
     // logger.debug('Mutation observed', mutation);
     mutation.addedNodes.forEach((node) => {
