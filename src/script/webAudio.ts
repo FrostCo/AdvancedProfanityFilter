@@ -149,9 +149,7 @@ export default class WebAudio {
         this.initYouTube();
       }
 
-      if (this.cueRuleIds.length) {
-        setInterval(this.watchForVideo, 250, this);
-      }
+      if (this.cueRuleIds.length) setInterval(this.watchForVideo, 250, this);
     }
   }
 
