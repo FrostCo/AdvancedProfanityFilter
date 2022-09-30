@@ -86,6 +86,8 @@ interface DomainCfg {
   deep?: boolean;
   disabled?: boolean;
   enabled?: boolean;
+  frames?: boolean;
+  framesOff?: boolean;
   wordlist?: number;
 }
 

@@ -809,6 +809,8 @@ export default class OptionPage {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
     const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
+    const domainFramesEnabledCheck = document.getElementById('domainFramesEnabledCheck') as HTMLInputElement;
+    const domainFramesDisabledCheck = document.getElementById('domainFramesDisabledCheck') as HTMLInputElement;
     const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
     const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
     const domainRemoveBtn = document.getElementById('domainRemove') as HTMLButtonElement;
@@ -835,6 +837,8 @@ export default class OptionPage {
 
     domainDisabledCheck.checked = domainCfg.disabled;
     domainEnabledCheck.checked = domainCfg.enabled;
+    domainFramesEnabledCheck.checked = domainCfg.frames;
+    domainFramesDisabledCheck.checked = domainCfg.framesOff;
     const wordlist = domainCfg.wordlist >= 0 ? domainCfg.wordlist + 1 : 0;
     const audioList = domainCfg.audioList >= 0 ? domainCfg.audioList + 1 : 0;
     domainWordlistSelect.selectedIndex = wordlist;
@@ -843,6 +847,7 @@ export default class OptionPage {
 
   populateDomainPage() {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+    const domainFilterAllFrames = document.getElementById('domainFilterAllFrames') as HTMLInputElement;
     const domainsSelect = document.getElementById('domainSelect') as HTMLSelectElement;
     const domainText = document.getElementById('domainText') as HTMLInputElement;
     const mode = this.cfg.enabledDomainsOnly ? 'minimal' : 'normal';
@@ -852,6 +857,9 @@ export default class OptionPage {
     domainMode.checked = true;
     const domainDisabledLabel = document.getElementById('domainDisabledLabel') as HTMLLabelElement;
     const domainEnabledLabel = document.getElementById('domainEnabledLabel') as HTMLLabelElement;
+    const domainFramesLabel = document.getElementById('domainFramesLabel') as HTMLLabelElement;
+    const domainFramesDisabledLabel = document.getElementById('domainFramesDisabledLabel') as HTMLLabelElement;
+
     OptionPage.hideInputError(domainText);
     removeChildren(domainsSelect);
 
@@ -863,6 +871,7 @@ export default class OptionPage {
       optionElement.value = domain === domains[0] ? '' : domain;
       domainsSelect.appendChild(optionElement);
     });
+    domainFilterAllFrames.checked = !option.cfg.filterEnabledFramesOnly;
 
     if (mode === 'minimal') {
       OptionPage.hide(domainDisabledLabel);
@@ -870,6 +879,14 @@ export default class OptionPage {
     } else {
       OptionPage.hide(domainEnabledLabel);
       OptionPage.show(domainDisabledLabel);
+    }
+
+    if (option.cfg.filterEnabledFramesOnly) {
+      OptionPage.hide(domainFramesDisabledLabel);
+      OptionPage.show(domainFramesLabel);
+    } else {
+      OptionPage.hide(domainFramesLabel);
+      OptionPage.show(domainFramesDisabledLabel);
     }
 
     dynamicList(Constants.orderedArray(Constants.DOMAIN_MODES), domainModeSelect, true);
@@ -1378,6 +1395,8 @@ export default class OptionPage {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
     const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
+    const domainFramesEnabledCheck = document.getElementById('domainFramesEnabledCheck') as HTMLInputElement;
+    const domainFramesDisabledCheck = document.getElementById('domainFramesDisabledCheck') as HTMLInputElement;
     const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
     const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
 
@@ -1399,6 +1418,8 @@ export default class OptionPage {
         audioList: audioList,
         disabled: domainDisabledCheck.checked,
         enabled: domainEnabledCheck.checked,
+        frames: domainFramesEnabledCheck.checked,
+        framesOff: domainFramesDisabledCheck.checked,
         wordlist: wordlist,
       };
       const domain = new Domain(newKey, newDomainCfg);
@@ -1434,6 +1455,7 @@ export default class OptionPage {
     const substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     const domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
+    const domainFilterAllFrames = document.getElementById('domainFilterAllFrames') as HTMLInputElement;
     const muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
     const fillerAudioSelect = document.getElementById('fillerAudioSelect') as HTMLSelectElement;
     const muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
@@ -1459,6 +1481,7 @@ export default class OptionPage {
     this.cfg.substitutionMark = substitutionMark.checked;
     this.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
     this.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
+    this.cfg.filterEnabledFramesOnly = !domainFilterAllFrames.checked; // ?
     this.cfg.muteAudio = muteAudioInput.checked;
     this.cfg.fillerAudio = fillerAudioSelect.value;
     this.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
@@ -1954,6 +1977,7 @@ document.getElementById('textWordlistSelect').addEventListener('change', (evt) =
 document.getElementById('audioWordlistSelect').addEventListener('change', (evt) => { option.setDefaultWordlist(evt.target as HTMLSelectElement); });
 // Domains
 document.querySelectorAll('#domainMode input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
+document.getElementById('domainFilterAllFrames').addEventListener('change', (evt) => { option.saveOptions(); });
 document.getElementById('domainSelect').addEventListener('change', (evt) => { option.populateDomain(); });
 document.getElementById('domainText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
 document.getElementById('domainSave').addEventListener('click', (evt) => { option.saveDomain(); });

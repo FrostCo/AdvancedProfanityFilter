@@ -341,6 +341,14 @@
         <span class="notes">Only filter enabled domains</span>
       </label>
     </div>
+
+    <br>
+    <h4 class="sectionHeader">Frame Mode</h4>
+    <label>
+      <input id="domainFilterAllFrames" type="checkbox" class="w3-check">
+      Filter all frames
+      <span class="notes">Filter frames on all domains</span>
+    </label>
   </div>
 
   <div id="domainRightContainer" class="w3-half w3-right">
@@ -360,6 +368,16 @@
         <input id="domainEnabledCheck" type="checkbox" class="w3-check">
         Enabled
         <span class="notes">Filter pages on this domain</span>
+      </label>
+      <label id="domainFramesLabel" class="w3-hide">
+        <input id="domainFramesEnabledCheck" type="checkbox" class="w3-check">
+        Frames enabled
+        <span class="notes">Filter frames on this domain</span>
+      </label>
+      <label id="domainFramesDisabledLabel" class="w3-hide">
+        <input id="domainFramesDisabledCheck" type="checkbox" class="w3-check">
+        Frames disabled
+        <span class="notes">Disable filtering frames on this domain</span>
       </label>
       <h4 class="sectionHeader">Mode</h4>
       <select id="domainModeSelect" class="w3-select w3-border small textInput"></select>
