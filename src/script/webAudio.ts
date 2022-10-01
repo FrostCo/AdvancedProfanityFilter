@@ -243,36 +243,19 @@ export default class WebAudio {
         if (subtitle.style.whiteSpace !== 'pre') { subtitle.style.whiteSpace = 'pre'; }
         subtitle.textContent = subtitle.innerHTML.replace(WebAudio.brTagRegExp, '\n');
       }
+      const result = this.replaceTextResult(subtitle[textMethod]);
+      for (const line of this.splitReplaceTextResultsOnNewlines(result)) captionData.push(line);
+      if (result.modified) {
+        filtered = true;
+        this.mute(rule); // Mute the audio if we haven't already
 
-      if (rule.apfCaptions) {
-        // Handle subtitles with newlines as separate lines for display
-        const subtitleTextLines = subtitle[textMethod].split('\n');
-        for (const subtitleTextLine of subtitleTextLines) {
-          const result = this.replaceTextResult(subtitleTextLine);
-          captionData.push(result);
-  
-          if (result.modified) {
-            filtered = true;
-            this.mute(rule); // Mute the audio if we haven't already
-          }
+        if (rule.filterSubtitles && !rule.apfCaptions) {
+          if (rule.preserveWhiteSpace && subtitle.style.whiteSpace !== 'pre') { subtitle.style.whiteSpace = 'pre'; }
+          if (rule.ignoreMutations) { this.filter.stopObserving(); }
+          subtitle[textMethod] = result.filtered;
+          if (rule.ignoreMutations) { this.filter.startObserving(); }
         }
-      } else {
-        const result = this.replaceTextResult(subtitle[textMethod]);
 
-        if (result.modified) {
-          filtered = true;
-          this.mute(rule); // Mute the audio if we haven't already
-
-          if (rule.filterSubtitles) {
-            if (rule.preserveWhiteSpace && subtitle.style.whiteSpace !== 'pre') { subtitle.style.whiteSpace = 'pre'; }
-            if (rule.ignoreMutations) { this.filter.stopObserving(); }
-            subtitle[textMethod] = result.filtered;
-            if (rule.ignoreMutations) { this.filter.startObserving(); }
-          }
-        }
-      }
-
-      if (filtered) {
         this.lastFilteredNode = subtitle;
         this.lastFilteredText = subtitle[textMethod];
       }
@@ -1017,6 +1000,21 @@ export default class WebAudio {
         if (container) container.style.setProperty('display', rule.displayShow);
       }
     }
+  }
+
+  splitReplaceTextResultsOnNewlines(result: ReplaceTextResult) {
+    const originalLines = result.original.split('\n');
+    const filteredLines = result.filtered.split('\n');
+    if (originalLines.length === 1 || originalLines.length !== filteredLines.length) return [result];
+
+    const lines = [];
+    for (let i = 0; i < originalLines.length; i++) {
+      const originalLine = originalLines[i];
+      const filteredLine = filteredLines[i];
+      const lineModified = result.modified && originalLine != filteredLine;
+      lines.push({ filtered: filteredLine, modified: lineModified, original: originalLine });
+    }
+    return lines;
   }
 
   stopFillerAudio() {
