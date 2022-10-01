@@ -300,10 +300,10 @@ async function toggleDomain(hostname: string, action: string) {
   const domain = Domain.byHostname(hostname, cfg.domains);
 
   switch (action) {
-    case 'disable':
-      cfg.enabledDomainsOnly ? domain.enabled = !domain.enabled : domain.disabled = !domain.disabled; break;
     case 'advanced':
       domain.advanced = !domain.advanced; break;
+    case 'disable':
+      cfg.enabledDomainsOnly ? domain.enabled = !domain.enabled : domain.disabled = !domain.disabled; break;
   }
 
   try {
