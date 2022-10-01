@@ -818,7 +818,7 @@ export default class OptionPage {
     const key = domainsSelect.value;
     domainText.value = key;
 
-    let domainCfg;
+    let domainCfg: DomainCfg;
     if (!key) { // New record
       OptionPage.disableBtn(domainRemoveBtn);
       domainCfg = Object.assign({}, Domain._domainCfgDefaults);
