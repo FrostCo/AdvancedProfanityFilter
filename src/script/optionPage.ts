@@ -871,7 +871,7 @@ export default class OptionPage {
       optionElement.value = domain === domains[0] ? '' : domain;
       domainsSelect.appendChild(optionElement);
     });
-    domainFilterAllFrames.checked = !option.cfg.filterEnabledFramesOnly;
+    domainFilterAllFrames.checked = !option.cfg.enabledFramesOnly;
 
     if (mode === 'minimal') {
       OptionPage.hide(domainDisabledLabel);
@@ -881,7 +881,7 @@ export default class OptionPage {
       OptionPage.show(domainDisabledLabel);
     }
 
-    if (option.cfg.filterEnabledFramesOnly) {
+    if (option.cfg.enabledFramesOnly) {
       OptionPage.hide(domainFramesDisabledLabel);
       OptionPage.show(domainFramesLabel);
     } else {
@@ -1481,7 +1481,7 @@ export default class OptionPage {
     this.cfg.substitutionMark = substitutionMark.checked;
     this.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
     this.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
-    this.cfg.filterEnabledFramesOnly = !domainFilterAllFrames.checked; // ?
+    this.cfg.enabledFramesOnly = !domainFilterAllFrames.checked;
     this.cfg.muteAudio = muteAudioInput.checked;
     this.cfg.fillerAudio = fillerAudioSelect.value;
     this.cfg.muteAudioOnly = muteAudioOnlyInput.checked;

@@ -217,8 +217,8 @@ export default class WebFilter extends Filter {
 
     if (
       this.iframe
-      && (this.cfg.filterEnabledFramesOnly && !this.domain.frames)
-      || (!this.cfg.filterEnabledFramesOnly && this.domain.framesOff)
+      && (this.cfg.enabledFramesOnly && !this.domain.frames)
+      || (!this.cfg.enabledFramesOnly && this.domain.framesOff)
     ) {
       logger.info('Filter disabled on frames for current domain');
       return false;

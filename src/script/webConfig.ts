@@ -14,8 +14,8 @@ export default class WebConfig extends Config {
   darkMode: boolean;
   domains: { [site: string]: DomainCfg };
   enabledDomainsOnly: boolean;
+  enabledFramesOnly: boolean;
   fillerAudio: string;
-  filterEnabledFramesOnly: boolean;
   muteAudio: boolean;
   muteAudioOnly: boolean;
   muteCueRequireShowing: boolean;
@@ -37,8 +37,8 @@ export default class WebConfig extends Config {
     darkMode: null,
     domains: {},
     enabledDomainsOnly: false,
+    enabledFramesOnly: false,
     fillerAudio: '',
-    filterEnabledFramesOnly: false,
     muteAudio: false,
     muteAudioOnly: false,
     muteCueRequireShowing: false,
