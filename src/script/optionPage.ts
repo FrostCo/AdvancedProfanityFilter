@@ -809,8 +809,8 @@ export default class OptionPage {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
     const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
-    const domainFramesEnabledCheck = document.getElementById('domainFramesEnabledCheck') as HTMLInputElement;
-    const domainFramesDisabledCheck = document.getElementById('domainFramesDisabledCheck') as HTMLInputElement;
+    const domainFramesOffCheck = document.getElementById('domainFramesOffCheck') as HTMLInputElement;
+    const domainFramesOnCheck = document.getElementById('domainFramesOnCheck') as HTMLInputElement;
     const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
     const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
     const domainRemoveBtn = document.getElementById('domainRemove') as HTMLButtonElement;
@@ -837,8 +837,8 @@ export default class OptionPage {
 
     domainDisabledCheck.checked = domainCfg.disabled;
     domainEnabledCheck.checked = domainCfg.enabled;
-    domainFramesEnabledCheck.checked = domainCfg.frames;
-    domainFramesDisabledCheck.checked = domainCfg.framesOff;
+    domainFramesOffCheck.checked = domainCfg.framesOff;
+    domainFramesOnCheck.checked = domainCfg.framesOn;
     const wordlist = domainCfg.wordlist >= 0 ? domainCfg.wordlist + 1 : 0;
     const audioList = domainCfg.audioList >= 0 ? domainCfg.audioList + 1 : 0;
     domainWordlistSelect.selectedIndex = wordlist;
@@ -857,8 +857,8 @@ export default class OptionPage {
     domainMode.checked = true;
     const domainDisabledLabel = document.getElementById('domainDisabledLabel') as HTMLLabelElement;
     const domainEnabledLabel = document.getElementById('domainEnabledLabel') as HTMLLabelElement;
-    const domainFramesLabel = document.getElementById('domainFramesLabel') as HTMLLabelElement;
-    const domainFramesDisabledLabel = document.getElementById('domainFramesDisabledLabel') as HTMLLabelElement;
+    const domainFramesOffLabel = document.getElementById('domainFramesOffLabel') as HTMLLabelElement;
+    const domainFramesOnLabel = document.getElementById('domainFramesOnLabel') as HTMLLabelElement;
 
     OptionPage.hideInputError(domainText);
     removeChildren(domainsSelect);
@@ -882,11 +882,11 @@ export default class OptionPage {
     }
 
     if (option.cfg.enabledFramesOnly) {
-      OptionPage.hide(domainFramesDisabledLabel);
-      OptionPage.show(domainFramesLabel);
+      OptionPage.hide(domainFramesOffLabel);
+      OptionPage.show(domainFramesOnLabel);
     } else {
-      OptionPage.hide(domainFramesLabel);
-      OptionPage.show(domainFramesDisabledLabel);
+      OptionPage.hide(domainFramesOnLabel);
+      OptionPage.show(domainFramesOffLabel);
     }
 
     dynamicList(Constants.orderedArray(Constants.DOMAIN_MODES), domainModeSelect, true);
@@ -1395,8 +1395,8 @@ export default class OptionPage {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
     const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
-    const domainFramesEnabledCheck = document.getElementById('domainFramesEnabledCheck') as HTMLInputElement;
-    const domainFramesDisabledCheck = document.getElementById('domainFramesDisabledCheck') as HTMLInputElement;
+    const domainFramesOffCheck = document.getElementById('domainFramesOffCheck') as HTMLInputElement;
+    const domainFramesOnCheck = document.getElementById('domainFramesOnCheck') as HTMLInputElement;
     const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
     const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
 
@@ -1418,8 +1418,8 @@ export default class OptionPage {
         audioList: audioList,
         disabled: domainDisabledCheck.checked,
         enabled: domainEnabledCheck.checked,
-        frames: domainFramesEnabledCheck.checked,
-        framesOff: domainFramesDisabledCheck.checked,
+        framesOn: domainFramesOnCheck.checked,
+        framesOff: domainFramesOffCheck.checked,
         wordlist: wordlist,
       };
       const domain = new Domain(newKey, newDomainCfg);

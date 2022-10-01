@@ -9,8 +9,8 @@ export default class Domain {
   deep: boolean;
   disabled: boolean;
   enabled: boolean;
-  frames: boolean;
   framesOff: boolean;
+  framesOn: boolean;
   hostname?: string;
   tab?: any;
   wordlistId: number;
@@ -21,8 +21,8 @@ export default class Domain {
     deep: undefined,
     disabled: undefined,
     enabled: undefined,
-    frames: undefined,
     framesOff: undefined,
+    framesOn: undefined,
     wordlist: undefined,
   };
 
@@ -131,8 +131,8 @@ export default class Domain {
     this.cfg.deep = this.deep === true ? true : undefined;
     this.cfg.disabled = this.disabled === true ? true : undefined;
     this.cfg.enabled = this.enabled === true ? true : undefined;
-    this.cfg.frames = this.frames === true ? true : undefined;
     this.cfg.framesOff = this.framesOff === true ? true : undefined;
+    this.cfg.framesOn = this.framesOn === true ? true : undefined;
     this.cfg.wordlist = this.wordlistId >= 0 ? this.wordlistId : undefined;
     this.cfg.audioList = this.audioWordlistId >= 0 ? this.audioWordlistId : undefined;
   }
@@ -142,8 +142,8 @@ export default class Domain {
     this.deep = this.cfg.deep;
     this.disabled = this.cfg.disabled;
     this.enabled = this.cfg.enabled;
-    this.frames = this.cfg.frames;
     this.framesOff = this.cfg.framesOff;
+    this.framesOn = this.cfg.framesOn;
     this.wordlistId = this.cfg.wordlist;
     this.audioWordlistId = this.cfg.audioList;
   }
