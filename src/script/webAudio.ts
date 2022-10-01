@@ -18,6 +18,8 @@ import WebConfig from './webConfig';
 const logger = new Logger('WebAudio');
 
 export default class WebAudio {
+  apfCaptionRuleIds: number[];
+  apfCaptionsEnabled: boolean;
   cueRuleIds: number[];
   enabledRuleIds: number[];
   fetching: boolean;
@@ -27,6 +29,7 @@ export default class WebAudio {
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
+  lastProcessedNode: HTMLElement | ChildNode;
   lastProcessedText: string;
   muted: boolean;
   rules: AudioRule[];
@@ -117,6 +120,7 @@ export default class WebAudio {
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.filter = filter;
     logger.setLevel(this.filter.cfg.loggingLevel);
+    this.apfCaptionRuleIds = [];
     this.cueRuleIds = [];
     this.enabledRuleIds = [];
     this.watcherRuleIds = [];
@@ -148,10 +152,19 @@ export default class WebAudio {
         this.initYouTube();
       }
 
-      if (this.cueRuleIds.length) {
-        setInterval(this.watchForVideo, 250, this);
-      }
+      if (this.apfCaptionRuleIds.length) this.apfCaptionsEnabled = true;
+      if (this.cueRuleIds.length) setInterval(this.watchForVideo, 250, this);
     }
+  }
+
+  apfCaptionContainer(rule: AudioRule, video?: HTMLVideoElement): HTMLElement {
+    let container;
+    if (rule.apfCaptionsSelector) container = getElement(rule.apfCaptionsSelector);
+    if (!container) { // Fall-back to video's parent
+      if (!video) video = getElement(rule.videoSelector) as HTMLVideoElement;
+      if (video && video.parentElement) container = video.parentElement;
+    }
+    return container;
   }
 
   apfCaptionLine(rule: AudioRule, text: string): HTMLSpanElement {
@@ -192,10 +205,24 @@ export default class WebAudio {
     }
   }
 
+  buildApfCaptions(rule: AudioRule, captionData: ReplaceTextResult[], container: HTMLElement) {
+    if (captionData.length) {
+      const captionLines = captionData.map((result) => rule.filterSubtitles && result.modified ? result.filtered : result.original);
+      const apfLines = captionLines.map((text) => this.apfCaptionLine(rule, text));
+      const apfCaptions = this.apfCaptionLines(rule, apfLines);
+      container.appendChild(apfCaptions);
+    }
+  }
+
   clean(subtitleContainer, ruleIndex = 0): void {
     const rule = this.rules[ruleIndex];
     if (rule.mode === 'watcher') { return; } // If this is for a watcher rule, leave the text alone
+
+    // Always hide captions if using APF Captions (requires displaySelector)
+    if (rule.apfCaptions && rule.displaySelector) this.hideSubtitles(rule);
+
     let filtered = false;
+    const captionData = [];
 
     if (subtitleContainer.nodeName && subtitleContainer.nodeName === '#text' && subtitleContainer.parentElement) {
       subtitleContainer = subtitleContainer.parentElement;
@@ -221,7 +248,7 @@ export default class WebAudio {
         filtered = true;
         this.mute(rule); // Mute the audio if we haven't already
 
-        if (rule.filterSubtitles) {
+        if (rule.filterSubtitles && !rule.apfCaptions) {
           if (rule.preserveWhiteSpace && subtitle.style.whiteSpace !== 'pre') { subtitle.style.whiteSpace = 'pre'; }
           if (rule.ignoreMutations) { this.filter.stopObserving(); }
           subtitle[textMethod] = result.filtered;
@@ -232,11 +259,17 @@ export default class WebAudio {
         this.lastFilteredText = subtitle[textMethod];
       }
 
+      if (rule.apfCaptions) {
+        for (const line of this.splitReplaceTextResultsOnNewlines(result)) captionData.push(line);
+      }
+
       // Final check to see if we already filtered this text
       // Reason: Hide/show for Funimation (ignoreMutations didn't fix the issue, but no issue if filterSubtitles = false)
       if (!filtered && this.lastFilteredNode == subtitle && this.lastFilteredText == subtitle[textMethod]) {
         filtered = true;
       }
+
+      this.lastProcessedNode = subtitle;
     });
 
     // When captions/subtitles are spread across multiple mutations, check to see if a filtered node is still present
@@ -246,8 +279,13 @@ export default class WebAudio {
       }
     }
 
+    // Handle hiding/showing caption text
     const shouldBeShown = this.subtitlesShouldBeShown(rule, filtered);
-    shouldBeShown ? this.showSubtitles(rule, subtitles) : this.hideSubtitles(rule, subtitles);
+    if (rule.apfCaptions) {
+      this.displayApfCaptions(rule, captionData, shouldBeShown);
+    } else {
+      shouldBeShown ? this.showSubtitles(rule, subtitles) : this.hideSubtitles(rule, subtitles);
+    }
   }
 
   cleanYouTubeAutoSubs(node): void {
@@ -318,6 +356,16 @@ export default class WebAudio {
     const delayed = true;
     instance.unmute(rule, null, delayed);
     this.unmuteTimeout = null;
+  }
+
+  displayApfCaptions(rule: AudioRule, captionData: ReplaceTextResult[], shouldBeShown: boolean) {
+    const container = this.apfCaptionContainer(rule);
+    if (container) {
+      this.removeApfCaptions(rule, container);
+      if (shouldBeShown) this.buildApfCaptions(rule, captionData, container);
+    } else {
+      logger.warn('Failed to find APF Captions container.');
+    }
   }
 
   fillerAudioHandlePause() {
@@ -450,9 +498,16 @@ export default class WebAudio {
 
   initElementChildRule(rule: AudioRule) {
     if (!rule.parentSelector && !rule.parentSelectorAll) rule.disabled = true;
+    if (rule.apfCaptions) {
+      if (rule.displaySelector === undefined) rule.disabled = true;
+    }
   }
 
-  initElementRule(rule: AudioRule) { }
+  initElementRule(rule: AudioRule) {
+    if (rule.apfCaptions) {
+      if (rule.displaySelector === undefined) rule.disabled = true;
+    }
+  }
 
   initFillerAudio(name: string = ''): HTMLAudioElement {
     const fillerConfig = WebAudio.fillerConfig[name];
@@ -534,6 +589,7 @@ export default class WebAudio {
         if (rule.mode != 'ytauto') logger.warn('Audio rule disabled during initialization', rule);
       } else {
         this.enabledRuleIds.push(ruleId);
+        if (rule.apfCaptions) this.apfCaptionRuleIds.push(ruleId);
 
         if (rule.mode == 'watcher') {
           if (rule.toCue) {
@@ -793,9 +849,10 @@ export default class WebAudio {
 
       const result = this.replaceTextResult(cue.text);
       cue.originalText = cue.text;
+      cue.filteredText = result.filtered;
       if (result.modified) {
         cue.filtered = true;
-        if (rule.filterSubtitles) { cue.text = result.filtered; }
+        if (rule.filterSubtitles && !rule.apfCaptions) { cue.text = result.filtered; }
       } else {
         cue.filtered = false;
       }
@@ -922,6 +979,14 @@ export default class WebAudio {
     this.lastProcessedText = captions.map((caption) => caption.textContent).join(' ');
   }
 
+  removeApfCaptions(rule: AudioRule, container?: HTMLElement) {
+    if (!container) container = this.apfCaptionContainer(rule);
+    if (container) {
+      const oldLines = getElement('div.APF-subtitles', container);
+      if (oldLines) oldLines.remove();
+    }
+  }
+
   replaceTextResult(string: string, wordlistId: number = this.wordlistId, statsType: string | null = Constants.STATS_TYPE_AUDIO) {
     return this.filter.replaceTextResult(string, wordlistId, statsType);
   }
@@ -938,6 +1003,21 @@ export default class WebAudio {
         if (container) container.style.setProperty('display', rule.displayShow);
       }
     }
+  }
+
+  splitReplaceTextResultsOnNewlines(result: ReplaceTextResult) {
+    const originalLines = result.original.split('\n');
+    const filteredLines = result.filtered.split('\n');
+    if (originalLines.length === 1 || originalLines.length !== filteredLines.length) return [result];
+
+    const lines = [];
+    for (let i = 0; i < originalLines.length; i++) {
+      const originalLine = originalLines[i];
+      const filteredLine = filteredLines[i];
+      const lineModified = result.modified && originalLine != filteredLine;
+      lines.push({ filtered: filteredLine, modified: lineModified, original: originalLine });
+    }
+    return lines;
   }
 
   stopFillerAudio() {
@@ -1094,21 +1174,7 @@ export default class WebAudio {
       const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
 
       if (rule.apfCaptions) {
-        let container;
-        if (rule.apfCaptionsSelector) container = getElement(rule.apfCaptionsSelector);
-        if (!container) container = video.parentElement; // Fall-back to video's parent
-
-        // Clean up old APF Caption lines
-        const oldLines = getElement('div.APF-subtitles', container);
-        if (oldLines) oldLines.remove();
-
-        // Show APF Caption lines if they should be shown
-        if (shouldBeShown && data.textResults.length) {
-          const captionLines = data.textResults.map((result) => rule.filterSubtitles && result.modified ? result.filtered : result.original);
-          const apfLines = captionLines.map((text) => instance.apfCaptionLine(rule, text));
-          const apfCaptions = instance.apfCaptionLines(rule, apfLines);
-          container.appendChild(apfCaptions);
-        }
+        this.displayApfCaptions(rule, data.textResults, shouldBeShown);
       } else {
         shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
       }
@@ -1133,7 +1199,7 @@ export default class WebAudio {
           textTrack.oncuechange = () => {
             if (textTrack.activeCues && textTrack.activeCues.length > 0) {
               const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
-              const apfLines = [];
+              const captionData = [] as ReplaceTextResult[];
 
               // Process cues
               const processed = activeCues.some((activeCue) => activeCue.hasOwnProperty('filtered'));
@@ -1150,34 +1216,23 @@ export default class WebAudio {
                 const activeCue = activeCues[i];
                 if (!shouldBeShown && rule.videoCueHideCues) { instance.hideCue(rule, activeCue); }
                 if (rule.apfCaptions) {
-                  const text = filtered ? activeCue.text : activeCue.originalText;
-                  const line = instance.apfCaptionLine(rule, text);
-                  apfLines.unshift(line); // Cues seem to show up in reverse order
+                  // Cues seem to show up in reverse order
+                  captionData.unshift({ filtered: activeCue.filteredText, original: activeCue.originalText, modified: activeCue.filtered });
                 }
               }
 
-              if (apfLines.length) {
-                const container = document.getElementById(rule.apfCaptionsSelector);
-                const oldLines = container.querySelector('div.APF-subtitles');
-                if (oldLines) { oldLines.remove(); }
-                if (shouldBeShown) {
-                  const apfCaptions = instance.apfCaptionLines(rule, apfLines);
-                  container.appendChild(apfCaptions);
-                }
-              }
-
+              if (rule.apfCaptions) instance.displayApfCaptions(rule, captionData, shouldBeShown);
               if (!rule.videoCueHideCues) { textTrack.mode = shouldBeShown ? 'showing' : 'hidden'; }
-              if (rule.displaySelector) { // Hide original subtitles if using apfCaptions
-                apfLines.length || !shouldBeShown ? instance.hideSubtitles(rule) : instance.showSubtitles(rule);
+              if (rule.displaySelector) {
+                // Hide original subtitles if using apfCaptions
+                rule.apfCaptions || !shouldBeShown ? instance.hideSubtitles(rule) : instance.showSubtitles(rule);
               }
             } else { // No active cues
               instance.unmute(rule, video);
 
               if (rule.apfCaptions) {
                 // Remove APF captions because there are no active cues
-                const container = document.getElementById(rule.apfCaptionsSelector);
-                const oldLines = container.querySelector('div.APF-subtitles');
-                if (oldLines) { oldLines.remove(); }
+                instance.removeApfCaptions(rule);
               }
             }
           };

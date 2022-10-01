@@ -91,6 +91,7 @@ interface DomainCfg {
 
 interface FilteredVTTCue extends VTTCue {
   filtered: boolean;
+  filteredText: string;
   originalText: string;
   position: number; // TextTrackCue
   size: number; // TextTrackCue

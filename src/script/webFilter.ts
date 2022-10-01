@@ -24,7 +24,7 @@ export default class WebFilter extends Filter {
   mutePage: boolean;
   observer: MutationObserver;
   processMutationTarget: boolean;
-  processNode: (node: HTMLElement | Document | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
+  processNode: (node: Document | HTMLElement | Node | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
   shadowObserver: MutationObserver;
   stats: Statistics;
   summary: Summary;
@@ -59,7 +59,7 @@ export default class WebFilter extends Filter {
     }
   }
 
-  checkMutationForProfanity(mutation) {
+  checkMutationForProfanity(mutation: MutationRecord) {
     // console.count('[APF] this.checkMutationForProfanity() count'); // Benchmark: Filter
     // logger.debug('Mutation observed', mutation);
     mutation.addedNodes.forEach((node) => {
@@ -74,25 +74,9 @@ export default class WebFilter extends Filter {
       // else { logger.debug('Forbidden node', node); }
     });
 
-    // Check removed nodes to see if we should unmute
-    if (this.mutePage && this.audio.muted) {
-      mutation.removedNodes.forEach((node) => {
-        const supported = this.audio.supportedNode(node);
-        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
-        if (
-          supported !== false
-          || node == this.audio.lastFilteredNode
-          || node.contains(this.audio.lastFilteredNode)
-          || (
-            rule.simpleUnmute
-            && node.textContent
-            && this.audio.lastFilteredText
-            && this.audio.lastFilteredText.includes(node.textContent)
-          )
-        ) {
-          this.audio.unmute(rule);
-        }
-      });
+    // Check removed nodes to see if we should unmute or remove APF Captions
+    if (this.mutePage && (this.audio.muted || this.audio.apfCaptionsEnabled)) {
+      this.handleRemovedNodesOnMutePage(mutation.removedNodes);
     }
 
     if (mutation.target) {
@@ -347,6 +331,38 @@ export default class WebFilter extends Filter {
         if (!response) { response = { disabledTab: false }; }
         resolve(response);
       });
+    });
+  }
+
+  handleRemovedNodesOnMutePage(removedNodes: NodeList) {
+    removedNodes.forEach((node) => {
+      // Remove APF Captions if the removed node was the last one we processed
+      if (this.audio.apfCaptionsEnabled) {
+        if (node == this.audio.lastProcessedNode || node.contains(this.audio.lastProcessedNode)) {
+          const apfCaptionRule = this.audio.rules[this.audio.apfCaptionRuleIds[0]];
+          this.audio.removeApfCaptions(apfCaptionRule);
+        }
+      }
+
+      // Check removed node to see if we should unmute
+      if (this.audio.muted) {
+        const supported = this.audio.supportedNode(node);
+        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
+        if (
+          supported !== false
+          || node == this.audio.lastFilteredNode
+          || node.contains(this.audio.lastFilteredNode)
+          || (
+            rule.simpleUnmute
+            && node.textContent
+            && this.audio.lastFilteredText
+            && this.audio.lastFilteredText.includes(node.textContent)
+          )
+        ) {
+          this.audio.unmute(rule);
+          if (rule.apfCaptions) this.audio.removeApfCaptions(rule);
+        }
+      }
     });
   }
 
