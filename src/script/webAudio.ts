@@ -244,7 +244,6 @@ export default class WebAudio {
         subtitle.textContent = subtitle.innerHTML.replace(WebAudio.brTagRegExp, '\n');
       }
       const result = this.replaceTextResult(subtitle[textMethod]);
-      for (const line of this.splitReplaceTextResultsOnNewlines(result)) captionData.push(line);
       if (result.modified) {
         filtered = true;
         this.mute(rule); // Mute the audio if we haven't already
@@ -258,6 +257,10 @@ export default class WebAudio {
 
         this.lastFilteredNode = subtitle;
         this.lastFilteredText = subtitle[textMethod];
+      }
+
+      if (rule.apfCaptions) {
+        for (const line of this.splitReplaceTextResultsOnNewlines(result)) captionData.push(line);
       }
 
       // Final check to see if we already filtered this text
