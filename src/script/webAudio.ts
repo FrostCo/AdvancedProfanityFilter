@@ -1034,69 +1034,97 @@ export default class WebAudio {
     }
   }
 
+  // [BETA]
+  // This isn't being actively used now
+  supportedDynamicNode(node: HTMLElement, rule: AudioRule) {
+    // HBO Max: When playing a video, this node gets added, but doesn't include any context. Grabbing classList and then start watching.
+    if (node.textContent === rule.dynamicTextKey) {
+      rule.mode = rule.dynamicTargetMode;
+      // TODO: Only working for HBO Max right now
+      rule.parentSelectorAll = `${node.tagName.toLowerCase()}.${Array.from(node.classList).join('.')} ${rule.parentSelectorAll}`;
+      this.initRule(rule);
+    }
+  }
+
+  supportedElementNode(node: HTMLElement, rule: AudioRule) {
+    if (node.nodeName == rule.tagName) {
+      let failed = false;
+      if (!failed && rule.className && (!node.className || !node.classList.contains(rule.className))) failed = true;
+      if (!failed && rule.dataPropPresent && (!node.dataset || !node.dataset.hasOwnProperty(rule.dataPropPresent))) failed = true;
+      if (!failed && rule.hasChildrenElements && (typeof node.childElementCount !== 'number' || node.childElementCount == 0)) failed = true;
+      if (!failed && rule.subtitleSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.subtitleSelector))) failed = true;
+      if (!failed && rule.containsSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.containsSelector))) failed = true;
+      if (!failed) return true;
+    }
+
+    return false;
+  }
+
+  supportedElementChildNode(node: HTMLElement, rule: AudioRule) {
+    if (node.nodeName === rule.tagName) {
+      const root = rule.rootNode ? node.getRootNode() : document as any;
+      if (root) {
+        if (rule.parentSelector) {
+          const parent = root.querySelector(rule.parentSelector);
+          if (parent && (parent == node || parent.contains(node))) return true;
+        } else {
+          const parents = root.querySelectorAll(rule.parentSelectorAll);
+          for (let j = 0; j < parents.length; j++) {
+            if (parents[j].contains(node)) return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
   // Checks if a node is a supported audio node.
   // Returns rule id upon first match, otherwise returns false
   supportedNode(node) {
     for (let i = 0; i < this.enabledRuleIds.length; i++) {
       const ruleId = this.enabledRuleIds[i];
       const rule = this.rules[ruleId];
+      let supported = false;
 
       switch (rule.mode) {
         case 'element':
-          if (node.nodeName == rule.tagName) {
-            let failed = false;
-            if (!failed && rule.className && (!node.className || !node.classList.contains(rule.className))) { failed = true; }
-            if (!failed && rule.dataPropPresent && (!node.dataset || !node.dataset.hasOwnProperty(rule.dataPropPresent))) { failed = true; }
-            if (!failed && rule.hasChildrenElements && (typeof node.childElementCount !== 'number' || node.childElementCount == 0)) { failed = true; }
-            if (!failed && rule.subtitleSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.subtitleSelector))) { failed = true; }
-            if (!failed && rule.containsSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.containsSelector))) { failed = true; }
-            if (!failed) { return ruleId; }
-          }
-          break;
+          supported = this.supportedElementNode(node, rule); break;
         case 'elementChild':
-          if (node.nodeName === rule.tagName) {
-            const root = rule.rootNode ? node.getRootNode() : document;
-            if (root) {
-              if (rule.parentSelector) {
-                const parent = root.querySelector(rule.parentSelector);
-                if (parent && (parent == node || parent.contains(node))) { return ruleId; }
-              } else {
-                const parents = root.querySelectorAll(rule.parentSelectorAll);
-                for (let j = 0; j < parents.length; j++) {
-                  if (parents[j].contains(node)) { return ruleId; }
-                }
-              }
-            }
-          }
-          break;
+          supported = this.supportedElementChildNode(node, rule); break;
         case 'text':
-          if (node.nodeName === rule.tagName) {
-            const parent = document.querySelector(rule.parentSelector);
-            if (parent && parent.contains(node)) { return ruleId; }
-          }
-          break;
+          supported = this.supportedTextNode(node, rule); break;
         case 'watcher':
-          if (rule.subtitleSelector != null && node.parentElement && node.parentElement == getElement(rule.subtitleSelector)) {
-            return ruleId;
-          }
-          if (rule.parentSelector != null) {
-            const parent = getElement(rule.parentSelector);
-            if (parent && parent.contains(node)) { return ruleId; }
-          }
-          break;
+          supported = this.supportedWatcherNode(node, rule); break;
         case 'dynamic':
-          // HBO Max: When playing a video, this node gets added, but doesn't include any context. Grabbing classList and then start watching.
-          if (node.textContent === rule.dynamicTextKey) {
-            rule.mode = rule.dynamicTargetMode;
-            // TODO: Only working for HBO Max right now
-            rule.parentSelectorAll = `${node.tagName.toLowerCase()}.${Array.from(node.classList).join('.')} ${rule.parentSelectorAll}`;
-            this.initRule(rule);
-          }
-          break;
+          this.supportedDynamicNode(node, rule); break;
       }
+
+      if (supported) return ruleId;
     }
 
     // No matching rule was found
+    return false;
+  }
+
+  supportedTextNode(node: HTMLElement, rule: AudioRule) {
+    if (node.nodeName === rule.tagName) {
+      const parent = document.querySelector(rule.parentSelector);
+      if (parent && parent.contains(node)) return true;
+    }
+
+    return false;
+  }
+
+  supportedWatcherNode(node: HTMLElement, rule: AudioRule) {
+    if (rule.subtitleSelector != null && node.parentElement && node.parentElement == getElement(rule.subtitleSelector)) {
+      return true;
+    }
+    if (rule.parentSelector != null) {
+      const parent = getElement(rule.parentSelector);
+      if (parent && parent.contains(node)) return true;
+    }
+
     return false;
   }
 
