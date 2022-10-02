@@ -66,6 +66,13 @@ async function contextMenuSetup(enabled?: boolean) {
     });
 
     chrome.contextMenus.create({
+      id: 'toggleFramesForDomain',
+      title: 'Toggle frames for domain',
+      contexts: ['all'],
+      documentUrlPatterns: ['http://*/*', 'https://*/*']
+    });
+
+    chrome.contextMenus.create({
       id: 'options',
       title: 'Options',
       contexts: ['all']
@@ -87,6 +94,8 @@ function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.
       toggleDomain((new URL(tab.url)).hostname, 'advanced'); break;
     case 'toggleForDomain':
       toggleDomain((new URL(tab.url)).hostname, 'disable'); break;
+    case 'toggleFramesForDomain':
+        toggleDomain((new URL(tab.url)).hostname, 'frames'); break;
     case 'toggleTabDisable':
       toggleTabDisable(tab.id); break;
   }
@@ -296,7 +305,7 @@ async function tabsOnRemoved(tabId: number) {
 }
 
 async function toggleDomain(hostname: string, action: string) {
-  const cfg = await WebConfig.load(['domains', 'enabledDomainsOnly']);
+  const cfg = await WebConfig.load(['domains', 'enabledDomainsOnly', 'enabledFramesOnly']);
   const domain = Domain.byHostname(hostname, cfg.domains);
 
   switch (action) {
@@ -304,6 +313,8 @@ async function toggleDomain(hostname: string, action: string) {
       domain.advanced = !domain.advanced; break;
     case 'disable':
       cfg.enabledDomainsOnly ? domain.enabled = !domain.enabled : domain.disabled = !domain.disabled; break;
+    case 'frames':
+      cfg.enabledFramesOnly ? domain.framesOn = !domain.framesOn : domain.framesOff = !domain.framesOff; break;
   }
 
   try {
