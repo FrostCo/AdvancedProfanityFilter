@@ -36,6 +36,7 @@ export default class WebAudio {
   sites: AudioSites;
   siteKey: string;
   supportedPage: boolean;
+  supportedCaptions: boolean;
   unmuteTimeout: number;
   volume: number;
   watcherRuleIds: number[];
@@ -136,6 +137,7 @@ export default class WebAudio {
       filter.cfg.customAudioSites = {};
     }
     this.sites = WebAudio.supportedAndCustomSites(filter.cfg.customAudioSites);
+    this.supportedCaptions = false;
     this.volume = 1;
     this.wordlistId = filter.audioWordlistId;
     this.youTubeAutoSubsMax = filter.cfg.youTubeAutoSubsMax * 1000;
@@ -1034,6 +1036,17 @@ export default class WebAudio {
     }
   }
 
+  supportedCaptionsFound(found = true) {
+    if (found == this.supportedCaptions) return;
+
+    this.supportedCaptions = found;
+    if (found) {
+      logger.info('Supported captions found');
+    } else {
+      logger.info('Supported captions not found yet');
+    }
+  }
+
   // [BETA]
   // This isn't being actively used now
   supportedDynamicNode(node: HTMLElement, rule: AudioRule) {
@@ -1100,7 +1113,10 @@ export default class WebAudio {
           this.supportedDynamicNode(node, rule); break;
       }
 
-      if (supported) return ruleId;
+      if (supported) {
+        this.supportedCaptionsFound();
+        return ruleId;
+      }
     }
 
     // No matching rule was found
@@ -1197,6 +1213,7 @@ export default class WebAudio {
       }
 
       if (data.skipped) { return false; }
+      instance.supportedCaptionsFound();
 
       // Hide/show caption/subtitle text
       const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
@@ -1268,6 +1285,7 @@ export default class WebAudio {
           // Pre-process all cues after setting oncuechange
           const allCues = Array.from(textTrack.cues as any as FilteredVTTCue[]);
           instance.processCues(allCues, rule);
+          instance.supportedCaptionsFound(true);
         }
       }
     }
@@ -1396,7 +1414,9 @@ export default class WebAudio {
   }
 
   youTubeAutoSubsPresent(): boolean {
-    return !!(document.querySelector('div.ytp-caption-window-rollup'));
+    const present = !!(document.querySelector('div.ytp-caption-window-rollup'));
+    if (present) this.supportedCaptionsFound();
+    return present;
   }
 
   youTubeAutoSubsSupportedNode(node: any): boolean {
