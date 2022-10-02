@@ -1202,7 +1202,7 @@ export default class WebAudio {
       const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
 
       if (rule.apfCaptions) {
-        this.displayApfCaptions(rule, data.textResults, shouldBeShown);
+        instance.displayApfCaptions(rule, data.textResults, shouldBeShown);
       } else {
         shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
       }
