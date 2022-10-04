@@ -10,6 +10,7 @@ const COLOR_FOREST_GREEN = [34, 139, 34, 255] as chrome.action.ColorArray;
 const COLOR_GREY = [85, 85, 85, 255] as chrome.action.ColorArray;
 const COLOR_ORANGE = [236, 147, 41, 255] as chrome.action.ColorArray;
 const COLOR_RED = [211, 45, 39, 255] as chrome.action.ColorArray;
+const BADGE_COLORS = [COLOR_GREY, COLOR_BLUE, COLOR_RED, COLOR_RED, COLOR_BLUE_VIOLET, COLOR_FOREST_GREEN] as chrome.action.ColorArray[];
 
 ////
 // Functions
@@ -132,7 +133,7 @@ function getWindowVariable(variableName: string) {
   }
 }
 
-async function handleBackgroundDataRequest(tabId: number, sendResponse) {
+async function handleBackgroundDataRequest(tabId: number, sendResponse, iframe: boolean) {
   const storage = await loadBackgroundStorage();
   const response: BackgroundData = { disabledTab: false };
   const tabOptions = getTabOptions(storage, tabId);
@@ -140,10 +141,20 @@ async function handleBackgroundDataRequest(tabId: number, sendResponse) {
     response.disabledTab = true;
   }
   sendResponse(response);
+
+  let updated = false;
   if (tabOptions.disabledOnce) {
     tabOptions.disabledOnce = false;
-    await saveBackgroundStorage(storage);
+    updated = true;
   }
+
+  // Reset filter status for main page
+  if (!iframe) {
+    tabOptions.status = 0;
+    updated = true;
+  }
+
+  if (updated) await saveBackgroundStorage(storage);
 }
 
 async function handleRequest(url: string, method: string = 'GET', sendResponse) {
@@ -203,7 +214,7 @@ function onMessage(request: Message, sender, sendResponse) {
   if (request.disabled === true) {
     chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
   } else if (request.backgroundData === true) {
-    handleBackgroundDataRequest(sender.tab.id, sendResponse);
+    handleBackgroundDataRequest(sender.tab.id, sendResponse, request.iframe);
     return true; // return true when waiting on an async call
   } else if (request.fetch) {
     handleRequest(request.fetch, request.fetchMethod, sendResponse);
@@ -214,17 +225,9 @@ function onMessage(request: Message, sender, sendResponse) {
   } else if (request.updateContextMenus != null) {
     contextMenuSetup(request.updateContextMenus);
   } else {
-    // Set badge color
-    if (request.setBadgeColor) {
-      if (request.captions) {
-        chromeAction.setBadgeBackgroundColor({ color: COLOR_FOREST_GREEN, tabId: sender.tab.id }); // Audio captions
-      } else if (request.mutePage) {
-        chromeAction.setBadgeBackgroundColor({ color: COLOR_BLUE_VIOLET, tabId: sender.tab.id }); // Audio
-      } else if (request.advanced) {
-        chromeAction.setBadgeBackgroundColor({ color: COLOR_RED, tabId: sender.tab.id }); // Advanced
-      } else {
-        chromeAction.setBadgeBackgroundColor({ color: COLOR_BLUE, tabId: sender.tab.id }); // Normal
-      }
+    // Update tab's status and set badge color
+    if (request.status) {
+      updateStatus(chromeAction, sender.tab.id, request.status);
     }
 
     // Show count of words filtered on badge
@@ -281,7 +284,7 @@ async function runUpdateMigrations(previousVersion) {
 }
 
 function newTabOptions(storage: BackgroundStorage, tabId: number, options: TabStorageOptions = {}): TabStorageOptions {
-  const _defaults: TabStorageOptions = { disabled: false, disabledOnce: false };
+  const _defaults: TabStorageOptions = { status: 0, disabled: false, disabledOnce: false };
   const tabOptions = Object.assign({}, _defaults, options) as TabStorageOptions;
   tabOptions.id = tabId;
   tabOptions.registeredAt = new Date().getTime();
@@ -326,6 +329,18 @@ async function toggleTabDisable(tabId: number) {
   tabOptions.disabled = !tabOptions.disabled;
   await saveBackgroundStorage(storage);
   chrome.tabs.reload(tabId);
+}
+
+async function updateStatus(chromeAction, tabId: number, status: number) {
+  const storage = await loadBackgroundStorage();
+  const tabOptions = await getTabOptions(storage, tabId);
+
+  // Only let status increase
+  if (status > tabOptions.status) {
+    tabOptions.status = status;
+    chromeAction.setBadgeBackgroundColor({ color: BADGE_COLORS[tabOptions.status], tabId: tabId });
+    await saveBackgroundStorage(storage);
+  }
 }
 
 ////

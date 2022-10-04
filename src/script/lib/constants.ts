@@ -18,6 +18,7 @@ export default class Constants {
   static readonly SHOW_SUBTITLES = { ALL: 0, FILTERED: 1, UNFILTERED: 2, NONE: 3 };
   static readonly STATS_TYPE_AUDIO = 'audio';
   static readonly STATS_TYPE_TEXT = 'text';
+  static readonly STATUS = { DISABLED: 0, NORMAL: 1, ADVANCED: 2, DEEP: 3, MUTE_PAGE: 4, CAPTIONS: 5 };
   static readonly TRUE = 1;
 
   // Helper Functions

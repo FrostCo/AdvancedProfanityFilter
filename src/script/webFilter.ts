@@ -327,7 +327,7 @@ export default class WebFilter extends Filter {
 
   getBackgroundData() {
     return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ backgroundData: true }, (response) => {
+      chrome.runtime.sendMessage({ backgroundData: true, iframe: !!this.iframe }, (response) => {
         if (!response) { response = { disabledTab: false }; }
         resolve(response);
       });
@@ -430,10 +430,14 @@ export default class WebFilter extends Filter {
     // Reset muted state on page load if we muted the tab audio
     if (this.cfg.muteAudio && this.cfg.muteMethod == Constants.MUTE_METHODS.TAB) { message.clearMute = true; }
 
-    // Send page state to color icon badge
-    if (!this.iframe || this.mutePage) { message.setBadgeColor = true; }
+    // Get status
+    message.iframe = !!(this.iframe);
     message.advanced = this.domain.advanced;
     message.mutePage = this.mutePage;
+    message.status = Constants.STATUS.NORMAL;
+    if (message.advanced) message.status = Constants.STATUS.ADVANCED;
+    if (message.mutePage) message.status = Constants.STATUS.MUTE_PAGE;
+
     if (this.mutePage && this.cfg.showCounter) { message.counter = this.counter; } // Always show counter when muting audio
     chrome.runtime.sendMessage(message);
   }

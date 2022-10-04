@@ -107,10 +107,11 @@ interface Message {
   fetch?: string;
   fetchMethod?: string;
   globalVariable?: string;
+  iframe?: boolean;
   mute?: boolean;
   mutePage?: boolean;
   popup?: boolean;
-  setBadgeColor?: boolean;
+  status?: number;
   summary?: Summary;
   updateContextMenus?: boolean;
 }
@@ -151,6 +152,7 @@ interface TabStorageOptions {
   disabled?: boolean;
   disabledOnce?: boolean;
   registeredAt?: number;
+  status?: number;
 }
 
 interface Version {
