@@ -258,6 +258,8 @@ class Popup {
 
 // Listen for data updates from filter
 chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) => {
+  if (request.destination !== Constants.MESSAGING.POPUP) return true;
+
   if (request.summary) {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (sender.tab.id == tabs[0].id) { popup.populateSummary(request.summary); }
@@ -268,7 +270,7 @@ chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) =>
 
 // Initial data request
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-  chrome.tabs.sendMessage(tabs[0].id, { popup: true });
+  chrome.tabs.sendMessage(tabs[0].id, { destination: Constants.MESSAGING.CONTEXT, source: Constants.MESSAGING.POPUP, summary: true });
 });
 
 const popup = new Popup;

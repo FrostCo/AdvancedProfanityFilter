@@ -59,6 +59,10 @@ export default class WebFilter extends Filter {
     }
   }
 
+  buildMessage(destination: string, data = {}): Message {
+    return Object.assign({ destination: destination, source: Constants.MESSAGING.CONTEXT }, data);
+  }
+
   checkMutationForProfanity(mutation: MutationRecord) {
     // console.count('[APF] this.checkMutationForProfanity() count'); // Benchmark: Filter
     // logger.debug('Mutation observed', mutation);
@@ -202,7 +206,7 @@ export default class WebFilter extends Filter {
     const backgroundData: BackgroundData = await this.getBackgroundData();
 
     // Use domain-specific settings
-    const message: Message = {};
+    const message = this.buildMessage(Constants.MESSAGING.BACKGROUND);
     if (
       backgroundData.disabledTab
       || (
@@ -327,7 +331,8 @@ export default class WebFilter extends Filter {
 
   getBackgroundData() {
     return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ backgroundData: true, iframe: !!this.iframe }, (response) => {
+      const message = this.buildMessage(Constants.MESSAGING.BACKGROUND, { backgroundData: true, iframe: !!this.iframe });
+      chrome.runtime.sendMessage(message, (response) => {
         if (!response) { response = { disabledTab: false }; }
         resolve(response);
       });
@@ -412,8 +417,11 @@ export default class WebFilter extends Filter {
   popupListener() {
     /* istanbul ignore next */
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      if (this.cfg.showSummary && request.popup && (this.counter > 0 || this.mutePage)) {
-        chrome.runtime.sendMessage({ mutePage: this.mutePage, summary: this.summary });
+      if (request.destination !== Constants.MESSAGING.CONTEXT) return true;
+
+      if (request.source == Constants.MESSAGING.POPUP && this.cfg.showSummary && request.summary && (this.counter > 0 || this.mutePage)) {
+        const message = this.buildMessage(Constants.MESSAGING.POPUP, { mutePage: this.mutePage, summary: this.summary });
+        chrome.runtime.sendMessage(message);
       }
       sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
     });
@@ -463,8 +471,15 @@ export default class WebFilter extends Filter {
     // console.count('updateCounterBadge'); // Benchmark: Filter
     if (this.counter > 0) {
       try {
-        if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter });
-        if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
+        if (this.cfg.showCounter) {
+          const message = this.buildMessage(Constants.MESSAGING.BACKGROUND, { counter: this.counter });
+          chrome.runtime.sendMessage(message);
+        }
+
+        if (this.cfg.showSummary) {
+          const message = this.buildMessage(Constants.MESSAGING.POPUP, { summary: this.summary });
+          chrome.runtime.sendMessage(message);
+        }
       } catch (err) {
         if (err.message !== 'Extension context invalidated.') {
           logger.warn('Failed to sendMessage to update counter.', err);

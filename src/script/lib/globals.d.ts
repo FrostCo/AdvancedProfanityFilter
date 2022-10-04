@@ -104,6 +104,7 @@ interface Message {
   clearMute?: boolean;
   counter?: number;
   deep?: boolean;
+  destination: string;
   disabled?: boolean;
   fetch?: string;
   fetchMethod?: string;
@@ -112,6 +113,7 @@ interface Message {
   mute?: boolean;
   mutePage?: boolean;
   popup?: boolean;
+  source: string;
   status?: number;
   summary?: Summary;
   updateContextMenus?: boolean;

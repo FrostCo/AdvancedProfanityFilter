@@ -1,3 +1,4 @@
+import Constants from './lib/constants';
 import DataMigration from './dataMigration';
 import Domain from './domain';
 import WebConfig from './webConfig';
@@ -208,45 +209,60 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
   }
 }
 
-function onMessage(request: Message, sender, sendResponse) {
+function onMessage(request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
+  if (request.destination !== Constants.MESSAGING.BACKGROUND) return true;
+
   // Support manifest V2/V3
   const chromeAction = chrome.action || chrome.browserAction;
-  if (request.disabled === true) {
-    chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
-  } else if (request.backgroundData === true) {
-    handleBackgroundDataRequest(sender.tab.id, sendResponse, request.iframe);
-    return true; // return true when waiting on an async call
-  } else if (request.fetch) {
-    handleRequest(request.fetch, request.fetchMethod, sendResponse);
-    return true; // return true when waiting on an async call
-  } else if (request.globalVariable) {
-    getGlobalVariable(request.globalVariable, sender, sendResponse);
-    return true; // return true when waiting on an async call
-  } else if (request.updateContextMenus != null) {
-    contextMenuSetup(request.updateContextMenus);
-  } else {
-    // Update tab's status and set badge color
-    if (request.status) {
-      updateStatus(chromeAction, sender.tab.id, request.status);
-    }
 
-    // Show count of words filtered on badge
-    if (request.counter != undefined) {
-      chromeAction.setBadgeText({ text: formatNumber(request.counter), tabId: sender.tab.id });
-    }
+  switch (request.source) {
+    case Constants.MESSAGING.CONTEXT:
+      if (request.disabled === true) {
+        chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
+      } else if (request.backgroundData === true) {
+        handleBackgroundDataRequest(sender.tab.id, sendResponse, request.iframe);
+        return true; // return true when waiting on an async call
+      } else if (request.fetch) {
+        handleRequest(request.fetch, request.fetchMethod, sendResponse);
+        return true; // return true when waiting on an async call
+      } else if (request.globalVariable) {
+        getGlobalVariable(request.globalVariable, sender, sendResponse);
+        return true; // return true when waiting on an async call
+      } else {
+        // Update tab's status and set badge color
+        if (request.status) {
+          updateStatus(chromeAction, sender.tab.id, request.status);
+        }
 
-    // Set mute state for tab
-    if (request.mute != undefined) {
-      chrome.tabs.update(sender.tab.id, { muted: request.mute });
-    }
+        // Show count of words filtered on badge
+        if (request.counter != undefined) {
+          chromeAction.setBadgeText({ text: formatNumber(request.counter), tabId: sender.tab.id });
+        }
 
-    // Unmute on page reload
-    if (request.clearMute === true && sender.tab != undefined) {
-      const { muted, reason, extensionId } = sender.tab.mutedInfo;
-      if (muted && reason == 'extension' && extensionId == chrome.runtime.id) {
-        chrome.tabs.update(sender.tab.id, { muted: false });
+        // Set mute state for tab
+        if (request.mute != undefined) {
+          chrome.tabs.update(sender.tab.id, { muted: request.mute });
+        }
+
+        // Unmute on page reload
+        if (request.clearMute === true && sender.tab != undefined) {
+          const { muted, reason, extensionId } = sender.tab.mutedInfo;
+          if (muted && reason == 'extension' && extensionId == chrome.runtime.id) {
+            chrome.tabs.update(sender.tab.id, { muted: false });
+          }
+        }
       }
-    }
+      break;
+
+    case Constants.MESSAGING.OPTION:
+      if (request.updateContextMenus != null) {
+        contextMenuSetup(request.updateContextMenus);
+      } else {
+        Logger.error('Received unhandled message.', JSON.stringify(request));
+      }
+      break;
+    default:
+      Logger.error('Received message without a supported source:', JSON.stringify(request));
   }
 
   sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called

@@ -649,7 +649,8 @@ export default class WebAudio {
 
       switch (rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
-          chrome.runtime.sendMessage({ mute: true });
+          const message: Message = { destination: Constants.MESSAGING.BACKGROUND, mute: true, source: Constants.MESSAGING.CONTEXT };
+          chrome.runtime.sendMessage(message);
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
           if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
@@ -1041,7 +1042,7 @@ export default class WebAudio {
 
     this.supportedCaptions = found;
     if (found) {
-      const message: Message = { status: Constants.STATUS.CAPTIONS };
+      const message: Message = { destination: Constants.MESSAGING.BACKGROUND, source: Constants.MESSAGING.CONTEXT, status: Constants.STATUS.CAPTIONS };
       chrome.runtime.sendMessage(message);
       logger.info('Supported captions found');
     } else {
@@ -1162,7 +1163,8 @@ export default class WebAudio {
       this.muted = false;
       switch (rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
-          chrome.runtime.sendMessage({ mute: false });
+          const message: Message = { destination: Constants.MESSAGING.BACKGROUND, mute: false, source: Constants.MESSAGING.CONTEXT };
+          chrome.runtime.sendMessage(message);
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
           if (this.fillerAudio) { this.stopFillerAudio(); }

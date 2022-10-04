@@ -14,6 +14,7 @@ export default class Constants {
   static readonly FILTER_METHODS = { CENSOR: 0, SUBSTITUTE: 1, REMOVE: 2, OFF: 3 };
   static readonly LOGGING_LEVELS = { DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3 };
   static readonly MATCH_METHODS = { EXACT: 0, PARTIAL: 1, WHOLE: 2, REGEX: 3 };
+  static readonly MESSAGING = { BACKGROUND: 'background', CONTEXT: 'context', OPTION: 'option', POPUP: 'popup' };
   static readonly MUTE_METHODS = { TAB: 0, VIDEO_VOLUME: 1, VIDEO_MUTE: 2, NONE: 9 };
   static readonly SHOW_SUBTITLES = { ALL: 0, FILTERED: 1, UNFILTERED: 2, NONE: 3 };
   static readonly STATS_TYPE_AUDIO = 'audio';
