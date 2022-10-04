@@ -419,10 +419,22 @@ export default class WebFilter extends Filter {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (request.destination !== Constants.MESSAGING.CONTEXT) return true;
 
-      if (request.source == Constants.MESSAGING.POPUP && this.cfg.showSummary && request.summary && (this.counter > 0 || this.mutePage)) {
-        const message = this.buildMessage(Constants.MESSAGING.POPUP, { mutePage: this.mutePage, summary: this.summary });
-        chrome.runtime.sendMessage(message);
+      switch (request.source) {
+        case Constants.MESSAGING.POPUP:
+          if (request.summary) {
+            if (this.cfg.showSummary && (this.counter > 0 || this.mutePage)) {
+              const message = this.buildMessage(Constants.MESSAGING.POPUP, { mutePage: this.mutePage, summary: this.summary });
+              chrome.runtime.sendMessage(message);
+            }
+          } else {
+            logger.error('Received unhandled message.', JSON.stringify(request));
+          }
+          break;
+
+        default:
+          logger.error('Received message without a supported source:', JSON.stringify(request));
       }
+
       sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
     });
   }
