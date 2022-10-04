@@ -216,8 +216,10 @@ function onMessage(request: Message, sender, sendResponse) {
   } else {
     // Set badge color
     if (request.setBadgeColor) {
-      if (request.mutePage) {
-        chromeAction.setBadgeBackgroundColor({ color: COLOR_FOREST_GREEN, tabId: sender.tab.id }); // Audio
+      if (request.captions) {
+        chromeAction.setBadgeBackgroundColor({ color: COLOR_FOREST_GREEN, tabId: sender.tab.id }); // Audio captions
+      } else if (request.mutePage) {
+        chromeAction.setBadgeBackgroundColor({ color: COLOR_BLUE_VIOLET, tabId: sender.tab.id }); // Audio
       } else if (request.advanced) {
         chromeAction.setBadgeBackgroundColor({ color: COLOR_RED, tabId: sender.tab.id }); // Advanced
       } else {

@@ -1041,6 +1041,8 @@ export default class WebAudio {
 
     this.supportedCaptions = found;
     if (found) {
+      const message: Message = { captions: true, setBadgeColor: true };
+      chrome.runtime.sendMessage(message);
       logger.info('Supported captions found');
     } else {
       logger.info('Supported captions not found yet');

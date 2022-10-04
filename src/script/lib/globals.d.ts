@@ -100,6 +100,7 @@ interface FilteredVTTCue extends VTTCue {
 interface Message {
   advanced?: boolean;
   backgroundData?: boolean;
+  captions?: boolean;
   clearMute?: boolean;
   counter?: number;
   disabled?: boolean;
