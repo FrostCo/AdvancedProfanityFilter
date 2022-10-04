@@ -1061,13 +1061,12 @@ export default class WebAudio {
 
   supportedElementNode(node: HTMLElement, rule: AudioRule) {
     if (node.nodeName == rule.tagName) {
-      let failed = false;
-      if (!failed && rule.className && (!node.className || !node.classList.contains(rule.className))) failed = true;
-      if (!failed && rule.dataPropPresent && (!node.dataset || !node.dataset.hasOwnProperty(rule.dataPropPresent))) failed = true;
-      if (!failed && rule.hasChildrenElements && (typeof node.childElementCount !== 'number' || node.childElementCount == 0)) failed = true;
-      if (!failed && rule.subtitleSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.subtitleSelector))) failed = true;
-      if (!failed && rule.containsSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.containsSelector))) failed = true;
-      if (!failed) return true;
+      if (rule.className && (!node.className || !node.classList.contains(rule.className))) return false;
+      if (rule.dataPropPresent && (!node.dataset || !node.dataset.hasOwnProperty(rule.dataPropPresent))) return false;
+      if (rule.hasChildrenElements && (typeof node.childElementCount !== 'number' || node.childElementCount == 0)) return false;
+      if (rule.subtitleSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.subtitleSelector))) return false;
+      if (rule.containsSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.containsSelector))) return false;
+      return true;
     }
 
     return false;
