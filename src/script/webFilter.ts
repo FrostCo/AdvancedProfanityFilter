@@ -246,7 +246,7 @@ export default class WebFilter extends Filter {
     }
 
     this.sendInitState(message);
-    this.popupListener();
+    this.onMessage();
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
@@ -414,7 +414,7 @@ export default class WebFilter extends Filter {
   }
 
   // Listen for data requests from Popup
-  popupListener() {
+  onMessage() {
     /* istanbul ignore next */
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (request.destination !== Constants.MESSAGING.CONTEXT) return true;
