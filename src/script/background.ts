@@ -4,6 +4,13 @@ import WebConfig from './webConfig';
 import { formatNumber, makeRequest } from './lib/helper';
 import Logger from './lib/logger';
 
+const COLOR_BLUE = [66, 133, 244, 255] as chrome.action.ColorArray;
+const COLOR_BLUE_VIOLET = [138, 43, 226, 255] as chrome.action.ColorArray;
+const COLOR_FOREST_GREEN = [34, 139, 34, 255] as chrome.action.ColorArray;
+const COLOR_GREY = [85, 85, 85, 255] as chrome.action.ColorArray;
+const COLOR_ORANGE = [236, 147, 41, 255] as chrome.action.ColorArray;
+const COLOR_RED = [211, 45, 39, 255] as chrome.action.ColorArray;
+
 ////
 // Functions
 //
@@ -208,16 +215,13 @@ function onMessage(request: Message, sender, sendResponse) {
     contextMenuSetup(request.updateContextMenus);
   } else {
     // Set badge color
-    // chromeAction.setBadgeBackgroundColor({ color: [138, 43, 226, 255], tabId: sender.tab.id }); // Blue Violet
-    // chromeAction.setBadgeBackgroundColor({ color: [85, 85, 85, 255], tabId: sender.tab.id }); // Grey (Default)
-    // chromeAction.setBadgeBackgroundColor({ color: [236, 147, 41, 255], tabId: sender.tab.id }); // Orange
     if (request.setBadgeColor) {
       if (request.mutePage) {
-        chromeAction.setBadgeBackgroundColor({ color: [34, 139, 34, 255], tabId: sender.tab.id }); // Forest Green - Audio
+        chromeAction.setBadgeBackgroundColor({ color: COLOR_FOREST_GREEN, tabId: sender.tab.id }); // Audio
       } else if (request.advanced) {
-        chromeAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255], tabId: sender.tab.id }); // Red - Advanced
+        chromeAction.setBadgeBackgroundColor({ color: COLOR_RED, tabId: sender.tab.id }); // Advanced
       } else {
-        chromeAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255], tabId: sender.tab.id }); // Blue - Normal
+        chromeAction.setBadgeBackgroundColor({ color: COLOR_BLUE, tabId: sender.tab.id }); // Normal
       }
     }
 
