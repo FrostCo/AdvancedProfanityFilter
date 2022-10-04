@@ -261,6 +261,16 @@ function onMessage(request: Message, sender: chrome.runtime.MessageSender, sendR
         Logger.error('Received unhandled message.', JSON.stringify(request));
       }
       break;
+
+    case Constants.MESSAGING.POPUP:
+      if (request.getStatus) {
+        updatePopupStatus(request.tabId, null, sendResponse);
+        return true; // return true when waiting on an async call
+      } else {
+        Logger.error('Received unhandled message.', JSON.stringify(request));
+      }
+      break;
+
     default:
       Logger.error('Received message without a supported source:', JSON.stringify(request));
   }
@@ -347,6 +357,17 @@ async function toggleTabDisable(tabId: number) {
   chrome.tabs.reload(tabId);
 }
 
+async function updatePopupStatus(tabId: number, status?: number, sendResponse?) {
+  if (!status) {
+    const storage = await loadBackgroundStorage();
+    const tabOptions = await getTabOptions(storage, tabId);
+    status = tabOptions.status;
+  }
+  if (!sendResponse) sendResponse = chrome.runtime.sendMessage;
+  const message: Message = { destination: 'popup', source: 'background', status: status, tabId: tabId };
+  sendResponse(message, () => chrome.runtime.lastError); // Suppress error if Popup isn't active
+}
+
 async function updateStatus(chromeAction, tabId: number, status: number) {
   const storage = await loadBackgroundStorage();
   const tabOptions = await getTabOptions(storage, tabId);
@@ -355,6 +376,7 @@ async function updateStatus(chromeAction, tabId: number, status: number) {
   if (status > tabOptions.status) {
     tabOptions.status = status;
     chromeAction.setBadgeBackgroundColor({ color: BADGE_COLORS[tabOptions.status], tabId: tabId });
+    updatePopupStatus(tabId, tabOptions.status);
     await saveBackgroundStorage(storage);
   }
 }
