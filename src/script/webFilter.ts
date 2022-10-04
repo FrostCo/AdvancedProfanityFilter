@@ -433,9 +433,11 @@ export default class WebFilter extends Filter {
     // Get status
     message.iframe = !!(this.iframe);
     message.advanced = this.domain.advanced;
+    message.deep = this.domain.deep;
     message.mutePage = this.mutePage;
     message.status = Constants.STATUS.NORMAL;
     if (message.advanced) message.status = Constants.STATUS.ADVANCED;
+    if (this.domain.deep) message.status = Constants.STATUS.DEEP;
     if (message.mutePage) message.status = Constants.STATUS.MUTE_PAGE;
 
     if (this.mutePage && this.cfg.showCounter) { message.counter = this.counter; } // Always show counter when muting audio

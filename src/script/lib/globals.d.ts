@@ -103,6 +103,7 @@ interface Message {
   captions?: boolean;
   clearMute?: boolean;
   counter?: number;
+  deep?: boolean;
   disabled?: boolean;
   fetch?: string;
   fetchMethod?: string;
