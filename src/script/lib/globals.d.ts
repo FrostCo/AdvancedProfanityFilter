@@ -108,6 +108,7 @@ interface Message {
   disabled?: boolean;
   fetch?: string;
   fetchMethod?: string;
+  forceUpdate?: boolean;
   getStatus?: boolean;
   globalVariable?: string;
   iframe?: boolean;
@@ -119,6 +120,7 @@ interface Message {
   summary?: Summary;
   tabId?: number;
   updateContextMenus?: boolean;
+  urlUpdate?: string;
 }
 
 interface Migration {

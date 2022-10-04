@@ -1037,16 +1037,20 @@ export default class WebAudio {
     }
   }
 
-  supportedCaptionsFound(found = true) {
-    if (found == this.supportedCaptions) return;
+  supportedCaptionsFound(found = true, forceUpdate = false) {
+    if (!forceUpdate && found == this.supportedCaptions) return;
+
+    const message: Message = { destination: Constants.MESSAGING.BACKGROUND, source: Constants.MESSAGING.CONTEXT, forceUpdate: forceUpdate };
 
     this.supportedCaptions = found;
     if (found) {
-      const message: Message = { destination: Constants.MESSAGING.BACKGROUND, source: Constants.MESSAGING.CONTEXT, status: Constants.STATUS.CAPTIONS };
+      message.status = Constants.STATUS.CAPTIONS;
       chrome.runtime.sendMessage(message);
       logger.info('Supported captions found');
     } else {
-      logger.info('Supported captions not found yet');
+      message.status = Constants.STATUS.MUTE_PAGE;
+      chrome.runtime.sendMessage(message);
+      logger.info('Watching for supported captions');
     }
   }
 

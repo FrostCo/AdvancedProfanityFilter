@@ -420,6 +420,16 @@ export default class WebFilter extends Filter {
       if (request.destination !== Constants.MESSAGING.CONTEXT) return true;
 
       switch (request.source) {
+        case Constants.MESSAGING.BACKGROUND:
+          if (request.urlUpdate) {
+            if (this.mutePage) {
+              this.audio.supportedCaptionsFound(false, true);
+            }
+          } else {
+            logger.error('Received unhandled message.', JSON.stringify(request));
+          }
+          break;
+
         case Constants.MESSAGING.POPUP:
           if (request.summary) {
             if (this.cfg.showSummary && (this.counter > 0 || this.mutePage)) {

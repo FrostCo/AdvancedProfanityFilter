@@ -231,7 +231,7 @@ function onMessage(request: Message, sender: chrome.runtime.MessageSender, sendR
       } else {
         // Update tab's status and set badge color
         if (request.status) {
-          updateStatus(chromeAction, sender.tab.id, request.status);
+          updateStatus(chromeAction, sender.tab.id, request.status, request.forceUpdate);
         }
 
         // Show count of words filtered on badge
@@ -330,6 +330,13 @@ async function tabsOnRemoved(tabId: number) {
   }
 }
 
+async function tabsOnUpdated(tabId, changeInfo, tab) {
+  if (changeInfo.url) {
+    const message: Message = { source: Constants.MESSAGING.BACKGROUND, destination: Constants.MESSAGING.CONTEXT, urlUpdate: changeInfo.url };
+    chrome.tabs.sendMessage(tabId, message, () => chrome.runtime.lastError); // Suppress error if no listener
+  }
+}
+
 async function toggleDomain(hostname: string, action: string) {
   const cfg = await WebConfig.load(['domains', 'enabledDomainsOnly']);
   const domain = Domain.byHostname(hostname, cfg.domains);
@@ -368,12 +375,12 @@ async function updatePopupStatus(tabId: number, status?: number, sendResponse?) 
   sendResponse(message, () => chrome.runtime.lastError); // Suppress error if Popup isn't active
 }
 
-async function updateStatus(chromeAction, tabId: number, status: number) {
+async function updateStatus(chromeAction, tabId: number, status: number, forceUpdate = false) {
   const storage = await loadBackgroundStorage();
   const tabOptions = await getTabOptions(storage, tabId);
 
   // Only let status increase
-  if (status > tabOptions.status) {
+  if (forceUpdate || status > tabOptions.status) {
     tabOptions.status = status;
     chromeAction.setBadgeBackgroundColor({ color: BADGE_COLORS[tabOptions.status], tabId: tabId });
     updatePopupStatus(tabId, tabOptions.status);
@@ -389,6 +396,7 @@ chrome.runtime.onInstalled.addListener((details) => { onInstalled(details); });
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { return onMessage(request, sender, sendResponse); });
 chrome.runtime.onStartup.addListener(() => { onStartup(); });
 chrome.tabs.onRemoved.addListener((tabId) => { tabsOnRemoved(tabId); });
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => { tabsOnUpdated(tabId, changeInfo, tab); });
 if (chrome.notifications != null) { // Not available in Safari
   chrome.notifications.onClicked.addListener((notificationId) => { notificationsOnClick(notificationId); });
 }
