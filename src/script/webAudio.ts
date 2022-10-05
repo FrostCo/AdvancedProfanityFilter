@@ -36,6 +36,7 @@ export default class WebAudio {
   sites: AudioSites;
   siteKey: string;
   supportedPage: boolean;
+  supportedCaptions: boolean;
   unmuteTimeout: number;
   volume: number;
   watcherRuleIds: number[];
@@ -136,6 +137,7 @@ export default class WebAudio {
       filter.cfg.customAudioSites = {};
     }
     this.sites = WebAudio.supportedAndCustomSites(filter.cfg.customAudioSites);
+    this.supportedCaptions = false;
     this.volume = 1;
     this.wordlistId = filter.audioWordlistId;
     this.youTubeAutoSubsMax = filter.cfg.youTubeAutoSubsMax * 1000;
@@ -647,7 +649,8 @@ export default class WebAudio {
 
       switch (rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
-          chrome.runtime.sendMessage({ mute: true });
+          const message: Message = { destination: Constants.MESSAGING.BACKGROUND, mute: true, source: Constants.MESSAGING.CONTEXT };
+          chrome.runtime.sendMessage(message);
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
           if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
@@ -1034,69 +1037,116 @@ export default class WebAudio {
     }
   }
 
+  supportedCaptionsFound(found = true, forceUpdate = false) {
+    if (!forceUpdate && found == this.supportedCaptions) return;
+
+    const message: Message = { destination: Constants.MESSAGING.BACKGROUND, source: Constants.MESSAGING.CONTEXT, forceUpdate: forceUpdate };
+
+    this.supportedCaptions = found;
+    if (found) {
+      message.status = Constants.STATUS.CAPTIONS;
+      chrome.runtime.sendMessage(message);
+      logger.info('Supported captions found');
+    } else {
+      message.status = Constants.STATUS.MUTE_PAGE;
+      chrome.runtime.sendMessage(message);
+      logger.info('Watching for supported captions');
+    }
+  }
+
+  // [BETA]
+  // This isn't being actively used now
+  supportedDynamicNode(node: HTMLElement, rule: AudioRule) {
+    // HBO Max: When playing a video, this node gets added, but doesn't include any context. Grabbing classList and then start watching.
+    if (node.textContent === rule.dynamicTextKey) {
+      rule.mode = rule.dynamicTargetMode;
+      // TODO: Only working for HBO Max right now
+      rule.parentSelectorAll = `${node.tagName.toLowerCase()}.${Array.from(node.classList).join('.')} ${rule.parentSelectorAll}`;
+      this.initRule(rule);
+    }
+  }
+
+  supportedElementNode(node: HTMLElement, rule: AudioRule) {
+    if (node.nodeName == rule.tagName) {
+      if (rule.className && (!node.className || !node.classList.contains(rule.className))) return false;
+      if (rule.dataPropPresent && (!node.dataset || !node.dataset.hasOwnProperty(rule.dataPropPresent))) return false;
+      if (rule.hasChildrenElements && (typeof node.childElementCount !== 'number' || node.childElementCount == 0)) return false;
+      if (rule.subtitleSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.subtitleSelector))) return false;
+      if (rule.containsSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.containsSelector))) return false;
+      return true;
+    }
+
+    return false;
+  }
+
+  supportedElementChildNode(node: HTMLElement, rule: AudioRule) {
+    if (node.nodeName === rule.tagName) {
+      const root = rule.rootNode ? node.getRootNode() : document as any;
+      if (root) {
+        if (rule.parentSelector) {
+          const parent = root.querySelector(rule.parentSelector);
+          if (parent && (parent == node || parent.contains(node))) return true;
+        } else {
+          const parents = root.querySelectorAll(rule.parentSelectorAll);
+          for (let j = 0; j < parents.length; j++) {
+            if (parents[j].contains(node)) return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
   // Checks if a node is a supported audio node.
   // Returns rule id upon first match, otherwise returns false
   supportedNode(node) {
     for (let i = 0; i < this.enabledRuleIds.length; i++) {
       const ruleId = this.enabledRuleIds[i];
       const rule = this.rules[ruleId];
+      let supported = false;
 
       switch (rule.mode) {
         case 'element':
-          if (node.nodeName == rule.tagName) {
-            let failed = false;
-            if (!failed && rule.className && (!node.className || !node.classList.contains(rule.className))) { failed = true; }
-            if (!failed && rule.dataPropPresent && (!node.dataset || !node.dataset.hasOwnProperty(rule.dataPropPresent))) { failed = true; }
-            if (!failed && rule.hasChildrenElements && (typeof node.childElementCount !== 'number' || node.childElementCount == 0)) { failed = true; }
-            if (!failed && rule.subtitleSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.subtitleSelector))) { failed = true; }
-            if (!failed && rule.containsSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.containsSelector))) { failed = true; }
-            if (!failed) { return ruleId; }
-          }
-          break;
+          supported = this.supportedElementNode(node, rule); break;
         case 'elementChild':
-          if (node.nodeName === rule.tagName) {
-            const root = rule.rootNode ? node.getRootNode() : document;
-            if (root) {
-              if (rule.parentSelector) {
-                const parent = root.querySelector(rule.parentSelector);
-                if (parent && (parent == node || parent.contains(node))) { return ruleId; }
-              } else {
-                const parents = root.querySelectorAll(rule.parentSelectorAll);
-                for (let j = 0; j < parents.length; j++) {
-                  if (parents[j].contains(node)) { return ruleId; }
-                }
-              }
-            }
-          }
-          break;
+          supported = this.supportedElementChildNode(node, rule); break;
         case 'text':
-          if (node.nodeName === rule.tagName) {
-            const parent = document.querySelector(rule.parentSelector);
-            if (parent && parent.contains(node)) { return ruleId; }
-          }
-          break;
+          supported = this.supportedTextNode(node, rule); break;
         case 'watcher':
-          if (rule.subtitleSelector != null && node.parentElement && node.parentElement == getElement(rule.subtitleSelector)) {
-            return ruleId;
-          }
-          if (rule.parentSelector != null) {
-            const parent = getElement(rule.parentSelector);
-            if (parent && parent.contains(node)) { return ruleId; }
-          }
-          break;
+          supported = this.supportedWatcherNode(node, rule); break;
         case 'dynamic':
-          // HBO Max: When playing a video, this node gets added, but doesn't include any context. Grabbing classList and then start watching.
-          if (node.textContent === rule.dynamicTextKey) {
-            rule.mode = rule.dynamicTargetMode;
-            // TODO: Only working for HBO Max right now
-            rule.parentSelectorAll = `${node.tagName.toLowerCase()}.${Array.from(node.classList).join('.')} ${rule.parentSelectorAll}`;
-            this.initRule(rule);
-          }
-          break;
+          this.supportedDynamicNode(node, rule); break;
+      }
+
+      if (supported) {
+        this.supportedCaptionsFound();
+        return ruleId;
       }
     }
 
     // No matching rule was found
+    return false;
+  }
+
+  supportedTextNode(node: HTMLElement, rule: AudioRule) {
+    if (node.nodeName === rule.tagName) {
+      const parent = document.querySelector(rule.parentSelector);
+      if (parent && parent.contains(node)) return true;
+    }
+
+    return false;
+  }
+
+  supportedWatcherNode(node: HTMLElement, rule: AudioRule) {
+    if (rule.subtitleSelector != null && node.parentElement && node.parentElement == getElement(rule.subtitleSelector)) {
+      return true;
+    }
+    if (rule.parentSelector != null) {
+      const parent = getElement(rule.parentSelector);
+      if (parent && parent.contains(node)) return true;
+    }
+
     return false;
   }
 
@@ -1117,7 +1167,8 @@ export default class WebAudio {
       this.muted = false;
       switch (rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
-          chrome.runtime.sendMessage({ mute: false });
+          const message: Message = { destination: Constants.MESSAGING.BACKGROUND, mute: false, source: Constants.MESSAGING.CONTEXT };
+          chrome.runtime.sendMessage(message);
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
           if (this.fillerAudio) { this.stopFillerAudio(); }
@@ -1169,12 +1220,13 @@ export default class WebAudio {
       }
 
       if (data.skipped) { return false; }
+      instance.supportedCaptionsFound();
 
       // Hide/show caption/subtitle text
       const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
 
       if (rule.apfCaptions) {
-        this.displayApfCaptions(rule, data.textResults, shouldBeShown);
+        instance.displayApfCaptions(rule, data.textResults, shouldBeShown);
       } else {
         shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
       }
@@ -1240,6 +1292,7 @@ export default class WebAudio {
           // Pre-process all cues after setting oncuechange
           const allCues = Array.from(textTrack.cues as any as FilteredVTTCue[]);
           instance.processCues(allCues, rule);
+          instance.supportedCaptionsFound(true);
         }
       }
     }
@@ -1368,7 +1421,9 @@ export default class WebAudio {
   }
 
   youTubeAutoSubsPresent(): boolean {
-    return !!(document.querySelector('div.ytp-caption-window-rollup'));
+    const present = !!(document.querySelector('div.ytp-caption-window-rollup'));
+    if (present) this.supportedCaptionsFound();
+    return present;
   }
 
   youTubeAutoSubsSupportedNode(node: any): boolean {

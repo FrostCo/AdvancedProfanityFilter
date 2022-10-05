@@ -14,6 +14,7 @@ class Popup {
   filterToggleProp: string;
   prefersDarkScheme: boolean;
   protected: boolean;
+  status: number;
   tab: chrome.tabs.Tab;
   themeElements: Element[];
   url: URL;
@@ -61,6 +62,19 @@ class Popup {
       instance.domain = new Domain('');
     }
     instance.filterToggleProp = instance.cfg.enabledDomainsOnly ? 'enabled' : 'disabled';
+
+    // Request current tab status
+    const statusMessage: Message = {
+      source: Constants.MESSAGING.POPUP,
+      destination: Constants.MESSAGING.BACKGROUND,
+      getStatus: true,
+      tabId: instance.tab.id,
+    };
+    chrome.runtime.sendMessage(statusMessage
+    , (response) => {
+      instance.updateStatus(response.status);
+    });
+
     return instance;
   }
 
@@ -244,6 +258,27 @@ class Popup {
     }
   }
 
+  updateStatus(status) {
+    this.status = status;
+    const container = document.getElementById('statusContainer');
+    const statusText = document.getElementById('statusText');
+
+    if (this.status == Constants.STATUS.MUTE_PAGE) {
+      Popup.show(container);
+      statusText.textContent = 'Watching for captions';
+      statusText.classList.remove('active');
+      statusText.classList.add('available');
+    } else if (this.status == Constants.STATUS.CAPTIONS) {
+      statusText.textContent = 'Muting active';
+      Popup.show(container);
+      statusText.classList.add('active');
+      statusText.classList.remove('available');
+    } else {
+      Popup.hide(container);
+      statusText.textContent = '';
+    }
+  }
+
   async wordlistSelect(select: HTMLSelectElement) {
     const type = select.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
     this.domain[type] = select.selectedIndex > 0 ? select.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
@@ -258,17 +293,24 @@ class Popup {
 
 // Listen for data updates from filter
 chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) => {
+  if (request.destination !== Constants.MESSAGING.POPUP) return true;
+
   if (request.summary) {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (sender.tab.id == tabs[0].id) { popup.populateSummary(request.summary); }
     });
+  } else if (request.status) {
+    popup.updateStatus(request.status);
+  } else {
+    logger.error('Received unhandled message.', JSON.stringify(request));
   }
+
   sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
 });
 
 // Initial data request
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-  chrome.tabs.sendMessage(tabs[0].id, { popup: true });
+  chrome.tabs.sendMessage(tabs[0].id, { destination: Constants.MESSAGING.CONTEXT, source: Constants.MESSAGING.POPUP, summary: true });
 });
 
 const popup = new Popup;

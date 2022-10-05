@@ -1,8 +1,17 @@
+import Constants from './lib/constants';
 import DataMigration from './dataMigration';
 import Domain from './domain';
 import WebConfig from './webConfig';
 import { formatNumber, makeRequest } from './lib/helper';
 import Logger from './lib/logger';
+
+const COLOR_BLUE = [66, 133, 244, 255] as chrome.action.ColorArray;
+const COLOR_BLUE_VIOLET = [138, 43, 226, 255] as chrome.action.ColorArray;
+const COLOR_FOREST_GREEN = [34, 139, 34, 255] as chrome.action.ColorArray;
+const COLOR_GREY = [85, 85, 85, 255] as chrome.action.ColorArray;
+const COLOR_ORANGE = [236, 147, 41, 255] as chrome.action.ColorArray;
+const COLOR_RED = [211, 45, 39, 255] as chrome.action.ColorArray;
+const BADGE_COLORS = [COLOR_GREY, COLOR_BLUE, COLOR_RED, COLOR_RED, COLOR_BLUE_VIOLET, COLOR_FOREST_GREEN] as chrome.action.ColorArray[];
 
 ////
 // Functions
@@ -134,7 +143,7 @@ function getWindowVariable(variableName: string) {
   }
 }
 
-async function handleBackgroundDataRequest(tabId: number, sendResponse) {
+async function handleBackgroundDataRequest(tabId: number, sendResponse, iframe: boolean) {
   const storage = await loadBackgroundStorage();
   const response: BackgroundData = { disabledTab: false };
   const tabOptions = getTabOptions(storage, tabId);
@@ -142,10 +151,20 @@ async function handleBackgroundDataRequest(tabId: number, sendResponse) {
     response.disabledTab = true;
   }
   sendResponse(response);
+
+  let updated = false;
   if (tabOptions.disabledOnce) {
     tabOptions.disabledOnce = false;
-    await saveBackgroundStorage(storage);
+    updated = true;
   }
+
+  // Reset filter status for main page
+  if (!iframe) {
+    tabOptions.status = 0;
+    updated = true;
+  }
+
+  if (updated) await saveBackgroundStorage(storage);
 }
 
 async function handleRequest(url: string, method: string = 'GET', sendResponse) {
@@ -199,54 +218,70 @@ function onInstalled(details: chrome.runtime.InstalledDetails) {
   }
 }
 
-function onMessage(request: Message, sender, sendResponse) {
+function onMessage(request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
+  if (request.destination !== Constants.MESSAGING.BACKGROUND) return true;
+
   // Support manifest V2/V3
   const chromeAction = chrome.action || chrome.browserAction;
-  if (request.disabled === true) {
-    chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
-  } else if (request.backgroundData === true) {
-    handleBackgroundDataRequest(sender.tab.id, sendResponse);
-    return true; // return true when waiting on an async call
-  } else if (request.fetch) {
-    handleRequest(request.fetch, request.fetchMethod, sendResponse);
-    return true; // return true when waiting on an async call
-  } else if (request.globalVariable) {
-    getGlobalVariable(request.globalVariable, sender, sendResponse);
-    return true; // return true when waiting on an async call
-  } else if (request.updateContextMenus != null) {
-    contextMenuSetup(request.updateContextMenus);
-  } else {
-    // Set badge color
-    // chromeAction.setBadgeBackgroundColor({ color: [138, 43, 226, 255], tabId: sender.tab.id }); // Blue Violet
-    // chromeAction.setBadgeBackgroundColor({ color: [85, 85, 85, 255], tabId: sender.tab.id }); // Grey (Default)
-    // chromeAction.setBadgeBackgroundColor({ color: [236, 147, 41, 255], tabId: sender.tab.id }); // Orange
-    if (request.setBadgeColor) {
-      if (request.mutePage) {
-        chromeAction.setBadgeBackgroundColor({ color: [34, 139, 34, 255], tabId: sender.tab.id }); // Forest Green - Audio
-      } else if (request.advanced) {
-        chromeAction.setBadgeBackgroundColor({ color: [211, 45, 39, 255], tabId: sender.tab.id }); // Red - Advanced
+
+  switch (request.source) {
+    case Constants.MESSAGING.CONTEXT:
+      if (request.disabled === true) {
+        chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
+      } else if (request.backgroundData === true) {
+        handleBackgroundDataRequest(sender.tab.id, sendResponse, request.iframe);
+        return true; // return true when waiting on an async call
+      } else if (request.fetch) {
+        handleRequest(request.fetch, request.fetchMethod, sendResponse);
+        return true; // return true when waiting on an async call
+      } else if (request.globalVariable) {
+        getGlobalVariable(request.globalVariable, sender, sendResponse);
+        return true; // return true when waiting on an async call
       } else {
-        chromeAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255], tabId: sender.tab.id }); // Blue - Normal
+        // Update tab's status and set badge color
+        if (request.status) {
+          updateStatus(chromeAction, sender.tab.id, request.status, request.forceUpdate);
+        }
+
+        // Show count of words filtered on badge
+        if (request.counter != undefined) {
+          chromeAction.setBadgeText({ text: formatNumber(request.counter), tabId: sender.tab.id });
+        }
+
+        // Set mute state for tab
+        if (request.mute != undefined) {
+          chrome.tabs.update(sender.tab.id, { muted: request.mute });
+        }
+
+        // Unmute on page reload
+        if (request.clearMute === true && sender.tab != undefined) {
+          const { muted, reason, extensionId } = sender.tab.mutedInfo;
+          if (muted && reason == 'extension' && extensionId == chrome.runtime.id) {
+            chrome.tabs.update(sender.tab.id, { muted: false });
+          }
+        }
       }
-    }
+      break;
 
-    // Show count of words filtered on badge
-    if (request.counter != undefined) {
-      chromeAction.setBadgeText({ text: formatNumber(request.counter), tabId: sender.tab.id });
-    }
-
-    // Set mute state for tab
-    if (request.mute != undefined) {
-      chrome.tabs.update(sender.tab.id, { muted: request.mute });
-    }
-
-    // Unmute on page reload
-    if (request.clearMute === true && sender.tab != undefined) {
-      const { muted, reason, extensionId } = sender.tab.mutedInfo;
-      if (muted && reason == 'extension' && extensionId == chrome.runtime.id) {
-        chrome.tabs.update(sender.tab.id, { muted: false });
+    case Constants.MESSAGING.OPTION:
+      if (request.updateContextMenus != null) {
+        contextMenuSetup(request.updateContextMenus);
+      } else {
+        Logger.error('Received unhandled message.', JSON.stringify(request));
       }
-    }
+      break;
+
+    case Constants.MESSAGING.POPUP:
+      if (request.getStatus) {
+        updatePopupStatus(request.tabId, null, sendResponse);
+        return true; // return true when waiting on an async call
+      } else {
+        Logger.error('Received unhandled message.', JSON.stringify(request));
+      }
+      break;
+
+    default:
+      Logger.error('Received message without a supported source:', JSON.stringify(request));
   }
 
   sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
@@ -284,7 +319,7 @@ async function runUpdateMigrations(previousVersion) {
 }
 
 function newTabOptions(storage: BackgroundStorage, tabId: number, options: TabStorageOptions = {}): TabStorageOptions {
-  const _defaults: TabStorageOptions = { disabled: false, disabledOnce: false };
+  const _defaults: TabStorageOptions = { status: 0, disabled: false, disabledOnce: false };
   const tabOptions = Object.assign({}, _defaults, options) as TabStorageOptions;
   tabOptions.id = tabId;
   tabOptions.registeredAt = new Date().getTime();
@@ -301,6 +336,13 @@ async function tabsOnRemoved(tabId: number) {
   if (storage.tabs[tabId]) {
     delete storage.tabs[tabId];
     await saveBackgroundStorage(storage);
+  }
+}
+
+async function tabsOnUpdated(tabId, changeInfo, tab) {
+  if (changeInfo.url) {
+    const message: Message = { source: Constants.MESSAGING.BACKGROUND, destination: Constants.MESSAGING.CONTEXT, urlUpdate: changeInfo.url };
+    chrome.tabs.sendMessage(tabId, message, () => chrome.runtime.lastError); // Suppress error if no listener
   }
 }
 
@@ -333,6 +375,30 @@ async function toggleTabDisable(tabId: number) {
   chrome.tabs.reload(tabId);
 }
 
+async function updatePopupStatus(tabId: number, status?: number, sendResponse?) {
+  if (!status) {
+    const storage = await loadBackgroundStorage();
+    const tabOptions = await getTabOptions(storage, tabId);
+    status = tabOptions.status;
+  }
+  if (!sendResponse) sendResponse = chrome.runtime.sendMessage;
+  const message: Message = { destination: 'popup', source: 'background', status: status, tabId: tabId };
+  sendResponse(message, () => chrome.runtime.lastError); // Suppress error if Popup isn't active
+}
+
+async function updateStatus(chromeAction, tabId: number, status: number, forceUpdate = false) {
+  const storage = await loadBackgroundStorage();
+  const tabOptions = await getTabOptions(storage, tabId);
+
+  // Only let status increase
+  if (forceUpdate || status > tabOptions.status) {
+    tabOptions.status = status;
+    chromeAction.setBadgeBackgroundColor({ color: BADGE_COLORS[tabOptions.status], tabId: tabId });
+    updatePopupStatus(tabId, tabOptions.status);
+    await saveBackgroundStorage(storage);
+  }
+}
+
 ////
 // Listeners
 //
@@ -341,6 +407,7 @@ chrome.runtime.onInstalled.addListener((details) => { onInstalled(details); });
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { return onMessage(request, sender, sendResponse); });
 chrome.runtime.onStartup.addListener(() => { onStartup(); });
 chrome.tabs.onRemoved.addListener((tabId) => { tabsOnRemoved(tabId); });
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => { tabsOnUpdated(tabId, changeInfo, tab); });
 if (chrome.notifications != null) { // Not available in Safari
   chrome.notifications.onClicked.addListener((notificationId) => { notificationsOnClick(notificationId); });
 }

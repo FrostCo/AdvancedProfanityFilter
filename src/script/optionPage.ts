@@ -1814,7 +1814,8 @@ export default class OptionPage {
   async updateContextMenu(input: HTMLInputElement) {
     this.cfg.contextMenu = input.checked;
     await this.cfg.save('contextMenu');
-    chrome.runtime.sendMessage({ updateContextMenus: this.cfg.contextMenu });
+    const message: Message = { destination: 'background', source: 'option', updateContextMenus: this.cfg.contextMenu };
+    chrome.runtime.sendMessage(message);
   }
 
   updateHostedBookmarklet() {

@@ -123,6 +123,24 @@ h4 {
   margin-right: 25px;
 }
 
+/* Status */
+#statusContainer {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#statusText {
+  padding-left: 8px;
+}
+
+#statusText.active {
+  color: #228B22
+}
+
+#statusText.available {
+  color: #8A2BE2
+}
+
 /* Summary table */
 #summary {
   overflow: auto;
