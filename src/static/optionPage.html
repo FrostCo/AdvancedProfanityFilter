@@ -207,7 +207,7 @@
   <div class="w3-half">
     <h4 class="sectionHeader">Words & Phrases</h4>
     <select id="wordList" class="w3-select w3-border small textInput"></select>
-    <label><input id="filterWordList" type="checkbox" class="w3-check">  Filter</label>
+    <label><input id="filterWordList" type="checkbox" class="w3-check">  Filter list</label>
 
     <h4 class="sectionHeader">Word/Phrase</h4>
     <input id="wordText" class="w3-input w3-border small" type="text" pattern=".+">
@@ -341,6 +341,14 @@
         <span class="notes">Only filter enabled domains</span>
       </label>
     </div>
+
+    <br>
+    <h4 class="sectionHeader">Frame Mode</h4>
+    <label>
+      <input id="domainFilterAllFrames" type="checkbox" class="w3-check">
+      Filter all frames
+      <span class="notes">Filter frames on all domains</span>
+    </label>
   </div>
 
   <div id="domainRightContainer" class="w3-half w3-right">
@@ -353,13 +361,23 @@
     <div style="padding-top: 8px;">
       <label id="domainDisabledLabel" class="w3-hide">
         <input id="domainDisabledCheck" type="checkbox" class="w3-check">
-        Disabled
+        Filter disabled
         <span class="notes">Don't filter pages on this domain</span>
       </label>
       <label id="domainEnabledLabel" class="w3-hide">
         <input id="domainEnabledCheck" type="checkbox" class="w3-check">
-        Enabled
+        Filter enabled
         <span class="notes">Filter pages on this domain</span>
+      </label>
+      <label id="domainFramesOffLabel" class="w3-hide">
+        <input id="domainFramesOffCheck" type="checkbox" class="w3-check">
+        Frames disabled
+        <span class="notes">Disable filtering frames on this domain</span>
+      </label>
+      <label id="domainFramesOnLabel" class="w3-hide">
+        <input id="domainFramesOnCheck" type="checkbox" class="w3-check">
+        Frames enabled
+        <span class="notes">Filter frames on this domain</span>
       </label>
       <h4 class="sectionHeader">Mode</h4>
       <select id="domainModeSelect" class="w3-select w3-border small textInput"></select>
@@ -533,7 +551,7 @@
 
 <div id="configPage" class="w3-container w3-hide">
   <h4 class="sectionHeader">Configuration</h4>
-  <label style="display:block;"><input id="configInlineInput" type="checkbox" class="w3-check">  Inline editor</label>
+  <label><input id="configInlineInput" type="checkbox" class="w3-check">  Inline editor</label>
   <div style="padding-top:16px;padding-bottom:16px;width:500px;">
     <input type="file" id="importFileInput" accept=".json" style="display:none"/>
     <button id="configExport" class="w3-btn w3-round-large w3-flat-peter-river">EXPORT</button>

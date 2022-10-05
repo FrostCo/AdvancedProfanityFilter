@@ -199,6 +199,17 @@ export default class WebFilter extends Filter {
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
     logger.info('Config loaded.', this.cfg);
 
+    if (
+      this.iframe
+      && (
+        (this.cfg.enabledFramesOnly && !this.domain.framesOn)
+        || (!this.cfg.enabledFramesOnly && this.domain.framesOff)
+      )
+    ) {
+      logger.info(`Filter disabled on frames for current domain (${this.iframe.href})`);
+      return false;
+    }
+
     const backgroundData: BackgroundData = await this.getBackgroundData();
 
     // Use domain-specific settings
