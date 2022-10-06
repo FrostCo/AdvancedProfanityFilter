@@ -68,24 +68,8 @@ export default class BookmarkletFilter extends Filter {
       }
     });
 
-    if (this.mutePage && this.audio.muted) {
-      mutation.removedNodes.forEach((node) => {
-        const supported = this.audio.supportedNode(node);
-        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0];
-        if (
-          supported !== false
-          || node == this.audio.lastFilteredNode
-          || node.contains(this.audio.lastFilteredNode)
-          || (
-            rule.simpleUnmute
-            && node.textContent
-            && this.audio.lastFilteredText
-            && this.audio.lastFilteredText.includes(node.textContent)
-          )
-        ) {
-          this.audio.unmute(rule);
-        }
-      });
+    if (this.mutePage && (this.audio.muted || this.audio.apfCaptionsEnabled)) {
+      this.handleRemovedNodesOnMutePage(mutation.removedNodes);
     }
 
     if (mutation.target) {
@@ -267,6 +251,38 @@ export default class BookmarkletFilter extends Filter {
   filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     this.shadowObserver.observe(shadowRoot, observerConfig);
     this.processNode(shadowRoot, wordlistId, statsType);
+  }
+
+  handleRemovedNodesOnMutePage(removedNodes: NodeList) {
+    removedNodes.forEach((node) => {
+      // Remove APF Captions if the removed node was the last one we processed
+      if (this.audio.apfCaptionsEnabled) {
+        if (node == this.audio.lastProcessedNode || node.contains(this.audio.lastProcessedNode)) {
+          const apfCaptionRule = this.audio.rules[this.audio.apfCaptionRuleIds[0]];
+          this.audio.removeApfCaptions(apfCaptionRule);
+        }
+      }
+
+      // Check removed node to see if we should unmute
+      if (this.audio.muted) {
+        const supported = this.audio.supportedNode(node);
+        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
+        if (
+          supported !== false
+          || node == this.audio.lastFilteredNode
+          || node.contains(this.audio.lastFilteredNode)
+          || (
+            rule.simpleUnmute
+            && node.textContent
+            && this.audio.lastFilteredText
+            && this.audio.lastFilteredText.includes(node.textContent)
+          )
+        ) {
+          this.audio.unmute(rule);
+          if (rule.apfCaptions) this.audio.removeApfCaptions(rule);
+        }
+      }
+    });
   }
 
   init(wordlistId: number | false = false) {
