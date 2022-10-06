@@ -545,7 +545,7 @@ export default class WebAudio {
     }
 
     if (rule.disabled) {
-      logger.warn('Audio rule disabled', rule);
+      logger.info('Audio rule disabled', rule);
     } else {
       // Setup rule defaults
       if (rule.filterSubtitles == null) rule.filterSubtitles = true;
@@ -588,7 +588,7 @@ export default class WebAudio {
       }
 
       if (rule.disabled) {
-        if (rule.mode != 'ytauto') logger.warn('Audio rule disabled during initialization', rule);
+        if (rule.mode != 'ytauto') logger.info('Audio rule disabled during initialization', rule);
       } else {
         this.enabledRuleIds.push(ruleId);
         if (rule.apfCaptions) this.apfCaptionRuleIds.push(ruleId);

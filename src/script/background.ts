@@ -250,14 +250,14 @@ function onMessage(request: Message, sender: chrome.runtime.MessageSender, sendR
 
         // Set mute state for tab
         if (request.mute != undefined) {
-          chrome.tabs.update(sender.tab.id, { muted: request.mute });
+          chrome.tabs.update(sender.tab.id, { muted: request.mute }, () => chrome.runtime.lastError); // Suppress error if no listener
         }
 
         // Unmute on page reload
         if (request.clearMute === true && sender.tab != undefined) {
           const { muted, reason, extensionId } = sender.tab.mutedInfo;
           if (muted && reason == 'extension' && extensionId == chrome.runtime.id) {
-            chrome.tabs.update(sender.tab.id, { muted: false });
+            chrome.tabs.update(sender.tab.id, { muted: false }, () => chrome.runtime.lastError); // Suppress error if no listener
           }
         }
       }

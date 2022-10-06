@@ -309,7 +309,11 @@ chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) =>
 
 // Initial data request
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-  chrome.tabs.sendMessage(tabs[0].id, { destination: Constants.MESSAGING.CONTEXT, source: Constants.MESSAGING.POPUP, summary: true });
+  chrome.tabs.sendMessage(
+    tabs[0].id,
+    { destination: Constants.MESSAGING.CONTEXT, source: Constants.MESSAGING.POPUP, summary: true },
+    () => chrome.runtime.lastError // Suppress error if no listener);
+  );
 });
 
 const popup = new Popup;
