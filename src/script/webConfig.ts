@@ -14,6 +14,7 @@ export default class WebConfig extends Config {
   darkMode: boolean;
   domains: { [site: string]: DomainCfg };
   enabledDomainsOnly: boolean;
+  enabledFramesOnly: boolean;
   fillerAudio: string;
   muteAudio: boolean;
   muteAudioOnly: boolean;
@@ -23,6 +24,7 @@ export default class WebConfig extends Config {
   showSubtitles: number;
   showUpdateNotification: boolean;
   syncLargeKeys: boolean;
+  youTubeAutoMatchCensored: boolean;
   youTubeAutoSubsMax: number;
   youTubeAutoSubsMin: number;
 
@@ -35,6 +37,7 @@ export default class WebConfig extends Config {
     darkMode: null,
     domains: {},
     enabledDomainsOnly: false,
+    enabledFramesOnly: false,
     fillerAudio: '',
     muteAudio: false,
     muteAudioOnly: false,
@@ -44,6 +47,7 @@ export default class WebConfig extends Config {
     showSubtitles: Constants.SHOW_SUBTITLES.ALL,
     showUpdateNotification: false,
     syncLargeKeys: true,
+    youTubeAutoMatchCensored: true,
     youTubeAutoSubsMax: 0,
     youTubeAutoSubsMin: 0,
   };

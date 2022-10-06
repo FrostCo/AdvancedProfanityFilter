@@ -765,6 +765,7 @@ export default class OptionPage {
     const selectedMuteMethod = document.querySelector(`input[name=audioMuteMethod][value='${this.cfg.muteMethod}']`) as HTMLInputElement;
     const selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
     const muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
+    const audioYouTubeAutoMatchCensored = document.getElementById('audioYouTubeAutoMatchCensored') as HTMLInputElement;
     const audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
     const audioYouTubeAutoSubsMax = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
     const customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
@@ -775,6 +776,7 @@ export default class OptionPage {
     this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
     selectedMuteMethod.checked = true;
     selectedshowSubtitle.checked = true;
+    audioYouTubeAutoMatchCensored.checked = this.cfg.youTubeAutoMatchCensored;
     audioYouTubeAutoSubsMin.value = this.cfg.youTubeAutoSubsMin.toString();
     audioYouTubeAutoSubsMax.value = this.cfg.youTubeAutoSubsMax.toString();
     customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
@@ -807,6 +809,8 @@ export default class OptionPage {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
     const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
+    const domainFramesOffCheck = document.getElementById('domainFramesOffCheck') as HTMLInputElement;
+    const domainFramesOnCheck = document.getElementById('domainFramesOnCheck') as HTMLInputElement;
     const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
     const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
     const domainRemoveBtn = document.getElementById('domainRemove') as HTMLButtonElement;
@@ -814,7 +818,7 @@ export default class OptionPage {
     const key = domainsSelect.value;
     domainText.value = key;
 
-    let domainCfg;
+    let domainCfg: DomainCfg;
     if (!key) { // New record
       OptionPage.disableBtn(domainRemoveBtn);
       domainCfg = Object.assign({}, Domain._domainCfgDefaults);
@@ -833,6 +837,8 @@ export default class OptionPage {
 
     domainDisabledCheck.checked = domainCfg.disabled;
     domainEnabledCheck.checked = domainCfg.enabled;
+    domainFramesOffCheck.checked = domainCfg.framesOff;
+    domainFramesOnCheck.checked = domainCfg.framesOn;
     const wordlist = domainCfg.wordlist >= 0 ? domainCfg.wordlist + 1 : 0;
     const audioList = domainCfg.audioList >= 0 ? domainCfg.audioList + 1 : 0;
     domainWordlistSelect.selectedIndex = wordlist;
@@ -841,6 +847,7 @@ export default class OptionPage {
 
   populateDomainPage() {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+    const domainFilterAllFrames = document.getElementById('domainFilterAllFrames') as HTMLInputElement;
     const domainsSelect = document.getElementById('domainSelect') as HTMLSelectElement;
     const domainText = document.getElementById('domainText') as HTMLInputElement;
     const mode = this.cfg.enabledDomainsOnly ? 'minimal' : 'normal';
@@ -850,6 +857,9 @@ export default class OptionPage {
     domainMode.checked = true;
     const domainDisabledLabel = document.getElementById('domainDisabledLabel') as HTMLLabelElement;
     const domainEnabledLabel = document.getElementById('domainEnabledLabel') as HTMLLabelElement;
+    const domainFramesOffLabel = document.getElementById('domainFramesOffLabel') as HTMLLabelElement;
+    const domainFramesOnLabel = document.getElementById('domainFramesOnLabel') as HTMLLabelElement;
+
     OptionPage.hideInputError(domainText);
     removeChildren(domainsSelect);
 
@@ -861,6 +871,7 @@ export default class OptionPage {
       optionElement.value = domain === domains[0] ? '' : domain;
       domainsSelect.appendChild(optionElement);
     });
+    domainFilterAllFrames.checked = !option.cfg.enabledFramesOnly;
 
     if (mode === 'minimal') {
       OptionPage.hide(domainDisabledLabel);
@@ -868,6 +879,14 @@ export default class OptionPage {
     } else {
       OptionPage.hide(domainEnabledLabel);
       OptionPage.show(domainDisabledLabel);
+    }
+
+    if (option.cfg.enabledFramesOnly) {
+      OptionPage.hide(domainFramesOffLabel);
+      OptionPage.show(domainFramesOnLabel);
+    } else {
+      OptionPage.hide(domainFramesOnLabel);
+      OptionPage.show(domainFramesOffLabel);
     }
 
     dynamicList(Constants.orderedArray(Constants.DOMAIN_MODES), domainModeSelect, true);
@@ -1376,6 +1395,8 @@ export default class OptionPage {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
     const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
+    const domainFramesOffCheck = document.getElementById('domainFramesOffCheck') as HTMLInputElement;
+    const domainFramesOnCheck = document.getElementById('domainFramesOnCheck') as HTMLInputElement;
     const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
     const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
 
@@ -1397,6 +1418,8 @@ export default class OptionPage {
         audioList: audioList,
         disabled: domainDisabledCheck.checked,
         enabled: domainEnabledCheck.checked,
+        framesOn: domainFramesOnCheck.checked,
+        framesOff: domainFramesOffCheck.checked,
         wordlist: wordlist,
       };
       const domain = new Domain(newKey, newDomainCfg);
@@ -1432,10 +1455,12 @@ export default class OptionPage {
     const substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     const domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
+    const domainFilterAllFrames = document.getElementById('domainFilterAllFrames') as HTMLInputElement;
     const muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
     const fillerAudioSelect = document.getElementById('fillerAudioSelect') as HTMLSelectElement;
     const muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
     const muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
+    const audioYouTubeAutoMatchCensored = document.getElementById('audioYouTubeAutoMatchCensored') as HTMLInputElement;
     const muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
     const showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
     const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
@@ -1456,10 +1481,12 @@ export default class OptionPage {
     this.cfg.substitutionMark = substitutionMark.checked;
     this.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
     this.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
+    this.cfg.enabledFramesOnly = !domainFilterAllFrames.checked;
     this.cfg.muteAudio = muteAudioInput.checked;
     this.cfg.fillerAudio = fillerAudioSelect.value;
     this.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
     this.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
+    this.cfg.youTubeAutoMatchCensored = audioYouTubeAutoMatchCensored.checked;
     this.cfg.muteMethod = parseInt(muteMethodInput.value);
     this.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
     this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
@@ -1787,7 +1814,8 @@ export default class OptionPage {
   async updateContextMenu(input: HTMLInputElement) {
     this.cfg.contextMenu = input.checked;
     await this.cfg.save('contextMenu');
-    chrome.runtime.sendMessage({ updateContextMenus: this.cfg.contextMenu });
+    const message: Message = { destination: 'background', source: 'option', updateContextMenus: this.cfg.contextMenu };
+    chrome.runtime.sendMessage(message);
   }
 
   updateHostedBookmarklet() {
@@ -1950,6 +1978,7 @@ document.getElementById('textWordlistSelect').addEventListener('change', (evt) =
 document.getElementById('audioWordlistSelect').addEventListener('change', (evt) => { option.setDefaultWordlist(evt.target as HTMLSelectElement); });
 // Domains
 document.querySelectorAll('#domainMode input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
+document.getElementById('domainFilterAllFrames').addEventListener('change', (evt) => { option.saveOptions(); });
 document.getElementById('domainSelect').addEventListener('change', (evt) => { option.populateDomain(); });
 document.getElementById('domainText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
 document.getElementById('domainSave').addEventListener('click', (evt) => { option.saveDomain(); });
@@ -1960,6 +1989,7 @@ document.getElementById('supportedAudioSitesConfig').addEventListener('click', (
 document.getElementById('fillerAudioSelect').addEventListener('change', (evt) => { option.saveOptions(); });
 document.getElementById('muteAudioOnly').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('muteCueRequireShowing').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('audioYouTubeAutoMatchCensored').addEventListener('click', (evt) => { option.saveOptions(); });
 document.querySelectorAll('#audioMuteMethod input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
 document.querySelectorAll('#audioSubtitleSelection input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
 document.querySelectorAll('input.audioYouTubeAutoSubs').forEach((el) => { el.addEventListener('change', (evt) => { option.updateYouTubeAutoLimits(evt.target as HTMLInputElement); }); });

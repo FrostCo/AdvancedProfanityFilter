@@ -121,9 +121,10 @@ export function getGlobalVariable(code: string, id: string = 'APFData') {
   return JSON.parse(result);
 }
 
-export function getGlobalVariableFromBackground(globalVariable: string) {
+export function getGlobalVariableFromBackground(globalVariable: string, source = 'context') {
   return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage({ globalVariable: globalVariable }, (response) => {
+    const message: Message = { destination: 'background', globalVariable: globalVariable, source: source };
+    chrome.runtime.sendMessage(message, (response) => {
       resolve(response);
     });
   });
@@ -180,9 +181,10 @@ export function isVersionOlder(version: Version, minimum: Version): boolean {
   return false;
 }
 
-export function makeBackgroundRequest(url: string, method: string) {
+export function makeBackgroundRequest(url: string, method: string, source = 'context') {
   return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage({ fetch: url, fetchMethod: method.toUpperCase() }, (response) => {
+    const message: Message = { destination: 'background', fetch: url, fetchMethod: method.toUpperCase(), source: source };
+    chrome.runtime.sendMessage(message, (response) => {
       resolve(response);
     });
   });

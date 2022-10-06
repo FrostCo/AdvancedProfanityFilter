@@ -24,7 +24,7 @@ export default class WebFilter extends Filter {
   mutePage: boolean;
   observer: MutationObserver;
   processMutationTarget: boolean;
-  processNode: (node: HTMLElement | Document | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
+  processNode: (node: Document | HTMLElement | Node | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
   shadowObserver: MutationObserver;
   stats: Statistics;
   summary: Summary;
@@ -59,7 +59,11 @@ export default class WebFilter extends Filter {
     }
   }
 
-  checkMutationForProfanity(mutation) {
+  buildMessage(destination: string, data = {}): Message {
+    return Object.assign({ destination: destination, source: Constants.MESSAGING.CONTEXT }, data);
+  }
+
+  checkMutationForProfanity(mutation: MutationRecord) {
     // console.count('[APF] this.checkMutationForProfanity() count'); // Benchmark: Filter
     // logger.debug('Mutation observed', mutation);
     mutation.addedNodes.forEach((node) => {
@@ -74,25 +78,9 @@ export default class WebFilter extends Filter {
       // else { logger.debug('Forbidden node', node); }
     });
 
-    // Check removed nodes to see if we should unmute
-    if (this.mutePage && this.audio.muted) {
-      mutation.removedNodes.forEach((node) => {
-        const supported = this.audio.supportedNode(node);
-        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
-        if (
-          supported !== false
-          || node == this.audio.lastFilteredNode
-          || node.contains(this.audio.lastFilteredNode)
-          || (
-            rule.simpleUnmute
-            && node.textContent
-            && this.audio.lastFilteredText
-            && this.audio.lastFilteredText.includes(node.textContent)
-          )
-        ) {
-          this.audio.unmute(rule);
-        }
-      });
+    // Check removed nodes to see if we should unmute or remove APF Captions
+    if (this.mutePage && (this.audio.muted || this.audio.apfCaptionsEnabled)) {
+      this.handleRemovedNodesOnMutePage(mutation.removedNodes);
     }
 
     if (mutation.target) {
@@ -215,10 +203,21 @@ export default class WebFilter extends Filter {
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
     logger.info('Config loaded.', this.cfg);
 
+    if (
+      this.iframe
+      && (
+        (this.cfg.enabledFramesOnly && !this.domain.framesOn)
+        || (!this.cfg.enabledFramesOnly && this.domain.framesOff)
+      )
+    ) {
+      logger.info(`Filter disabled on frames for current domain (${this.iframe.href})`);
+      return false;
+    }
+
     const backgroundData: BackgroundData = await this.getBackgroundData();
 
     // Use domain-specific settings
-    const message: Message = {};
+    const message = this.buildMessage(Constants.MESSAGING.BACKGROUND);
     if (
       backgroundData.disabledTab
       || (
@@ -258,7 +257,7 @@ export default class WebFilter extends Filter {
     }
 
     this.sendInitState(message);
-    this.popupListener();
+    this.onMessage();
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
@@ -343,10 +342,43 @@ export default class WebFilter extends Filter {
 
   getBackgroundData() {
     return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ backgroundData: true }, (response) => {
+      const message = this.buildMessage(Constants.MESSAGING.BACKGROUND, { backgroundData: true, iframe: !!this.iframe });
+      chrome.runtime.sendMessage(message, (response) => {
         if (!response) { response = { disabledTab: false }; }
         resolve(response);
       });
+    });
+  }
+
+  handleRemovedNodesOnMutePage(removedNodes: NodeList) {
+    removedNodes.forEach((node) => {
+      // Remove APF Captions if the removed node was the last one we processed
+      if (this.audio.apfCaptionsEnabled) {
+        if (node == this.audio.lastProcessedNode || node.contains(this.audio.lastProcessedNode)) {
+          const apfCaptionRule = this.audio.rules[this.audio.apfCaptionRuleIds[0]];
+          this.audio.removeApfCaptions(apfCaptionRule);
+        }
+      }
+
+      // Check removed node to see if we should unmute
+      if (this.audio.muted) {
+        const supported = this.audio.supportedNode(node);
+        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
+        if (
+          supported !== false
+          || node == this.audio.lastFilteredNode
+          || node.contains(this.audio.lastFilteredNode)
+          || (
+            rule.simpleUnmute
+            && node.textContent
+            && this.audio.lastFilteredText
+            && this.audio.lastFilteredText.includes(node.textContent)
+          )
+        ) {
+          this.audio.unmute(rule);
+          if (rule.apfCaptions) this.audio.removeApfCaptions(rule);
+        }
+      }
     });
   }
 
@@ -393,12 +425,37 @@ export default class WebFilter extends Filter {
   }
 
   // Listen for data requests from Popup
-  popupListener() {
+  onMessage() {
     /* istanbul ignore next */
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      if (this.cfg.showSummary && request.popup && (this.counter > 0 || this.mutePage)) {
-        chrome.runtime.sendMessage({ mutePage: this.mutePage, summary: this.summary });
+      if (request.destination !== Constants.MESSAGING.CONTEXT) return true;
+
+      switch (request.source) {
+        case Constants.MESSAGING.BACKGROUND:
+          if (request.urlUpdate) {
+            if (this.mutePage) {
+              this.audio.supportedCaptionsFound(false, true);
+            }
+          } else {
+            logger.error('Received unhandled message.', JSON.stringify(request));
+          }
+          break;
+
+        case Constants.MESSAGING.POPUP:
+          if (request.summary) {
+            if (this.cfg.showSummary && (this.counter > 0 || this.mutePage)) {
+              const message = this.buildMessage(Constants.MESSAGING.POPUP, { mutePage: this.mutePage, summary: this.summary });
+              chrome.runtime.sendMessage(message);
+            }
+          } else {
+            logger.error('Received unhandled message.', JSON.stringify(request));
+          }
+          break;
+
+        default:
+          logger.error('Received message without a supported source:', JSON.stringify(request));
       }
+
       sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
     });
   }
@@ -414,10 +471,16 @@ export default class WebFilter extends Filter {
     // Reset muted state on page load if we muted the tab audio
     if (this.cfg.muteAudio && this.cfg.muteMethod == Constants.MUTE_METHODS.TAB) { message.clearMute = true; }
 
-    // Send page state to color icon badge
-    if (!this.iframe || this.mutePage) { message.setBadgeColor = true; }
+    // Get status
+    message.iframe = !!(this.iframe);
     message.advanced = this.domain.advanced;
+    message.deep = this.domain.deep;
     message.mutePage = this.mutePage;
+    message.status = Constants.STATUS.NORMAL;
+    if (message.advanced) message.status = Constants.STATUS.ADVANCED;
+    if (this.domain.deep) message.status = Constants.STATUS.DEEP;
+    if (message.mutePage) message.status = Constants.STATUS.MUTE_PAGE;
+
     if (this.mutePage && this.cfg.showCounter) { message.counter = this.counter; } // Always show counter when muting audio
     chrome.runtime.sendMessage(message);
   }
@@ -441,8 +504,15 @@ export default class WebFilter extends Filter {
     // console.count('updateCounterBadge'); // Benchmark: Filter
     if (this.counter > 0) {
       try {
-        if (this.cfg.showCounter) chrome.runtime.sendMessage({ counter: this.counter });
-        if (this.cfg.showSummary) chrome.runtime.sendMessage({ summary: this.summary });
+        if (this.cfg.showCounter) {
+          const message = this.buildMessage(Constants.MESSAGING.BACKGROUND, { counter: this.counter });
+          chrome.runtime.sendMessage(message);
+        }
+
+        if (this.cfg.showSummary) {
+          const message = this.buildMessage(Constants.MESSAGING.POPUP, { summary: this.summary });
+          chrome.runtime.sendMessage(message);
+        }
       } catch (err) {
         if (err.message !== 'Extension context invalidated.') {
           logger.warn('Failed to sendMessage to update counter.', err);

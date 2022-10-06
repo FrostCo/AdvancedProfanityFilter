@@ -149,6 +149,7 @@
         "always"
       ],
       "comma-spacing": "warn",
+      "eol-last": "error",
       "indent": [
         "warn",
         2,

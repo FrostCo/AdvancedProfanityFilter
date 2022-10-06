@@ -86,11 +86,14 @@ interface DomainCfg {
   deep?: boolean;
   disabled?: boolean;
   enabled?: boolean;
+  framesOff?: boolean;
+  framesOn?: boolean;
   wordlist?: number;
 }
 
 interface FilteredVTTCue extends VTTCue {
   filtered: boolean;
+  filteredText: string;
   originalText: string;
   position: number; // TextTrackCue
   size: number; // TextTrackCue
@@ -99,18 +102,27 @@ interface FilteredVTTCue extends VTTCue {
 interface Message {
   advanced?: boolean;
   backgroundData?: boolean;
+  captions?: boolean;
   clearMute?: boolean;
   counter?: number;
+  deep?: boolean;
+  destination: string;
   disabled?: boolean;
   fetch?: string;
   fetchMethod?: string;
+  forceUpdate?: boolean;
+  getStatus?: boolean;
   globalVariable?: string;
+  iframe?: boolean;
   mute?: boolean;
   mutePage?: boolean;
   popup?: boolean;
-  setBadgeColor?: boolean;
+  source: string;
+  status?: number;
   summary?: Summary;
+  tabId?: number;
   updateContextMenus?: boolean;
+  urlUpdate?: string;
 }
 
 interface Migration {
@@ -149,6 +161,7 @@ interface TabStorageOptions {
   disabled?: boolean;
   disabledOnce?: boolean;
   registeredAt?: number;
+  status?: number;
 }
 
 interface Version {

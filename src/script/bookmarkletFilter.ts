@@ -16,6 +16,7 @@ export default class BookmarkletFilter extends Filter {
   audio: WebAudio;
   audioOnly: boolean;
   audioWordlistId: number;
+  buildMessage: (destination: string, data?: object) => Message; // Bookmarklet: Not used - Needed to match signature of WebFilter
   declare cfg: WebConfig;
   domain: Domain;
   extension: boolean;
@@ -26,7 +27,7 @@ export default class BookmarkletFilter extends Filter {
   mutePage: boolean;
   observer: MutationObserver;
   processMutationTarget: boolean;
-  processNode: (node: HTMLElement | Document | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
+  processNode: (node: Document | HTMLElement | Node | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
   shadowObserver: MutationObserver;
   stats?: Statistics; // Bookmarklet: Not used
   updateCounterBadge: () => void; // Bookmarklet: Not used - Needed to match signature of WebFilter
@@ -68,24 +69,8 @@ export default class BookmarkletFilter extends Filter {
       }
     });
 
-    if (this.mutePage && this.audio.muted) {
-      mutation.removedNodes.forEach((node) => {
-        const supported = this.audio.supportedNode(node);
-        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0];
-        if (
-          supported !== false
-          || node == this.audio.lastFilteredNode
-          || node.contains(this.audio.lastFilteredNode)
-          || (
-            rule.simpleUnmute
-            && node.textContent
-            && this.audio.lastFilteredText
-            && this.audio.lastFilteredText.includes(node.textContent)
-          )
-        ) {
-          this.audio.unmute(rule);
-        }
-      });
+    if (this.mutePage && (this.audio.muted || this.audio.apfCaptionsEnabled)) {
+      this.handleRemovedNodesOnMutePage(mutation.removedNodes);
     }
 
     if (mutation.target) {
@@ -192,13 +177,22 @@ export default class BookmarkletFilter extends Filter {
     this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
 
+    if (
+      this.iframe
+      && (
+        (this.cfg.enabledFramesOnly && !this.domain.framesOn)
+        || (!this.cfg.enabledFramesOnly && this.domain.framesOff)
+      )
+    ) {
+      return false;
+    }
+
     // Bookmarklet: Force video volume mute method
     if (this.cfg.muteMethod === Constants.MUTE_METHODS.TAB) {
       this.cfg.muteMethod === Constants.MUTE_METHODS.VIDEO_VOLUME;
     }
 
     // Use domain-specific settings
-    const message: Message = {};
     if (
       (
         this.cfg.enabledDomainsOnly
@@ -207,7 +201,6 @@ export default class BookmarkletFilter extends Filter {
       )
       || this.domain.disabled
     ) {
-      message.disabled = true;
       return false;
     }
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
@@ -226,7 +219,6 @@ export default class BookmarkletFilter extends Filter {
 
     // Disable if muteAudioOnly mode is active and this is not a suported page
     if (this.cfg.muteAudioOnly && !this.mutePage) {
-      message.disabled = true;
       return false;
     }
 
@@ -260,6 +252,38 @@ export default class BookmarkletFilter extends Filter {
   filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     this.shadowObserver.observe(shadowRoot, observerConfig);
     this.processNode(shadowRoot, wordlistId, statsType);
+  }
+
+  handleRemovedNodesOnMutePage(removedNodes: NodeList) {
+    removedNodes.forEach((node) => {
+      // Remove APF Captions if the removed node was the last one we processed
+      if (this.audio.apfCaptionsEnabled) {
+        if (node == this.audio.lastProcessedNode || node.contains(this.audio.lastProcessedNode)) {
+          const apfCaptionRule = this.audio.rules[this.audio.apfCaptionRuleIds[0]];
+          this.audio.removeApfCaptions(apfCaptionRule);
+        }
+      }
+
+      // Check removed node to see if we should unmute
+      if (this.audio.muted) {
+        const supported = this.audio.supportedNode(node);
+        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
+        if (
+          supported !== false
+          || node == this.audio.lastFilteredNode
+          || node.contains(this.audio.lastFilteredNode)
+          || (
+            rule.simpleUnmute
+            && node.textContent
+            && this.audio.lastFilteredText
+            && this.audio.lastFilteredText.includes(node.textContent)
+          )
+        ) {
+          this.audio.unmute(rule);
+          if (rule.apfCaptions) this.audio.removeApfCaptions(rule);
+        }
+      }
+    });
   }
 
   init(wordlistId: number | false = false) {

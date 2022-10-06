@@ -18,6 +18,8 @@ import WebConfig from './webConfig';
 const logger = new Logger('WebAudio');
 
 export default class WebAudio {
+  apfCaptionRuleIds: number[];
+  apfCaptionsEnabled: boolean;
   cueRuleIds: number[];
   enabledRuleIds: number[];
   fetching: boolean;
@@ -27,12 +29,14 @@ export default class WebAudio {
   filter: WebFilter | BookmarkletFilter;
   lastFilteredNode: HTMLElement | ChildNode;
   lastFilteredText: string;
+  lastProcessedNode: HTMLElement | ChildNode;
   lastProcessedText: string;
   muted: boolean;
   rules: AudioRule[];
   sites: AudioSites;
   siteKey: string;
   supportedPage: boolean;
+  supportedCaptions: boolean;
   unmuteTimeout: number;
   volume: number;
   watcherRuleIds: number[];
@@ -117,6 +121,7 @@ export default class WebAudio {
   constructor(filter: WebFilter | BookmarkletFilter) {
     this.filter = filter;
     logger.setLevel(this.filter.cfg.loggingLevel);
+    this.apfCaptionRuleIds = [];
     this.cueRuleIds = [];
     this.enabledRuleIds = [];
     this.watcherRuleIds = [];
@@ -132,6 +137,7 @@ export default class WebAudio {
       filter.cfg.customAudioSites = {};
     }
     this.sites = WebAudio.supportedAndCustomSites(filter.cfg.customAudioSites);
+    this.supportedCaptions = false;
     this.volume = 1;
     this.wordlistId = filter.audioWordlistId;
     this.youTubeAutoSubsMax = filter.cfg.youTubeAutoSubsMax * 1000;
@@ -148,10 +154,19 @@ export default class WebAudio {
         this.initYouTube();
       }
 
-      if (this.cueRuleIds.length) {
-        setInterval(this.watchForVideo, 250, this);
-      }
+      if (this.apfCaptionRuleIds.length) this.apfCaptionsEnabled = true;
+      if (this.cueRuleIds.length) setInterval(this.watchForVideo, 250, this);
     }
+  }
+
+  apfCaptionContainer(rule: AudioRule, video?: HTMLVideoElement): HTMLElement {
+    let container;
+    if (rule.apfCaptionsSelector) container = getElement(rule.apfCaptionsSelector);
+    if (!container) { // Fall-back to video's parent
+      if (!video) video = getElement(rule.videoSelector) as HTMLVideoElement;
+      if (video && video.parentElement) container = video.parentElement;
+    }
+    return container;
   }
 
   apfCaptionLine(rule: AudioRule, text: string): HTMLSpanElement {
@@ -192,10 +207,24 @@ export default class WebAudio {
     }
   }
 
+  buildApfCaptions(rule: AudioRule, captionData: ReplaceTextResult[], container: HTMLElement) {
+    if (captionData.length) {
+      const captionLines = captionData.map((result) => rule.filterSubtitles && result.modified ? result.filtered : result.original);
+      const apfLines = captionLines.map((text) => this.apfCaptionLine(rule, text));
+      const apfCaptions = this.apfCaptionLines(rule, apfLines);
+      container.appendChild(apfCaptions);
+    }
+  }
+
   clean(subtitleContainer, ruleIndex = 0): void {
     const rule = this.rules[ruleIndex];
     if (rule.mode === 'watcher') { return; } // If this is for a watcher rule, leave the text alone
+
+    // Always hide captions if using APF Captions (requires displaySelector)
+    if (rule.apfCaptions && rule.displaySelector) this.hideSubtitles(rule);
+
     let filtered = false;
+    const captionData = [];
 
     if (subtitleContainer.nodeName && subtitleContainer.nodeName === '#text' && subtitleContainer.parentElement) {
       subtitleContainer = subtitleContainer.parentElement;
@@ -221,7 +250,7 @@ export default class WebAudio {
         filtered = true;
         this.mute(rule); // Mute the audio if we haven't already
 
-        if (rule.filterSubtitles) {
+        if (rule.filterSubtitles && !rule.apfCaptions) {
           if (rule.preserveWhiteSpace && subtitle.style.whiteSpace !== 'pre') { subtitle.style.whiteSpace = 'pre'; }
           if (rule.ignoreMutations) { this.filter.stopObserving(); }
           subtitle[textMethod] = result.filtered;
@@ -232,11 +261,17 @@ export default class WebAudio {
         this.lastFilteredText = subtitle[textMethod];
       }
 
+      if (rule.apfCaptions) {
+        for (const line of this.splitReplaceTextResultsOnNewlines(result)) captionData.push(line);
+      }
+
       // Final check to see if we already filtered this text
       // Reason: Hide/show for Funimation (ignoreMutations didn't fix the issue, but no issue if filterSubtitles = false)
       if (!filtered && this.lastFilteredNode == subtitle && this.lastFilteredText == subtitle[textMethod]) {
         filtered = true;
       }
+
+      this.lastProcessedNode = subtitle;
     });
 
     // When captions/subtitles are spread across multiple mutations, check to see if a filtered node is still present
@@ -246,8 +281,13 @@ export default class WebAudio {
       }
     }
 
+    // Handle hiding/showing caption text
     const shouldBeShown = this.subtitlesShouldBeShown(rule, filtered);
-    shouldBeShown ? this.showSubtitles(rule, subtitles) : this.hideSubtitles(rule, subtitles);
+    if (rule.apfCaptions) {
+      this.displayApfCaptions(rule, captionData, shouldBeShown);
+    } else {
+      shouldBeShown ? this.showSubtitles(rule, subtitles) : this.hideSubtitles(rule, subtitles);
+    }
   }
 
   cleanYouTubeAutoSubs(node): void {
@@ -318,6 +358,16 @@ export default class WebAudio {
     const delayed = true;
     instance.unmute(rule, null, delayed);
     this.unmuteTimeout = null;
+  }
+
+  displayApfCaptions(rule: AudioRule, captionData: ReplaceTextResult[], shouldBeShown: boolean) {
+    const container = this.apfCaptionContainer(rule);
+    if (container) {
+      this.removeApfCaptions(rule, container);
+      if (shouldBeShown) this.buildApfCaptions(rule, captionData, container);
+    } else {
+      logger.warn('Failed to find APF Captions container.');
+    }
   }
 
   fillerAudioHandlePause() {
@@ -450,9 +500,16 @@ export default class WebAudio {
 
   initElementChildRule(rule: AudioRule) {
     if (!rule.parentSelector && !rule.parentSelectorAll) rule.disabled = true;
+    if (rule.apfCaptions) {
+      if (rule.displaySelector === undefined) rule.disabled = true;
+    }
   }
 
-  initElementRule(rule: AudioRule) { }
+  initElementRule(rule: AudioRule) {
+    if (rule.apfCaptions) {
+      if (rule.displaySelector === undefined) rule.disabled = true;
+    }
+  }
 
   initFillerAudio(name: string = ''): HTMLAudioElement {
     const fillerConfig = WebAudio.fillerConfig[name];
@@ -534,6 +591,7 @@ export default class WebAudio {
         if (rule.mode != 'ytauto') logger.warn('Audio rule disabled during initialization', rule);
       } else {
         this.enabledRuleIds.push(ruleId);
+        if (rule.apfCaptions) this.apfCaptionRuleIds.push(ruleId);
 
         if (rule.mode == 'watcher') {
           if (rule.toCue) {
@@ -561,17 +619,20 @@ export default class WebAudio {
   initYouTube() {
     if (['m.youtube.com', 'tv.youtube.com', 'www.youtube.com'].includes(this.siteKey)) {
       this.youTube = true;
+
       // Issue 251: YouTube is now filtering words out of auto-generated captions/subtitles
-      const youTubeAutoCensor = '\\[\\s__\\s\\]';
-      const lists = this.wordlistId === Constants.ALL_WORDS_WORDLIST_ID ? [] : [this.wordlistId];
-      const youTubeAutoCensorOptions: WordOptions = {
-        lists: lists,
-        matchMethod: Constants.MATCH_METHODS.REGEX,
-        repeat: Constants.FALSE,
-        separators: Constants.FALSE,
-        sub: '[ _ ]',
-      };
-      this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
+      if (this.filter.cfg.youTubeAutoMatchCensored) {
+        const youTubeAutoCensor = '\\[\\s__\\s\\]';
+        const lists = this.wordlistId === Constants.ALL_WORDS_WORDLIST_ID ? [] : [this.wordlistId];
+        const youTubeAutoCensorOptions: WordOptions = {
+          lists: lists,
+          matchMethod: Constants.MATCH_METHODS.REGEX,
+          repeat: Constants.FALSE,
+          separators: Constants.FALSE,
+          sub: '[ _ ]',
+        };
+        this.filter.cfg.addWord(youTubeAutoCensor, youTubeAutoCensorOptions);
+      }
 
       // Setup rule for YouTube Auto Subs
       this.youTubeAutoSubsRule = { mode: 'ytauto' } as AudioRule;
@@ -588,7 +649,7 @@ export default class WebAudio {
 
       switch (rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
-          chrome.runtime.sendMessage({ mute: true });
+          chrome.runtime.sendMessage(this.filter.buildMessage(Constants.MESSAGING.BACKGROUND, { mute: true }));
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
           if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
@@ -790,9 +851,10 @@ export default class WebAudio {
 
       const result = this.replaceTextResult(cue.text);
       cue.originalText = cue.text;
+      cue.filteredText = result.filtered;
       if (result.modified) {
         cue.filtered = true;
-        if (rule.filterSubtitles) { cue.text = result.filtered; }
+        if (rule.filterSubtitles && !rule.apfCaptions) { cue.text = result.filtered; }
       } else {
         cue.filtered = false;
       }
@@ -919,6 +981,14 @@ export default class WebAudio {
     this.lastProcessedText = captions.map((caption) => caption.textContent).join(' ');
   }
 
+  removeApfCaptions(rule: AudioRule, container?: HTMLElement) {
+    if (!container) container = this.apfCaptionContainer(rule);
+    if (container) {
+      const oldLines = getElement('div.APF-subtitles', container);
+      if (oldLines) oldLines.remove();
+    }
+  }
+
   replaceTextResult(string: string, wordlistId: number = this.wordlistId, statsType: string | null = Constants.STATS_TYPE_AUDIO) {
     return this.filter.replaceTextResult(string, wordlistId, statsType);
   }
@@ -937,6 +1007,21 @@ export default class WebAudio {
     }
   }
 
+  splitReplaceTextResultsOnNewlines(result: ReplaceTextResult) {
+    const originalLines = result.original.split('\n');
+    const filteredLines = result.filtered.split('\n');
+    if (originalLines.length === 1 || originalLines.length !== filteredLines.length) return [result];
+
+    const lines = [];
+    for (let i = 0; i < originalLines.length; i++) {
+      const originalLine = originalLines[i];
+      const filteredLine = filteredLines[i];
+      const lineModified = result.modified && originalLine != filteredLine;
+      lines.push({ filtered: filteredLine, modified: lineModified, original: originalLine });
+    }
+    return lines;
+  }
+
   stopFillerAudio() {
     this.fillerAudio.pause();
     this.fillerAudio.currentTime = 0;
@@ -951,69 +1036,116 @@ export default class WebAudio {
     }
   }
 
+  supportedCaptionsFound(found = true, forceUpdate = false) {
+    if (!this.filter.extension || (!forceUpdate && found == this.supportedCaptions)) return;
+
+    const message: Message = { destination: Constants.MESSAGING.BACKGROUND, source: Constants.MESSAGING.CONTEXT, forceUpdate: forceUpdate };
+
+    this.supportedCaptions = found;
+    if (found) {
+      message.status = Constants.STATUS.CAPTIONS;
+      chrome.runtime.sendMessage(message);
+      logger.info('Supported captions found');
+    } else {
+      message.status = Constants.STATUS.MUTE_PAGE;
+      chrome.runtime.sendMessage(message);
+      logger.info('Watching for supported captions');
+    }
+  }
+
+  // [BETA]
+  // This isn't being actively used now
+  supportedDynamicNode(node: HTMLElement, rule: AudioRule) {
+    // HBO Max: When playing a video, this node gets added, but doesn't include any context. Grabbing classList and then start watching.
+    if (node.textContent === rule.dynamicTextKey) {
+      rule.mode = rule.dynamicTargetMode;
+      // TODO: Only working for HBO Max right now
+      rule.parentSelectorAll = `${node.tagName.toLowerCase()}.${Array.from(node.classList).join('.')} ${rule.parentSelectorAll}`;
+      this.initRule(rule);
+    }
+  }
+
+  supportedElementNode(node: HTMLElement, rule: AudioRule) {
+    if (node.nodeName == rule.tagName) {
+      if (rule.className && (!node.className || !node.classList.contains(rule.className))) return false;
+      if (rule.dataPropPresent && (!node.dataset || !node.dataset.hasOwnProperty(rule.dataPropPresent))) return false;
+      if (rule.hasChildrenElements && (typeof node.childElementCount !== 'number' || node.childElementCount == 0)) return false;
+      if (rule.subtitleSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.subtitleSelector))) return false;
+      if (rule.containsSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.containsSelector))) return false;
+      return true;
+    }
+
+    return false;
+  }
+
+  supportedElementChildNode(node: HTMLElement, rule: AudioRule) {
+    if (node.nodeName === rule.tagName) {
+      const root = rule.rootNode ? node.getRootNode() : document as any;
+      if (root) {
+        if (rule.parentSelector) {
+          const parent = root.querySelector(rule.parentSelector);
+          if (parent && (parent == node || parent.contains(node))) return true;
+        } else {
+          const parents = root.querySelectorAll(rule.parentSelectorAll);
+          for (let j = 0; j < parents.length; j++) {
+            if (parents[j].contains(node)) return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
   // Checks if a node is a supported audio node.
   // Returns rule id upon first match, otherwise returns false
   supportedNode(node) {
     for (let i = 0; i < this.enabledRuleIds.length; i++) {
       const ruleId = this.enabledRuleIds[i];
       const rule = this.rules[ruleId];
+      let supported = false;
 
       switch (rule.mode) {
         case 'element':
-          if (node.nodeName == rule.tagName) {
-            let failed = false;
-            if (!failed && rule.className && (!node.className || !node.classList.contains(rule.className))) { failed = true; }
-            if (!failed && rule.dataPropPresent && (!node.dataset || !node.dataset.hasOwnProperty(rule.dataPropPresent))) { failed = true; }
-            if (!failed && rule.hasChildrenElements && (typeof node.childElementCount !== 'number' || node.childElementCount == 0)) { failed = true; }
-            if (!failed && rule.subtitleSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.subtitleSelector))) { failed = true; }
-            if (!failed && rule.containsSelector && (typeof node.querySelector !== 'function' || !node.querySelector(rule.containsSelector))) { failed = true; }
-            if (!failed) { return ruleId; }
-          }
-          break;
+          supported = this.supportedElementNode(node, rule); break;
         case 'elementChild':
-          if (node.nodeName === rule.tagName) {
-            const root = rule.rootNode ? node.getRootNode() : document;
-            if (root) {
-              if (rule.parentSelector) {
-                const parent = root.querySelector(rule.parentSelector);
-                if (parent && (parent == node || parent.contains(node))) { return ruleId; }
-              } else {
-                const parents = root.querySelectorAll(rule.parentSelectorAll);
-                for (let j = 0; j < parents.length; j++) {
-                  if (parents[j].contains(node)) { return ruleId; }
-                }
-              }
-            }
-          }
-          break;
+          supported = this.supportedElementChildNode(node, rule); break;
         case 'text':
-          if (node.nodeName === rule.tagName) {
-            const parent = document.querySelector(rule.parentSelector);
-            if (parent && parent.contains(node)) { return ruleId; }
-          }
-          break;
+          supported = this.supportedTextNode(node, rule); break;
         case 'watcher':
-          if (rule.subtitleSelector != null && node.parentElement && node.parentElement == getElement(rule.subtitleSelector)) {
-            return ruleId;
-          }
-          if (rule.parentSelector != null) {
-            const parent = getElement(rule.parentSelector);
-            if (parent && parent.contains(node)) { return ruleId; }
-          }
-          break;
+          supported = this.supportedWatcherNode(node, rule); break;
         case 'dynamic':
-          // HBO Max: When playing a video, this node gets added, but doesn't include any context. Grabbing classList and then start watching.
-          if (node.textContent === rule.dynamicTextKey) {
-            rule.mode = rule.dynamicTargetMode;
-            // TODO: Only working for HBO Max right now
-            rule.parentSelectorAll = `${node.tagName.toLowerCase()}.${Array.from(node.classList).join('.')} ${rule.parentSelectorAll}`;
-            this.initRule(rule);
-          }
-          break;
+          this.supportedDynamicNode(node, rule); break;
+      }
+
+      if (supported) {
+        this.supportedCaptionsFound();
+        return ruleId;
       }
     }
 
     // No matching rule was found
+    return false;
+  }
+
+  supportedTextNode(node: HTMLElement, rule: AudioRule) {
+    if (node.nodeName === rule.tagName) {
+      const parent = document.querySelector(rule.parentSelector);
+      if (parent && parent.contains(node)) return true;
+    }
+
+    return false;
+  }
+
+  supportedWatcherNode(node: HTMLElement, rule: AudioRule) {
+    if (rule.subtitleSelector != null && node.parentElement && node.parentElement == getElement(rule.subtitleSelector)) {
+      return true;
+    }
+    if (rule.parentSelector != null) {
+      const parent = getElement(rule.parentSelector);
+      if (parent && parent.contains(node)) return true;
+    }
+
     return false;
   }
 
@@ -1034,7 +1166,7 @@ export default class WebAudio {
       this.muted = false;
       switch (rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
-          chrome.runtime.sendMessage({ mute: false });
+          chrome.runtime.sendMessage(this.filter.buildMessage(Constants.MESSAGING.BACKGROUND, { mute: false }));
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
           if (this.fillerAudio) { this.stopFillerAudio(); }
@@ -1086,26 +1218,13 @@ export default class WebAudio {
       }
 
       if (data.skipped) { return false; }
+      instance.supportedCaptionsFound();
 
       // Hide/show caption/subtitle text
       const shouldBeShown = instance.subtitlesShouldBeShown(rule, data.filtered);
 
       if (rule.apfCaptions) {
-        let container;
-        if (rule.apfCaptionsSelector) container = getElement(rule.apfCaptionsSelector);
-        if (!container) container = video.parentElement; // Fall-back to video's parent
-
-        // Clean up old APF Caption lines
-        const oldLines = getElement('div.APF-subtitles', container);
-        if (oldLines) oldLines.remove();
-
-        // Show APF Caption lines if they should be shown
-        if (shouldBeShown && data.textResults.length) {
-          const captionLines = data.textResults.map((result) => rule.filterSubtitles && result.modified ? result.filtered : result.original);
-          const apfLines = captionLines.map((text) => instance.apfCaptionLine(rule, text));
-          const apfCaptions = instance.apfCaptionLines(rule, apfLines);
-          container.appendChild(apfCaptions);
-        }
+        instance.displayApfCaptions(rule, data.textResults, shouldBeShown);
       } else {
         shouldBeShown ? instance.showSubtitles(rule) : instance.hideSubtitles(rule);
       }
@@ -1130,7 +1249,7 @@ export default class WebAudio {
           textTrack.oncuechange = () => {
             if (textTrack.activeCues && textTrack.activeCues.length > 0) {
               const activeCues = Array.from(textTrack.activeCues as any as FilteredVTTCue[]);
-              const apfLines = [];
+              const captionData = [] as ReplaceTextResult[];
 
               // Process cues
               const processed = activeCues.some((activeCue) => activeCue.hasOwnProperty('filtered'));
@@ -1147,34 +1266,23 @@ export default class WebAudio {
                 const activeCue = activeCues[i];
                 if (!shouldBeShown && rule.videoCueHideCues) { instance.hideCue(rule, activeCue); }
                 if (rule.apfCaptions) {
-                  const text = filtered ? activeCue.text : activeCue.originalText;
-                  const line = instance.apfCaptionLine(rule, text);
-                  apfLines.unshift(line); // Cues seem to show up in reverse order
+                  // Cues seem to show up in reverse order
+                  captionData.unshift({ filtered: activeCue.filteredText, original: activeCue.originalText, modified: activeCue.filtered });
                 }
               }
 
-              if (apfLines.length) {
-                const container = document.getElementById(rule.apfCaptionsSelector);
-                const oldLines = container.querySelector('div.APF-subtitles');
-                if (oldLines) { oldLines.remove(); }
-                if (shouldBeShown) {
-                  const apfCaptions = instance.apfCaptionLines(rule, apfLines);
-                  container.appendChild(apfCaptions);
-                }
-              }
-
+              if (rule.apfCaptions) instance.displayApfCaptions(rule, captionData, shouldBeShown);
               if (!rule.videoCueHideCues) { textTrack.mode = shouldBeShown ? 'showing' : 'hidden'; }
-              if (rule.displaySelector) { // Hide original subtitles if using apfCaptions
-                apfLines.length || !shouldBeShown ? instance.hideSubtitles(rule) : instance.showSubtitles(rule);
+              if (rule.displaySelector) {
+                // Hide original subtitles if using apfCaptions
+                rule.apfCaptions || !shouldBeShown ? instance.hideSubtitles(rule) : instance.showSubtitles(rule);
               }
             } else { // No active cues
               instance.unmute(rule, video);
 
               if (rule.apfCaptions) {
                 // Remove APF captions because there are no active cues
-                const container = document.getElementById(rule.apfCaptionsSelector);
-                const oldLines = container.querySelector('div.APF-subtitles');
-                if (oldLines) { oldLines.remove(); }
+                instance.removeApfCaptions(rule);
               }
             }
           };
@@ -1182,6 +1290,7 @@ export default class WebAudio {
           // Pre-process all cues after setting oncuechange
           const allCues = Array.from(textTrack.cues as any as FilteredVTTCue[]);
           instance.processCues(allCues, rule);
+          instance.supportedCaptionsFound(true);
         }
       }
     }
@@ -1310,7 +1419,9 @@ export default class WebAudio {
   }
 
   youTubeAutoSubsPresent(): boolean {
-    return !!(document.querySelector('div.ytp-caption-window-rollup'));
+    const present = !!(document.querySelector('div.ytp-caption-window-rollup'));
+    if (present) this.supportedCaptionsFound();
+    return present;
   }
 
   youTubeAutoSubsSupportedNode(node: any): boolean {
