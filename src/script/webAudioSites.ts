@@ -79,10 +79,13 @@ export const supportedSites: AudioSites = {
   'tv.apple.com': [
     {
       apfCaptions: true,
-      displaySelector: 'apple-tv-plus-player >>> amp-video-player-internal >>> amp-video-player >>> div.video-container > div',
-      mode: 'watcher',
-      subtitleSelector: 'apple-tv-plus-player >>> amp-video-player-internal >>> amp-video-player >>> div.video-container > div > div > div > div',
-      videoSelector: 'apple-tv-plus-player >>> amp-video-player-internal >>> amp-video-player >>> div.video-container video',
+      apfCaptionsSelector: 'div.video-container',
+      displaySelector: 'div.video-player div.video-container > div > div',
+      mode: 'elementChild',
+      parentSelector: 'div.video-player div.video-container',
+      subtitleSelector: ':scope div > div',
+      tagName: 'DIV',
+      videoSelector: 'div.video-player div.video-container video',
     },
   ],
   'www.att.tv': [{ mode: 'cue', videoSelector: 'video#quickplayPlayer' }],
