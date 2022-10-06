@@ -506,7 +506,7 @@ export default class WebFilter extends Filter {
   updateCounterBadge() {
     /* istanbul ignore next */
     // console.count('updateCounterBadge'); // Benchmark: Filter
-    if (this.counter > 0) {
+    if (chrome.runtime && this.counter > 0) {
       try {
         if (this.cfg.showCounter) {
           const message = this.buildMessage(Constants.MESSAGING.BACKGROUND, { counter: this.counter });
