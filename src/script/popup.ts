@@ -70,8 +70,7 @@ class Popup {
       getStatus: true,
       tabId: instance.tab.id,
     };
-    chrome.runtime.sendMessage(statusMessage
-    , (response) => {
+    chrome.runtime.sendMessage(statusMessage, (response) => {
       instance.updateStatus(response.status);
     });
 

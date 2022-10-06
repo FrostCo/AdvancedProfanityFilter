@@ -9,7 +9,7 @@ const COLOR_BLUE = [66, 133, 244, 255] as chrome.action.ColorArray;
 const COLOR_BLUE_VIOLET = [138, 43, 226, 255] as chrome.action.ColorArray;
 const COLOR_FOREST_GREEN = [34, 139, 34, 255] as chrome.action.ColorArray;
 const COLOR_GREY = [85, 85, 85, 255] as chrome.action.ColorArray;
-const COLOR_ORANGE = [236, 147, 41, 255] as chrome.action.ColorArray;
+// const COLOR_ORANGE = [236, 147, 41, 255] as chrome.action.ColorArray;
 const COLOR_RED = [211, 45, 39, 255] as chrome.action.ColorArray;
 const BADGE_COLORS = [COLOR_GREY, COLOR_BLUE, COLOR_RED, COLOR_RED, COLOR_BLUE_VIOLET, COLOR_FOREST_GREEN] as chrome.action.ColorArray[];
 
@@ -104,7 +104,7 @@ function contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.
     case 'toggleForDomain':
       toggleDomain((new URL(tab.url)).hostname, 'disable'); break;
     case 'toggleFramesForDomain':
-        toggleDomain((new URL(tab.url)).hostname, 'frames'); break;
+      toggleDomain((new URL(tab.url)).hostname, 'frames'); break;
     case 'toggleTabDisable':
       toggleTabDisable(tab.id); break;
   }

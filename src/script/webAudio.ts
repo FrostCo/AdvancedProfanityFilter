@@ -649,8 +649,7 @@ export default class WebAudio {
 
       switch (rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
-          const message: Message = { destination: Constants.MESSAGING.BACKGROUND, mute: true, source: Constants.MESSAGING.CONTEXT };
-          chrome.runtime.sendMessage(message);
+          chrome.runtime.sendMessage(this.filter.buildMessage(Constants.MESSAGING.BACKGROUND, { mute: true }));
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
           if (!video) { video = getElement(rule.videoSelector) as HTMLVideoElement; }
@@ -1167,8 +1166,7 @@ export default class WebAudio {
       this.muted = false;
       switch (rule.muteMethod) {
         case Constants.MUTE_METHODS.TAB:
-          const message: Message = { destination: Constants.MESSAGING.BACKGROUND, mute: false, source: Constants.MESSAGING.CONTEXT };
-          chrome.runtime.sendMessage(message);
+          chrome.runtime.sendMessage(this.filter.buildMessage(Constants.MESSAGING.BACKGROUND, { mute: false }));
           break;
         case Constants.MUTE_METHODS.VIDEO_MUTE:
           if (this.fillerAudio) { this.stopFillerAudio(); }
