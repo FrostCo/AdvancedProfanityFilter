@@ -352,6 +352,10 @@ export default class WebFilter extends Filter {
 
   handleRemovedNodesOnMutePage(removedNodes: NodeList) {
     removedNodes.forEach((node) => {
+      if (node.nodeName == 'VIDEO' && this.audio.supportedCaptions) {
+        this.audio.supportedCaptionsFound(false, true);
+      }
+
       // Remove APF Captions if the removed node was the last one we processed
       if (this.audio.apfCaptionsEnabled) {
         if (node == this.audio.lastProcessedNode || node.contains(this.audio.lastProcessedNode)) {
