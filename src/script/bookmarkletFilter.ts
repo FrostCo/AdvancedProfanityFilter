@@ -192,6 +192,16 @@ export default class BookmarkletFilter extends Filter {
     this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
 
+    if (
+      this.iframe
+      && (
+        (this.cfg.enabledFramesOnly && !this.domain.framesOn)
+        || (!this.cfg.enabledFramesOnly && this.domain.framesOff)
+      )
+    ) {
+      return false;
+    }
+
     // Bookmarklet: Force video volume mute method
     if (this.cfg.muteMethod === Constants.MUTE_METHODS.TAB) {
       this.cfg.muteMethod === Constants.MUTE_METHODS.VIDEO_VOLUME;
