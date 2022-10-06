@@ -16,6 +16,7 @@ export default class BookmarkletFilter extends Filter {
   audio: WebAudio;
   audioOnly: boolean;
   audioWordlistId: number;
+  buildMessage: (destination: string, data?: object) => Message; // Bookmarklet: Not used - Needed to match signature of WebFilter
   declare cfg: WebConfig;
   domain: Domain;
   extension: boolean;
@@ -26,7 +27,7 @@ export default class BookmarkletFilter extends Filter {
   mutePage: boolean;
   observer: MutationObserver;
   processMutationTarget: boolean;
-  processNode: (node: HTMLElement | Document | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
+  processNode: (node: Document | HTMLElement | Node | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
   shadowObserver: MutationObserver;
   stats?: Statistics; // Bookmarklet: Not used
   updateCounterBadge: () => void; // Bookmarklet: Not used - Needed to match signature of WebFilter
