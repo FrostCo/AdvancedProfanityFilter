@@ -1037,7 +1037,7 @@ export default class WebAudio {
   }
 
   supportedCaptionsFound(found = true, forceUpdate = false) {
-    if (!forceUpdate && found == this.supportedCaptions) return;
+    if (!this.filter.extension || (!forceUpdate && found == this.supportedCaptions)) return;
 
     const message: Message = { destination: Constants.MESSAGING.BACKGROUND, source: Constants.MESSAGING.CONTEXT, forceUpdate: forceUpdate };
 
