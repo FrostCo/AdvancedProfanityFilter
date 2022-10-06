@@ -198,7 +198,6 @@ export default class BookmarkletFilter extends Filter {
     }
 
     // Use domain-specific settings
-    const message: Message = {};
     if (
       (
         this.cfg.enabledDomainsOnly
@@ -207,7 +206,6 @@ export default class BookmarkletFilter extends Filter {
       )
       || this.domain.disabled
     ) {
-      message.disabled = true;
       return false;
     }
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
@@ -226,7 +224,6 @@ export default class BookmarkletFilter extends Filter {
 
     // Disable if muteAudioOnly mode is active and this is not a suported page
     if (this.cfg.muteAudioOnly && !this.mutePage) {
-      message.disabled = true;
       return false;
     }
 
