@@ -685,10 +685,11 @@
     <li>You can also choose your theme by clicking the sun/moon icon in the menu.</li>
     </ul>
     </li>
-    <li><strong>Show number of filtered words</strong>: Show a counter on the extension button with the number of filtered words on the current page.<ul>
-    <li><strong>Blue</strong>: Normal mode</li>
-    <li><strong>Red</strong>: Advanced mode</li>
-    <li><strong>Green</strong>: Audio Muting mode (Shows even when no words have been filtered)</li>
+    <li><strong>Show number of filtered words</strong>: Show a counter on the extension button with the number of filtered words on the current page. It also serves as a status for the current tab:<ul>
+    <li>🟦 Blue: Normal mode <em>(only visible when there has been at least 1 word filtered on the current tab)</em></li>
+    <li>🟥 Red: Advanced/Deep mode enabled</li>
+    <li>🟪 Purple: Audio supported on page, actively watching for supported captions/subtitles</li>
+    <li>🟩 Green: Audio supported on page, supported captions have been found</li>
     </ul>
     </li>
     <li><strong>Show summary of filtered words</strong>: Show a summary of the words filtered on the current page.</li>
@@ -733,6 +734,11 @@
     <li><strong>Normal: <em>(default)</em></strong> Filter all domains unless specifically disabled</li>
     <li><strong>Minimal:</strong> Only filter pages that are specifically enabled</li>
     </ul>
+    <h3 id="frame-mode">Frame Mode:</h3>
+    <ul>
+    <li><strong>Filter all frames <em>(default)</em></strong>: Filter all frames, unless disabled for a specific domain</li>
+    <li><strong>Don&#39;t filter all frames</strong>: Only filter frames when enabled for a specific domain</li>
+    </ul>
     <h3 id="domains-1">Domains:</h3>
     <p>Adjust the domain list for the currently selected mode. To match google.com and all its sub-domains, simply add <code>google.com</code>. If you want to just match Gmail, you can add <code>mail.google.com</code>.</p>
     <p>When browsing a web page, you can also toggle the filter for the current domain from the context (right-click) menu, or using the extension&#39;s Popup menu.</p>
@@ -771,6 +777,7 @@
     <li><strong>Only mute audio</strong> - This will disable the text filter, and only perform filtering/muting on supported video sites.
     This mode will disable the text filter everywhere, and only mute audio (and filter subtitles) on supported sites.</li>
     <li><strong>Require subtitles to be showing</strong> - This setting is only for sites using the &quot;cue&quot; mode, and will only filter when subtitles are set to &quot;showing&quot; for the current video. If enabled, this typically means there is a manual step involved in turning on the subtitles (varies by site) to enable audio muting through the filter.</li>
+    <li><strong>Mute pre-censored captions on YouTube</strong> - YouTube sometimes pre-censors profanity in auto-generated captions and replaces them with <code>[ _ ]</code>. When enabled, this option will attempt to mute those words. <em>(The default on)</em></li>
     <li><strong>YouTube Minimum Muting</strong> - Set a minimum amount of time (in seconds) that the filter will mute matched words in a YouTube video using auto-generated subtitles. <em>(The default is 0)</em></li>
     <li><strong>Custom Sites</strong> - Add support for <a href="https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio#custom-audio-sites-advanced">Custom Audio Muting Sites</a>.</li>
     </ul>
@@ -802,9 +809,11 @@
     <p>The &quot;Remove words&quot; feature, found under the stats table, allows the user to specify a threshold for removing words that don&#39;t get filtered often. To use the feature, provide a number and all words that have been filtered less than that number can be removed. This can be helpful to help clear words from your wordlist that may not be necessary.</p>
     <p><em>TIP: Before making batch changes it&#39;s recommended to save a backup, which you can do from the prompt before confirming the action.</em></p>
     <h1 id="popup">Popup</h1>
-    <p>The popup provides access to some quick settings:</p>
+    <p>The popup provides access to some quick details and settings:</p>
     <ul>
+    <li><strong>Audio Status</strong> - Shows either &quot;Watching for captions&quot; or &quot;Muting active&quot; depending on the current tab&#39;s status. <em>(Only available on supported audio pages)</em></li>
     <li><strong>Domain Toggle</strong> - Switch to turn the filter on/off for the current domain.</li>
+    <li><strong>Audio Muting Status</strong> - Status line for pages which support audio muting.</li>
     <li><strong>Advanced Mode</strong> - Switch Advanced Mode on/off for the current domain.</li>
     <li><strong>Filter</strong> - Change the filter mode. <strong>This is a global setting and affects all pages.</strong></li>
     <li><strong>Text Wordlist</strong> - Change the active wordlist for text for the current domain (Only when wordlists are enabled)</li>
@@ -820,6 +829,7 @@
     <li><strong>Toggle for tab</strong> - Turn the filter on/off for the current tab (any domain)</li>
     <li><strong>Toggle for domain</strong> - Turn the filter on/off for the current domain</li>
     <li><strong>Toggle advanced for domain</strong> - Switch the Advanced Mode on/off for the current domain</li>
+    <li><strong>Toggle frames for domain</strong> - Switch filtering frames on/off for the current domain</li>
     <li><strong>Options</strong> - Open the options page</li>
     </ul>
   </div>
