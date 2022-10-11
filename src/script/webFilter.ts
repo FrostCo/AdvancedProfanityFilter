@@ -485,7 +485,9 @@ export default class WebFilter extends Filter {
     if (message.deep) message.status = Constants.STATUS.DEEP;
     if (message.mutePage) message.status = Constants.STATUS.MUTE_PAGE;
 
-    if (this.mutePage && this.cfg.showCounter) { message.counter = this.counter; } // Always show counter when muting audio
+    // Always show counter if not in normal mode
+    if (this.cfg.showCounter && message.status != Constants.STATUS.NORMAL) { message.counter = this.counter; }
+
     chrome.runtime.sendMessage(message);
   }
 
