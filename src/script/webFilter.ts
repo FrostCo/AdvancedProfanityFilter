@@ -488,6 +488,12 @@ export default class WebFilter extends Filter {
     // Always show counter if not in normal mode
     if (this.cfg.showCounter && message.status != Constants.STATUS.NORMAL) { message.counter = this.counter; }
 
+    // iOS doesn't support passing messages from the content script to the background script
+    if (WebConfig.BUILD.target == Constants.BUILD_TARGET_IOS) {
+      message.source = Constants.MESSAGING.BACKGROUND;
+      message.destination = Constants.MESSAGING.POPUP;
+    }
+
     chrome.runtime.sendMessage(message);
   }
 

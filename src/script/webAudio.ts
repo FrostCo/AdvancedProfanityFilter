@@ -1040,6 +1040,11 @@ export default class WebAudio {
     if (!this.filter.extension || (!forceUpdate && found == this.supportedCaptions)) return;
 
     const message: Message = { destination: Constants.MESSAGING.BACKGROUND, source: Constants.MESSAGING.CONTEXT, forceUpdate: forceUpdate };
+    // iOS doesn't support passing messages from the content script to the background script
+    if (WebConfig.BUILD.target == Constants.BUILD_TARGET_IOS) {
+      message.source = Constants.MESSAGING.BACKGROUND;
+      message.destination = Constants.MESSAGING.POPUP;
+    }
 
     this.supportedCaptions = found;
     if (found) {
