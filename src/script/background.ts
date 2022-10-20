@@ -382,7 +382,7 @@ async function updatePopupStatus(tabId: number, status?: number, sendResponse?) 
     status = tabOptions.status;
   }
   if (!sendResponse) sendResponse = chrome.runtime.sendMessage;
-  const message: Message = { destination: 'popup', source: 'background', status: status, tabId: tabId };
+  const message: Message = { destination: Constants.MESSAGING.POPUP, source: Constants.MESSAGING.BACKGROUND, status: status, tabId: tabId };
   sendResponse(message, () => chrome.runtime.lastError); // Suppress error if Popup isn't active
 }
 
