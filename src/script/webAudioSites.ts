@@ -132,7 +132,7 @@ export const supportedSites: AudioSites = {
       externalSubVar: 'window.v1config.media.subtitles',
       iframe: true,
       mode: 'cue',
-      videoCueLanguage: 'enUS',
+      videoCueLanguage: 'en-US',
       videoCueRequireShowing: false,
       videoSelector: 'video#player0',
     },
