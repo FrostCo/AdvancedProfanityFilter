@@ -237,9 +237,20 @@ export const supportedSites: AudioSites = {
   ],
   'www.pbs.org': [{ iframe: true, mode: 'element', subtitleSelector: 'div.vjs-text-track-cue > div', tagName: 'DIV' }],
   'www.peacocktv.com': [
-    { displaySelector: 'div.video-player__subtitles', mode: 'elementChild', parentSelector: 'div.video-player__subtitles > div', simpleUnmute: true, tagName: '#text' },
-    { displaySelector: 'div.video-player__subtitles', mode: 'elementChild', parentSelector: 'div.video-player__subtitles > div', subtitleSelector: 'SPAN > SPAN', tagName: 'DIV' },
-    { displaySelector: 'div.video-player__subtitles', mode: 'elementChild', parentSelector: 'div.video-player__subtitles > div', tagName: 'SPAN' },
+    {
+      displaySelector: 'div.video-player__subtitles',
+      mode: 'elementChild',
+      parentSelector: 'div.video-player__subtitles > span.video-player__subtitles__cue span.video-player__subtitles__line',
+      simpleUnmute: true,
+      tagName: '#text'
+    },
+    {
+      className: 'video-player__subtitles',
+      displaySelector: 'div.video-player__subtitles',
+      mode: 'element',
+      subtitleSelector: 'span.video-player__subtitles__cue > span.video-player__subtitles__line',
+      tagName: 'DIV'
+    },
   ],
   'www.philo.com': [{ mode: 'cue' }],
   'app.plex.tv': [
