@@ -284,6 +284,7 @@ export const supportedSites: AudioSites = {
   'www.sbs.com.au': [{ className: 'bmpui-subtitle-region-container', mode: 'element', subtitleSelector: 'DIV.bmpui-container-wrapper > SPAN.bmpui-ui-subtitle-label > SPAN', tagName: 'DIV' }],
   'www.showmax.com': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.contentWrapper > div.subtitles--3EXhT', simpleUnmute: true, tagName: '#text' }],
   'www.showtime.com': [{ mode: 'cue', videoCueHideCues: true, videoCueLanguage: 'en', videoCueRequireShowing: false }],
+  'www.shudder.com': [{ mode: 'element', subtitleSelector: 'div.vjs-text-track-cue > div', tagName: 'DIV' }],
   'watch.sling.com': [{ className: 'bmpui-subtitle-region-container', mode: 'element', subtitleSelector: 'DIV.bmpui-container-wrapper > SPAN.bmpui-ui-subtitle-label', tagName: 'DIV' }],
   'play.stan.com.au': [{ ignoreMutations: true, mode: 'elementChild', parentSelector: 'div.clpp-text-container', simpleUnmute: true, tagName: 'DIV' }],
   'www.starz.com': [{ mode: 'elementChild', parentSelector: 'starz-captions > div.cue-list', tagName: 'SPAN' }],
