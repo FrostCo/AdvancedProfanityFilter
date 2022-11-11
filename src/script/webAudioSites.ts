@@ -12,6 +12,7 @@ export const iOSTargetConfig: BuildTargetSites = {
     'watch.sling.com',
   ],
   sites: {
+    'tv.apple.com': [{ mode: 'cue', videoCueLanguage: 'en' }],
     'play.stan.com.au': [{ mode: 'cue', videoCueLanguage: 'en' }],
   },
 };
@@ -19,6 +20,7 @@ export const iOSTargetConfig: BuildTargetSites = {
 export const safariTargetConfig: BuildTargetSites = {
   disabledSites: [],
   sites: {
+    'tv.apple.com': [{ mode: 'cue', videoCueLanguage: 'en' }],
     'play.stan.com.au': [{ mode: 'cue', videoCueLanguage: 'en' }],
   },
 };
