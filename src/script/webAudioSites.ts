@@ -224,6 +224,7 @@ export const supportedSites: AudioSites = {
       videoSelector: 'div#playerContainer video',
     },
   ],
+  'moviesanywhere.com': [{ mode: 'cue' }],
   'www.nbc.com': [
     { className: 'ttr-line', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
     { mode: 'cue', videoCueLanguage: 'en' },
