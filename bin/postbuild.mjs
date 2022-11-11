@@ -55,7 +55,7 @@ function edgeLegacyBuild() {
 
 function firefoxBuild() {
   const manifest = loadJSONFile(distManifestPath);
-  manifest.applications = {
+  manifest.browser_specific_settings = {
     gecko: {
       id: '{853d1586-e2ab-4387-a7fd-1f7f894d2651}'
     }
