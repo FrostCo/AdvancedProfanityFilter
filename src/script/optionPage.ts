@@ -1084,7 +1084,7 @@ export default class OptionPage {
     const regExp = RegExp(' [*]$');
     const sensitiveList = filter.cfg.wordAllowlist.map((item) => { return item + ' *'; });
     const list = [].concat(sensitiveList, filter.cfg.iWordAllowlist).sort();
-    const allowlist = document.getElementById('allowlist') as HTMLSelectElement;
+    const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
     removeChildren(allowlist);
     list.unshift('Add, or update existing...');
     list.forEach((item) => {
@@ -1098,7 +1098,7 @@ export default class OptionPage {
   }
 
   populateAllowlistWord() {
-    const allowlist = document.getElementById('allowlist') as HTMLSelectElement;
+    const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
     const allowlistRemove = document.getElementById('allowlistRemove') as HTMLInputElement;
     const allowlistText = document.getElementById('allowlistText') as HTMLInputElement;
     const selected = allowlist.selectedOptions[0];
@@ -1318,7 +1318,7 @@ export default class OptionPage {
   }
 
   async removeAllowlist() {
-    const allowlist = document.getElementById('allowlist') as HTMLSelectElement;
+    const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
     const selected = allowlist.selectedOptions[0];
     const originalWord = selected.value;
     const originalCase = selected.dataset.sensitive === 'true' ? 'sensitive': 'insensitive';
@@ -1524,7 +1524,7 @@ export default class OptionPage {
   }
 
   async saveAllowlist() {
-    const allowlist = document.getElementById('allowlist') as HTMLSelectElement;
+    const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
     const selected = allowlist.selectedOptions[0];
     const selectedCase = document.querySelector('input[name="allowlistCase"]:checked') as HTMLInputElement;
     const allowlistText = document.getElementById('allowlistText') as HTMLInputElement;
@@ -1988,7 +1988,7 @@ document.getElementById('wordRemove').addEventListener('click', (evt) => { optio
 document.getElementById('wordRemoveAll').addEventListener('click', (evt) => { option.confirm('removeAllWords'); });
 document.getElementById('bulkWordEditorButton').addEventListener('click', (evt) => { option.showBulkWordEditor(); });
 // Lists
-document.getElementById('allowlist').addEventListener('change', (evt) => { option.populateAllowlistWord(); });
+document.getElementById('allowlistSelect').addEventListener('change', (evt) => { option.populateAllowlistWord(); });
 document.getElementById('allowlistText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
 document.getElementById('allowlistSave').addEventListener('click', (evt) => { option.saveAllowlist(); });
 document.getElementById('allowlistRemove').addEventListener('click', (evt) => { option.removeAllowlist(); });
