@@ -5,17 +5,17 @@ import Config from './config';
 import { randomArrayElement } from './helper';
 
 export default class Filter {
+  allowlist: string[];
   cfg: Config;
   counter: number;
   iAllowlist: string[];
-  allowlist: string[];
   wordlistId: number;
   wordlists: { [name: string]: Wordlist };
 
   constructor() {
+    this.allowlist = [];
     this.counter = 0;
     this.iAllowlist = [];
-    this.allowlist = [];
     this.wordlists = {};
   }
 
