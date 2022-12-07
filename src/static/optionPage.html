@@ -274,28 +274,28 @@
 
 <div id="listsPage" class="w3-container w3-hide">
   <div class="w3-half w3">
-    <h4 class="sectionHeader">Whitelist</h4>
-    <select id="whitelist" class="w3-select w3-border small textInput"></select><span class="notes">(* Case-sensitive)</span>
+    <h4 class="sectionHeader">Allowlist</h4>
+    <select id="allowlist" class="w3-select w3-border small textInput"></select><span class="notes">(* Case-sensitive)</span>
 
     <h4 class="sectionHeader">Word/Phrase</h4>
-    <input id="whitelistText" class="w3-input w3-border small" type="text" pattern=".+">
+    <input id="allowlistText" class="w3-input w3-border small" type="text" pattern=".+">
 
     <br>
     <label>
-      <input id="whitelistInsensitive" type="radio" class="w3-radio" name="whitelistCase" value="insensitive">
+      <input id="allowlistInsensitive" type="radio" class="w3-radio" name="allowlistCase" value="insensitive">
       Case-insensitive<span class="notes">(doghouse: Don't filter "DogHouse")</span>
     </label>
 
     <br>
     <label>
-      <input id="whitelistSensitive" type="radio" class="w3-radio" name="whitelistCase" value="sensitive">
+      <input id="allowlistSensitive" type="radio" class="w3-radio" name="allowlistCase" value="sensitive">
       Case-sensitive<span class="notes">(Doghouse: Don't filter "Doghouse")</span>
     </label>
 
     <br>
     <div class="w3-left" style="padding-top: 20px;">
-      <button id="whitelistSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
-      <button id="whitelistRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
+      <button id="allowlistSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
+      <button id="allowlistRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
     </div>
   </div>
 

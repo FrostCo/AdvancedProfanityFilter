@@ -241,7 +241,7 @@ describe('Filter', () => {
         });
       });
 
-      describe('whitelist', () => {
+      describe('allowlist', () => {
         it('case-sensitive exact match', () => {
           const filter = new Filter;
           filter.cfg = new Config({
@@ -249,7 +249,7 @@ describe('Filter', () => {
             words: {
               master: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'padawan' },
             },
-            wordWhitelist: ['Master'],
+            wordAllowlist: ['Master'],
           });
           filter.init();
           expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the m***** outsmart the Master?');
@@ -263,7 +263,7 @@ describe('Filter', () => {
             words: {
               more: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE },
             },
-            wordWhitelist: ['smore'],
+            wordAllowlist: ['smore'],
           });
           filter.init();
           expect(filter.replaceText('Would you like smore smores?')).to.equal('Would you like smore sm***s?');
@@ -274,7 +274,7 @@ describe('Filter', () => {
           const filter = new Filter;
           filter.cfg = new Config({
             filterMethod: Constants.FILTER_METHODS.CENSOR,
-            iWordWhitelist: ['master'],
+            iWordAllowlist: ['master'],
             words: {
               master: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'padawan' },
               the: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'teh' },
@@ -289,7 +289,7 @@ describe('Filter', () => {
           const filter = new Filter;
           filter.cfg = new Config({
             filterMethod: Constants.FILTER_METHODS.CENSOR,
-            iWordWhitelist: ['smore'],
+            iWordAllowlist: ['smore'],
             words: {
               more: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE },
             },
@@ -365,7 +365,7 @@ describe('Filter', () => {
           expect(filter.replaceText('За пределами Словении этнические словенцы компактно')).to.equal('За пределами ******** этнические ******** компактно');
         });
 
-        it('Should not filter a whitelisted word (partial match)', () => {
+        it('Should not filter an allowlisted word (partial match)', () => {
           const filter = new Filter;
           filter.cfg = new Config({
             censorCharacter: '*',
@@ -375,7 +375,7 @@ describe('Filter', () => {
             words: Object.assign({
               'ловен': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
             }, testWords),
-            wordWhitelist: ['словенцы'],
+            wordAllowlist: ['словенцы'],
           });
           filter.init();
           expect(filter.replaceText('За пределами Словении этнические словенцы компактно')).to.equal('За пределами С*****ии этнические словенцы компактно');
@@ -659,7 +659,7 @@ describe('Filter', () => {
         });
       });
 
-      describe('whitelist', () => {
+      describe('allowlist', () => {
         it('case-sensitive exact match', () => {
           const filter = new Filter;
           filter.cfg = new Config({
@@ -669,7 +669,7 @@ describe('Filter', () => {
             words: {
               master: { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE, sub: 'padawan' },
             },
-            wordWhitelist: ['Master'],
+            wordAllowlist: ['Master'],
           });
           filter.init();
           expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the padawan outsmart the Master?');
@@ -680,7 +680,7 @@ describe('Filter', () => {
           const filter = new Filter;
           filter.cfg = new Config({
             filterMethod: Constants.FILTER_METHODS.SUBSTITUTE,
-            iWordWhitelist: ['master'],
+            iWordAllowlist: ['master'],
             words: {
               master: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'padawan' },
               the: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'teh' },
@@ -695,7 +695,7 @@ describe('Filter', () => {
           const filter = new Filter;
           filter.cfg = new Config({
             filterMethod: Constants.FILTER_METHODS.SUBSTITUTE,
-            iWordWhitelist: ['smore'],
+            iWordAllowlist: ['smore'],
             words: {
               more: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'less' },
             },
@@ -806,7 +806,7 @@ describe('Filter', () => {
         expect(filter.replaceText('Have you ever done this and everything after it?')).to.equal('Have you ever done ');
       });
 
-      describe('whitelist', () => {
+      describe('allowlist', () => {
         it('case-sensitive exact match', () => {
           const filter = new Filter;
           filter.cfg = new Config({
@@ -814,7 +814,7 @@ describe('Filter', () => {
             words: {
               master: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'padawan' },
             },
-            wordWhitelist: ['Master'],
+            wordAllowlist: ['Master'],
           });
           filter.init();
           expect(filter.replaceText('Can the master outsmart the Master?')).to.equal('Can the outsmart the Master?');
@@ -828,7 +828,7 @@ describe('Filter', () => {
             words: {
               more: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE },
             },
-            wordWhitelist: ['smores'],
+            wordAllowlist: ['smores'],
           });
           filter.init();
           expect(filter.replaceText('Would you like smore smores?')).to.equal('Would you like smores?');
@@ -839,7 +839,7 @@ describe('Filter', () => {
           const filter = new Filter;
           filter.cfg = new Config({
             filterMethod: Constants.FILTER_METHODS.REMOVE,
-            iWordWhitelist: ['pie'],
+            iWordAllowlist: ['pie'],
             words: {
               pie: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'cake' },
             },

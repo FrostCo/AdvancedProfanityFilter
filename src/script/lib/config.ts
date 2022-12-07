@@ -9,7 +9,7 @@ export default class Config {
   defaultWordSeparators: number;
   filterMethod: number;
   filterWordList: boolean;
-  iWordWhitelist: string[];
+  iWordAllowlist: string[];
   loggingLevel: number;
   preserveCase: boolean;
   preserveFirst: boolean;
@@ -22,7 +22,7 @@ export default class Config {
   wordlistsEnabled: boolean;
   words: { [key: string]: WordOptions };
   wordSubSeparator: string;
-  wordWhitelist: string[];
+  wordAllowlist: string[];
 
   static readonly _allWordlists = ['All words'];
 
@@ -35,7 +35,7 @@ export default class Config {
     defaultWordSeparators: Constants.FALSE,
     filterMethod: Constants.FILTER_METHODS.SUBSTITUTE,
     filterWordList: true,
-    iWordWhitelist: [],
+    iWordAllowlist: [],
     loggingLevel: Constants.LOGGING_LEVELS.WARN,
     preserveCase: true,
     preserveFirst: true,
@@ -47,7 +47,7 @@ export default class Config {
     wordlists: ['Wordlist 1', 'Wordlist 2', 'Wordlist 3', 'Wordlist 4', 'Wordlist 5', 'Wordlist 6'],
     wordlistsEnabled: true,
     wordSubSeparator: ';;',
-    wordWhitelist: [],
+    wordAllowlist: [],
   };
 
   static readonly _defaultWords: { [key: string]: WordOptions } = {
