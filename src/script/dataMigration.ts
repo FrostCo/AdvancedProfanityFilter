@@ -18,6 +18,7 @@ export default class DataMigration {
     { version: '2.12.0', name: 'overwriteMuteCueRequireShowingDefault', runOnImport: false },
     { version: '2.22.0', name: 'updateWordRepeatAndSeparatorDataTypes', runOnImport: true },
     { version: '2.26.0', name: 'changeShowUpdateNotificationDefaultToFalse', runOnImport: false },
+    { version: '2.40.0', name: 'renameToWordAllowlist', runOnImport: true },
   ];
 
   constructor(config) {
@@ -137,6 +138,29 @@ export default class DataMigration {
       }
       delete cfg[propToDelete];
     });
+  }
+
+  // [2.40.0]
+  renameToWordAllowlist() {
+    const cfg = this.cfg as any;
+    if (cfg.iWordWhitelist || cfg.wordWhitelist) {
+      if (!cfg.iWordWhitelist) cfg.iWordWhitelist = [];
+      if (!cfg.wordWhitelist) cfg.wordWhitelist = [];
+
+      if (!cfg.wordAllowlist || cfg.wordAllowlist.length == 0) {
+        cfg.wordAllowlist = cfg.wordWhitelist;
+        delete cfg.wordWhitelist;
+      } else {
+        throw new Error('wordAllowlist and wordWhitelist both exist. Please combine them manually into wordAllowlist.');
+      }
+
+      if (!cfg.iWordAllowlist || cfg.iWordAllowlist.length == 0) {
+        cfg.iWordAllowlist = cfg.iWordWhitelist;
+        delete cfg.iWordWhitelist;
+      } else {
+        throw new Error('iWordAllowlist and iWordWhitelist both exist. Please combine them manually into iWordAllowlist.');
+      }
+    }
   }
 
   runImportMigrations() {
