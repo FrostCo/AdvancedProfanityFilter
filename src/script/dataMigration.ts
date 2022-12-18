@@ -18,7 +18,7 @@ export default class DataMigration {
     { version: '2.12.0', name: 'overwriteMuteCueRequireShowingDefault', runOnImport: false },
     { version: '2.22.0', name: 'updateWordRepeatAndSeparatorDataTypes', runOnImport: true },
     { version: '2.26.0', name: 'changeShowUpdateNotificationDefaultToFalse', runOnImport: false },
-    { version: '2.40.0', name: 'renameToWordAllowlist', runOnImport: true },
+    { version: '2.40.0', name: 'renameToWordAllowlist', runOnImport: true, async: true },
   ];
 
   constructor(config) {
@@ -36,6 +36,18 @@ export default class DataMigration {
 
   static migrationNeeded(oldVersion: string): boolean {
     return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.latestMigration().version));
+  }
+
+  // TODO: Only tested with arrays
+  _renameConfigKeys(oldCfg, oldKeys, mapping) {
+    for (const oldKey of oldKeys) {
+      const newKey = mapping[oldKey];
+      if (!oldCfg[oldKey]) oldCfg[oldKey] = WebConfig._defaults[newKey];
+      if (oldCfg[oldKey].length) {
+        if (this.cfg[newKey].length) throw new Error(`'${oldKey}' and '${newKey}' both exist. Please combine them manually into '${newKey}'.`);
+        this.cfg[newKey] = oldCfg[oldKey];
+      }
+    }
   }
 
   // [2.7.0]
@@ -138,26 +150,21 @@ export default class DataMigration {
   }
 
   // [2.40.0]
-  renameToWordAllowlist() {
-    const cfg = this.cfg as any;
-    if (cfg.iWordWhitelist || cfg.wordWhitelist) {
-      if (!cfg.iWordWhitelist) cfg.iWordWhitelist = [];
-      if (!cfg.wordWhitelist) cfg.wordWhitelist = [];
+  async renameToWordAllowlist() {
+    const mapping = { iWordWhitelist: 'iWordAllowlist', wordWhitelist: 'wordAllowlist' };
+    const oldKeys = Object.keys(mapping);
 
-      if (!cfg.wordAllowlist || cfg.wordAllowlist.length == 0) {
-        cfg.wordAllowlist = cfg.wordWhitelist;
-        delete cfg.wordWhitelist;
-      } else {
-        throw new Error('wordAllowlist and wordWhitelist both exist. Please combine them manually into wordAllowlist.');
-      }
-
-      if (!cfg.iWordAllowlist || cfg.iWordAllowlist.length == 0) {
-        cfg.iWordAllowlist = cfg.iWordWhitelist;
-        delete cfg.iWordWhitelist;
-      } else {
-        throw new Error('iWordAllowlist and iWordWhitelist both exist. Please combine them manually into iWordAllowlist.');
+    // Handle chrome storage config
+    if (WebConfig.chromeStorageAvailable()) {
+      const oldCfg = await WebConfig.getSyncStorage(oldKeys) as any;
+      if (Object.keys(oldCfg).some(k => oldKeys.includes(k))) {
+        this._renameConfigKeys(oldCfg, oldKeys, mapping);
+        await WebConfig.removeSyncStorage(oldKeys);
       }
     }
+
+    // Handle importing config
+    this._renameConfigKeys(this.cfg, oldKeys, mapping);
   }
 
   async runImportMigrations() {
