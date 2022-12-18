@@ -730,7 +730,7 @@ export default class OptionPage {
     try {
       const importedCfg = new WebConfig(JSON.parse(cfg));
       const migration = new DataMigration(importedCfg);
-      migration.runImportMigrations();
+      await migration.runImportMigrations();
       const resetSuccess = await this.restoreDefaults(true);
       if (resetSuccess) {
         try {

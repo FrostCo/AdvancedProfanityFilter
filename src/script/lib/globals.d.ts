@@ -126,6 +126,7 @@ interface Message {
 }
 
 interface Migration {
+  async?: boolean;
   name: string;
   runOnImport: boolean;
   version: string;

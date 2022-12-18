@@ -50,15 +50,16 @@ export default class DataMigration {
   }
 
   // This will look at the version (from before the update) and perform data migrations if necessary
-  byVersion(oldVersion: string) {
+  async byVersion(oldVersion: string) {
     const version = getVersion(oldVersion) as Version;
     let migrated = false;
-    DataMigration.migrations.forEach((migration) => {
+    for (const migration of DataMigration.migrations) {
       if (isVersionOlder(version, getVersion(migration.version))) {
         migrated = true;
-        this[migration.name]();
+        if (migration.async) await this[migration.name]();
+        else this[migration.name]();
       }
-    });
+    }
 
     return migrated;
   }
@@ -163,14 +164,16 @@ export default class DataMigration {
     }
   }
 
-  runImportMigrations() {
+  async runImportMigrations() {
     let migrated = false;
-    DataMigration.migrations.forEach((migration) => {
+
+    for (const migration of DataMigration.migrations) {
       if (migration.runOnImport) {
         migrated = true;
-        this[migration.name]();
+        if (migration.async) await this[migration.name]();
+        else this[migration.name]();
       }
-    });
+    }
 
     return migrated;
   }

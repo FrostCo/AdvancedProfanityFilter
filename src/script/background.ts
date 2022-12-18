@@ -313,7 +313,7 @@ async function runUpdateMigrations(previousVersion) {
   if (DataMigration.migrationNeeded(previousVersion)) {
     const cfg = await WebConfig.load();
     const migration = new DataMigration(cfg);
-    const migrated = migration.byVersion(previousVersion);
+    const migrated = await migration.byVersion(previousVersion);
     if (migrated) cfg.save();
   }
 }
