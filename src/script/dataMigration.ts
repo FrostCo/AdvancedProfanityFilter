@@ -7,7 +7,7 @@ export default class DataMigration {
 
   // Only append so the order stays the same (oldest first).
   static readonly migrations: Migration[] = [
-    { version: '1.0.13', name: 'moveToNewWordsStorage', runOnImport: false },
+    { version: '1.0.13', name: 'moveToNewWordsStorage', runOnImport: false, async: true },
     { version: '1.1.0', name: 'sanitizeWords', runOnImport: true },
     { version: '1.2.0', name: 'singleWordSubstitution', runOnImport: true },
     { version: '2.1.4', name: 'updateDefaultSubs', runOnImport: false },
@@ -86,17 +86,13 @@ export default class DataMigration {
   }
 
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
-  moveToNewWordsStorage() {
-    chrome.storage.sync.get({ 'words': null }, (oldWords) => {
-      if (oldWords.words) {
-        chrome.storage.sync.set({ '_words0': oldWords.words }, () => {
-          if (!chrome.runtime.lastError) {
-            // Remove old words
-            chrome.storage.sync.remove('words');
-          }
-        });
-      }
-    });
+  async moveToNewWordsStorage() {
+    const oldWordsKey = 'words';
+    const oldCfg = await WebConfig.getSyncStorage(oldWordsKey) as any;
+    if (oldCfg.words) {
+      await WebConfig.saveSyncStorage({ _words0: oldCfg.words });
+      await WebConfig.removeSyncStorage(oldWordsKey);
+    }
   }
 
   // This setting has caused some issues for users specifically with Disney+.
