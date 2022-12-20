@@ -39,7 +39,7 @@ export default class DataMigration {
   }
 
   // TODO: Only tested with arrays
-  _renameConfigKeys(oldCfg, oldKeys, mapping) {
+  _renameConfigKeys(oldCfg: WebConfig, oldKeys: string[], mapping: {[key: string]: string}) {
     for (const oldKey of oldKeys) {
       const newKey = mapping[oldKey];
       if (!oldCfg[oldKey]) oldCfg[oldKey] = WebConfig._defaults[newKey];
