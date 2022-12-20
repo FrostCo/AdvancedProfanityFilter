@@ -4,6 +4,27 @@ import DataMigration from './built/dataMigration';
 import WebConfig from './built/webConfig';
 
 describe('DataMigration', function() {
+  describe('_renameConfigKeys()', function() {
+    it('should migrate to allowlists', function() {
+      const cfg = {
+        iWordAllowlist: WebConfig._defaults.iWordAllowlist,
+        wordAllowlist: WebConfig._defaults.wordAllowlist,
+      };
+      const oldCfg = {
+        iWordWhitelist: ['ALLCAPS', 'LOUD NOISES'],
+        wordWhitelist: ['allowed'],
+      };
+      const mapping = { iWordWhitelist: 'iWordAllowlist', wordWhitelist: 'wordAllowlist' };
+      const oldKeys = Object.keys(mapping);
+      const dataMigration = new DataMigration(cfg);
+      dataMigration._renameConfigKeys(oldCfg, oldKeys, mapping);
+      expect(cfg.iWordAllowlist.length).to.equal(2);
+      expect(cfg.wordAllowlist.length).to.equal(1);
+      expect(cfg.iWordAllowlist[0]).to.equal('ALLCAPS');
+      expect(cfg.wordAllowlist[0]).to.equal('allowed');
+    });
+  });
+
   // 2.7.0
   describe('addWordlistsToWords()', function() {
     it('should add wordlist to all words', function() {
