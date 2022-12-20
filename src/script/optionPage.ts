@@ -674,6 +674,26 @@ export default class OptionPage {
     }
   }
 
+  async filterWordListUpdate() {
+    const filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
+    const wordList = document.getElementById('wordList') as HTMLSelectElement;
+    this.cfg.filterWordList = filterWordList.checked;
+    const selectedWord = wordList.value;
+
+    try {
+      await this.cfg.save('filterWordList');
+      this.populateWordPage();
+
+      if (selectedWord) {
+        wordList.value = selectedWord;
+        this.populateWord();
+      }
+    } catch (err) {
+      OptionPage.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
+      return false;
+    }
+  }
+
   importConfig() {
     const input = document.getElementById('configInlineInput') as HTMLInputElement;
     if (input.checked) { // inline editor
@@ -1451,7 +1471,6 @@ export default class OptionPage {
     const showCounter = document.getElementById('showCounter') as HTMLInputElement;
     const showSummary = document.getElementById('showSummary') as HTMLInputElement;
     const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
-    const filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     const substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     const domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
@@ -1477,7 +1496,6 @@ export default class OptionPage {
     this.cfg.showCounter = showCounter.checked;
     this.cfg.showSummary = showSummary.checked;
     this.cfg.showUpdateNotification = showUpdateNotification.checked;
-    this.cfg.filterWordList = filterWordList.checked;
     this.cfg.substitutionMark = substitutionMark.checked;
     this.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
     this.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
@@ -1958,7 +1976,7 @@ document.getElementById('showContextMenu').addEventListener('click', (evt) => { 
 document.getElementById('showCounter').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('showSummary').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('showUpdateNotification').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('filterWordList').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('filterWordList').addEventListener('click', (evt) => { option.filterWordListUpdate(); });
 document.getElementById('substitutionMark').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('defaultWordSubstitutionText').addEventListener('change', (evt) => { option.saveOptions(); });
 // Words/Phrases
