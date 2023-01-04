@@ -71,7 +71,7 @@ export default class Word {
     this.matchMethod = options.matchMethod === undefined ? cfg.defaultWordMatchMethod : options.matchMethod;
     this.matchRepeated = options.repeat === undefined ? cfg.defaultWordRepeat : options.repeat;
     this.matchSeparators = options.separators === undefined ? cfg.defaultWordSeparators : options.separators;
-    this.sub = options.sub === undefined ? cfg.defaultSubstitution : options.sub;
+    this.sub = options.sub || cfg.defaultSubstitution;
     this._filterMethod = options._filterMethod === undefined ? cfg.filterMethod : options._filterMethod;
     this.unicode = Word.containsDoubleByte(word);
     this.escaped = this.matchMethod === Constants.MATCH_METHODS.REGEX ? this.value : Word.escapeRegExp(this.value); // Don't escape a RegExp
