@@ -2,6 +2,7 @@ import Constants from './constants';
 import Word from './word';
 import Wordlist from './wordlist';
 import Config from './config';
+import { randomArrayElement } from './helper';
 
 export default class Filter {
   cfg: Config;
@@ -140,7 +141,7 @@ export default class Filter {
             const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
             if (this.checkWhitelist(match, string, matchStartIndex, word)) { return match; } // Check for whitelisted match
             if (statsType) { this.foundMatch(word, statsType); }
-            let sub = word.sub;
+            let sub = this.shuffleSubstitution(word.subs);
 
             // Support backreferences for REGEX match method (only checks for 1 capture group)
             if (word.matchMethod == Constants.MATCH_METHODS.REGEX && captureGroups.length && word.sub.includes('\\1')) {
@@ -219,5 +220,9 @@ export default class Filter {
     };
     result.modified = (result.filtered != str);
     return result;
+  }
+
+  shuffleSubstitution(subs: string[]): string {
+    return randomArrayElement(subs);
   }
 }

@@ -21,6 +21,7 @@ export default class Config {
   wordlists: string[];
   wordlistsEnabled: boolean;
   words: { [key: string]: WordOptions };
+  wordSubSeparator: string;
   wordWhitelist: string[];
 
   static readonly _allWordlists = ['All words'];
@@ -45,6 +46,7 @@ export default class Config {
     wordlistId: 0,
     wordlists: ['Wordlist 1', 'Wordlist 2', 'Wordlist 3', 'Wordlist 4', 'Wordlist 5', 'Wordlist 6'],
     wordlistsEnabled: true,
+    wordSubSeparator: ';;',
     wordWhitelist: [],
   };
 
