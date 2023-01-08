@@ -78,6 +78,7 @@ export const supportedSites: AudioSites = {
     { className: 'ttr-container', mode: 'element', subtitleSelector: 'span.ttr-cue', tagName: 'DIV' },
     { mode: 'cue', videoCueLanguage: 'en', videoSelector: 'video' },
   ],
+  'www.amcplus.com': [{ mode: 'element', subtitleSelector: 'div.vjs-text-track-cue > div', tagName: 'DIV' }],
   'tv.apple.com': [
     {
       apfCaptions: true,
