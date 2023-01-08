@@ -260,6 +260,14 @@ export function prettyPrintArray(array: string[]) {
   return `[${array.toString().replace(/,/g, ', ')}]`;
 }
 
+export function randomArrayElement(array: any[]): string {
+  const length = array.length;
+
+  if (length <= 1) return array[0];
+
+  return array[Math.floor(Math.random() * length)];
+}
+
 export function readFile(file) {
   return new Promise((resolve, reject) => {
     const fr = new FileReader();

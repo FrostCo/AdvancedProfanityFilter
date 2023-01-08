@@ -580,6 +580,25 @@ describe('Filter', () => {
           expect(filter.replaceText('I love to eat P-I-Z-___Z---A!')).to.equal('I love to eat PIE!');
           expect(filter.replaceText('I love to eat P-I-Z_   Z---A!')).to.equal('I love to eat PIE!');
         });
+
+        it('Randomizes substitutions (separated by ";;")', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            filterMethod: Constants.FILTER_METHODS.SUBSTITUTE,
+            words: {
+              fast: { matchMethod: Constants.MATCH_METHODS.PARTIAL, separators: Constants.TRUE, sub: 'rapid;;speedy;;quick' },
+            },
+          });
+          filter.init();
+          const results = new Set();
+          for (let i = 0; i < 100; i++) {
+            if (results.size == 3) break;
+
+            results.add(filter.replaceText('The Flash is really fast!', filter.wordlistId));
+          }
+
+          expect(results.size).to.equal(3);
+        });
       });
 
       describe('RegExp', () => {
