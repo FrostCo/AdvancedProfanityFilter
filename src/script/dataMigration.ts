@@ -7,7 +7,7 @@ export default class DataMigration {
 
   // Only append so the order stays the same (oldest first).
   static readonly migrations: Migration[] = [
-    { version: '1.0.13', name: 'moveToNewWordsStorage', runOnImport: false },
+    { version: '1.0.13', name: 'moveToNewWordsStorage', runOnImport: false, async: true },
     { version: '1.1.0', name: 'sanitizeWords', runOnImport: true },
     { version: '1.2.0', name: 'singleWordSubstitution', runOnImport: true },
     { version: '2.1.4', name: 'updateDefaultSubs', runOnImport: false },
@@ -18,6 +18,7 @@ export default class DataMigration {
     { version: '2.12.0', name: 'overwriteMuteCueRequireShowingDefault', runOnImport: false },
     { version: '2.22.0', name: 'updateWordRepeatAndSeparatorDataTypes', runOnImport: true },
     { version: '2.26.0', name: 'changeShowUpdateNotificationDefaultToFalse', runOnImport: false },
+    { version: '2.40.0', name: 'renameToWordAllowlist', runOnImport: true, async: true },
   ];
 
   constructor(config) {
@@ -37,6 +38,18 @@ export default class DataMigration {
     return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.latestMigration().version));
   }
 
+  // TODO: Only tested with arrays
+  _renameConfigKeys(oldCfg: WebConfig, oldKeys: string[], mapping: {[key: string]: string}) {
+    for (const oldKey of oldKeys) {
+      const newKey = mapping[oldKey];
+      if (!oldCfg[oldKey]) oldCfg[oldKey] = WebConfig._defaults[newKey];
+      if (oldCfg[oldKey].length) {
+        if (this.cfg[newKey].length) throw new Error(`'${oldKey}' and '${newKey}' both exist. Please combine them manually into '${newKey}'.`);
+        this.cfg[newKey] = oldCfg[oldKey];
+      }
+    }
+  }
+
   // [2.7.0]
   addWordlistsToWords() {
     const cfg = this.cfg as WebConfig;
@@ -49,15 +62,16 @@ export default class DataMigration {
   }
 
   // This will look at the version (from before the update) and perform data migrations if necessary
-  byVersion(oldVersion: string) {
+  async byVersion(oldVersion: string) {
     const version = getVersion(oldVersion) as Version;
     let migrated = false;
-    DataMigration.migrations.forEach((migration) => {
+    for (const migration of DataMigration.migrations) {
       if (isVersionOlder(version, getVersion(migration.version))) {
         migrated = true;
-        this[migration.name]();
+        if (migration.async) await this[migration.name]();
+        else this[migration.name]();
       }
-    });
+    }
 
     return migrated;
   }
@@ -84,17 +98,13 @@ export default class DataMigration {
   }
 
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
-  moveToNewWordsStorage() {
-    chrome.storage.sync.get({ 'words': null }, (oldWords) => {
-      if (oldWords.words) {
-        chrome.storage.sync.set({ '_words0': oldWords.words }, () => {
-          if (!chrome.runtime.lastError) {
-            // Remove old words
-            chrome.storage.sync.remove('words');
-          }
-        });
-      }
-    });
+  async moveToNewWordsStorage() {
+    const oldWordsKey = 'words';
+    const oldCfg = await WebConfig.getSyncStorage(oldWordsKey) as any;
+    if (oldCfg.words) {
+      await WebConfig.saveSyncStorage({ _words0: oldCfg.words });
+      await WebConfig.removeSyncStorage(oldWordsKey);
+    }
   }
 
   // This setting has caused some issues for users specifically with Disney+.
@@ -139,14 +149,34 @@ export default class DataMigration {
     });
   }
 
-  runImportMigrations() {
+  // [2.40.0]
+  async renameToWordAllowlist() {
+    const mapping = { iWordWhitelist: 'iWordAllowlist', wordWhitelist: 'wordAllowlist' };
+    const oldKeys = Object.keys(mapping);
+
+    // Handle chrome storage config
+    if (WebConfig.chromeStorageAvailable()) {
+      const oldCfg = await WebConfig.getSyncStorage(oldKeys) as any;
+      if (Object.keys(oldCfg).some(k => oldKeys.includes(k))) {
+        this._renameConfigKeys(oldCfg, oldKeys, mapping);
+        await WebConfig.removeSyncStorage(oldKeys);
+      }
+    }
+
+    // Handle importing config
+    this._renameConfigKeys(this.cfg, oldKeys, mapping);
+  }
+
+  async runImportMigrations() {
     let migrated = false;
-    DataMigration.migrations.forEach((migration) => {
+
+    for (const migration of DataMigration.migrations) {
       if (migration.runOnImport) {
         migrated = true;
-        this[migration.name]();
+        if (migration.async) await this[migration.name]();
+        else this[migration.name]();
       }
-    });
+    }
 
     return migrated;
   }

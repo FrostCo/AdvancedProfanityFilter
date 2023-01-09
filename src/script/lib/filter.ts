@@ -5,17 +5,17 @@ import Config from './config';
 import { randomArrayElement } from './helper';
 
 export default class Filter {
+  allowlist: string[];
   cfg: Config;
   counter: number;
-  iWhitelist: string[];
-  whitelist: string[];
+  iAllowlist: string[];
   wordlistId: number;
   wordlists: { [name: string]: Wordlist };
 
   constructor() {
+    this.allowlist = [];
     this.counter = 0;
-    this.iWhitelist = [];
-    this.whitelist = [];
+    this.iAllowlist = [];
     this.wordlists = {};
   }
 
@@ -30,18 +30,18 @@ export default class Filter {
     return wordlistId;
   }
 
-  checkWhitelist(match: string, string: string, matchStartIndex: number, word: Word): boolean {
-    const whitelistLength = this.whitelist.length;
-    const iWhitelistLength = this.iWhitelist.length;
+  checkAllowlist(match: string, string: string, matchStartIndex: number, word: Word): boolean {
+    const allowlistLength = this.allowlist.length;
+    const iAllowlistLength = this.iAllowlist.length;
 
-    if (whitelistLength || iWhitelistLength) {
+    if (allowlistLength || iAllowlistLength) {
       // Check for exact/whole match (match case)
-      if (whitelistLength && this.whitelist.includes(match)) { return true; }
+      if (allowlistLength && this.allowlist.includes(match)) { return true; }
 
       // Check for exact/whole match (case insensitive)
-      if (iWhitelistLength && this.iWhitelist.includes(match.toLowerCase())) { return true; }
+      if (iAllowlistLength && this.iAllowlist.includes(match.toLowerCase())) { return true; }
 
-      // Check for partial match (match may not contain the full whitelisted word)
+      // Check for partial match (match may not contain the full allowlisted word)
       if (word.matchMethod === Constants.MATCH_METHODS.PARTIAL) {
         const wordOptions: WordOptions = {
           matchMethod: Constants.MATCH_METHODS.WHOLE,
@@ -60,8 +60,8 @@ export default class Filter {
             resultIndex <= matchStartIndex
             && (resultIndex + resultMatch.length) >= (matchStartIndex + match.length)
           ) {
-            if (whitelistLength && this.whitelist.includes(resultMatch)) { return true; }
-            if (iWhitelistLength && this.iWhitelist.includes(resultMatch.toLowerCase())) { return true; }
+            if (allowlistLength && this.allowlist.includes(resultMatch)) { return true; }
+            if (iAllowlistLength && this.iAllowlist.includes(resultMatch.toLowerCase())) { return true; }
           }
         }
       }
@@ -75,8 +75,8 @@ export default class Filter {
   }
 
   init(wordlistId: number | false = false) {
-    this.iWhitelist = this.cfg.iWordWhitelist;
-    this.whitelist = this.cfg.wordWhitelist;
+    this.iAllowlist = this.cfg.iWordAllowlist;
+    this.allowlist = this.cfg.wordAllowlist;
     if (this.wordlistId === undefined) { this.wordlistId = this.cfg.wordlistId == null ? Constants.ALL_WORDS_WORDLIST_ID : this.cfg.wordlistId; }
     this.buildWordlist(wordlistId);
   }
@@ -113,7 +113,7 @@ export default class Filter {
         wordlist.regExps.forEach((regExp, index) => {
           str = str.replace(regExp, (originalMatch, ...args): string => {
             const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
-            if (this.checkWhitelist(match, string, matchStartIndex, word)) { return match; } // Check for whitelisted match
+            if (this.checkAllowlist(match, string, matchStartIndex, word)) { return match; } // Check for allowlisted match
             if (statsType) { this.foundMatch(word, statsType); }
 
             // Filter
@@ -139,7 +139,7 @@ export default class Filter {
         wordlist.regExps.forEach((regExp, index) => {
           str = str.replace(regExp, (originalMatch, ...args): string => {
             const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
-            if (this.checkWhitelist(match, string, matchStartIndex, word)) { return match; } // Check for whitelisted match
+            if (this.checkAllowlist(match, string, matchStartIndex, word)) { return match; } // Check for allowlisted match
             if (statsType) { this.foundMatch(word, statsType); }
             let sub = this.shuffleSubstitution(word.subs);
 
@@ -184,7 +184,7 @@ export default class Filter {
         wordlist.regExps.forEach((regExp, index) => {
           str = str.replace(regExp, (originalMatch, ...args): string => {
             const { word, string, match, matchStartIndex, captureGroups, internalCaptureGroups } = this.matchData(wordlist, index, originalMatch, args);
-            if (this.checkWhitelist(match.trim(), string, matchStartIndex, word)) { return match; } // Check for whitelisted match
+            if (this.checkAllowlist(match.trim(), string, matchStartIndex, word)) { return match; } // Check for allowlisted match
             if (statsType) { this.foundMatch(word, statsType); }
 
             // Filter

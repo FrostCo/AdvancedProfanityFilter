@@ -730,7 +730,7 @@ export default class OptionPage {
     try {
       const importedCfg = new WebConfig(JSON.parse(cfg));
       const migration = new DataMigration(importedCfg);
-      migration.runImportMigrations();
+      await migration.runImportMigrations();
       const resetSuccess = await this.restoreDefaults(true);
       if (resetSuccess) {
         try {
@@ -935,7 +935,7 @@ export default class OptionPage {
   populateOptions() {
     this.populateSettings();
     this.populateWordPage();
-    this.populateWhitelist();
+    this.populateAllowlist();
     this.populateWordlists();
     this.populateDomainPage();
     this.populateAudio();
@@ -1080,42 +1080,42 @@ export default class OptionPage {
     }
   }
 
-  populateWhitelist() {
+  populateAllowlist() {
     const regExp = RegExp(' [*]$');
-    const sensitiveList = filter.cfg.wordWhitelist.map((item) => { return item + ' *'; });
-    const list = [].concat(sensitiveList, filter.cfg.iWordWhitelist).sort();
-    const whitelist = document.getElementById('whitelist') as HTMLSelectElement;
-    removeChildren(whitelist);
+    const sensitiveList = filter.cfg.wordAllowlist.map((item) => { return item + ' *'; });
+    const list = [].concat(sensitiveList, filter.cfg.iWordAllowlist).sort();
+    const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
+    removeChildren(allowlist);
     list.unshift('Add, or update existing...');
     list.forEach((item) => {
       const optionElement = document.createElement('option');
       optionElement.value = item === list[0] ? '' : item.replace(regExp, '');
       optionElement.dataset.sensitive = regExp.test(item).toString();
       optionElement.textContent = item;
-      whitelist.appendChild(optionElement);
+      allowlist.appendChild(optionElement);
     });
-    this.populateWhitelistWord();
+    this.populateAllowlistWord();
   }
 
-  populateWhitelistWord() {
-    const whitelist = document.getElementById('whitelist') as HTMLSelectElement;
-    const whitelistRemove = document.getElementById('whitelistRemove') as HTMLInputElement;
-    const whitelistText = document.getElementById('whitelistText') as HTMLInputElement;
-    const selected = whitelist.selectedOptions[0];
+  populateAllowlistWord() {
+    const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
+    const allowlistRemove = document.getElementById('allowlistRemove') as HTMLInputElement;
+    const allowlistText = document.getElementById('allowlistText') as HTMLInputElement;
+    const selected = allowlist.selectedOptions[0];
 
     if (selected.value == '') { // New word
-      whitelistText.value = '';
-      OptionPage.disableBtn(whitelistRemove);
+      allowlistText.value = '';
+      OptionPage.disableBtn(allowlistRemove);
 
       // Default to case-insensitive
-      const whitelistCase = document.getElementById('whitelistInsensitive') as HTMLInputElement;
-      whitelistCase.checked = true;
+      const allowlistCase = document.getElementById('allowlistInsensitive') as HTMLInputElement;
+      allowlistCase.checked = true;
     } else {
-      whitelistText.value = selected.value;
-      const caseId = selected.dataset.sensitive === 'true' ? 'whitelistSensitive' : 'whitelistInsensitive';
-      const whitelistCase = document.getElementById(caseId) as HTMLInputElement;
-      whitelistCase.checked = true;
-      OptionPage.enableBtn(whitelistRemove);
+      allowlistText.value = selected.value;
+      const caseId = selected.dataset.sensitive === 'true' ? 'allowlistSensitive' : 'allowlistInsensitive';
+      const allowlistCase = document.getElementById(caseId) as HTMLInputElement;
+      allowlistCase.checked = true;
+      OptionPage.enableBtn(allowlistRemove);
     }
   }
 
@@ -1317,12 +1317,12 @@ export default class OptionPage {
     this.populateOptions();
   }
 
-  async removeWhitelist() {
-    const whitelist = document.getElementById('whitelist') as HTMLSelectElement;
-    const selected = whitelist.selectedOptions[0];
+  async removeAllowlist() {
+    const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
+    const selected = allowlist.selectedOptions[0];
     const originalWord = selected.value;
     const originalCase = selected.dataset.sensitive === 'true' ? 'sensitive': 'insensitive';
-    const originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
+    const originalListName = originalCase === 'sensitive' ? 'wordAllowlist' : 'iWordAllowlist';
     this.cfg[originalListName] = removeFromArray(this.cfg[originalListName], originalWord);
 
     try {
@@ -1330,8 +1330,8 @@ export default class OptionPage {
       filter.init();
       this.populateOptions();
     } catch (err) {
-      logger.warn(`Failed to remove '${originalWord}' from whitelist.`, err);
-      OptionPage.showErrorModal([`Failed to remove '${originalWord}' from whitelist.`, `Error: ${err.message}`]);
+      logger.warn(`Failed to remove '${originalWord}' from allowlist.`, err);
+      OptionPage.showErrorModal([`Failed to remove '${originalWord}' from allowlist.`, `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1523,35 +1523,35 @@ export default class OptionPage {
     }
   }
 
-  async saveWhitelist() {
-    const whitelist = document.getElementById('whitelist') as HTMLSelectElement;
-    const selected = whitelist.selectedOptions[0];
-    const selectedCase = document.querySelector('input[name="whitelistCase"]:checked') as HTMLInputElement;
-    const whitelistText = document.getElementById('whitelistText') as HTMLInputElement;
+  async saveAllowlist() {
+    const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
+    const selected = allowlist.selectedOptions[0];
+    const selectedCase = document.querySelector('input[name="allowlistCase"]:checked') as HTMLInputElement;
+    const allowlistText = document.getElementById('allowlistText') as HTMLInputElement;
 
     const propsToSave = [];
     const newCase = selectedCase.value;
-    const newWord = newCase === 'sensitive' ? whitelistText.value : whitelistText.value.toLowerCase();
-    const newListName = newCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
+    const newWord = newCase === 'sensitive' ? allowlistText.value : allowlistText.value.toLowerCase();
+    const newListName = newCase === 'sensitive' ? 'wordAllowlist' : 'iWordAllowlist';
 
-    if (whitelistText.value === '') {
-      OptionPage.showInputError(whitelistText, 'Please enter a valid word/phrase.');
+    if (allowlistText.value === '') {
+      OptionPage.showInputError(allowlistText, 'Please enter a valid word/phrase.');
       return false;
     }
 
     if (this.cfg[newListName].indexOf(newWord) > -1) {
-      OptionPage.showInputError(whitelistText, 'Already whitelisted.');
+      OptionPage.showInputError(allowlistText, 'Already allowlisted.');
       return false;
     }
 
-    if (whitelistText.checkValidity()) {
+    if (allowlistText.checkValidity()) {
       if (selected.value === '') { // New word
         this.cfg[newListName].push(newWord);
         propsToSave.push(newListName);
       } else { // Modifying existing word
         const originalWord = selected.value;
         const originalCase = selected.dataset.sensitive === 'true' ? 'sensitive': 'insensitive';
-        const originalListName = originalCase === 'sensitive' ? 'wordWhitelist' : 'iWordWhitelist';
+        const originalListName = originalCase === 'sensitive' ? 'wordAllowlist' : 'iWordAllowlist';
 
         if ((originalWord != newWord) || (originalCase != newCase)) {
           this.cfg[originalListName] = removeFromArray(this.cfg[originalListName], originalWord);
@@ -1569,13 +1569,13 @@ export default class OptionPage {
           filter.init();
           this.populateOptions();
         } catch (err) {
-          logger.warn('Failed to update whitelist.', err);
-          OptionPage.showErrorModal(['Failed to update whitelist.', `Error: ${err.message}`]);
+          logger.warn('Failed to update allowlist.', err);
+          OptionPage.showErrorModal(['Failed to update allowlist.', `Error: ${err.message}`]);
           return false;
         }
       }
     } else {
-      OptionPage.showInputError(whitelistText, 'Please enter a valid word/phrase.');
+      OptionPage.showInputError(allowlistText, 'Please enter a valid word/phrase.');
     }
   }
 
@@ -1988,10 +1988,10 @@ document.getElementById('wordRemove').addEventListener('click', (evt) => { optio
 document.getElementById('wordRemoveAll').addEventListener('click', (evt) => { option.confirm('removeAllWords'); });
 document.getElementById('bulkWordEditorButton').addEventListener('click', (evt) => { option.showBulkWordEditor(); });
 // Lists
-document.getElementById('whitelist').addEventListener('change', (evt) => { option.populateWhitelistWord(); });
-document.getElementById('whitelistText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
-document.getElementById('whitelistSave').addEventListener('click', (evt) => { option.saveWhitelist(); });
-document.getElementById('whitelistRemove').addEventListener('click', (evt) => { option.removeWhitelist(); });
+document.getElementById('allowlistSelect').addEventListener('change', (evt) => { option.populateAllowlistWord(); });
+document.getElementById('allowlistText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
+document.getElementById('allowlistSave').addEventListener('click', (evt) => { option.saveAllowlist(); });
+document.getElementById('allowlistRemove').addEventListener('click', (evt) => { option.removeAllowlist(); });
 document.getElementById('wordlistsEnabled').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('wordlistRename').addEventListener('click', (evt) => { option.renameWordlist(); });
 document.getElementById('wordlistSelect').addEventListener('change', (evt) => { option.populateWordlist(); });

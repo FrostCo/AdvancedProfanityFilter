@@ -126,9 +126,10 @@ interface Message {
 }
 
 interface Migration {
-  version: string;
+  async?: boolean;
   name: string;
   runOnImport: boolean;
+  version: string;
 }
 
 interface ParsedSubOptions {
@@ -138,9 +139,9 @@ interface ParsedSubOptions {
 }
 
 interface ReplaceTextResult {
-  original: string;
   filtered: string;
   modified: boolean;
+  original: string;
 }
 
 interface Statistics {
@@ -157,9 +158,9 @@ interface Summary {
 }
 
 interface TabStorageOptions {
-  id?: number;
   disabled?: boolean;
   disabledOnce?: boolean;
+  id?: number;
   registeredAt?: number;
   status?: number;
 }
