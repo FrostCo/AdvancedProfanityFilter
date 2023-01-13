@@ -345,3 +345,4 @@ if (typeof window !== 'undefined') {
 
   filter.cleanPage();
 }
+/* @preserve - Advanced Profanity Filter by Richard Frost (FrostCo) */
