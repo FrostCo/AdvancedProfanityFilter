@@ -4,7 +4,7 @@ import path from 'path';
 import { marked } from 'marked';
 import download from 'download';
 
-const readmeURI = 'https://raw.githubusercontent.com/wiki/richardfrost/AdvancedProfanityFilter/Home.md';
+const readmeURI = 'https://raw.githubusercontent.com/wiki/FrostCo/AdvancedProfanityFilter/Home.md';
 const optionPage = path.join('src/static', 'optionPage.html');
 const optionPageHTML = fse.readFileSync(optionPage).toString();
 const prefix = '<div id="helpContainer">';

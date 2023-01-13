@@ -11,7 +11,7 @@ APF is not limited to filtering text alone! With the use of captions and subtitl
 language filter,profanity filter,family friendly,safari extension
 
 ### Support URL
-https://github.com/richardfrost/AdvancedProfanityFilter/issues
+https://github.com/FrostCo/AdvancedProfanityFilter/issues
 
 ### Copyright
 FrostCo LLC

@@ -5,7 +5,7 @@
   "node": "^12.20.0 || ^14.13.1 || >=16.0.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/richardfrost/AdvancedProfanityFilter.git"
+    "url": "git+https://github.com/FrostCo/AdvancedProfanityFilter.git"
   },
   "keywords": [
     "Profanity",
@@ -14,9 +14,9 @@
   "author": "Richard Frost",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
-    "url": "https://github.com/richardfrost/AdvancedProfanityFilter/issues"
+    "url": "https://github.com/FrostCo/AdvancedProfanityFilter/issues"
   },
-  "homepage": "https://github.com/richardfrost/AdvancedProfanityFilter#readme",
+  "homepage": "https://github.com/FrostCo/AdvancedProfanityFilter#readme",
   "scripts": {
     "build:edge": "node bin/prebuild.mjs --edgeLegacy && npm run build",
     "build:firefox": "node bin/prebuild.mjs --firefox && npm run build",

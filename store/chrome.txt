@@ -5,6 +5,6 @@ APF is not limited to filtering text alone! With the use of captions and subtitl
 
 For a detailed overview of the features and settings, please see the Getting Started page here:
 
-https://github.com/richardfrost/AdvancedProfanityFilter/wiki
+https://github.com/FrostCo/AdvancedProfanityFilter/wiki
 
 Thank you for supporting the ongoing development of this project.

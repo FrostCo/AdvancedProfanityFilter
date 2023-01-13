@@ -7,7 +7,7 @@
 
 A browser extension to filter profanity from webpages.
 
-For an overview of features and options, please head to the [wiki](https://github.com/richardfrost/AdvancedProfanityFilter/wiki).
+For an overview of features and options, please head to the [wiki](https://github.com/FrostCo/AdvancedProfanityFilter/wiki).
 
 ## Installation
 | Browser | Download |
@@ -17,9 +17,9 @@ For an overview of features and options, please head to the [wiki](https://githu
 | Edge    | [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/lhnbdlbhcokmgpjenkjolnhdnkphnkam) |
 | Safari  | [App Store](https://apps.apple.com/app/advanced-profanity-filter/id1593810102) |
 | Opera   | [Opera addons](https://addons.opera.com/en/extensions/details/advanced-profanity-filter/) |
-| Android | [Kiwi](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser) or [Firefox](https://github.com/richardfrost/AdvancedProfanityFilter/issues/243#issuecomment-726218625) |
-| Other   | [Bookmarklet Info](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Bookmarklet) |
-| TV Cast | [Instructions](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio#watch-on-tv) - [Discussion](https://github.com/richardfrost/AdvancedProfanityFilter/issues/206) |
+| Android | [Kiwi](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser) or [Firefox](https://github.com/FrostCo/AdvancedProfanityFilter/issues/243#issuecomment-726218625) |
+| Other   | [Bookmarklet Info](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Bookmarklet) |
+| TV Cast | [Instructions](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Audio#watch-on-tv) - [Discussion](https://github.com/FrostCo/AdvancedProfanityFilter/issues/206) |
 
 ## Features
 * Filter modes
@@ -32,7 +32,7 @@ For an overview of features and options, please head to the [wiki](https://githu
     * Pinterest
     * Reddit
     * Twitter
-* [Audio muting](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Audio) for videos on supported sites:
+* [Audio muting](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Audio) for videos on supported sites:
     * Amazon Video
     * Hulu
     * Netflix
@@ -40,16 +40,16 @@ For an overview of features and options, please head to the [wiki](https://githu
     * Vudu
     * YouTube
     * And more! see [all supported sites here](https://apf.frostco.dev/status)
-    * You can even add your own! ([advanced](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site))
+    * You can even add your own! ([advanced](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site))
 
-For a detailed overview of the features and settings, please see the [Getting Started page](https://github.com/richardfrost/AdvancedProfanityFilter/wiki).
+For a detailed overview of the features and settings, please see the [Getting Started page](https://github.com/FrostCo/AdvancedProfanityFilter/wiki).
 
 ## Issues, Suggestions or Feedback?
-* Found a bug? Please open an [issue](https://github.com/richardfrost/AdvancedProfanityFilter/issues/new).
+* Found a bug? Please open an [issue](https://github.com/FrostCo/AdvancedProfanityFilter/issues/new).
 * Have a great idea to improve the project? Want to share some feedback? Head over [here](https://goo.gl/forms/LTqFpJ0mCTsrgGgf2).
 
 ## Beta Testing
-If you would like to help with development, but don't have experience coding, its very helpful to have users test a release candidate before actually publishing it to everyone. If you are interested in testing new versions see [this page](https://github.com/richardfrost/AdvancedProfanityFilter/wiki/Beta-Testing) for more information.
+If you would like to help with development, but don't have experience coding, its very helpful to have users test a release candidate before actually publishing it to everyone. If you are interested in testing new versions see [this page](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Beta-Testing) for more information.
 
 ## Development
 ### Quick Start

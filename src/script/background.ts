@@ -181,7 +181,7 @@ function notificationsOnClick(notificationId: string) {
   switch (notificationId) {
     case 'extensionUpdate':
       chrome.notifications.clear('extensionUpdate');
-      chrome.tabs.create({ url: 'https://github.com/richardfrost/AdvancedProfanityFilter/releases' });
+      chrome.tabs.create({ url: 'https://github.com/FrostCo/AdvancedProfanityFilter/releases' });
       break;
   }
 }

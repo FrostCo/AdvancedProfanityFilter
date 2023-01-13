@@ -1,6 +1,6 @@
 # Contributing
 
-Welcome! Thanks for your interest in helping to make the project better. Before making a contribution, please read through this document fully to be aware of what is expected. If you have any questions, please feel free to open an [issue](https://github.com/richardfrost/AdvancedProfanityFilter/issues/new), or reach out to the community on [Discord](https://discord.com/invite/MpE5Z3f).
+Welcome! Thanks for your interest in helping to make the project better. Before making a contribution, please read through this document fully to be aware of what is expected. If you have any questions, please feel free to open an [issue](https://github.com/FrostCo/AdvancedProfanityFilter/issues/new), or reach out to the community on [Discord](https://discord.com/invite/MpE5Z3f).
 
 Contributions to this project are released to the public under the [project's open source license](LICENSE). By participating in this project you agree to abide by its terms, and agree to donate your contributions to the project.
 
@@ -19,7 +19,7 @@ Please reach out if you have any questions.
 
 ## Code Contributions (Pull Requests)
 
-If you have any substantial changes that you would like to make, please [open an issue](https://github.com/richardfrost/AdvancedProfanityFilter/issues/new) so we can discuss it and avoid any wasted efforts.
+If you have any substantial changes that you would like to make, please [open an issue](https://github.com/FrostCo/AdvancedProfanityFilter/issues/new) so we can discuss it and avoid any wasted efforts.
 
 1. [Fork](https://github.com/github/view_component/fork) and clone the repository
 2. Install Node.js
@@ -28,7 +28,7 @@ If you have any substantial changes that you would like to make, please [open an
 6. Run tests and make sure they are all passing: `npm run test`
 5. Make your changes, add tests (if applicable)
 6. Run tests again to make sure they still pass
-7. Push to your fork and [submit a pull request](https://github.com/richardfrost/AdvancedProfanityFilter/compare)
+7. Push to your fork and [submit a pull request](https://github.com/FrostCo/AdvancedProfanityFilter/compare)
 8. Wait for your pull request to be reviewed, and be willing to answer questions or make adjustments as needed so that it can get merged
 
 Tips for a good review process:
@@ -36,7 +36,7 @@ Tips for a good review process:
 - Keep your change as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, consider submitting them as separate pull requests.
 - Write tests if possible
 - Write a good commit message. This project is aiming to use [gitmoji](https://gitmoji.dev/). For examples, look through the commit history.
-- If you are adding a new feature, please include a section in the pull request with proposed text to be included in the [main wiki page](https://github.com/richardfrost/AdvancedProfanityFilter/wiki).
+- If you are adding a new feature, please include a section in the pull request with proposed text to be included in the [main wiki page](https://github.com/FrostCo/AdvancedProfanityFilter/wiki).
 
 ## Releases
 
