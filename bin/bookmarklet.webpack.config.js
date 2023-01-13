@@ -29,6 +29,9 @@ module.exports = {
   optimization: {
     minimizer: [
       new TerserPlugin({
+        extractComments: {
+          banner: false,
+        },
         terserOptions: {
           ecma: undefined,
           warnings: false,
@@ -37,7 +40,7 @@ module.exports = {
           mangle: true, // Note `mangle.properties` is `false` by default.
           module: false,
           output: {
-            comments: 'some',
+            comments: /@preserve/i,
           },
           toplevel: false,
           nameCache: null,
