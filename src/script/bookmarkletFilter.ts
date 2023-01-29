@@ -114,7 +114,7 @@ export default class BookmarkletFilter extends Filter {
     }
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
 
-    // Remove profanity from the main document and watch for new nodes
+    // Filter text from the main document and watch for new nodes
     this.init();
     this.processNode(document, this.wordlistId);
     this.startObserving(document);

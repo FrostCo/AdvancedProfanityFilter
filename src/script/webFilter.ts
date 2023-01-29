@@ -140,7 +140,7 @@ export default class WebFilter extends Filter {
     this.sendInitState(message);
     this.onMessage();
 
-    // Remove profanity from the main document and watch for new nodes
+    // Filter text from the main document and watch for new nodes
     this.init();
     logger.infoTime('Filter initialized.', this);
     this.processNode(document, this.wordlistId);
