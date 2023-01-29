@@ -50,22 +50,6 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  checkMutationForProfanity(mutation) {
-    mutation.addedNodes.forEach((node) => {
-      if (!Page.isForbiddenNode(node)) {
-        this.processNode(node, this.wordlistId);
-      }
-    });
-
-    if (mutation.target) {
-      if (mutation.target.nodeName === '#text') {
-        this.checkMutationTargetTextForProfanity(mutation);
-      } else if (this.processMutationTarget) {
-        this.processNode(mutation.target, this.wordlistId);
-      }
-    }
-  }
-
   checkMutationTargetTextForProfanity(mutation) {
     if (!Page.isForbiddenNode(mutation.target)) {
       const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
@@ -182,9 +166,25 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
+  processMutation(mutation: MutationRecord) {
+    mutation.addedNodes.forEach((node) => {
+      if (!Page.isForbiddenNode(node)) {
+        this.processNode(node, this.wordlistId);
+      }
+    });
+
+    if (mutation.target) {
+      if (mutation.target.nodeName === '#text') {
+        this.checkMutationTargetTextForProfanity(mutation);
+      } else if (this.processMutationTarget) {
+        this.processNode(mutation.target, this.wordlistId);
+      }
+    }
+  }
+
   processMutations(mutations) {
     mutations.forEach((mutation) => {
-      filter.checkMutationForProfanity(mutation);
+      filter.processMutation(mutation);
     });
   }
 

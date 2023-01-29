@@ -55,26 +55,6 @@ export default class WebFilter extends Filter {
     return Object.assign({ destination: destination, source: Constants.MESSAGING.CONTEXT }, data);
   }
 
-  checkMutationForProfanity(mutation: MutationRecord) {
-    // console.count('[APF] this.checkMutationForProfanity() count'); // Benchmark: Filter
-    // logger.debug('Mutation observed', mutation);
-    mutation.addedNodes.forEach((node) => {
-      if (!Page.isForbiddenNode(node)) {
-        // logger.debug('[APF] Added node(s):', node);
-        this.processNode(node, this.wordlistId);
-      }
-      // else { logger.debug('Forbidden node', node); }
-    });
-
-    if (mutation.target) {
-      if (mutation.target.nodeName === '#text') {
-        this.checkMutationTargetTextForProfanity(mutation);
-      } else if (this.processMutationTarget) {
-        this.processNode(mutation.target, this.wordlistId);
-      }
-    }
-  }
-
   checkMutationTargetTextForProfanity(mutation) {
     // console.count('checkMutationTargetTextForProfanity'); // Benchmark: Filter
     // logger.debug('Process mutation.target', mutation.target, mutation.target.data);
@@ -334,9 +314,29 @@ export default class WebFilter extends Filter {
     });
   }
 
+  processMutation(mutation: MutationRecord) {
+    // console.count('[APF] this.processMutation() count'); // Benchmark: Filter
+    // logger.debug('Mutation observed', mutation);
+    mutation.addedNodes.forEach((node) => {
+      if (!Page.isForbiddenNode(node)) {
+        // logger.debug('[APF] Added node(s):', node);
+        this.processNode(node, this.wordlistId);
+      }
+      // else { logger.debug('Forbidden node', node); }
+    });
+
+    if (mutation.target) {
+      if (mutation.target.nodeName === '#text') {
+        this.checkMutationTargetTextForProfanity(mutation);
+      } else if (this.processMutationTarget) {
+        this.processNode(mutation.target, this.wordlistId);
+      }
+    }
+  }
+
   processMutations(mutations) {
     mutations.forEach((mutation) => {
-      filter.checkMutationForProfanity(mutation);
+      filter.processMutation(mutation);
     });
     filter.updateCounterBadge();
   }
