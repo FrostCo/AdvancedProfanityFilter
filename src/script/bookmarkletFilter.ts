@@ -50,13 +50,6 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  checkMutationTargetTextForProfanity(mutation) {
-    if (!Page.isForbiddenNode(mutation.target)) {
-      const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
-      if (result.modified) { mutation.target.data = result.filtered; }
-    }
-  }
-
   cleanChildNode(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     if (node.nodeName) {
       if (node.textContent && node.textContent.trim() != '') {
@@ -175,10 +168,17 @@ export default class BookmarkletFilter extends Filter {
 
     if (mutation.target) {
       if (mutation.target.nodeName === '#text') {
-        this.checkMutationTargetTextForProfanity(mutation);
+        this.processMutationTargetText(mutation);
       } else if (this.processMutationTarget) {
         this.processNode(mutation.target, this.wordlistId);
       }
+    }
+  }
+
+  processMutationTargetText(mutation) {
+    if (!Page.isForbiddenNode(mutation.target)) {
+      const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
+      if (result.modified) { mutation.target.data = result.filtered; }
     }
   }
 

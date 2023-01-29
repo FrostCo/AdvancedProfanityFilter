@@ -55,16 +55,6 @@ export default class WebFilter extends Filter {
     return Object.assign({ destination: destination, source: Constants.MESSAGING.CONTEXT }, data);
   }
 
-  checkMutationTargetTextForProfanity(mutation) {
-    // console.count('checkMutationTargetTextForProfanity'); // Benchmark: Filter
-    // logger.debug('Process mutation.target', mutation.target, mutation.target.data);
-    if (!Page.isForbiddenNode(mutation.target)) {
-      const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
-      if (result.modified) { mutation.target.data = result.filtered; }
-    }
-    // else { logger.debug('Forbidden mutation.target node', mutation.target); }
-  }
-
   cleanChildNode(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     if (node.nodeName) {
       if (node.textContent && node.textContent.trim() != '') {
@@ -327,11 +317,21 @@ export default class WebFilter extends Filter {
 
     if (mutation.target) {
       if (mutation.target.nodeName === '#text') {
-        this.checkMutationTargetTextForProfanity(mutation);
+        this.processMutationTargetText(mutation);
       } else if (this.processMutationTarget) {
         this.processNode(mutation.target, this.wordlistId);
       }
     }
+  }
+
+  processMutationTargetText(mutation) {
+    // console.count('processMutationTargetText'); // Benchmark: Filter
+    // logger.debug('Process mutation.target', mutation.target, mutation.target.data);
+    if (!Page.isForbiddenNode(mutation.target)) {
+      const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
+      if (result.modified) { mutation.target.data = result.filtered; }
+    }
+    // else { logger.debug('Forbidden mutation.target node', mutation.target); }
   }
 
   processMutations(mutations) {
