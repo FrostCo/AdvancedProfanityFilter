@@ -24,7 +24,6 @@ describe('Domain', function() {
       expect(domain.disabled).to.be.undefined;
       expect(domain.enabled).to.be.undefined;
       expect(domain.wordlist).to.be.undefined;
-      expect(domain.audioList).to.be.undefined;
       expect(domain.cfgKey).to.eq(key);
     });
 
@@ -37,7 +36,6 @@ describe('Domain', function() {
       expect(domain.cfg.disabled).to.be.true;
       expect(domain.enabled).to.be.undefined;
       expect(domain.wordlist).to.be.undefined;
-      expect(domain.audioList).to.be.undefined;
       expect(domain.cfgKey).to.eq(key);
     });
 
@@ -49,7 +47,6 @@ describe('Domain', function() {
       expect(domain.disabled).to.be.undefined;
       expect(domain.enabled).to.be.undefined;
       expect(domain.wordlist).to.be.undefined;
-      expect(domain.audioList).to.be.undefined;
       expect(domain.cfgKey).to.eq(key);
     });
   });
@@ -63,7 +60,6 @@ describe('Domain', function() {
       expect(domain.disabled).to.be.undefined;
       expect(domain.enabled).to.be.undefined;
       expect(domain.wordlist).to.be.undefined;
-      expect(domain.audioList).to.be.undefined;
       expect(domain.cfgKey).to.eq(hostname);
     });
 
@@ -76,7 +72,6 @@ describe('Domain', function() {
       expect(domain.cfg.disabled).to.be.true;
       expect(domain.enabled).to.be.undefined;
       expect(domain.wordlist).to.be.undefined;
-      expect(domain.audioList).to.be.undefined;
       expect(domain.cfgKey).to.eq(hostname);
     });
 
@@ -89,7 +84,6 @@ describe('Domain', function() {
       expect(domain.disabled).to.be.undefined;
       expect(domain.enabled).to.be.undefined;
       expect(domain.wordlist).to.be.undefined;
-      expect(domain.audioList).to.be.undefined;
       expect(domain.cfgKey).to.eq('another.com');
     });
   });

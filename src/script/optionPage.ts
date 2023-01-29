@@ -5,7 +5,6 @@ import Domain from './domain';
 import OptionAuth from './optionAuth';
 import DataMigration from './dataMigration';
 import Bookmarklet from './bookmarklet';
-import WebAudio from './webAudio';
 import Logger from './lib/logger';
 import {
   booleanToNumber,
@@ -26,7 +25,6 @@ export default class OptionPage {
   darkModeButton: Element;
   lightModeButton: Element;
   prefersDarkScheme: boolean;
-  supportedAudioSites: AudioSites;
   themeElements: Element[];
 
   static readonly activeClass = 'w3-flat-belize-hole';
@@ -777,31 +775,6 @@ export default class OptionPage {
     }
   }
 
-  populateAudio() {
-    const muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
-    const fillerAudioSelect = document.getElementById('fillerAudioSelect') as HTMLSelectElement;
-    const muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
-    const muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
-    const selectedMuteMethod = document.querySelector(`input[name=audioMuteMethod][value='${this.cfg.muteMethod}']`) as HTMLInputElement;
-    const selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
-    const muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
-    const audioYouTubeAutoMatchCensored = document.getElementById('audioYouTubeAutoMatchCensored') as HTMLInputElement;
-    const audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
-    const audioYouTubeAutoSubsMax = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
-    const customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
-    muteAudioInput.checked = this.cfg.muteAudio;
-    fillerAudioSelect.value = this.cfg.fillerAudio;
-    muteAudioOnlyInput.checked = this.cfg.muteAudioOnly;
-    muteCueRequireShowingInput.checked = this.cfg.muteCueRequireShowing;
-    this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
-    selectedMuteMethod.checked = true;
-    selectedshowSubtitle.checked = true;
-    audioYouTubeAutoMatchCensored.checked = this.cfg.youTubeAutoMatchCensored;
-    audioYouTubeAutoSubsMin.value = this.cfg.youTubeAutoSubsMin.toString();
-    audioYouTubeAutoSubsMax.value = this.cfg.youTubeAutoSubsMax.toString();
-    customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
-  }
-
   populateBookmarkletPage() {
     const bookmarkletConfig = document.querySelector('input[name="bookmarkletConfig"]:checked') as HTMLInputElement;
     const bookmarkletCustomConfig = document.getElementById('bookmarkletCustomConfig') as HTMLDivElement;
@@ -832,7 +805,6 @@ export default class OptionPage {
     const domainFramesOffCheck = document.getElementById('domainFramesOffCheck') as HTMLInputElement;
     const domainFramesOnCheck = document.getElementById('domainFramesOnCheck') as HTMLInputElement;
     const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
-    const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
     const domainRemoveBtn = document.getElementById('domainRemove') as HTMLButtonElement;
 
     const key = domainsSelect.value;
@@ -860,9 +832,7 @@ export default class OptionPage {
     domainFramesOffCheck.checked = domainCfg.framesOff;
     domainFramesOnCheck.checked = domainCfg.framesOn;
     const wordlist = domainCfg.wordlist >= 0 ? domainCfg.wordlist + 1 : 0;
-    const audioList = domainCfg.audioList >= 0 ? domainCfg.audioList + 1 : 0;
     domainWordlistSelect.selectedIndex = wordlist;
-    domainAudioWordlistSelect.selectedIndex = audioList;
   }
 
   populateDomainPage() {
@@ -873,7 +843,6 @@ export default class OptionPage {
     const mode = this.cfg.enabledDomainsOnly ? 'minimal' : 'normal';
     const domainMode = document.querySelector(`input[name=domainMode][value='${mode}']`) as HTMLInputElement;
     const wordlistContainer = document.getElementById('domainWordlistContainer') as HTMLInputElement;
-    const audioWordlistContainer = document.getElementById('domainAudioWordlistContainer') as HTMLInputElement;
     domainMode.checked = true;
     const domainDisabledLabel = document.getElementById('domainDisabledLabel') as HTMLLabelElement;
     const domainEnabledLabel = document.getElementById('domainEnabledLabel') as HTMLLabelElement;
@@ -914,19 +883,11 @@ export default class OptionPage {
     if (this.cfg.wordlistsEnabled) {
       OptionPage.show(wordlistContainer);
       const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
-      const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
 
       const wordlists = ['Default'].concat(WebConfig._allWordlists, this.cfg.wordlists);
       dynamicList(wordlists, domainWordlistSelect);
-      if (this.cfg.muteAudio) {
-        OptionPage.show(audioWordlistContainer);
-        dynamicList(wordlists, domainAudioWordlistSelect);
-      } else {
-        OptionPage.hide(audioWordlistContainer);
-      }
     } else {
       OptionPage.hide(wordlistContainer);
-      OptionPage.hide(audioWordlistContainer);
     }
 
     this.populateDomain();
@@ -938,7 +899,6 @@ export default class OptionPage {
     this.populateAllowlist();
     this.populateWordlists();
     this.populateDomainPage();
-    this.populateAudio();
     this.populateConfig();
     this.populateStats();
     this.populateTest();
@@ -1001,7 +961,7 @@ export default class OptionPage {
   async populateStats() {
     try {
       filter.buildWordlist(Constants.ALL_WORDS_WORDLIST_ID, true);
-      const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
+      const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
 
       // Prepare data (collect totals, add words without stats, sort output)
       let totalFiltered = 0;
@@ -1009,10 +969,10 @@ export default class OptionPage {
       allWords.forEach((word) => {
         const wordStats = stats.words[word];
         if (wordStats) {
-          wordStats.total = wordStats.audio + wordStats.text;
+          wordStats.total = wordStats.text;
           totalFiltered += wordStats.total;
         } else {
-          stats.words[word] = { audio: 0, text: 0, total: 0 };
+          stats.words[word] = { text: 0, total: 0 };
         }
       });
       const alphaSortedWords = allWords.sort();
@@ -1038,12 +998,6 @@ export default class OptionPage {
 
         const textCell = row.insertCell(1);
         textCell.textContent = numberWithCommas(wordStats.text);
-
-        const audioCell = row.insertCell(2);
-        audioCell.textContent = numberWithCommas(wordStats.audio);
-
-        const totalCell = row.insertCell(3);
-        totalCell.textContent = numberWithCommas(wordStats.total);
       });
       const oldTBody = statsWordTable.tBodies[0];
       statsWordTable.replaceChild(tBody, oldTBody);
@@ -1055,8 +1009,6 @@ export default class OptionPage {
       // Summary
       const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableDataCellElement;
       statsSummaryTotal.textContent = numberWithCommas(totalFiltered);
-      const statsSummaryMutes = document.querySelector('table#statsSummaryTable td#statsSummaryMutes') as HTMLTableDataCellElement;
-      statsSummaryMutes.textContent = numberWithCommas(stats.mutes);
       const statsSummarySince = document.querySelector('table#statsSummaryTable td#statsSummarySince') as HTMLTableDataCellElement;
       statsSummarySince.textContent = stats.startedAt ? new Date(stats.startedAt).toLocaleString() : '';
     } catch (err) {
@@ -1145,11 +1097,6 @@ export default class OptionPage {
       wordlistSelections.forEach((wordlist, index) => {
         wordlist.checked = (
           index == (this.cfg.wordlistId - 1)
-          || (
-            this.cfg.muteAudio
-            && this.cfg.muteAudioOnly
-            && index == (this.cfg.audioWordlistId - 1)
-          )
         );
       });
     } else { // Existing word
@@ -1188,20 +1135,10 @@ export default class OptionPage {
     if (this.cfg.wordlistsEnabled) {
       const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
       const textWordlistSelect = document.getElementById('textWordlistSelect') as HTMLSelectElement;
-      const audioWordlistDiv = document.getElementById('audioWordlistDiv') as HTMLElement;
-      const audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
       dynamicList(this.cfg.wordlists, wordlistSelect);
       dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), textWordlistSelect);
       wordlistSelect.selectedIndex = selectedIndex;
       textWordlistSelect.selectedIndex = this.cfg.wordlistId;
-
-      if (this.cfg.muteAudio) {
-        dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), audioWordlistSelect);
-        audioWordlistSelect.selectedIndex = this.cfg.audioWordlistId;
-        OptionPage.show(audioWordlistDiv);
-      } else {
-        OptionPage.hide(audioWordlistDiv);
-      }
 
       OptionPage.show(wordlistContainer);
       this.populateWordlist();
@@ -1265,7 +1202,7 @@ export default class OptionPage {
 
   async prepareLessUsedWords() {
     try {
-      const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
+      const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
       const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
       const lessThan = parseInt(lessUsedWordsNumber.value);
       lessUsedWords = {};
@@ -1273,7 +1210,7 @@ export default class OptionPage {
       const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
       allWords.forEach((word) => {
         const wordStats = stats.words[word];
-        const total = wordStats ? (wordStats.audio + wordStats.text) : 0;
+        const total = wordStats ? wordStats.text : 0;
         if (total < lessThan) {
           lessUsedWords[word] = total;
         }
@@ -1396,19 +1333,6 @@ export default class OptionPage {
     }
   }
 
-  async saveCustomAudioSites() {
-    const customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
-    try {
-      const text = customAudioSitesTextArea.value;
-      this.cfg.customAudioSites = text == '' ? null : JSON.parse(text);
-      await this.cfg.save('customAudioSites');
-      customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
-      OptionPage.showStatusModal('Custom Audio Sites saved.');
-    } catch (err) {
-      OptionPage.handleError('Failed to save custom audio sites. Please make sure it is valid JSON.', err);
-    }
-  }
-
   async saveDomain() {
     const domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
     const domainText = document.getElementById('domainText') as HTMLInputElement;
@@ -1418,7 +1342,6 @@ export default class OptionPage {
     const domainFramesOffCheck = document.getElementById('domainFramesOffCheck') as HTMLInputElement;
     const domainFramesOnCheck = document.getElementById('domainFramesOnCheck') as HTMLInputElement;
     const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
-    const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
 
     const originalKey = domainsSelect.value;
     const newKey = domainText.value.trim().toLowerCase();
@@ -1433,9 +1356,7 @@ export default class OptionPage {
       if (newKey != originalKey) { delete this.cfg.domains[originalKey]; } // URL changed: remove old entry
 
       const wordlist = domainWordlistSelect.selectedIndex > 0 ? domainWordlistSelect.selectedIndex - 1 : undefined;
-      const audioList = domainAudioWordlistSelect.selectedIndex > 0 ? domainAudioWordlistSelect.selectedIndex - 1 : undefined;
       const newDomainCfg: DomainCfg = {
-        audioList: audioList,
         disabled: domainDisabledCheck.checked,
         enabled: domainEnabledCheck.checked,
         framesOn: domainFramesOnCheck.checked,
@@ -1475,13 +1396,6 @@ export default class OptionPage {
     const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     const domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
     const domainFilterAllFrames = document.getElementById('domainFilterAllFrames') as HTMLInputElement;
-    const muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
-    const fillerAudioSelect = document.getElementById('fillerAudioSelect') as HTMLSelectElement;
-    const muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
-    const muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
-    const audioYouTubeAutoMatchCensored = document.getElementById('audioYouTubeAutoMatchCensored') as HTMLInputElement;
-    const muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
-    const showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
     const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
     const collectStats = document.getElementById('collectStats') as HTMLInputElement;
     const configLoggingLevelSelect = document.getElementById('configLoggingLevelSelect') as HTMLSelectElement;
@@ -1500,13 +1414,6 @@ export default class OptionPage {
     this.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
     this.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
     this.cfg.enabledFramesOnly = !domainFilterAllFrames.checked;
-    this.cfg.muteAudio = muteAudioInput.checked;
-    this.cfg.fillerAudio = fillerAudioSelect.value;
-    this.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
-    this.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
-    this.cfg.youTubeAutoMatchCensored = audioYouTubeAutoMatchCensored.checked;
-    this.cfg.muteMethod = parseInt(muteMethodInput.value);
-    this.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
     this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
     this.cfg.collectStats = collectStats.checked;
     this.cfg.loggingLevel = Constants.LOGGING_LEVELS[configLoggingLevelSelect.value.toUpperCase()];
@@ -1701,7 +1608,7 @@ export default class OptionPage {
   }
 
   async setDefaultWordlist(element: HTMLSelectElement) {
-    const prop = element.id === 'textWordlistSelect' ? 'wordlistId' : 'audioWordlistId';
+    const prop = element.id === 'textWordlistSelect' ? 'wordlistId' : '';
     this.cfg[prop] = element.selectedIndex;
 
     try {
@@ -1751,34 +1658,6 @@ export default class OptionPage {
       el.addEventListener('click', (evt) => { this.bulkEditorWordlistCheckbox(evt.target as HTMLInputElement); });
     });
     OptionPage.openModal(modalId);
-  }
-
-  showSupportedAudioSiteConfig() {
-    const select = document.querySelector('#supportedAudioSitesModal select#siteSelect') as HTMLSelectElement;
-    const textArea = document.querySelector('#supportedAudioSitesModal div#modalContentRight textarea') as HTMLTextAreaElement;
-    const config = {};
-    config[select.value] = this.supportedAudioSites[select.value];
-    textArea.textContent = JSON.stringify(config, null, 2);
-  }
-
-  showSupportedAudioSites() {
-    const title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
-    title.textContent = 'Supported Audio Sites';
-    const contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
-    const select = contentLeft.querySelector('#siteSelect') as HTMLSelectElement;
-    removeChildren(select);
-
-    this.supportedAudioSites = WebAudio.supportedSites();
-    const sortedSites = Domain.sortedKeys(this.supportedAudioSites);
-    sortedSites.forEach((site) => {
-      const optionElement = document.createElement('option');
-      optionElement.value = site;
-      optionElement.textContent = site;
-      select.appendChild(optionElement);
-    });
-
-    this.showSupportedAudioSiteConfig();
-    OptionPage.openModal('supportedAudioSitesModal');
   }
 
   async statsReset() {
@@ -1888,30 +1767,6 @@ export default class OptionPage {
     }
   }
 
-  async updateYouTubeAutoLimits(input: HTMLInputElement) {
-    const max = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
-    const min = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
-    OptionPage.hideInputError(max);
-    OptionPage.hideInputError(min);
-    if (input.checkValidity()) {
-      const maxValue = parseFloat(max.value);
-      const minValue = parseFloat(min.value);
-      if (minValue != 0 && maxValue != 0 && minValue > maxValue) {
-        OptionPage.showInputError(input, 'Min must be less than max.');
-      } else {
-        try {
-          this.cfg.youTubeAutoSubsMax = maxValue;
-          this.cfg.youTubeAutoSubsMin = minValue;
-          await this.cfg.save(['youTubeAutoSubsMax', 'youTubeAutoSubsMin']);
-        } catch (err) {
-          OptionPage.handleError('Failed to update YouTube muting min/max values.', err);
-        }
-      }
-    } else {
-      OptionPage.showInputError(input, 'Please enter a valid number of seconds.');
-    }
-  }
-
   validateLessUsedWordsNumber() {
     const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
     let valid = false;
@@ -1955,8 +1810,6 @@ document.getElementById('confirmModalBackup').addEventListener('click', (evt) =>
 document.getElementById('confirmModalOK').addEventListener('click', (evt) => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('confirmModalCancel').addEventListener('click', (evt) => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('statusModalOK').addEventListener('click', (evt) => { OptionPage.closeModal('statusModal'); });
-document.querySelector('#supportedAudioSitesModal #siteSelect').addEventListener('change', (evt) => { option.showSupportedAudioSiteConfig(); });
-document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', (evt) => { OptionPage.closeModal('supportedAudioSitesModal'); });
 document.querySelector('#bulkWordEditorModal button.modalAddWord').addEventListener('click', (evt) => { option.bulkEditorAddRow(); });
 document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEventListener('click', (evt) => { option.bulkEditorAddWords(); });
 document.querySelector('#bulkWordEditorModal button.modalCancel').addEventListener('click', (evt) => { OptionPage.closeModal('bulkWordEditorModal'); });
@@ -1997,7 +1850,6 @@ document.getElementById('wordlistRename').addEventListener('click', (evt) => { o
 document.getElementById('wordlistSelect').addEventListener('change', (evt) => { option.populateWordlist(); });
 document.getElementById('wordlistText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
 document.getElementById('textWordlistSelect').addEventListener('change', (evt) => { option.setDefaultWordlist(evt.target as HTMLSelectElement); });
-document.getElementById('audioWordlistSelect').addEventListener('change', (evt) => { option.setDefaultWordlist(evt.target as HTMLSelectElement); });
 // Domains
 document.querySelectorAll('#domainMode input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
 document.getElementById('domainFilterAllFrames').addEventListener('change', (evt) => { option.saveOptions(); });
@@ -2005,17 +1857,6 @@ document.getElementById('domainSelect').addEventListener('change', (evt) => { op
 document.getElementById('domainText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
 document.getElementById('domainSave').addEventListener('click', (evt) => { option.saveDomain(); });
 document.getElementById('domainRemove').addEventListener('click', (evt) => { option.removeDomain(); });
-// Audio
-document.getElementById('muteAudio').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('supportedAudioSitesConfig').addEventListener('click', (evt) => { option.showSupportedAudioSites(); });
-document.getElementById('fillerAudioSelect').addEventListener('change', (evt) => { option.saveOptions(); });
-document.getElementById('muteAudioOnly').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('muteCueRequireShowing').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('audioYouTubeAutoMatchCensored').addEventListener('click', (evt) => { option.saveOptions(); });
-document.querySelectorAll('#audioMuteMethod input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
-document.querySelectorAll('#audioSubtitleSelection input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
-document.querySelectorAll('input.audioYouTubeAutoSubs').forEach((el) => { el.addEventListener('change', (evt) => { option.updateYouTubeAutoLimits(evt.target as HTMLInputElement); }); });
-document.getElementById('customAudioSitesSave').addEventListener('click', (evt) => { option.saveCustomAudioSites(); });
 // Bookmarklet
 document.querySelectorAll('#bookmarkletConfigInputs input').forEach((el) => { el.addEventListener('click', (evt) => { option.populateBookmarkletPage(); }); });
 document.getElementById('bookmarkletFile').addEventListener('click', (evt) => { option.exportBookmarkletFile(); });

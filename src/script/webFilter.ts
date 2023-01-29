@@ -3,17 +3,12 @@ import Constants from './lib/constants';
 import Domain from './domain';
 import Filter from './lib/filter';
 import Page from './page';
-import WebAudio from './webAudio';
 import WebConfig from './webConfig';
 import Word from './lib/word';
-import Wordlist from './lib/wordlist';
 import Logger from './lib/logger';
 const logger = new Logger('WebFilter');
 
 export default class WebFilter extends Filter {
-  audio: WebAudio;
-  audioOnly: boolean;
-  audioWordlistId: number;
   declare cfg: WebConfig;
   domain: Domain;
   extension: boolean;
@@ -21,7 +16,6 @@ export default class WebFilter extends Filter {
   hostname: string;
   iframe: Location;
   location: Location | URL;
-  mutePage: boolean;
   observer: MutationObserver;
   processMutationTarget: boolean;
   processNode: (node: Document | HTMLElement | Node | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
@@ -31,12 +25,10 @@ export default class WebFilter extends Filter {
 
   constructor() {
     super();
-    this.audioWordlistId = Constants.ALL_WORDS_WORDLIST_ID;
     this.extension = true;
     this.filterText = true;
-    this.mutePage = false;
     this.processMutationTarget = false;
-    this.stats = { mutes: 0, words: {} };
+    this.stats = { words: {} };
     this.summary = {};
   }
 
@@ -69,19 +61,10 @@ export default class WebFilter extends Filter {
     mutation.addedNodes.forEach((node) => {
       if (!Page.isForbiddenNode(node)) {
         // logger.debug('[APF] Added node(s):', node);
-        if (this.mutePage) {
-          this.cleanAudio(node);
-        } else if (!this.audioOnly) {
-          this.processNode(node, this.wordlistId);
-        }
+        this.processNode(node, this.wordlistId);
       }
       // else { logger.debug('Forbidden node', node); }
     });
-
-    // Check removed nodes to see if we should unmute or remove APF Captions
-    if (this.mutePage && (this.audio.muted || this.audio.apfCaptionsEnabled)) {
-      this.handleRemovedNodesOnMutePage(mutation.removedNodes);
-    }
 
     if (mutation.target) {
       if (mutation.target.nodeName === '#text') {
@@ -96,59 +79,10 @@ export default class WebFilter extends Filter {
     // console.count('checkMutationTargetTextForProfanity'); // Benchmark: Filter
     // logger.debug('Process mutation.target', mutation.target, mutation.target.data);
     if (!Page.isForbiddenNode(mutation.target)) {
-      if (this.mutePage) {
-        const supported = this.audio.supportedNode(mutation.target);
-        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
-        if (supported !== false && rule.simpleUnmute) {
-          // Supported node. Check if a previously filtered node is being removed
-          if (
-            this.audio.muted
-            && mutation.oldValue
-            && this.audio.lastFilteredText
-            && this.audio.lastFilteredText.includes(mutation.oldValue)
-          ) {
-            this.audio.unmute(rule);
-          }
-          this.audio.clean(mutation.target, supported);
-        } else if (rule.simpleUnmute && this.audio.muted && !mutation.target.parentElement) {
-          // Check for removing a filtered subtitle (no parent)
-          if (this.audio.lastFilteredText && this.audio.lastFilteredText.includes(mutation.target.textContent)) {
-            this.audio.unmute(rule);
-          }
-        } else if (!this.audioOnly) { // Filter regular text
-          const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
-          if (result.modified) { mutation.target.data = result.filtered; }
-        }
-      } else if (!this.audioOnly) { // Filter regular text
-        const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
-        if (result.modified) { mutation.target.data = result.filtered; }
-      }
+      const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
+      if (result.modified) { mutation.target.data = result.filtered; }
     }
     // else { logger.debug('Forbidden mutation.target node', mutation.target); }
-  }
-
-  cleanAudio(node) {
-    // YouTube Auto subs
-    if (this.audio.youTube && this.audio.youTubeAutoSubsPresent()) {
-      if (this.audio.youTubeAutoSubsSupportedNode(node)) {
-        if (this.audio.youTubeAutoSubsCurrentRow(node)) {
-          // logger.debug('[Audio] YouTube subtitle node', node);
-          this.audio.cleanYouTubeAutoSubs(node);
-        } else if (!this.audioOnly) {
-          this.processNode(node, this.wordlistId); // Clean the rest of the page
-        }
-      } else if (!this.audioOnly && !this.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
-        this.processNode(node, this.wordlistId); // Clean the rest of the page
-      }
-    } else { // Other audio muting
-      const supported = this.audio.supportedNode(node);
-      if (supported !== false) {
-        // logger.debug('[Audio] Audio subtitle node', node);
-        this.audio.clean(node, supported);
-      } else if (!this.audioOnly) {
-        this.processNode(node, this.wordlistId); // Clean the rest of the page
-      }
-    }
   }
 
   cleanChildNode(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
@@ -223,7 +157,6 @@ export default class WebFilter extends Filter {
       || (
         this.cfg.enabledDomainsOnly
         && !this.domain.enabled
-        && !this.cfg.muteAudioOnly
       )
       || this.domain.disabled
     ) {
@@ -233,28 +166,6 @@ export default class WebFilter extends Filter {
       return false;
     }
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
-    if (this.domain.audioWordlistId !== undefined) { this.audioWordlistId = this.domain.audioWordlistId; }
-
-    // Detect if we should mute audio for the current page
-    if (this.cfg.muteAudio) {
-      this.audio = new WebAudio(this);
-      this.mutePage = this.audio.supportedPage;
-      if (this.mutePage) {
-        logger.info(`[Audio] Enabling audio muting on ${this.hostname}.`);
-        // Prebuild audio wordlist
-        if (this.cfg.wordlistsEnabled && this.wordlistId != this.audio.wordlistId) {
-          this.wordlists[this.audio.wordlistId] = new Wordlist(this.cfg, this.audio.wordlistId);
-        }
-      }
-    }
-
-    // Disable if muteAudioOnly mode is active and this is not a suported page
-    if (this.cfg.muteAudioOnly && !this.mutePage) {
-      message.disabled = true;
-      logger.info(`'[Audio] ${this.hostname}' is not an audio page and audio only mode is enabled. Exiting.`);
-      chrome.runtime.sendMessage(message);
-      return false;
-    }
 
     this.sendInitState(message);
     this.onMessage();
@@ -262,7 +173,7 @@ export default class WebFilter extends Filter {
     // Remove profanity from the main document and watch for new nodes
     this.init();
     logger.infoTime('Filter initialized.', this);
-    if (!this.audioOnly) { this.processNode(document, this.wordlistId); }
+    this.processNode(document, this.wordlistId);
     logger.infoTime('Initial page filtered.');
     this.updateCounterBadge();
     this.startObserving(document);
@@ -328,12 +239,11 @@ export default class WebFilter extends Filter {
     if (this.cfg.collectStats) {
       const wordStats = this.stats.words;
       if (!wordStats[word.value]) {
-        wordStats[word.value] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
+        wordStats[word.value] = { [ Constants.STATS_TYPE_TEXT ]: 0 };
       }
 
       if (this.filterText) {
         switch (statsType) {
-          case Constants.STATS_TYPE_AUDIO: wordStats[word.value].audio++; break;
           case Constants.STATS_TYPE_TEXT: wordStats[word.value].text++; break;
         }
       }
@@ -347,42 +257,6 @@ export default class WebFilter extends Filter {
         if (!response) { response = { disabledTab: false }; }
         resolve(response);
       });
-    });
-  }
-
-  handleRemovedNodesOnMutePage(removedNodes: NodeList) {
-    removedNodes.forEach((node) => {
-      if (node.nodeName == 'VIDEO' && this.audio.supportedCaptions) {
-        this.audio.supportedCaptionsFound(false, true);
-      }
-
-      // Remove APF Captions if the removed node was the last one we processed
-      if (this.audio.apfCaptionsEnabled) {
-        if (node == this.audio.lastProcessedNode || node.contains(this.audio.lastProcessedNode)) {
-          const apfCaptionRule = this.audio.rules[this.audio.apfCaptionRuleIds[0]];
-          this.audio.removeApfCaptions(apfCaptionRule);
-        }
-      }
-
-      // Check removed node to see if we should unmute
-      if (this.audio.muted) {
-        const supported = this.audio.supportedNode(node);
-        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
-        if (
-          supported !== false
-          || node == this.audio.lastFilteredNode
-          || node.contains(this.audio.lastFilteredNode)
-          || (
-            rule.simpleUnmute
-            && node.textContent
-            && this.audio.lastFilteredText
-            && this.audio.lastFilteredText.includes(node.textContent)
-          )
-        ) {
-          this.audio.unmute(rule);
-          if (rule.apfCaptions) this.audio.removeApfCaptions(rule);
-        }
-      }
     });
   }
 
@@ -404,22 +278,20 @@ export default class WebFilter extends Filter {
     try {
       const words = Object.keys(filter.stats.words);
       if (words.length) {
-        const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
+        const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
         const storedWords = stats.words;
 
         words.forEach((word) => {
           if (!storedWords[word]) {
-            storedWords[word] = { [ Constants.STATS_TYPE_AUDIO ]: 0, [ Constants.STATS_TYPE_TEXT ]: 0 };
+            storedWords[word] = { [ Constants.STATS_TYPE_TEXT ]: 0 };
           }
-          storedWords[word].audio += filter.stats.words[word].audio;
           storedWords[word].text += filter.stats.words[word].text;
         });
 
-        stats.mutes += filter.stats.mutes;
         if (stats.startedAt == null) { stats.startedAt = Date.now(); }
 
         await WebConfig.saveLocalStorage({ stats: stats });
-        filter.stats = { mutes: 0, words: {} };
+        filter.stats = { words: {} };
       }
     } catch (err) {
       if (err.message !== 'Extension context invalidated.') {
@@ -437,9 +309,7 @@ export default class WebFilter extends Filter {
       switch (request.source) {
         case Constants.MESSAGING.BACKGROUND:
           if (request.urlUpdate) {
-            if (this.mutePage) {
-              this.audio.supportedCaptionsFound(false, true);
-            }
+            // No-op
           } else {
             logger.error('Received unhandled message.', JSON.stringify(request));
           }
@@ -447,8 +317,8 @@ export default class WebFilter extends Filter {
 
         case Constants.MESSAGING.POPUP:
           if (request.summary) {
-            if (this.cfg.showSummary && (this.counter > 0 || this.mutePage)) {
-              const message = this.buildMessage(Constants.MESSAGING.POPUP, { mutePage: this.mutePage, summary: this.summary });
+            if (this.cfg.showSummary && (this.counter > 0)) {
+              const message = this.buildMessage(Constants.MESSAGING.POPUP, { summary: this.summary });
               chrome.runtime.sendMessage(message);
             }
           } else {
@@ -472,18 +342,13 @@ export default class WebFilter extends Filter {
   }
 
   sendInitState(message: Message) {
-    // Reset muted state on page load if we muted the tab audio
-    if (this.cfg.muteAudio && this.cfg.muteMethod == Constants.MUTE_METHODS.TAB) { message.clearMute = true; }
-
     // Get status
     message.iframe = !!(this.iframe);
     message.advanced = this.domain.advanced;
     message.deep = this.domain.deep;
-    message.mutePage = this.mutePage;
     message.status = Constants.STATUS.NORMAL;
     if (message.advanced) message.status = Constants.STATUS.ADVANCED;
     if (message.deep) message.status = Constants.STATUS.DEEP;
-    if (message.mutePage) message.status = Constants.STATUS.MUTE_PAGE;
 
     // Always show counter if not in normal mode
     if (this.cfg.showCounter && message.status != Constants.STATUS.NORMAL) { message.counter = this.counter; }

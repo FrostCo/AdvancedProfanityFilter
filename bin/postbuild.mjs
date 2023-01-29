@@ -88,7 +88,6 @@ function handleManifestVersion() {
       default_title: 'Advanced Profanity Filter',
     };
     manifest.host_permissions = undefined;
-    manifest.web_accessible_resources = ['audio/*.mp3'];
     writeJSONFile(distManifestPath, manifest);
   }
 }

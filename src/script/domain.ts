@@ -3,7 +3,6 @@ import WebConfig from './webConfig';
 
 export default class Domain {
   advanced: boolean;
-  audioWordlistId: number;
   cfg: DomainCfg;
   cfgKey: string;
   deep: boolean;
@@ -17,7 +16,6 @@ export default class Domain {
 
   static readonly _domainCfgDefaults: DomainCfg = {
     adv: undefined,
-    audioList: undefined,
     deep: undefined,
     disabled: undefined,
     enabled: undefined,
@@ -134,7 +132,6 @@ export default class Domain {
     this.cfg.framesOff = this.framesOff === true ? true : undefined;
     this.cfg.framesOn = this.framesOn === true ? true : undefined;
     this.cfg.wordlist = this.wordlistId >= 0 ? this.wordlistId : undefined;
-    this.cfg.audioList = this.audioWordlistId >= 0 ? this.audioWordlistId : undefined;
   }
 
   updateFromCfg() {
@@ -145,7 +142,6 @@ export default class Domain {
     this.framesOff = this.cfg.framesOff;
     this.framesOn = this.cfg.framesOn;
     this.wordlistId = this.cfg.wordlist;
-    this.audioWordlistId = this.cfg.audioList;
   }
 
   updateFromModeIndex(index: number) {

@@ -29,7 +29,6 @@
   <a href="#/words" class="w3-bar-item w3-button">Words</a>
   <a href="#/lists" class="w3-bar-item w3-button">Lists</a>
   <a href="#/domains" class="w3-bar-item w3-button">Domains</a>
-  <a href="#/audio" class="w3-bar-item w3-button">Audio</a>
   <a href="#/bookmarklet" class="w3-bar-item w3-button">Bookmarklet</a>
   <a href="#/config" class="w3-bar-item w3-button">Config</a>
   <div class="w3-bar-item w3-button w3-right themes">
@@ -314,11 +313,6 @@
 
       <h4 class="sectionHeader">Default Text Wordlist</h4>
       <select id="textWordlistSelect" class="w3-select w3-border small textInput"></select><span class="notes"></span>
-
-      <div id="audioWordlistDiv" class="w3-hide">
-        <h4 class="sectionHeader">Default Audio Wordlist</h4>
-        <select id="audioWordlistSelect" class="w3-select w3-border small textInput"></select><span class="notes"></span>
-      </div>
     </div>
   </div>
 </div>
@@ -386,135 +380,11 @@
     <div id="domainWordlistContainer" class="w3-hide">
       <h4 class="sectionHeader">Text Wordlist</h4>
       <select id="domainWordlistSelect" class="w3-select w3-border small textInput"></select><span class="notes"></span>
-
-      <div id="domainAudioWordlistContainer" class="w3-hide">
-        <h4 class="sectionHeader">Audio Wordlist</h4>
-        <select id="domainAudioWordlistSelect" class="w3-select w3-border small textInput"></select><span class="notes"></span>
-      </div>
     </div>
 
     <div style="padding-top: 16px;">
       <button id="domainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
       <button id="domainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
-    </div>
-  </div>
-</div>
-
-<div id="audioPage" class="w3-container w3-hide">
-  <p>Mute audio during video playback when a filtered word is detected in the captions/subtitles (which must be enabled). <i>Effectiveness is dependent on the quality/timing of the text accompanying the video.</i> <a href="https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Audio". target="_blank">Learn more</a>.</p>
-
-  <a id="supportedAudioSitesStatus" href="https://apf.frostco.dev/status" target="_blank" class="w3-btn w3-round-large w3-flat-peter-river">Supported Sites Status</a>
-  <br />
-
-  <label>
-    <input id="muteAudio" type="checkbox" class="w3-check">
-    Mute audio on supported video sites
-  </label>
-
-  <div id="muteAudioOptionsContainer" class="w3-hide">
-    <div class="w3-twothird">
-      <h4 class="sectionHeader">Mute Method</h4>
-      <div id="audioMuteMethod">
-        <label>
-          <input id="audioMuteMethodTab" type="radio" class="w3-radio" name="audioMuteMethod" value="0">
-          Browser tab
-        </label>
-
-        <br>
-        <label>
-          <input id="audioMuteMethodVideo" type="radio" class="w3-radio" name="audioMuteMethod" value="2">
-          Video mute
-        </label>
-
-        <br>
-        <label>
-          <input id="audioMuteMethodVideo" type="radio" class="w3-radio" name="audioMuteMethod" value="1">
-          Video volume
-        </label>
-
-        <br>
-        <label>
-          <input id="audioMuteMethodVideo" type="radio" class="w3-radio" name="audioMuteMethod" value="9">
-          None
-        </label>
-      </div>
-
-      <h4 class="sectionHeader">Captions/Subtitles</h4>
-      <div id="audioSubtitleSelection">
-        <label>
-          <input id="audioShowAllSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="0">
-          Show all
-        </label>
-
-        <br>
-        <label>
-          <input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="1">
-          Show only filtered
-        </label>
-
-        <br>
-        <label>
-          <input id="audioShowOnlySubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="2">
-          Show only unfiltered
-        </label>
-
-        <br>
-        <label>
-          <input id="audioHideSubtitles" type="radio" class="w3-radio" name="audioShowSubtitles" value="3">
-          Hide all
-        </label>
-      </div>
-
-      <h4 class="sectionHeader">Other</h4>
-      <div id="audioOther">
-        <label>
-          Filler audio
-          <select id="fillerAudioSelect" class="w3-select w3-border small textInput">
-            <option value="">None</option>
-            <option value="beep">Beep</option>
-            <option value="crickets">Crickets</option>
-            <option value="static">Static</option>
-          </select>
-          <span class="notes">(Only for Video mute/volume methods)</span>
-        </label>
-
-        <br>
-        <label>
-          <input id="muteAudioOnly" type="checkbox" class="w3-check">
-          Only mute audio
-          <span class="notes">(Disable text filter)</span>
-        </label>
-
-        <br>
-        <label>
-          <input id="muteCueRequireShowing" type="checkbox" class="w3-check">
-          Require captions/subtitles to be showing
-          <span class="notes">(Only for "cue" mode)</span>
-        </label>
-
-        <br>
-        <label>
-          <input id="audioYouTubeAutoMatchCensored" type="checkbox" class="w3-check">
-          Mute pre-censored captions on YouTube
-          <span class="notes">(Shown as "[ _ ]" in captions)</span>
-        </label>
-
-        <br>
-        <label>YouTube muting min:
-          <input id="audioYouTubeAutoSubsMin" class="audioYouTubeAutoSubs w3-input w3-border extraSmallInput" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
-        </label>
-        <label>max:
-          <input id="audioYouTubeAutoSubsMax" class="audioYouTubeAutoSubs w3-input w3-border extraSmallInput" type="text" pattern="([0-9]*[.])?[0-9]+" style="display:inline;">
-        </label>
-        <span class="notes">(Only for auto captions; 0.5 = half second)</span>
-      </div>
-    </div>
-    <div class="w3-third w3-right">
-      <h4 class="sectionHeader">Custom Sites (Advanced)</h4>
-      <button id="supportedAudioSitesConfig" class="w3-btn w3-round-large w3-flat-peter-river">Supported Sites Config</button>
-      <textarea id="customAudioSitesText" class="w3-input w3-border w3-card" style="width:300px;height:350px;font-size:11px;" spellcheck="false"></textarea>
-      <button id="customAudioSitesSave" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top: 16px;">SAVE</button>
-      <a href="https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site" class="notes" target="_blank">How to add a custom site</a>
     </div>
   </div>
 </div>
@@ -593,10 +463,6 @@
           <td id="statsSummaryTotal"></td>
         </tr>
         <tr>
-          <td>Total audio mutes</td>
-          <td id="statsSummaryMutes"></td>
-        </tr>
-        <tr>
           <td>Tracking since</td>
           <td id="statsSummarySince"></td>
         </tr>
@@ -610,8 +476,6 @@
       <thead class="w3-flat-peter-river">
         <tr>
           <th>Word</th>
-          <th>Text</th>
-          <th>Audio</th>
           <th>Total</th>
         </tr>
       </thead>
@@ -894,27 +758,6 @@
       <div id="statusModalContent"></div>
       <div class="w3-right">
         <button id="statusModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="supportedAudioSitesModal" class="w3-modal">
-  <div class="w3-modal-content w3-card-4 w3-animate-zoom">
-    <header class="w3-container w3-flat-peter-river"><h5 class="modalTitle"></h5></header>
-    <div class="w3-container w3-padding w3-margin">
-      <div class="w3-container">
-        <div id="modalContentLeft" class="w3-half">
-          <h4 class="sectionHeader">Sites</h4>
-          <select id="siteSelect" class="textInput"></select>
-        </div>
-        <div id="modalContentRight" class="w3-half w3-right">
-          <h4 class="sectionHeader">Site Config</h4>
-          <textarea class="w3-input w3-border w3-card" spellcheck="false" readonly></textarea>
-        </div>
-      </div>
-      <div class="w3-right">
-        <button class="modalOK w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
       </div>
     </div>
   </div>

@@ -1,4 +1,3 @@
-import Constants from './lib/constants';
 import Config from './lib/config';
 import { prettyPrintArray, stringArray } from './lib/helper';
 import Logger from './lib/logger';
@@ -7,49 +6,27 @@ const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
   _lastSplitKeys: { [key: string]: number };
-  audioWordlistId: number;
   collectStats: boolean;
   contextMenu: boolean;
-  customAudioSites: AudioSites;
   darkMode: boolean;
   domains: { [site: string]: DomainCfg };
   enabledDomainsOnly: boolean;
   enabledFramesOnly: boolean;
-  fillerAudio: string;
-  muteAudio: boolean;
-  muteAudioOnly: boolean;
-  muteCueRequireShowing: boolean;
-  muteMethod: number;
   password: string;
-  showSubtitles: number;
   showUpdateNotification: boolean;
   syncLargeKeys: boolean;
-  youTubeAutoMatchCensored: boolean;
-  youTubeAutoSubsMax: number;
-  youTubeAutoSubsMin: number;
 
   static readonly BUILD = Build;
   static readonly _classDefaults = {
-    audioWordlistId: 0,
     collectStats: true,
     contextMenu: true,
-    customAudioSites: null,
     darkMode: null,
     domains: {},
     enabledDomainsOnly: false,
     enabledFramesOnly: false,
-    fillerAudio: '',
-    muteAudio: false,
-    muteAudioOnly: false,
-    muteCueRequireShowing: false,
-    muteMethod: WebConfig.BUILD.config.muteMethod || Constants.MUTE_METHODS.TAB,
     password: null,
-    showSubtitles: Constants.SHOW_SUBTITLES.ALL,
     showUpdateNotification: false,
     syncLargeKeys: true,
-    youTubeAutoMatchCensored: true,
-    youTubeAutoSubsMax: 0,
-    youTubeAutoSubsMin: 0,
   };
 
   // eslint-disable-next-line @typescript-eslint/naming-convention

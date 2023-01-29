@@ -1,6 +1,5 @@
 import Constants from './lib/constants';
 import { dynamicList } from './lib/helper';
-import WebAudio from './webAudio';
 import WebConfig from './webConfig';
 import Domain from './domain';
 import Page from './page';
@@ -8,7 +7,6 @@ import Logger from './lib/logger';
 const logger = new Logger('Popup');
 
 class Popup {
-  audioSiteKeys: string[];
   cfg: WebConfig;
   domain: Domain;
   filterToggleProp: string;
@@ -20,15 +18,11 @@ class Popup {
   url: URL;
 
   static readonly _requiredConfig = [
-    'audioWordlistId',
-    'customAudioSites',
     'darkMode',
     'domains',
     'enabledDomainsOnly',
     'filterMethod',
     'loggingLevel',
-    'muteAudio',
-    'muteAudioOnly',
     'password',
     'wordlistId',
     'wordlists',
@@ -137,8 +131,6 @@ class Popup {
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     const wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
-    const audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
-    let audioPage = false;
     dynamicList(Constants.orderedArray(Constants.DOMAIN_MODES), domainModeSelect, true);
     domainModeSelect.selectedIndex = this.domain.getModeIndex();
     dynamicList(Constants.orderedArray(Constants.FILTER_METHODS), filterMethodSelect, true);
@@ -149,17 +141,6 @@ class Popup {
       const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
       dynamicList(wordlists, wordlistSelect);
       wordlistSelect.selectedIndex = wordlistIndex;
-      if (this.cfg.muteAudio) {
-        this.audioSiteKeys = Object.keys(WebAudio.supportedAndCustomSites(this.cfg.customAudioSites));
-        if (this.audioSiteKeys.includes(this.domain.cfgKey)) {
-          audioPage = true;
-          const audioWordlistIndex = this.domain.audioWordlistId >= 0 ? this.domain.audioWordlistId + 1 : 0;
-          dynamicList(wordlists, audioWordlistSelect);
-          audioWordlistSelect.selectedIndex = audioWordlistIndex;
-          const audioWordlistContainer = document.getElementById('audioWordlistContainer') as HTMLElement;
-          Popup.show(audioWordlistContainer);
-        }
-      }
       Popup.show(wordListContainer);
     }
 
@@ -170,7 +151,6 @@ class Popup {
       Popup.disable(domainModeSelect);
       Popup.disable(filterMethodSelect);
       Popup.disable(wordlistSelect);
-      Popup.disable(audioWordlistSelect);
     }
 
     // Restricted pages
@@ -178,7 +158,6 @@ class Popup {
       !this.domain.hostname
       || Page.disabledProtocols.test(this.url.protocol)
       || this.domain.hostname == 'chrome.google.com'
-      || (this.cfg.muteAudio && this.cfg.muteAudioOnly && !audioPage)
     ) {
       domainFilter.checked = false;
       Popup.disable(domainFilter);
@@ -186,7 +165,6 @@ class Popup {
       Popup.disable(domainModeSelect);
       Popup.disable(filterMethodSelect);
       Popup.disable(wordlistSelect);
-      Popup.disable(audioWordlistSelect);
       return false;
     }
 
@@ -196,7 +174,6 @@ class Popup {
       Popup.disable(domainModeSelect);
       Popup.disable(filterMethodSelect);
       Popup.disable(wordlistSelect);
-      Popup.disable(audioWordlistSelect);
     }
   }
 
@@ -262,24 +239,12 @@ class Popup {
     const container = document.getElementById('statusContainer');
     const statusText = document.getElementById('statusText');
 
-    if (this.status == Constants.STATUS.MUTE_PAGE) {
-      Popup.show(container);
-      statusText.textContent = 'Watching for captions';
-      statusText.classList.remove('active');
-      statusText.classList.add('available');
-    } else if (this.status == Constants.STATUS.CAPTIONS) {
-      statusText.textContent = 'Muting active';
-      Popup.show(container);
-      statusText.classList.add('active');
-      statusText.classList.remove('available');
-    } else {
-      Popup.hide(container);
-      statusText.textContent = '';
-    }
+    Popup.hide(container);
+    statusText.textContent = '';
   }
 
   async wordlistSelect(select: HTMLSelectElement) {
-    const type = select.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
+    const type = select.id === 'wordlistSelect' ? 'wordlistId' : '';
     this.domain[type] = select.selectedIndex > 0 ? select.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
     try {
       await this.domain.save(this.cfg);
@@ -325,5 +290,4 @@ document.getElementById('domainFilter').addEventListener('change', (evt) => { po
 document.getElementById('domainModeSelect').addEventListener('change', (evt) => { popup.updateDomainMode(); });
 document.getElementById('filterMethodSelect').addEventListener('change', (evt) => { popup.filterMethodSelect(); });
 document.getElementById('wordlistSelect').addEventListener('change', (evt) => { popup.wordlistSelect(evt.target as HTMLSelectElement); });
-document.getElementById('audioWordlistSelect').addEventListener('change', (evt) => { popup.wordlistSelect(evt.target as HTMLSelectElement); });
 document.getElementById('options').addEventListener('click', (evt) => { chrome.runtime.openOptionsPage(); });

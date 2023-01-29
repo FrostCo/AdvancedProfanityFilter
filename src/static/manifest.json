@@ -48,15 +48,5 @@
   "host_permissions": [
     "https://*.crunchyroll.com/",
     "https://*.vrv.co/"
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "audio/*.mp3"
-      ],
-      "matches": [
-        "<all_urls>"
-      ]
-    }
   ]
 }

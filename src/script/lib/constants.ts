@@ -15,11 +15,8 @@ export default class Constants {
   static readonly LOGGING_LEVELS = { DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3 };
   static readonly MATCH_METHODS = { EXACT: 0, PARTIAL: 1, WHOLE: 2, REGEX: 3 };
   static readonly MESSAGING = { BACKGROUND: 'background', CONTEXT: 'context', OPTION: 'option', POPUP: 'popup' };
-  static readonly MUTE_METHODS = { TAB: 0, VIDEO_VOLUME: 1, VIDEO_MUTE: 2, NONE: 9 };
-  static readonly SHOW_SUBTITLES = { ALL: 0, FILTERED: 1, UNFILTERED: 2, NONE: 3 };
-  static readonly STATS_TYPE_AUDIO = 'audio';
   static readonly STATS_TYPE_TEXT = 'text';
-  static readonly STATUS = { DISABLED: 0, NORMAL: 1, ADVANCED: 2, DEEP: 3, MUTE_PAGE: 4, CAPTIONS: 5 };
+  static readonly STATUS = { DISABLED: 0, NORMAL: 1, ADVANCED: 2, DEEP: 3 };
   static readonly TRUE = 1;
 
   // Helper Functions

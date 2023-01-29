@@ -15,7 +15,6 @@ export default class DataMigration {
     { version: '2.7.0', name: 'addWordlistsToWords', runOnImport: true },
     { version: '2.7.0', name: 'removeGlobalMatchMethod', runOnImport: true },
     { version: '2.7.0', name: 'removeOldDomainArrays', runOnImport: true },
-    { version: '2.12.0', name: 'overwriteMuteCueRequireShowingDefault', runOnImport: false },
     { version: '2.22.0', name: 'updateWordRepeatAndSeparatorDataTypes', runOnImport: true },
     { version: '2.26.0', name: 'changeShowUpdateNotificationDefaultToFalse', runOnImport: false },
     { version: '2.40.0', name: 'renameToWordAllowlist', runOnImport: true, async: true },
@@ -104,15 +103,6 @@ export default class DataMigration {
     if (oldCfg.words) {
       await WebConfig.saveSyncStorage({ _words0: oldCfg.words });
       await WebConfig.removeSyncStorage(oldWordsKey);
-    }
-  }
-
-  // This setting has caused some issues for users specifically with Disney+.
-  // This migration should only run once, and sets it to the new default of false.
-  overwriteMuteCueRequireShowingDefault() {
-    const cfg = this.cfg;
-    if (cfg.muteCueRequireShowing === true) {
-      cfg.muteCueRequireShowing = false;
     }
   }
 

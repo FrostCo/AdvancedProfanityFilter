@@ -77,7 +77,7 @@ describe('WebConfig', function() {
       const testingMax = WebConfig._maxBytes * 1.1;
 
       for (let i = 0; domainsLength < testingMax; i++) {
-        domains[`www.example${i}.com`] = { adv: true, wordlist: 2, audioList: 3 };
+        domains[`www.example${i}.com`] = { adv: true, wordlist: 2 };
         domainsLength = encoder.encode(JSON.stringify(domains)).length;
       }
 
@@ -97,7 +97,7 @@ describe('WebConfig', function() {
       const testingMax = WebConfig._maxBytes * 0.5;
 
       for (let i = 0; domainsLength < testingMax; i++) {
-        domains[`www.example${i}.com`] = { adv: true, wordlist: 2, audioList: 3 };
+        domains[`www.example${i}.com`] = { adv: true, wordlist: 2 };
         domainsLength = encoder.encode(JSON.stringify(domains)).length;
       }
 

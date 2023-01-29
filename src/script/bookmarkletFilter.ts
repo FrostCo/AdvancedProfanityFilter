@@ -3,9 +3,7 @@ import Constants from './lib/constants';
 import Domain from './domain';
 import Filter from './lib/filter';
 import Page from './page';
-import WebAudio from './webAudio';
 import WebConfig from './webConfig';
-import Wordlist from './lib/wordlist';
 
 /* @preserve - Start User Config */
 const config = WebConfig._defaults as any;
@@ -13,9 +11,6 @@ config.words = WebConfig._defaultWords;
 /* @preserve - End User Config */
 
 export default class BookmarkletFilter extends Filter {
-  audio: WebAudio;
-  audioOnly: boolean;
-  audioWordlistId: number;
   buildMessage: (destination: string, data?: object) => Message; // Bookmarklet: Not used - Needed to match signature of WebFilter
   declare cfg: WebConfig;
   domain: Domain;
@@ -24,7 +19,6 @@ export default class BookmarkletFilter extends Filter {
   hostname: string;
   iframe: Location;
   location: Location | URL;
-  mutePage: boolean;
   observer: MutationObserver;
   processMutationTarget: boolean;
   processNode: (node: Document | HTMLElement | Node | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
@@ -36,8 +30,6 @@ export default class BookmarkletFilter extends Filter {
     super();
     this.extension = false;
     this.filterText = true;
-    this.audioWordlistId = Constants.ALL_WORDS_WORDLIST_ID;
-    this.mutePage = false;
     this.processMutationTarget = false;
   }
 
@@ -61,17 +53,9 @@ export default class BookmarkletFilter extends Filter {
   checkMutationForProfanity(mutation) {
     mutation.addedNodes.forEach((node) => {
       if (!Page.isForbiddenNode(node)) {
-        if (this.mutePage) {
-          this.cleanAudio(node);
-        } else if (!this.audioOnly) {
-          this.processNode(node, this.wordlistId);
-        }
+        this.processNode(node, this.wordlistId);
       }
     });
-
-    if (this.mutePage && (this.audio.muted || this.audio.apfCaptionsEnabled)) {
-      this.handleRemovedNodesOnMutePage(mutation.removedNodes);
-    }
 
     if (mutation.target) {
       if (mutation.target.nodeName === '#text') {
@@ -84,54 +68,8 @@ export default class BookmarkletFilter extends Filter {
 
   checkMutationTargetTextForProfanity(mutation) {
     if (!Page.isForbiddenNode(mutation.target)) {
-      if (this.mutePage) {
-        const supported = this.audio.supportedNode(mutation.target);
-        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0];
-        if (supported !== false && rule.simpleUnmute) {
-          // Supported node. Check if a previously filtered node is being removed
-          if (
-            this.audio.muted
-            && mutation.oldValue
-            && this.audio.lastFilteredText
-            && this.audio.lastFilteredText.includes(mutation.oldValue)
-          ) {
-            this.audio.unmute(rule);
-          }
-          this.audio.clean(mutation.target, supported);
-        } else if (rule.simpleUnmute && this.audio.muted && !mutation.target.parentElement) {
-          // Check for removing a filtered subtitle (no parent)
-          if (this.audio.lastFilteredText && this.audio.lastFilteredText.includes(mutation.target.textContent)) {
-            this.audio.unmute(rule);
-          }
-        } else if (!this.audioOnly) { // Filter regular text
-          const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
-          if (result.modified) { mutation.target.data = result.filtered; }
-        }
-      } else if (!this.audioOnly) { // Filter regular text
-        const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
-        if (result.modified) { mutation.target.data = result.filtered; }
-      }
-    }
-  }
-
-  cleanAudio(node) {
-    if (this.audio.youTube && this.audio.youTubeAutoSubsPresent()) {
-      if (this.audio.youTubeAutoSubsSupportedNode(node)) {
-        if (this.audio.youTubeAutoSubsCurrentRow(node)) {
-          this.audio.cleanYouTubeAutoSubs(node);
-        } else if (!this.audioOnly) {
-          this.processNode(node, this.wordlistId);
-        }
-      } else if (!this.audioOnly && !this.audio.youTubeAutoSubsNodeIsSubtitleText(node)) {
-        this.processNode(node, this.wordlistId);
-      }
-    } else {
-      const supported = this.audio.supportedNode(node);
-      if (supported !== false) {
-        this.audio.clean(node, supported);
-      } else if (!this.audioOnly) {
-        this.processNode(node, this.wordlistId);
-      }
+      const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
+      if (result.modified) { mutation.target.data = result.filtered; }
     }
   }
 
@@ -187,44 +125,21 @@ export default class BookmarkletFilter extends Filter {
       return false;
     }
 
-    // Bookmarklet: Force video volume mute method
-    if (this.cfg.muteMethod === Constants.MUTE_METHODS.TAB) {
-      this.cfg.muteMethod === Constants.MUTE_METHODS.VIDEO_VOLUME;
-    }
-
     // Use domain-specific settings
     if (
       (
         this.cfg.enabledDomainsOnly
         && !this.domain.enabled
-        && !this.cfg.muteAudioOnly
       )
       || this.domain.disabled
     ) {
       return false;
     }
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
-    if (this.domain.audioWordlistId !== undefined) { this.audioWordlistId = this.domain.audioWordlistId; }
-
-    // Detect if we should mute audio for the current page
-    if (this.cfg.muteAudio) {
-      this.audio = new WebAudio(this);
-      this.mutePage = this.audio.supportedPage;
-      if (this.mutePage) {
-        if (this.cfg.wordlistsEnabled && this.wordlistId != this.audio.wordlistId) {
-          this.wordlists[this.audio.wordlistId] = new Wordlist(this.cfg, this.audio.wordlistId);
-        }
-      }
-    }
-
-    // Disable if muteAudioOnly mode is active and this is not a suported page
-    if (this.cfg.muteAudioOnly && !this.mutePage) {
-      return false;
-    }
 
     // Remove profanity from the main document and watch for new nodes
     this.init();
-    if (!this.audioOnly) { this.processNode(document, this.wordlistId); }
+    this.processNode(document, this.wordlistId);
     this.startObserving(document);
   }
 
@@ -252,38 +167,6 @@ export default class BookmarkletFilter extends Filter {
   filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     this.shadowObserver.observe(shadowRoot, observerConfig);
     this.processNode(shadowRoot, wordlistId, statsType);
-  }
-
-  handleRemovedNodesOnMutePage(removedNodes: NodeList) {
-    removedNodes.forEach((node) => {
-      // Remove APF Captions if the removed node was the last one we processed
-      if (this.audio.apfCaptionsEnabled) {
-        if (node == this.audio.lastProcessedNode || node.contains(this.audio.lastProcessedNode)) {
-          const apfCaptionRule = this.audio.rules[this.audio.apfCaptionRuleIds[0]];
-          this.audio.removeApfCaptions(apfCaptionRule);
-        }
-      }
-
-      // Check removed node to see if we should unmute
-      if (this.audio.muted) {
-        const supported = this.audio.supportedNode(node);
-        const rule = supported !== false ? this.audio.rules[supported] : this.audio.rules[0]; // Use the matched rule, or the first rule
-        if (
-          supported !== false
-          || node == this.audio.lastFilteredNode
-          || node.contains(this.audio.lastFilteredNode)
-          || (
-            rule.simpleUnmute
-            && node.textContent
-            && this.audio.lastFilteredText
-            && this.audio.lastFilteredText.includes(node.textContent)
-          )
-        ) {
-          this.audio.unmute(rule);
-          if (rule.apfCaptions) this.audio.removeApfCaptions(rule);
-        }
-      }
-    });
   }
 
   init(wordlistId: number | false = false) {

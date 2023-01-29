@@ -5,9 +5,7 @@ import { buildFilePath, devBuildFilePath, loadJSONFile, parseArgv, releaseBuildF
 
 let data = {
   release: false,
-  config: {
-    muteMethod: null,
-  },
+  config: {},
   manifestVersion: 2,
   target: 'chrome',
   version: '1.0.0',
@@ -40,7 +38,6 @@ function firefoxBuild() {
 
 function iOSBuild() {
   data.target = 'ios';
-  data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
 }
 
 function main() {
@@ -115,7 +112,6 @@ function manifestV3Build() {
 
 function safariBuild() {
   data.target = 'safari';
-  data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
 }
 
 function targetFromData() {
