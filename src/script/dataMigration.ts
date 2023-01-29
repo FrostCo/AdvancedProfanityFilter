@@ -147,7 +147,7 @@ export default class DataMigration {
     // Handle chrome storage config
     if (WebConfig.chromeStorageAvailable()) {
       const oldCfg = await WebConfig.getSyncStorage(oldKeys) as any;
-      if (Object.keys(oldCfg).some(k => oldKeys.includes(k))) {
+      if (Object.keys(oldCfg).some((k) => oldKeys.includes(k))) {
         this._renameConfigKeys(oldCfg, oldKeys, mapping);
         await WebConfig.removeSyncStorage(oldKeys);
       }
