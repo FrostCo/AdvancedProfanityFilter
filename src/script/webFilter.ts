@@ -327,7 +327,7 @@ export default class WebFilter extends Filter {
 
   processMutationTargetText(target: CharacterData) {
     // console.count('processMutationTargetText'); // Benchmark: Filter
-    // logger.debug('Process mutation.target', mutation.target, mutation.target.data);
+    // logger.debug('processMutationTargetText', target, target.data);
     if (!Page.isForbiddenNode(target)) {
       const result = this.replaceTextResult(target.data, this.wordlistId);
       if (result.modified) { target.data = result.filtered; }
