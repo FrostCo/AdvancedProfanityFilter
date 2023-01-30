@@ -335,7 +335,7 @@ export default class WebFilter extends Filter {
     // else { logger.debug('Forbidden mutation.target node', mutation.target); }
   }
 
-  processMutations(mutations) {
+  processMutations(mutations: MutationRecord[]) {
     mutations.forEach((mutation) => {
       filter.processMutation(mutation);
     });
