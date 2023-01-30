@@ -168,17 +168,18 @@ export default class BookmarkletFilter extends Filter {
 
     if (mutation.target) {
       if (mutation.target.nodeName === '#text') {
-        this.processMutationTargetText(mutation);
+        const target = mutation.target as CharacterData;
+        this.processMutationTargetText(target);
       } else if (this.processMutationTarget) {
         this.processNode(mutation.target, this.wordlistId);
       }
     }
   }
 
-  processMutationTargetText(mutation) {
-    if (!Page.isForbiddenNode(mutation.target)) {
-      const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
-      if (result.modified) { mutation.target.data = result.filtered; }
+  processMutationTargetText(target: CharacterData) {
+    if (!Page.isForbiddenNode(target)) {
+      const result = this.replaceTextResult(target.data, this.wordlistId);
+      if (result.modified) { target.data = result.filtered; }
     }
   }
 

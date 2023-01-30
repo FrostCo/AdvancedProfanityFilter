@@ -317,19 +317,20 @@ export default class WebFilter extends Filter {
 
     if (mutation.target) {
       if (mutation.target.nodeName === '#text') {
-        this.processMutationTargetText(mutation);
+        const target = mutation.target as CharacterData;
+        this.processMutationTargetText(target);
       } else if (this.processMutationTarget) {
         this.processNode(mutation.target, this.wordlistId);
       }
     }
   }
 
-  processMutationTargetText(mutation) {
+  processMutationTargetText(target: CharacterData) {
     // console.count('processMutationTargetText'); // Benchmark: Filter
     // logger.debug('Process mutation.target', mutation.target, mutation.target.data);
-    if (!Page.isForbiddenNode(mutation.target)) {
-      const result = this.replaceTextResult(mutation.target.data, this.wordlistId);
-      if (result.modified) { mutation.target.data = result.filtered; }
+    if (!Page.isForbiddenNode(target)) {
+      const result = this.replaceTextResult(target.data, this.wordlistId);
+      if (result.modified) { target.data = result.filtered; }
     }
     // else { logger.debug('Forbidden mutation.target node', mutation.target); }
   }
