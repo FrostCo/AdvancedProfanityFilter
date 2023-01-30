@@ -328,11 +328,8 @@ export default class WebFilter extends Filter {
   processMutationTargetText(target: CharacterData) {
     // console.count('processMutationTargetText'); // Benchmark: Filter
     // logger.debug('processMutationTargetText', target, target.data);
-    if (!Page.isForbiddenNode(target)) {
-      const result = this.replaceTextResult(target.data, this.wordlistId);
-      if (result.modified) { target.data = result.filtered; }
-    }
-    // else { logger.debug('Forbidden mutation.target node', mutation.target); }
+    const result = this.replaceTextResult(target.data, this.wordlistId);
+    if (result.modified) target.data = result.filtered;
   }
 
   processMutations(mutations: MutationRecord[]) {

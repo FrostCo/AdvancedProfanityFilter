@@ -177,10 +177,8 @@ export default class BookmarkletFilter extends Filter {
   }
 
   processMutationTargetText(target: CharacterData) {
-    if (!Page.isForbiddenNode(target)) {
-      const result = this.replaceTextResult(target.data, this.wordlistId);
-      if (result.modified) { target.data = result.filtered; }
-    }
+    const result = this.replaceTextResult(target.data, this.wordlistId);
+    if (result.modified) target.data = result.filtered;
   }
 
   processMutations(mutations: MutationRecord[]) {
