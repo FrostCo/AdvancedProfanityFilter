@@ -34,7 +34,7 @@ export default class WebFilter extends Filter {
 
   advancedReplaceText(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     if (node.parentNode || node === document) {
-      this.wordlists[wordlistId].regExps.forEach((regExp) => {
+      for (const regExp of this.wordlists[wordlistId].regExps) {
         // @ts-ignore: External library function
         findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: (portion, match) => {
           // logger.debug('[APF] Advanced match found', node.textContent);
@@ -44,7 +44,7 @@ export default class WebFilter extends Filter {
             return '';
           }
         } });
-      });
+      }
     } else {
       // ?: Might want to add support for processNode()
       this.cleanText(node, wordlistId, statsType);
@@ -165,9 +165,9 @@ export default class WebFilter extends Filter {
       // Note: This while loop skips processing on first node
       while (treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
-          treeWalker.currentNode.childNodes.forEach((childNode) => {
+          for (const childNode of treeWalker.currentNode.childNodes) {
             this.cleanText(childNode, wordlistId, statsType);
-          });
+          }
         } else {
           if (!Page.isForbiddenNode(treeWalker.currentNode)) {
             this.cleanChildNode(treeWalker.currentNode, wordlistId, statsType);
@@ -247,12 +247,12 @@ export default class WebFilter extends Filter {
         const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
         const storedWords = stats.words;
 
-        words.forEach((word) => {
+        for (const word of words) {
           if (!storedWords[word]) {
             storedWords[word] = { [ Constants.STATS_TYPE_TEXT ]: 0 };
           }
           storedWords[word].text += filter.stats.words[word].text;
-        });
+        }
 
         if (stats.startedAt == null) { stats.startedAt = Date.now(); }
 
@@ -303,13 +303,13 @@ export default class WebFilter extends Filter {
   processMutation(mutation: MutationRecord) {
     // console.count('[APF] this.processMutation() count'); // Benchmark: Filter
     // logger.debug('Mutation observed', mutation);
-    mutation.addedNodes.forEach((node) => {
+    for (const node of mutation.addedNodes) {
       if (!Page.isForbiddenNode(node)) {
         // logger.debug('[APF] Added node(s):', node);
         this.processNode(node, this.wordlistId);
       }
       // else { logger.debug('Forbidden node', node); }
-    });
+    }
 
     if (mutation.target) {
       if (mutation.target.nodeName === '#text') {
@@ -329,9 +329,9 @@ export default class WebFilter extends Filter {
   }
 
   processMutations(mutations: MutationRecord[]) {
-    mutations.forEach((mutation) => {
+    for (const mutation of mutations) {
       filter.processMutation(mutation);
-    });
+    }
     filter.updateCounterBadge();
   }
 
