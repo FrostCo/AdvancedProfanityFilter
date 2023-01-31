@@ -212,11 +212,7 @@ export default class WebFilter extends Filter {
         wordStats[word.value] = { [ Constants.STATS_TYPE_TEXT ]: 0 };
       }
 
-      if (this.filterText) {
-        switch (statsType) {
-          case Constants.STATS_TYPE_TEXT: wordStats[word.value].text++; break;
-        }
-      }
+      if (this.filterText && statsType == Constants.STATS_TYPE_TEXT) wordStats[word.value][Constants.STATS_TYPE_TEXT]++;
     }
   }
 
