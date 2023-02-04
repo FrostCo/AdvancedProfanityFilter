@@ -24,9 +24,13 @@ export default class Config {
   words: { [key: string]: WordOptions };
   wordSubSeparator: string;
 
+  protected static initializeDefaults(...defaults) {
+    return Object.assign({}, this._configDefaults, ...defaults);
+  }
+
   static readonly _allWordlists = ['All words'];
 
-  static readonly _defaults = {
+  static readonly _configDefaults = {
     censorCharacter: '*',
     censorFixedLength: 0,
     defaultSubstitution: 'censored',
@@ -83,6 +87,9 @@ export default class Config {
     'twats': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'dumbos' },
     'whore': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'tramp' },
   };
+
+  // Extending: Sub classes should pass in additional config defaults
+  static _defaults = this.initializeDefaults(this._configDefaults) as Config;
 
   constructor(data: Record<string, unknown> = {}) {
     Object.assign(this, Config._defaults, data);
