@@ -303,7 +303,7 @@ export default class WebConfig extends Config {
     }
 
     super(config); // Get the Config defaults
-    Object.assign(this, WebConfig._classDefaults, config); // Separate due to _defineProperty()
+    Object.assign(this, WebConfig._defaults, config); // Separate due to _defineProperty() for tests
   }
 
   // Order and remove `_` prefixed values
