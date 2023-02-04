@@ -17,7 +17,7 @@ export default class WebConfig extends Config {
   syncLargeKeys: boolean;
 
   static readonly BUILD = Build;
-  static readonly _classDefaults = {
+  static readonly _webDefaults = {
     collectStats: true,
     contextMenu: true,
     darkMode: null,
@@ -29,8 +29,7 @@ export default class WebConfig extends Config {
     syncLargeKeys: true,
   };
 
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  static readonly _defaults = Object.assign({}, Config._defaults, WebConfig._classDefaults);
+  static _defaults = this.initializeDefaults({}, this._configDefaults, this._webDefaults) as WebConfig;
   static readonly _localConfigKeys = ['domains', 'syncLargeKeys', 'words'];
   static readonly _localOnlyKeys = ['background', 'stats'];
   static readonly _maxSplitKeys = 64;
@@ -303,7 +302,7 @@ export default class WebConfig extends Config {
       throw new Error('Cannot be called directly, call load() instead.');
     }
 
-    super(); // Get the Config defaults
+    super(config); // Get the Config defaults
     Object.assign(this, WebConfig._classDefaults, config); // Separate due to _defineProperty()
   }
 
