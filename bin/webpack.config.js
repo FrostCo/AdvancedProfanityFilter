@@ -12,21 +12,10 @@ module.exports = {
   module: {
     rules: [
       {
-        exclude: /(node_modules|bower_components)/,
+        exclude: /node_modules/,
         test: /\.tsx?$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              '@babel/typescript',
-            ],
-            plugins: [
-              '@babel/proposal-class-properties',
-              '@babel/proposal-object-rest-spread',
-            ]
-          }
-        }
-      }
+        use: 'ts-loader',
+      },
     ]
   },
   optimization: {
