@@ -25,6 +25,7 @@ export default class OptionPage {
   auth: OptionAuth;
   cfg: WebConfig;
   darkModeButton: Element;
+  filter: Filter;
   lightModeButton: Element;
   prefersDarkScheme: boolean;
   themeElements: Element[];
@@ -188,6 +189,7 @@ export default class OptionPage {
     }).flat();
     this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
     this.setHelpVersion();
+    this.filter = new Filter;
   }
 
   applyDarkTheme(allElements = true) {
@@ -410,7 +412,7 @@ export default class OptionPage {
       await this.cfg.save('words');
       OptionPage.closeModal('bulkWordEditorModal');
       OptionPage.showStatusModal('Words saved successfully.');
-      filter.rebuildWordlists();
+      this.filter.rebuildWordlists();
       this.populateOptions();
     } catch (err) {
       if (OptionPage.isStorageError(err) && this.cfg.syncLargeKeys) {
@@ -756,8 +758,8 @@ export default class OptionPage {
     logger.setLevel(this.cfg.loggingLevel);
     this.applyTheme(refreshTheme);
     if (!this.auth) this.auth = new OptionAuth(this, this.cfg.password);
-    filter.cfg = this.cfg;
-    filter.init();
+    this.filter.cfg = this.cfg;
+    this.filter.init();
 
     // logger.debug(`Password: '${this.cfg.password}', Authenticated: ${this.auth.authenticated}`);
     if (this.cfg.password && !this.auth.authenticated) {
@@ -962,12 +964,12 @@ export default class OptionPage {
 
   async populateStats() {
     try {
-      filter.buildWordlist(Constants.ALL_WORDS_WORDLIST_ID, true);
+      this.filter.buildWordlist(Constants.ALL_WORDS_WORDLIST_ID, true);
       const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
 
       // Prepare data (collect totals, add words without stats, sort output)
       let totalFiltered = 0;
-      const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
+      const allWords = this.filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
       allWords.forEach((word) => {
         const wordStats = stats.words[word];
         if (wordStats) {
@@ -994,7 +996,7 @@ export default class OptionPage {
         tooltipSpan.classList.add('statsTooltip', 'w3-tag', 'w3-text');
         tooltipSpan.textContent = word;
         const wordSpan = document.createElement('span');
-        wordSpan.textContent = filter.replaceText(word, Constants.ALL_WORDS_WORDLIST_ID, null);
+        wordSpan.textContent = this.filter.replaceText(word, Constants.ALL_WORDS_WORDLIST_ID, null);
         wordCell.appendChild(tooltipSpan);
         wordCell.appendChild(wordSpan);
 
@@ -1029,15 +1031,15 @@ export default class OptionPage {
       if (option.cfg.filterMethod === Constants.FILTER_METHODS.OFF) {
         filteredTestText.textContent = testText.value;
       } else {
-        filteredTestText.textContent = filter.replaceText(testText.value, filter.cfg.wordlistId, null);
+        filteredTestText.textContent = this.filter.replaceText(testText.value, this.filter.cfg.wordlistId, null);
       }
     }
   }
 
   populateAllowlist() {
     const regExp = RegExp(' [*]$');
-    const sensitiveList = filter.cfg.wordAllowlist.map((item) => { return item + ' *'; });
-    const list = [].concat(sensitiveList, filter.cfg.iWordAllowlist).sort();
+    const sensitiveList = this.filter.cfg.wordAllowlist.map((item) => { return item + ' *'; });
+    const list = [].concat(sensitiveList, this.filter.cfg.iWordAllowlist).sort();
     const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
     removeChildren(allowlist);
     list.unshift('Add, or update existing...');
@@ -1150,13 +1152,13 @@ export default class OptionPage {
   }
 
   populateWordPage() {
-    let wordlistFilter = filter;
+    let wordlistFilter = this.filter;
     const selections = document.getElementById('wordlistSelections') as HTMLInputElement;
     const wordsSelect = document.getElementById('wordList') as HTMLSelectElement;
     removeChildren(wordsSelect);
 
     // Workaround for remove filter method
-    if (filter.cfg.filterWordList && filter.cfg.filterMethod === 2) {
+    if (this.filter.cfg.filterWordList && this.filter.cfg.filterMethod === 2) {
       wordlistFilter = new Filter;
       // Works because we are only changing a native value (filterMethod: number)
       wordlistFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: 0 }));
@@ -1209,7 +1211,7 @@ export default class OptionPage {
       const lessThan = parseInt(lessUsedWordsNumber.value);
       lessUsedWords = {};
 
-      const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
+      const allWords = this.filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
       allWords.forEach((word) => {
         const wordStats = stats.words[word];
         const total = wordStats ? wordStats.text : 0;
@@ -1228,7 +1230,7 @@ export default class OptionPage {
     await this.cfg.save('words');
     const wordList = document.getElementById('wordList') as HTMLSelectElement;
     wordList.selectedIndex = 0;
-    filter.rebuildWordlists();
+    this.filter.rebuildWordlists();
     this.populateOptions();
   }
 
@@ -1266,7 +1268,7 @@ export default class OptionPage {
 
     try {
       await this.cfg.save(originalListName);
-      filter.init();
+      this.filter.init();
       this.populateOptions();
     } catch (err) {
       logger.warn(`Failed to remove '${originalWord}' from allowlist.`, err);
@@ -1287,7 +1289,7 @@ export default class OptionPage {
         await this.cfg.save('words');
         // Update states and Reset word form
         wordList.selectedIndex = 0;
-        filter.rebuildWordlists();
+        this.filter.rebuildWordlists();
         this.populateOptions();
       } catch (err) {
         logger.warn(`Failed to remove '${word}'.`, err);
@@ -1475,7 +1477,7 @@ export default class OptionPage {
         });
         try {
           await this.cfg.save(propsToSave);
-          filter.init();
+          this.filter.init();
           this.populateOptions();
         } catch (err) {
           logger.warn('Failed to update allowlist.', err);
@@ -1582,7 +1584,7 @@ export default class OptionPage {
         try {
           await this.saveOptions();
           // Update states and Reset word form
-          filter.rebuildWordlists();
+          this.filter.rebuildWordlists();
           this.populateOptions();
         } catch (err) {
           logger.warn(`Failed to update word '${word}'.`, err);
@@ -1602,7 +1604,7 @@ export default class OptionPage {
     this.cfg.filterMethod = Constants.FILTER_METHODS[filterMethodInput.value];
     try {
       await this.cfg.save('filterMethod');
-      filter.rebuildWordlists();
+      this.filter.rebuildWordlists();
       this.populateOptions();
     } catch (err) {
       OptionPage.handleError('Failed to set filter method.', err);
@@ -1783,7 +1785,6 @@ export default class OptionPage {
   }
 }
 
-const filter = new Filter;
 const option = new OptionPage;
 let lessUsedWords = {};
 
