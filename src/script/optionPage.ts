@@ -26,6 +26,7 @@ export default class OptionPage {
   cfg: WebConfig;
   darkModeButton: Element;
   filter: Filter;
+  lessUsedWords: { [word: string]: number };
   lightModeButton: Element;
   prefersDarkScheme: boolean;
   themeElements: Element[];
@@ -579,8 +580,8 @@ export default class OptionPage {
         validated = this.validateLessUsedWordsNumber();
         if (validated) {
           await option.prepareLessUsedWords();
-          if (Object.keys(lessUsedWords).length) {
-            OptionPage.configureConfirmModal({ backup: true, content: `Are you sure you want to remove ${Object.keys(lessUsedWords).length} words?` });
+          if (Object.keys(this.lessUsedWords).length) {
+            OptionPage.configureConfirmModal({ backup: true, content: `Are you sure you want to remove ${Object.keys(this.lessUsedWords).length} words?` });
             ok.addEventListener('click', removeLessUsedWords);
           } else {
             OptionPage.configureConfirmModal(
@@ -1209,14 +1210,14 @@ export default class OptionPage {
       const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
       const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
       const lessThan = parseInt(lessUsedWordsNumber.value);
-      lessUsedWords = {};
+      this.lessUsedWords = {};
 
       const allWords = this.filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
       allWords.forEach((word) => {
         const wordStats = stats.words[word];
         const total = wordStats ? wordStats.text : 0;
         if (total < lessThan) {
-          lessUsedWords[word] = total;
+          this.lessUsedWords[word] = total;
         }
       });
     } catch (err) {
@@ -1251,7 +1252,7 @@ export default class OptionPage {
   }
 
   async removeLessUsedWords() {
-    Object.keys(lessUsedWords).forEach(((word) => {
+    Object.keys(this.lessUsedWords).forEach(((word) => {
       this.cfg.removeWord(word);
     }));
     await this.cfg.save('words');
@@ -1786,7 +1787,6 @@ export default class OptionPage {
 }
 
 const option = new OptionPage;
-let lessUsedWords = {};
 
 ////
 // Events
