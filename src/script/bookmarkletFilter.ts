@@ -1,4 +1,4 @@
-import '@VENDOR/findAndReplaceDOMText';
+import '@VENDOR/findAndReplaceDOMText.js';
 import Constants from '@APF/lib/constants';
 import Domain from '@APF/domain';
 import Filter from '@APF/lib/filter';
