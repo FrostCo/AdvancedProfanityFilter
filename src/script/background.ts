@@ -21,6 +21,7 @@ export default class Background {
     this.COLOR_BLUE_VIOLET,
     this.COLOR_FOREST_GREEN,
   ] as chrome.action.ColorArray[];
+  static readonly LOGGER = new Logger('Background');
   // #endregion
 
   // #region Static Methods
@@ -124,7 +125,7 @@ export default class Background {
     tabOptions.disabledOnce = true;
     await this.saveBackgroundStorage(storage);
     chrome.tabs.reload(tabId);
-    Logger.info('[Background] disabling tab once.', tabId);
+    this.LOGGER.info('disabling tab once.', tabId);
   }
 
   static async getGlobalVariable(variableName: string, sender, sendResponse) {
@@ -210,7 +211,7 @@ export default class Background {
     } else if (details.reason == 'update') {
       this.contextMenuSetup();
       const thisVersion = chrome.runtime.getManifest().version;
-      Logger.info(`[Background] Updated from ${details.previousVersion} to ${thisVersion}.`);
+      this.LOGGER.info(`Updated from ${details.previousVersion} to ${thisVersion}.`);
 
       // Open options page to show new features
       // chrome.runtime.openOptionsPage();
@@ -271,7 +272,7 @@ export default class Background {
         if (request.updateContextMenus != null) {
           this.contextMenuSetup(request.updateContextMenus);
         } else {
-          Logger.error('Received unhandled message.', JSON.stringify(request));
+          this.LOGGER.error('Received unhandled message.', JSON.stringify(request));
         }
         break;
 
@@ -280,12 +281,12 @@ export default class Background {
           this.updatePopupStatus(request.tabId, null, sendResponse);
           return true; // return true when waiting on an async call
         } else {
-          Logger.error('Received unhandled message.', JSON.stringify(request));
+          this.LOGGER.error('Received unhandled message.', JSON.stringify(request));
         }
         break;
 
       default:
-        Logger.error('Received message without a supported source:', JSON.stringify(request));
+        this.LOGGER.error('Received message without a supported source:', JSON.stringify(request));
     }
 
     sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
@@ -308,7 +309,7 @@ export default class Background {
         await cfg.save('words');
         chrome.tabs.reload();
       } catch (err) {
-        Logger.errorTime(`[Background] Failed to process selection '${selection}'.`, err);
+        this.LOGGER.errorTime(`Failed to process selection '${selection}'.`, err);
       }
     }
   }
@@ -358,7 +359,7 @@ export default class Background {
       await domain.save(cfg);
       chrome.tabs.reload();
     } catch (err) {
-      Logger.error(`[Background] Failed to modify '${action}' for domain '${domain.cfgKey}'.`, err, domain);
+      this.LOGGER.error(`Failed to modify '${action}' for domain '${domain.cfgKey}'.`, err, domain);
     }
   }
 
