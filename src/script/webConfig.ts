@@ -1,7 +1,7 @@
 import Config from '@APF/lib/config';
 import { prettyPrintArray, stringArray } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
-import * as Build from '../../.build.json';
+import Build from '@ROOT/.build.json';
 const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {

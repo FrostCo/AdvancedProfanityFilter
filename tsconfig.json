@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
     "lib": ["es2017", "dom", "dom.iterable"],
     "moduleResolution": "node",
@@ -8,6 +9,7 @@
     "outDir": "./dist",
     "paths": {
       "@APF/*": ["src/script/*"],
+      "@ROOT/*": ["./*"],
       "@VENDOR/*": ["src/script/vendor/*"],
     },
     "resolveJsonModule": true,
