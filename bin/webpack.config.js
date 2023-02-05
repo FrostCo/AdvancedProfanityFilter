@@ -1,7 +1,7 @@
 module.exports = {
   entry: {
     background: './src/script/background.ts',
-    optionPage: './src/script/optionPage.ts',
+    optionPage: './src/script/mainOptionPage.ts',
     popup: './src/script/mainPopup.ts',
     showErrors: '/src/script/showErrors.ts',
     webFilter: './src/script/mainContent.ts',
