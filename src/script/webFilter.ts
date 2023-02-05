@@ -158,9 +158,9 @@ export default class WebFilter extends Filter {
     // Track stats (if enabled)
     if (this.cfg.collectStats) {
       this.persistStats();
-      window.setTimeout(filter.persistStats, 3000); // Persist once after 3 seconds
-      window.setTimeout(filter.persistStats, 6000); // Persist once again after 3 more seconds
-      window.setInterval(filter.persistStats, 10000); // Persist every 10 seconds after that
+      window.setTimeout(this.persistStats.bind(this), 3000); // Persist once after 3 seconds
+      window.setTimeout(this.persistStats.bind(this), 6000); // Persist once again after 3 more seconds
+      window.setInterval(this.persistStats.bind(this), 10000); // Persist every 10 seconds after that
     }
   }
 
@@ -249,7 +249,7 @@ export default class WebFilter extends Filter {
   async persistStats() {
     if (!WebConfig.chromeStorageAvailable()) { return false; }
     try {
-      const words = Object.keys(filter.stats.words);
+      const words = Object.keys(this.stats.words);
       if (words.length) {
         const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
         const storedWords = stats.words;
@@ -258,13 +258,13 @@ export default class WebFilter extends Filter {
           if (!storedWords[word]) {
             storedWords[word] = { [ Constants.STATS_TYPE_TEXT ]: 0 };
           }
-          storedWords[word].text += filter.stats.words[word].text;
+          storedWords[word].text += this.stats.words[word].text;
         }
 
         if (stats.startedAt == null) { stats.startedAt = Date.now(); }
 
         await WebConfig.saveLocalStorage({ stats: stats });
-        filter.stats = { words: {} };
+        this.stats = { words: {} };
       }
     } catch (err) {
       if (err.message !== 'Extension context invalidated.') {
