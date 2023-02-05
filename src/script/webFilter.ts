@@ -23,6 +23,13 @@ export default class WebFilter extends Filter {
   stats: Statistics;
   summary: Summary;
 
+  static readonly observerConfig: MutationObserverInit = {
+    characterData: true,
+    characterDataOldValue: true,
+    childList: true,
+    subtree: true,
+  };
+
   constructor() {
     super();
     this.extension = true;
@@ -180,7 +187,7 @@ export default class WebFilter extends Filter {
   }
 
   filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
-    this.shadowObserver.observe(shadowRoot, observerConfig);
+    this.shadowObserver.observe(shadowRoot, WebFilter.observerConfig);
     this.processNode(shadowRoot, wordlistId, statsType);
   }
 
@@ -380,7 +387,7 @@ export default class WebFilter extends Filter {
   }
 
   startObserving(target: Node = document, observer: MutationObserver = this.observer) {
-    observer.observe(target, observerConfig);
+    observer.observe(target, WebFilter.observerConfig);
     // TODO: Track shadowObserver nodes if we need to restart observing
   }
 
@@ -417,12 +424,6 @@ export default class WebFilter extends Filter {
 }
 
 const filter = new WebFilter;
-const observerConfig: MutationObserverInit = {
-  characterData: true,
-  characterDataOldValue: true,
-  childList: true,
-  subtree: true,
-};
 
 if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptGlobalScope]'].includes(({}).toString.call(window))) {
   filter.observer = new MutationObserver(filter.processMutations);
