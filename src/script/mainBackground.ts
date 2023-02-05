@@ -1,4 +1,4 @@
-import Background from './background';
+import Background from '@APF/background';
 
 chrome.contextMenus.onClicked.addListener((info, tab) => { Background.contextMenusOnClick(info, tab); });
 chrome.runtime.onInstalled.addListener((details) => { Background.onInstalled(details); });

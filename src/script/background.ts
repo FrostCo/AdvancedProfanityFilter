@@ -1,9 +1,9 @@
-import Constants from './lib/constants';
-import DataMigration from './dataMigration';
-import Domain from './domain';
-import WebConfig from './webConfig';
-import { formatNumber, makeRequest } from './lib/helper';
-import Logger from './lib/logger';
+import Constants from '@APF/lib/constants';
+import DataMigration from '@APF/dataMigration';
+import Domain from '@APF/domain';
+import WebConfig from '@APF/webConfig';
+import { formatNumber, makeRequest } from '@APF/lib/helper';
+import Logger from '@APF/lib/logger';
 
 export default class Background {
   // #region Constants

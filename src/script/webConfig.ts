@@ -1,6 +1,6 @@
-import Config from './lib/config';
-import { prettyPrintArray, stringArray } from './lib/helper';
-import Logger from './lib/logger';
+import Config from '@APF/lib/config';
+import { prettyPrintArray, stringArray } from '@APF/lib/helper';
+import Logger from '@APF/lib/logger';
 import * as Build from '../../.build.json';
 const logger = new Logger('WebConfig');
 

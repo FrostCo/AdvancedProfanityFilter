@@ -1,4 +1,4 @@
-import WebFilter from './webFilter';
+import WebFilter from '@APF/webFilter';
 
 const filter = new WebFilter;
 

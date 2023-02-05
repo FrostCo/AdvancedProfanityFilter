@@ -1,4 +1,4 @@
-import OptionPage from './optionPage';
+import OptionPage from '@APF/optionPage';
 
 const option = new OptionPage;
 

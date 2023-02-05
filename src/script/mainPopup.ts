@@ -1,6 +1,6 @@
-import Constants from './lib/constants';
-import Popup from './popup';
-import Logger from './lib/logger';
+import Constants from '@APF/lib/constants';
+import Popup from '@APF/popup';
+import Logger from '@APF/lib/logger';
 
 const logger = new Logger('Popup');
 

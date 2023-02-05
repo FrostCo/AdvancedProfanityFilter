@@ -1,9 +1,9 @@
-import Constants from './lib/constants';
-import { dynamicList } from './lib/helper';
-import WebConfig from './webConfig';
-import Domain from './domain';
-import Page from './page';
-import Logger from './lib/logger';
+import Constants from '@APF/lib/constants';
+import { dynamicList } from '@APF/lib/helper';
+import WebConfig from '@APF/webConfig';
+import Domain from '@APF/domain';
+import Page from '@APF/page';
+import Logger from '@APF/lib/logger';
 const logger = new Logger('Popup');
 
 export default class Popup {

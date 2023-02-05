@@ -1,11 +1,11 @@
-import Constants from './lib/constants';
-import WebConfig from './webConfig';
-import Filter from './lib/filter';
-import Domain from './domain';
-import OptionAuth from './optionAuth';
-import DataMigration from './dataMigration';
-import Bookmarklet from './bookmarklet';
-import Logger from './lib/logger';
+import Constants from '@APF/lib/constants';
+import WebConfig from '@APF/webConfig';
+import Filter from '@APF/lib/filter';
+import Domain from '@APF/domain';
+import OptionAuth from '@APF/optionAuth';
+import DataMigration from '@APF/dataMigration';
+import Bookmarklet from '@APF/bookmarklet';
+import Logger from '@APF/lib/logger';
 import {
   booleanToNumber,
   dynamicList,
@@ -18,7 +18,7 @@ import {
   removeFromArray,
   stringArray,
   upperCaseFirst
-} from './lib/helper';
+} from '@APF/lib/helper';
 
 const logger = new Logger('OptionPage');
 

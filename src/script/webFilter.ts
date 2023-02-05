@@ -1,11 +1,11 @@
-import './vendor/findAndReplaceDOMText';
-import Constants from './lib/constants';
-import Domain from './domain';
-import Filter from './lib/filter';
-import Page from './page';
-import WebConfig from './webConfig';
-import Word from './lib/word';
-import Logger from './lib/logger';
+import '@VENDOR/findAndReplaceDOMText';
+import Constants from '@APF/lib/constants';
+import Domain from '@APF/domain';
+import Filter from '@APF/lib/filter';
+import Page from '@APF/page';
+import WebConfig from '@APF/webConfig';
+import Word from '@APF/lib/word';
+import Logger from '@APF/lib/logger';
 const logger = new Logger('WebFilter');
 
 export default class WebFilter extends Filter {

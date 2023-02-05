@@ -1,3 +1,5 @@
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+
 module.exports = {
   entry: {
     background: './src/script/mainBackground.ts',
@@ -31,7 +33,10 @@ module.exports = {
     minimize: false
   },
   resolve: {
-    extensions: ['.js', '.ts']
+    extensions: ['.js', '.ts'],
+    plugins: [
+      new TsconfigPathsPlugin({ configFile: "./tsconfig.json" }),
+    ],
   },
   target: 'web',
 };

@@ -1,9 +1,9 @@
-import './vendor/findAndReplaceDOMText';
-import Constants from './lib/constants';
-import Domain from './domain';
-import Filter from './lib/filter';
-import Page from './page';
-import WebConfig from './webConfig';
+import '@VENDOR/findAndReplaceDOMText';
+import Constants from '@APF/lib/constants';
+import Domain from '@APF/domain';
+import Filter from '@APF/lib/filter';
+import Page from '@APF/page';
+import WebConfig from '@APF/webConfig';
 
 /* @preserve - Start User Config */
 const config = WebConfig._defaults as any;
