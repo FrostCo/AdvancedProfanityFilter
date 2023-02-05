@@ -4,7 +4,7 @@ module.exports = {
     optionPage: './src/script/optionPage.ts',
     popup: './src/script/popup.ts',
     showErrors: '/src/script/showErrors.ts',
-    webFilter: './src/script/webFilter.ts',
+    webFilter: './src/script/mainContent.ts',
   },
   mode: 'production',
   module: {
