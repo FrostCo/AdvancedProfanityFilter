@@ -10,6 +10,7 @@ import {
   booleanToNumber,
   dynamicList,
   exportToFile,
+  lastElement,
   numberToBoolean,
   numberWithCommas,
   readFile,
@@ -22,6 +23,7 @@ import {
 const logger = new Logger('OptionPage');
 
 export default class OptionPage {
+  _confirmEventListeners: { (): void; } [];
   auth: OptionAuth;
   cfg: WebConfig;
   darkModeButton: Element;
@@ -183,6 +185,7 @@ export default class OptionPage {
   }
 
   constructor() {
+    this._confirmEventListeners = [];
     this.darkModeButton = document.querySelector('div.themes > div.moon');
     this.lightModeButton = document.querySelector('div.themes > div.sun');
     this.themeElements = OptionPage.themeElementSelectors.map((selector) => {
@@ -429,7 +432,7 @@ export default class OptionPage {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     configSyncLargeKeys.checked = false;
     try {
-      await this.convertStorageLocation(true);
+      await this.convertStorageLocation(null, true);
       await this.bulkEditorSave();
     } catch (err) {
       OptionPage.handleError('Failed to save.', err);
@@ -510,18 +513,15 @@ export default class OptionPage {
 
   async confirm(action: string) {
     const cancel = document.getElementById('confirmModalCancel');
-    cancel.removeEventListener('click', populateConfig);
-    cancel.removeEventListener('click', importConfigRetryCancel);
     const ok = document.getElementById('confirmModalOK');
-    ok.removeEventListener('click', bulkEditorSave);
-    ok.removeEventListener('click', bulkEditorSaveRetry);
-    ok.removeEventListener('click', convertStorageLocation);
-    ok.removeEventListener('click', importConfig);
-    ok.removeEventListener('click', importConfigRetry);
-    ok.removeEventListener('click', removeAllWords);
-    ok.removeEventListener('click', restoreDefaults);
-    ok.removeEventListener('click', setPassword);
-    ok.removeEventListener('click', statsReset);
+
+    // Cleanup old event listeners
+    for (const listener of this._confirmEventListeners) {
+      cancel.removeEventListener('click', listener);
+      ok.removeEventListener('click', listener);
+    }
+    this._confirmEventListeners = [];
+
     const content = document.createElement('span');
     const paragraph = document.createElement('p');
     const italics = document.createElement('i');
@@ -534,7 +534,8 @@ export default class OptionPage {
         content.appendChild(paragraph);
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: true }, content);
-        ok.addEventListener('click', bulkEditorSave);
+        this._confirmEventListeners.push(this.bulkEditorSave.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'bulkEditorSaveRetry':
         paragraph.textContent = 'Failed to save changes because they were too large to be stored. Retry using local storage?';
@@ -542,7 +543,8 @@ export default class OptionPage {
         content.appendChild(paragraph);
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: true, titleClass: 'w3-red' }, content);
-        ok.addEventListener('click', bulkEditorSaveRetry);
+        this._confirmEventListeners.push(this.bulkEditorSaveRetry.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'convertStorageLocation':
         if (option.cfg.syncLargeKeys) {
@@ -554,12 +556,15 @@ export default class OptionPage {
         content.appendChild(paragraph);
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: true }, content);
-        cancel.addEventListener('click', populateConfig);
-        ok.addEventListener('click', convertStorageLocation);
+        this._confirmEventListeners.push(this.populateConfig.bind(this));
+        cancel.addEventListener('click', lastElement(this._confirmEventListeners));
+        this._confirmEventListeners.push(this.convertStorageLocation.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfig':
         OptionPage.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
-        ok.addEventListener('click', importConfig);
+        this._confirmEventListeners.push(this.importConfig.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfigRetry':
         paragraph.textContent = 'Import failed due to storage limitations. Would you like to try again using local storage?';
@@ -567,14 +572,17 @@ export default class OptionPage {
         content.appendChild(paragraph);
         content.appendChild(italics);
         OptionPage.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
-        ok.addEventListener('click', importConfigRetry);
-        cancel.addEventListener('click', importConfigRetryCancel);
+        this._confirmEventListeners.push(this.importConfigRetryCancel.bind(this));
+        cancel.addEventListener('click', lastElement(this._confirmEventListeners));
+        this._confirmEventListeners.push(this.importConfigRetry.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'removeAllWords':
         paragraph.textContent = 'Are you sure you want to remove all words?';
         content.appendChild(paragraph);
         OptionPage.configureConfirmModal({ backup: true }, content);
-        ok.addEventListener('click', removeAllWords);
+        this._confirmEventListeners.push(this.removeAllWords.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'removeLessUsedWords':
         validated = this.validateLessUsedWordsNumber();
@@ -582,7 +590,8 @@ export default class OptionPage {
           await option.prepareLessUsedWords();
           if (Object.keys(this.lessUsedWords).length) {
             OptionPage.configureConfirmModal({ backup: true, content: `Are you sure you want to remove ${Object.keys(this.lessUsedWords).length} words?` });
-            ok.addEventListener('click', removeLessUsedWords);
+            this._confirmEventListeners.push(this.removeLessUsedWords.bind(this));
+            ok.addEventListener('click', lastElement(this._confirmEventListeners));
           } else {
             OptionPage.configureConfirmModal(
               { content: 'All words have been filtered more times than the provided number.\n\nTry increasing the number to include more words.' }
@@ -592,11 +601,13 @@ export default class OptionPage {
         break;
       case 'statsReset':
         OptionPage.configureConfirmModal({ content: 'Are you sure you want to reset filter statistics?' });
-        ok.addEventListener('click', statsReset);
+        this._confirmEventListeners.push(this.statsReset.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'restoreDefaults':
         OptionPage.configureConfirmModal({ content: 'Are you sure you want to restore defaults?', backup: true });
-        ok.addEventListener('click', restoreDefaults);
+        this._confirmEventListeners.push(this.restoreDefaults.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'setPassword': {
         const passwordText = document.getElementById('setPassword') as HTMLInputElement;
@@ -605,7 +616,8 @@ export default class OptionPage {
 
         const message = passwordText.value == '' ? 'Are you sure you want to remove the password?' : `Are you sure you want to set the password to '${passwordText.value}'?`;
         OptionPage.configureConfirmModal({ content: message });
-        ok.addEventListener('click', setPassword);
+        this._confirmEventListeners.push(this.auth.setPassword.bind(this.auth));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       }
     }
@@ -623,7 +635,7 @@ export default class OptionPage {
     }
   }
 
-  async convertStorageLocation(silent = false) {
+  async convertStorageLocation(evt: Event = null, silent = false) {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
     const keys = WebConfig._localConfigKeys;
@@ -720,7 +732,7 @@ export default class OptionPage {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     configSyncLargeKeys.checked = false;
     try {
-      await this.convertStorageLocation(true);
+      await this.convertStorageLocation(null, true);
       await this.cfg.save();
       OptionPage.showStatusModal('Settings imported successfully.');
       await this.init();
@@ -734,7 +746,7 @@ export default class OptionPage {
       const importedCfg = new WebConfig(JSON.parse(cfg));
       const migration = new DataMigration(importedCfg);
       await migration.runImportMigrations();
-      const resetSuccess = await this.restoreDefaults(true);
+      const resetSuccess = await this.restoreDefaults(null, true);
       if (resetSuccess) {
         try {
           this.cfg = importedCfg;
@@ -1325,7 +1337,7 @@ export default class OptionPage {
     }
   }
 
-  async restoreDefaults(silent = false) {
+  async restoreDefaults(evt: Event = null, silent = false) {
     try {
       await this.cfg.resetPreserveStats();
       if (!silent) OptionPage.showStatusModal('Default settings restored.');
@@ -1790,19 +1802,6 @@ const option = new OptionPage;
 
 ////
 // Events
-// Functions for confirm() to have access to `this`
-function bulkEditorSave() { option.bulkEditorSave(); }
-function bulkEditorSaveRetry() { option.bulkEditorSaveRetry(); }
-function importConfig() { option.importConfig(); }
-function importConfigRetry() { option.importConfigRetry(); }
-function importConfigRetryCancel() { option.importConfigRetryCancel(); }
-function populateConfig() { option.populateConfig(); }
-function convertStorageLocation() { option.convertStorageLocation(); }
-function removeAllWords() { option.removeAllWords(); }
-function removeLessUsedWords() { option.removeLessUsedWords(); }
-function restoreDefaults() { option.restoreDefaults(); }
-function setPassword() { option.auth.setPassword(); }
-function statsReset() { option.statsReset(); }
 // Add event listeners to DOM
 window.addEventListener('load', (evt) => { option.init(); });
 document.querySelectorAll('#menu a').forEach((el) => { el.addEventListener('click', (evt) => { option.switchPage(evt.target as HTMLAnchorElement); }); });
