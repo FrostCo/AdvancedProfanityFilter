@@ -394,6 +394,10 @@ export default class Background {
     }
   }
   // #endregion
+
+  constructor() {
+    throw new Error('This is a static class. Call methods directly on the class, no instance needed.');
+  }
 }
 
 chrome.contextMenus.onClicked.addListener((info, tab) => { Background.contextMenusOnClick(info, tab); });
