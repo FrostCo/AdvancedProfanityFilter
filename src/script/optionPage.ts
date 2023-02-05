@@ -593,8 +593,9 @@ export default class OptionPage {
             this._confirmEventListeners.push(this.removeLessUsedWords.bind(this));
             ok.addEventListener('click', lastElement(this._confirmEventListeners));
           } else {
-            OptionPage.configureConfirmModal(
-              { content: 'All words have been filtered more times than the provided number.\n\nTry increasing the number to include more words.' }
+            validated = false;
+            OptionPage.showStatusModal(
+              'All words have been filtered more times than the provided number.\n\nTry increasing the number to include more words.'
             );
           }
         }
