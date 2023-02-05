@@ -19,6 +19,8 @@ import {
   upperCaseFirst
 } from './lib/helper';
 
+const logger = new Logger('OptionPage');
+
 export default class OptionPage {
   auth: OptionAuth;
   cfg: WebConfig;
@@ -1781,7 +1783,6 @@ export default class OptionPage {
   }
 }
 
-const logger = new Logger('OptionPage');
 const filter = new Filter;
 const option = new OptionPage;
 let lessUsedWords = {};
