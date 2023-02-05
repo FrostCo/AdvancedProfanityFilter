@@ -547,7 +547,7 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'convertStorageLocation':
-        if (option.cfg.syncLargeKeys) {
+        if (this.cfg.syncLargeKeys) {
           paragraph.textContent = 'This will prevent large settings like words and domains from syncing, but allow you to store more.';
         } else {
           paragraph.textContent = 'This will allow large settings like words and domains to sync, but has stricter limits on how much you can store.';
@@ -587,7 +587,7 @@ export default class OptionPage {
       case 'removeLessUsedWords':
         validated = this.validateLessUsedWordsNumber();
         if (validated) {
-          await option.prepareLessUsedWords();
+          await this.prepareLessUsedWords();
           if (Object.keys(this.lessUsedWords).length) {
             OptionPage.configureConfirmModal({ backup: true, content: `Are you sure you want to remove ${Object.keys(this.lessUsedWords).length} words?` });
             this._confirmEventListeners.push(this.removeLessUsedWords.bind(this));
@@ -638,14 +638,14 @@ export default class OptionPage {
 
   async convertStorageLocation(evt: Event = null, silent = false) {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
-    option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
+    this.cfg.syncLargeKeys = configSyncLargeKeys.checked;
     const keys = WebConfig._localConfigKeys;
 
     try {
-      await option.cfg.save(keys);
+      await this.cfg.save(keys);
 
       try {
-        if (option.cfg.syncLargeKeys) {
+        if (this.cfg.syncLargeKeys) {
           await WebConfig.removeLocalStorage(WebConfig._largeKeys);
         } else {
           let removeKeys = [];
@@ -660,17 +660,17 @@ export default class OptionPage {
         }
       } catch (err) {
         // Revert UI and export a backup of config.
-        option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
-        option.backupConfig();
+        this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
+        this.backupConfig();
         OptionPage.handleError('Failed to cleanup old storage, backup automatically exported.', err);
-        await option.cfg.save('syncLargeKeys');
-        option.populateConfig();
+        await this.cfg.save('syncLargeKeys');
+        this.populateConfig();
       }
     } catch (err) {
       // Revert UI
       OptionPage.handleError('Failed to update storage preference.', err);
-      option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
-      option.populateConfig();
+      this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
+      this.populateConfig();
     }
   }
 
@@ -878,7 +878,7 @@ export default class OptionPage {
       optionElement.value = domain === domains[0] ? '' : domain;
       domainsSelect.appendChild(optionElement);
     });
-    domainFilterAllFrames.checked = !option.cfg.enabledFramesOnly;
+    domainFilterAllFrames.checked = !this.cfg.enabledFramesOnly;
 
     if (mode === 'minimal') {
       OptionPage.hide(domainDisabledLabel);
@@ -888,7 +888,7 @@ export default class OptionPage {
       OptionPage.show(domainDisabledLabel);
     }
 
-    if (option.cfg.enabledFramesOnly) {
+    if (this.cfg.enabledFramesOnly) {
       OptionPage.hide(domainFramesOffLabel);
       OptionPage.show(domainFramesOnLabel);
     } else {
@@ -1042,7 +1042,7 @@ export default class OptionPage {
     if (testText.value === '') {
       filteredTestText.textContent = 'Enter some text above to test the filter...';
     } else {
-      if (option.cfg.filterMethod === Constants.FILTER_METHODS.OFF) {
+      if (this.cfg.filterMethod === Constants.FILTER_METHODS.OFF) {
         filteredTestText.textContent = testText.value;
       } else {
         filteredTestText.textContent = this.filter.replaceText(testText.value, this.filter.cfg.wordlistId, null);
