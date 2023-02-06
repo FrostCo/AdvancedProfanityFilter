@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import Domain from './built/domain';
-import WebConfig from './built/webConfig';
-import WebFilter from './built/webFilter';
+import Domain from '@APF/domain';
+import WebConfig from '@APF/webConfig';
+import WebFilter from '@APF/webFilter';
 
 describe('WebFilter', function() {
   describe('domains', function() {

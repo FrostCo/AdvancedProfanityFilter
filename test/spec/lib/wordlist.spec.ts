@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import Constants from '../built/lib/constants';
-import Wordlist from '../built/lib/wordlist';
+import Constants from '@APF/lib/constants';
+import Wordlist from '@APF/lib/wordlist';
 
 const testWords = {
   'example': { lists: [1], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'demo' },

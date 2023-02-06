@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import Constants from '../built/lib/constants';
-import { booleanToNumber, formatNumber, getParent, getVersion, hmsToSeconds, isVersionOlder, numberToBoolean, removeFromArray, secondsToHMS } from '../built/lib/helper';
+import Constants from '@APF/lib/constants';
+import { booleanToNumber, formatNumber, getParent, getVersion, hmsToSeconds, isVersionOlder, numberToBoolean, removeFromArray, secondsToHMS } from '@APF/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 

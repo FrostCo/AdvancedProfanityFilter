@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import Bookmarklet from './built/bookmarklet';
+import Bookmarklet from '@APF/bookmarklet';
 
 describe('Bookmarklet', function() {
   describe('dropboxDownloadURL()', function() {

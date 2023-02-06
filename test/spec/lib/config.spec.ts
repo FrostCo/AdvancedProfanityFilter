@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import Constants from '../built/lib/constants';
-import Config from '../built/lib/config';
+import Constants from '@APF/lib/constants';
+import Config from '@APF/lib/config';
 
 describe('Config', function() {
   describe('constructor()', function() {

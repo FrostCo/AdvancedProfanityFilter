@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import Constants from './built/lib/constants';
-import DataMigration from './built/dataMigration';
-import WebConfig from './built/webConfig';
+import Constants from '@APF/lib/constants';
+import DataMigration from '@APF/dataMigration';
+import WebConfig from '@APF/webConfig';
 
 describe('DataMigration', function() {
   describe('_renameConfigKeys()', function() {

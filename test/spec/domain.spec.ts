@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import Domain from './built/domain';
-import WebConfig from './built/webConfig';
+import Domain from '@APF/domain';
+import WebConfig from '@APF/webConfig';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 const domains = {

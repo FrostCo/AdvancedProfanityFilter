@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import Constants from '../built/lib/constants';
-import Config from '../built/lib/config';
-import Word from '../built/lib/word';
+import Constants from '@APF/lib/constants';
+import Config from '@APF/lib/config';
+import Word from '@APF/lib/word';
 
 describe('Word', function() {
   describe('Regular Expressions', function() {
