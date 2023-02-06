@@ -5,7 +5,7 @@
     "baseUrl": "./",
     "lib": ["es2017", "dom", "dom.iterable"],
     "moduleResolution": "node",
-    "outDir": "./dist",
+    "outDir": "./built",
     "paths": {
       "@APF/*": ["src/script/*"],
       "@ROOT/*": ["./*"],
