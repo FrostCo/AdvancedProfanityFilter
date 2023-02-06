@@ -60,7 +60,7 @@
     "test:lint:all": "npm run test:lint && npm run test:lint:bin && npm run test:lint:tests",
     "test:lint:bin": "eslint \"bin/**/*.*js\"",
     "test:lint:nibble": "npx eslint-nibble \"src/**/*.ts\"",
-    "test:lint:tests": "eslint \"test/**/*.spec.js\"",
+    "test:lint:tests": "eslint \"test/spec/*.spec.ts\"",
     "test:lint": "eslint \"src/**/*.ts\"",
     "test:nocov": "ts-mocha -p test.tsconfig.json --paths",
     "test:types": "tsc --noEmit",
