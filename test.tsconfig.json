@@ -2,10 +2,11 @@
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "../",
+    "baseUrl": "./",
     "lib": ["es2017", "dom", "dom.iterable"],
     "moduleResolution": "node",
-    "outDir": "./built",
+    "noEmit": true,
+    "outDir": "./test/built",
     "paths": {
       "@APF/*": ["src/script/*"],
       "@ROOT/*": ["./*"],
@@ -16,6 +17,6 @@
     "target": "esnext"
   },
   "include": [
-    "../src/script/**/*.ts"
+    "./src/script/**/*.ts"
   ]
 }
