@@ -55,7 +55,7 @@
     "release": "node bin/prebuild.mjs --release && npm run release:build && npm run package",
     "test:addon": "npm run package:firefox && npx addons-linter ./extension-firefox.zip",
     "test:all": "npm run test && npm run test:lint:tests",
-    "test:cov": "npm run build:test && nyc --reporter=lcov --reporter=text node_modules/mocha/bin/_mocha",
+    "test:cov": "nyc --reporter=lcov --reporter=text npm run test:nocov",
     "test:debug": "npm run build:test && node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
     "test:lint:all": "npm run test:lint && npm run test:lint:bin && npm run test:lint:tests",
     "test:lint:bin": "eslint \"bin/**/*.*js\"",
@@ -275,10 +275,11 @@
     ]
   },
   "nyc": {
-    "cwd": "test/",
-    "exclude": [
-      "**/*.spec.js",
-      "built/vendor/**/*"
-    ]
+    "extension": [".ts"],
+    "include": [
+      "src/script/**/*.ts"
+    ],
+    "report-dir": "test/coverage",
+    "temp-dir": "./test/.nyc_output"
   }
 }
