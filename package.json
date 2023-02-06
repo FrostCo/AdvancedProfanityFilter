@@ -26,7 +26,7 @@
     "build:mv3": "node bin/prebuild.mjs --manifestV3 && npm run build",
     "build:safari": "node bin/prebuild.mjs --safari && npm run build",
     "build:static": "node bin/copy-static.mjs",
-    "build:test": "tsc -p ./test/built.tsconfig.json",
+    "build:test": "tsc -p test.tsconfig.json",
     "build": "npm run build:static && webpack --config bin/webpack.config.js",
     "clean:build": "node bin/clean.mjs --build",
     "clean:dist": "node bin/clean.mjs --dist",
@@ -62,7 +62,7 @@
     "test:lint:nibble": "npx eslint-nibble \"src/**/*.ts\"",
     "test:lint:tests": "eslint \"test/**/*.spec.js\"",
     "test:lint": "eslint \"src/**/*.ts\"",
-    "test:nocov": "npm run build:test && node_modules/mocha/bin/_mocha",
+    "test:nocov": "ts-mocha -p test.tsconfig.json --paths",
     "test:types": "tsc --noEmit",
     "test": "npm run test:lint && npm run test:types && npm run test:addon && npm run test:cov",
     "type-check:watch": "npm run type-check -- --watch",
@@ -270,11 +270,8 @@
   },
   "mocha": {
     "reporter": "dot",
-    "require": [
-      "@babel/register"
-    ],
     "spec": [
-      "test/**/*.spec.js"
+      "test/spec/**/*.spec.ts"
     ]
   },
   "nyc": {
