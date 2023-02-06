@@ -56,7 +56,7 @@
     "test:addon": "npm run package:firefox && npx addons-linter ./extension-firefox.zip",
     "test:all": "npm run test && npm run test:lint:tests",
     "test:cov": "nyc --reporter=lcov --reporter=text npm run test:nocov",
-    "test:debug": "npm run build:test && node --inspect-brk node_modules/mocha/bin/_mocha --reporter tap",
+    "test:debug": "node --inspect-brk node_modules/ts-mocha/bin/ts-mocha -p test.tsconfig.json --paths --reporter tap",
     "test:lint:all": "npm run test:lint && npm run test:lint:bin && npm run test:lint:tests",
     "test:lint:bin": "eslint \"bin/**/*.*js\"",
     "test:lint:nibble": "npx eslint-nibble \"src/**/*.ts\"",
