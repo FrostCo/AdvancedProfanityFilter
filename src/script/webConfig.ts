@@ -3,7 +3,9 @@ import { prettyPrintArray, stringArray } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
-declare const __BUILD__: any; /* eslint-disable-line @typescript-eslint/naming-convention */
+/* eslint-disable-next-line @typescript-eslint/naming-convention */
+declare const __BUILD__: { config: any, manifestVersion: number, release: boolean, target: string, version: string };
+const BUILD_DEFAULTS = { config: {}, manifestVersion: 3, release: true, target: 'chrome', version: '1.0.0' };
 const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
@@ -18,7 +20,8 @@ export default class WebConfig extends Config {
   showUpdateNotification: boolean;
   syncLargeKeys: boolean;
 
-  static readonly BUILD = __BUILD__; /* eslint-disable-line @typescript-eslint/naming-convention */
+  /* eslint-disable-next-line @typescript-eslint/naming-convention */
+  static readonly BUILD = typeof __BUILD__ == 'undefined' ? BUILD_DEFAULTS  : __BUILD__;
   static readonly _webDefaults = {
     collectStats: true,
     contextMenu: true,
