@@ -256,15 +256,7 @@ export default class Background {
           this.getGlobalVariable(request.globalVariable, sender, sendResponse);
           return true; // return true when waiting on an async call
         } else {
-          // Update tab's status and set badge color
-          if (request.status) {
-            this.updateStatus(chromeAction, sender.tab.id, request.status, request.forceUpdate);
-          }
-
-          // Show count of words filtered on badge
-          if (request.counter != undefined) {
-            chromeAction.setBadgeText({ text: formatNumber(request.counter), tabId: sender.tab.id });
-          }
+          this.onContextMessageElse(chromeAction, request, sender, sendResponse);
         }
         break;
 
@@ -290,6 +282,18 @@ export default class Background {
     }
 
     sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
+  }
+
+  static onContextMessageElse(chromeAction: typeof chrome.browserAction, request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
+    // Update tab's status and set badge color
+    if (request.status) {
+      this.updateStatus(chromeAction, sender.tab.id, request.status, request.forceUpdate);
+    }
+
+    // Show count of words filtered on badge
+    if (request.counter != undefined) {
+      chromeAction.setBadgeText({ text: formatNumber(request.counter), tabId: sender.tab.id });
+    }
   }
 
   static async onStartup() {
