@@ -121,60 +121,90 @@ export default class Popup {
     }
   }
 
-  async populateOptions() {
-    await Popup.load(this);
-    this.applyTheme();
+  handleDisabled() {
+    this.setDomainSwitch(false);
+    this.disableOptions();
+  }
 
+  disableDomainSwitch() {
     const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
     const domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
+    Popup.disable(domainFilter);
+    Popup.disable(domainToggle);
+  }
+
+  disableOptions() {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    Popup.disable(domainModeSelect);
+    Popup.disable(filterMethodSelect);
+    Popup.disable(wordlistSelect);
+  }
+
+  handlePasswordProtected() {
+    this.protected = true;
+    this.disableDomainSwitch();
+    this.disableOptions();
+  }
+
+  handleRestrictedPage() {
+    this.setDomainSwitch(false);
+    this.disableDomainSwitch();
+    this.disableOptions();
+  }
+
+  handleWordlistsEnabled() {
     const wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    const wordlists = ['Default Wordlist'].concat(WebConfig._allWordlists, this.cfg.wordlists);
+    const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
+    dynamicList(wordlists, wordlistSelect);
+    wordlistSelect.selectedIndex = wordlistIndex;
+    Popup.show(wordListContainer);
+  }
+
+  initializePopup() {
+    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+    const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     dynamicList(Constants.orderedArray(Constants.DOMAIN_MODES), domainModeSelect, true);
     domainModeSelect.selectedIndex = this.domain.getModeIndex();
     dynamicList(Constants.orderedArray(Constants.FILTER_METHODS), filterMethodSelect, true);
     filterMethodSelect.selectedIndex = this.cfg.filterMethod;
+  }
 
-    if (this.cfg.wordlistsEnabled) {
-      const wordlists = ['Default Wordlist'].concat(WebConfig._allWordlists, this.cfg.wordlists);
-      const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
-      dynamicList(wordlists, wordlistSelect);
-      wordlistSelect.selectedIndex = wordlistIndex;
-      Popup.show(wordListContainer);
-    }
+  get isDisabled() {
+    return this.domain.disabled || (this.cfg.enabledDomainsOnly && !this.domain.enabled);
+  }
 
-    if (this.cfg.password && this.cfg.password != '') {
-      this.protected = true;
-      Popup.disable(domainFilter);
-      Popup.disable(domainToggle);
-      Popup.disable(domainModeSelect);
-      Popup.disable(filterMethodSelect);
-      Popup.disable(wordlistSelect);
-    }
+  get isPasswordProtected() {
+    return this.cfg.password && this.cfg.password != '';
+  }
 
-    // Restricted pages
-    if (
+  get isRestrictedPage() {
+    return (
       !this.domain.hostname
       || Page.disabledProtocols.test(this.url.protocol)
       || this.domain.hostname == 'chrome.google.com'
-    ) {
-      domainFilter.checked = false;
-      Popup.disable(domainFilter);
-      Popup.disable(domainToggle);
-      Popup.disable(domainModeSelect);
-      Popup.disable(filterMethodSelect);
-      Popup.disable(wordlistSelect);
+    );
+  }
+
+  async populateOptions() {
+    await Popup.load(this);
+    this.applyTheme();
+    this.initializePopup();
+
+    if (this.wordlistsEnabled) this.handleWordlistsEnabled();
+
+    if (this.isPasswordProtected) this.handlePasswordProtected();
+
+    if (this.isRestrictedPage) {
+      this.handleRestrictedPage();
       return false;
     }
 
     // Set initial value for domain filter and disable options if they are not applicable
-    if (this.domain.disabled || (this.cfg.enabledDomainsOnly && !this.domain.enabled)) {
-      domainFilter.checked = false;
-      Popup.disable(domainModeSelect);
-      Popup.disable(filterMethodSelect);
-      Popup.disable(wordlistSelect);
-    }
+    if (this.isDisabled) this.handleDisabled();
   }
 
   populateSummary(summary: Summary) {
@@ -207,6 +237,11 @@ export default class Popup {
       summaryContainer.classList.add('w3-hide');
     }
     table.replaceChild(tBody, oldTBody);
+  }
+
+  setDomainSwitch(checked: boolean = true) {
+    const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
+    domainFilter.checked = checked;
   }
 
   async toggle(prop: string) {
@@ -244,7 +279,7 @@ export default class Popup {
   }
 
   async wordlistSelect(select: HTMLSelectElement) {
-    const type = select.id === 'wordlistSelect' ? 'wordlistId' : '';
+    const type = this.wordlistType(select);
     this.domain[type] = select.selectedIndex > 0 ? select.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
     try {
       await this.domain.save(this.cfg);
@@ -252,5 +287,13 @@ export default class Popup {
     } catch (err) {
       logger.error(`Failed to select wordlist for domain ${this.domain.hostname}.`, err);
     }
+  }
+
+  get wordlistsEnabled() {
+    return !!this.cfg.wordlistsEnabled;
+  }
+
+  wordlistType(select: HTMLSelectElement): string {
+    return select.id === 'wordlistSelect' ? 'wordlistId' : '';
   }
 }
