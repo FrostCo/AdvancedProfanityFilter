@@ -1,4 +1,6 @@
+const BUILD = require('../.build.json');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
@@ -21,6 +23,9 @@ module.exports = {
   optimization: {
     minimize: false
   },
+  plugins: [
+    new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) }),
+  ],
   resolve: {
     extensions: ['.js', '.ts'],
     plugins: [

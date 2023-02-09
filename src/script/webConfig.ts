@@ -1,7 +1,9 @@
 import Config from '@APF/lib/config';
 import { prettyPrintArray, stringArray } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
-import Build from '@ROOT/.build.json';
+
+// __BUILD__ is injected by webpack from ROOT/.build.json
+declare const __BUILD__: any; /* eslint-disable-line @typescript-eslint/naming-convention */
 const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
@@ -16,7 +18,7 @@ export default class WebConfig extends Config {
   showUpdateNotification: boolean;
   syncLargeKeys: boolean;
 
-  static readonly BUILD = Build;
+  static readonly BUILD = __BUILD__; /* eslint-disable-line @typescript-eslint/naming-convention */
   static readonly _webDefaults = {
     collectStats: true,
     contextMenu: true,
@@ -414,7 +416,7 @@ export default class WebConfig extends Config {
 
     try {
       // Safari won't store null values
-      if (Build.target === 'safari') {
+      if (WebConfig.BUILD.target === 'safari') {
         const nullLocalKeys = Object.keys(localData).filter((key) => localData[key] == null);
         const nullSyncKeys = Object.keys(syncData).filter((key) => syncData[key] == null);
         if (nullLocalKeys.length) {

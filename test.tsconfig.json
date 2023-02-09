@@ -9,7 +9,6 @@
     "outDir": "./test/built",
     "paths": {
       "@APF/*": ["src/script/*"],
-      "@ROOT/*": ["./*"],
       "@VENDOR/*": ["src/script/vendor/*"]
     },
     "resolveJsonModule": true,
