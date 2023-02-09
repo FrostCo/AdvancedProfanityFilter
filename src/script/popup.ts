@@ -110,22 +110,6 @@ export default class Popup {
     }
   }
 
-  async filterMethodSelect() {
-    const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
-    this.cfg.filterMethod = filterMethodSelect.selectedIndex;
-    try {
-      await this.cfg.save('filterMethod');
-      chrome.tabs.reload();
-    } catch (err) {
-      logger.error('Failed to update selected filter method.', err);
-    }
-  }
-
-  handleDisabled() {
-    this.setDomainSwitch(false);
-    this.disableOptions();
-  }
-
   disableDomainSwitch() {
     const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
     const domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
@@ -140,6 +124,22 @@ export default class Popup {
     Popup.disable(domainModeSelect);
     Popup.disable(filterMethodSelect);
     Popup.disable(wordlistSelect);
+  }
+
+  async filterMethodSelect() {
+    const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    this.cfg.filterMethod = filterMethodSelect.selectedIndex;
+    try {
+      await this.cfg.save('filterMethod');
+      chrome.tabs.reload();
+    } catch (err) {
+      logger.error('Failed to update selected filter method.', err);
+    }
+  }
+
+  handleDisabled() {
+    this.setDomainSwitch(false);
+    this.disableOptions();
   }
 
   handlePasswordProtected() {
