@@ -45,7 +45,7 @@ export default class Popup {
   }
 
   static async load(instance: Popup) {
-    instance.cfg = await WebConfig.load(Popup._requiredConfig);
+    instance.cfg = await WebConfig.load(this._requiredConfig);
     logger.setLevel(instance.cfg.loggingLevel);
     instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
     if (instance.tab.url) {
