@@ -139,7 +139,6 @@ export default class WebConfig extends Config {
     // No keys provided, load everything
     if (keys.length === 0) {
       keys = Object.keys(this._defaults);
-      keys.push('words'); // words is not part of _defaults
     }
 
     try {
@@ -388,7 +387,6 @@ export default class WebConfig extends Config {
     // No keys provided, save everything
     if (keys.length === 0) {
       keys = Object.keys(WebConfig._defaults);
-      keys.push('words'); // words is not part of _defaults
     }
 
     let unusedSplitKeys = [];
