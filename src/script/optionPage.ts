@@ -1398,45 +1398,8 @@ export default class OptionPage {
   }
 
   async saveOptions() {
-    // Gather current settings
-    const censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
-    const censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
-    const defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
-    const defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
-    const defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
-    const preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
-    const preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
-    const preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
-    const showCounter = document.getElementById('showCounter') as HTMLInputElement;
-    const showSummary = document.getElementById('showSummary') as HTMLInputElement;
-    const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
-    const substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
-    const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
-    const domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
-    const domainFilterAllFrames = document.getElementById('domainFilterAllFrames') as HTMLInputElement;
-    const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
-    const collectStats = document.getElementById('collectStats') as HTMLInputElement;
-    const configLoggingLevelSelect = document.getElementById('configLoggingLevelSelect') as HTMLSelectElement;
-    this.cfg.censorCharacter = censorCharacterSelect.value;
-    this.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
-    this.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
-    this.cfg.defaultWordRepeat = booleanToNumber(defaultWordRepeat.checked);
-    this.cfg.defaultWordSeparators = booleanToNumber(defaultWordSeparators.checked);
-    this.cfg.preserveCase = preserveCase.checked;
-    this.cfg.preserveFirst = preserveFirst.checked;
-    this.cfg.preserveLast = preserveLast.checked;
-    this.cfg.showCounter = showCounter.checked;
-    this.cfg.showSummary = showSummary.checked;
-    this.cfg.showUpdateNotification = showUpdateNotification.checked;
-    this.cfg.substitutionMark = substitutionMark.checked;
-    this.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
-    this.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
-    this.cfg.enabledFramesOnly = !domainFilterAllFrames.checked;
-    this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
-    this.cfg.collectStats = collectStats.checked;
-    this.cfg.loggingLevel = Constants.LOGGING_LEVELS[configLoggingLevelSelect.value.toUpperCase()];
+    this.updateOptionsFromPage();
 
-    // Save settings
     try {
       await this.cfg.save();
       await this.init();
@@ -1773,6 +1736,45 @@ export default class OptionPage {
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
     }
+  }
+
+  updateOptionsFromPage() {
+    const censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
+    const censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
+    const defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
+    const defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
+    const defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
+    const preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
+    const preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
+    const preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
+    const showCounter = document.getElementById('showCounter') as HTMLInputElement;
+    const showSummary = document.getElementById('showSummary') as HTMLInputElement;
+    const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
+    const substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
+    const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
+    const domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
+    const domainFilterAllFrames = document.getElementById('domainFilterAllFrames') as HTMLInputElement;
+    const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
+    const collectStats = document.getElementById('collectStats') as HTMLInputElement;
+    const configLoggingLevelSelect = document.getElementById('configLoggingLevelSelect') as HTMLSelectElement;
+    this.cfg.censorCharacter = censorCharacterSelect.value;
+    this.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
+    this.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
+    this.cfg.defaultWordRepeat = booleanToNumber(defaultWordRepeat.checked);
+    this.cfg.defaultWordSeparators = booleanToNumber(defaultWordSeparators.checked);
+    this.cfg.preserveCase = preserveCase.checked;
+    this.cfg.preserveFirst = preserveFirst.checked;
+    this.cfg.preserveLast = preserveLast.checked;
+    this.cfg.showCounter = showCounter.checked;
+    this.cfg.showSummary = showSummary.checked;
+    this.cfg.showUpdateNotification = showUpdateNotification.checked;
+    this.cfg.substitutionMark = substitutionMark.checked;
+    this.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
+    this.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
+    this.cfg.enabledFramesOnly = !domainFilterAllFrames.checked;
+    this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
+    this.cfg.collectStats = collectStats.checked;
+    this.cfg.loggingLevel = Constants.LOGGING_LEVELS[configLoggingLevelSelect.value.toUpperCase()];
   }
 
   async updateUseSystemTheme(useDeviceThemeInput: HTMLInputElement) {
