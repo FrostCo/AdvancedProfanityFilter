@@ -674,6 +674,23 @@ export default class OptionPage {
     }
   }
 
+  domainCfgFromPage(): DomainCfg {
+    const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
+    const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
+    const domainFramesOffCheck = document.getElementById('domainFramesOffCheck') as HTMLInputElement;
+    const domainFramesOnCheck = document.getElementById('domainFramesOnCheck') as HTMLInputElement;
+    const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
+    const wordlist = domainWordlistSelect.selectedIndex > 0 ? domainWordlistSelect.selectedIndex - 1 : undefined;
+    const newDomainCfg: DomainCfg = {
+      disabled: domainDisabledCheck.checked,
+      enabled: domainEnabledCheck.checked,
+      framesOn: domainFramesOnCheck.checked,
+      framesOff: domainFramesOffCheck.checked,
+      wordlist: wordlist,
+    };
+    return newDomainCfg;
+  }
+
   async exportBookmarkletFile() {
     const code = await Bookmarklet.injectConfig(this.cfg.ordered());
     exportToFile(code, 'apfBookmarklet.js');
@@ -1358,16 +1375,7 @@ export default class OptionPage {
   }
 
   async saveDomain() {
-    const domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
     const domainText = document.getElementById('domainText') as HTMLInputElement;
-    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
-    const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
-    const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
-    const domainFramesOffCheck = document.getElementById('domainFramesOffCheck') as HTMLInputElement;
-    const domainFramesOnCheck = document.getElementById('domainFramesOnCheck') as HTMLInputElement;
-    const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
-
-    const originalKey = domainsSelect.value;
     const newKey = domainText.value.trim().toLowerCase();
 
     if (newKey == '') { // No data
@@ -1377,20 +1385,24 @@ export default class OptionPage {
 
     if (domainText.checkValidity()) {
       OptionPage.hideInputError(domainText);
-      if (newKey != originalKey) { delete this.cfg.domains[originalKey]; } // URL changed: remove old entry
-
-      const wordlist = domainWordlistSelect.selectedIndex > 0 ? domainWordlistSelect.selectedIndex - 1 : undefined;
-      const newDomainCfg: DomainCfg = {
-        disabled: domainDisabledCheck.checked,
-        enabled: domainEnabledCheck.checked,
-        framesOn: domainFramesOnCheck.checked,
-        framesOff: domainFramesOffCheck.checked,
-        wordlist: wordlist,
-      };
-      const domain = new Domain(newKey, newDomainCfg);
-      domain.updateFromModeIndex(domainModeSelect.selectedIndex);
+      const domainCfg = this.domainCfgFromPage();
+      if (!domainCfg) {
+        OptionPage.showInputError('Failed to gather domain settings.');
+        return false;
+      }
 
       try {
+        // URL changed: remove old entry
+        const domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
+        const originalKey = domainsSelect.value;
+        if (originalKey && newKey != originalKey) delete this.cfg.domains[originalKey];
+
+        const domain = new Domain(newKey, domainCfg);
+
+        // Get domain mode
+        const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+        domain.updateFromModeIndex(domainModeSelect.selectedIndex);
+
         await domain.save(this.cfg);
         this.populateDomainPage();
       } catch (err) {
