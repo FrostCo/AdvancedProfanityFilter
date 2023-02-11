@@ -855,6 +855,8 @@ export default class OptionPage {
     domainFramesOnCheck.checked = domainCfg.framesOn;
     const wordlist = domainCfg.wordlist >= 0 ? domainCfg.wordlist + 1 : 0;
     domainWordlistSelect.selectedIndex = wordlist;
+
+    return domainCfg;
   }
 
   populateDomainPage() {
