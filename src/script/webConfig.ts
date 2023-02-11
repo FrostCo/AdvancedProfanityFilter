@@ -143,9 +143,7 @@ export default class WebConfig extends Config {
     try {
       if (this.includesLargeKeys(keys)) {
         // Add syncLargeKeys if any largeKeys were requested
-        if (!keys.includes('syncLargeKeys')) {
-          keys.push('syncLargeKeys');
-        }
+        if (!keys.includes('syncLargeKeys')) keys.push('syncLargeKeys');
 
         // Load large keys from LocalStorage if necessary
         this._localConfigKeys.forEach((localKey) => {
