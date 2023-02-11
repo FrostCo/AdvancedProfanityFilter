@@ -224,7 +224,7 @@ export default class WebConfig extends Config {
         });
       }
 
-      return new WebConfig(data);
+      return new this(data);
     } catch (err) {
       logger.error('Failed to load items.', keys, err);
       throw new Error(`Failed to load items: ${prettyPrintArray(keys)}. [${err.message}]`);
