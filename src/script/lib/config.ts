@@ -91,9 +91,14 @@ export default class Config {
 
   // Extending: Sub classes should pass in additional config defaults
   static _defaults = this.initializeDefaults(this._configDefaults) as Config;
+  static _persistableKeys = Object.keys(this._defaults); // Make sure _defaults has already been assigned before this
 
   constructor(data: Record<string, unknown> = {}) {
     Object.assign(this, Config._defaults, data);
+  }
+
+  get _persistableKeys(): string[] {
+    return (this.constructor as typeof Config)._persistableKeys;
   }
 
   addWord(str: string, options: WordOptions = this.defaultWordOptions()) {

@@ -35,6 +35,7 @@ export default class WebConfig extends Config {
   };
 
   static _defaults = this.initializeDefaults({}, this._configDefaults, this._webDefaults) as WebConfig;
+  static _persistableKeys = Object.keys(this._defaults); // Make sure _defaults has already been assigned before this
   static readonly _localConfigKeys = ['domains', 'syncLargeKeys', 'words'];
   static readonly _localOnlyKeys = ['background', 'stats'];
   static readonly _maxSplitKeys = 64;
@@ -137,9 +138,7 @@ export default class WebConfig extends Config {
     let syncKeys = [];
 
     // No keys provided, load everything
-    if (keys.length === 0) {
-      keys = Object.keys(this._defaults);
-    }
+    if (keys.length === 0) keys = this._persistableKeys;
 
     try {
       if (this.includesLargeKeys(keys)) {
@@ -385,9 +384,7 @@ export default class WebConfig extends Config {
     const localData = {};
 
     // No keys provided, save everything
-    if (keys.length === 0) {
-      keys = Object.keys(WebConfig._defaults);
-    }
+    if (keys.length === 0) keys = this._persistableKeys;
 
     let unusedSplitKeys = [];
     keys.forEach((key) => {
