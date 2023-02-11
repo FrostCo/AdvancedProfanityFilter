@@ -1718,22 +1718,6 @@ export default class OptionPage {
     chrome.runtime.sendMessage(message);
   }
 
-  updateHostedBookmarklet() {
-    const bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
-    const bookmarkletHostedURLInput = document.getElementById('bookmarkletHostedURL') as HTMLInputElement;
-    OptionPage.hideInputError(bookmarkletHostedURLInput);
-
-    if (bookmarkletHostedURLInput.checkValidity()) {
-      this.updateBookmarklet(bookmarkletHostedURLInput.value);
-    } else {
-      if (bookmarkletHostedURLInput.value !== '') {
-        OptionPage.showInputError(bookmarkletHostedURLInput, 'Please enter a valid URL.');
-      }
-      bookmarkletLink.href = '#0';
-      OptionPage.disableBtn(bookmarkletLink);
-    }
-  }
-
   updateFilterOptions() {
     // Show/hide options as needed
     switch (this.cfg.filterMethod) {
@@ -1753,6 +1737,22 @@ export default class OptionPage {
         OptionPage.hide(document.getElementById('substitutionSettings'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
+    }
+  }
+
+  updateHostedBookmarklet() {
+    const bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
+    const bookmarkletHostedURLInput = document.getElementById('bookmarkletHostedURL') as HTMLInputElement;
+    OptionPage.hideInputError(bookmarkletHostedURLInput);
+
+    if (bookmarkletHostedURLInput.checkValidity()) {
+      this.updateBookmarklet(bookmarkletHostedURLInput.value);
+    } else {
+      if (bookmarkletHostedURLInput.value !== '') {
+        OptionPage.showInputError(bookmarkletHostedURLInput, 'Please enter a valid URL.');
+      }
+      bookmarkletLink.href = '#0';
+      OptionPage.disableBtn(bookmarkletLink);
     }
   }
 
