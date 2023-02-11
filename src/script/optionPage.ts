@@ -768,7 +768,7 @@ export default class OptionPage {
   }
 
   async init(refreshTheme = false) {
-    this.cfg = await WebConfig.load();
+    await this.initializeCfg();
     logger.setLevel(this.cfg.loggingLevel);
     this.applyTheme(refreshTheme);
     if (!this.auth) this.auth = new OptionAuth(this, this.cfg.password);
@@ -791,6 +791,10 @@ export default class OptionPage {
     if (tab) {
       tab.click();
     }
+  }
+
+  async initializeCfg() {
+    this.cfg = await WebConfig.load();
   }
 
   populateBookmarkletPage() {
