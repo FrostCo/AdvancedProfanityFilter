@@ -305,8 +305,11 @@ export default class WebConfig extends Config {
       throw new Error('Cannot be called directly, call load() instead.');
     }
 
-    super(config); // Get the Config defaults
-    Object.assign(this, WebConfig._defaults, config); // Separate due to _defineProperty() for tests
+    // Apply the Config defaults
+    super(config);
+
+    // Apply class defaults
+    Object.assign(this, WebConfig._webDefaults, config);
   }
 
   // Order and remove `_` prefixed values
