@@ -1607,7 +1607,7 @@ export default class OptionPage {
   }
 
   async setDefaultWordlist(element: HTMLSelectElement) {
-    const prop = element.id === 'textWordlistSelect' ? 'wordlistId' : '';
+    const prop = this.wordlistTypeFromElement(element);
     this.cfg[prop] = element.selectedIndex;
 
     try {
@@ -1816,5 +1816,9 @@ export default class OptionPage {
     }
 
     return valid;
+  }
+
+  wordlistTypeFromElement(element: HTMLSelectElement) {
+    if (element.id === 'textWordlistSelect') return 'wordlistId';
   }
 }
