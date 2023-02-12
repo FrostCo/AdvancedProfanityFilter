@@ -819,6 +819,10 @@ export default class OptionPage {
     this.cfg = await WebConfig.load();
   }
 
+  newWordWordlistChecked(index: number): boolean {
+    return index == (this.cfg.wordlistId - 1);
+  }
+
   populateBookmarkletPage() {
     const bookmarkletConfig = document.querySelector('input[name="bookmarkletConfig"]:checked') as HTMLInputElement;
     const bookmarkletCustomConfig = document.getElementById('bookmarkletCustomConfig') as HTMLDivElement;
@@ -1156,9 +1160,7 @@ export default class OptionPage {
       substitutionText.value = '';
       substitutionCase.checked = false;
       wordlistSelections.forEach((wordlist, index) => {
-        wordlist.checked = (
-          index == (this.cfg.wordlistId - 1)
-        );
+        wordlist.checked = this.newWordWordlistChecked(index);
       });
     } else { // Existing word
       OptionPage.enableBtn(wordRemove);
