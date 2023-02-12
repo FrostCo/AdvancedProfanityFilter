@@ -3,9 +3,6 @@ import WebFilter from '@APF/webFilter';
 const filter = new WebFilter;
 
 if (typeof window !== 'undefined' && ['[object Window]', '[object ContentScriptGlobalScope]'].includes(({}).toString.call(window))) {
-  filter.observer = new MutationObserver(filter.processMutations.bind(filter));
-  filter.shadowObserver = new MutationObserver(filter.processMutations.bind(filter));
-
   // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
   if (window != window.top) {
     filter.iframe = document.location;

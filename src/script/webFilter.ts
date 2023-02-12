@@ -244,6 +244,9 @@ export default class WebFilter extends Filter {
     } else {
       this.processNode = this.cleanText;
     }
+
+    this.observer = new MutationObserver(this.processMutations.bind(this));
+    this.shadowObserver = new MutationObserver(this.processMutations.bind(this));
   }
 
   async persistStats() {
