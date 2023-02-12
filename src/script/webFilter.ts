@@ -267,33 +267,6 @@ export default class WebFilter extends Filter {
     }
   }
 
-  async persistStats() {
-    if (!WebConfig.chromeStorageAvailable()) { return false; }
-    try {
-      const words = Object.keys(this.stats.words);
-      if (words.length) {
-        const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
-        const storedWords = stats.words;
-
-        for (const word of words) {
-          if (!storedWords[word]) {
-            storedWords[word] = { [ Constants.STATS_TYPE_TEXT ]: 0 };
-          }
-          storedWords[word].text += this.stats.words[word].text;
-        }
-
-        if (stats.startedAt == null) { stats.startedAt = Date.now(); }
-
-        await WebConfig.saveLocalStorage({ stats: stats });
-        this.stats = { words: {} };
-      }
-    } catch (err) {
-      if (err.message !== 'Extension context invalidated.') {
-        logger.warn('Failed to save stats.', err);
-      }
-    }
-  }
-
   // Listen for data requests from Popup
   onMessage() {
     /* istanbul ignore next */
@@ -326,6 +299,33 @@ export default class WebFilter extends Filter {
 
       sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
     });
+  }
+
+  async persistStats() {
+    if (!WebConfig.chromeStorageAvailable()) { return false; }
+    try {
+      const words = Object.keys(this.stats.words);
+      if (words.length) {
+        const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
+        const storedWords = stats.words;
+
+        for (const word of words) {
+          if (!storedWords[word]) {
+            storedWords[word] = { [ Constants.STATS_TYPE_TEXT ]: 0 };
+          }
+          storedWords[word].text += this.stats.words[word].text;
+        }
+
+        if (stats.startedAt == null) { stats.startedAt = Date.now(); }
+
+        await WebConfig.saveLocalStorage({ stats: stats });
+        this.stats = { words: {} };
+      }
+    } catch (err) {
+      if (err.message !== 'Extension context invalidated.') {
+        logger.warn('Failed to save stats.', err);
+      }
+    }
   }
 
   processAddedNode(node: Node) {
