@@ -29,7 +29,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts'],
     plugins: [
-      new TsconfigPathsPlugin({ configFile: "./tsconfig.json" }),
+      new TsconfigPathsPlugin({ configFile: './tsconfig.json' }),
     ],
   },
   target: 'web',
