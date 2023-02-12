@@ -1007,20 +1007,14 @@ export default class OptionPage {
   async populateStats() {
     try {
       this.filter.buildWordlist(Constants.ALL_WORDS_WORDLIST_ID, true);
-      const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
+      const stats = await this.getStatsFromStorage()
 
       // Prepare data (collect totals, add words without stats, sort output)
       let totalFiltered = 0;
       const allWords = this.filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
-      allWords.forEach((word) => {
-        const wordStats = stats.words[word];
-        if (wordStats) {
-          wordStats.total = wordStats.text;
-          totalFiltered += wordStats.total;
-        } else {
-          stats.words[word] = { text: 0, total: 0 };
-        }
-      });
+      for (const word of allWords) {
+        totalFiltered += this.populateStatsCompileWords(stats, word);
+      }
       const alphaSortedWords = allWords.sort();
       const sortedWords = alphaSortedWords.sort((a, b) => stats.words[b].total - stats.words[a].total);
 
@@ -1029,22 +1023,9 @@ export default class OptionPage {
 
       // Table body
       const tBody = document.createElement('tbody');
-      sortedWords.forEach((word) => {
-        const wordStats = stats.words[word];
-        const row = tBody.insertRow();
-        const wordCell = row.insertCell(0);
-        wordCell.classList.add('w3-tooltip');
-        const tooltipSpan = document.createElement('span');
-        tooltipSpan.classList.add('statsTooltip', 'w3-tag', 'w3-text');
-        tooltipSpan.textContent = word;
-        const wordSpan = document.createElement('span');
-        wordSpan.textContent = this.filter.replaceText(word, Constants.ALL_WORDS_WORDLIST_ID, null);
-        wordCell.appendChild(tooltipSpan);
-        wordCell.appendChild(wordSpan);
-
-        const textCell = row.insertCell(1);
-        textCell.textContent = numberWithCommas(wordStats.text);
-      });
+      for (const word of sortedWords) {
+        this.populateStatsWordRow(stats, tBody, word);
+      }
       const oldTBody = statsWordTable.tBodies[0];
       statsWordTable.replaceChild(tBody, oldTBody);
 
@@ -1052,15 +1033,49 @@ export default class OptionPage {
       const collectStats = document.getElementById('collectStats') as HTMLInputElement;
       collectStats.checked = this.cfg.collectStats;
 
-      // Summary
-      const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableDataCellElement;
-      statsSummaryTotal.textContent = numberWithCommas(totalFiltered);
-      const statsSummarySince = document.querySelector('table#statsSummaryTable td#statsSummarySince') as HTMLTableDataCellElement;
-      statsSummarySince.textContent = stats.startedAt ? new Date(stats.startedAt).toLocaleString() : '';
+      this.populateStatsSummary(stats, totalFiltered);
     } catch (err) {
       logger.warn('Failed to populate stats.', err);
       OptionPage.showErrorModal(['Failed to populate stats.', `Error: ${err.message}`]);
     }
+  }
+
+  populateStatsCompileWords(stats, word: string): number {
+    let total = 0;
+    let wordStats = stats.words[word];
+    if (wordStats) {
+      wordStats.total = wordStats.text;
+      total += wordStats.text;
+    } else {
+      stats.words[word] = { text: 0, total: 0 };
+    }
+    return total;
+  }
+
+  populateStatsSummary(stats, totalFiltered: number) {
+    const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableCellElement;
+    statsSummaryTotal.textContent = numberWithCommas(totalFiltered);
+    const statsSummarySince = document.querySelector('table#statsSummaryTable td#statsSummarySince') as HTMLTableCellElement;
+    statsSummarySince.textContent = stats.startedAt ? new Date(stats.startedAt).toLocaleString() : '';
+  }
+
+  populateStatsWordRow(stats, tBody: HTMLTableSectionElement, word: string) {
+    const wordStats = stats.words[word];
+    const row = tBody.insertRow();
+    const wordCell = row.insertCell(0);
+    wordCell.classList.add('w3-tooltip');
+    const tooltipSpan = document.createElement('span');
+    tooltipSpan.classList.add('statsTooltip', 'w3-tag', 'w3-text');
+    tooltipSpan.textContent = word;
+    const wordSpan = document.createElement('span');
+    wordSpan.textContent = this.filter.replaceText(word, Constants.ALL_WORDS_WORDLIST_ID, null);
+    wordCell.appendChild(tooltipSpan);
+    wordCell.appendChild(wordSpan);
+
+    const textCell = row.insertCell(1);
+    textCell.textContent = numberWithCommas(wordStats.text);
+
+    return row;
   }
 
   populateTest() {
