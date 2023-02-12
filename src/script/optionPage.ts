@@ -727,6 +727,11 @@ export default class OptionPage {
     }
   }
 
+  async getStatsFromStorage() {
+    const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
+    return stats;
+  }
+
   importConfig() {
     const input = document.getElementById('configInlineInput') as HTMLInputElement;
     if (input.checked) { // inline editor
@@ -1243,19 +1248,19 @@ export default class OptionPage {
 
   async prepareLessUsedWords() {
     try {
-      const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
+      const stats = await this.getStatsFromStorage();
       const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
       const lessThan = parseInt(lessUsedWordsNumber.value);
       this.lessUsedWords = {};
 
       const allWords = this.filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
-      allWords.forEach((word) => {
+      for (const word of allWords) {
         const wordStats = stats.words[word];
-        const total = wordStats ? wordStats.text : 0;
+        const total = this.totalFilteredWordStat(wordStats);
         if (total < lessThan) {
           this.lessUsedWords[word] = total;
         }
-      });
+      }
     } catch (err) {
       logger.warn('Error while prepapring less-used words.', err);
       return {};
@@ -1698,6 +1703,10 @@ export default class OptionPage {
 
     await this.cfg.save('darkMode');
     this.applyTheme();
+  }
+
+  totalFilteredWordStat(wordStats) {
+    return wordStats ? wordStats.text : 0;
   }
 
   updateBookmarklet(url: string) {
