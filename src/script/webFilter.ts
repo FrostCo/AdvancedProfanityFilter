@@ -353,7 +353,13 @@ export default class WebFilter extends Filter {
     this.updateCounterBadge();
   }
 
-  processRemovedNodes(removedNodes: NodeList) {}
+  processRemovedNode(node: Node) {}
+
+  processRemovedNodes(nodes: NodeList) {
+    for (const node of nodes) {
+      this.processRemovedNode(node);
+    }
+  }
 
   sendInitState(message: Message) {
     // Get status
