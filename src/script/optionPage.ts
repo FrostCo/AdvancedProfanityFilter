@@ -1011,7 +1011,7 @@ export default class OptionPage {
   async populateStats() {
     try {
       this.filter.buildWordlist(Constants.ALL_WORDS_WORDLIST_ID, true);
-      const stats = await this.getStatsFromStorage()
+      const stats = await this.getStatsFromStorage();
 
       // Prepare data (collect totals, add words without stats, sort output)
       let totalFiltered = 0;
@@ -1046,7 +1046,7 @@ export default class OptionPage {
 
   populateStatsCompileWords(stats, word: string): number {
     let total = 0;
-    let wordStats = stats.words[word];
+    const wordStats = stats.words[word];
     if (wordStats) {
       wordStats.total = wordStats.text;
       total += wordStats.text;
