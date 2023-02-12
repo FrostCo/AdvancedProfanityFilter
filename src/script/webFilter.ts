@@ -249,6 +249,24 @@ export default class WebFilter extends Filter {
     this.shadowObserver = new MutationObserver(this.processMutations.bind(this));
   }
 
+  initPageDetails() {
+    // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
+    if (window != window.top) {
+      this.iframe = document.location;
+      try { // same domain
+        this.hostname = window.parent.location.hostname;
+      } catch (err) { // different domain
+        if (document.referrer) {
+          this.hostname = new URL(document.referrer).hostname;
+        } else {
+          this.hostname = document.location.hostname;
+        }
+      }
+    } else {
+      this.hostname = document.location.hostname;
+    }
+  }
+
   async persistStats() {
     if (!WebConfig.chromeStorageAvailable()) { return false; }
     try {
