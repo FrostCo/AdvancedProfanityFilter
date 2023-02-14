@@ -7,12 +7,12 @@ export default class DataMigration {
 
   //#region Class reference helpers
   // Can be overridden in children classes
-  static get _Config() {
+  static get Config() {
     return WebConfig;
   }
 
   // Can be overridden in children classes
-  static get _Constants() {
+  static get Constants() {
     return Constants;
   }
 
@@ -52,7 +52,7 @@ export default class DataMigration {
   }
 
   static async loadCfg() {
-    return await this._Config.load();
+    return await this.Config.load();
   }
 
   static migrationNeeded(oldVersion: string): boolean {
@@ -72,7 +72,7 @@ export default class DataMigration {
   _renameConfigKeys(oldCfg: WebConfig, oldKeys: string[], mapping: {[key: string]: string}) {
     for (const oldKey of oldKeys) {
       const newKey = mapping[oldKey];
-      if (!oldCfg[oldKey]) oldCfg[oldKey] = this.Class._Config._defaults[newKey];
+      if (!oldCfg[oldKey]) oldCfg[oldKey] = this.Class.Config._defaults[newKey];
       if (oldCfg[oldKey].length) {
         if (this.cfg[newKey].length) throw new Error(`'${oldKey}' and '${newKey}' both exist. Please combine them manually into '${newKey}'.`);
         this.cfg[newKey] = oldCfg[oldKey];
@@ -110,10 +110,10 @@ export default class DataMigration {
   fixSmartWatch() {
     const cfg = this.cfg;
     const originalWord = 'twat';
-    const originalWordConf = { matchMethod: this.Class._Constants.MATCH_METHODS.PARTIAL, repeat: true, sub: 'dumbo' };
+    const originalWordConf = { matchMethod: this.Class.Constants.MATCH_METHODS.PARTIAL, repeat: true, sub: 'dumbo' };
     const update = {
-      twat: { matchMethod: this.Class._Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'dumbo' },
-      twats: { matchMethod: this.Class._Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'dumbos' }
+      twat: { matchMethod: this.Class.Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'dumbo' },
+      twats: { matchMethod: this.Class.Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'dumbos' }
     };
 
     if (
@@ -130,10 +130,10 @@ export default class DataMigration {
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
   async moveToNewWordsStorage() {
     const oldWordsKey = 'words';
-    const oldCfg = await this.Class._Config.getSyncStorage(oldWordsKey) as any;
+    const oldCfg = await this.Class.Config.getSyncStorage(oldWordsKey) as any;
     if (oldCfg.words) {
-      await this.Class._Config.saveSyncStorage({ _words0: oldCfg.words });
-      await this.Class._Config.removeSyncStorage(oldWordsKey);
+      await this.Class.Config.saveSyncStorage({ _words0: oldCfg.words });
+      await this.Class.Config.removeSyncStorage(oldWordsKey);
     }
   }
 
@@ -144,7 +144,7 @@ export default class DataMigration {
         const word = cfg.words[name];
         // Move RegExp from 4 to 3
         if (word.matchMethod === 4) {
-          word.matchMethod = this.Class._Constants.MATCH_METHODS.REGEX;
+          word.matchMethod = this.Class.Constants.MATCH_METHODS.REGEX;
         }
       });
       cfg.remove('globalMatchMethod');
@@ -176,11 +176,11 @@ export default class DataMigration {
     const oldKeys = Object.keys(mapping);
 
     // Handle chrome storage config
-    if (this.Class._Config.chromeStorageAvailable()) {
-      const oldCfg = await this.Class._Config.getSyncStorage(oldKeys) as any;
+    if (this.Class.Config.chromeStorageAvailable()) {
+      const oldCfg = await this.Class.Config.getSyncStorage(oldKeys) as any;
       if (Object.keys(oldCfg).some((k) => oldKeys.includes(k))) {
         this._renameConfigKeys(oldCfg, oldKeys, mapping);
-        await this.Class._Config.removeSyncStorage(oldKeys);
+        await this.Class.Config.removeSyncStorage(oldKeys);
       }
     }
 
@@ -278,6 +278,6 @@ export default class DataMigration {
 
   // [2.26.0]
   changeShowUpdateNotificationDefaultToFalse() {
-    this.cfg.showUpdateNotification = this.Class._Config._defaults.showUpdateNotification;
+    this.cfg.showUpdateNotification = this.Class.Config._defaults.showUpdateNotification;
   }
 }
