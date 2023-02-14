@@ -7,6 +7,10 @@ import Logger from '@APF/lib/logger';
 
 export default class Background {
     //#region Class reference helpers
+    static get Config() {
+      return WebConfig;
+    }
+
     static get DataMigration() {
       return DataMigration;
     }
@@ -43,7 +47,7 @@ export default class Background {
     await this.contextMenuRemoveAll();
 
     if (enabled == null) {
-      enabled = (await WebConfig.getSyncStorage({ contextMenu: WebConfig._defaults.contextMenu }) as WebConfig).contextMenu;
+      enabled = (await this.Config.getSyncStorage({ contextMenu: this.Config._defaults.contextMenu }) as WebConfig).contextMenu;
     }
 
     if (enabled) {
@@ -188,7 +192,7 @@ export default class Background {
   }
 
   static async loadBackgroundStorage(): Promise<BackgroundStorage> {
-    const data = await WebConfig.getLocalStorage({ background: { tabs: {} } });
+    const data = await this.Config.getLocalStorage({ background: { tabs: {} } });
     return data['background'] as BackgroundStorage;
   }
 
@@ -311,7 +315,7 @@ export default class Background {
 
   // Add selected word/phrase and reload page (unless already present)
   static async processSelection(action: string, selection: string) {
-    const cfg = await WebConfig.load('words');
+    const cfg = await this.Config.load('words');
     const result = cfg[action](selection);
 
     if (result) {
@@ -326,7 +330,7 @@ export default class Background {
 
   static async runUpdateMigrations(previousVersion) {
     if (this.DataMigration.migrationNeeded(previousVersion)) {
-      const cfg = await WebConfig.load();
+      const cfg = await this.Config.load();
       const migration = new this.DataMigration(cfg);
       const migrated = await migration.byVersion(previousVersion);
       if (migrated) cfg.save();
@@ -334,7 +338,7 @@ export default class Background {
   }
 
   static async saveBackgroundStorage(storage: BackgroundStorage) {
-    await WebConfig.saveLocalStorage({ background: storage });
+    await this.Config.saveLocalStorage({ background: storage });
   }
 
   static async tabsOnRemoved(tabId: number) {
@@ -353,7 +357,7 @@ export default class Background {
   }
 
   static async toggleDomain(hostname: string, action: string) {
-    const cfg = await WebConfig.load(['domains', 'enabledDomainsOnly', 'enabledFramesOnly']);
+    const cfg = await this.Config.load(['domains', 'enabledDomainsOnly', 'enabledFramesOnly']);
     const domain = Domain.byHostname(hostname, cfg.domains);
 
     switch (action) {
