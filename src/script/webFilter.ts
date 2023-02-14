@@ -39,6 +39,21 @@ export default class WebFilter extends Filter {
     this.summary = {};
   }
 
+  get _defaultStats(): Statistics {
+    return { words: {} };
+  }
+
+  get _defaultWordStat(): WordStatistic {
+    return { [ Constants.STATS_TYPE_TEXT ]: 0 };
+  }
+
+  _processStatsBeforeSaving(stats) {}
+
+  _processWordStat(stats, word: string) {
+    if (!stats.words[word]) stats.words[word] = this._defaultWordStat;
+    stats.words[word].text += this.stats.words[word].text;
+  }
+
   advancedReplaceText(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     if (node.parentNode || node === document) {
       for (const regExp of this.wordlists[wordlistId].regExps) {
@@ -246,6 +261,11 @@ export default class WebFilter extends Filter {
     });
   }
 
+  async getStatsFromStorage() {
+    const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: this._defaultStats }) as any;
+    return stats;
+  }
+
   init(wordlistId: number | false = false) {
     super.init(wordlistId);
 
@@ -319,20 +339,17 @@ export default class WebFilter extends Filter {
     try {
       const words = Object.keys(this.stats.words);
       if (words.length) {
-        const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
-        const storedWords = stats.words;
+        const stats = await this.getStatsFromStorage();
 
         for (const word of words) {
-          if (!storedWords[word]) {
-            storedWords[word] = { [ Constants.STATS_TYPE_TEXT ]: 0 };
-          }
-          storedWords[word].text += this.stats.words[word].text;
+          this._processWordStat(stats, word);
         }
 
         if (stats.startedAt == null) { stats.startedAt = Date.now(); }
 
+        this._processStatsBeforeSaving(stats);
         await WebConfig.saveLocalStorage({ stats: stats });
-        this.stats = { words: {} };
+        this.stats = this._defaultStats;
       }
     } catch (err) {
       if (err.message !== 'Extension context invalidated.') {
