@@ -9,6 +9,7 @@ export default class Background {
     //#region Class reference helpers
     static get Config() { return WebConfig; }
     static get DataMigration() { return DataMigration; }
+    static get Domain() { return Domain; }
     //#endregion
 
   // #region Constants
@@ -353,7 +354,7 @@ export default class Background {
 
   static async toggleDomain(hostname: string, action: string) {
     const cfg = await this.Config.load(['domains', 'enabledDomainsOnly', 'enabledFramesOnly']);
-    const domain = Domain.byHostname(hostname, cfg.domains);
+    const domain = this.Domain.byHostname(hostname, cfg.domains);
 
     switch (action) {
       case 'advanced':
