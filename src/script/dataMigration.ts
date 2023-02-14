@@ -38,10 +38,6 @@ export default class DataMigration {
   // Can add more migrations in children classes
   static migrations = this.compileMigrations();
 
-  constructor(config) {
-    this.cfg = config;
-  }
-
   static async build() {
     const cfg = this.loadCfg();
     return new this(cfg);
@@ -66,6 +62,10 @@ export default class DataMigration {
   static sortByVersions(a: Migration, b: Migration) {
     if (a.version == b.version) return 0;
     return isVersionOlder(getVersion(a.version), getVersion(b.version)) ? -1 : 1;
+  }
+
+  constructor(config) {
+    this.cfg = config;
   }
 
   // TODO: Only tested with arrays
