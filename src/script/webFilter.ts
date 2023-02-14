@@ -266,6 +266,8 @@ export default class WebFilter extends Filter {
     return stats;
   }
 
+  handleUrlUpdateMessage() {}
+
   init(wordlistId: number | false = false) {
     super.init(wordlistId);
 
@@ -300,7 +302,6 @@ export default class WebFilter extends Filter {
     }
   }
 
-  // Listen for data requests from Popup
   onMessage() {
     /* istanbul ignore next */
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -309,7 +310,7 @@ export default class WebFilter extends Filter {
       switch (request.source) {
         case Constants.MESSAGING.BACKGROUND:
           if (request.urlUpdate) {
-            // No-op
+            this.handleUrlUpdateMessage();
           } else {
             logger.error('Received unhandled message.', JSON.stringify(request));
           }
@@ -317,10 +318,7 @@ export default class WebFilter extends Filter {
 
         case Constants.MESSAGING.POPUP:
           if (request.summary) {
-            if (this.cfg.showSummary && (this.counter > 0)) {
-              const message = this.buildMessage(Constants.MESSAGING.POPUP, { summary: this.summary });
-              chrome.runtime.sendMessage(message);
-            }
+            if (this.shouldSendPopupSummary) chrome.runtime.sendMessage(this.popupSummaryMessage);
           } else {
             logger.error('Received unhandled message.', JSON.stringify(request));
           }
@@ -356,6 +354,10 @@ export default class WebFilter extends Filter {
         logger.warn('Failed to save stats.', err);
       }
     }
+  }
+
+  get popupSummaryMessage() {
+    return this.buildMessage(Constants.MESSAGING.POPUP, { summary: this.summary });
   }
 
   processAddedNode(node: Node) {
@@ -431,6 +433,10 @@ export default class WebFilter extends Filter {
 
   shouldProcessRemovedNodes(mutation: MutationRecord) {
     return false;
+  }
+
+  get shouldSendPopupSummary() {
+    return this.cfg.showSummary && this.counter > 0;
   }
 
   startObserving(target: Node = document, observer: MutationObserver = this.observer) {
