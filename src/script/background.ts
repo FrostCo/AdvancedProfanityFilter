@@ -7,13 +7,8 @@ import Logger from '@APF/lib/logger';
 
 export default class Background {
     //#region Class reference helpers
-    static get Config() {
-      return WebConfig;
-    }
-
-    static get DataMigration() {
-      return DataMigration;
-    }
+    static get Config() { return WebConfig; }
+    static get DataMigration() { return DataMigration; }
     //#endregion
 
   // #region Constants
