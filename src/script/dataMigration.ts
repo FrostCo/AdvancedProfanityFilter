@@ -30,7 +30,7 @@ export default class DataMigration {
   }
 
   static latestMigration(): Migration {
-    return DataMigration.migrations[DataMigration.migrations.length - 1];
+    return this.migrations[this.migrations.length - 1];
   }
 
   static async loadCfg() {
@@ -38,7 +38,7 @@ export default class DataMigration {
   }
 
   static migrationNeeded(oldVersion: string): boolean {
-    return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.latestMigration().version));
+    return isVersionOlder(getVersion(oldVersion), getVersion(this.latestMigration().version));
   }
 
   // TODO: Only tested with arrays
@@ -68,7 +68,7 @@ export default class DataMigration {
   async byVersion(oldVersion: string) {
     const version = getVersion(oldVersion) as Version;
     let migrated = false;
-    for (const migration of DataMigration.migrations) {
+    for (const migration of (this.constructor as typeof DataMigration).migrations) {
       if (isVersionOlder(version, getVersion(migration.version))) {
         migrated = true;
         if (migration.async) await this[migration.name]();
@@ -164,7 +164,7 @@ export default class DataMigration {
   async runImportMigrations() {
     let migrated = false;
 
-    for (const migration of DataMigration.migrations) {
+    for (const migration of (this.constructor as typeof DataMigration).migrations) {
       if (migration.runOnImport) {
         migrated = true;
         if (migration.async) await this[migration.name]();
