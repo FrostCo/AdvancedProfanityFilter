@@ -21,8 +21,7 @@ export default class DataMigration {
   }
   //#endregion
 
-  // Only append so the order stays the same (oldest first).
-  static readonly migrations: Migration[] = [
+  static readonly _migrations: Migration[] = [
     { version: '1.0.13', name: 'moveToNewWordsStorage', runOnImport: false, async: true },
     { version: '1.1.0', name: 'sanitizeWords', runOnImport: true },
     { version: '1.2.0', name: 'singleWordSubstitution', runOnImport: true },
@@ -36,6 +35,9 @@ export default class DataMigration {
     { version: '2.40.0', name: 'renameToWordAllowlist', runOnImport: true, async: true },
   ];
 
+  // Can add more migrations in children classes
+  static migrations = this.compileMigrations();
+
   constructor(config) {
     this.cfg = config;
   }
@@ -43,6 +45,10 @@ export default class DataMigration {
   static async build() {
     const cfg = this.loadCfg();
     return new this(cfg);
+  }
+
+  static compileMigrations(...migrations: Migration[][]) {
+    return this._migrations.concat(...migrations).sort(this.sortByVersions);
   }
 
   static latestMigration(): Migration {
@@ -55,6 +61,11 @@ export default class DataMigration {
 
   static migrationNeeded(oldVersion: string): boolean {
     return isVersionOlder(getVersion(oldVersion), getVersion(this.latestMigration().version));
+  }
+
+  static sortByVersions(a: Migration, b: Migration) {
+    if (a.version == b.version) return 0;
+    return isVersionOlder(getVersion(a.version), getVersion(b.version)) ? -1 : 1;
   }
 
   // TODO: Only tested with arrays
