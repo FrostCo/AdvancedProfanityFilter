@@ -33,6 +33,17 @@ export default class OptionPage {
   prefersDarkScheme: boolean;
   themeElements: Element[];
 
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  static get DataMigration() {
+    return DataMigration;
+  }
+
+  get Class() {
+    return (this.constructor as typeof OptionPage);
+  }
+  //#endregion
+
   static readonly activeClass = 'w3-flat-belize-hole';
   static readonly themeElementSelectors = [
     'body',
@@ -767,7 +778,7 @@ export default class OptionPage {
   async importConfigText(cfg: string) {
     try {
       const importedCfg = new WebConfig(JSON.parse(cfg));
-      const migration = new DataMigration(importedCfg);
+      const migration = new this.Class.DataMigration(importedCfg);
       await migration.runImportMigrations();
       const resetSuccess = await this.restoreDefaults(null, true);
       if (resetSuccess) {
