@@ -6,12 +6,12 @@ import { formatNumber, makeRequest } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
 
 export default class Background {
-    //#region Class reference helpers
-    static get Config() { return WebConfig; }
-    static get Constants() { return Constants; }
-    static get DataMigration() { return DataMigration; }
-    static get Domain() { return Domain; }
-    //#endregion
+  //#region Class reference helpers
+  static get Config() { return WebConfig; }
+  static get Constants() { return Constants; }
+  static get DataMigration() { return DataMigration; }
+  static get Domain() { return Domain; }
+  //#endregion
 
   // #region Constants
   static readonly COLOR_BLUE = [66, 133, 244, 255] as chrome.action.ColorArray;
