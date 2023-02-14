@@ -7,6 +7,7 @@ import Logger from '@APF/lib/logger';
 
 export default class Background {
   //#region Class reference helpers
+  // Can be overridden in children classes
   static get Config() { return WebConfig; }
   static get Constants() { return Constants; }
   static get DataMigration() { return DataMigration; }
