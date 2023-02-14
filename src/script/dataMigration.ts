@@ -25,12 +25,16 @@ export default class DataMigration {
   }
 
   static async build() {
-    const cfg = await WebConfig.load();
-    return new DataMigration(cfg);
+    const cfg = this.loadCfg();
+    return new this(cfg);
   }
 
   static latestMigration(): Migration {
     return DataMigration.migrations[DataMigration.migrations.length - 1];
+  }
+
+  static async loadCfg() {
+    return await WebConfig.load();
   }
 
   static migrationNeeded(oldVersion: string): boolean {
