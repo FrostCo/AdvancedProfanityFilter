@@ -8,6 +8,7 @@ import Logger from '@APF/lib/logger';
 export default class Background {
     //#region Class reference helpers
     static get Config() { return WebConfig; }
+    static get Constants() { return Constants; }
     static get DataMigration() { return DataMigration; }
     static get Domain() { return Domain; }
     //#endregion
@@ -243,13 +244,13 @@ export default class Background {
   }
 
   static onMessage(request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
-    if (request.destination !== Constants.MESSAGING.BACKGROUND) return true;
+    if (request.destination !== this.Constants.MESSAGING.BACKGROUND) return true;
 
     // Support manifest V2/V3
     const chromeAction = chrome.action || chrome.browserAction;
 
     switch (request.source) {
-      case Constants.MESSAGING.CONTEXT:
+      case this.Constants.MESSAGING.CONTEXT:
         if (request.disabled === true) {
           chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
         } else if (request.backgroundData === true) {
@@ -266,7 +267,7 @@ export default class Background {
         }
         break;
 
-      case Constants.MESSAGING.OPTION:
+      case this.Constants.MESSAGING.OPTION:
         if (request.updateContextMenus != null) {
           this.contextMenuSetup(request.updateContextMenus);
         } else {
@@ -274,7 +275,7 @@ export default class Background {
         }
         break;
 
-      case Constants.MESSAGING.POPUP:
+      case this.Constants.MESSAGING.POPUP:
         if (request.getStatus) {
           this.updatePopupStatus(request.tabId, null, sendResponse);
           return true; // return true when waiting on an async call
@@ -347,7 +348,7 @@ export default class Background {
 
   static async tabsOnUpdated(tabId, changeInfo, tab) {
     if (changeInfo.url) {
-      const message: Message = { source: Constants.MESSAGING.BACKGROUND, destination: Constants.MESSAGING.CONTEXT, urlUpdate: changeInfo.url };
+      const message: Message = { source: this.Constants.MESSAGING.BACKGROUND, destination: this.Constants.MESSAGING.CONTEXT, urlUpdate: changeInfo.url };
       chrome.tabs.sendMessage(tabId, message, () => chrome.runtime.lastError); // Suppress error if no listener
     }
   }
@@ -388,7 +389,7 @@ export default class Background {
       status = tabOptions.status;
     }
     if (!sendResponse) sendResponse = chrome.runtime.sendMessage;
-    const message: Message = { destination: Constants.MESSAGING.POPUP, source: Constants.MESSAGING.BACKGROUND, status: status, tabId: tabId };
+    const message: Message = { destination: this.Constants.MESSAGING.POPUP, source: this.Constants.MESSAGING.BACKGROUND, status: status, tabId: tabId };
     sendResponse(message, () => chrome.runtime.lastError); // Suppress error if Popup isn't active
   }
 
