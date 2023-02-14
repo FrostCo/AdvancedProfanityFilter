@@ -58,6 +58,19 @@ export default class WebFilter extends Filter {
     }
   }
 
+  buildInitStateMessage(message: Message) {
+    // Get status
+    message.iframe = !!(this.iframe);
+    message.advanced = this.domain.advanced;
+    message.deep = this.domain.deep;
+    message.status = Constants.STATUS.NORMAL;
+    if (message.advanced) message.status = Constants.STATUS.ADVANCED;
+    if (message.deep) message.status = Constants.STATUS.DEEP;
+
+    // Always show counter if not in normal mode
+    if (this.cfg.showCounter && message.status != Constants.STATUS.NORMAL) { message.counter = this.counter; }
+  }
+
   buildMessage(destination: string, data = {}): Message {
     return Object.assign({ destination: destination, source: Constants.MESSAGING.CONTEXT }, data);
   }
@@ -383,17 +396,7 @@ export default class WebFilter extends Filter {
   }
 
   sendInitState(message: Message) {
-    // Get status
-    message.iframe = !!(this.iframe);
-    message.advanced = this.domain.advanced;
-    message.deep = this.domain.deep;
-    message.status = Constants.STATUS.NORMAL;
-    if (message.advanced) message.status = Constants.STATUS.ADVANCED;
-    if (message.deep) message.status = Constants.STATUS.DEEP;
-
-    // Always show counter if not in normal mode
-    if (this.cfg.showCounter && message.status != Constants.STATUS.NORMAL) { message.counter = this.counter; }
-
+    this.buildInitStateMessage(message);
     chrome.runtime.sendMessage(message);
   }
 
