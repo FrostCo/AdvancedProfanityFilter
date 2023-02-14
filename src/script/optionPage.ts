@@ -35,13 +35,8 @@ export default class OptionPage {
 
   //#region Class reference helpers
   // Can be overridden in children classes
-  static get DataMigration() {
-    return DataMigration;
-  }
-
-  get Class() {
-    return (this.constructor as typeof OptionPage);
-  }
+  static get DataMigration() { return DataMigration; }
+  get Class() { return (this.constructor as typeof OptionPage); }
   //#endregion
 
   static readonly activeClass = 'w3-flat-belize-hole';

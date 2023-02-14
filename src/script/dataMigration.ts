@@ -7,18 +7,9 @@ export default class DataMigration {
 
   //#region Class reference helpers
   // Can be overridden in children classes
-  static get Config() {
-    return WebConfig;
-  }
-
-  // Can be overridden in children classes
-  static get Constants() {
-    return Constants;
-  }
-
-  get Class() {
-    return (this.constructor as typeof DataMigration);
-  }
+  static get Config() { return WebConfig; }
+  static get Constants() { return Constants; }
+  get Class() { return (this.constructor as typeof DataMigration); }
   //#endregion
 
   static readonly _migrations: Migration[] = [
