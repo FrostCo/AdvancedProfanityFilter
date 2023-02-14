@@ -6,6 +6,12 @@ import { formatNumber, makeRequest } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
 
 export default class Background {
+    //#region Class reference helpers
+    static get DataMigration() {
+      return DataMigration;
+    }
+    //#endregion
+
   // #region Constants
   static readonly COLOR_BLUE = [66, 133, 244, 255] as chrome.action.ColorArray;
   static readonly COLOR_BLUE_VIOLET = [138, 43, 226, 255] as chrome.action.ColorArray;
@@ -319,9 +325,9 @@ export default class Background {
   }
 
   static async runUpdateMigrations(previousVersion) {
-    if (DataMigration.migrationNeeded(previousVersion)) {
+    if (this.DataMigration.migrationNeeded(previousVersion)) {
       const cfg = await WebConfig.load();
-      const migration = new DataMigration(cfg);
+      const migration = new this.DataMigration(cfg);
       const migrated = await migration.byVersion(previousVersion);
       if (migrated) cfg.save();
     }
