@@ -275,7 +275,9 @@
     ]
   },
   "nyc": {
-    "extension": [".ts"],
+    "extension": [
+      ".ts"
+    ],
     "include": [
       "src/script/**/*.ts"
     ],
