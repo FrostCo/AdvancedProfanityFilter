@@ -11,6 +11,7 @@ module.exports = {
     webFilter: './src/script/mainContent.ts',
   },
   mode: 'production',
+  devtool: 'source-map',
   module: {
     rules: [
       {
@@ -29,7 +30,7 @@ module.exports = {
     ]
   },
   optimization: {
-    minimize: false
+    minimize: true
   },
   plugins: [
     new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) }),
