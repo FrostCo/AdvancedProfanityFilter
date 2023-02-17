@@ -11,7 +11,6 @@ module.exports = {
     webFilter: './src/script/mainContent.ts',
   },
   mode: 'production',
-  devtool: 'source-map',
   module: {
     rules: [
       {
