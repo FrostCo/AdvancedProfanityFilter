@@ -10,8 +10,8 @@ function buildArchive() {
   const zip = new AdmZip();
   zip.addLocalFolder(dist, null);
 
-  // Remove source maps
-  const filesToRemove = globbySync(['dist/**/*.js.map']);
+  // Remove unwanted files
+  const filesToRemove = globbySync(['dist/**/*.LICENSE.txt']);
   for (const file of filesToRemove) {
     const entry = file.replace(/^dist\//, '');
     zip.deleteFile(entry);
