@@ -209,6 +209,15 @@
       "@typescript-eslint/naming-convention": [
         "error",
         {
+          "selector": "accessor",
+          "format": [
+            "camelCase",
+            "PascalCase"
+          ],
+          "leadingUnderscore": "allow",
+          "trailingUnderscore": "forbid"
+        },
+        {
           "selector": "class",
           "format": [
             "PascalCase"
