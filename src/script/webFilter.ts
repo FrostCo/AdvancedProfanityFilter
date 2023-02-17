@@ -23,6 +23,12 @@ export default class WebFilter extends Filter {
   stats: Statistics;
   summary: Summary;
 
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  static get Config() { return WebConfig; }
+  get Class() { return (this.constructor as typeof WebFilter); }
+  //#endregion
+
   static readonly observerConfig: MutationObserverInit = {
     characterData: true,
     characterDataOldValue: true,
@@ -130,7 +136,7 @@ export default class WebFilter extends Filter {
   }
 
   async cleanPage() {
-    this.cfg = await WebConfig.load();
+    this.cfg = await this.Class.Config.load();
     logger.setLevel(this.cfg.loggingLevel);
 
     if (Object.keys(this.cfg.words).length === 0) {
@@ -262,7 +268,7 @@ export default class WebFilter extends Filter {
   }
 
   async getStatsFromStorage() {
-    const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: this._defaultStats }) as any;
+    const { stats }: { stats: Statistics } = await this.Class.Config.getLocalStorage({ stats: this._defaultStats }) as any;
     return stats;
   }
 
@@ -333,7 +339,7 @@ export default class WebFilter extends Filter {
   }
 
   async persistStats() {
-    if (!WebConfig.chromeStorageAvailable()) { return false; }
+    if (!this.Class.Config.chromeStorageAvailable()) { return false; }
     try {
       const words = Object.keys(this.stats.words);
       if (words.length) {
@@ -346,7 +352,7 @@ export default class WebFilter extends Filter {
         if (stats.startedAt == null) { stats.startedAt = Date.now(); }
 
         this._processStatsBeforeSaving(stats);
-        await WebConfig.saveLocalStorage({ stats: stats });
+        await this.Class.Config.saveLocalStorage({ stats: stats });
         this.stats = this._defaultStats;
       }
     } catch (err) {
