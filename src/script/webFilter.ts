@@ -79,6 +79,8 @@ export default class WebFilter extends Filter {
     }
   }
 
+  beforeProcessingPage(message: Message) {}
+
   buildInitStateMessage(message: Message) {
     // Get status
     message.iframe = !!(this.iframe);
@@ -163,8 +165,11 @@ export default class WebFilter extends Filter {
       return false;
     }
 
-    this.setDefaultWordlist();
+    this.beforeProcessingPage(message);
     this.sendInitState(message);
+    if (message.disabled) return false;
+
+    this.setDefaultWordlist();
     this.onMessage();
 
     // Filter text from the main document and watch for new nodes
