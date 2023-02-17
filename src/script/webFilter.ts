@@ -154,22 +154,15 @@ export default class WebFilter extends Filter {
     }
 
     const backgroundData: BackgroundData = await this.getBackgroundData();
-
-    // Use domain-specific settings
     const message = this.buildMessage(Constants.MESSAGING.BACKGROUND);
-    if (
-      backgroundData.disabledTab
-      || (
-        this.cfg.enabledDomainsOnly
-        && !this.domain.enabled
-      )
-      || this.domain.disabled
-    ) {
+
+    if (this.shouldBeDisabled(backgroundData)) {
       message.disabled = true;
       logger.info(`Disabled for page '${this.hostname}'.`);
       chrome.runtime.sendMessage(message);
       return false;
     }
+
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
 
     this.sendInitState(message);
@@ -417,6 +410,17 @@ export default class WebFilter extends Filter {
   sendInitState(message: Message) {
     this.buildInitStateMessage(message);
     chrome.runtime.sendMessage(message);
+  }
+
+  shouldBeDisabled(backgroundData: BackgroundData) {
+    return (
+      backgroundData.disabledTab
+      || (
+        this.cfg.enabledDomainsOnly
+        && !this.domain.enabled
+      )
+      || this.domain.disabled
+    );
   }
 
   shouldProcessAddedNode(node) {
