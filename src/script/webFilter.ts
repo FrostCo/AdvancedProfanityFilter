@@ -169,7 +169,7 @@ export default class WebFilter extends Filter {
     this.sendInitState(message);
     if (message.disabled) return false;
 
-    this.setDefaultWordlist();
+    this.setDomainWordlist();
     this.onMessage();
 
     // Filter text from the main document and watch for new nodes
@@ -415,7 +415,7 @@ export default class WebFilter extends Filter {
     }
   }
 
-  setDefaultWordlist() {
+  setDomainWordlist() {
     if (this.domain.wordlistId !== undefined) this.wordlistId = this.domain.wordlistId;
   }
 
