@@ -148,13 +148,7 @@ export default class WebFilter extends Filter {
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
     logger.info('Config loaded.', this.cfg);
 
-    if (
-      this.iframe
-      && (
-        (this.cfg.enabledFramesOnly && !this.domain.framesOn)
-        || (!this.cfg.enabledFramesOnly && this.domain.framesOff)
-      )
-    ) {
+    if (!this.shouldProcessFrame) {
       logger.info(`Filter disabled on frames for current domain (${this.iframe.href})`);
       return false;
     }
@@ -431,6 +425,16 @@ export default class WebFilter extends Filter {
 
   shouldProcessAddedNodes(mutation: MutationRecord) {
     return mutation.addedNodes.length;
+  }
+
+  get shouldProcessFrame() {
+    return (
+      !this.iframe
+      || (
+        (this.cfg.enabledFramesOnly && this.domain.framesOn)
+        || (!this.cfg.enabledFramesOnly && !this.domain.framesOff)
+      )
+    );
   }
 
   shouldProcessMutationTargetNode(mutation: MutationRecord) {
