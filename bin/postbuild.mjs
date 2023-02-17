@@ -12,12 +12,13 @@ import {
 } from './lib.mjs';
 
 let buildData;
+let distDir = 'dist';
 
 function appleBuild(updateBuildNumber) {
   const files = [
-    path.join('dist', 'img', 'donate.gif'),
-    path.join('dist', 'img', 'patreon-small.png'),
-    path.join('dist', 'img', 'patreon.png'),
+    path.join(distDir, 'img', 'donate.gif'),
+    path.join(distDir, 'img', 'patreon-small.png'),
+    path.join(distDir, 'img', 'patreon.png'),
   ];
 
   removeOptionPageBookmarklet();
@@ -137,7 +138,7 @@ function main() {
 
 function removeOptionPageBookmarklet() {
   console.log("Removing Bookmarklet tab from Option's page");
-  const optionPage = path.join('dist', 'optionPage.html');
+  const optionPage = path.join(distDir, 'optionPage.html');
   const optionPageHTML = fse.readFileSync(optionPage).toString();
 
   // Remove div#menu a[href='#/bookmarklet']
@@ -150,7 +151,7 @@ function removeOptionPageBookmarklet() {
 
 function removeOptionPageDonations() {
   console.log("Removing donations from Option's page");
-  const optionPage = path.join('dist', 'optionPage.html');
+  const optionPage = path.join(distDir, 'optionPage.html');
   const optionPageHTML = fse.readFileSync(optionPage).toString();
 
   // Remove span.donations
