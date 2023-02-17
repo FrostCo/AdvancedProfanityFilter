@@ -163,8 +163,7 @@ export default class WebFilter extends Filter {
       return false;
     }
 
-    if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
-
+    this.setDefaultWordlist();
     this.sendInitState(message);
     this.onMessage();
 
@@ -405,6 +404,10 @@ export default class WebFilter extends Filter {
     for (const node of nodes) {
       this.processRemovedNode(node);
     }
+  }
+
+  setDefaultWordlist() {
+    if (this.domain.wordlistId !== undefined) this.wordlistId = this.domain.wordlistId;
   }
 
   sendInitState(message: Message) {
