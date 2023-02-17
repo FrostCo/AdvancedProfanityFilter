@@ -175,9 +175,8 @@ export default class WebFilter extends Filter {
     // Filter text from the main document and watch for new nodes
     this.init();
     logger.infoTime('Filter initialized.', this);
-    this.processNode(document, this.wordlistId);
+    this.processInitialPage();
     logger.infoTime('Initial page filtered.');
-    this.updateCounterBadge();
     this.startObserving(document);
 
     // Track stats (if enabled)
@@ -367,6 +366,11 @@ export default class WebFilter extends Filter {
         this.processAddedNode(node);
       }
     }
+  }
+
+  processInitialPage() {
+    this.processNode(document, this.wordlistId);
+    this.updateCounterBadge();
   }
 
   processMutation(mutation: MutationRecord) {
