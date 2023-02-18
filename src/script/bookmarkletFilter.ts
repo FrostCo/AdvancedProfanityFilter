@@ -164,6 +164,9 @@ export default class BookmarkletFilter extends Filter {
     } else {
       this.processNode = this.cleanText;
     }
+
+    this.observer = new MutationObserver(this.processMutations.bind(this));
+    this.shadowObserver = new MutationObserver(this.processMutations.bind(this));
   }
 
   processAddedNode(node: Node) {
@@ -242,9 +245,6 @@ export default class BookmarkletFilter extends Filter {
 const filter = new BookmarkletFilter;
 
 if (typeof window !== 'undefined') {
-  filter.observer = new MutationObserver(filter.processMutations);
-  filter.shadowObserver = new MutationObserver(filter.processMutations);
-
   if (window != window.top) {
     filter.iframe = document.location;
     try {
