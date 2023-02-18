@@ -76,8 +76,8 @@ export default class Bookmarklet {
 
   static async injectConfig(config = null): Promise<string> {
     const prefix = '/* @preserve - Start User Config */';
-    const postfix = '/* @preserve - End User Config */';
-    const configRegExp = new RegExp(`${prefix.replace(/[\/\*]/g, '\\$&')}[\\S\\s]\*${postfix.replace(/[\/\*]/g, '\\$&')}`, 'm');
+    const suffix = '/* @preserve - End User Config */';
+    const configRegExp = new RegExp(`${prefix.replace(/[\/\*]/g, '\\$&')}[\\S\\s]\*${suffix.replace(/[\/\*]/g, '\\$&')}`, 'm');
     const origURL = './bookmarkletFilter.js';
 
     const response = await fetch(origURL);
@@ -88,7 +88,7 @@ export default class Bookmarklet {
       const variableCode = cfgCode.match(/const ([a-zA-Z])=/m);
       if (variableCode && variableCode[1]) {
         const variableName = variableCode[1];
-        return code.replace(configRegExp, `${prefix}\nconst ${variableName}=${JSON.stringify(config)};\n${postfix}`);
+        return code.replace(configRegExp, `${prefix}\nconst ${variableName}=${JSON.stringify(config)};\n${suffix}`);
       } else {
         throw new Error('Unable to set user config - using defaults.');
       }
@@ -104,7 +104,7 @@ export default class Bookmarklet {
 
   destination(): string {
     const prefix = '(function(){if(!document.querySelector("script.apfBookmarklet")){const apfScriptEl=document.body.appendChild(document.createElement("script"));apfScriptEl.type="text/javascript";apfScriptEl.src="';
-    const postfix = '";apfScriptEl.className="apfBookmarklet";}})()';
-    return 'javascript:' + encodeURIComponent(prefix + this.hostedUrl + postfix);
+    const suffix = '";apfScriptEl.className="apfBookmarklet";}})()';
+    return 'javascript:' + encodeURIComponent(prefix + this.hostedUrl + suffix);
   }
 }
