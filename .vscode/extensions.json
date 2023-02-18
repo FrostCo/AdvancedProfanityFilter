@@ -2,6 +2,7 @@
   "recommendations": [
     "dbaeumer.vscode-eslint",
     "kamikillerto.vscode-colorize",
-    "shardulm94.trailing-spaces"
+    "shardulm94.trailing-spaces",
+    "vscode-icons-team.vscode-icons"
   ]
 }

@@ -1,5 +1,15 @@
 {
   "files.associations": {
     "**/*.js.example": "javascript"
-  }
+  },
+  "vsicons.associations.files": [
+    {
+      "icon": "webpack",
+      "extensions": [
+        "webpack.bookmarklet.js"
+      ],
+      "filename": true,
+      "format": "svg"
+    }
+  ]
 }
