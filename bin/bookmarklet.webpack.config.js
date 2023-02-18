@@ -28,6 +28,7 @@ module.exports = {
     minimize: true,
     minimizer: [
       new TerserPlugin({
+        extractComments: false, // Don't create LICENSE.txt files
         terserOptions: {
           ecma: undefined,
           warnings: false,
