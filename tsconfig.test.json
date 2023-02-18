@@ -1,17 +1,14 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
     "lib": ["es2017", "dom", "dom.iterable"],
     "moduleResolution": "node",
     "noEmit": true,
-    "outDir": "./test/built",
     "paths": {
       "@APF/*": ["src/script/*"],
       "@VENDOR/*": ["src/script/vendor/*"]
     },
-    "resolveJsonModule": true,
     "skipLibCheck": true,
     "target": "esnext"
   },
