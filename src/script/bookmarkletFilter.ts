@@ -110,15 +110,10 @@ export default class BookmarkletFilter extends Filter {
     }
 
     // Use domain-specific settings
-    if (
-      (
-        this.cfg.enabledDomainsOnly
-        && !this.domain.enabled
-      )
-      || this.domain.disabled
-    ) {
+    if (this.shouldBeDisabled({} as BackgroundData)) {
       return false;
     }
+
     if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
 
     // Filter text from the main document and watch for new nodes
@@ -230,6 +225,16 @@ export default class BookmarkletFilter extends Filter {
     for (const node of nodes) {
       this.processRemovedNode(node);
     }
+  }
+
+  shouldBeDisabled(backgroundData: BackgroundData) {
+    return (
+      (
+        this.cfg.enabledDomainsOnly
+        && !this.domain.enabled
+      )
+      || this.domain.disabled
+    );
   }
 
   shouldProcessAddedNode(node) {
