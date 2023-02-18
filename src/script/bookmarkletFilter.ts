@@ -169,6 +169,23 @@ export default class BookmarkletFilter extends Filter {
     this.shadowObserver = new MutationObserver(this.processMutations.bind(this));
   }
 
+  initPageDetails() {
+    if (window != window.top) {
+      this.iframe = document.location;
+      try { // same domain
+        this.hostname = window.parent.location.hostname;
+      } catch (err) { // different domain
+        if (document.referrer) {
+          this.hostname = new URL(document.referrer).hostname;
+        } else {
+          this.hostname = document.location.hostname;
+        }
+      }
+    } else {
+      this.hostname = document.location.hostname;
+    }
+  }
+
   processAddedNode(node: Node) {
     this.processNode(node, this.wordlistId);
   }
@@ -245,20 +262,6 @@ export default class BookmarkletFilter extends Filter {
 const filter = new BookmarkletFilter;
 
 if (typeof window !== 'undefined') {
-  if (window != window.top) {
-    filter.iframe = document.location;
-    try {
-      filter.hostname = window.parent.location.hostname;
-    } catch (err) {
-      if (document.referrer) {
-        filter.hostname = new URL(document.referrer).hostname;
-      } else {
-        filter.hostname = document.location.hostname;
-      }
-    }
-  } else {
-    filter.hostname = document.location.hostname;
-  }
-
+  filter.initPageDetails();
   filter.cleanPage();
 }
