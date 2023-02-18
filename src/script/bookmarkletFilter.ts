@@ -105,13 +105,7 @@ export default class BookmarkletFilter extends Filter {
     this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
 
-    if (
-      this.iframe
-      && (
-        (this.cfg.enabledFramesOnly && !this.domain.framesOn)
-        || (!this.cfg.enabledFramesOnly && this.domain.framesOff)
-      )
-    ) {
+    if (!this.shouldProcessFrame) {
       return false;
     }
 
@@ -244,6 +238,16 @@ export default class BookmarkletFilter extends Filter {
 
   shouldProcessAddedNodes(mutation: MutationRecord) {
     return mutation.addedNodes.length;
+  }
+
+  get shouldProcessFrame() {
+    return (
+      !this.iframe
+      || (
+        (this.cfg.enabledFramesOnly && this.domain.framesOn)
+        || (!this.cfg.enabledFramesOnly && !this.domain.framesOff)
+      )
+    );
   }
 
   shouldProcessMutationTargetNode(mutation: MutationRecord) {
