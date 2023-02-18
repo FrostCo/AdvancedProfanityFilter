@@ -186,14 +186,14 @@ export default class BookmarkletFilter extends Filter {
 
   processMutationTargetNode(mutation: MutationRecord) {
     if (mutation.target.nodeName === '#text') {
-      const target = mutation.target as CharacterData;
-      this.processMutationTargetText(target);
+      this.processMutationTargetText(mutation);
     } else if (this.processMutationTarget) {
       this.processNode(mutation.target, this.wordlistId);
     }
   }
 
-  processMutationTargetText(target: CharacterData) {
+  processMutationTargetText(mutation: MutationRecord) {
+    const target = mutation.target as CharacterData;
     const result = this.replaceTextResult(target.data, this.wordlistId);
     if (result.modified) target.data = result.filtered;
   }
