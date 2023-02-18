@@ -204,7 +204,13 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  processRemovedNodes(removedNodes: NodeList) {}
+  processRemovedNode(node: Node) {}
+
+  processRemovedNodes(nodes: NodeList) {
+    for (const node of nodes) {
+      this.processRemovedNode(node);
+    }
+  }
 
   shouldProcessAddedNode(node) {
     return !Page.isForbiddenNode(node);
