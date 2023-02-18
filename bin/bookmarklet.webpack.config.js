@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 const TerserPlugin = require('terser-webpack-plugin'); // eslint-disable-line @typescript-eslint/no-var-requires
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -9,24 +10,22 @@ module.exports = {
   module: {
     rules: [
       {
-        exclude: /(node_modules|bower_components)/,
+        exclude: /node_modules/,
         test: /\.tsx?$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              '@babel/typescript',
-            ],
-            plugins: [
-              '@babel/proposal-class-properties',
-              '@babel/proposal-object-rest-spread',
-            ]
-          }
-        }
-      }
-    ]
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              // Ignore typescript errors
+              transpileOnly: false,
+            },
+          },
+        ],
+      },
+    ],
   },
   optimization: {
+    minimize: true,
     minimizer: [
       new TerserPlugin({
         terserOptions: {
@@ -50,7 +49,10 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.js', '.ts']
+    extensions: ['.js', '.ts'],
+    plugins: [
+      new TsconfigPathsPlugin({ configFile: './tsconfig.json' }),
+    ],
   },
   target: 'web',
 };

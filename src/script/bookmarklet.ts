@@ -85,10 +85,10 @@ export default class Bookmarklet {
 
     try {
       const cfgCode = code.match(configRegExp).toString();
-      const variableCode = cfgCode.match(/const ([a-z])=/m);
+      const variableCode = cfgCode.match(/const ([a-zA-Z])=/m);
       if (variableCode && variableCode[1]) {
         const variableName = variableCode[1];
-        return code.replace(configRegExp, `${prefix}\nconst ${variableName}=${JSON.stringify(config)}\n${postfix}`);
+        return code.replace(configRegExp, `${prefix}\nconst ${variableName}=${JSON.stringify(config)};\n${postfix}`);
       } else {
         throw new Error('Unable to set user config - using defaults.');
       }
