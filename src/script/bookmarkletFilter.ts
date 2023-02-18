@@ -124,7 +124,7 @@ export default class BookmarkletFilter extends Filter {
 
     // Filter text from the main document and watch for new nodes
     this.init();
-    this.processNode(document, this.wordlistId);
+    this.processInitialPage();
     this.startObserving(document);
   }
 
@@ -197,6 +197,10 @@ export default class BookmarkletFilter extends Filter {
         this.processAddedNode(node);
       }
     }
+  }
+
+  processInitialPage() {
+    this.processNode(document, this.wordlistId);
   }
 
   processMutation(mutation: MutationRecord) {
