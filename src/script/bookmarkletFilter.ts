@@ -183,7 +183,7 @@ export default class BookmarkletFilter extends Filter {
 
   processMutations(mutations: MutationRecord[]) {
     for (const mutation of mutations) {
-      filter.processMutation(mutation);
+      this.processMutation(mutation);
     }
   }
 
