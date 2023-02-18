@@ -26,6 +26,12 @@ export default class BookmarkletFilter extends Filter {
   stats?: Statistics; // Bookmarklet: Not used
   updateCounterBadge: () => void; // Bookmarklet: Not used - Needed to match signature of WebFilter
 
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  static get Config() { return WebConfig; }
+  get Class() { return (this.constructor as typeof BookmarkletFilter); }
+  //#endregion
+
   static readonly observerConfig: MutationObserverInit = {
     characterData: true,
     characterDataOldValue: true,
@@ -95,7 +101,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   cleanPage() {
-    this.cfg = new WebConfig(config);
+    this.cfg = new this.Class.Config(config);
     this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
 
