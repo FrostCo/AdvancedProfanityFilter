@@ -26,6 +26,13 @@ export default class BookmarkletFilter extends Filter {
   stats?: Statistics; // Bookmarklet: Not used
   updateCounterBadge: () => void; // Bookmarklet: Not used - Needed to match signature of WebFilter
 
+  static readonly observerConfig: MutationObserverInit = {
+    characterData: true,
+    characterDataOldValue: true,
+    childList: true,
+    subtree: true,
+  };
+
   constructor() {
     super();
     this.extension = false;
@@ -142,7 +149,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
-    this.shadowObserver.observe(shadowRoot, observerConfig);
+    this.shadowObserver.observe(shadowRoot, BookmarkletFilter.observerConfig);
     this.processNode(shadowRoot, wordlistId, statsType);
   }
 
@@ -216,7 +223,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   startObserving(target: Node = document, observer: MutationObserver = this.observer) {
-    observer.observe(target, observerConfig);
+    observer.observe(target, BookmarkletFilter.observerConfig);
   }
 
   stopObserving(observer: MutationObserver = this.observer) {
@@ -227,12 +234,6 @@ export default class BookmarkletFilter extends Filter {
 }
 
 const filter = new BookmarkletFilter;
-const observerConfig: MutationObserverInit = {
-  characterData: true,
-  characterDataOldValue: true,
-  childList: true,
-  subtree: true,
-};
 
 if (typeof window !== 'undefined') {
   filter.observer = new MutationObserver(filter.processMutations);
