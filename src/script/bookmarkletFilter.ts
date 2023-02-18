@@ -63,6 +63,8 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
+  beforeProcessingPage(message: Message) {}
+
   cleanChildNode(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     if (node.nodeName) {
       if (node.textContent && node.textContent.trim() != '') {
@@ -113,6 +115,10 @@ export default class BookmarkletFilter extends Filter {
     if (this.shouldBeDisabled({} as BackgroundData)) {
       return false;
     }
+
+    const message = { disabled: false } as Message;
+    this.beforeProcessingPage(message);
+    if (message.disabled) return false;
 
     this.setDefaultWordlist();
 
