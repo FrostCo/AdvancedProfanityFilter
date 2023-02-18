@@ -3,7 +3,7 @@ const TerserPlugin = require('terser-webpack-plugin'); // eslint-disable-line @t
 
 module.exports = {
   entry: {
-    bookmarkletFilter: './src/script/bookmarkletFilter.ts',
+    bookmarkletFilter: './src/script/mainBookmarklet.ts',
   },
   mode: 'production',
   module: {

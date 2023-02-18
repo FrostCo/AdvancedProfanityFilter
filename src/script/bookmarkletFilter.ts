@@ -5,11 +5,6 @@ import Filter from '@APF/lib/filter';
 import Page from '@APF/page';
 import WebConfig from '@APF/webConfig';
 
-/* @preserve - Start User Config */
-const config = WebConfig._defaults as any;
-config.words = WebConfig._defaultWords;
-/* @preserve - End User Config */
-
 export default class BookmarkletFilter extends Filter {
   buildMessage: (destination: string, data?: object) => Message; // Bookmarklet: Not used - Needed to match signature of WebFilter
   declare cfg: WebConfig;
@@ -102,7 +97,7 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  cleanPage() {
+  cleanPage(config?: WebConfig) {
     this.cfg = new this.Class.Config(config);
     this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
@@ -286,11 +281,4 @@ export default class BookmarkletFilter extends Filter {
     observer.disconnect();
     if (mutations) { this.processMutations(mutations); }
   }
-}
-
-const filter = new BookmarkletFilter;
-
-if (typeof window !== 'undefined') {
-  filter.initPageDetails();
-  filter.cleanPage();
 }
