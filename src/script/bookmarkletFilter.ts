@@ -114,7 +114,7 @@ export default class BookmarkletFilter extends Filter {
       return false;
     }
 
-    if (this.domain.wordlistId !== undefined) { this.wordlistId = this.domain.wordlistId; }
+    this.setDefaultWordlist();
 
     // Filter text from the main document and watch for new nodes
     this.init();
@@ -225,6 +225,10 @@ export default class BookmarkletFilter extends Filter {
     for (const node of nodes) {
       this.processRemovedNode(node);
     }
+  }
+
+  setDefaultWordlist() {
+    if (this.domain.wordlistId !== undefined) this.wordlistId = this.domain.wordlistId;
   }
 
   shouldBeDisabled(backgroundData: BackgroundData) {
