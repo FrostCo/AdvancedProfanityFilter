@@ -35,7 +35,7 @@ export default class BookmarkletFilter extends Filter {
 
   advancedReplaceText(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
     if (node.parentNode || node === document) {
-      this.wordlists[wordlistId].regExps.forEach((regExp) => {
+      for (const regExp of this.wordlists[wordlistId].regExps) {
         // @ts-ignore: External library function
         findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: (portion, match) => {
           if (portion.index === 0) {
@@ -44,7 +44,7 @@ export default class BookmarkletFilter extends Filter {
             return '';
           }
         } });
-      });
+      }
     } else {
       this.cleanText(node, wordlistId, statsType);
     }
@@ -127,9 +127,9 @@ export default class BookmarkletFilter extends Filter {
       const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
       while (treeWalker.nextNode()) {
         if (treeWalker.currentNode.childNodes.length > 0) {
-          treeWalker.currentNode.childNodes.forEach((childNode) => {
+          for (const childNode of treeWalker.currentNode.childNodes) {
             this.cleanText(childNode, wordlistId, statsType);
-          });
+          }
         } else {
           if (!Page.isForbiddenNode(treeWalker.currentNode)) {
             this.cleanChildNode(treeWalker.currentNode, wordlistId, statsType);
@@ -160,11 +160,11 @@ export default class BookmarkletFilter extends Filter {
   }
 
   processMutation(mutation: MutationRecord) {
-    mutation.addedNodes.forEach((node) => {
+    for (const node of mutation.addedNodes) {
       if (!Page.isForbiddenNode(node)) {
         this.processNode(node, this.wordlistId);
       }
-    });
+    }
 
     if (mutation.target) {
       if (mutation.target.nodeName === '#text') {
@@ -182,9 +182,9 @@ export default class BookmarkletFilter extends Filter {
   }
 
   processMutations(mutations: MutationRecord[]) {
-    mutations.forEach((mutation) => {
+    for (const mutation of mutations) {
       filter.processMutation(mutation);
-    });
+    }
   }
 
   startObserving(target: Node = document, observer: MutationObserver = this.observer) {
