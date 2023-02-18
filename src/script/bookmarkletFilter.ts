@@ -120,7 +120,7 @@ export default class BookmarkletFilter extends Filter {
     this.beforeProcessingPage(message);
     if (message.disabled) return false;
 
-    this.setDefaultWordlist();
+    this.setDomainWordlist();
 
     // Filter text from the main document and watch for new nodes
     this.init();
@@ -237,7 +237,7 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  setDefaultWordlist() {
+  setDomainWordlist() {
     if (this.domain.wordlistId !== undefined) this.wordlistId = this.domain.wordlistId;
   }
 
