@@ -159,20 +159,30 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  processMutation(mutation: MutationRecord) {
-    for (const node of mutation.addedNodes) {
-      if (!Page.isForbiddenNode(node)) {
-        this.processNode(node, this.wordlistId);
+  processAddedNode(node: Node) {
+    this.processNode(node, this.wordlistId);
+  }
+
+  processAddedNodes(addedNodes: NodeList) {
+    for (const node of addedNodes) {
+      if (this.shouldProcessAddedNode(node)) {
+        this.processAddedNode(node);
       }
     }
+  }
 
-    if (mutation.target) {
-      if (mutation.target.nodeName === '#text') {
-        const target = mutation.target as CharacterData;
-        this.processMutationTargetText(target);
-      } else if (this.processMutationTarget) {
-        this.processNode(mutation.target, this.wordlistId);
-      }
+  processMutation(mutation: MutationRecord) {
+    if (this.shouldProcessAddedNodes(mutation)) this.processAddedNodes(mutation.addedNodes);
+    if (this.shouldProcessRemovedNodes(mutation)) this.processRemovedNodes(mutation.removedNodes);
+    if (this.shouldProcessMutationTargetNode(mutation)) this.processMutationTargetNode(mutation);
+  }
+
+  processMutationTargetNode(mutation: MutationRecord) {
+    if (mutation.target.nodeName === '#text') {
+      const target = mutation.target as CharacterData;
+      this.processMutationTargetText(target);
+    } else if (this.processMutationTarget) {
+      this.processNode(mutation.target, this.wordlistId);
     }
   }
 
@@ -185,6 +195,24 @@ export default class BookmarkletFilter extends Filter {
     for (const mutation of mutations) {
       this.processMutation(mutation);
     }
+  }
+
+  processRemovedNodes(removedNodes: NodeList) {}
+
+  shouldProcessAddedNode(node) {
+    return !Page.isForbiddenNode(node);
+  }
+
+  shouldProcessAddedNodes(mutation: MutationRecord) {
+    return mutation.addedNodes.length;
+  }
+
+  shouldProcessMutationTargetNode(mutation: MutationRecord) {
+    return mutation.target != null;
+  }
+
+  shouldProcessRemovedNodes(mutation: MutationRecord) {
+    return false;
   }
 
   startObserving(target: Node = document, observer: MutationObserver = this.observer) {
