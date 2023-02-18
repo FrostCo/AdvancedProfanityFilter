@@ -2,7 +2,7 @@ import WebConfig from '@APF/webConfig';
 import BookmarkletFilter from '@APF/bookmarkletFilter';
 
 /* @preserve - Start User Config */
-const config = WebConfig._defaults as any;
+const config = WebConfig._defaults as WebConfig;
 /* @preserve - End User Config */
 
 if (typeof window !== 'undefined') {
