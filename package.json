@@ -38,7 +38,7 @@
     "package:mv3": "node bin/prebuild.mjs --release --manifestV3 && npm run release:build && npm run package",
     "package": "node bin/package-extension.mjs",
     "postbuild": "node bin/postbuild.mjs",
-    "postrelease:all": "npm run update:bookmarklet && npm run build",
+    "postrelease:all": "npm run build",
     "postrelease:build": "node bin/postbuild.mjs",
     "postrelease:firefox": "node bin/package-source.mjs",
     "prebuild": "npm run clean:build && node bin/prebuild.mjs",
@@ -66,7 +66,6 @@
     "test:types": "tsc --noEmit",
     "test": "npm run test:lint && npm run test:types && npm run test:addon && npm run test:cov",
     "type-check:watch": "npm run type-check -- --watch",
-    "update:bookmarklet": "node bin/update-bookmarklet.mjs",
     "update:deps": "npx npm-check-updates --concurrency 10 --timeout 600000 --upgrade",
     "update:help": "node bin/update-help.mjs",
     "watch": "node bin/watch.js"
