@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import WebConfig from '@APF/webConfig';
 import BookmarkletFilter from '@APF/bookmarkletFilter';
 
