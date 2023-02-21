@@ -6,7 +6,8 @@ const config = WebConfig._defaults as WebConfig;
 /* @preserve - End User Config */
 
 console.log('[APF Bookmarklet] Bookmarklet activated');
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && !(<any>window).apfBookmarklet) {
+  (<any>window).apfBookmarklet = true;
   console.log('[APF Bookmarklet] Bookmarklet running');
   if (!config.words) config.words = WebConfig._defaultWords;
   const filter = new BookmarkletFilter;
