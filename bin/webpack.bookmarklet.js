@@ -42,7 +42,7 @@ module.exports = {
           toplevel: false,
           nameCache: null,
           ie8: false,
-          keep_classnames: undefined,
+          keep_classnames: false,
           keep_fnames: false,
           safari10: false,
         },
