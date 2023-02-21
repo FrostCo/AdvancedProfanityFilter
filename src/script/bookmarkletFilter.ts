@@ -121,6 +121,8 @@ export default class BookmarkletFilter extends Filter {
     this.init();
     this.processInitialPage();
     this.startObserving(document);
+    /* eslint-disable-next-line no-console */
+    console.log('[APF Bookmarklet] Page filtered');
   }
 
   cleanText(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
