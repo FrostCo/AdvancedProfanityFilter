@@ -25,6 +25,7 @@ const logger = new Logger('OptionPage');
 export default class OptionPage {
   _confirmEventListeners: { (): void; } [];
   auth: OptionAuth;
+  bookmarklet: Bookmarklet;
   cfg: WebConfig;
   darkModeButton: Element;
   filter: Filter;
@@ -697,11 +698,6 @@ export default class OptionPage {
     return newDomainCfg;
   }
 
-  async exportBookmarkletFile() {
-    const code = await Bookmarklet.injectConfig(this.cfg.ordered());
-    exportToFile(code, 'apfBookmarklet.js');
-  }
-
   exportConfig() {
     const input = document.getElementById('configInlineInput') as HTMLInputElement;
 
@@ -811,6 +807,7 @@ export default class OptionPage {
       OptionPage.show(document.getElementById('main'));
     }
 
+    if (!this.bookmarklet) this.bookmarklet = await Bookmarklet.create();
     this.populateOptions();
 
     // Route to page based on URL
@@ -830,15 +827,14 @@ export default class OptionPage {
   }
 
   populateBookmarkletPage() {
+    if (!this.bookmarklet) return;
+
     const bookmarkletConfig = document.querySelector('input[name="bookmarkletConfig"]:checked') as HTMLInputElement;
-    const bookmarkletCustomConfig = document.getElementById('bookmarkletCustomConfig') as HTMLDivElement;
-    if (bookmarkletConfig.value == 'default') {
-      OptionPage.hide(bookmarkletCustomConfig);
-      this.updateBookmarklet(Bookmarklet._defaultBookmarklet);
-    } else {
-      OptionPage.show(bookmarkletCustomConfig);
-      this.updateHostedBookmarklet();
-    }
+    const bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
+    const cfg = bookmarkletConfig.value == 'default' ? null : this.cfg;
+    const href = this.bookmarklet.href(cfg);
+    bookmarkletLink.href = href;
+    OptionPage.enableBtn(bookmarkletLink);
   }
 
   populateConfig() {
@@ -955,6 +951,7 @@ export default class OptionPage {
     this.populateAllowlist();
     this.populateWordlists();
     this.populateDomainPage();
+    this.populateBookmarkletPage();
     this.populateConfig();
     this.populateStats();
     this.populateTest();
@@ -1732,13 +1729,6 @@ export default class OptionPage {
     return wordStats ? wordStats.text : 0;
   }
 
-  updateBookmarklet(url: string) {
-    const bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
-    const bookmarklet = new Bookmarklet(url);
-    bookmarkletLink.href = bookmarklet.destination();
-    OptionPage.enableBtn(bookmarkletLink);
-  }
-
   async updateContextMenu(input: HTMLInputElement) {
     this.cfg.contextMenu = input.checked;
     await this.cfg.save('contextMenu');
@@ -1769,22 +1759,6 @@ export default class OptionPage {
         OptionPage.hide(document.getElementById('substitutionSettings'));
         OptionPage.hide(document.getElementById('wordSubstitution'));
         break;
-    }
-  }
-
-  updateHostedBookmarklet() {
-    const bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
-    const bookmarkletHostedURLInput = document.getElementById('bookmarkletHostedURL') as HTMLInputElement;
-    OptionPage.hideInputError(bookmarkletHostedURLInput);
-
-    if (bookmarkletHostedURLInput.checkValidity()) {
-      this.updateBookmarklet(bookmarkletHostedURLInput.value);
-    } else {
-      if (bookmarkletHostedURLInput.value !== '') {
-        OptionPage.showInputError(bookmarkletHostedURLInput, 'Please enter a valid URL.');
-      }
-      bookmarkletLink.href = '#0';
-      OptionPage.disableBtn(bookmarkletLink);
     }
   }
 

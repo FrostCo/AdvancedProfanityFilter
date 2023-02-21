@@ -62,9 +62,6 @@ document.getElementById('domainSave').addEventListener('click', (evt) => { optio
 document.getElementById('domainRemove').addEventListener('click', (evt) => { option.removeDomain(); });
 // Bookmarklet
 document.querySelectorAll('#bookmarkletConfigInputs input').forEach((el) => { el.addEventListener('click', (evt) => { option.populateBookmarkletPage(); }); });
-document.getElementById('bookmarkletFile').addEventListener('click', (evt) => { option.exportBookmarkletFile(); });
-document.getElementById('bookmarkletHostedURL').addEventListener('input', (evt) => { option.updateHostedBookmarklet(); });
-document.getElementById('bookmarkletLink').addEventListener('click', (evt) => { evt.preventDefault(); });
 // Config
 document.getElementById('configSyncLargeKeys').addEventListener('click', (evt) => { option.confirm('convertStorageLocation'); });
 document.getElementById('configInlineInput').addEventListener('click', (evt) => { option.configInlineToggle(); });
