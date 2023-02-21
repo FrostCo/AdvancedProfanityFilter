@@ -6,7 +6,7 @@ import BookmarkletFilter from '@APF/bookmarkletFilter';
 const config = WebConfig._defaults as WebConfig;
 /* @preserve - End User Config */
 
-console.log('[APF Bookmarklet] Bookmarklet activated');
+console.log(`[APF Bookmarklet] Activated (version ${WebConfig.BUILD.version})`);
 if (typeof window !== 'undefined' && !(<any>window).apfBookmarklet) {
   (<any>window).apfBookmarklet = true;
   console.log('[APF Bookmarklet] Bookmarklet running');
