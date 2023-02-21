@@ -515,7 +515,10 @@
     <ul>
     <li><strong>Preserve case</strong> - Preserve the original case of the filtered word. (Default: <code>Enabled</code>).</li>
     <li><strong>Mark substituted words</strong> - Marks substituted words by surrounding them with <code>[</code> and <code>]</code>.</li>
-    <li><strong>Default Substitution</strong> - This will be used as the substitution for words that don&#39;t have a set substitution.</li>
+    <li><strong>Default Substitution</strong> - This will be used as the substitution for words that don&#39;t have a set substitution.<ul>
+    <li><strong>TIP</strong>: If you would like to cycle through multiple substitution words randomly separate them with <code>;;</code>.</li>
+    </ul>
+    </li>
     </ul>
     <h4 id="remove-mode">Remove Mode</h4>
     <p>When selected, the offensive word will simply be removed completely from the page, with no indicator that it was ever there. Note that this can sometimes lead to strange sentences.</p>
@@ -638,7 +641,37 @@
     <li><strong>Custom Sites</strong> - Add support for <a href="https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Audio#custom-audio-sites-advanced">Custom Audio Muting Sites</a>.</li>
     </ul>
     <h1 id="bookmarklet">Bookmarklet</h1>
-    <p>The bookmarklet allows you to run a minimal version of the filter on devices that can&#39;t install the full version. It is an advanced tool, and requires several steps to set it up. Learn more <a href="https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Bookmarklet">here</a>.</p>
+    <p>When you can&#39;t install the extension but would still like to filter a webpage, your best option is to use the Advanced Profanity Filter (APF) Bookmarklet.</p>
+    <p><strong>Pros:</strong></p>
+    <ul>
+    <li>Runs on most browsers, including mobile Google Chrome and iOS Safari</li>
+    <li>Only runs when you want it (must manually activate the bookmarklet)</li>
+    <li>Compatible with the same configuration as the extension</li>
+    </ul>
+    <p><strong>Cons:</strong></p>
+    <ul>
+    <li>Not run automatically; you have to run the bookmarklet on each page and every reload</li>
+    <li>No UI to modify settings</li>
+    <li>No auto-updating</li>
+    </ul>
+    <h3 id="creating-a-bookmarklet">Creating a Bookmarklet</h3>
+    <ol>
+    <li>Navigate to the Advanced Profanity Filter Option page and open the &quot;Bookmarklet&quot; tab</li>
+    <li>Choose whether you&#39;d like to use your configuration, or APF defaults</li>
+    <li>Save the APF Bookmarklet to your browser (Found at the bottom of the Bookmarklet&#39;s option tab, named <strong>APF</strong>). This can be done by dragging it to your browser&#39;s Bookmark bar or by right-clicking and copying the link destination and saving that to a bookmark.<ul>
+    <li>If you have browser bookmark syncing enabled this may copy to your desired device/browser automatically.</li>
+    <li>Alternatively, you can copy the bookmarklet link and add it to your desired device/browser as a bookmark. If you don&#39;t know how to do that check the documentation for your browser.</li>
+    </ul>
+    </li>
+    </ol>
+    <h4 id="updating-your-bookmarklet">Updating your Bookmarklet</h4>
+    <p>Your bookmarklet will not automatically update or stay in sync with your settings. So, if you add a new word to filter or some other change, you may want to revisit the previous steps and replace your bookmarklet. Your bookmarklet will also not get code updates, so you may want to periodically update it, or just update it if you run into trouble.</p>
+    <h3 id="usage">Usage</h3>
+    <ul>
+    <li><strong>Android Google Chrome Mobile:</strong> To activate the APF Bookmarklet filter you will need to browse to the desired page and then from the Omnibox (address bar) start typing your bookmark&#39;s name (example: <code>APF</code>) and then select it. Using the bookmark manager on Chrome Mobile doesn&#39;t allow bookmarklets to run.</li>
+    <li><strong>iOS Safari (iPod/iPhone/iPad):</strong> To activate the APF Bookmarklet filter, browse to the desired page, open your Bookmarks and then tap on the bookmarklet.</li>
+    <li><strong>Other:</strong> This varies between browsers and devices, but typically you can just select/activate it by tapping/clicking on it. Search for &quot;Bookmarklets on device/browser name&quot; for more information on your particular case.</li>
+    </ul>
     <h1 id="config">Config</h1>
     <p>This tab allows you to control your configuration for the filter.</p>
     <ul>
