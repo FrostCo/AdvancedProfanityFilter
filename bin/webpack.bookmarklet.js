@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+const BUILD = require('../.build.json');
 const TerserPlugin = require('terser-webpack-plugin'); // eslint-disable-line @typescript-eslint/no-var-requires
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
@@ -49,6 +51,9 @@ module.exports = {
       }),
     ],
   },
+  plugins: [
+    new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) }),
+  ],
   resolve: {
     extensions: ['.js', '.ts'],
     plugins: [
