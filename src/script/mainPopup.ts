@@ -32,7 +32,9 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 
 const popup = new Popup;
 
-////
+// Use internal help page
+(document.getElementById('gettingStarted') as HTMLAnchorElement).href = chrome.runtime.getURL('optionPage.html#/help');
+
 // Listeners
 window.addEventListener('load', (evt) => { popup.populateOptions(); });
 document.getElementById('domainFilter').addEventListener('change', (evt) => { popup.toggle(popup.filterToggleProp); });
