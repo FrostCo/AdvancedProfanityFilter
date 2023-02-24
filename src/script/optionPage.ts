@@ -36,6 +36,7 @@ export default class OptionPage {
 
   //#region Class reference helpers
   // Can be overridden in children classes
+  static get Config() { return WebConfig; }
   static get DataMigration() { return DataMigration; }
   get Class() { return (this.constructor as typeof OptionPage); }
   //#endregion
@@ -646,20 +647,20 @@ export default class OptionPage {
   async convertStorageLocation(evt: Event = null, silent = false) {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     this.cfg.syncLargeKeys = configSyncLargeKeys.checked;
-    const keys = WebConfig._localConfigKeys;
+    const keys = this.Class.Config._localConfigKeys;
 
     try {
       await this.cfg.save(keys);
 
       try {
         if (this.cfg.syncLargeKeys) {
-          await WebConfig.removeLocalStorage(WebConfig._largeKeys);
+          await this.Class.Config.removeLocalStorage(this.Class.Config._largeKeys);
         } else {
           let removeKeys = [];
-          WebConfig._largeKeys.forEach((largeKey) => {
-            removeKeys = removeKeys.concat(WebConfig.splitKeyNames(largeKey));
+          this.Class.Config._largeKeys.forEach((largeKey) => {
+            removeKeys = removeKeys.concat(this.Class.Config.splitKeyNames(largeKey));
           });
-          await WebConfig.removeSyncStorage(removeKeys);
+          await this.Class.Config.removeSyncStorage(removeKeys);
         }
 
         if (!silent) {
@@ -730,7 +731,7 @@ export default class OptionPage {
   }
 
   async getStatsFromStorage() {
-    const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { words: {} } }) as any;
+    const { stats }: { stats: Statistics } = await this.Class.Config.getLocalStorage({ stats: { words: {} } }) as any;
     return stats;
   }
 
@@ -768,7 +769,7 @@ export default class OptionPage {
 
   async importConfigText(cfg: string) {
     try {
-      const importedCfg = new WebConfig(JSON.parse(cfg));
+      const importedCfg = new this.Class.Config(JSON.parse(cfg));
       const migration = new this.Class.DataMigration(importedCfg);
       await migration.runImportMigrations();
       const resetSuccess = await this.restoreDefaults(null, true);
@@ -819,7 +820,7 @@ export default class OptionPage {
   }
 
   async initializeCfg() {
-    this.cfg = await WebConfig.load();
+    this.cfg = await this.Class.Config.load();
   }
 
   newWordWordlistChecked(index: number): boolean {
@@ -936,7 +937,7 @@ export default class OptionPage {
       OptionPage.show(wordlistContainer);
       const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
 
-      const wordlists = ['Default'].concat(WebConfig._allWordlists, this.cfg.wordlists);
+      const wordlists = ['Default'].concat(this.Class.Config._allWordlists, this.cfg.wordlists);
       dynamicList(wordlists, domainWordlistSelect);
     } else {
       OptionPage.hide(wordlistContainer);
@@ -1202,7 +1203,7 @@ export default class OptionPage {
       const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
       const textWordlistSelect = document.getElementById('textWordlistSelect') as HTMLSelectElement;
       dynamicList(this.cfg.wordlists, wordlistSelect);
-      dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), textWordlistSelect);
+      dynamicList(this.Class.Config._allWordlists.concat(this.cfg.wordlists), textWordlistSelect);
       wordlistSelect.selectedIndex = selectedIndex;
       textWordlistSelect.selectedIndex = this.cfg.wordlistId;
 
@@ -1223,7 +1224,7 @@ export default class OptionPage {
     if (this.filter.cfg.filterWordList && this.filter.cfg.filterMethod === 2) {
       wordlistFilter = new Filter;
       // Works because we are only changing a native value (filterMethod: number)
-      wordlistFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: 0 }));
+      wordlistFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { filterMethod: 0 }));
       wordlistFilter.init();
     }
 
@@ -1558,7 +1559,7 @@ export default class OptionPage {
         const subFilter = new Filter;
         const words = {};
         words[word] = wordOptions;
-        subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: Constants.FILTER_METHODS.SUBSTITUTE }, { words: words }));
+        subFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { filterMethod: Constants.FILTER_METHODS.SUBSTITUTE }, { words: words }));
         subFilter.init();
         const first = subFilter.replaceTextResult(word, Constants.ALL_WORDS_WORDLIST_ID, null);
         const second = subFilter.replaceTextResult(first.filtered, Constants.ALL_WORDS_WORDLIST_ID, null);
@@ -1573,7 +1574,7 @@ export default class OptionPage {
         const subFilter = new Filter;
         const words = {};
         words[word] = wordOptions;
-        subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { words: words }));
+        subFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { words: words }));
         subFilter.init();
         if (subFilter.wordlists[subFilter.wordlistId].regExps.length === 0) {
           OptionPage.showInputError(wordText, 'Invalid Regex.');
@@ -1645,7 +1646,7 @@ export default class OptionPage {
 
   setHelpVersion() {
     const helpVersion = document.getElementById('helpVersion') as HTMLAnchorElement;
-    helpVersion.textContent = WebConfig.BUILD.version;
+    helpVersion.textContent = this.Class.Config.BUILD.version;
   }
 
   setThemeButton(darkTheme: boolean) {
@@ -1686,7 +1687,7 @@ export default class OptionPage {
 
   async statsReset() {
     try {
-      await WebConfig.removeLocalStorage('stats');
+      await this.Class.Config.removeLocalStorage('stats');
       this.populateStats();
     } catch (err) {
       logger.warn('Failed to reset stats.', err);
