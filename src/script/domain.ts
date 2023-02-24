@@ -1,5 +1,5 @@
 import Constants from '@APF/lib/constants';
-import WebConfig from '@APF/webConfig';
+import type WebConfig from '@APF/webConfig';
 
 export default class Domain {
   advanced: boolean;
