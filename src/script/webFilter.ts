@@ -26,6 +26,7 @@ export default class WebFilter extends Filter {
   //#region Class reference helpers
   // Can be overridden in children classes
   static get Config() { return WebConfig; }
+  static get Domain() { return Domain; }
   get Class() { return (this.constructor as typeof WebFilter); }
   //#endregion
 
@@ -147,7 +148,7 @@ export default class WebFilter extends Filter {
     }
 
     this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
-    this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
+    this.domain = this.Class.Domain.byHostname(this.hostname, this.cfg.domains);
     logger.info('Config loaded.', this.cfg);
 
     if (!this.shouldProcessFrame) {
