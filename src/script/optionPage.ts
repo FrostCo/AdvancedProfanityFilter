@@ -36,6 +36,7 @@ export default class OptionPage {
 
   //#region Class reference helpers
   // Can be overridden in children classes
+  static get Bookmarklet() { return Bookmarklet; }
   static get Config() { return WebConfig; }
   static get Constants() { return Constants; }
   static get DataMigration() { return DataMigration; }
@@ -812,7 +813,7 @@ export default class OptionPage {
       OptionPage.show(document.getElementById('main'));
     }
 
-    if (!this.bookmarklet) this.bookmarklet = await Bookmarklet.create();
+    if (!this.bookmarklet) this.bookmarklet = await this.Class.Bookmarklet.create();
     this.populateOptions();
 
     // Route to page based on URL
