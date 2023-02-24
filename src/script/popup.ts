@@ -20,6 +20,7 @@ export default class Popup {
   //#region Class reference helpers
   // Can be overridden in children classes
   static get Config() { return WebConfig; }
+  static get Constants() { return Constants; }
   get Class() { return (this.constructor as typeof Popup); }
   //#endregion
 
@@ -65,8 +66,8 @@ export default class Popup {
 
     // Request current tab status
     const statusMessage: Message = {
-      source: Constants.MESSAGING.POPUP,
-      destination: Constants.MESSAGING.BACKGROUND,
+      source: this.Constants.MESSAGING.POPUP,
+      destination: this.Constants.MESSAGING.BACKGROUND,
       getStatus: true,
       tabId: instance.tab.id,
     };
@@ -173,9 +174,9 @@ export default class Popup {
   initializePopup() {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
-    dynamicList(Constants.orderedArray(Constants.DOMAIN_MODES), domainModeSelect, true);
+    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.DOMAIN_MODES), domainModeSelect, true);
     domainModeSelect.selectedIndex = this.domain.getModeIndex();
-    dynamicList(Constants.orderedArray(Constants.FILTER_METHODS), filterMethodSelect, true);
+    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.FILTER_METHODS), filterMethodSelect, true);
     filterMethodSelect.selectedIndex = this.cfg.filterMethod;
   }
 
