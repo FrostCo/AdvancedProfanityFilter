@@ -14,6 +14,11 @@ export default class Domain {
   tab?: any;
   wordlistId: number;
 
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  get Class() { return (this.constructor as typeof Domain); }
+  //#endregion
+
   static readonly _domainCfgDefaults: DomainCfg = {
     adv: undefined,
     deep: undefined,
@@ -25,14 +30,14 @@ export default class Domain {
   };
 
   static byHostname(hostname: string, domains: { [domain: string]: DomainCfg }): Domain {
-    const cfgKey = Domain.findDomainKey(hostname, domains) || hostname;
-    const domain = Domain.byKey(cfgKey, domains);
+    const cfgKey = this.findDomainKey(hostname, domains) || hostname;
+    const domain = this.byKey(cfgKey, domains);
     domain.hostname = hostname;
     return domain;
   }
 
   static byKey(key: string, domains: { [domain: string]: DomainCfg }): Domain {
-    return new Domain(key, domains[key]);
+    return new this(key, domains[key]);
   }
 
   static findDomainKey(hostname: string, domains: { [domain: string]: DomainCfg }): string {
@@ -51,8 +56,8 @@ export default class Domain {
 
   static sortedKeys(domains: { [site: string]: any }) {
     return Object.keys(domains).sort((a, b) => {
-      const domainA = Domain.sortingKey(a);
-      const domainB = Domain.sortingKey(b);
+      const domainA = this.sortingKey(a);
+      const domainB = this.sortingKey(b);
       if (domainA == domainB) {
         // Same domain, sort using full domain
         return a < b ? -1 : a > b ? 1 : 0;
@@ -91,7 +96,7 @@ export default class Domain {
     this.cfgKey = key;
     this.cfg = {};
     if (!domainCfg) {
-      Object.assign(this.cfg, Domain._domainCfgDefaults);
+      Object.assign(this.cfg, this.Class._domainCfgDefaults);
     } else {
       this.cfg = domainCfg;
     }
