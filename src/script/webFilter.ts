@@ -26,6 +26,7 @@ export default class WebFilter extends Filter {
   //#region Class reference helpers
   // Can be overridden in children classes
   static get Config() { return WebConfig; }
+  static get Constants() { return Constants; }
   static get Domain() { return Domain; }
   static get Page() { return Page; }
   get Class() { return (this.constructor as typeof WebFilter); }
@@ -52,7 +53,7 @@ export default class WebFilter extends Filter {
   }
 
   get _defaultWordStat(): WordStatistic {
-    return { [ Constants.STATS_TYPE_TEXT ]: 0 };
+    return { [ this.Class.Constants.STATS_TYPE_TEXT ]: 0 };
   }
 
   _processStatsBeforeSaving(stats) {}
@@ -62,7 +63,7 @@ export default class WebFilter extends Filter {
     stats.words[word].text += this.stats.words[word].text;
   }
 
-  advancedReplaceText(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+  advancedReplaceText(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     if (node.parentNode || node === document) {
       for (const regExp of this.wordlists[wordlistId].regExps) {
         // @ts-ignore: External library function
@@ -88,19 +89,19 @@ export default class WebFilter extends Filter {
     message.iframe = !!(this.iframe);
     message.advanced = this.domain.advanced;
     message.deep = this.domain.deep;
-    message.status = Constants.STATUS.NORMAL;
-    if (message.advanced) message.status = Constants.STATUS.ADVANCED;
-    if (message.deep) message.status = Constants.STATUS.DEEP;
+    message.status = this.Class.Constants.STATUS.NORMAL;
+    if (message.advanced) message.status = this.Class.Constants.STATUS.ADVANCED;
+    if (message.deep) message.status = this.Class.Constants.STATUS.DEEP;
 
     // Always show counter if not in normal mode
-    if (this.cfg.showCounter && message.status != Constants.STATUS.NORMAL) { message.counter = this.counter; }
+    if (this.cfg.showCounter && message.status != this.Class.Constants.STATUS.NORMAL) { message.counter = this.counter; }
   }
 
   buildMessage(destination: string, data = {}): Message {
-    return Object.assign({ destination: destination, source: Constants.MESSAGING.CONTEXT }, data);
+    return Object.assign({ destination: destination, source: this.Class.Constants.MESSAGING.CONTEXT }, data);
   }
 
-  cleanChildNode(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+  cleanChildNode(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     if (node.nodeName) {
       if (node.textContent && node.textContent.trim() != '') {
         const result = this.replaceTextResult(node.textContent, wordlistId, statsType);
@@ -118,7 +119,7 @@ export default class WebFilter extends Filter {
     // else { logger.debug('Node without nodeName', node); }
   }
 
-  cleanNode(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+  cleanNode(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     if (this.Class.Page.isForbiddenNode(node)) { return false; }
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
     if (node.childNodes.length > 0) {
@@ -130,7 +131,7 @@ export default class WebFilter extends Filter {
     }
   }
 
-  cleanNodeAttribute(node, attribute: string, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+  cleanNodeAttribute(node, attribute: string, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     if (node[attribute] != '') {
       const result = this.replaceTextResult(node[attribute], wordlistId, statsType);
       if (result.modified && this.filterText) {
@@ -148,7 +149,7 @@ export default class WebFilter extends Filter {
       return false;
     }
 
-    this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
+    this.filterText = this.cfg.filterMethod !== this.Class.Constants.FILTER_METHODS.OFF;
     this.domain = this.Class.Domain.byHostname(this.hostname, this.cfg.domains);
     logger.info('Config loaded.', this.cfg);
 
@@ -158,7 +159,7 @@ export default class WebFilter extends Filter {
     }
 
     const backgroundData: BackgroundData = await this.getBackgroundData();
-    const message = this.buildMessage(Constants.MESSAGING.BACKGROUND);
+    const message = this.buildMessage(this.Class.Constants.MESSAGING.BACKGROUND);
 
     if (this.shouldBeDisabled(backgroundData)) {
       message.disabled = true;
@@ -190,7 +191,7 @@ export default class WebFilter extends Filter {
     }
   }
 
-  cleanText(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+  cleanText(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     if (this.Class.Page.isForbiddenNode(node)) { return false; }
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
     if (node.childElementCount > 0) {
@@ -212,7 +213,7 @@ export default class WebFilter extends Filter {
     }
   }
 
-  filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+  filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     this.shadowObserver.observe(shadowRoot, WebFilter.observerConfig);
     this.processNode(shadowRoot, wordlistId, statsType);
   }
@@ -229,10 +230,10 @@ export default class WebFilter extends Filter {
         }
       } else {
         let result;
-        if (word.matchMethod === Constants.MATCH_METHODS.REGEX) {
+        if (word.matchMethod === this.Class.Constants.MATCH_METHODS.REGEX) {
           result = word.sub || this.cfg.defaultSubstitution;
         } else {
-          result = this.replaceText(word.value, Constants.ALL_WORDS_WORDLIST_ID, null); // Use all words because we are just filtering a word
+          result = this.replaceText(word.value, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null); // Use all words because we are just filtering a word
         }
 
         this.summary[word.value] = { filtered: result, count: 1 };
@@ -242,16 +243,16 @@ export default class WebFilter extends Filter {
     if (this.cfg.collectStats) {
       const wordStats = this.stats.words;
       if (!wordStats[word.value]) {
-        wordStats[word.value] = { [ Constants.STATS_TYPE_TEXT ]: 0 };
+        wordStats[word.value] = { [ this.Class.Constants.STATS_TYPE_TEXT ]: 0 };
       }
 
-      if (this.filterText && statsType == Constants.STATS_TYPE_TEXT) wordStats[word.value][Constants.STATS_TYPE_TEXT]++;
+      if (this.filterText && statsType == this.Class.Constants.STATS_TYPE_TEXT) wordStats[word.value][this.Class.Constants.STATS_TYPE_TEXT]++;
     }
   }
 
   getBackgroundData() {
     return new Promise((resolve, reject) => {
-      const message = this.buildMessage(Constants.MESSAGING.BACKGROUND, { backgroundData: true, iframe: !!this.iframe });
+      const message = this.buildMessage(this.Class.Constants.MESSAGING.BACKGROUND, { backgroundData: true, iframe: !!this.iframe });
       chrome.runtime.sendMessage(message, (response) => {
         if (!response) { response = { disabledTab: false }; }
         resolve(response);
@@ -303,10 +304,10 @@ export default class WebFilter extends Filter {
   onMessage() {
     /* istanbul ignore next */
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      if (request.destination !== Constants.MESSAGING.CONTEXT) return true;
+      if (request.destination !== this.Class.Constants.MESSAGING.CONTEXT) return true;
 
       switch (request.source) {
-        case Constants.MESSAGING.BACKGROUND:
+        case this.Class.Constants.MESSAGING.BACKGROUND:
           if (request.urlUpdate) {
             this.handleUrlUpdateMessage();
           } else {
@@ -314,7 +315,7 @@ export default class WebFilter extends Filter {
           }
           break;
 
-        case Constants.MESSAGING.POPUP:
+        case this.Class.Constants.MESSAGING.POPUP:
           if (request.summary) {
             if (this.shouldSendPopupSummary) chrome.runtime.sendMessage(this.popupSummaryMessage);
           } else {
@@ -355,7 +356,7 @@ export default class WebFilter extends Filter {
   }
 
   get popupSummaryMessage() {
-    return this.buildMessage(Constants.MESSAGING.POPUP, { summary: this.summary });
+    return this.buildMessage(this.Class.Constants.MESSAGING.POPUP, { summary: this.summary });
   }
 
   processAddedNode(node: Node) {
@@ -487,12 +488,12 @@ export default class WebFilter extends Filter {
     if (chrome.runtime && this.counter > 0) {
       try {
         if (this.cfg.showCounter) {
-          const message = this.buildMessage(Constants.MESSAGING.BACKGROUND, { counter: this.counter });
+          const message = this.buildMessage(this.Class.Constants.MESSAGING.BACKGROUND, { counter: this.counter });
           chrome.runtime.sendMessage(message);
         }
 
         if (this.cfg.showSummary) {
-          const message = this.buildMessage(Constants.MESSAGING.POPUP, { summary: this.summary });
+          const message = this.buildMessage(this.Class.Constants.MESSAGING.POPUP, { summary: this.summary });
           chrome.runtime.sendMessage(message);
         }
       } catch (err) {
