@@ -54,7 +54,7 @@ export default class OptionPage {
   ];
 
   static closeModal(id: string) {
-    OptionPage.hide(document.getElementById(id));
+    this.hide(document.getElementById(id));
   }
 
   static configureConfirmModal(settings: ConfirmModalSettings = {}, contentElement?: HTMLElement) {
@@ -82,11 +82,11 @@ export default class OptionPage {
     modalContent.appendChild(contentElement);
     modalHeader.className = `w3-container ${settings.titleClass}`;
     if (settings.backup) {
-      OptionPage.show(backupButtonContainer);
-      OptionPage.enableBtn(backupButton);
+      this.show(backupButtonContainer);
+      this.enableBtn(backupButton);
     } else {
-      OptionPage.hide(backupButtonContainer);
-      OptionPage.disableBtn(backupButton);
+      this.hide(backupButtonContainer);
+      this.disableBtn(backupButton);
     }
   }
 
@@ -120,10 +120,10 @@ export default class OptionPage {
   static handleError(message: string, error?: Error) {
     if (error) {
       logger.error(message, error);
-      OptionPage.showErrorModal([message, `Error: ${error.message}`]);
+      this.showErrorModal([message, `Error: ${error.message}`]);
     } else {
       logger.error(message);
-      OptionPage.showErrorModal([message]);
+      this.showErrorModal([message]);
     }
   }
 
@@ -143,7 +143,7 @@ export default class OptionPage {
 
   static hideStatus() {
     const notificationPanel = document.getElementById('notificationPanel') as HTMLElement;
-    OptionPage.hide(notificationPanel);
+    this.hide(notificationPanel);
   }
 
   static isStorageError(error: Error): boolean {
@@ -162,7 +162,7 @@ export default class OptionPage {
   }
 
   static openModal(id: string) {
-    OptionPage.show(document.getElementById(id));
+    this.show(document.getElementById(id));
   }
 
   static show(element: HTMLElement) {
@@ -172,7 +172,7 @@ export default class OptionPage {
 
   static showErrorModal(content: string | string[] = ['The requested action failed. Please try again or contact support.'], title = 'Error', titleColor = 'w3-red') {
     this.configureStatusModal(content, title, titleColor);
-    OptionPage.openModal('statusModal');
+    this.openModal('statusModal');
   }
 
   static showInputError(element, message = '') {
@@ -182,26 +182,26 @@ export default class OptionPage {
         element.setCustomValidity(message);
         element.reportValidity();
       } catch (err) {
-        OptionPage.showWarningModal(message);
+        this.showWarningModal(message);
       }
     }
   }
 
   static showStatusModal(content: string | string[] = ['Status updated.'], title = 'Status', titleColor = 'w3-flat-peter-river') {
     this.configureStatusModal(content, title, titleColor);
-    OptionPage.openModal('statusModal');
+    this.openModal('statusModal');
   }
 
   static showWarningModal(content: string | string[] = ['Invalid input.'], title = 'Warning', titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
-    OptionPage.openModal('statusModal');
+    this.openModal('statusModal');
   }
 
   constructor() {
     this._confirmEventListeners = [];
     this.darkModeButton = document.querySelector('div.themes > div.moon');
     this.lightModeButton = document.querySelector('div.themes > div.sun');
-    this.themeElements = OptionPage.themeElementSelectors.map((selector) => {
+    this.themeElements = this.Class.themeElementSelectors.map((selector) => {
       return Array.from(document.querySelectorAll(selector));
     }).flat();
     this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
@@ -427,16 +427,16 @@ export default class OptionPage {
 
     try {
       await this.cfg.save('words');
-      OptionPage.closeModal('bulkWordEditorModal');
-      OptionPage.showStatusModal('Words saved successfully.');
+      this.Class.closeModal('bulkWordEditorModal');
+      this.Class.showStatusModal('Words saved successfully.');
       this.filter.rebuildWordlists();
       this.populateOptions();
     } catch (err) {
-      if (OptionPage.isStorageError(err) && this.cfg.syncLargeKeys) {
+      if (this.Class.isStorageError(err) && this.cfg.syncLargeKeys) {
         this.confirm('bulkEditorSaveRetry');
       } else {
         logger.warn('Failed to save.', err);
-        OptionPage.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
+        this.Class.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
       }
     }
   }
@@ -448,7 +448,7 @@ export default class OptionPage {
       await this.convertStorageLocation(null, true);
       await this.bulkEditorSave();
     } catch (err) {
-      OptionPage.handleError('Failed to save.', err);
+      this.Class.handleError('Failed to save.', err);
     }
   }
 
@@ -516,10 +516,10 @@ export default class OptionPage {
     const input = document.getElementById('configInlineInput') as HTMLInputElement;
     const configText = document.getElementById('configText') as HTMLTextAreaElement;
     if (input.checked) {
-      OptionPage.show(configText);
+      this.Class.show(configText);
       this.exportConfig();
     } else {
-      OptionPage.hide(configText);
+      this.Class.hide(configText);
       configText.value = '';
     }
   }
@@ -546,7 +546,7 @@ export default class OptionPage {
         italics.textContent = 'Make sure you have a backup first!';
         content.appendChild(paragraph);
         content.appendChild(italics);
-        OptionPage.configureConfirmModal({ backup: true }, content);
+        this.Class.configureConfirmModal({ backup: true }, content);
         this._confirmEventListeners.push(this.bulkEditorSave.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
@@ -555,7 +555,7 @@ export default class OptionPage {
         italics.textContent = 'Local storage can store more, but things like words and domains will no longer sync between devices.';
         content.appendChild(paragraph);
         content.appendChild(italics);
-        OptionPage.configureConfirmModal({ backup: true, titleClass: 'w3-red' }, content);
+        this.Class.configureConfirmModal({ backup: true, titleClass: 'w3-red' }, content);
         this._confirmEventListeners.push(this.bulkEditorSaveRetry.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
@@ -568,14 +568,14 @@ export default class OptionPage {
         italics.textContent = 'Make sure you have a backup first!';
         content.appendChild(paragraph);
         content.appendChild(italics);
-        OptionPage.configureConfirmModal({ backup: true }, content);
+        this.Class.configureConfirmModal({ backup: true }, content);
         this._confirmEventListeners.push(this.populateConfig.bind(this));
         cancel.addEventListener('click', lastElement(this._confirmEventListeners));
         this._confirmEventListeners.push(this.convertStorageLocation.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfig':
-        OptionPage.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
+        this.Class.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
         this._confirmEventListeners.push(this.importConfig.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
@@ -584,7 +584,7 @@ export default class OptionPage {
         italics.textContent = 'Local storage can store more, but things like words and domains will no longer sync between devices.';
         content.appendChild(paragraph);
         content.appendChild(italics);
-        OptionPage.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
+        this.Class.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
         this._confirmEventListeners.push(this.importConfigRetryCancel.bind(this));
         cancel.addEventListener('click', lastElement(this._confirmEventListeners));
         this._confirmEventListeners.push(this.importConfigRetry.bind(this));
@@ -593,7 +593,7 @@ export default class OptionPage {
       case 'removeAllWords':
         paragraph.textContent = 'Are you sure you want to remove all words?';
         content.appendChild(paragraph);
-        OptionPage.configureConfirmModal({ backup: true }, content);
+        this.Class.configureConfirmModal({ backup: true }, content);
         this._confirmEventListeners.push(this.removeAllWords.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
@@ -602,24 +602,24 @@ export default class OptionPage {
         if (validated) {
           await this.prepareLessUsedWords();
           if (Object.keys(this.lessUsedWords).length) {
-            OptionPage.configureConfirmModal({ backup: true, content: `Are you sure you want to remove ${Object.keys(this.lessUsedWords).length} words?` });
+            this.Class.configureConfirmModal({ backup: true, content: `Are you sure you want to remove ${Object.keys(this.lessUsedWords).length} words?` });
             this._confirmEventListeners.push(this.removeLessUsedWords.bind(this));
             ok.addEventListener('click', lastElement(this._confirmEventListeners));
           } else {
             validated = false;
-            OptionPage.showStatusModal(
+            this.Class.showStatusModal(
               'All words have been filtered more times than the provided number.\n\nTry increasing the number to include more words.'
             );
           }
         }
         break;
       case 'statsReset':
-        OptionPage.configureConfirmModal({ content: 'Are you sure you want to reset filter statistics?' });
+        this.Class.configureConfirmModal({ content: 'Are you sure you want to reset filter statistics?' });
         this._confirmEventListeners.push(this.statsReset.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'restoreDefaults':
-        OptionPage.configureConfirmModal({ content: 'Are you sure you want to restore defaults?', backup: true });
+        this.Class.configureConfirmModal({ content: 'Are you sure you want to restore defaults?', backup: true });
         this._confirmEventListeners.push(this.restoreDefaults.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
@@ -629,7 +629,7 @@ export default class OptionPage {
         if (passwordBtn.classList.contains('disabled')) return false;
 
         const message = passwordText.value == '' ? 'Are you sure you want to remove the password?' : `Are you sure you want to set the password to '${passwordText.value}'?`;
-        OptionPage.configureConfirmModal({ content: message });
+        this.Class.configureConfirmModal({ content: message });
         this._confirmEventListeners.push(this.auth.setPassword.bind(this.auth));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
@@ -637,7 +637,7 @@ export default class OptionPage {
     }
 
     if (validated) {
-      OptionPage.openModal('confirmModal');
+      this.Class.openModal('confirmModal');
     }
   }
 
@@ -645,7 +645,7 @@ export default class OptionPage {
     const backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
     if (!backupButton.classList.contains('disabled')) {
       this.backupConfig();
-      OptionPage.disableBtn(backupButton);
+      this.Class.disableBtn(backupButton);
     }
   }
 
@@ -669,19 +669,19 @@ export default class OptionPage {
         }
 
         if (!silent) {
-          OptionPage.showStatusModal('Storage converted successfully.');
+          this.Class.showStatusModal('Storage converted successfully.');
         }
       } catch (err) {
         // Revert UI and export a backup of config.
         this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
         this.backupConfig();
-        OptionPage.handleError('Failed to cleanup old storage, backup automatically exported.', err);
+        this.Class.handleError('Failed to cleanup old storage, backup automatically exported.', err);
         await this.cfg.save('syncLargeKeys');
         this.populateConfig();
       }
     } catch (err) {
       // Revert UI
-      OptionPage.handleError('Failed to update storage preference.', err);
+      this.Class.handleError('Failed to update storage preference.', err);
       this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
       this.populateConfig();
     }
@@ -730,7 +730,7 @@ export default class OptionPage {
         this.populateWord();
       }
     } catch (err) {
-      OptionPage.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
+      this.Class.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
       return false;
     }
   }
@@ -765,10 +765,10 @@ export default class OptionPage {
     try {
       await this.convertStorageLocation(null, true);
       await this.cfg.save();
-      OptionPage.showStatusModal('Settings imported successfully.');
+      this.Class.showStatusModal('Settings imported successfully.');
       await this.init();
     } catch (err) {
-      OptionPage.handleError('Failed to import config.', err);
+      this.Class.handleError('Failed to import config.', err);
     }
   }
 
@@ -782,18 +782,18 @@ export default class OptionPage {
         try {
           this.cfg = importedCfg;
           await this.cfg.save();
-          OptionPage.showStatusModal('Settings imported successfully.');
+          this.Class.showStatusModal('Settings imported successfully.');
           await this.init(true);
         } catch (err) {
-          if (OptionPage.isStorageError(err) && this.cfg.syncLargeKeys) {
+          if (this.Class.isStorageError(err) && this.cfg.syncLargeKeys) {
             this.confirm('importConfigRetry');
           } else {
-            OptionPage.handleError('Failed to import settings.', err);
+            this.Class.handleError('Failed to import settings.', err);
           }
         }
       }
     } catch (err) {
-      OptionPage.showErrorModal(['Failed to process new settings.', `Error: ${err.message}`]);
+      this.Class.showErrorModal(['Failed to process new settings.', `Error: ${err.message}`]);
     }
   }
 
@@ -807,10 +807,10 @@ export default class OptionPage {
 
     // logger.debug(`Password: '${this.cfg.password}', Authenticated: ${this.auth.authenticated}`);
     if (this.cfg.password && !this.auth.authenticated) {
-      OptionPage.openModal('passwordModal');
+      this.Class.openModal('passwordModal');
       document.getElementById('passwordInput').focus();
     } else {
-      OptionPage.show(document.getElementById('main'));
+      this.Class.show(document.getElementById('main'));
     }
 
     if (!this.bookmarklet) this.bookmarklet = await this.Class.Bookmarklet.create();
@@ -840,7 +840,7 @@ export default class OptionPage {
     const cfg = bookmarkletConfig.value == 'default' ? null : this.cfg;
     const href = this.bookmarklet.href(cfg);
     bookmarkletLink.href = href;
-    OptionPage.enableBtn(bookmarkletLink);
+    this.Class.enableBtn(bookmarkletLink);
   }
 
   populateConfig() {
@@ -868,10 +868,10 @@ export default class OptionPage {
 
     let domainCfg: DomainCfg;
     if (!key) { // New record
-      OptionPage.disableBtn(domainRemoveBtn);
+      this.Class.disableBtn(domainRemoveBtn);
       domainCfg = Object.assign({}, this.Class.Domain._domainCfgDefaults);
     } else { // Existing record
-      OptionPage.enableBtn(domainRemoveBtn);
+      this.Class.enableBtn(domainRemoveBtn);
       domainCfg = this.cfg.domains[domainsSelect.value];
     }
 
@@ -907,7 +907,7 @@ export default class OptionPage {
     const domainFramesOffLabel = document.getElementById('domainFramesOffLabel') as HTMLLabelElement;
     const domainFramesOnLabel = document.getElementById('domainFramesOnLabel') as HTMLLabelElement;
 
-    OptionPage.hideInputError(domainText);
+    this.Class.hideInputError(domainText);
     removeChildren(domainsSelect);
 
     const domains = this.Class.Domain.sortedKeys(this.cfg.domains);
@@ -921,31 +921,31 @@ export default class OptionPage {
     domainFilterAllFrames.checked = !this.cfg.enabledFramesOnly;
 
     if (mode === 'minimal') {
-      OptionPage.hide(domainDisabledLabel);
-      OptionPage.show(domainEnabledLabel);
+      this.Class.hide(domainDisabledLabel);
+      this.Class.show(domainEnabledLabel);
     } else {
-      OptionPage.hide(domainEnabledLabel);
-      OptionPage.show(domainDisabledLabel);
+      this.Class.hide(domainEnabledLabel);
+      this.Class.show(domainDisabledLabel);
     }
 
     if (this.cfg.enabledFramesOnly) {
-      OptionPage.hide(domainFramesOffLabel);
-      OptionPage.show(domainFramesOnLabel);
+      this.Class.hide(domainFramesOffLabel);
+      this.Class.show(domainFramesOnLabel);
     } else {
-      OptionPage.hide(domainFramesOnLabel);
-      OptionPage.show(domainFramesOffLabel);
+      this.Class.hide(domainFramesOnLabel);
+      this.Class.show(domainFramesOffLabel);
     }
 
     dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.DOMAIN_MODES), domainModeSelect, true);
 
     if (this.cfg.wordlistsEnabled) {
-      OptionPage.show(wordlistContainer);
+      this.Class.show(wordlistContainer);
       const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
 
       const wordlists = ['Default'].concat(this.Class.Config._allWordlists, this.cfg.wordlists);
       dynamicList(wordlists, domainWordlistSelect);
     } else {
-      OptionPage.hide(wordlistContainer);
+      this.Class.hide(wordlistContainer);
     }
 
     this.populateDomain();
@@ -1049,7 +1049,7 @@ export default class OptionPage {
       this.populateStatsSummary(stats, totalFiltered);
     } catch (err) {
       logger.warn('Failed to populate stats.', err);
-      OptionPage.showErrorModal(['Failed to populate stats.', `Error: ${err.message}`]);
+      this.Class.showErrorModal(['Failed to populate stats.', `Error: ${err.message}`]);
     }
   }
 
@@ -1131,7 +1131,7 @@ export default class OptionPage {
 
     if (selected.value == '') { // New word
       allowlistText.value = '';
-      OptionPage.disableBtn(allowlistRemove);
+      this.Class.disableBtn(allowlistRemove);
 
       // Default to case-insensitive
       const allowlistCase = document.getElementById('allowlistInsensitive') as HTMLInputElement;
@@ -1141,7 +1141,7 @@ export default class OptionPage {
       const caseId = selected.dataset.sensitive === 'true' ? 'allowlistSensitive' : 'allowlistInsensitive';
       const allowlistCase = document.getElementById(caseId) as HTMLInputElement;
       allowlistCase.checked = true;
-      OptionPage.enableBtn(allowlistRemove);
+      this.Class.enableBtn(allowlistRemove);
     }
   }
 
@@ -1156,12 +1156,12 @@ export default class OptionPage {
     const word = wordList.value;
     const wordWordlistDiv = document.getElementById('wordWordlistDiv') as HTMLSelectElement;
     const wordlistSelections = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
-    OptionPage.hideInputError(wordText);
-    OptionPage.hideInputError(substitutionText);
+    this.Class.hideInputError(wordText);
+    this.Class.hideInputError(substitutionText);
 
     if (word == '') { // New word
       wordText.value = '';
-      OptionPage.disableBtn(wordRemove);
+      this.Class.disableBtn(wordRemove);
       const selectedMatchMethod = document.getElementById(`wordMatch${upperCaseFirst(this.Class.Constants.matchMethodName(this.cfg.defaultWordMatchMethod))}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
       wordMatchRepeated.checked = numberToBoolean(this.cfg.defaultWordRepeat);
@@ -1172,7 +1172,7 @@ export default class OptionPage {
         wordlist.checked = this.newWordWordlistChecked(index);
       });
     } else { // Existing word
-      OptionPage.enableBtn(wordRemove);
+      this.Class.enableBtn(wordRemove);
       const wordCfg = this.cfg.words[word];
       wordText.value = word;
       const selectedMatchMethod = document.getElementById(`wordMatch${upperCaseFirst(this.Class.Constants.matchMethodName(wordCfg.matchMethod))}`) as HTMLInputElement;
@@ -1187,9 +1187,9 @@ export default class OptionPage {
     }
 
     if (this.cfg.wordlistsEnabled) {
-      OptionPage.show(wordWordlistDiv);
+      this.Class.show(wordWordlistDiv);
     } else {
-      OptionPage.hide(wordWordlistDiv);
+      this.Class.hide(wordWordlistDiv);
     }
   }
 
@@ -1212,10 +1212,10 @@ export default class OptionPage {
       wordlistSelect.selectedIndex = selectedIndex;
       textWordlistSelect.selectedIndex = this.cfg.wordlistId;
 
-      OptionPage.show(wordlistContainer);
+      this.Class.show(wordlistContainer);
       this.populateWordlist();
     } else {
-      OptionPage.hide(wordlistContainer);
+      this.Class.hide(wordlistContainer);
     }
   }
 
@@ -1312,7 +1312,7 @@ export default class OptionPage {
         this.populateDomainPage();
       } catch (err) {
         logger.warn(`Failed to remove domain '${domainsSelect.value}'.`, err);
-        OptionPage.showErrorModal([`Failed to remove domain '${domainsSelect.value}'.`, `Error: ${err.message}`]);
+        this.Class.showErrorModal([`Failed to remove domain '${domainsSelect.value}'.`, `Error: ${err.message}`]);
         return false;
       }
     }
@@ -1340,7 +1340,7 @@ export default class OptionPage {
       this.populateOptions();
     } catch (err) {
       logger.warn(`Failed to remove '${originalWord}' from allowlist.`, err);
-      OptionPage.showErrorModal([`Failed to remove '${originalWord}' from allowlist.`, `Error: ${err.message}`]);
+      this.Class.showErrorModal([`Failed to remove '${originalWord}' from allowlist.`, `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1361,7 +1361,7 @@ export default class OptionPage {
         this.populateOptions();
       } catch (err) {
         logger.warn(`Failed to remove '${word}'.`, err);
-        OptionPage.showErrorModal([`Failed to remove '${word}'.`, `Error: ${err.message}`]);
+        this.Class.showErrorModal([`Failed to remove '${word}'.`, `Error: ${err.message}`]);
       }
     }
   }
@@ -1375,7 +1375,7 @@ export default class OptionPage {
     if (wordlistText.checkValidity()) {
       // Make sure there are no duplicates
       if (this.cfg.wordlists.includes(name)) {
-        OptionPage.showInputError(wordlistText, 'Please enter a unique name.');
+        this.Class.showInputError(wordlistText, 'Please enter a unique name.');
         return false;
       }
 
@@ -1385,22 +1385,22 @@ export default class OptionPage {
         this.populateWordlists(index);
         this.populateWordPage();
       } catch (err) {
-        OptionPage.handleError('Failed to save wordlist name.', err);
+        this.Class.handleError('Failed to save wordlist name.', err);
       }
     } else {
-      OptionPage.showInputError(wordlistText, 'Please enter a valid name.');
+      this.Class.showInputError(wordlistText, 'Please enter a valid name.');
     }
   }
 
   async restoreDefaults(evt: Event = null, silent = false) {
     try {
       await this.cfg.resetPreserveStats();
-      if (!silent) OptionPage.showStatusModal('Default settings restored.');
+      if (!silent) this.Class.showStatusModal('Default settings restored.');
       await this.init(true);
       return true;
     } catch (err) {
       logger.warn('Failed to restore defaults.', err);
-      OptionPage.showErrorModal(['Failed to restore defaults.', `Error: ${err.message}`]);
+      this.Class.showErrorModal(['Failed to restore defaults.', `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1410,15 +1410,15 @@ export default class OptionPage {
     const newKey = domainText.value.trim().toLowerCase();
 
     if (newKey == '') { // No data
-      OptionPage.showInputError(domainText, 'Please enter a value.');
+      this.Class.showInputError(domainText, 'Please enter a value.');
       return false;
     }
 
     if (domainText.checkValidity()) {
-      OptionPage.hideInputError(domainText);
+      this.Class.hideInputError(domainText);
       const domainCfg = this.domainCfgFromPage();
       if (!domainCfg) {
-        OptionPage.showInputError('Failed to gather domain settings.');
+        this.Class.showInputError('Failed to gather domain settings.');
         return false;
       }
 
@@ -1437,11 +1437,11 @@ export default class OptionPage {
         await domain.save(this.cfg);
         this.populateDomainPage();
       } catch (err) {
-        OptionPage.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
+        this.Class.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
         return false;
       }
     } else {
-      OptionPage.showInputError(domainText, 'Valid domain example: google.com or www.google.com');
+      this.Class.showInputError(domainText, 'Valid domain example: google.com or www.google.com');
       return false;
     }
   }
@@ -1455,7 +1455,7 @@ export default class OptionPage {
       return true;
     } catch (err) {
       logger.warn('Settings not saved! Please try again.', err);
-      OptionPage.showErrorModal(['Settings not saved! Please try again.', `Error: ${err.message}`]);
+      this.Class.showErrorModal(['Settings not saved! Please try again.', `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1472,12 +1472,12 @@ export default class OptionPage {
     const newListName = newCase === 'sensitive' ? 'wordAllowlist' : 'iWordAllowlist';
 
     if (allowlistText.value === '') {
-      OptionPage.showInputError(allowlistText, 'Please enter a valid word/phrase.');
+      this.Class.showInputError(allowlistText, 'Please enter a valid word/phrase.');
       return false;
     }
 
     if (this.cfg[newListName].indexOf(newWord) > -1) {
-      OptionPage.showInputError(allowlistText, 'Already allowlisted.');
+      this.Class.showInputError(allowlistText, 'Already allowlisted.');
       return false;
     }
 
@@ -1507,12 +1507,12 @@ export default class OptionPage {
           this.populateOptions();
         } catch (err) {
           logger.warn('Failed to update allowlist.', err);
-          OptionPage.showErrorModal(['Failed to update allowlist.', `Error: ${err.message}`]);
+          this.Class.showErrorModal(['Failed to update allowlist.', `Error: ${err.message}`]);
           return false;
         }
       }
     } else {
-      OptionPage.showInputError(allowlistText, 'Please enter a valid word/phrase.');
+      this.Class.showInputError(allowlistText, 'Please enter a valid word/phrase.');
     }
   }
 
@@ -1536,13 +1536,13 @@ export default class OptionPage {
     }
 
     if (word == '') {
-      OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
+      this.Class.showInputError(wordText, 'Please enter a valid word/phrase.');
       return false;
     }
 
     // Make sure word and substitution are different
     if (word == sub) {
-      OptionPage.showInputError(substitutionText, 'Word and substitution must be different.');
+      this.Class.showInputError(substitutionText, 'Word and substitution must be different.');
       return false;
     }
 
@@ -1569,7 +1569,7 @@ export default class OptionPage {
         const first = subFilter.replaceTextResult(word, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
         const second = subFilter.replaceTextResult(first.filtered, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
         if (first.filtered != second.filtered) {
-          OptionPage.showInputError(substitutionText, "Substitution can't contain word (causes an endless loop).");
+          this.Class.showInputError(substitutionText, "Substitution can't contain word (causes an endless loop).");
           return false;
         }
       }
@@ -1582,7 +1582,7 @@ export default class OptionPage {
         subFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { words: words }));
         subFilter.init();
         if (subFilter.wordlists[subFilter.wordlistId].regExps.length === 0) {
-          OptionPage.showInputError(wordText, 'Invalid Regex.');
+          this.Class.showInputError(wordText, 'Invalid Regex.');
           return false;
         }
       }
@@ -1601,7 +1601,7 @@ export default class OptionPage {
           if (added) {
             delete this.cfg.words[originalWord];
           } else {
-            OptionPage.showInputError(wordText, `'${word}' already in list.`);
+            this.Class.showInputError(wordText, `'${word}' already in list.`);
           }
         }
       }
@@ -1614,15 +1614,15 @@ export default class OptionPage {
           this.populateOptions();
         } catch (err) {
           logger.warn(`Failed to update word '${word}'.`, err);
-          OptionPage.showErrorModal([`Failed to update word '${word}'.`, `Error: ${err.message}`]);
+          this.Class.showErrorModal([`Failed to update word '${word}'.`, `Error: ${err.message}`]);
           this.cfg.removeWord(word);
           return false;
         }
       } else {
-        OptionPage.showInputError(wordText, `'${word}' already in list.`);
+        this.Class.showInputError(wordText, `'${word}' already in list.`);
       }
     } else {
-      OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
+      this.Class.showInputError(wordText, 'Please enter a valid word/phrase.');
     }
   }
 
@@ -1633,7 +1633,7 @@ export default class OptionPage {
       this.filter.rebuildWordlists();
       this.populateOptions();
     } catch (err) {
-      OptionPage.handleError('Failed to set filter method.', err);
+      this.Class.handleError('Failed to set filter method.', err);
     }
   }
 
@@ -1645,7 +1645,7 @@ export default class OptionPage {
       await this.cfg.save(prop);
       this.populateOptions();
     } catch (err) {
-      OptionPage.showErrorModal('Failed to update defult wordlist.', err);
+      this.Class.showErrorModal('Failed to update defult wordlist.', err);
     }
   }
 
@@ -1687,7 +1687,7 @@ export default class OptionPage {
     tableContainer.querySelectorAll('th input.wordlistHeader').forEach((el) => {
       el.addEventListener('click', (evt) => { this.bulkEditorWordlistCheckbox(evt.target as HTMLInputElement); });
     });
-    OptionPage.openModal(modalId);
+    this.Class.openModal(modalId);
   }
 
   async statsReset() {
@@ -1696,20 +1696,20 @@ export default class OptionPage {
       this.populateStats();
     } catch (err) {
       logger.warn('Failed to reset stats.', err);
-      OptionPage.showErrorModal(['Failed to reset stats.', `Error: ${err.message}`]);
+      this.Class.showErrorModal(['Failed to reset stats.', `Error: ${err.message}`]);
     }
   }
 
   switchPage(newTab: HTMLAnchorElement) {
-    const currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
+    const currentTab = document.querySelector(`#menu a.${this.Class.activeClass}`) as HTMLElement;
 
-    currentTab.classList.remove(OptionPage.activeClass);
-    newTab.classList.add(OptionPage.activeClass);
+    currentTab.classList.remove(this.Class.activeClass);
+    newTab.classList.add(this.Class.activeClass);
 
     const currentPage = document.getElementById(currentTab.textContent.toLowerCase() + 'Page') as HTMLElement;
     const newPage = document.getElementById(newTab.textContent.toLowerCase() + 'Page') as HTMLElement;
-    OptionPage.hide(currentPage);
-    OptionPage.show(newPage);
+    this.Class.hide(currentPage);
+    this.Class.show(newPage);
 
     switch (newTab.textContent.toLowerCase()) {
       case 'test':
@@ -1750,20 +1750,20 @@ export default class OptionPage {
     // Show/hide options as needed
     switch (this.cfg.filterMethod) {
       case this.Class.Constants.FILTER_METHODS.CENSOR:
-        OptionPage.show(document.getElementById('censorSettings'));
-        OptionPage.hide(document.getElementById('substitutionSettings'));
-        OptionPage.hide(document.getElementById('wordSubstitution'));
+        this.Class.show(document.getElementById('censorSettings'));
+        this.Class.hide(document.getElementById('substitutionSettings'));
+        this.Class.hide(document.getElementById('wordSubstitution'));
         break;
       case this.Class.Constants.FILTER_METHODS.SUBSTITUTE:
-        OptionPage.hide(document.getElementById('censorSettings'));
-        OptionPage.show(document.getElementById('substitutionSettings'));
-        OptionPage.show(document.getElementById('wordSubstitution'));
+        this.Class.hide(document.getElementById('censorSettings'));
+        this.Class.show(document.getElementById('substitutionSettings'));
+        this.Class.show(document.getElementById('wordSubstitution'));
         break;
       case this.Class.Constants.FILTER_METHODS.OFF:
       case this.Class.Constants.FILTER_METHODS.REMOVE:
-        OptionPage.hide(document.getElementById('censorSettings'));
-        OptionPage.hide(document.getElementById('substitutionSettings'));
-        OptionPage.hide(document.getElementById('wordSubstitution'));
+        this.Class.hide(document.getElementById('censorSettings'));
+        this.Class.hide(document.getElementById('substitutionSettings'));
+        this.Class.hide(document.getElementById('wordSubstitution'));
         break;
     }
   }
@@ -1813,18 +1813,18 @@ export default class OptionPage {
       await this.cfg.save('darkMode');
       this.applyTheme(true);
     } catch (err) {
-      OptionPage.handleError('Failed to update theme selection.', err);
+      this.Class.handleError('Failed to update theme selection.', err);
     }
   }
 
   validateLessUsedWordsNumber() {
     const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
     let valid = false;
-    OptionPage.hideInputError(lessUsedWordsNumber);
+    this.Class.hideInputError(lessUsedWordsNumber);
     if (lessUsedWordsNumber.value.match(/^\d+$/) && parseInt(lessUsedWordsNumber.value) > 0) {
       valid = true;
     } else {
-      OptionPage.showInputError(lessUsedWordsNumber, 'Enter a positive whole number.');
+      this.Class.showInputError(lessUsedWordsNumber, 'Enter a positive whole number.');
     }
 
     return valid;
