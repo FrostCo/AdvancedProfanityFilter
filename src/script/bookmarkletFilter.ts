@@ -26,6 +26,7 @@ export default class BookmarkletFilter extends Filter {
   static get Config() { return WebConfig; }
   static get Constants() { return Constants; }
   static get Domain() { return Domain; }
+  static get Page() { return Page; }
   get Class() { return (this.constructor as typeof BookmarkletFilter); }
   //#endregion
 
@@ -79,7 +80,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   cleanNode(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
-    if (Page.isForbiddenNode(node)) { return false; }
+    if (this.Class.Page.isForbiddenNode(node)) { return false; }
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
     if (node.childNodes.length > 0) {
       for (let i = 0; i < node.childNodes.length ; i++) {
@@ -128,7 +129,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   cleanText(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
-    if (Page.isForbiddenNode(node)) { return false; }
+    if (this.Class.Page.isForbiddenNode(node)) { return false; }
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
     if (node.childElementCount > 0) {
       const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
@@ -138,7 +139,7 @@ export default class BookmarkletFilter extends Filter {
             this.cleanText(childNode, wordlistId, statsType);
           }
         } else {
-          if (!Page.isForbiddenNode(treeWalker.currentNode)) {
+          if (!this.Class.Page.isForbiddenNode(treeWalker.currentNode)) {
             this.cleanChildNode(treeWalker.currentNode, wordlistId, statsType);
           }
         }
@@ -251,7 +252,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   shouldProcessAddedNode(node) {
-    return !Page.isForbiddenNode(node);
+    return !this.Class.Page.isForbiddenNode(node);
   }
 
   shouldProcessAddedNodes(mutation: MutationRecord) {
