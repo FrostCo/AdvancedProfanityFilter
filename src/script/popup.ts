@@ -19,6 +19,7 @@ export default class Popup {
 
   //#region Class reference helpers
   // Can be overridden in children classes
+  static get Config() { return WebConfig; }
   get Class() { return (this.constructor as typeof Popup); }
   //#endregion
 
@@ -50,7 +51,7 @@ export default class Popup {
   }
 
   static async load(instance: Popup) {
-    instance.cfg = await WebConfig.load(this._requiredConfig);
+    instance.cfg = await this.Config.load(this._requiredConfig);
     logger.setLevel(instance.cfg.loggingLevel);
     instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
     if (instance.tab.url) {
@@ -162,7 +163,7 @@ export default class Popup {
   handleWordlistsEnabled() {
     const wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
-    const wordlists = ['Default Wordlist'].concat(WebConfig._allWordlists, this.cfg.wordlists);
+    const wordlists = ['Default Wordlist'].concat(this.Class.Config._allWordlists, this.cfg.wordlists);
     const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
     dynamicList(wordlists, wordlistSelect);
     wordlistSelect.selectedIndex = wordlistIndex;
