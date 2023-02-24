@@ -41,6 +41,7 @@ export default class OptionPage {
   static get DataMigration() { return DataMigration; }
   static get Domain() { return Domain; }
   static get Filter() { return Filter; }
+  static get OptionAuth() { return OptionAuth; }
   get Class() { return (this.constructor as typeof OptionPage); }
   //#endregion
 
@@ -799,7 +800,7 @@ export default class OptionPage {
     await this.initializeCfg();
     logger.setLevel(this.cfg.loggingLevel);
     this.applyTheme(refreshTheme);
-    if (!this.auth) this.auth = new OptionAuth(this, this.cfg.password);
+    if (!this.auth) this.auth = new this.Class.OptionAuth(this, this.cfg.password);
     this.filter.cfg = this.cfg;
     this.filter.init();
 
