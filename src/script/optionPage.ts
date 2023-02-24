@@ -39,6 +39,7 @@ export default class OptionPage {
   static get Config() { return WebConfig; }
   static get Constants() { return Constants; }
   static get DataMigration() { return DataMigration; }
+  static get Filter() { return Filter; }
   get Class() { return (this.constructor as typeof OptionPage); }
   //#endregion
 
@@ -202,7 +203,7 @@ export default class OptionPage {
     }).flat();
     this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
     this.setHelpVersion();
-    this.filter = new Filter;
+    this.filter = new this.Class.Filter;
   }
 
   applyDarkTheme(allElements = true) {
@@ -1223,7 +1224,7 @@ export default class OptionPage {
 
     // Workaround for remove filter method
     if (this.filter.cfg.filterWordList && this.filter.cfg.filterMethod === 2) {
-      wordlistFilter = new Filter;
+      wordlistFilter = new this.Class.Filter;
       // Works because we are only changing a native value (filterMethod: number)
       wordlistFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { filterMethod: 0 }));
       wordlistFilter.init();
@@ -1557,7 +1558,7 @@ export default class OptionPage {
 
       // Check for endless substitution loop
       if (wordOptions.matchMethod != this.Class.Constants.MATCH_METHODS.REGEX) {
-        const subFilter = new Filter;
+        const subFilter = new this.Class.Filter;
         const words = {};
         words[word] = wordOptions;
         subFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { filterMethod: this.Class.Constants.FILTER_METHODS.SUBSTITUTE }, { words: words }));
@@ -1572,7 +1573,7 @@ export default class OptionPage {
 
       // Test for a valid Regex
       if (wordOptions.matchMethod === this.Class.Constants.MATCH_METHODS.REGEX) {
-        const subFilter = new Filter;
+        const subFilter = new this.Class.Filter;
         const words = {};
         words[word] = wordOptions;
         subFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { words: words }));
