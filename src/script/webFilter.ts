@@ -27,6 +27,7 @@ export default class WebFilter extends Filter {
   // Can be overridden in children classes
   static get Config() { return WebConfig; }
   static get Domain() { return Domain; }
+  static get Page() { return Page; }
   get Class() { return (this.constructor as typeof WebFilter); }
   //#endregion
 
@@ -118,7 +119,7 @@ export default class WebFilter extends Filter {
   }
 
   cleanNode(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
-    if (Page.isForbiddenNode(node)) { return false; }
+    if (this.Class.Page.isForbiddenNode(node)) { return false; }
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
     if (node.childNodes.length > 0) {
       for (let i = 0; i < node.childNodes.length ; i++) {
@@ -190,7 +191,7 @@ export default class WebFilter extends Filter {
   }
 
   cleanText(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
-    if (Page.isForbiddenNode(node)) { return false; }
+    if (this.Class.Page.isForbiddenNode(node)) { return false; }
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
     if (node.childElementCount > 0) {
       const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
@@ -201,7 +202,7 @@ export default class WebFilter extends Filter {
             this.cleanText(childNode, wordlistId, statsType);
           }
         } else {
-          if (!Page.isForbiddenNode(treeWalker.currentNode)) {
+          if (!this.Class.Page.isForbiddenNode(treeWalker.currentNode)) {
             this.cleanChildNode(treeWalker.currentNode, wordlistId, statsType);
           }
         }
@@ -437,7 +438,7 @@ export default class WebFilter extends Filter {
   }
 
   shouldProcessAddedNode(node) {
-    return !Page.isForbiddenNode(node);
+    return !this.Class.Page.isForbiddenNode(node);
   }
 
   shouldProcessAddedNodes(mutation: MutationRecord) {
