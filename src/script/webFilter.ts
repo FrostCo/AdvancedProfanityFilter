@@ -214,7 +214,7 @@ export default class WebFilter extends Filter {
   }
 
   filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
-    this.shadowObserver.observe(shadowRoot, WebFilter.observerConfig);
+    this.shadowObserver.observe(shadowRoot, this.Class.observerConfig);
     this.processNode(shadowRoot, wordlistId, statsType);
   }
 
@@ -469,7 +469,7 @@ export default class WebFilter extends Filter {
   }
 
   startObserving(target: Node = document, observer: MutationObserver = this.observer) {
-    observer.observe(target, WebFilter.observerConfig);
+    observer.observe(target, this.Class.observerConfig);
     // TODO: Track shadowObserver nodes if we need to restart observing
   }
 
