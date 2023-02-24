@@ -4,8 +4,8 @@ import Domain from '@APF/domain';
 import Filter from '@APF/lib/filter';
 import Page from '@APF/page';
 import WebConfig from '@APF/webConfig';
-import Word from '@APF/lib/word';
 import Logger from '@APF/lib/logger';
+import type Word from '@APF/lib/word';
 const logger = new Logger('WebFilter');
 
 export default class WebFilter extends Filter {
