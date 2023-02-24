@@ -21,6 +21,7 @@ export default class Popup {
   // Can be overridden in children classes
   static get Config() { return WebConfig; }
   static get Constants() { return Constants; }
+  static get Domain() { return Domain; }
   get Class() { return (this.constructor as typeof Popup); }
   //#endregion
 
@@ -54,13 +55,13 @@ export default class Popup {
   static async load(instance: Popup) {
     instance.cfg = await this.Config.load(this._requiredConfig);
     logger.setLevel(instance.cfg.loggingLevel);
-    instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
+    instance.tab = await this.Domain.getCurrentTab() as chrome.tabs.Tab;
     if (instance.tab.url) {
       instance.url = new URL(instance.tab.url);
-      instance.domain = Domain.byHostname(instance.url.hostname, instance.cfg.domains);
+      instance.domain = this.Domain.byHostname(instance.url.hostname, instance.cfg.domains);
     } else { // No URL (can be blank in Safari new tab)
       instance.url = null;
-      instance.domain = new Domain('');
+      instance.domain = new this.Domain('');
     }
     instance.filterToggleProp = instance.cfg.enabledDomainsOnly ? 'enabled' : 'disabled';
 
