@@ -22,6 +22,7 @@ export default class Popup {
   static get Config() { return WebConfig; }
   static get Constants() { return Constants; }
   static get Domain() { return Domain; }
+  static get Page() { return Page; }
   get Class() { return (this.constructor as typeof Popup); }
   //#endregion
 
@@ -192,7 +193,7 @@ export default class Popup {
   get isRestrictedPage() {
     return (
       !this.domain.hostname
-      || Page.disabledProtocols.test(this.url.protocol)
+      || this.Class.Page.disabledProtocols.test(this.url.protocol)
       || this.domain.hostname == 'chrome.google.com'
     );
   }
