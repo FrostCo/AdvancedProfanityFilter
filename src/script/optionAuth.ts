@@ -7,6 +7,7 @@ export default class OptionAuth {
 
   //#region Class reference helpers
   // Can be overridden in children classes
+  static get OptionPage() { return OptionPage; }
   get Class() { return (this.constructor as typeof OptionAuth); }
   //#endregion
 
@@ -14,11 +15,11 @@ export default class OptionAuth {
     const passwordInput = document.getElementById('passwordInput') as HTMLInputElement;
     if (passwordInput.value == this.password) {
       this.authenticated = true;
-      OptionPage.closeModal('passwordModal');
-      OptionPage.show(document.getElementById('main'));
-      OptionPage.hideInputError(passwordInput);
+      this.Class.OptionPage.closeModal('passwordModal');
+      this.Class.OptionPage.show(document.getElementById('main'));
+      this.Class.OptionPage.hideInputError(passwordInput);
     } else {
-      OptionPage.showInputError(passwordInput);
+      this.Class.OptionPage.showInputError(passwordInput);
     }
   }
 
@@ -36,7 +37,7 @@ export default class OptionAuth {
       password.value = '';
       this.setPasswordButton();
     } catch (err) {
-      OptionPage.handleError('Failed to update password.', err);
+      this.Class.OptionPage.handleError('Failed to update password.', err);
     }
   }
 
@@ -45,7 +46,7 @@ export default class OptionAuth {
     const passwordBtn = document.getElementById('setPasswordBtn') as HTMLButtonElement;
 
     if (this.optionPage.cfg.password) { // Password already set
-      OptionPage.enableBtn(passwordBtn);
+      this.Class.OptionPage.enableBtn(passwordBtn);
       if (passwordText.value) { // Password field filled
         passwordBtn.innerText = 'SET';
       } else { // Empty password field
@@ -54,9 +55,9 @@ export default class OptionAuth {
     } else { // Password not already set
       passwordBtn.innerText = 'SET';
       if (passwordText.value) { // Password field filled
-        OptionPage.enableBtn(passwordBtn);
+        this.Class.OptionPage.enableBtn(passwordBtn);
       } else { // Empty password field
-        OptionPage.disableBtn(passwordBtn);
+        this.Class.OptionPage.disableBtn(passwordBtn);
       }
     }
   }
