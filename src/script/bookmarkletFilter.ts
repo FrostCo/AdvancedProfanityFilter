@@ -24,6 +24,7 @@ export default class BookmarkletFilter extends Filter {
   //#region Class reference helpers
   // Can be overridden in children classes
   static get Config() { return WebConfig; }
+  static get Constants() { return Constants; }
   get Class() { return (this.constructor as typeof BookmarkletFilter); }
   //#endregion
 
@@ -41,7 +42,7 @@ export default class BookmarkletFilter extends Filter {
     this.processMutationTarget = false;
   }
 
-  advancedReplaceText(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+  advancedReplaceText(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     if (node.parentNode || node === document) {
       for (const regExp of this.wordlists[wordlistId].regExps) {
         // @ts-ignore: External library function
@@ -60,7 +61,7 @@ export default class BookmarkletFilter extends Filter {
 
   beforeProcessingPage(message: Message) {}
 
-  cleanChildNode(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+  cleanChildNode(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     if (node.nodeName) {
       if (node.textContent && node.textContent.trim() != '') {
         const result = this.replaceTextResult(node.textContent, wordlistId, statsType);
@@ -76,7 +77,7 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  cleanNode(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+  cleanNode(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     if (Page.isForbiddenNode(node)) { return false; }
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
     if (node.childNodes.length > 0) {
@@ -88,7 +89,7 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  cleanNodeAttribute(node, attribute: string, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+  cleanNodeAttribute(node, attribute: string, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     if (node[attribute] != '') {
       const result = this.replaceTextResult(node[attribute], wordlistId, statsType);
       if (result.modified && this.filterText) {
@@ -99,7 +100,7 @@ export default class BookmarkletFilter extends Filter {
 
   cleanPage(config?: WebConfig) {
     this.cfg = new this.Class.Config(config);
-    this.filterText = this.cfg.filterMethod !== Constants.FILTER_METHODS.OFF;
+    this.filterText = this.cfg.filterMethod !== this.Class.Constants.FILTER_METHODS.OFF;
     this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
 
     if (!this.shouldProcessFrame) {
@@ -125,7 +126,7 @@ export default class BookmarkletFilter extends Filter {
     console.log('[APF Bookmarklet] Page filtered');
   }
 
-  cleanText(node, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+  cleanText(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     if (Page.isForbiddenNode(node)) { return false; }
     if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
     if (node.childElementCount > 0) {
@@ -146,7 +147,7 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = Constants.STATS_TYPE_TEXT) {
+  filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     this.shadowObserver.observe(shadowRoot, BookmarkletFilter.observerConfig);
     this.processNode(shadowRoot, wordlistId, statsType);
   }
