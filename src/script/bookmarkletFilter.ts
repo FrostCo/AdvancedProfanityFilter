@@ -150,7 +150,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
-    this.shadowObserver.observe(shadowRoot, BookmarkletFilter.observerConfig);
+    this.shadowObserver.observe(shadowRoot, this.Class.observerConfig);
     this.processNode(shadowRoot, wordlistId, statsType);
   }
 
@@ -278,7 +278,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   startObserving(target: Node = document, observer: MutationObserver = this.observer) {
-    observer.observe(target, BookmarkletFilter.observerConfig);
+    observer.observe(target, this.Class.observerConfig);
   }
 
   stopObserving(observer: MutationObserver = this.observer) {
