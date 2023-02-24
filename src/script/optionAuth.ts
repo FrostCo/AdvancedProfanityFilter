@@ -5,6 +5,11 @@ export default class OptionAuth {
   optionPage: OptionPage;
   password: string;
 
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  get Class() { return (this.constructor as typeof OptionAuth); }
+  //#endregion
+
   authenticate(evt) {
     const passwordInput = document.getElementById('passwordInput') as HTMLInputElement;
     if (passwordInput.value == this.password) {
