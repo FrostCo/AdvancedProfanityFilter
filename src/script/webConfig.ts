@@ -20,6 +20,11 @@ export default class WebConfig extends Config {
   showUpdateNotification: boolean;
   syncLargeKeys: boolean;
 
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  get Class() { return (this.constructor as typeof WebConfig); }
+  //#endregion
+
   /* eslint-disable-next-line @typescript-eslint/naming-convention */
   static readonly BUILD = typeof __BUILD__ == 'undefined' ? BUILD_DEFAULTS  : __BUILD__;
   static readonly _webDefaults = {
@@ -307,7 +312,7 @@ export default class WebConfig extends Config {
     super(config);
 
     // Apply class defaults
-    Object.assign(this, WebConfig._webDefaults, config);
+    Object.assign(this, this.Class._webDefaults, config);
   }
 
   // Order and remove `_` prefixed values
@@ -329,10 +334,10 @@ export default class WebConfig extends Config {
         if (key == 'syncLargeKeys') {
           // syncLargeKeys is always stored in local storage
           localKeys.push(key);
-        } else if (WebConfig._largeKeys.includes(key)) {
+        } else if (this.Class._largeKeys.includes(key)) {
           if (this.syncLargeKeys) {
             // Remove large keys from sync storage
-            syncKeys = syncKeys.concat(WebConfig.splitKeyNames(key));
+            syncKeys = syncKeys.concat(this.Class.splitKeyNames(key));
           } else {
             localKeys.push(key);
           }
@@ -343,10 +348,10 @@ export default class WebConfig extends Config {
 
       try {
         if (syncKeys.length) {
-          await WebConfig.removeSyncStorage(syncKeys);
+          await this.Class.removeSyncStorage(syncKeys);
         }
         if (localKeys.length) {
-          await WebConfig.removeLocalStorage(localKeys);
+          await this.Class.removeLocalStorage(localKeys);
         }
 
         keys.forEach((key) => {
@@ -361,8 +366,8 @@ export default class WebConfig extends Config {
 
   async reset() {
     try {
-      await WebConfig.resetSyncStorage();
-      await WebConfig.resetLocalStorage();
+      await this.Class.resetSyncStorage();
+      await this.Class.resetLocalStorage();
     } catch (err) {
       logger.error('Failed to clear storage.', err);
       throw new Error(`Failed to clear storage. ${err.message}`);
@@ -371,8 +376,8 @@ export default class WebConfig extends Config {
 
   async resetPreserveStats() {
     try {
-      await WebConfig.resetSyncStorage();
-      await WebConfig.removeLocalStorage(WebConfig._localConfigKeys);
+      await this.Class.resetSyncStorage();
+      await this.Class.removeLocalStorage(this.Class._localConfigKeys);
     } catch (err) {
       logger.error('Failed to clear storage.', err);
       throw new Error(`Failed to clear storage. ${err.message}`);
@@ -392,15 +397,15 @@ export default class WebConfig extends Config {
       if (key == 'syncLargeKeys') {
         // syncLargeKeys is always stored in local storage
         localData[key] = this[key];
-      } else if (WebConfig._largeKeys.includes(key)) {
+      } else if (this.Class._largeKeys.includes(key)) {
         if (this.syncLargeKeys) {
           Object.assign(syncData, this.splitData(key));
 
           // Check for any unused splitContainers
           if (this._lastSplitKeys) {
-            const newMaxSplitKey = WebConfig.getMaxSplitKeyFromData(syncData, key);
+            const newMaxSplitKey = this.Class.getMaxSplitKeyFromData(syncData, key);
             if (this._lastSplitKeys[key] > newMaxSplitKey) { // Split data was reduced
-              unusedSplitKeys = unusedSplitKeys.concat(WebConfig.splitKeyNames(key, newMaxSplitKey + 1));
+              unusedSplitKeys = unusedSplitKeys.concat(this.Class.splitKeyNames(key, newMaxSplitKey + 1));
             } else if (this._lastSplitKeys[key] < newMaxSplitKey) { // Split data was increased
               this._lastSplitKeys[key] = newMaxSplitKey;
             }
@@ -415,24 +420,24 @@ export default class WebConfig extends Config {
 
     try {
       // Safari won't store null values
-      if (WebConfig.BUILD.target === 'safari') {
+      if (this.Class.BUILD.target === 'safari') {
         const nullLocalKeys = Object.keys(localData).filter((key) => localData[key] == null);
         const nullSyncKeys = Object.keys(syncData).filter((key) => syncData[key] == null);
         if (nullLocalKeys.length) {
-          await WebConfig.removeLocalStorage(nullLocalKeys);
+          await this.Class.removeLocalStorage(nullLocalKeys);
           nullLocalKeys.forEach((key) => delete localData[key]);
         }
         if (nullSyncKeys.length) {
-          await WebConfig.removeSyncStorage(nullSyncKeys);
+          await this.Class.removeSyncStorage(nullSyncKeys);
           nullSyncKeys.forEach((key) => delete syncData[key]);
         }
       }
 
       if (Object.keys(syncData).length) {
-        await WebConfig.saveSyncStorage(syncData);
+        await this.Class.saveSyncStorage(syncData);
       }
       if (Object.keys(localData).length) {
-        await WebConfig.saveLocalStorage(localData);
+        await this.Class.saveLocalStorage(localData);
       }
       if (unusedSplitKeys.length) {
         await this.remove(unusedSplitKeys);
@@ -458,7 +463,7 @@ export default class WebConfig extends Config {
       newBytes += encoder.encode(JSON.stringify(this[key][item])).length;
 
       // Next word would be too big, setup next container
-      if ((currentBytes + newBytes) >= WebConfig._maxBytes) {
+      if ((currentBytes + newBytes) >= this.Class._maxBytes) {
         currentContainerNum++;
         currentContainer = `_${key}${currentContainerNum}`;
         data[currentContainer] = {};
