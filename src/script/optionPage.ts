@@ -39,6 +39,7 @@ export default class OptionPage {
   static get Config() { return WebConfig; }
   static get Constants() { return Constants; }
   static get DataMigration() { return DataMigration; }
+  static get Domain() { return Domain; }
   static get Filter() { return Filter; }
   get Class() { return (this.constructor as typeof OptionPage); }
   //#endregion
@@ -866,7 +867,7 @@ export default class OptionPage {
     let domainCfg: DomainCfg;
     if (!key) { // New record
       OptionPage.disableBtn(domainRemoveBtn);
-      domainCfg = Object.assign({}, Domain._domainCfgDefaults);
+      domainCfg = Object.assign({}, this.Class.Domain._domainCfgDefaults);
     } else { // Existing record
       OptionPage.enableBtn(domainRemoveBtn);
       domainCfg = this.cfg.domains[domainsSelect.value];
@@ -876,7 +877,7 @@ export default class OptionPage {
     if (domainKey == '') { // No data
       domainModeSelect.selectedIndex = this.Class.Constants.DOMAIN_MODES.NORMAL;
     } else {
-      const domain = new Domain(domainKey, domainCfg);
+      const domain = new this.Class.Domain(domainKey, domainCfg);
       domainModeSelect.selectedIndex = domain.getModeIndex();
     }
 
@@ -907,7 +908,7 @@ export default class OptionPage {
     OptionPage.hideInputError(domainText);
     removeChildren(domainsSelect);
 
-    const domains = Domain.sortedKeys(this.cfg.domains);
+    const domains = this.Class.Domain.sortedKeys(this.cfg.domains);
     domains.unshift('Add, or update existing...');
     domains.forEach((domain) => {
       const optionElement = document.createElement('option');
@@ -1425,7 +1426,7 @@ export default class OptionPage {
         const originalKey = domainsSelect.value;
         if (originalKey && newKey != originalKey) delete this.cfg.domains[originalKey];
 
-        const domain = new Domain(newKey, domainCfg);
+        const domain = new this.Class.Domain(newKey, domainCfg);
 
         // Get domain mode
         const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
