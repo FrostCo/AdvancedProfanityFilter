@@ -25,6 +25,7 @@ export default class BookmarkletFilter extends Filter {
   // Can be overridden in children classes
   static get Config() { return WebConfig; }
   static get Constants() { return Constants; }
+  static get Domain() { return Domain; }
   get Class() { return (this.constructor as typeof BookmarkletFilter); }
   //#endregion
 
@@ -101,7 +102,7 @@ export default class BookmarkletFilter extends Filter {
   cleanPage(config?: WebConfig) {
     this.cfg = new this.Class.Config(config);
     this.filterText = this.cfg.filterMethod !== this.Class.Constants.FILTER_METHODS.OFF;
-    this.domain = Domain.byHostname(this.hostname, this.cfg.domains);
+    this.domain = this.Class.Domain.byHostname(this.hostname, this.cfg.domains);
 
     if (!this.shouldProcessFrame) {
       return false;
