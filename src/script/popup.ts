@@ -17,6 +17,11 @@ export default class Popup {
   themeElements: Element[];
   url: URL;
 
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  get Class() { return (this.constructor as typeof Popup); }
+  //#endregion
+
   static readonly _requiredConfig = [
     'darkMode',
     'domains',
@@ -113,17 +118,17 @@ export default class Popup {
   disableDomainSwitch() {
     const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
     const domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
-    Popup.disable(domainFilter);
-    Popup.disable(domainToggle);
+    this.Class.disable(domainFilter);
+    this.Class.disable(domainToggle);
   }
 
   disableOptions() {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
-    Popup.disable(domainModeSelect);
-    Popup.disable(filterMethodSelect);
-    Popup.disable(wordlistSelect);
+    this.Class.disable(domainModeSelect);
+    this.Class.disable(filterMethodSelect);
+    this.Class.disable(wordlistSelect);
   }
 
   async filterMethodSelect() {
@@ -161,7 +166,7 @@ export default class Popup {
     const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
     dynamicList(wordlists, wordlistSelect);
     wordlistSelect.selectedIndex = wordlistIndex;
-    Popup.show(wordListContainer);
+    this.Class.show(wordListContainer);
   }
 
   initializePopup() {
@@ -190,7 +195,7 @@ export default class Popup {
   }
 
   async populateOptions() {
-    await Popup.load(this);
+    await this.Class.load(this);
     this.applyTheme();
     this.initializePopup();
 
@@ -274,7 +279,7 @@ export default class Popup {
     const container = document.getElementById('statusContainer');
     const statusText = document.getElementById('statusText');
 
-    Popup.hide(container);
+    this.Class.hide(container);
     statusText.textContent = '';
   }
 
