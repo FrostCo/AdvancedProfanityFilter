@@ -16,6 +16,7 @@ export default class Domain {
 
   //#region Class reference helpers
   // Can be overridden in children classes
+  static get Constants() { return Constants; }
   get Class() { return (this.constructor as typeof Domain); }
   //#endregion
 
@@ -106,11 +107,11 @@ export default class Domain {
 
   getModeIndex() {
     if (this.advanced) {
-      return Constants.DOMAIN_MODES.ADVANCED;
+      return this.Class.Constants.DOMAIN_MODES.ADVANCED;
     } else if (this.deep) {
-      return Constants.DOMAIN_MODES.DEEP;
+      return this.Class.Constants.DOMAIN_MODES.DEEP;
     } else {
-      return Constants.DOMAIN_MODES.NORMAL;
+      return this.Class.Constants.DOMAIN_MODES.NORMAL;
     }
   }
 
@@ -151,9 +152,9 @@ export default class Domain {
 
   updateFromModeIndex(index: number) {
     switch (index) {
-      case Constants.DOMAIN_MODES.NORMAL: this.advanced = false; this.deep = false; break;
-      case Constants.DOMAIN_MODES.ADVANCED: this.advanced = true; this.deep = false; break;
-      case Constants.DOMAIN_MODES.DEEP: this.advanced = false; this.deep = true; break;
+      case this.Class.Constants.DOMAIN_MODES.NORMAL: this.advanced = false; this.deep = false; break;
+      case this.Class.Constants.DOMAIN_MODES.ADVANCED: this.advanced = true; this.deep = false; break;
+      case this.Class.Constants.DOMAIN_MODES.DEEP: this.advanced = false; this.deep = true; break;
     }
   }
 }
