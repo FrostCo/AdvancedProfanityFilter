@@ -173,13 +173,22 @@ export default class Popup {
     this.Class.show(wordListContainer);
   }
 
-  populateOptions() {
-    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
-    const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
-    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.DOMAIN_MODES), domainModeSelect, true);
-    domainModeSelect.selectedIndex = this.domain.getModeIndex();
-    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.FILTER_METHODS), filterMethodSelect, true);
-    filterMethodSelect.selectedIndex = this.cfg.filterMethod;
+  async initializePopup() {
+    await this.Class.load(this);
+    this.applyTheme();
+    this.populateOptions();
+
+    if (this.wordlistsEnabled) this.handleWordlistsEnabled();
+
+    if (this.isPasswordProtected) this.handlePasswordProtected();
+
+    if (this.isRestrictedPage) {
+      this.handleRestrictedPage();
+      return false;
+    }
+
+    // Set initial value for domain filter and disable options if they are not applicable
+    if (this.isDisabled) this.handleDisabled();
   }
 
   get isDisabled() {
@@ -198,22 +207,13 @@ export default class Popup {
     );
   }
 
-  async initializePopup() {
-    await this.Class.load(this);
-    this.applyTheme();
-    this.populateOptions();
-
-    if (this.wordlistsEnabled) this.handleWordlistsEnabled();
-
-    if (this.isPasswordProtected) this.handlePasswordProtected();
-
-    if (this.isRestrictedPage) {
-      this.handleRestrictedPage();
-      return false;
-    }
-
-    // Set initial value for domain filter and disable options if they are not applicable
-    if (this.isDisabled) this.handleDisabled();
+  populateOptions() {
+    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+    const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.DOMAIN_MODES), domainModeSelect, true);
+    domainModeSelect.selectedIndex = this.domain.getModeIndex();
+    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.FILTER_METHODS), filterMethodSelect, true);
+    filterMethodSelect.selectedIndex = this.cfg.filterMethod;
   }
 
   populateSummary(summary: Summary) {
