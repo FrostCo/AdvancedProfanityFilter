@@ -141,6 +141,7 @@ export default class Popup {
     try {
       await this.cfg.save('filterMethod');
       chrome.tabs.reload();
+      this.populateOptions();
     } catch (err) {
       logger.error('Failed to update selected filter method.', err);
     }
@@ -203,6 +204,10 @@ export default class Popup {
     dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.FILTER_METHODS), filterMethodSelect, true);
     filterMethodSelect.selectedIndex = this.cfg.filterMethod;
 
+    // Clean up popup after making changes
+    this.updateStatus(null);
+    this.populateSummary({});
+
     if (this.wordlistsEnabled) this.handleWordlistsEnabled();
 
     if (this.isPasswordProtected) this.handlePasswordProtected();
@@ -259,6 +264,7 @@ export default class Popup {
       try {
         await this.domain.save(this.cfg);
         chrome.tabs.reload();
+        this.populateOptions();
       } catch (err) {
         logger.error(`Failed to toggle domain '${this.domain.hostname}'.`, err);
       }
@@ -272,6 +278,7 @@ export default class Popup {
       try {
         await this.domain.save(this.cfg);
         chrome.tabs.reload();
+        this.populateOptions();
       } catch (err) {
         logger.error(`Failed to update mode for domain '${this.domain.hostname}'.`, err);
       }
@@ -293,6 +300,7 @@ export default class Popup {
     try {
       await this.domain.save(this.cfg);
       chrome.tabs.reload();
+      this.populateOptions();
     } catch (err) {
       logger.error(`Failed to select wordlist for domain ${this.domain.hostname}.`, err);
     }
