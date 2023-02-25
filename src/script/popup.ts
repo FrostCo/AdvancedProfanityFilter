@@ -177,18 +177,6 @@ export default class Popup {
     await this.Class.load(this);
     this.applyTheme();
     this.populateOptions();
-
-    if (this.wordlistsEnabled) this.handleWordlistsEnabled();
-
-    if (this.isPasswordProtected) this.handlePasswordProtected();
-
-    if (this.isRestrictedPage) {
-      this.handleRestrictedPage();
-      return false;
-    }
-
-    // Set initial value for domain filter and disable options if they are not applicable
-    if (this.isDisabled) this.handleDisabled();
   }
 
   get isDisabled() {
@@ -214,6 +202,18 @@ export default class Popup {
     domainModeSelect.selectedIndex = this.domain.getModeIndex();
     dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.FILTER_METHODS), filterMethodSelect, true);
     filterMethodSelect.selectedIndex = this.cfg.filterMethod;
+
+    if (this.wordlistsEnabled) this.handleWordlistsEnabled();
+
+    if (this.isPasswordProtected) this.handlePasswordProtected();
+
+    if (this.isRestrictedPage) {
+      this.handleRestrictedPage();
+      return false;
+    }
+
+    // Set initial value for domain filter and disable options if they are not applicable
+    if (this.isDisabled) this.handleDisabled();
   }
 
   populateSummary(summary: Summary) {
