@@ -36,7 +36,7 @@ const popup = new Popup;
 (document.getElementById('gettingStarted') as HTMLAnchorElement).href = chrome.runtime.getURL('optionPage.html#/help');
 
 // Listeners
-window.addEventListener('load', (evt) => { popup.populateOptions(); });
+window.addEventListener('load', (evt) => { popup.initializePopup(); });
 document.getElementById('domainFilter').addEventListener('change', (evt) => { popup.toggle(popup.filterToggleProp); });
 document.getElementById('domainModeSelect').addEventListener('change', (evt) => { popup.updateDomainMode(); });
 document.getElementById('filterMethodSelect').addEventListener('change', (evt) => { popup.filterMethodSelect(); });

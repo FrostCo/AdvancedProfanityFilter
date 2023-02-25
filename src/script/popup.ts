@@ -173,7 +173,7 @@ export default class Popup {
     this.Class.show(wordListContainer);
   }
 
-  initializePopup() {
+  populateOptions() {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.DOMAIN_MODES), domainModeSelect, true);
@@ -198,10 +198,10 @@ export default class Popup {
     );
   }
 
-  async populateOptions() {
+  async initializePopup() {
     await this.Class.load(this);
     this.applyTheme();
-    this.initializePopup();
+    this.populateOptions();
 
     if (this.wordlistsEnabled) this.handleWordlistsEnabled();
 
