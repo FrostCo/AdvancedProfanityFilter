@@ -135,6 +135,15 @@ export default class Popup {
     this.Class.disable(wordlistSelect);
   }
 
+  enableOptions() {
+    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+    const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    this.Class.enable(domainModeSelect);
+    this.Class.enable(filterMethodSelect);
+    this.Class.enable(wordlistSelect);
+  }
+
   async filterMethodSelect() {
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     this.cfg.filterMethod = filterMethodSelect.selectedIndex;
@@ -150,6 +159,11 @@ export default class Popup {
   handleDisabled() {
     this.setDomainSwitch(false);
     this.disableOptions();
+  }
+
+  handleEnabled() {
+    this.setDomainSwitch(true);
+    this.enableOptions();
   }
 
   handlePasswordProtected() {
@@ -218,7 +232,7 @@ export default class Popup {
     }
 
     // Set initial value for domain filter and disable options if they are not applicable
-    if (this.isDisabled) this.handleDisabled();
+    this.isDisabled ? this.handleDisabled() : this.handleEnabled();
   }
 
   populateSummary(summary: Summary) {
