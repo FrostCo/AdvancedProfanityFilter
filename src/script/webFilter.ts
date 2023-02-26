@@ -60,7 +60,7 @@ export default class WebFilter extends Filter {
 
   _processWordStat(stats, word: string) {
     if (!stats.words[word]) stats.words[word] = this._defaultWordStat;
-    stats.words[word].text += this.stats.words[word].text;
+    stats.words[word][this.Class.Constants.STATS_TYPE_TEXT] += this.stats.words[word][this.Class.Constants.STATS_TYPE_TEXT];
   }
 
   advancedReplaceText(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
@@ -219,7 +219,7 @@ export default class WebFilter extends Filter {
   }
 
   foundMatch(word: Word, statsType?: string) {
-    super.foundMatch(word);
+    super.foundMatch(word, statsType);
 
     if (this.cfg.showSummary) {
       if (this.summary[word.value]) {
