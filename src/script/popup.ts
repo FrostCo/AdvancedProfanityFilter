@@ -224,13 +224,13 @@ export default class Popup {
 
     if (this.wordlistsEnabled) this.handleWordlistsEnabled();
 
-    if (this.isPasswordProtected) {
-      this.handlePasswordProtected();
+    if (this.isRestrictedPage) {
+      this.handleRestrictedPage();
       return false;
     }
 
-    if (this.isRestrictedPage) {
-      this.handleRestrictedPage();
+    if (this.isPasswordProtected) {
+      this.handlePasswordProtected();
       return false;
     }
 
