@@ -86,6 +86,7 @@ export default class Popup {
   }
 
   constructor() {
+    this.initializeMessaging();
     this.prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
     this.protected = false;
     this.themeElements = [document.body, document.querySelector('#footer')];
@@ -186,6 +187,33 @@ export default class Popup {
     dynamicList(wordlists, wordlistSelect);
     wordlistSelect.selectedIndex = wordlistIndex;
     this.Class.show(wordListContainer);
+  }
+
+  initializeMessaging() {
+    chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) => {
+      if (request.destination !== this.Class.Constants.MESSAGING.POPUP) return true;
+
+      if (request.summary) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (sender.tab.id == tabs[0].id) { this.populateSummary(request.summary); }
+        });
+      } else if (request.status) {
+        this.updateStatus(request.status);
+      } else {
+        logger.error('Received unhandled message.', JSON.stringify(request));
+      }
+
+      sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
+    });
+
+    // Initial data request
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        { destination: this.Class.Constants.MESSAGING.CONTEXT, source: this.Class.Constants.MESSAGING.POPUP, summary: true },
+        () => chrome.runtime.lastError // Suppress error if no listener);
+      );
+    });
   }
 
   async initializePopup() {
