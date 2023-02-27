@@ -15,6 +15,7 @@ export default class WebFilter extends Filter {
   filterText: boolean;
   hostname: string;
   iframe: Location;
+  lastCounter: number;
   location: Location | URL;
   observer: MutationObserver;
   processMutationTarget: boolean;
@@ -43,6 +44,7 @@ export default class WebFilter extends Filter {
     super();
     this.extension = true;
     this.filterText = true;
+    this.lastCounter = 0;
     this.processMutationTarget = false;
     this.stats = { words: {} };
     this.summary = {};
@@ -485,8 +487,9 @@ export default class WebFilter extends Filter {
   updateCounterBadge() {
     /* istanbul ignore next */
     // console.count('updateCounterBadge'); // Benchmark: Filter
-    if (chrome.runtime && this.counter > 0) {
+    if (chrome.runtime && this.counter > this.lastCounter) {
       try {
+        this.lastCounter = this.counter;
         if (this.cfg.showCounter) {
           const message = this.buildMessage(this.Class.Constants.MESSAGING.BACKGROUND, { counter: this.counter });
           chrome.runtime.sendMessage(message);
