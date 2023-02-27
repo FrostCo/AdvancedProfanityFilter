@@ -17,6 +17,7 @@ export default class Constants {
   static readonly MESSAGING = { BACKGROUND: 'background', CONTEXT: 'context', OPTION: 'option', POPUP: 'popup' };
   static readonly STATS_TYPE_TEXT = 'text';
   static readonly STATUS = { DISABLED: 0, NORMAL: 1, ADVANCED: 2, DEEP: 3 };
+  static readonly TAB_DISABLE_ONCE = { NOT_SET: 0, DISABLED: 1, WILL_DISABLE: 2 };
   static readonly TRUE = 1;
 
   // Helper Functions

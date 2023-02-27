@@ -130,7 +130,7 @@ export default class Background {
   static async disableTabOnce(tabId: number) {
     const storage = await this.loadBackgroundStorage();
     const tabOptions = await this.getTabOptions(storage, tabId);
-    tabOptions.disabledOnce = true;
+    tabOptions.disabledOnce = this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE;
     await this.saveBackgroundStorage(storage);
     chrome.tabs.reload(tabId);
     this.LOGGER.info('disabling tab once.', tabId);
@@ -164,14 +164,20 @@ export default class Background {
     const storage = await this.loadBackgroundStorage();
     const response: BackgroundData = { disabledTab: false };
     const tabOptions = this.getTabOptions(storage, tabId);
-    if (tabOptions.disabled || tabOptions.disabledOnce) {
+    if (
+      tabOptions.disabled
+      || tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE
+    ) {
       response.disabledTab = true;
     }
     sendResponse(response);
 
     let updated = false;
-    if (tabOptions.disabledOnce) {
-      tabOptions.disabledOnce = false;
+    if (tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE) {
+      tabOptions.disabledOnce = this.Constants.TAB_DISABLE_ONCE.DISABLED;
+      updated = true;
+    } else if (tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.DISABLED) {
+      tabOptions.disabledOnce = this.Constants.TAB_DISABLE_ONCE.NOT_SET;
       updated = true;
     }
 
@@ -195,7 +201,7 @@ export default class Background {
   }
 
   static newTabOptions(storage: BackgroundStorage, tabId: number, options: TabStorageOptions = {}): TabStorageOptions {
-    const _defaults: TabStorageOptions = { status: 0, disabled: false, disabledOnce: false };
+    const _defaults: TabStorageOptions = { status: 0, disabled: false, disabledOnce: this.Constants.TAB_DISABLE_ONCE.NOT_SET };
     const tabOptions = Object.assign({}, _defaults, options) as TabStorageOptions;
     tabOptions.id = tabId;
     tabOptions.registeredAt = new Date().getTime();
