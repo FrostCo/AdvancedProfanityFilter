@@ -8,6 +8,7 @@ const logger = new Logger('Popup');
 
 export default class Popup {
   cfg: WebConfig;
+  disabledTab: boolean;
   domain: Domain;
   filterToggleProp: string;
   prefersDarkScheme: boolean;
@@ -87,6 +88,7 @@ export default class Popup {
 
   constructor() {
     this.initializeMessaging();
+    this.disabledTab = false;
     this.prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
     this.protected = false;
     this.themeElements = [document.body, document.querySelector('#footer')];
@@ -157,6 +159,21 @@ export default class Popup {
     }
   }
 
+  getBackgroundData(): Promise<BackgroundData> {
+    return new Promise((resolve, reject) => {
+      const message = {
+        destination: this.Class.Constants.MESSAGING.BACKGROUND,
+        source: this.Class.Constants.MESSAGING.POPUP,
+        backgroundData: true,
+        tabId: this.tab.id,
+      };
+      chrome.runtime.sendMessage(message, (response) => {
+        if (!response) { response = { disabledTab: false }; }
+        resolve(response);
+      });
+    });
+  }
+
   handleDisabled() {
     this.setDomainSwitch(false);
     this.disableOptions();
@@ -223,7 +240,7 @@ export default class Popup {
   }
 
   get isDisabled() {
-    return this.domain.disabled || (this.cfg.enabledDomainsOnly && !this.domain.enabled);
+    return this.domain.disabled || this.disabledTab || (this.cfg.enabledDomainsOnly && !this.domain.enabled);
   }
 
   get isPasswordProtected() {
@@ -238,7 +255,7 @@ export default class Popup {
     );
   }
 
-  populateOptions() {
+  async populateOptions() {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.DOMAIN_MODES), domainModeSelect, true);
@@ -251,6 +268,9 @@ export default class Popup {
     this.populateSummary({});
 
     if (this.wordlistsEnabled) this.handleWordlistsEnabled();
+
+    const backgroundData = await this.getBackgroundData();
+    this.disabledTab = backgroundData.disabledTab;
 
     if (this.isRestrictedPage) {
       this.handleRestrictedPage();

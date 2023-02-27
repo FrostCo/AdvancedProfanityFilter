@@ -167,10 +167,13 @@ export default class Background {
     if (
       tabOptions.disabled
       || (source == this.Constants.MESSAGING.CONTEXT && tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE)
+      || (source == this.Constants.MESSAGING.POPUP && tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.DISABLED)
     ) {
       response.disabledTab = true;
     }
     sendResponse(response);
+
+    if (source == this.Constants.MESSAGING.POPUP) return;
 
     let updated = false;
     if (tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE) {
@@ -285,6 +288,9 @@ export default class Background {
       case this.Constants.MESSAGING.POPUP:
         if (request.getStatus) {
           this.updatePopupStatus(request.tabId, null, sendResponse);
+          return true; // return true when waiting on an async call
+        } else if (request.backgroundData) {
+          this.handleBackgroundDataRequest(request.source, request.tabId, sendResponse, false);
           return true; // return true when waiting on an async call
         } else {
           this.LOGGER.error('Received unhandled message.', JSON.stringify(request));
