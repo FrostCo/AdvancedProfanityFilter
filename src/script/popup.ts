@@ -176,6 +176,7 @@ export default class Popup {
 
   handleDisabled() {
     this.setDomainSwitch(false);
+    if (this.disabledTab) this.disableDomainSwitch();
     this.disableOptions();
   }
 
