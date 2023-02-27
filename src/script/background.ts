@@ -160,13 +160,13 @@ export default class Background {
     }
   }
 
-  static async handleBackgroundDataRequest(tabId: number, sendResponse, iframe: boolean) {
+  static async handleBackgroundDataRequest(source: string, tabId: number, sendResponse, iframe: boolean) {
     const storage = await this.loadBackgroundStorage();
     const response: BackgroundData = { disabledTab: false };
     const tabOptions = this.getTabOptions(storage, tabId);
     if (
       tabOptions.disabled
-      || tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE
+      || (source == this.Constants.MESSAGING.CONTEXT && tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE)
     ) {
       response.disabledTab = true;
     }
@@ -261,7 +261,7 @@ export default class Background {
         if (request.disabled === true) {
           chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
         } else if (request.backgroundData === true) {
-          this.handleBackgroundDataRequest(sender.tab.id, sendResponse, request.iframe);
+          this.handleBackgroundDataRequest(request.source, sender.tab.id, sendResponse, request.iframe);
           return true; // return true when waiting on an async call
         } else if (request.fetch) {
           this.handleRequest(request.fetch, request.fetchMethod, sendResponse);
