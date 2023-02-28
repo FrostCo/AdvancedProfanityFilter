@@ -237,7 +237,7 @@ export default class Popup {
   async initializePopup() {
     await this.Class.load(this);
     this.applyTheme();
-    this.populateOptions();
+    this.populateOptions(true);
   }
 
   get isDisabled() {
@@ -256,7 +256,7 @@ export default class Popup {
     );
   }
 
-  async populateOptions() {
+  async populateOptions(init = false) {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.DOMAIN_MODES), domainModeSelect, true);
@@ -264,14 +264,15 @@ export default class Popup {
     dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.FILTER_METHODS), filterMethodSelect, true);
     filterMethodSelect.selectedIndex = this.cfg.filterMethod;
 
-    // Clean up popup after making changes
-    this.updateStatus(null);
-    this.populateSummary({});
+    if (init) {
+      const backgroundData = await this.getBackgroundData();
+      this.disabledTab = backgroundData.disabledTab;
+    } else {
+      this.updateStatus(null);
+      this.populateSummary({});
+    }
 
     if (this.wordlistsEnabled) this.handleWordlistsEnabled();
-
-    const backgroundData = await this.getBackgroundData();
-    this.disabledTab = backgroundData.disabledTab;
 
     if (this.isRestrictedPage) {
       this.handleRestrictedPage();
