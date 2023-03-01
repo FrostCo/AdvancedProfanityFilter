@@ -14,6 +14,7 @@ export default class Popup {
   prefersDarkScheme: boolean;
   protected: boolean;
   status: number;
+  summaries: { number?: Summary };
   tab: chrome.tabs.Tab;
   themeElements: Element[];
   url: URL;
@@ -91,6 +92,7 @@ export default class Popup {
     this.disabledTab = false;
     this.prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
     this.protected = false;
+    this.summaries = {};
     this.themeElements = [document.body, document.querySelector('#footer')];
   }
 
@@ -197,6 +199,11 @@ export default class Popup {
     this.disableOptions();
   }
 
+  handleSummaryMessage(frameId: number, summary: Summary) {
+    this.updateSummaries(frameId, summary);
+    this.populateSummary();
+  }
+
   handleWordlistsEnabled() {
     const wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
@@ -213,7 +220,7 @@ export default class Popup {
 
       if (request.summary) {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          if (sender.tab.id == tabs[0].id) { this.populateSummary(request.summary); }
+          if (sender.tab.id == tabs[0].id) this.handleSummaryMessage(sender.frameId, request.summary);
         });
       } else if (request.status) {
         this.updateStatus(request.status);
@@ -269,7 +276,8 @@ export default class Popup {
       this.disabledTab = backgroundData.disabledTab;
     } else {
       this.updateStatus(null);
-      this.populateSummary({});
+      this.summaries = {};
+      this.populateSummary();
     }
 
     if (this.wordlistsEnabled) this.handleWordlistsEnabled();
@@ -288,15 +296,16 @@ export default class Popup {
     this.isDisabled ? this.handleDisabled() : this.handleEnabled();
   }
 
-  populateSummary(summary: Summary) {
+  populateSummary() {
     const summaryContainer = document.getElementById('summary') as HTMLDivElement;
     const table = summaryContainer.querySelector('table') as HTMLTableElement;
     const oldTBody = table.tBodies[0];
     const tBody = document.createElement('tbody');
+    const summary = this.summary;
+    const sortedKeys = Object.keys(summary).sort((a, b) => summary[b].count - summary[a].count);
 
-    if (Object.keys(summary).length > 0) {
-      const sortedKeys = Object.keys(summary).sort((a, b) => summary[b].count - summary[a].count);
-      sortedKeys.forEach((key) => {
+    if (sortedKeys.length) {
+      for (const key of sortedKeys) {
         const row = tBody.insertRow();
         const wordCell = row.insertCell(0);
         wordCell.classList.add('w3-tooltip');
@@ -311,7 +320,7 @@ export default class Popup {
         const countCell = row.insertCell(1);
         countCell.classList.add('w3-right');
         countCell.textContent = summary[key].count.toString();
-      });
+      }
 
       summaryContainer.classList.remove('w3-hide');
     } else {
@@ -323,6 +332,20 @@ export default class Popup {
   setDomainSwitch(checked: boolean = true) {
     const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
     domainFilter.checked = checked;
+  }
+
+  get summary(): Summary {
+    const combined = {};
+    for (const frameId of Object.keys(this.summaries)) {
+      const frame = this.summaries[frameId];
+      for (const wordKey of Object.keys(frame)) {
+        const frameWord = frame[wordKey];
+        if (!combined[wordKey]) combined[wordKey] = { count: 0, filtered: frameWord.filtered };
+        combined[wordKey].count += frameWord.count;
+      }
+    }
+
+    return combined;
   }
 
   async toggle(prop: string) {
@@ -359,6 +382,10 @@ export default class Popup {
 
     this.Class.hide(container);
     statusText.textContent = '';
+  }
+
+  updateSummaries(frameId: number, summary: Summary) {
+    this.summaries[frameId] = summary;
   }
 
   async wordlistSelect(select: HTMLSelectElement) {
