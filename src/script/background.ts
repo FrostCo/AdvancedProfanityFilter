@@ -167,6 +167,19 @@ export default class Background {
     const response: BackgroundData = { disabledTab: false };
     let updated = false;
 
+    // Reset tab's counters
+    if (
+      request.source == this.Constants.MESSAGING.CONTEXT
+      && sender.frameId == this.Constants.TOP_WINDOW_FRAME_ID
+      && (
+        !tabOptions.counters
+        || Object.keys(tabOptions.counters).length
+      )
+    ) {
+      tabOptions.counters = {};
+      updated = true;
+    }
+
     if (
       tabOptions.disabled
       || (request.source == this.Constants.MESSAGING.CONTEXT && tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE)
