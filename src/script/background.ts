@@ -314,7 +314,13 @@ export default class Background {
 
     // Show count of words filtered on badge
     if (request.counter != undefined) {
-      chromeAction.setBadgeText({ text: formatNumber(request.counter), tabId: sender.tab.id });
+      const storage = await this.loadBackgroundStorage();
+      const tabOptions = this.getTabOptions(storage, sender.tab.id);
+      tabOptions.counters[sender.frameId] = request.counter;
+      await this.saveBackgroundStorage(storage);
+
+      const total = Object.values(tabOptions.counters).reduce((a, b) => a + b);
+      chromeAction.setBadgeText({ text: formatNumber(total), tabId: sender.tab.id });
     }
   }
 
