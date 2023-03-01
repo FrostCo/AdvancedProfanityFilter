@@ -160,20 +160,22 @@ export default class Background {
     }
   }
 
-  static async handleBackgroundDataRequest(source: string, tabId: number, sendResponse, iframe: boolean) {
+  static async handleBackgroundDataRequest(request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
     const storage = await this.loadBackgroundStorage();
+    const tabId = request.source == this.Constants.MESSAGING.CONTEXT ? sender.tab.id : request.tabId;
     const response: BackgroundData = { disabledTab: false };
     const tabOptions = this.getTabOptions(storage, tabId);
+
     if (
       tabOptions.disabled
-      || (source == this.Constants.MESSAGING.CONTEXT && tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE)
-      || (source == this.Constants.MESSAGING.POPUP && tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.DISABLED)
+      || (request.source == this.Constants.MESSAGING.CONTEXT && tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE)
+      || (request.source == this.Constants.MESSAGING.POPUP && tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.DISABLED)
     ) {
       response.disabledTab = true;
     }
     sendResponse(response);
 
-    if (source == this.Constants.MESSAGING.POPUP) return;
+    if (request.source == this.Constants.MESSAGING.POPUP) return;
 
     let updated = false;
     if (tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE) {
@@ -185,7 +187,7 @@ export default class Background {
     }
 
     // Reset filter status for main page
-    if (!iframe) {
+    if (!request.iframe) {
       tabOptions.status = 0;
       updated = true;
     }
@@ -264,7 +266,7 @@ export default class Background {
         if (request.disabled === true) {
           chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
         } else if (request.backgroundData === true) {
-          this.handleBackgroundDataRequest(request.source, sender.tab.id, sendResponse, request.iframe);
+          this.handleBackgroundDataRequest(request, sender, sendResponse);
           return true; // return true when waiting on an async call
         } else if (request.fetch) {
           this.handleRequest(request.fetch, request.fetchMethod, sendResponse);
@@ -290,7 +292,7 @@ export default class Background {
           this.updatePopupStatus(request.tabId, null, sendResponse);
           return true; // return true when waiting on an async call
         } else if (request.backgroundData) {
-          this.handleBackgroundDataRequest(request.source, request.tabId, sendResponse, false);
+          this.handleBackgroundDataRequest(request, sender, sendResponse);
           return true; // return true when waiting on an async call
         } else {
           this.LOGGER.error('Received unhandled message.', JSON.stringify(request));
