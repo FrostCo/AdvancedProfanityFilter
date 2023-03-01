@@ -36,10 +36,6 @@ function firefoxBuild() {
   data.target = 'firefox';
 }
 
-function iOSBuild() {
-  data.target = 'ios';
-}
-
 function main() {
   const argv = parseArgv(process.argv);
   if (argv.count >= 2 && argv.count <= 4) {
@@ -75,17 +71,11 @@ function main() {
       case '--firefox':
         firefoxBuild();
         break;
-      case '--ios':
-        iOSBuild();
-        break;
       case '--manifestV2':
         manifestV2Build();
         break;
       case '--manifestV3':
         manifestV3Build();
-        break;
-      case '--safari':
-        safariBuild();
         break;
       default:
         defaultBuild();
@@ -110,18 +100,12 @@ function manifestV3Build() {
   data.manifestVersion = 3;
 }
 
-function safariBuild() {
-  data.target = 'safari';
-}
-
 function targetFromData() {
   switch (data.target) {
     case 'chrome':
       return `--manifestV${data.manifestVersion}`;
     case 'bookmarklet':
     case 'firefox:':
-    case 'ios':
-    case 'safari':
       return `--${data.target}`;
   }
 }

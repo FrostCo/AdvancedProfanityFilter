@@ -1,34 +1,16 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-console */
 import fse from 'fs-extra';
-import path from 'path';
 import {
   buildFilePath,
   distManifestPath,
   loadJSONFile,
-  removeFiles,
   srcManifestPath,
   writeJSONFile
 } from './lib.mjs';
 
 let buildData;
 let distDir = 'dist';
-
-function appleBuild(updateBuildNumber) {
-  const files = [
-    path.join(distDir, 'img', 'donate.gif'),
-    path.join(distDir, 'img', 'patreon-small.png'),
-    path.join(distDir, 'img', 'patreon.png'),
-  ];
-
-  removeOptionPageBookmarklet();
-  removeOptionPageDonations();
-  removeFiles(files);
-
-  if (buildData.release) {
-    updateSafariXcodeVersion(updateBuildNumber);
-  }
-}
 
 function common() {
   handleManifestVersion();
@@ -108,11 +90,6 @@ function handleVersion() {
   }
 }
 
-function iOSBuild() {
-  const updateBuildNumber = false;
-  appleBuild(updateBuildNumber);
-}
-
 function main() {
   buildData = loadJSONFile(buildFilePath);
 
@@ -125,67 +102,6 @@ function main() {
 
   if (buildData.target == 'firefox') {
     firefoxBuild();
-  }
-
-  if (buildData.target == 'ios') {
-    iOSBuild();
-  }
-
-  if (buildData.target == 'safari') {
-    safariBuild();
-  }
-}
-
-function removeOptionPageBookmarklet() {
-  console.log("Removing Bookmarklet tab from Option's page");
-  const optionPage = path.join(distDir, 'optionPage.html');
-  const optionPageHTML = fse.readFileSync(optionPage).toString();
-
-  // Remove div#menu a[href='#/bookmarklet']
-  // const donationsRegex = new RegExp();
-  const newOptionPageHTML = optionPageHTML.replace('  <a href="#/bookmarklet" class="w3-bar-item w3-button">Bookmarklet</a>', '');
-
-  // Save changes
-  fse.writeFileSync(optionPage, newOptionPageHTML);
-}
-
-function removeOptionPageDonations() {
-  console.log("Removing donations from Option's page");
-  const optionPage = path.join(distDir, 'optionPage.html');
-  const optionPageHTML = fse.readFileSync(optionPage).toString();
-
-  // Remove span.donations
-  const donationsRegex = new RegExp('[\\s\\S]{4}<span class="donations">[\\s\\S].*[\\s\\S]+?<\/span>');
-  const newOptionPageHTML = optionPageHTML.replace(donationsRegex, '');
-
-  // Save changes
-  fse.writeFileSync(optionPage, newOptionPageHTML);
-}
-
-function safariBuild() {
-  const updateBuildNumber = true;
-  appleBuild(updateBuildNumber);
-}
-
-function updateSafariXcodeVersion(updateBuildNumber) {
-  const projectFilePath = path.join('safari', 'Advanced Profanity Filter.xcodeproj', 'project.pbxproj');
-  const projectFileText = fse.readFileSync(projectFilePath).toString();
-  let updatedProjectFileText = projectFileText.replace(/MARKETING_VERSION = \d+\.\d+\.\d+;$/gm, `MARKETING_VERSION = ${buildData.version};`);
-
-  // Increment the build version when running a Safari release
-  // macOS Apps require the build number to be larger than the previous build number
-  // https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleversion
-  if (updateBuildNumber) {
-    const buildVersionMatch = projectFileText.match(/CURRENT_PROJECT_VERSION = (?<buildNumber>\d+);/);
-    if (buildVersionMatch.groups) {
-      const newBuildNumber = parseInt(buildVersionMatch.groups.buildNumber) + 1;
-      updatedProjectFileText = updatedProjectFileText.replace(/CURRENT_PROJECT_VERSION = (?<buildNumber>\d+);/gm, `CURRENT_PROJECT_VERSION = ${newBuildNumber};`);
-    }
-  }
-
-  if (projectFileText !== updatedProjectFileText) {
-    console.log('Updating Xcode project version...');
-    fse.writeFileSync(projectFilePath, updatedProjectFileText);
   }
 }
 
