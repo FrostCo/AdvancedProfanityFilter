@@ -163,8 +163,9 @@ export default class Background {
   static async handleBackgroundDataRequest(request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
     const storage = await this.loadBackgroundStorage();
     const tabId = request.source == this.Constants.MESSAGING.CONTEXT ? sender.tab.id : request.tabId;
-    const response: BackgroundData = { disabledTab: false };
     const tabOptions = this.getTabOptions(storage, tabId);
+    const response: BackgroundData = { disabledTab: false };
+    let updated = false;
 
     if (
       tabOptions.disabled
@@ -177,7 +178,6 @@ export default class Background {
 
     if (request.source == this.Constants.MESSAGING.POPUP) return;
 
-    let updated = false;
     if (tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE) {
       tabOptions.disabledOnce = this.Constants.TAB_DISABLE_ONCE.DISABLED;
       updated = true;
