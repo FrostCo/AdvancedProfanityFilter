@@ -206,7 +206,7 @@ export default class Background {
   }
 
   static newTabOptions(storage: BackgroundStorage, tabId: number, options: TabStorageOptions = {}): TabStorageOptions {
-    const _defaults: TabStorageOptions = { status: 0, disabled: false, disabledOnce: this.Constants.TAB_DISABLE_ONCE.NOT_SET };
+    const _defaults: TabStorageOptions = { counters: {}, status: 0, disabled: false, disabledOnce: this.Constants.TAB_DISABLE_ONCE.NOT_SET };
     const tabOptions = Object.assign({}, _defaults, options) as TabStorageOptions;
     tabOptions.id = tabId;
     tabOptions.registeredAt = new Date().getTime();

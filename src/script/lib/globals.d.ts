@@ -73,6 +73,7 @@ interface Summary {
 }
 
 interface TabStorageOptions {
+  counters?: { number?: number };
   disabled?: boolean;
   disabledOnce?: number; // NOT_SET: 0, DISABLED: 1, WILL_DISABLE: 2
   id?: number;
