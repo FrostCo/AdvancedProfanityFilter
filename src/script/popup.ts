@@ -200,8 +200,10 @@ export default class Popup {
   }
 
   handleSummaryMessage(frameId: number, summary: Summary) {
-    this.updateSummaries(frameId, summary);
-    this.populateSummary();
+    if (Object.keys(summary).length) {
+      this.updateSummaries(frameId, summary);
+      this.populateSummary();
+    }
   }
 
   handleWordlistsEnabled() {
