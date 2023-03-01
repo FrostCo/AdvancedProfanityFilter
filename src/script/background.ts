@@ -306,7 +306,7 @@ export default class Background {
     sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
   }
 
-  static onContextMessageElse(chromeAction: typeof chrome.browserAction, request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
+  static async onContextMessageElse(chromeAction: typeof chrome.browserAction, request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
     // Update tab's status and set badge color
     if (request.status) {
       this.updateStatus(chromeAction, sender.tab.id, request.status, request.forceUpdate);
