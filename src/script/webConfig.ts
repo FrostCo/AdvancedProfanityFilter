@@ -1,59 +1,46 @@
-import Constants from './lib/constants';
-import Config from './lib/config';
-import { prettyPrintArray, stringArray } from './lib/helper';
-import Logger from './lib/logger';
-import * as Build from '../../.build.json';
+import Config from '@APF/lib/config';
+import { prettyPrintArray, stringArray } from '@APF/lib/helper';
+import Logger from '@APF/lib/logger';
+
+// __BUILD__ is injected by webpack from ROOT/.build.json
+/* eslint-disable-next-line @typescript-eslint/naming-convention */
+declare const __BUILD__: { config: any, manifestVersion: number, release: boolean, target: string, version: string };
+const BUILD_DEFAULTS = { config: {}, manifestVersion: 3, release: true, target: 'chrome', version: '1.0.0' };
 const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
   _lastSplitKeys: { [key: string]: number };
-  audioWordlistId: number;
   collectStats: boolean;
   contextMenu: boolean;
-  customAudioSites: AudioSites;
   darkMode: boolean;
   domains: { [site: string]: DomainCfg };
   enabledDomainsOnly: boolean;
   enabledFramesOnly: boolean;
-  fillerAudio: string;
-  muteAudio: boolean;
-  muteAudioOnly: boolean;
-  muteCueRequireShowing: boolean;
-  muteMethod: number;
   password: string;
-  showSubtitles: number;
   showUpdateNotification: boolean;
   syncLargeKeys: boolean;
-  youTubeAutoMatchCensored: boolean;
-  youTubeAutoSubsMax: number;
-  youTubeAutoSubsMin: number;
 
-  static readonly BUILD = Build;
-  static readonly _classDefaults = {
-    audioWordlistId: 0,
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  get Class() { return (this.constructor as typeof WebConfig); }
+  //#endregion
+
+  /* eslint-disable-next-line @typescript-eslint/naming-convention */
+  static readonly BUILD = typeof __BUILD__ == 'undefined' ? BUILD_DEFAULTS  : __BUILD__;
+  static readonly _webDefaults = {
     collectStats: true,
     contextMenu: true,
-    customAudioSites: null,
     darkMode: null,
     domains: {},
     enabledDomainsOnly: false,
     enabledFramesOnly: false,
-    fillerAudio: '',
-    muteAudio: false,
-    muteAudioOnly: false,
-    muteCueRequireShowing: false,
-    muteMethod: WebConfig.BUILD.config.muteMethod || Constants.MUTE_METHODS.TAB,
     password: null,
-    showSubtitles: Constants.SHOW_SUBTITLES.ALL,
     showUpdateNotification: false,
     syncLargeKeys: true,
-    youTubeAutoMatchCensored: true,
-    youTubeAutoSubsMax: 0,
-    youTubeAutoSubsMin: 0,
   };
 
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  static readonly _defaults = Object.assign({}, Config._defaults, WebConfig._classDefaults);
+  static _defaults = this.initializeDefaults({}, this._configDefaults, this._webDefaults) as WebConfig;
+  static _persistableKeys = Object.keys(this._defaults); // Make sure _defaults has already been assigned before this
   static readonly _localConfigKeys = ['domains', 'syncLargeKeys', 'words'];
   static readonly _localOnlyKeys = ['background', 'stats'];
   static readonly _maxSplitKeys = 64;
@@ -80,7 +67,7 @@ export default class WebConfig extends Config {
   static combineData(data, key: string): string[] {
     data[key] = {};
     if (data[`_${key}0`] !== undefined) {
-      const dataKeys = WebConfig.getDataContainerKeys(data, key);
+      const dataKeys = this.getDataContainerKeys(data, key);
 
       // Add all _[key]* to .[key] and remove _[key]*
       dataKeys.forEach((dataKey) => {
@@ -124,8 +111,8 @@ export default class WebConfig extends Config {
   }
 
   static getMaxSplitKeyFromData(data, key: string): number {
-    const keys = WebConfig.getDataContainerKeys(data, key);
-    return WebConfig.getMaxSplitKeyFromArray(keys);
+    const keys = this.getDataContainerKeys(data, key);
+    return this.getMaxSplitKeyFromArray(keys);
   }
 
   static getSyncStorage(keys: string | string[] | Record<string, unknown>) {
@@ -141,7 +128,7 @@ export default class WebConfig extends Config {
   }
 
   static includesLargeKeys(keys: string[]) {
-    return keys.some((key) => { return WebConfig._largeKeys.includes(key); });
+    return keys.some((key) => { return this._largeKeys.includes(key); });
   }
 
   // keys: Requested keys (defaults to all)
@@ -156,26 +143,21 @@ export default class WebConfig extends Config {
     let syncKeys = [];
 
     // No keys provided, load everything
-    if (keys.length === 0) {
-      keys = Object.keys(WebConfig._defaults);
-      keys.push('words'); // words is not part of _defaults
-    }
+    if (keys.length === 0) keys = this._persistableKeys;
 
     try {
-      if (WebConfig.includesLargeKeys(keys)) {
+      if (this.includesLargeKeys(keys)) {
         // Add syncLargeKeys if any largeKeys were requested
-        if (!keys.includes('syncLargeKeys')) {
-          keys.push('syncLargeKeys');
-        }
+        if (!keys.includes('syncLargeKeys')) keys.push('syncLargeKeys');
 
         // Load large keys from LocalStorage if necessary
-        WebConfig._localConfigKeys.forEach((localKey) => {
+        this._localConfigKeys.forEach((localKey) => {
           if (keys.includes(localKey)) {
             localKeys.push(localKey);
           }
         });
-        localData = await WebConfig.getLocalStorage(localKeys);
-        data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : WebConfig._defaults.syncLargeKeys;
+        localData = await this.getLocalStorage(localKeys);
+        data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : this._defaults.syncLargeKeys;
 
         if (data.syncLargeKeys === false) { // Use local storage for large keys
           // Add large keys from local storage to data
@@ -184,9 +166,9 @@ export default class WebConfig extends Config {
             if (localData[localKey] === undefined) {
               // 'words' are not included in Webconfig._defaults
               if (localKey === 'words') {
-                data[localKey] = WebConfig._defaultWords;
+                data[localKey] = this._defaultWords;
               } else {
-                data[localKey] = WebConfig._defaults[localKey];
+                data[localKey] = this._defaults[localKey];
               }
             } else {
               data[localKey] = localData[localKey];
@@ -194,7 +176,7 @@ export default class WebConfig extends Config {
           });
 
           // Get all keys from sync storage except the ones found in local storage
-          syncKeys = keys.filter((key) => { return !WebConfig._localConfigKeys.includes(key); });
+          syncKeys = keys.filter((key) => { return !this._localConfigKeys.includes(key); });
         } else { // Use sync storage for large keys
           // Get all keys from sync storage (except syncLargeKeys)
           syncKeys = keys.filter((key) => { return key !== 'syncLargeKeys'; });
@@ -207,37 +189,37 @@ export default class WebConfig extends Config {
       if (syncKeys.length) {
         // Prepare to get large keys from sync storage if needed
         let syncKeysSplit = [].concat(syncKeys);
-        WebConfig._largeKeys.forEach((largeKey) => {
+        this._largeKeys.forEach((largeKey) => {
           if (syncKeys.includes(largeKey)) {
             // Prepare to get split large keys (_words0..N)
             syncKeysSplit.splice(syncKeysSplit.indexOf(largeKey), 1);
-            syncKeysSplit = syncKeysSplit.concat(WebConfig.splitKeyNames(largeKey));
+            syncKeysSplit = syncKeysSplit.concat(this.splitKeyNames(largeKey));
           }
         });
 
-        const syncData = await WebConfig.getSyncStorage(syncKeysSplit);
+        const syncData = await this.getSyncStorage(syncKeysSplit);
         data._lastSplitKeys = {};
 
         syncKeys.forEach((key) => {
           // If we are getting large keys from sync storage combine them
-          if (WebConfig._largeKeys.includes(key)) {
+          if (this._largeKeys.includes(key)) {
             // Add values for large keys or fill in defaults
-            const splitKeys = WebConfig.combineData(syncData, key);
+            const splitKeys = this.combineData(syncData, key);
             if (splitKeys) {
-              data._lastSplitKeys[key] = WebConfig.getMaxSplitKeyFromArray(splitKeys);
+              data._lastSplitKeys[key] = this.getMaxSplitKeyFromArray(splitKeys);
               data[key] = syncData[key];
             } else { // Add defaults if nothing was returned
               data._lastSplitKeys[key] = 0;
               if (key === 'words') {
-                data[key] = WebConfig._defaultWords;
+                data[key] = this._defaultWords;
               } else {
-                data[key] = WebConfig._defaults[key];
+                data[key] = this._defaults[key];
               }
             }
           } else {
             // Assign values to data and fill in defaults for missing keys
             if (syncData[key] === undefined) {
-              data[key] = WebConfig._defaults[key];
+              data[key] = this._defaults[key];
             } else {
               data[key] = syncData[key];
             }
@@ -245,7 +227,7 @@ export default class WebConfig extends Config {
         });
       }
 
-      return new WebConfig(data);
+      return new this(data);
     } catch (err) {
       logger.error('Failed to load items.', keys, err);
       throw new Error(`Failed to load items: ${prettyPrintArray(keys)}. [${err.message}]`);
@@ -326,8 +308,11 @@ export default class WebConfig extends Config {
       throw new Error('Cannot be called directly, call load() instead.');
     }
 
-    super(); // Get the Config defaults
-    Object.assign(this, WebConfig._classDefaults, config); // Separate due to _defineProperty()
+    // Apply the Config defaults
+    super(config);
+
+    // Apply class defaults
+    Object.assign(this, this.Class._webDefaults, config);
   }
 
   // Order and remove `_` prefixed values
@@ -349,10 +334,10 @@ export default class WebConfig extends Config {
         if (key == 'syncLargeKeys') {
           // syncLargeKeys is always stored in local storage
           localKeys.push(key);
-        } else if (WebConfig._largeKeys.includes(key)) {
+        } else if (this.Class._largeKeys.includes(key)) {
           if (this.syncLargeKeys) {
             // Remove large keys from sync storage
-            syncKeys = syncKeys.concat(WebConfig.splitKeyNames(key));
+            syncKeys = syncKeys.concat(this.Class.splitKeyNames(key));
           } else {
             localKeys.push(key);
           }
@@ -363,10 +348,10 @@ export default class WebConfig extends Config {
 
       try {
         if (syncKeys.length) {
-          await WebConfig.removeSyncStorage(syncKeys);
+          await this.Class.removeSyncStorage(syncKeys);
         }
         if (localKeys.length) {
-          await WebConfig.removeLocalStorage(localKeys);
+          await this.Class.removeLocalStorage(localKeys);
         }
 
         keys.forEach((key) => {
@@ -381,8 +366,8 @@ export default class WebConfig extends Config {
 
   async reset() {
     try {
-      await WebConfig.resetSyncStorage();
-      await WebConfig.resetLocalStorage();
+      await this.Class.resetSyncStorage();
+      await this.Class.resetLocalStorage();
     } catch (err) {
       logger.error('Failed to clear storage.', err);
       throw new Error(`Failed to clear storage. ${err.message}`);
@@ -391,8 +376,8 @@ export default class WebConfig extends Config {
 
   async resetPreserveStats() {
     try {
-      await WebConfig.resetSyncStorage();
-      await WebConfig.removeLocalStorage(WebConfig._localConfigKeys);
+      await this.Class.resetSyncStorage();
+      await this.Class.removeLocalStorage(this.Class._localConfigKeys);
     } catch (err) {
       logger.error('Failed to clear storage.', err);
       throw new Error(`Failed to clear storage. ${err.message}`);
@@ -405,25 +390,22 @@ export default class WebConfig extends Config {
     const localData = {};
 
     // No keys provided, save everything
-    if (keys.length === 0) {
-      keys = Object.keys(WebConfig._defaults);
-      keys.push('words'); // words is not part of _defaults
-    }
+    if (keys.length === 0) keys = this._persistableKeys;
 
     let unusedSplitKeys = [];
     keys.forEach((key) => {
       if (key == 'syncLargeKeys') {
         // syncLargeKeys is always stored in local storage
         localData[key] = this[key];
-      } else if (WebConfig._largeKeys.includes(key)) {
+      } else if (this.Class._largeKeys.includes(key)) {
         if (this.syncLargeKeys) {
           Object.assign(syncData, this.splitData(key));
 
           // Check for any unused splitContainers
           if (this._lastSplitKeys) {
-            const newMaxSplitKey = WebConfig.getMaxSplitKeyFromData(syncData, key);
+            const newMaxSplitKey = this.Class.getMaxSplitKeyFromData(syncData, key);
             if (this._lastSplitKeys[key] > newMaxSplitKey) { // Split data was reduced
-              unusedSplitKeys = unusedSplitKeys.concat(WebConfig.splitKeyNames(key, newMaxSplitKey + 1));
+              unusedSplitKeys = unusedSplitKeys.concat(this.Class.splitKeyNames(key, newMaxSplitKey + 1));
             } else if (this._lastSplitKeys[key] < newMaxSplitKey) { // Split data was increased
               this._lastSplitKeys[key] = newMaxSplitKey;
             }
@@ -438,24 +420,24 @@ export default class WebConfig extends Config {
 
     try {
       // Safari won't store null values
-      if (Build.target === 'safari') {
+      if (this.Class.BUILD.target === 'safari') {
         const nullLocalKeys = Object.keys(localData).filter((key) => localData[key] == null);
         const nullSyncKeys = Object.keys(syncData).filter((key) => syncData[key] == null);
         if (nullLocalKeys.length) {
-          await WebConfig.removeLocalStorage(nullLocalKeys);
+          await this.Class.removeLocalStorage(nullLocalKeys);
           nullLocalKeys.forEach((key) => delete localData[key]);
         }
         if (nullSyncKeys.length) {
-          await WebConfig.removeSyncStorage(nullSyncKeys);
+          await this.Class.removeSyncStorage(nullSyncKeys);
           nullSyncKeys.forEach((key) => delete syncData[key]);
         }
       }
 
       if (Object.keys(syncData).length) {
-        await WebConfig.saveSyncStorage(syncData);
+        await this.Class.saveSyncStorage(syncData);
       }
       if (Object.keys(localData).length) {
-        await WebConfig.saveLocalStorage(localData);
+        await this.Class.saveLocalStorage(localData);
       }
       if (unusedSplitKeys.length) {
         await this.remove(unusedSplitKeys);
@@ -481,7 +463,7 @@ export default class WebConfig extends Config {
       newBytes += encoder.encode(JSON.stringify(this[key][item])).length;
 
       // Next word would be too big, setup next container
-      if ((currentBytes + newBytes) >= WebConfig._maxBytes) {
+      if ((currentBytes + newBytes) >= this.Class._maxBytes) {
         currentContainerNum++;
         currentContainer = `_${key}${currentContainerNum}`;
         data[currentContainer] = {};

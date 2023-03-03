@@ -1,110 +1,53 @@
+import type WebConfig from '@APF/webConfig';
+import Logger from '@APF/lib/logger';
+
+const logger = new Logger('OptionPage:Bookmarklet');
+
 export default class Bookmarklet {
-  hostedUrl: string;
+  code: string;
 
-  static readonly _defaultBookmarklet = 'https://raw.githubusercontent.com/FrostCo/AdvancedProfanityFilter/main/bookmarklet.js';
-  static readonly _defaultFilename = 'apfBookmarklet.js';
-  static readonly dropboxRegExp = /^https:\/\/www\.dropbox\.com\/[a-z]\/\w+?\/[\w\-\.]+?\?dl=0$/;
-  static readonly gitHubGistLinkRegExp = /^https:\/\/gist\.github\.com\/([\w\-]+?)\/([\w\-]+?)$/;
-  static readonly gitHubGistRawRegExp = /^https:\/\/gist\.githubusercontent\.com\/([\w\-]+?)\/([\w\-]+?)\/raw\/[\w\-]+?\/([\w\-.]+?)$/;
-  static readonly githubRawRegExp = /^https:\/\/raw\.githubusercontent\.com\/([\w-]+?)\/([\w-]+?)\/([\w-]+?)\/([\w-.]+?)$/;
-  static readonly googleDriveRegExp = /^https:\/\/drive\.google\.com\/file\/[a-z]\/(.+?)\/view/;
+  static async create() {
+    const code = await this.loadCode();
+    if (code) return new this(code);
+  }
 
-  // Input (share link): https://www.dropbox.com/s/id/apfBookmarklet.js?dl=0
-  // Output: https://dl.dropbox.com/s/id/apfBookmarklet.js?raw=1
-  static dropboxDownloadURL(url: string): string {
-    const match = url.match(Bookmarklet.dropboxRegExp);
-    if (match) {
-      return url.replace(/\/www\./, '/dl.').replace(/\?dl=0/, '?raw=1');
+  static async loadCode() {
+    try {
+      const origURL = './bookmarkletFilter.js';
+      const response = await fetch(origURL);
+      return await response.text();
+    } catch (err) {
+      logger.warn('Failed to load bookmarklet script.', err);
     }
-    return url;
   }
 
-  // Input: https://raw.githubusercontent.com/user/project/branch/apfBookmarklet.js
-  // Output: https://cdn.jsdelivr.net/gh/user/project@branch/apfBookmarklet.js
-  static githubDownloadURL(url: string): string {
-    const match = url.match(Bookmarklet.githubRawRegExp);
-    if (match && match[1] && match[2] && match[3] && match[4]) {
-      const user = match[1];
-      const project = match[2];
-      const branch = match[3];
-      const filename = match[4];
-      return `https://cdn.jsdelivr.net/gh/${user}/${project}@${branch}/${filename}`;
-    }
-    return url;
+  constructor(code: string) {
+    this.code = code;
   }
 
-  // Input (raw): https://gist.githubusercontent.com/user/gist_id/raw/revision_id/apfBookmarklet.js
-  // Input (uses default filename): https://gist.github.com/user/gist_id
-  // Output: https://cdn.statically.io/gist/user/gist_id/raw/apfBookmarklet.js?env=dev
-  static gitHubGistDownloadURL(url: string): string {
-    let match = url.match(Bookmarklet.gitHubGistRawRegExp);
-    if (match && match[1] && match[2]) {
-      const user = match[1];
-      const gistId = match[2];
-      const filename = match[3];
-      return `https://cdn.statically.io/gist/${user}/${gistId}/raw/${filename}?env=dev`;
-    } else {
-      match = url.match(Bookmarklet.gitHubGistLinkRegExp);
-      if (match && match[1] && match[2]) {
-        const user = match[1];
-        const gistId = match[2];
-        return `https://cdn.statically.io/gist/${user}/${gistId}/raw/${Bookmarklet._defaultFilename}?env=dev`;
-      }
-    }
-
-    return url;
-  }
-
-  // Input (share link): https://drive.google.com/file/d/id/view?usp=sharing
-  // Output: https://drive.google.com/uc?export=view&id=id
-  static googleDriveDownloadURL(url: string): string {
-    const match = url.match(Bookmarklet.googleDriveRegExp);
-    if (match && match[1]) {
-      return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-    }
-    return url;
-  }
-
-  static processDownloadURL(url: string): string {
-    const originalUrl = url;
-    if (originalUrl === url) { url = Bookmarklet.dropboxDownloadURL(url); }
-    if (originalUrl === url) { url = Bookmarklet.githubDownloadURL(url); }
-    if (originalUrl === url) { url = Bookmarklet.gitHubGistDownloadURL(url); }
-    if (originalUrl === url) { url = Bookmarklet.googleDriveDownloadURL(url); }
-    return url;
-  }
-
-  static async injectConfig(config = null): Promise<string> {
+  customizedCode(cfg: WebConfig): string {
     const prefix = '/* @preserve - Start User Config */';
-    const postfix = '/* @preserve - End User Config */';
-    const configRegExp = new RegExp(`${prefix.replace(/[\/\*]/g, '\\$&')}[\\S\\s]\*${postfix.replace(/[\/\*]/g, '\\$&')}`, 'm');
-    const origURL = './bookmarkletFilter.js';
-
-    const response = await fetch(origURL);
-    const code = await response.text();
+    const suffix = '/* @preserve - End User Config */';
+    const configRegExp = new RegExp(`${prefix.replace(/[\/\*]/g, '\\$&')}[\\S\\s]\*${suffix.replace(/[\/\*]/g, '\\$&')}`, 'm');
 
     try {
-      const cfgCode = code.match(configRegExp).toString();
-      const variableCode = cfgCode.match(/const ([a-z])=/m);
+      const cfgCode = this.code.match(configRegExp).toString();
+      const variableCode = cfgCode.match(/const ([a-zA-Z_$]+)=/m);
       if (variableCode && variableCode[1]) {
         const variableName = variableCode[1];
-        return code.replace(configRegExp, `${prefix}\nconst ${variableName}=${JSON.stringify(config)}\n${postfix}`);
+        return this.code.replace(configRegExp, `${prefix}\nconst ${variableName}=${JSON.stringify(cfg)};\n${suffix}\n`);
       } else {
         throw new Error('Unable to set user config - using defaults.');
       }
     } catch (err) {
       window.alert(err.message);
-      return code;
+      return this.code;
     }
   }
 
-  constructor(url: string) {
-    this.hostedUrl = Bookmarklet.processDownloadURL(url);
-  }
-
-  destination(): string {
-    const prefix = '(function(){if(!document.querySelector("script.apfBookmarklet")){const apfScriptEl=document.body.appendChild(document.createElement("script"));apfScriptEl.type="text/javascript";apfScriptEl.src="';
-    const postfix = '";apfScriptEl.className="apfBookmarklet";}})()';
-    return 'javascript:' + encodeURIComponent(prefix + this.hostedUrl + postfix);
+  href(cfg: WebConfig = null): string {
+    const prefix = 'javascript:';
+    const code = cfg ? this.customizedCode(cfg) : this.code;
+    return prefix + code;
   }
 }

@@ -161,19 +161,6 @@ div#wordsPage input#substitutionText {
   display: inline;
 }
 
-/* Audio */
-#supportedAudioSitesStatus, #supportedAudioSitesStatus:hover {
-  color: #fff;
-  display: inline-block;
-  margin-bottom: 15px;
-  text-decoration: none;
-}
-
-#supportedAudioSitesConfig {
-  display: block;
-  margin-bottom: 15px;
-}
-
 /* Bookmarklet */
 a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited {
   color: #fff;
@@ -191,14 +178,8 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   z-index: 900;
 }
 
-#bulkWordEditorModal, #supportedAudioSitesModal {
+#bulkWordEditorModal {
   z-index: 500;
-}
-
-#supportedAudioSitesModal textarea {
-  width: 420px;
-  height: 400px;
-  font-size: 11px;
 }
 
 /* Bulk Word Editor */

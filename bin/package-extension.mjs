@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import AdmZip from 'adm-zip';
+import { globbySync } from 'globby';
 import { buildFilePath, loadJSONFile, removeFiles } from './lib.mjs';
 
 let buildData;
@@ -8,6 +9,14 @@ const dist = './dist/';
 function buildArchive() {
   const zip = new AdmZip();
   zip.addLocalFolder(dist, null);
+
+  // Remove unwanted files
+  const filesToRemove = globbySync(['dist/**/*.LICENSE.txt']);
+  for (const file of filesToRemove) {
+    const entry = file.replace(/^dist\//, '');
+    zip.deleteFile(entry);
+  }
+
   return zip;
 }
 

@@ -1,6 +1,6 @@
 // findAndReplaceDOMText v 0.4.6
 // @author James Padolsey http://james.padolsey.com
-// @license http://unlicense.org/UNLICENSE
+// license http://unlicense.org/UNLICENSE (Remove "@" prefix to prevent being added by webpack bundle)
 //
 // Matches the text of a DOM node against a regular expression
 // and replaces each match (or node-separated portions of the match)

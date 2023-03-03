@@ -24,9 +24,13 @@ export default class Config {
   words: { [key: string]: WordOptions };
   wordSubSeparator: string;
 
+  protected static initializeDefaults(...defaults) {
+    return Object.assign({}, this._configDefaults, ...defaults);
+  }
+
   static readonly _allWordlists = ['All words'];
 
-  static readonly _defaults = {
+  static readonly _configDefaults = {
     censorCharacter: '*',
     censorFixedLength: 0,
     defaultSubstitution: 'censored',
@@ -47,6 +51,7 @@ export default class Config {
     wordlistId: 0,
     wordlists: ['Wordlist 1', 'Wordlist 2', 'Wordlist 3', 'Wordlist 4', 'Wordlist 5', 'Wordlist 6'],
     wordlistsEnabled: true,
+    words: undefined,
     wordSubSeparator: ';;',
   };
 
@@ -84,8 +89,16 @@ export default class Config {
     'whore': { lists: [], matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'tramp' },
   };
 
+  // Extending: Sub classes should pass in additional config defaults
+  static _defaults = this.initializeDefaults(this._configDefaults) as Config;
+  static _persistableKeys = Object.keys(this._defaults); // Make sure _defaults has already been assigned before this
+
   constructor(data: Record<string, unknown> = {}) {
     Object.assign(this, Config._defaults, data);
+  }
+
+  get _persistableKeys(): string[] {
+    return (this.constructor as typeof Config)._persistableKeys;
   }
 
   addWord(str: string, options: WordOptions = this.defaultWordOptions()) {

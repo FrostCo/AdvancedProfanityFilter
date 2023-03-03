@@ -181,6 +181,10 @@ export function isVersionOlder(version: Version, minimum: Version): boolean {
   return false;
 }
 
+export function lastElement(array: any[]): any {
+  return array[array.length - 1];
+}
+
 export function makeBackgroundRequest(url: string, method: string, source = 'context') {
   return new Promise((resolve, reject) => {
     const message: Message = { destination: 'background', fetch: url, fetchMethod: method.toUpperCase(), source: source };

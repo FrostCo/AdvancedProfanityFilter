@@ -5,9 +5,7 @@ import { buildFilePath, devBuildFilePath, loadJSONFile, parseArgv, releaseBuildF
 
 let data = {
   release: false,
-  config: {
-    muteMethod: null,
-  },
+  config: {},
   manifestVersion: 2,
   target: 'chrome',
   version: '1.0.0',
@@ -36,11 +34,6 @@ function edgeLegacyBuild() {
 
 function firefoxBuild() {
   data.target = 'firefox';
-}
-
-function iOSBuild() {
-  data.target = 'ios';
-  data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
 }
 
 function main() {
@@ -78,17 +71,11 @@ function main() {
       case '--firefox':
         firefoxBuild();
         break;
-      case '--ios':
-        iOSBuild();
-        break;
       case '--manifestV2':
         manifestV2Build();
         break;
       case '--manifestV3':
         manifestV3Build();
-        break;
-      case '--safari':
-        safariBuild();
         break;
       default:
         defaultBuild();
@@ -113,19 +100,12 @@ function manifestV3Build() {
   data.manifestVersion = 3;
 }
 
-function safariBuild() {
-  data.target = 'safari';
-  data.config.muteMethod = 2; // Constants.MUTE_METHODS.VIDEO_MUTE;
-}
-
 function targetFromData() {
   switch (data.target) {
     case 'chrome':
       return `--manifestV${data.manifestVersion}`;
     case 'bookmarklet':
     case 'firefox:':
-    case 'ios':
-    case 'safari':
       return `--${data.target}`;
   }
 }

@@ -1,12 +1,18 @@
-import Constants from './lib/constants';
-import { booleanToNumber, getVersion, isVersionOlder } from './lib/helper';
-import WebConfig from './webConfig';
+import Constants from '@APF/lib/constants';
+import { booleanToNumber, getVersion, isVersionOlder } from '@APF/lib/helper';
+import WebConfig from '@APF/webConfig';
 
 export default class DataMigration {
   cfg: WebConfig;
 
-  // Only append so the order stays the same (oldest first).
-  static readonly migrations: Migration[] = [
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  static get Config() { return WebConfig; }
+  static get Constants() { return Constants; }
+  get Class() { return (this.constructor as typeof DataMigration); }
+  //#endregion
+
+  static readonly _migrations: Migration[] = [
     { version: '1.0.13', name: 'moveToNewWordsStorage', runOnImport: false, async: true },
     { version: '1.1.0', name: 'sanitizeWords', runOnImport: true },
     { version: '1.2.0', name: 'singleWordSubstitution', runOnImport: true },
@@ -15,34 +21,49 @@ export default class DataMigration {
     { version: '2.7.0', name: 'addWordlistsToWords', runOnImport: true },
     { version: '2.7.0', name: 'removeGlobalMatchMethod', runOnImport: true },
     { version: '2.7.0', name: 'removeOldDomainArrays', runOnImport: true },
-    { version: '2.12.0', name: 'overwriteMuteCueRequireShowingDefault', runOnImport: false },
     { version: '2.22.0', name: 'updateWordRepeatAndSeparatorDataTypes', runOnImport: true },
     { version: '2.26.0', name: 'changeShowUpdateNotificationDefaultToFalse', runOnImport: false },
     { version: '2.40.0', name: 'renameToWordAllowlist', runOnImport: true, async: true },
   ];
 
-  constructor(config) {
-    this.cfg = config;
-  }
+  // Can add more migrations in children classes
+  static migrations = this.compileMigrations();
 
   static async build() {
-    const cfg = await WebConfig.load();
-    return new DataMigration(cfg);
+    const cfg = this.loadCfg();
+    return new this(cfg);
+  }
+
+  static compileMigrations(...migrations: Migration[][]) {
+    return this._migrations.concat(...migrations).sort(this.sortByVersions);
   }
 
   static latestMigration(): Migration {
-    return DataMigration.migrations[DataMigration.migrations.length - 1];
+    return this.migrations[this.migrations.length - 1];
+  }
+
+  static async loadCfg() {
+    return await this.Config.load();
   }
 
   static migrationNeeded(oldVersion: string): boolean {
-    return isVersionOlder(getVersion(oldVersion), getVersion(DataMigration.latestMigration().version));
+    return isVersionOlder(getVersion(oldVersion), getVersion(this.latestMigration().version));
+  }
+
+  static sortByVersions(a: Migration, b: Migration) {
+    if (a.version == b.version) return 0;
+    return isVersionOlder(getVersion(a.version), getVersion(b.version)) ? -1 : 1;
+  }
+
+  constructor(config) {
+    this.cfg = config;
   }
 
   // TODO: Only tested with arrays
   _renameConfigKeys(oldCfg: WebConfig, oldKeys: string[], mapping: {[key: string]: string}) {
     for (const oldKey of oldKeys) {
       const newKey = mapping[oldKey];
-      if (!oldCfg[oldKey]) oldCfg[oldKey] = WebConfig._defaults[newKey];
+      if (!oldCfg[oldKey]) oldCfg[oldKey] = this.Class.Config._defaults[newKey];
       if (oldCfg[oldKey].length) {
         if (this.cfg[newKey].length) throw new Error(`'${oldKey}' and '${newKey}' both exist. Please combine them manually into '${newKey}'.`);
         this.cfg[newKey] = oldCfg[oldKey];
@@ -65,7 +86,7 @@ export default class DataMigration {
   async byVersion(oldVersion: string) {
     const version = getVersion(oldVersion) as Version;
     let migrated = false;
-    for (const migration of DataMigration.migrations) {
+    for (const migration of (this.constructor as typeof DataMigration).migrations) {
       if (isVersionOlder(version, getVersion(migration.version))) {
         migrated = true;
         if (migration.async) await this[migration.name]();
@@ -80,10 +101,10 @@ export default class DataMigration {
   fixSmartWatch() {
     const cfg = this.cfg;
     const originalWord = 'twat';
-    const originalWordConf = { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, sub: 'dumbo' };
+    const originalWordConf = { matchMethod: this.Class.Constants.MATCH_METHODS.PARTIAL, repeat: true, sub: 'dumbo' };
     const update = {
-      twat: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'dumbo' },
-      twats: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'dumbos' }
+      twat: { matchMethod: this.Class.Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'dumbo' },
+      twats: { matchMethod: this.Class.Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'dumbos' }
     };
 
     if (
@@ -100,19 +121,10 @@ export default class DataMigration {
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
   async moveToNewWordsStorage() {
     const oldWordsKey = 'words';
-    const oldCfg = await WebConfig.getSyncStorage(oldWordsKey) as any;
+    const oldCfg = await this.Class.Config.getSyncStorage(oldWordsKey) as any;
     if (oldCfg.words) {
-      await WebConfig.saveSyncStorage({ _words0: oldCfg.words });
-      await WebConfig.removeSyncStorage(oldWordsKey);
-    }
-  }
-
-  // This setting has caused some issues for users specifically with Disney+.
-  // This migration should only run once, and sets it to the new default of false.
-  overwriteMuteCueRequireShowingDefault() {
-    const cfg = this.cfg;
-    if (cfg.muteCueRequireShowing === true) {
-      cfg.muteCueRequireShowing = false;
+      await this.Class.Config.saveSyncStorage({ _words0: oldCfg.words });
+      await this.Class.Config.removeSyncStorage(oldWordsKey);
     }
   }
 
@@ -123,7 +135,7 @@ export default class DataMigration {
         const word = cfg.words[name];
         // Move RegExp from 4 to 3
         if (word.matchMethod === 4) {
-          word.matchMethod = Constants.MATCH_METHODS.REGEX;
+          word.matchMethod = this.Class.Constants.MATCH_METHODS.REGEX;
         }
       });
       cfg.remove('globalMatchMethod');
@@ -155,11 +167,11 @@ export default class DataMigration {
     const oldKeys = Object.keys(mapping);
 
     // Handle chrome storage config
-    if (WebConfig.chromeStorageAvailable()) {
-      const oldCfg = await WebConfig.getSyncStorage(oldKeys) as any;
-      if (Object.keys(oldCfg).some(k => oldKeys.includes(k))) {
+    if (this.Class.Config.chromeStorageAvailable()) {
+      const oldCfg = await this.Class.Config.getSyncStorage(oldKeys) as any;
+      if (Object.keys(oldCfg).some((k) => oldKeys.includes(k))) {
         this._renameConfigKeys(oldCfg, oldKeys, mapping);
-        await WebConfig.removeSyncStorage(oldKeys);
+        await this.Class.Config.removeSyncStorage(oldKeys);
       }
     }
 
@@ -170,7 +182,7 @@ export default class DataMigration {
   async runImportMigrations() {
     let migrated = false;
 
-    for (const migration of DataMigration.migrations) {
+    for (const migration of (this.constructor as typeof DataMigration).migrations) {
       if (migration.runOnImport) {
         migrated = true;
         if (migration.async) await this[migration.name]();
@@ -257,6 +269,6 @@ export default class DataMigration {
 
   // [2.26.0]
   changeShowUpdateNotificationDefaultToFalse() {
-    this.cfg.showUpdateNotification = WebConfig._defaults.showUpdateNotification;
+    this.cfg.showUpdateNotification = this.Class.Config._defaults.showUpdateNotification;
   }
 }

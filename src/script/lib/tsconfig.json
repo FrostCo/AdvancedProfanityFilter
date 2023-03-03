@@ -5,7 +5,7 @@
     "noEmit": false,
     "outDir": "../../../dist-lib",
     "skipLibCheck": true,
-    "target": "es6"
+    "target": "esnext"
   },
   "include": [
     "*.ts"

@@ -1,16 +1,16 @@
-import Constants from './lib/constants';
-import WebConfig from './webConfig';
-import Filter from './lib/filter';
-import Domain from './domain';
-import OptionAuth from './optionAuth';
-import DataMigration from './dataMigration';
-import Bookmarklet from './bookmarklet';
-import WebAudio from './webAudio';
-import Logger from './lib/logger';
+import Constants from '@APF/lib/constants';
+import WebConfig from '@APF/webConfig';
+import Filter from '@APF/lib/filter';
+import Domain from '@APF/domain';
+import OptionAuth from '@APF/optionAuth';
+import DataMigration from '@APF/dataMigration';
+import Bookmarklet from '@APF/bookmarklet';
+import Logger from '@APF/lib/logger';
 import {
   booleanToNumber,
   dynamicList,
   exportToFile,
+  lastElement,
   numberToBoolean,
   numberWithCommas,
   readFile,
@@ -18,16 +18,33 @@ import {
   removeFromArray,
   stringArray,
   upperCaseFirst
-} from './lib/helper';
+} from '@APF/lib/helper';
+
+const logger = new Logger('OptionPage');
 
 export default class OptionPage {
+  _confirmEventListeners: { (): void; } [];
   auth: OptionAuth;
+  bookmarklet: Bookmarklet;
   cfg: WebConfig;
   darkModeButton: Element;
+  filter: Filter;
+  lessUsedWords: { [word: string]: number };
   lightModeButton: Element;
   prefersDarkScheme: boolean;
-  supportedAudioSites: AudioSites;
   themeElements: Element[];
+
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  static get Bookmarklet() { return Bookmarklet; }
+  static get Config() { return WebConfig; }
+  static get Constants() { return Constants; }
+  static get DataMigration() { return DataMigration; }
+  static get Domain() { return Domain; }
+  static get Filter() { return Filter; }
+  static get OptionAuth() { return OptionAuth; }
+  get Class() { return (this.constructor as typeof OptionPage); }
+  //#endregion
 
   static readonly activeClass = 'w3-flat-belize-hole';
   static readonly themeElementSelectors = [
@@ -37,7 +54,7 @@ export default class OptionPage {
   ];
 
   static closeModal(id: string) {
-    OptionPage.hide(document.getElementById(id));
+    this.hide(document.getElementById(id));
   }
 
   static configureConfirmModal(settings: ConfirmModalSettings = {}, contentElement?: HTMLElement) {
@@ -65,11 +82,11 @@ export default class OptionPage {
     modalContent.appendChild(contentElement);
     modalHeader.className = `w3-container ${settings.titleClass}`;
     if (settings.backup) {
-      OptionPage.show(backupButtonContainer);
-      OptionPage.enableBtn(backupButton);
+      this.show(backupButtonContainer);
+      this.enableBtn(backupButton);
     } else {
-      OptionPage.hide(backupButtonContainer);
-      OptionPage.disableBtn(backupButton);
+      this.hide(backupButtonContainer);
+      this.disableBtn(backupButton);
     }
   }
 
@@ -103,10 +120,10 @@ export default class OptionPage {
   static handleError(message: string, error?: Error) {
     if (error) {
       logger.error(message, error);
-      OptionPage.showErrorModal([message, `Error: ${error.message}`]);
+      this.showErrorModal([message, `Error: ${error.message}`]);
     } else {
       logger.error(message);
-      OptionPage.showErrorModal([message]);
+      this.showErrorModal([message]);
     }
   }
 
@@ -126,7 +143,7 @@ export default class OptionPage {
 
   static hideStatus() {
     const notificationPanel = document.getElementById('notificationPanel') as HTMLElement;
-    OptionPage.hide(notificationPanel);
+    this.hide(notificationPanel);
   }
 
   static isStorageError(error: Error): boolean {
@@ -145,7 +162,7 @@ export default class OptionPage {
   }
 
   static openModal(id: string) {
-    OptionPage.show(document.getElementById(id));
+    this.show(document.getElementById(id));
   }
 
   static show(element: HTMLElement) {
@@ -155,7 +172,7 @@ export default class OptionPage {
 
   static showErrorModal(content: string | string[] = ['The requested action failed. Please try again or contact support.'], title = 'Error', titleColor = 'w3-red') {
     this.configureStatusModal(content, title, titleColor);
-    OptionPage.openModal('statusModal');
+    this.openModal('statusModal');
   }
 
   static showInputError(element, message = '') {
@@ -165,29 +182,31 @@ export default class OptionPage {
         element.setCustomValidity(message);
         element.reportValidity();
       } catch (err) {
-        OptionPage.showWarningModal(message);
+        this.showWarningModal(message);
       }
     }
   }
 
   static showStatusModal(content: string | string[] = ['Status updated.'], title = 'Status', titleColor = 'w3-flat-peter-river') {
     this.configureStatusModal(content, title, titleColor);
-    OptionPage.openModal('statusModal');
+    this.openModal('statusModal');
   }
 
   static showWarningModal(content: string | string[] = ['Invalid input.'], title = 'Warning', titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
-    OptionPage.openModal('statusModal');
+    this.openModal('statusModal');
   }
 
   constructor() {
+    this._confirmEventListeners = [];
     this.darkModeButton = document.querySelector('div.themes > div.moon');
     this.lightModeButton = document.querySelector('div.themes > div.sun');
-    this.themeElements = OptionPage.themeElementSelectors.map((selector) => {
+    this.themeElements = this.Class.themeElementSelectors.map((selector) => {
       return Array.from(document.querySelectorAll(selector));
     }).flat();
     this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
     this.setHelpVersion();
+    this.filter = new this.Class.Filter;
   }
 
   applyDarkTheme(allElements = true) {
@@ -294,11 +313,11 @@ export default class OptionPage {
     cellSubCase.appendChild(subCaseInput);
 
     const matchMethodSelect = document.createElement('select');
-    Constants.orderedArray(Constants.MATCH_METHODS).forEach((matchMethod, index) => {
+    this.Class.Constants.orderedArray(this.Class.Constants.MATCH_METHODS).forEach((matchMethod, index) => {
       const matchMethodUpper = matchMethod.toUpperCase();
       const optionElement = document.createElement('option');
-      optionElement.value = Constants.MATCH_METHODS[matchMethodUpper].toString();
-      optionElement.classList.add(`bulkMatchMethod${Constants.MATCH_METHODS[matchMethodUpper]}`);
+      optionElement.value = this.Class.Constants.MATCH_METHODS[matchMethodUpper].toString();
+      optionElement.classList.add(`bulkMatchMethod${this.Class.Constants.MATCH_METHODS[matchMethodUpper]}`);
       optionElement.textContent = matchMethod;
       matchMethodSelect.appendChild(optionElement);
     });
@@ -408,16 +427,16 @@ export default class OptionPage {
 
     try {
       await this.cfg.save('words');
-      OptionPage.closeModal('bulkWordEditorModal');
-      OptionPage.showStatusModal('Words saved successfully.');
-      filter.rebuildWordlists();
+      this.Class.closeModal('bulkWordEditorModal');
+      this.Class.showStatusModal('Words saved successfully.');
+      this.filter.rebuildWordlists();
       this.populateOptions();
     } catch (err) {
-      if (OptionPage.isStorageError(err) && this.cfg.syncLargeKeys) {
+      if (this.Class.isStorageError(err) && this.cfg.syncLargeKeys) {
         this.confirm('bulkEditorSaveRetry');
       } else {
         logger.warn('Failed to save.', err);
-        OptionPage.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
+        this.Class.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
       }
     }
   }
@@ -426,10 +445,10 @@ export default class OptionPage {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     configSyncLargeKeys.checked = false;
     try {
-      await this.convertStorageLocation(true);
+      await this.convertStorageLocation(null, true);
       await this.bulkEditorSave();
     } catch (err) {
-      OptionPage.handleError('Failed to save.', err);
+      this.Class.handleError('Failed to save.', err);
     }
   }
 
@@ -497,28 +516,25 @@ export default class OptionPage {
     const input = document.getElementById('configInlineInput') as HTMLInputElement;
     const configText = document.getElementById('configText') as HTMLTextAreaElement;
     if (input.checked) {
-      OptionPage.show(configText);
+      this.Class.show(configText);
       this.exportConfig();
     } else {
-      OptionPage.hide(configText);
+      this.Class.hide(configText);
       configText.value = '';
     }
   }
 
   async confirm(action: string) {
     const cancel = document.getElementById('confirmModalCancel');
-    cancel.removeEventListener('click', populateConfig);
-    cancel.removeEventListener('click', importConfigRetryCancel);
     const ok = document.getElementById('confirmModalOK');
-    ok.removeEventListener('click', bulkEditorSave);
-    ok.removeEventListener('click', bulkEditorSaveRetry);
-    ok.removeEventListener('click', convertStorageLocation);
-    ok.removeEventListener('click', importConfig);
-    ok.removeEventListener('click', importConfigRetry);
-    ok.removeEventListener('click', removeAllWords);
-    ok.removeEventListener('click', restoreDefaults);
-    ok.removeEventListener('click', setPassword);
-    ok.removeEventListener('click', statsReset);
+
+    // Cleanup old event listeners
+    for (const listener of this._confirmEventListeners) {
+      cancel.removeEventListener('click', listener);
+      ok.removeEventListener('click', listener);
+    }
+    this._confirmEventListeners = [];
+
     const content = document.createElement('span');
     const paragraph = document.createElement('p');
     const italics = document.createElement('i');
@@ -530,19 +546,21 @@ export default class OptionPage {
         italics.textContent = 'Make sure you have a backup first!';
         content.appendChild(paragraph);
         content.appendChild(italics);
-        OptionPage.configureConfirmModal({ backup: true }, content);
-        ok.addEventListener('click', bulkEditorSave);
+        this.Class.configureConfirmModal({ backup: true }, content);
+        this._confirmEventListeners.push(this.bulkEditorSave.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'bulkEditorSaveRetry':
         paragraph.textContent = 'Failed to save changes because they were too large to be stored. Retry using local storage?';
         italics.textContent = 'Local storage can store more, but things like words and domains will no longer sync between devices.';
         content.appendChild(paragraph);
         content.appendChild(italics);
-        OptionPage.configureConfirmModal({ backup: true, titleClass: 'w3-red' }, content);
-        ok.addEventListener('click', bulkEditorSaveRetry);
+        this.Class.configureConfirmModal({ backup: true, titleClass: 'w3-red' }, content);
+        this._confirmEventListeners.push(this.bulkEditorSaveRetry.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'convertStorageLocation':
-        if (option.cfg.syncLargeKeys) {
+        if (this.cfg.syncLargeKeys) {
           paragraph.textContent = 'This will prevent large settings like words and domains from syncing, but allow you to store more.';
         } else {
           paragraph.textContent = 'This will allow large settings like words and domains to sync, but has stricter limits on how much you can store.';
@@ -550,50 +568,60 @@ export default class OptionPage {
         italics.textContent = 'Make sure you have a backup first!';
         content.appendChild(paragraph);
         content.appendChild(italics);
-        OptionPage.configureConfirmModal({ backup: true }, content);
-        cancel.addEventListener('click', populateConfig);
-        ok.addEventListener('click', convertStorageLocation);
+        this.Class.configureConfirmModal({ backup: true }, content);
+        this._confirmEventListeners.push(this.populateConfig.bind(this));
+        cancel.addEventListener('click', lastElement(this._confirmEventListeners));
+        this._confirmEventListeners.push(this.convertStorageLocation.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfig':
-        OptionPage.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
-        ok.addEventListener('click', importConfig);
+        this.Class.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
+        this._confirmEventListeners.push(this.importConfig.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfigRetry':
         paragraph.textContent = 'Import failed due to storage limitations. Would you like to try again using local storage?';
         italics.textContent = 'Local storage can store more, but things like words and domains will no longer sync between devices.';
         content.appendChild(paragraph);
         content.appendChild(italics);
-        OptionPage.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
-        ok.addEventListener('click', importConfigRetry);
-        cancel.addEventListener('click', importConfigRetryCancel);
+        this.Class.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
+        this._confirmEventListeners.push(this.importConfigRetryCancel.bind(this));
+        cancel.addEventListener('click', lastElement(this._confirmEventListeners));
+        this._confirmEventListeners.push(this.importConfigRetry.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'removeAllWords':
         paragraph.textContent = 'Are you sure you want to remove all words?';
         content.appendChild(paragraph);
-        OptionPage.configureConfirmModal({ backup: true }, content);
-        ok.addEventListener('click', removeAllWords);
+        this.Class.configureConfirmModal({ backup: true }, content);
+        this._confirmEventListeners.push(this.removeAllWords.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'removeLessUsedWords':
         validated = this.validateLessUsedWordsNumber();
         if (validated) {
-          await option.prepareLessUsedWords();
-          if (Object.keys(lessUsedWords).length) {
-            OptionPage.configureConfirmModal({ backup: true, content: `Are you sure you want to remove ${Object.keys(lessUsedWords).length} words?` });
-            ok.addEventListener('click', removeLessUsedWords);
+          await this.prepareLessUsedWords();
+          if (Object.keys(this.lessUsedWords).length) {
+            this.Class.configureConfirmModal({ backup: true, content: `Are you sure you want to remove ${Object.keys(this.lessUsedWords).length} words?` });
+            this._confirmEventListeners.push(this.removeLessUsedWords.bind(this));
+            ok.addEventListener('click', lastElement(this._confirmEventListeners));
           } else {
-            OptionPage.configureConfirmModal(
-              { content: 'All words have been filtered more times than the provided number.\n\nTry increasing the number to include more words.' }
+            validated = false;
+            this.Class.showStatusModal(
+              'All words have been filtered more times than the provided number.\n\nTry increasing the number to include more words.'
             );
           }
         }
         break;
       case 'statsReset':
-        OptionPage.configureConfirmModal({ content: 'Are you sure you want to reset filter statistics?' });
-        ok.addEventListener('click', statsReset);
+        this.Class.configureConfirmModal({ content: 'Are you sure you want to reset filter statistics?' });
+        this._confirmEventListeners.push(this.statsReset.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'restoreDefaults':
-        OptionPage.configureConfirmModal({ content: 'Are you sure you want to restore defaults?', backup: true });
-        ok.addEventListener('click', restoreDefaults);
+        this.Class.configureConfirmModal({ content: 'Are you sure you want to restore defaults?', backup: true });
+        this._confirmEventListeners.push(this.restoreDefaults.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'setPassword': {
         const passwordText = document.getElementById('setPassword') as HTMLInputElement;
@@ -601,14 +629,15 @@ export default class OptionPage {
         if (passwordBtn.classList.contains('disabled')) return false;
 
         const message = passwordText.value == '' ? 'Are you sure you want to remove the password?' : `Are you sure you want to set the password to '${passwordText.value}'?`;
-        OptionPage.configureConfirmModal({ content: message });
-        ok.addEventListener('click', setPassword);
+        this.Class.configureConfirmModal({ content: message });
+        this._confirmEventListeners.push(this.auth.setPassword.bind(this.auth));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       }
     }
 
     if (validated) {
-      OptionPage.openModal('confirmModal');
+      this.Class.openModal('confirmModal');
     }
   }
 
@@ -616,51 +645,63 @@ export default class OptionPage {
     const backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
     if (!backupButton.classList.contains('disabled')) {
       this.backupConfig();
-      OptionPage.disableBtn(backupButton);
+      this.Class.disableBtn(backupButton);
     }
   }
 
-  async convertStorageLocation(silent = false) {
+  async convertStorageLocation(evt: Event = null, silent = false) {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
-    option.cfg.syncLargeKeys = configSyncLargeKeys.checked;
-    const keys = WebConfig._localConfigKeys;
+    this.cfg.syncLargeKeys = configSyncLargeKeys.checked;
+    const keys = this.Class.Config._localConfigKeys;
 
     try {
-      await option.cfg.save(keys);
+      await this.cfg.save(keys);
 
       try {
-        if (option.cfg.syncLargeKeys) {
-          await WebConfig.removeLocalStorage(WebConfig._largeKeys);
+        if (this.cfg.syncLargeKeys) {
+          await this.Class.Config.removeLocalStorage(this.Class.Config._largeKeys);
         } else {
           let removeKeys = [];
-          WebConfig._largeKeys.forEach((largeKey) => {
-            removeKeys = removeKeys.concat(WebConfig.splitKeyNames(largeKey));
+          this.Class.Config._largeKeys.forEach((largeKey) => {
+            removeKeys = removeKeys.concat(this.Class.Config.splitKeyNames(largeKey));
           });
-          await WebConfig.removeSyncStorage(removeKeys);
+          await this.Class.Config.removeSyncStorage(removeKeys);
         }
 
         if (!silent) {
-          OptionPage.showStatusModal('Storage converted successfully.');
+          this.Class.showStatusModal('Storage converted successfully.');
         }
       } catch (err) {
         // Revert UI and export a backup of config.
-        option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
-        option.backupConfig();
-        OptionPage.handleError('Failed to cleanup old storage, backup automatically exported.', err);
-        await option.cfg.save('syncLargeKeys');
-        option.populateConfig();
+        this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
+        this.backupConfig();
+        this.Class.handleError('Failed to cleanup old storage, backup automatically exported.', err);
+        await this.cfg.save('syncLargeKeys');
+        this.populateConfig();
       }
     } catch (err) {
       // Revert UI
-      OptionPage.handleError('Failed to update storage preference.', err);
-      option.cfg.syncLargeKeys = !option.cfg.syncLargeKeys;
-      option.populateConfig();
+      this.Class.handleError('Failed to update storage preference.', err);
+      this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
+      this.populateConfig();
     }
   }
 
-  async exportBookmarkletFile() {
-    const code = await Bookmarklet.injectConfig(this.cfg.ordered());
-    exportToFile(code, 'apfBookmarklet.js');
+  domainCfgFromPage(): DomainCfg {
+    const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
+    const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
+    const domainFramesOffCheck = document.getElementById('domainFramesOffCheck') as HTMLInputElement;
+    const domainFramesOnCheck = document.getElementById('domainFramesOnCheck') as HTMLInputElement;
+    const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
+    const wordlist = domainWordlistSelect.selectedIndex > 0 ? domainWordlistSelect.selectedIndex - 1 : undefined;
+    const newDomainCfg: DomainCfg = {
+      disabled: domainDisabledCheck.checked,
+      enabled: domainEnabledCheck.checked,
+      framesOn: domainFramesOnCheck.checked,
+      framesOff: domainFramesOffCheck.checked,
+      wordlist: wordlist,
+    };
+    return newDomainCfg;
   }
 
   exportConfig() {
@@ -689,9 +730,14 @@ export default class OptionPage {
         this.populateWord();
       }
     } catch (err) {
-      OptionPage.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
+      this.Class.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
       return false;
     }
+  }
+
+  async getStatsFromStorage() {
+    const { stats }: { stats: Statistics } = await this.Class.Config.getLocalStorage({ stats: { words: {} } }) as any;
+    return stats;
   }
 
   importConfig() {
@@ -717,56 +763,57 @@ export default class OptionPage {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     configSyncLargeKeys.checked = false;
     try {
-      await this.convertStorageLocation(true);
+      await this.convertStorageLocation(null, true);
       await this.cfg.save();
-      OptionPage.showStatusModal('Settings imported successfully.');
+      this.Class.showStatusModal('Settings imported successfully.');
       await this.init();
     } catch (err) {
-      OptionPage.handleError('Failed to import config.', err);
+      this.Class.handleError('Failed to import config.', err);
     }
   }
 
   async importConfigText(cfg: string) {
     try {
-      const importedCfg = new WebConfig(JSON.parse(cfg));
-      const migration = new DataMigration(importedCfg);
+      const importedCfg = new this.Class.Config(JSON.parse(cfg));
+      const migration = new this.Class.DataMigration(importedCfg);
       await migration.runImportMigrations();
-      const resetSuccess = await this.restoreDefaults(true);
+      const resetSuccess = await this.restoreDefaults(null, true);
       if (resetSuccess) {
         try {
           this.cfg = importedCfg;
           await this.cfg.save();
-          OptionPage.showStatusModal('Settings imported successfully.');
+          this.Class.showStatusModal('Settings imported successfully.');
           await this.init(true);
         } catch (err) {
-          if (OptionPage.isStorageError(err) && this.cfg.syncLargeKeys) {
+          if (this.Class.isStorageError(err) && this.cfg.syncLargeKeys) {
             this.confirm('importConfigRetry');
           } else {
-            OptionPage.handleError('Failed to import settings.', err);
+            this.Class.handleError('Failed to import settings.', err);
           }
         }
       }
     } catch (err) {
-      OptionPage.showErrorModal(['Failed to process new settings.', `Error: ${err.message}`]);
+      this.Class.showErrorModal(['Failed to process new settings.', `Error: ${err.message}`]);
     }
   }
 
   async init(refreshTheme = false) {
-    this.cfg = await WebConfig.load();
+    await this.initializeCfg();
     logger.setLevel(this.cfg.loggingLevel);
     this.applyTheme(refreshTheme);
-    if (!this.auth) this.auth = new OptionAuth(this, this.cfg.password);
-    filter.cfg = this.cfg;
-    filter.init();
+    if (!this.auth) this.auth = new this.Class.OptionAuth(this, this.cfg.password);
+    this.filter.cfg = this.cfg;
+    this.filter.init();
 
     // logger.debug(`Password: '${this.cfg.password}', Authenticated: ${this.auth.authenticated}`);
     if (this.cfg.password && !this.auth.authenticated) {
-      OptionPage.openModal('passwordModal');
+      this.Class.openModal('passwordModal');
       document.getElementById('passwordInput').focus();
     } else {
-      OptionPage.show(document.getElementById('main'));
+      this.Class.show(document.getElementById('main'));
     }
 
+    if (!this.bookmarklet) this.bookmarklet = await this.Class.Bookmarklet.create();
     this.populateOptions();
 
     // Route to page based on URL
@@ -777,47 +824,29 @@ export default class OptionPage {
     }
   }
 
-  populateAudio() {
-    const muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
-    const fillerAudioSelect = document.getElementById('fillerAudioSelect') as HTMLSelectElement;
-    const muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
-    const muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
-    const selectedMuteMethod = document.querySelector(`input[name=audioMuteMethod][value='${this.cfg.muteMethod}']`) as HTMLInputElement;
-    const selectedshowSubtitle = document.querySelector(`input[name=audioShowSubtitles][value='${this.cfg.showSubtitles}']`) as HTMLInputElement;
-    const muteAudioOptionsContainer = document.getElementById('muteAudioOptionsContainer') as HTMLElement;
-    const audioYouTubeAutoMatchCensored = document.getElementById('audioYouTubeAutoMatchCensored') as HTMLInputElement;
-    const audioYouTubeAutoSubsMin = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
-    const audioYouTubeAutoSubsMax = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
-    const customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
-    muteAudioInput.checked = this.cfg.muteAudio;
-    fillerAudioSelect.value = this.cfg.fillerAudio;
-    muteAudioOnlyInput.checked = this.cfg.muteAudioOnly;
-    muteCueRequireShowingInput.checked = this.cfg.muteCueRequireShowing;
-    this.cfg.muteAudio ? OptionPage.show(muteAudioOptionsContainer) : OptionPage.hide(muteAudioOptionsContainer);
-    selectedMuteMethod.checked = true;
-    selectedshowSubtitle.checked = true;
-    audioYouTubeAutoMatchCensored.checked = this.cfg.youTubeAutoMatchCensored;
-    audioYouTubeAutoSubsMin.value = this.cfg.youTubeAutoSubsMin.toString();
-    audioYouTubeAutoSubsMax.value = this.cfg.youTubeAutoSubsMax.toString();
-    customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
+  async initializeCfg() {
+    this.cfg = await this.Class.Config.load();
+  }
+
+  newWordWordlistChecked(index: number): boolean {
+    return index == (this.cfg.wordlistId - 1);
   }
 
   populateBookmarkletPage() {
+    if (!this.bookmarklet) return;
+
     const bookmarkletConfig = document.querySelector('input[name="bookmarkletConfig"]:checked') as HTMLInputElement;
-    const bookmarkletCustomConfig = document.getElementById('bookmarkletCustomConfig') as HTMLDivElement;
-    if (bookmarkletConfig.value == 'default') {
-      OptionPage.hide(bookmarkletCustomConfig);
-      this.updateBookmarklet(Bookmarklet._defaultBookmarklet);
-    } else {
-      OptionPage.show(bookmarkletCustomConfig);
-      this.updateHostedBookmarklet();
-    }
+    const bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
+    const cfg = bookmarkletConfig.value == 'default' ? null : this.cfg;
+    const href = this.bookmarklet.href(cfg);
+    bookmarkletLink.href = href;
+    this.Class.enableBtn(bookmarkletLink);
   }
 
   populateConfig() {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     const configLoggingLevelSelect = document.getElementById('configLoggingLevelSelect') as HTMLSelectElement;
-    dynamicList(Constants.orderedArray(Constants.LOGGING_LEVELS), configLoggingLevelSelect, true);
+    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.LOGGING_LEVELS), configLoggingLevelSelect, true);
     configLoggingLevelSelect.selectedIndex = this.cfg.loggingLevel;
     configSyncLargeKeys.checked = this.cfg.syncLargeKeys;
     this.auth.setPasswordButton();
@@ -832,7 +861,6 @@ export default class OptionPage {
     const domainFramesOffCheck = document.getElementById('domainFramesOffCheck') as HTMLInputElement;
     const domainFramesOnCheck = document.getElementById('domainFramesOnCheck') as HTMLInputElement;
     const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
-    const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
     const domainRemoveBtn = document.getElementById('domainRemove') as HTMLButtonElement;
 
     const key = domainsSelect.value;
@@ -840,18 +868,18 @@ export default class OptionPage {
 
     let domainCfg: DomainCfg;
     if (!key) { // New record
-      OptionPage.disableBtn(domainRemoveBtn);
-      domainCfg = Object.assign({}, Domain._domainCfgDefaults);
+      this.Class.disableBtn(domainRemoveBtn);
+      domainCfg = Object.assign({}, this.Class.Domain._domainCfgDefaults);
     } else { // Existing record
-      OptionPage.enableBtn(domainRemoveBtn);
+      this.Class.enableBtn(domainRemoveBtn);
       domainCfg = this.cfg.domains[domainsSelect.value];
     }
 
     const domainKey = domainText.value.trim().toLowerCase();
     if (domainKey == '') { // No data
-      domainModeSelect.selectedIndex = Constants.DOMAIN_MODES.NORMAL;
+      domainModeSelect.selectedIndex = this.Class.Constants.DOMAIN_MODES.NORMAL;
     } else {
-      const domain = new Domain(domainKey, domainCfg);
+      const domain = new this.Class.Domain(domainKey, domainCfg);
       domainModeSelect.selectedIndex = domain.getModeIndex();
     }
 
@@ -860,9 +888,9 @@ export default class OptionPage {
     domainFramesOffCheck.checked = domainCfg.framesOff;
     domainFramesOnCheck.checked = domainCfg.framesOn;
     const wordlist = domainCfg.wordlist >= 0 ? domainCfg.wordlist + 1 : 0;
-    const audioList = domainCfg.audioList >= 0 ? domainCfg.audioList + 1 : 0;
     domainWordlistSelect.selectedIndex = wordlist;
-    domainAudioWordlistSelect.selectedIndex = audioList;
+
+    return domainCfg;
   }
 
   populateDomainPage() {
@@ -873,17 +901,16 @@ export default class OptionPage {
     const mode = this.cfg.enabledDomainsOnly ? 'minimal' : 'normal';
     const domainMode = document.querySelector(`input[name=domainMode][value='${mode}']`) as HTMLInputElement;
     const wordlistContainer = document.getElementById('domainWordlistContainer') as HTMLInputElement;
-    const audioWordlistContainer = document.getElementById('domainAudioWordlistContainer') as HTMLInputElement;
     domainMode.checked = true;
     const domainDisabledLabel = document.getElementById('domainDisabledLabel') as HTMLLabelElement;
     const domainEnabledLabel = document.getElementById('domainEnabledLabel') as HTMLLabelElement;
     const domainFramesOffLabel = document.getElementById('domainFramesOffLabel') as HTMLLabelElement;
     const domainFramesOnLabel = document.getElementById('domainFramesOnLabel') as HTMLLabelElement;
 
-    OptionPage.hideInputError(domainText);
+    this.Class.hideInputError(domainText);
     removeChildren(domainsSelect);
 
-    const domains = Domain.sortedKeys(this.cfg.domains);
+    const domains = this.Class.Domain.sortedKeys(this.cfg.domains);
     domains.unshift('Add, or update existing...');
     domains.forEach((domain) => {
       const optionElement = document.createElement('option');
@@ -891,42 +918,34 @@ export default class OptionPage {
       optionElement.value = domain === domains[0] ? '' : domain;
       domainsSelect.appendChild(optionElement);
     });
-    domainFilterAllFrames.checked = !option.cfg.enabledFramesOnly;
+    domainFilterAllFrames.checked = !this.cfg.enabledFramesOnly;
 
     if (mode === 'minimal') {
-      OptionPage.hide(domainDisabledLabel);
-      OptionPage.show(domainEnabledLabel);
+      this.Class.hide(domainDisabledLabel);
+      this.Class.show(domainEnabledLabel);
     } else {
-      OptionPage.hide(domainEnabledLabel);
-      OptionPage.show(domainDisabledLabel);
+      this.Class.hide(domainEnabledLabel);
+      this.Class.show(domainDisabledLabel);
     }
 
-    if (option.cfg.enabledFramesOnly) {
-      OptionPage.hide(domainFramesOffLabel);
-      OptionPage.show(domainFramesOnLabel);
+    if (this.cfg.enabledFramesOnly) {
+      this.Class.hide(domainFramesOffLabel);
+      this.Class.show(domainFramesOnLabel);
     } else {
-      OptionPage.hide(domainFramesOnLabel);
-      OptionPage.show(domainFramesOffLabel);
+      this.Class.hide(domainFramesOnLabel);
+      this.Class.show(domainFramesOffLabel);
     }
 
-    dynamicList(Constants.orderedArray(Constants.DOMAIN_MODES), domainModeSelect, true);
+    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.DOMAIN_MODES), domainModeSelect, true);
 
     if (this.cfg.wordlistsEnabled) {
-      OptionPage.show(wordlistContainer);
+      this.Class.show(wordlistContainer);
       const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
-      const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
 
-      const wordlists = ['Default'].concat(WebConfig._allWordlists, this.cfg.wordlists);
+      const wordlists = ['Default'].concat(this.Class.Config._allWordlists, this.cfg.wordlists);
       dynamicList(wordlists, domainWordlistSelect);
-      if (this.cfg.muteAudio) {
-        OptionPage.show(audioWordlistContainer);
-        dynamicList(wordlists, domainAudioWordlistSelect);
-      } else {
-        OptionPage.hide(audioWordlistContainer);
-      }
     } else {
-      OptionPage.hide(wordlistContainer);
-      OptionPage.hide(audioWordlistContainer);
+      this.Class.hide(wordlistContainer);
     }
 
     this.populateDomain();
@@ -938,7 +957,7 @@ export default class OptionPage {
     this.populateAllowlist();
     this.populateWordlists();
     this.populateDomainPage();
-    this.populateAudio();
+    this.populateBookmarkletPage();
     this.populateConfig();
     this.populateStats();
     this.populateTest();
@@ -948,7 +967,7 @@ export default class OptionPage {
     this.updateFilterOptions();
 
     // Settings
-    const selectedFilter = document.getElementById(`filter${Constants.filterMethodName(this.cfg.filterMethod)}`) as HTMLInputElement;
+    const selectedFilter = document.getElementById(`filter${this.Class.Constants.filterMethodName(this.cfg.filterMethod)}`) as HTMLInputElement;
     const useDeviceTheme = document.getElementById('useDeviceTheme') as HTMLInputElement;
     const showContextMenu = document.getElementById('showContextMenu') as HTMLInputElement;
     const showCounter = document.getElementById('showCounter') as HTMLInputElement;
@@ -990,7 +1009,7 @@ export default class OptionPage {
     removeChildren(defaultWordMatchMethodSelect);
     for (let i = 0; i < 3; i++) { // Skip Regex
       const optionElement = document.createElement('option');
-      const matchMethodName = upperCaseFirst(Constants.matchMethodName(i));
+      const matchMethodName = upperCaseFirst(this.Class.Constants.matchMethodName(i));
       optionElement.value = matchMethodName;
       optionElement.textContent = matchMethodName;
       defaultWordMatchMethodSelect.appendChild(optionElement);
@@ -1000,21 +1019,15 @@ export default class OptionPage {
 
   async populateStats() {
     try {
-      filter.buildWordlist(Constants.ALL_WORDS_WORDLIST_ID, true);
-      const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
+      this.filter.buildWordlist(this.Class.Constants.ALL_WORDS_WORDLIST_ID, true);
+      const stats = await this.getStatsFromStorage();
 
       // Prepare data (collect totals, add words without stats, sort output)
       let totalFiltered = 0;
-      const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
-      allWords.forEach((word) => {
-        const wordStats = stats.words[word];
-        if (wordStats) {
-          wordStats.total = wordStats.audio + wordStats.text;
-          totalFiltered += wordStats.total;
-        } else {
-          stats.words[word] = { audio: 0, text: 0, total: 0 };
-        }
-      });
+      const allWords = this.filter.wordlists[this.Class.Constants.ALL_WORDS_WORDLIST_ID].list;
+      for (const word of allWords) {
+        totalFiltered += this.populateStatsCompileWords(stats, word);
+      }
       const alphaSortedWords = allWords.sort();
       const sortedWords = alphaSortedWords.sort((a, b) => stats.words[b].total - stats.words[a].total);
 
@@ -1023,28 +1036,9 @@ export default class OptionPage {
 
       // Table body
       const tBody = document.createElement('tbody');
-      sortedWords.forEach((word) => {
-        const wordStats = stats.words[word];
-        const row = tBody.insertRow();
-        const wordCell = row.insertCell(0);
-        wordCell.classList.add('w3-tooltip');
-        const tooltipSpan = document.createElement('span');
-        tooltipSpan.classList.add('statsTooltip', 'w3-tag', 'w3-text');
-        tooltipSpan.textContent = word;
-        const wordSpan = document.createElement('span');
-        wordSpan.textContent = filter.replaceText(word, Constants.ALL_WORDS_WORDLIST_ID, null);
-        wordCell.appendChild(tooltipSpan);
-        wordCell.appendChild(wordSpan);
-
-        const textCell = row.insertCell(1);
-        textCell.textContent = numberWithCommas(wordStats.text);
-
-        const audioCell = row.insertCell(2);
-        audioCell.textContent = numberWithCommas(wordStats.audio);
-
-        const totalCell = row.insertCell(3);
-        totalCell.textContent = numberWithCommas(wordStats.total);
-      });
+      for (const word of sortedWords) {
+        this.populateStatsWordRow(stats, tBody, word);
+      }
       const oldTBody = statsWordTable.tBodies[0];
       statsWordTable.replaceChild(tBody, oldTBody);
 
@@ -1052,17 +1046,49 @@ export default class OptionPage {
       const collectStats = document.getElementById('collectStats') as HTMLInputElement;
       collectStats.checked = this.cfg.collectStats;
 
-      // Summary
-      const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableDataCellElement;
-      statsSummaryTotal.textContent = numberWithCommas(totalFiltered);
-      const statsSummaryMutes = document.querySelector('table#statsSummaryTable td#statsSummaryMutes') as HTMLTableDataCellElement;
-      statsSummaryMutes.textContent = numberWithCommas(stats.mutes);
-      const statsSummarySince = document.querySelector('table#statsSummaryTable td#statsSummarySince') as HTMLTableDataCellElement;
-      statsSummarySince.textContent = stats.startedAt ? new Date(stats.startedAt).toLocaleString() : '';
+      this.populateStatsSummary(stats, totalFiltered);
     } catch (err) {
       logger.warn('Failed to populate stats.', err);
-      OptionPage.showErrorModal(['Failed to populate stats.', `Error: ${err.message}`]);
+      this.Class.showErrorModal(['Failed to populate stats.', `Error: ${err.message}`]);
     }
+  }
+
+  populateStatsCompileWords(stats, word: string): number {
+    let total = 0;
+    const wordStats = stats.words[word];
+    if (wordStats) {
+      wordStats.total = wordStats.text;
+      total += wordStats.text;
+    } else {
+      stats.words[word] = { text: 0, total: 0 };
+    }
+    return total;
+  }
+
+  populateStatsSummary(stats, totalFiltered: number) {
+    const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableCellElement;
+    statsSummaryTotal.textContent = numberWithCommas(totalFiltered);
+    const statsSummarySince = document.querySelector('table#statsSummaryTable td#statsSummarySince') as HTMLTableCellElement;
+    statsSummarySince.textContent = stats.startedAt ? new Date(stats.startedAt).toLocaleString() : '';
+  }
+
+  populateStatsWordRow(stats, tBody: HTMLTableSectionElement, word: string) {
+    const wordStats = stats.words[word];
+    const row = tBody.insertRow();
+    const wordCell = row.insertCell(0);
+    wordCell.classList.add('w3-tooltip');
+    const tooltipSpan = document.createElement('span');
+    tooltipSpan.classList.add('statsTooltip', 'w3-tag', 'w3-text');
+    tooltipSpan.textContent = word;
+    const wordSpan = document.createElement('span');
+    wordSpan.textContent = this.filter.replaceText(word, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
+    wordCell.appendChild(tooltipSpan);
+    wordCell.appendChild(wordSpan);
+
+    const textCell = row.insertCell(1);
+    textCell.textContent = numberWithCommas(wordStats.text);
+
+    return row;
   }
 
   populateTest() {
@@ -1072,18 +1098,18 @@ export default class OptionPage {
     if (testText.value === '') {
       filteredTestText.textContent = 'Enter some text above to test the filter...';
     } else {
-      if (option.cfg.filterMethod === Constants.FILTER_METHODS.OFF) {
+      if (this.cfg.filterMethod === this.Class.Constants.FILTER_METHODS.OFF) {
         filteredTestText.textContent = testText.value;
       } else {
-        filteredTestText.textContent = filter.replaceText(testText.value, filter.cfg.wordlistId, null);
+        filteredTestText.textContent = this.filter.replaceText(testText.value, this.filter.cfg.wordlistId, null);
       }
     }
   }
 
   populateAllowlist() {
     const regExp = RegExp(' [*]$');
-    const sensitiveList = filter.cfg.wordAllowlist.map((item) => { return item + ' *'; });
-    const list = [].concat(sensitiveList, filter.cfg.iWordAllowlist).sort();
+    const sensitiveList = this.filter.cfg.wordAllowlist.map((item) => { return item + ' *'; });
+    const list = [].concat(sensitiveList, this.filter.cfg.iWordAllowlist).sort();
     const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
     removeChildren(allowlist);
     list.unshift('Add, or update existing...');
@@ -1105,7 +1131,7 @@ export default class OptionPage {
 
     if (selected.value == '') { // New word
       allowlistText.value = '';
-      OptionPage.disableBtn(allowlistRemove);
+      this.Class.disableBtn(allowlistRemove);
 
       // Default to case-insensitive
       const allowlistCase = document.getElementById('allowlistInsensitive') as HTMLInputElement;
@@ -1115,7 +1141,7 @@ export default class OptionPage {
       const caseId = selected.dataset.sensitive === 'true' ? 'allowlistSensitive' : 'allowlistInsensitive';
       const allowlistCase = document.getElementById(caseId) as HTMLInputElement;
       allowlistCase.checked = true;
-      OptionPage.enableBtn(allowlistRemove);
+      this.Class.enableBtn(allowlistRemove);
     }
   }
 
@@ -1130,33 +1156,26 @@ export default class OptionPage {
     const word = wordList.value;
     const wordWordlistDiv = document.getElementById('wordWordlistDiv') as HTMLSelectElement;
     const wordlistSelections = document.querySelectorAll('div#wordlistSelections input') as NodeListOf<HTMLInputElement>;
-    OptionPage.hideInputError(wordText);
-    OptionPage.hideInputError(substitutionText);
+    this.Class.hideInputError(wordText);
+    this.Class.hideInputError(substitutionText);
 
     if (word == '') { // New word
       wordText.value = '';
-      OptionPage.disableBtn(wordRemove);
-      const selectedMatchMethod = document.getElementById(`wordMatch${upperCaseFirst(Constants.matchMethodName(this.cfg.defaultWordMatchMethod))}`) as HTMLInputElement;
+      this.Class.disableBtn(wordRemove);
+      const selectedMatchMethod = document.getElementById(`wordMatch${upperCaseFirst(this.Class.Constants.matchMethodName(this.cfg.defaultWordMatchMethod))}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
       wordMatchRepeated.checked = numberToBoolean(this.cfg.defaultWordRepeat);
       wordMatchSeparators.checked = numberToBoolean(this.cfg.defaultWordSeparators);
       substitutionText.value = '';
       substitutionCase.checked = false;
       wordlistSelections.forEach((wordlist, index) => {
-        wordlist.checked = (
-          index == (this.cfg.wordlistId - 1)
-          || (
-            this.cfg.muteAudio
-            && this.cfg.muteAudioOnly
-            && index == (this.cfg.audioWordlistId - 1)
-          )
-        );
+        wordlist.checked = this.newWordWordlistChecked(index);
       });
     } else { // Existing word
-      OptionPage.enableBtn(wordRemove);
+      this.Class.enableBtn(wordRemove);
       const wordCfg = this.cfg.words[word];
       wordText.value = word;
-      const selectedMatchMethod = document.getElementById(`wordMatch${upperCaseFirst(Constants.matchMethodName(wordCfg.matchMethod))}`) as HTMLInputElement;
+      const selectedMatchMethod = document.getElementById(`wordMatch${upperCaseFirst(this.Class.Constants.matchMethodName(wordCfg.matchMethod))}`) as HTMLInputElement;
       selectedMatchMethod.checked = true;
       wordMatchRepeated.checked = numberToBoolean(wordCfg.repeat);
       wordMatchSeparators.checked = numberToBoolean(wordCfg.separators === undefined ? this.cfg.defaultWordSeparators : wordCfg.separators);
@@ -1168,9 +1187,9 @@ export default class OptionPage {
     }
 
     if (this.cfg.wordlistsEnabled) {
-      OptionPage.show(wordWordlistDiv);
+      this.Class.show(wordWordlistDiv);
     } else {
-      OptionPage.hide(wordWordlistDiv);
+      this.Class.hide(wordWordlistDiv);
     }
   }
 
@@ -1188,39 +1207,29 @@ export default class OptionPage {
     if (this.cfg.wordlistsEnabled) {
       const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
       const textWordlistSelect = document.getElementById('textWordlistSelect') as HTMLSelectElement;
-      const audioWordlistDiv = document.getElementById('audioWordlistDiv') as HTMLElement;
-      const audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
       dynamicList(this.cfg.wordlists, wordlistSelect);
-      dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), textWordlistSelect);
+      dynamicList(this.Class.Config._allWordlists.concat(this.cfg.wordlists), textWordlistSelect);
       wordlistSelect.selectedIndex = selectedIndex;
       textWordlistSelect.selectedIndex = this.cfg.wordlistId;
 
-      if (this.cfg.muteAudio) {
-        dynamicList(WebConfig._allWordlists.concat(this.cfg.wordlists), audioWordlistSelect);
-        audioWordlistSelect.selectedIndex = this.cfg.audioWordlistId;
-        OptionPage.show(audioWordlistDiv);
-      } else {
-        OptionPage.hide(audioWordlistDiv);
-      }
-
-      OptionPage.show(wordlistContainer);
+      this.Class.show(wordlistContainer);
       this.populateWordlist();
     } else {
-      OptionPage.hide(wordlistContainer);
+      this.Class.hide(wordlistContainer);
     }
   }
 
   populateWordPage() {
-    let wordlistFilter = filter;
+    let wordlistFilter = this.filter;
     const selections = document.getElementById('wordlistSelections') as HTMLInputElement;
     const wordsSelect = document.getElementById('wordList') as HTMLSelectElement;
     removeChildren(wordsSelect);
 
     // Workaround for remove filter method
-    if (filter.cfg.filterWordList && filter.cfg.filterMethod === 2) {
-      wordlistFilter = new Filter;
+    if (this.filter.cfg.filterWordList && this.filter.cfg.filterMethod === 2) {
+      wordlistFilter = new this.Class.Filter;
       // Works because we are only changing a native value (filterMethod: number)
-      wordlistFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: 0 }));
+      wordlistFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { filterMethod: 0 }));
       wordlistFilter.init();
     }
 
@@ -1229,10 +1238,10 @@ export default class OptionPage {
     words.forEach((word) => {
       let filteredWord = word;
       if (word != words[0] && wordlistFilter.cfg.filterWordList) {
-        if (wordlistFilter.cfg.words[word].matchMethod === Constants.MATCH_METHODS.REGEX) { // Regexp
+        if (wordlistFilter.cfg.words[word].matchMethod === this.Class.Constants.MATCH_METHODS.REGEX) { // Regexp
           filteredWord = wordlistFilter.cfg.words[word].sub || wordlistFilter.cfg.defaultSubstitution;
         } else {
-          filteredWord = wordlistFilter.replaceText(word, Constants.ALL_WORDS_WORDLIST_ID, null);
+          filteredWord = wordlistFilter.replaceText(word, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
         }
       }
 
@@ -1265,19 +1274,19 @@ export default class OptionPage {
 
   async prepareLessUsedWords() {
     try {
-      const { stats }: { stats: Statistics } = await WebConfig.getLocalStorage({ stats: { mutes: 0, words: {} } }) as any;
+      const stats = await this.getStatsFromStorage();
       const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
       const lessThan = parseInt(lessUsedWordsNumber.value);
-      lessUsedWords = {};
+      this.lessUsedWords = {};
 
-      const allWords = filter.wordlists[Constants.ALL_WORDS_WORDLIST_ID].list;
-      allWords.forEach((word) => {
+      const allWords = this.filter.wordlists[this.Class.Constants.ALL_WORDS_WORDLIST_ID].list;
+      for (const word of allWords) {
         const wordStats = stats.words[word];
-        const total = wordStats ? (wordStats.audio + wordStats.text) : 0;
+        const total = this.totalFilteredWordStat(wordStats);
         if (total < lessThan) {
-          lessUsedWords[word] = total;
+          this.lessUsedWords[word] = total;
         }
-      });
+      }
     } catch (err) {
       logger.warn('Error while prepapring less-used words.', err);
       return {};
@@ -1289,7 +1298,7 @@ export default class OptionPage {
     await this.cfg.save('words');
     const wordList = document.getElementById('wordList') as HTMLSelectElement;
     wordList.selectedIndex = 0;
-    filter.rebuildWordlists();
+    this.filter.rebuildWordlists();
     this.populateOptions();
   }
 
@@ -1303,14 +1312,14 @@ export default class OptionPage {
         this.populateDomainPage();
       } catch (err) {
         logger.warn(`Failed to remove domain '${domainsSelect.value}'.`, err);
-        OptionPage.showErrorModal([`Failed to remove domain '${domainsSelect.value}'.`, `Error: ${err.message}`]);
+        this.Class.showErrorModal([`Failed to remove domain '${domainsSelect.value}'.`, `Error: ${err.message}`]);
         return false;
       }
     }
   }
 
   async removeLessUsedWords() {
-    Object.keys(lessUsedWords).forEach(((word) => {
+    Object.keys(this.lessUsedWords).forEach(((word) => {
       this.cfg.removeWord(word);
     }));
     await this.cfg.save('words');
@@ -1327,11 +1336,11 @@ export default class OptionPage {
 
     try {
       await this.cfg.save(originalListName);
-      filter.init();
+      this.filter.init();
       this.populateOptions();
     } catch (err) {
       logger.warn(`Failed to remove '${originalWord}' from allowlist.`, err);
-      OptionPage.showErrorModal([`Failed to remove '${originalWord}' from allowlist.`, `Error: ${err.message}`]);
+      this.Class.showErrorModal([`Failed to remove '${originalWord}' from allowlist.`, `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1348,11 +1357,11 @@ export default class OptionPage {
         await this.cfg.save('words');
         // Update states and Reset word form
         wordList.selectedIndex = 0;
-        filter.rebuildWordlists();
+        this.filter.rebuildWordlists();
         this.populateOptions();
       } catch (err) {
         logger.warn(`Failed to remove '${word}'.`, err);
-        OptionPage.showErrorModal([`Failed to remove '${word}'.`, `Error: ${err.message}`]);
+        this.Class.showErrorModal([`Failed to remove '${word}'.`, `Error: ${err.message}`]);
       }
     }
   }
@@ -1366,7 +1375,7 @@ export default class OptionPage {
     if (wordlistText.checkValidity()) {
       // Make sure there are no duplicates
       if (this.cfg.wordlists.includes(name)) {
-        OptionPage.showInputError(wordlistText, 'Please enter a unique name.');
+        this.Class.showInputError(wordlistText, 'Please enter a unique name.');
         return false;
       }
 
@@ -1376,149 +1385,77 @@ export default class OptionPage {
         this.populateWordlists(index);
         this.populateWordPage();
       } catch (err) {
-        OptionPage.handleError('Failed to save wordlist name.', err);
+        this.Class.handleError('Failed to save wordlist name.', err);
       }
     } else {
-      OptionPage.showInputError(wordlistText, 'Please enter a valid name.');
+      this.Class.showInputError(wordlistText, 'Please enter a valid name.');
     }
   }
 
-  async restoreDefaults(silent = false) {
+  async restoreDefaults(evt: Event = null, silent = false) {
     try {
       await this.cfg.resetPreserveStats();
-      if (!silent) OptionPage.showStatusModal('Default settings restored.');
+      if (!silent) this.Class.showStatusModal('Default settings restored.');
       await this.init(true);
       return true;
     } catch (err) {
       logger.warn('Failed to restore defaults.', err);
-      OptionPage.showErrorModal(['Failed to restore defaults.', `Error: ${err.message}`]);
+      this.Class.showErrorModal(['Failed to restore defaults.', `Error: ${err.message}`]);
       return false;
-    }
-  }
-
-  async saveCustomAudioSites() {
-    const customAudioSitesTextArea = document.getElementById('customAudioSitesText') as HTMLTextAreaElement;
-    try {
-      const text = customAudioSitesTextArea.value;
-      this.cfg.customAudioSites = text == '' ? null : JSON.parse(text);
-      await this.cfg.save('customAudioSites');
-      customAudioSitesTextArea.value = this.cfg.customAudioSites ? JSON.stringify(this.cfg.customAudioSites, null, 2) : '';
-      OptionPage.showStatusModal('Custom Audio Sites saved.');
-    } catch (err) {
-      OptionPage.handleError('Failed to save custom audio sites. Please make sure it is valid JSON.', err);
     }
   }
 
   async saveDomain() {
-    const domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
     const domainText = document.getElementById('domainText') as HTMLInputElement;
-    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
-    const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
-    const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
-    const domainFramesOffCheck = document.getElementById('domainFramesOffCheck') as HTMLInputElement;
-    const domainFramesOnCheck = document.getElementById('domainFramesOnCheck') as HTMLInputElement;
-    const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
-    const domainAudioWordlistSelect = document.getElementById('domainAudioWordlistSelect') as HTMLSelectElement;
-
-    const originalKey = domainsSelect.value;
     const newKey = domainText.value.trim().toLowerCase();
 
     if (newKey == '') { // No data
-      OptionPage.showInputError(domainText, 'Please enter a value.');
+      this.Class.showInputError(domainText, 'Please enter a value.');
       return false;
     }
 
     if (domainText.checkValidity()) {
-      OptionPage.hideInputError(domainText);
-      if (newKey != originalKey) { delete this.cfg.domains[originalKey]; } // URL changed: remove old entry
-
-      const wordlist = domainWordlistSelect.selectedIndex > 0 ? domainWordlistSelect.selectedIndex - 1 : undefined;
-      const audioList = domainAudioWordlistSelect.selectedIndex > 0 ? domainAudioWordlistSelect.selectedIndex - 1 : undefined;
-      const newDomainCfg: DomainCfg = {
-        audioList: audioList,
-        disabled: domainDisabledCheck.checked,
-        enabled: domainEnabledCheck.checked,
-        framesOn: domainFramesOnCheck.checked,
-        framesOff: domainFramesOffCheck.checked,
-        wordlist: wordlist,
-      };
-      const domain = new Domain(newKey, newDomainCfg);
-      domain.updateFromModeIndex(domainModeSelect.selectedIndex);
+      this.Class.hideInputError(domainText);
+      const domainCfg = this.domainCfgFromPage();
+      if (!domainCfg) {
+        this.Class.showInputError('Failed to gather domain settings.');
+        return false;
+      }
 
       try {
+        // URL changed: remove old entry
+        const domainsSelect = document.getElementById('domainSelect') as HTMLInputElement;
+        const originalKey = domainsSelect.value;
+        if (originalKey && newKey != originalKey) delete this.cfg.domains[originalKey];
+
+        const domain = new this.Class.Domain(newKey, domainCfg);
+
+        // Get domain mode
+        const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+        domain.updateFromModeIndex(domainModeSelect.selectedIndex);
+
         await domain.save(this.cfg);
         this.populateDomainPage();
       } catch (err) {
-        OptionPage.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
+        this.Class.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
         return false;
       }
     } else {
-      OptionPage.showInputError(domainText, 'Valid domain example: google.com or www.google.com');
+      this.Class.showInputError(domainText, 'Valid domain example: google.com or www.google.com');
       return false;
     }
   }
 
   async saveOptions() {
-    // Gather current settings
-    const censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
-    const censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
-    const defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
-    const defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
-    const defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
-    const preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
-    const preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
-    const preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
-    const showCounter = document.getElementById('showCounter') as HTMLInputElement;
-    const showSummary = document.getElementById('showSummary') as HTMLInputElement;
-    const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
-    const substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
-    const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
-    const domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
-    const domainFilterAllFrames = document.getElementById('domainFilterAllFrames') as HTMLInputElement;
-    const muteAudioInput = document.getElementById('muteAudio') as HTMLInputElement;
-    const fillerAudioSelect = document.getElementById('fillerAudioSelect') as HTMLSelectElement;
-    const muteAudioOnlyInput = document.getElementById('muteAudioOnly') as HTMLInputElement;
-    const muteCueRequireShowingInput = document.getElementById('muteCueRequireShowing') as HTMLInputElement;
-    const audioYouTubeAutoMatchCensored = document.getElementById('audioYouTubeAutoMatchCensored') as HTMLInputElement;
-    const muteMethodInput = document.querySelector('input[name="audioMuteMethod"]:checked') as HTMLInputElement;
-    const showSubtitlesInput = document.querySelector('input[name="audioShowSubtitles"]:checked') as HTMLInputElement;
-    const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
-    const collectStats = document.getElementById('collectStats') as HTMLInputElement;
-    const configLoggingLevelSelect = document.getElementById('configLoggingLevelSelect') as HTMLSelectElement;
-    this.cfg.censorCharacter = censorCharacterSelect.value;
-    this.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
-    this.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
-    this.cfg.defaultWordRepeat = booleanToNumber(defaultWordRepeat.checked);
-    this.cfg.defaultWordSeparators = booleanToNumber(defaultWordSeparators.checked);
-    this.cfg.preserveCase = preserveCase.checked;
-    this.cfg.preserveFirst = preserveFirst.checked;
-    this.cfg.preserveLast = preserveLast.checked;
-    this.cfg.showCounter = showCounter.checked;
-    this.cfg.showSummary = showSummary.checked;
-    this.cfg.showUpdateNotification = showUpdateNotification.checked;
-    this.cfg.substitutionMark = substitutionMark.checked;
-    this.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
-    this.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
-    this.cfg.enabledFramesOnly = !domainFilterAllFrames.checked;
-    this.cfg.muteAudio = muteAudioInput.checked;
-    this.cfg.fillerAudio = fillerAudioSelect.value;
-    this.cfg.muteAudioOnly = muteAudioOnlyInput.checked;
-    this.cfg.muteCueRequireShowing = muteCueRequireShowingInput.checked;
-    this.cfg.youTubeAutoMatchCensored = audioYouTubeAutoMatchCensored.checked;
-    this.cfg.muteMethod = parseInt(muteMethodInput.value);
-    this.cfg.showSubtitles = parseInt(showSubtitlesInput.value);
-    this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
-    this.cfg.collectStats = collectStats.checked;
-    this.cfg.loggingLevel = Constants.LOGGING_LEVELS[configLoggingLevelSelect.value.toUpperCase()];
+    this.updateOptionsFromPage();
 
-    // Save settings
     try {
       await this.cfg.save();
       await this.init();
       return true;
     } catch (err) {
       logger.warn('Settings not saved! Please try again.', err);
-      OptionPage.showErrorModal(['Settings not saved! Please try again.', `Error: ${err.message}`]);
+      this.Class.showErrorModal(['Settings not saved! Please try again.', `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1535,12 +1472,12 @@ export default class OptionPage {
     const newListName = newCase === 'sensitive' ? 'wordAllowlist' : 'iWordAllowlist';
 
     if (allowlistText.value === '') {
-      OptionPage.showInputError(allowlistText, 'Please enter a valid word/phrase.');
+      this.Class.showInputError(allowlistText, 'Please enter a valid word/phrase.');
       return false;
     }
 
     if (this.cfg[newListName].indexOf(newWord) > -1) {
-      OptionPage.showInputError(allowlistText, 'Already allowlisted.');
+      this.Class.showInputError(allowlistText, 'Already allowlisted.');
       return false;
     }
 
@@ -1566,16 +1503,16 @@ export default class OptionPage {
         });
         try {
           await this.cfg.save(propsToSave);
-          filter.init();
+          this.filter.init();
           this.populateOptions();
         } catch (err) {
           logger.warn('Failed to update allowlist.', err);
-          OptionPage.showErrorModal(['Failed to update allowlist.', `Error: ${err.message}`]);
+          this.Class.showErrorModal(['Failed to update allowlist.', `Error: ${err.message}`]);
           return false;
         }
       }
     } else {
-      OptionPage.showInputError(allowlistText, 'Please enter a valid word/phrase.');
+      this.Class.showInputError(allowlistText, 'Please enter a valid word/phrase.');
     }
   }
 
@@ -1592,20 +1529,20 @@ export default class OptionPage {
     let word = wordText.value.trim();
     const subCase = booleanToNumber(substitutionCase.checked);
     const sub = numberToBoolean(subCase) ? substitutionText.value.trim() : substitutionText.value.trim().toLowerCase();
-    const matchMethod = Constants.MATCH_METHODS[selectedMatchMethod.value];
+    const matchMethod = this.Class.Constants.MATCH_METHODS[selectedMatchMethod.value];
 
-    if (matchMethod !== Constants.MATCH_METHODS.REGEX) {
+    if (matchMethod !== this.Class.Constants.MATCH_METHODS.REGEX) {
       word = word.toLowerCase();
     }
 
     if (word == '') {
-      OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
+      this.Class.showInputError(wordText, 'Please enter a valid word/phrase.');
       return false;
     }
 
     // Make sure word and substitution are different
     if (word == sub) {
-      OptionPage.showInputError(substitutionText, 'Word and substitution must be different.');
+      this.Class.showInputError(substitutionText, 'Word and substitution must be different.');
       return false;
     }
 
@@ -1623,29 +1560,29 @@ export default class OptionPage {
       };
 
       // Check for endless substitution loop
-      if (wordOptions.matchMethod != Constants.MATCH_METHODS.REGEX) {
-        const subFilter = new Filter;
+      if (wordOptions.matchMethod != this.Class.Constants.MATCH_METHODS.REGEX) {
+        const subFilter = new this.Class.Filter;
         const words = {};
         words[word] = wordOptions;
-        subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { filterMethod: Constants.FILTER_METHODS.SUBSTITUTE }, { words: words }));
+        subFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { filterMethod: this.Class.Constants.FILTER_METHODS.SUBSTITUTE }, { words: words }));
         subFilter.init();
-        const first = subFilter.replaceTextResult(word, Constants.ALL_WORDS_WORDLIST_ID, null);
-        const second = subFilter.replaceTextResult(first.filtered, Constants.ALL_WORDS_WORDLIST_ID, null);
+        const first = subFilter.replaceTextResult(word, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
+        const second = subFilter.replaceTextResult(first.filtered, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
         if (first.filtered != second.filtered) {
-          OptionPage.showInputError(substitutionText, "Substitution can't contain word (causes an endless loop).");
+          this.Class.showInputError(substitutionText, "Substitution can't contain word (causes an endless loop).");
           return false;
         }
       }
 
       // Test for a valid Regex
-      if (wordOptions.matchMethod === Constants.MATCH_METHODS.REGEX) {
-        const subFilter = new Filter;
+      if (wordOptions.matchMethod === this.Class.Constants.MATCH_METHODS.REGEX) {
+        const subFilter = new this.Class.Filter;
         const words = {};
         words[word] = wordOptions;
-        subFilter.cfg = new WebConfig(Object.assign({}, this.cfg, { words: words }));
+        subFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { words: words }));
         subFilter.init();
         if (subFilter.wordlists[subFilter.wordlistId].regExps.length === 0) {
-          OptionPage.showInputError(wordText, 'Invalid Regex.');
+          this.Class.showInputError(wordText, 'Invalid Regex.');
           return false;
         }
       }
@@ -1664,7 +1601,7 @@ export default class OptionPage {
           if (added) {
             delete this.cfg.words[originalWord];
           } else {
-            OptionPage.showInputError(wordText, `'${word}' already in list.`);
+            this.Class.showInputError(wordText, `'${word}' already in list.`);
           }
         }
       }
@@ -1673,48 +1610,48 @@ export default class OptionPage {
         try {
           await this.saveOptions();
           // Update states and Reset word form
-          filter.rebuildWordlists();
+          this.filter.rebuildWordlists();
           this.populateOptions();
         } catch (err) {
           logger.warn(`Failed to update word '${word}'.`, err);
-          OptionPage.showErrorModal([`Failed to update word '${word}'.`, `Error: ${err.message}`]);
+          this.Class.showErrorModal([`Failed to update word '${word}'.`, `Error: ${err.message}`]);
           this.cfg.removeWord(word);
           return false;
         }
       } else {
-        OptionPage.showInputError(wordText, `'${word}' already in list.`);
+        this.Class.showInputError(wordText, `'${word}' already in list.`);
       }
     } else {
-      OptionPage.showInputError(wordText, 'Please enter a valid word/phrase.');
+      this.Class.showInputError(wordText, 'Please enter a valid word/phrase.');
     }
   }
 
   async selectFilterMethod(filterMethodInput: HTMLInputElement) {
-    this.cfg.filterMethod = Constants.FILTER_METHODS[filterMethodInput.value];
+    this.cfg.filterMethod = this.Class.Constants.FILTER_METHODS[filterMethodInput.value];
     try {
       await this.cfg.save('filterMethod');
-      filter.rebuildWordlists();
+      this.filter.rebuildWordlists();
       this.populateOptions();
     } catch (err) {
-      OptionPage.handleError('Failed to set filter method.', err);
+      this.Class.handleError('Failed to set filter method.', err);
     }
   }
 
   async setDefaultWordlist(element: HTMLSelectElement) {
-    const prop = element.id === 'textWordlistSelect' ? 'wordlistId' : 'audioWordlistId';
+    const prop = this.wordlistTypeFromElement(element);
     this.cfg[prop] = element.selectedIndex;
 
     try {
       await this.cfg.save(prop);
       this.populateOptions();
     } catch (err) {
-      OptionPage.showErrorModal('Failed to update defult wordlist.', err);
+      this.Class.showErrorModal('Failed to update defult wordlist.', err);
     }
   }
 
   setHelpVersion() {
     const helpVersion = document.getElementById('helpVersion') as HTMLAnchorElement;
-    helpVersion.textContent = WebConfig.BUILD.version;
+    helpVersion.textContent = this.Class.Config.BUILD.version;
   }
 
   setThemeButton(darkTheme: boolean) {
@@ -1750,57 +1687,29 @@ export default class OptionPage {
     tableContainer.querySelectorAll('th input.wordlistHeader').forEach((el) => {
       el.addEventListener('click', (evt) => { this.bulkEditorWordlistCheckbox(evt.target as HTMLInputElement); });
     });
-    OptionPage.openModal(modalId);
-  }
-
-  showSupportedAudioSiteConfig() {
-    const select = document.querySelector('#supportedAudioSitesModal select#siteSelect') as HTMLSelectElement;
-    const textArea = document.querySelector('#supportedAudioSitesModal div#modalContentRight textarea') as HTMLTextAreaElement;
-    const config = {};
-    config[select.value] = this.supportedAudioSites[select.value];
-    textArea.textContent = JSON.stringify(config, null, 2);
-  }
-
-  showSupportedAudioSites() {
-    const title = document.querySelector('#supportedAudioSitesModal h5.modalTitle') as HTMLHeadingElement;
-    title.textContent = 'Supported Audio Sites';
-    const contentLeft = document.querySelector('#supportedAudioSitesModal div#modalContentLeft') as HTMLDivElement;
-    const select = contentLeft.querySelector('#siteSelect') as HTMLSelectElement;
-    removeChildren(select);
-
-    this.supportedAudioSites = WebAudio.supportedSites();
-    const sortedSites = Domain.sortedKeys(this.supportedAudioSites);
-    sortedSites.forEach((site) => {
-      const optionElement = document.createElement('option');
-      optionElement.value = site;
-      optionElement.textContent = site;
-      select.appendChild(optionElement);
-    });
-
-    this.showSupportedAudioSiteConfig();
-    OptionPage.openModal('supportedAudioSitesModal');
+    this.Class.openModal(modalId);
   }
 
   async statsReset() {
     try {
-      await WebConfig.removeLocalStorage('stats');
+      await this.Class.Config.removeLocalStorage('stats');
       this.populateStats();
     } catch (err) {
       logger.warn('Failed to reset stats.', err);
-      OptionPage.showErrorModal(['Failed to reset stats.', `Error: ${err.message}`]);
+      this.Class.showErrorModal(['Failed to reset stats.', `Error: ${err.message}`]);
     }
   }
 
   switchPage(newTab: HTMLAnchorElement) {
-    const currentTab = document.querySelector(`#menu a.${OptionPage.activeClass}`) as HTMLElement;
+    const currentTab = document.querySelector(`#menu a.${this.Class.activeClass}`) as HTMLElement;
 
-    currentTab.classList.remove(OptionPage.activeClass);
-    newTab.classList.add(OptionPage.activeClass);
+    currentTab.classList.remove(this.Class.activeClass);
+    newTab.classList.add(this.Class.activeClass);
 
     const currentPage = document.getElementById(currentTab.textContent.toLowerCase() + 'Page') as HTMLElement;
     const newPage = document.getElementById(newTab.textContent.toLowerCase() + 'Page') as HTMLElement;
-    OptionPage.hide(currentPage);
-    OptionPage.show(newPage);
+    this.Class.hide(currentPage);
+    this.Class.show(newPage);
 
     switch (newTab.textContent.toLowerCase()) {
       case 'test':
@@ -1822,60 +1731,80 @@ export default class OptionPage {
     this.applyTheme();
   }
 
-  updateBookmarklet(url: string) {
-    const bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
-    const bookmarklet = new Bookmarklet(url);
-    bookmarkletLink.href = bookmarklet.destination();
-    OptionPage.enableBtn(bookmarkletLink);
+  totalFilteredWordStat(wordStats) {
+    return wordStats ? wordStats.text : 0;
   }
 
   async updateContextMenu(input: HTMLInputElement) {
     this.cfg.contextMenu = input.checked;
     await this.cfg.save('contextMenu');
     const message: Message = {
-      destination: Constants.MESSAGING.BACKGROUND,
-      source: Constants.MESSAGING.OPTION,
+      destination: this.Class.Constants.MESSAGING.BACKGROUND,
+      source: this.Class.Constants.MESSAGING.OPTION,
       updateContextMenus: this.cfg.contextMenu,
     };
     chrome.runtime.sendMessage(message);
   }
 
-  updateHostedBookmarklet() {
-    const bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
-    const bookmarkletHostedURLInput = document.getElementById('bookmarkletHostedURL') as HTMLInputElement;
-    OptionPage.hideInputError(bookmarkletHostedURLInput);
-
-    if (bookmarkletHostedURLInput.checkValidity()) {
-      this.updateBookmarklet(bookmarkletHostedURLInput.value);
-    } else {
-      if (bookmarkletHostedURLInput.value !== '') {
-        OptionPage.showInputError(bookmarkletHostedURLInput, 'Please enter a valid URL.');
-      }
-      bookmarkletLink.href = '#0';
-      OptionPage.disableBtn(bookmarkletLink);
-    }
-  }
-
   updateFilterOptions() {
     // Show/hide options as needed
     switch (this.cfg.filterMethod) {
-      case Constants.FILTER_METHODS.CENSOR:
-        OptionPage.show(document.getElementById('censorSettings'));
-        OptionPage.hide(document.getElementById('substitutionSettings'));
-        OptionPage.hide(document.getElementById('wordSubstitution'));
+      case this.Class.Constants.FILTER_METHODS.CENSOR:
+        this.Class.show(document.getElementById('censorSettings'));
+        this.Class.hide(document.getElementById('substitutionSettings'));
+        this.Class.hide(document.getElementById('wordSubstitution'));
         break;
-      case Constants.FILTER_METHODS.SUBSTITUTE:
-        OptionPage.hide(document.getElementById('censorSettings'));
-        OptionPage.show(document.getElementById('substitutionSettings'));
-        OptionPage.show(document.getElementById('wordSubstitution'));
+      case this.Class.Constants.FILTER_METHODS.SUBSTITUTE:
+        this.Class.hide(document.getElementById('censorSettings'));
+        this.Class.show(document.getElementById('substitutionSettings'));
+        this.Class.show(document.getElementById('wordSubstitution'));
         break;
-      case Constants.FILTER_METHODS.OFF:
-      case Constants.FILTER_METHODS.REMOVE:
-        OptionPage.hide(document.getElementById('censorSettings'));
-        OptionPage.hide(document.getElementById('substitutionSettings'));
-        OptionPage.hide(document.getElementById('wordSubstitution'));
+      case this.Class.Constants.FILTER_METHODS.OFF:
+      case this.Class.Constants.FILTER_METHODS.REMOVE:
+        this.Class.hide(document.getElementById('censorSettings'));
+        this.Class.hide(document.getElementById('substitutionSettings'));
+        this.Class.hide(document.getElementById('wordSubstitution'));
         break;
     }
+  }
+
+  updateOptionsFromPage() {
+    const censorCharacterSelect = document.getElementById('censorCharacterSelect') as HTMLSelectElement;
+    const censorFixedLengthSelect = document.getElementById('censorFixedLengthSelect') as HTMLSelectElement;
+    const defaultWordMatchMethodSelect = document.getElementById('defaultWordMatchMethodSelect') as HTMLSelectElement;
+    const defaultWordRepeat = document.getElementById('defaultWordRepeat') as HTMLInputElement;
+    const defaultWordSeparators = document.getElementById('defaultWordSeparators') as HTMLInputElement;
+    const preserveCase = document.getElementById('preserveCase') as HTMLInputElement;
+    const preserveFirst = document.getElementById('preserveFirst') as HTMLInputElement;
+    const preserveLast = document.getElementById('preserveLast') as HTMLInputElement;
+    const showCounter = document.getElementById('showCounter') as HTMLInputElement;
+    const showSummary = document.getElementById('showSummary') as HTMLInputElement;
+    const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
+    const substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
+    const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
+    const domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
+    const domainFilterAllFrames = document.getElementById('domainFilterAllFrames') as HTMLInputElement;
+    const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
+    const collectStats = document.getElementById('collectStats') as HTMLInputElement;
+    const configLoggingLevelSelect = document.getElementById('configLoggingLevelSelect') as HTMLSelectElement;
+    this.cfg.censorCharacter = censorCharacterSelect.value;
+    this.cfg.censorFixedLength = censorFixedLengthSelect.selectedIndex;
+    this.cfg.defaultWordMatchMethod = defaultWordMatchMethodSelect.selectedIndex;
+    this.cfg.defaultWordRepeat = booleanToNumber(defaultWordRepeat.checked);
+    this.cfg.defaultWordSeparators = booleanToNumber(defaultWordSeparators.checked);
+    this.cfg.preserveCase = preserveCase.checked;
+    this.cfg.preserveFirst = preserveFirst.checked;
+    this.cfg.preserveLast = preserveLast.checked;
+    this.cfg.showCounter = showCounter.checked;
+    this.cfg.showSummary = showSummary.checked;
+    this.cfg.showUpdateNotification = showUpdateNotification.checked;
+    this.cfg.substitutionMark = substitutionMark.checked;
+    this.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
+    this.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
+    this.cfg.enabledFramesOnly = !domainFilterAllFrames.checked;
+    this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
+    this.cfg.collectStats = collectStats.checked;
+    this.cfg.loggingLevel = this.Class.Constants.LOGGING_LEVELS[configLoggingLevelSelect.value.toUpperCase()];
   }
 
   async updateUseSystemTheme(useDeviceThemeInput: HTMLInputElement) {
@@ -1884,161 +1813,24 @@ export default class OptionPage {
       await this.cfg.save('darkMode');
       this.applyTheme(true);
     } catch (err) {
-      OptionPage.handleError('Failed to update theme selection.', err);
-    }
-  }
-
-  async updateYouTubeAutoLimits(input: HTMLInputElement) {
-    const max = document.getElementById('audioYouTubeAutoSubsMax') as HTMLInputElement;
-    const min = document.getElementById('audioYouTubeAutoSubsMin') as HTMLInputElement;
-    OptionPage.hideInputError(max);
-    OptionPage.hideInputError(min);
-    if (input.checkValidity()) {
-      const maxValue = parseFloat(max.value);
-      const minValue = parseFloat(min.value);
-      if (minValue != 0 && maxValue != 0 && minValue > maxValue) {
-        OptionPage.showInputError(input, 'Min must be less than max.');
-      } else {
-        try {
-          this.cfg.youTubeAutoSubsMax = maxValue;
-          this.cfg.youTubeAutoSubsMin = minValue;
-          await this.cfg.save(['youTubeAutoSubsMax', 'youTubeAutoSubsMin']);
-        } catch (err) {
-          OptionPage.handleError('Failed to update YouTube muting min/max values.', err);
-        }
-      }
-    } else {
-      OptionPage.showInputError(input, 'Please enter a valid number of seconds.');
+      this.Class.handleError('Failed to update theme selection.', err);
     }
   }
 
   validateLessUsedWordsNumber() {
     const lessUsedWordsNumber = document.getElementById('lessUsedWordsNumber') as HTMLInputElement;
     let valid = false;
-    OptionPage.hideInputError(lessUsedWordsNumber);
+    this.Class.hideInputError(lessUsedWordsNumber);
     if (lessUsedWordsNumber.value.match(/^\d+$/) && parseInt(lessUsedWordsNumber.value) > 0) {
       valid = true;
     } else {
-      OptionPage.showInputError(lessUsedWordsNumber, 'Enter a positive whole number.');
+      this.Class.showInputError(lessUsedWordsNumber, 'Enter a positive whole number.');
     }
 
     return valid;
   }
+
+  wordlistTypeFromElement(element: HTMLSelectElement) {
+    if (element.id === 'textWordlistSelect') return 'wordlistId';
+  }
 }
-
-const logger = new Logger('OptionPage');
-const filter = new Filter;
-const option = new OptionPage;
-let lessUsedWords = {};
-
-////
-// Events
-// Functions for confirm() to have access to `this`
-function bulkEditorSave() { option.bulkEditorSave(); }
-function bulkEditorSaveRetry() { option.bulkEditorSaveRetry(); }
-function importConfig() { option.importConfig(); }
-function importConfigRetry() { option.importConfigRetry(); }
-function importConfigRetryCancel() { option.importConfigRetryCancel(); }
-function populateConfig() { option.populateConfig(); }
-function convertStorageLocation() { option.convertStorageLocation(); }
-function removeAllWords() { option.removeAllWords(); }
-function removeLessUsedWords() { option.removeLessUsedWords(); }
-function restoreDefaults() { option.restoreDefaults(); }
-function setPassword() { option.auth.setPassword(); }
-function statsReset() { option.statsReset(); }
-// Add event listeners to DOM
-window.addEventListener('load', (evt) => { option.init(); });
-document.querySelectorAll('#menu a').forEach((el) => { el.addEventListener('click', (evt) => { option.switchPage(evt.target as HTMLAnchorElement); }); });
-// Modals
-document.getElementById('submitPassword').addEventListener('click', (evt) => { option.auth.authenticate(evt.target as HTMLButtonElement); });
-document.getElementById('confirmModalBackup').addEventListener('click', (evt) => { option.confirmModalBackup(); });
-document.getElementById('confirmModalOK').addEventListener('click', (evt) => { OptionPage.closeModal('confirmModal'); });
-document.getElementById('confirmModalCancel').addEventListener('click', (evt) => { OptionPage.closeModal('confirmModal'); });
-document.getElementById('statusModalOK').addEventListener('click', (evt) => { OptionPage.closeModal('statusModal'); });
-document.querySelector('#supportedAudioSitesModal #siteSelect').addEventListener('change', (evt) => { option.showSupportedAudioSiteConfig(); });
-document.querySelector('#supportedAudioSitesModal button.modalOK').addEventListener('click', (evt) => { OptionPage.closeModal('supportedAudioSitesModal'); });
-document.querySelector('#bulkWordEditorModal button.modalAddWord').addEventListener('click', (evt) => { option.bulkEditorAddRow(); });
-document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEventListener('click', (evt) => { option.bulkEditorAddWords(); });
-document.querySelector('#bulkWordEditorModal button.modalCancel').addEventListener('click', (evt) => { OptionPage.closeModal('bulkWordEditorModal'); });
-document.querySelector('#bulkWordEditorModal button.modalSave').addEventListener('click', (evt) => { option.confirm('bulkEditorSave'); });
-// Settings
-document.querySelectorAll('#filterMethod input').forEach((el) => { el.addEventListener('click', (evt) => { option.selectFilterMethod(evt.target as HTMLInputElement); }); });
-document.getElementById('censorCharacterSelect').addEventListener('change', (evt) => { option.saveOptions(); });
-document.getElementById('censorFixedLengthSelect').addEventListener('change', (evt) => { option.saveOptions(); });
-document.getElementById('defaultWordMatchMethodSelect').addEventListener('change', (evt) => { option.saveOptions(); });
-document.getElementById('defaultWordRepeat').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('defaultWordSeparators').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('preserveCase').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('preserveFirst').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('preserveLast').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('useDeviceTheme').addEventListener('click', (evt) => { option.updateUseSystemTheme(evt.target as HTMLInputElement); });
-document.getElementById('showContextMenu').addEventListener('click', (evt) => { option.updateContextMenu(evt.target as HTMLInputElement); });
-document.getElementById('showCounter').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('showSummary').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('showUpdateNotification').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('filterWordList').addEventListener('click', (evt) => { option.filterWordListUpdate(); });
-document.getElementById('substitutionMark').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('defaultWordSubstitutionText').addEventListener('change', (evt) => { option.saveOptions(); });
-// Words/Phrases
-document.getElementById('wordList').addEventListener('change', (evt) => { option.populateWord(); });
-document.getElementById('wordText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
-document.getElementById('substitutionText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
-document.getElementById('wordSave').addEventListener('click', (evt) => { option.saveWord(); });
-document.getElementById('wordRemove').addEventListener('click', (evt) => { option.removeWord(evt.target as HTMLButtonElement); });
-document.getElementById('wordRemoveAll').addEventListener('click', (evt) => { option.confirm('removeAllWords'); });
-document.getElementById('bulkWordEditorButton').addEventListener('click', (evt) => { option.showBulkWordEditor(); });
-// Lists
-document.getElementById('allowlistSelect').addEventListener('change', (evt) => { option.populateAllowlistWord(); });
-document.getElementById('allowlistText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
-document.getElementById('allowlistSave').addEventListener('click', (evt) => { option.saveAllowlist(); });
-document.getElementById('allowlistRemove').addEventListener('click', (evt) => { option.removeAllowlist(); });
-document.getElementById('wordlistsEnabled').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('wordlistRename').addEventListener('click', (evt) => { option.renameWordlist(); });
-document.getElementById('wordlistSelect').addEventListener('change', (evt) => { option.populateWordlist(); });
-document.getElementById('wordlistText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
-document.getElementById('textWordlistSelect').addEventListener('change', (evt) => { option.setDefaultWordlist(evt.target as HTMLSelectElement); });
-document.getElementById('audioWordlistSelect').addEventListener('change', (evt) => { option.setDefaultWordlist(evt.target as HTMLSelectElement); });
-// Domains
-document.querySelectorAll('#domainMode input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
-document.getElementById('domainFilterAllFrames').addEventListener('change', (evt) => { option.saveOptions(); });
-document.getElementById('domainSelect').addEventListener('change', (evt) => { option.populateDomain(); });
-document.getElementById('domainText').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
-document.getElementById('domainSave').addEventListener('click', (evt) => { option.saveDomain(); });
-document.getElementById('domainRemove').addEventListener('click', (evt) => { option.removeDomain(); });
-// Audio
-document.getElementById('muteAudio').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('supportedAudioSitesConfig').addEventListener('click', (evt) => { option.showSupportedAudioSites(); });
-document.getElementById('fillerAudioSelect').addEventListener('change', (evt) => { option.saveOptions(); });
-document.getElementById('muteAudioOnly').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('muteCueRequireShowing').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('audioYouTubeAutoMatchCensored').addEventListener('click', (evt) => { option.saveOptions(); });
-document.querySelectorAll('#audioMuteMethod input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
-document.querySelectorAll('#audioSubtitleSelection input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
-document.querySelectorAll('input.audioYouTubeAutoSubs').forEach((el) => { el.addEventListener('change', (evt) => { option.updateYouTubeAutoLimits(evt.target as HTMLInputElement); }); });
-document.getElementById('customAudioSitesSave').addEventListener('click', (evt) => { option.saveCustomAudioSites(); });
-// Bookmarklet
-document.querySelectorAll('#bookmarkletConfigInputs input').forEach((el) => { el.addEventListener('click', (evt) => { option.populateBookmarkletPage(); }); });
-document.getElementById('bookmarkletFile').addEventListener('click', (evt) => { option.exportBookmarkletFile(); });
-document.getElementById('bookmarkletHostedURL').addEventListener('input', (evt) => { option.updateHostedBookmarklet(); });
-document.getElementById('bookmarkletLink').addEventListener('click', (evt) => { evt.preventDefault(); });
-// Config
-document.getElementById('configSyncLargeKeys').addEventListener('click', (evt) => { option.confirm('convertStorageLocation'); });
-document.getElementById('configInlineInput').addEventListener('click', (evt) => { option.configInlineToggle(); });
-document.getElementById('importFileInput').addEventListener('change', (evt) => { option.importConfigFile((evt.target as HTMLInputElement).files); });
-document.getElementById('configReset').addEventListener('click', (evt) => { option.confirm('restoreDefaults'); });
-document.getElementById('configExport').addEventListener('click', (evt) => { option.exportConfig(); });
-document.getElementById('configImport').addEventListener('click', (evt) => { option.confirm('importConfig'); });
-document.getElementById('configLoggingLevelSelect').addEventListener('change', (evt) => { option.saveOptions(); });
-document.getElementById('setPassword').addEventListener('input', (evt) => { option.auth.setPasswordButton(); });
-document.getElementById('setPasswordBtn').addEventListener('click', (evt) => { option.confirm('setPassword'); });
-// Test
-document.getElementById('testText').addEventListener('input', (evt) => { option.populateTest(); });
-// Stats
-document.getElementById('collectStats').addEventListener('click', (evt) => { option.saveOptions(); });
-document.getElementById('statsReset').addEventListener('click', (evt) => { option.confirm('statsReset'); });
-document.getElementById('lessUsedWordsNumber').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
-document.getElementById('removeLessUsedWords').addEventListener('click', (evt) => { option.confirm('removeLessUsedWords'); });
-// Help
-document.querySelectorAll('div#helpContainer a').forEach((anchor) => { anchor.setAttribute('target', '_blank'); });
-// Other
-document.getElementsByClassName('themes')[0].addEventListener('click', (evt) => { option.toggleTheme(); });

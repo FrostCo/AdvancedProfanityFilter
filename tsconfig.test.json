@@ -4,10 +4,10 @@
     "baseUrl": "./",
     "lib": ["es2017", "dom", "dom.iterable"],
     "moduleResolution": "node",
-    "outDir": "./built",
+    "noEmit": true,
     "paths": {
       "@APF/*": ["src/script/*"],
-      "@VENDOR/*": ["src/script/vendor/*"],
+      "@VENDOR/*": ["src/script/vendor/*"]
     },
     "skipLibCheck": true,
     "target": "esnext"

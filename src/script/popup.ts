@@ -1,34 +1,39 @@
-import Constants from './lib/constants';
-import { dynamicList } from './lib/helper';
-import WebAudio from './webAudio';
-import WebConfig from './webConfig';
-import Domain from './domain';
-import Page from './page';
-import Logger from './lib/logger';
+import Constants from '@APF/lib/constants';
+import { dynamicList } from '@APF/lib/helper';
+import WebConfig from '@APF/webConfig';
+import Domain from '@APF/domain';
+import Page from '@APF/page';
+import Logger from '@APF/lib/logger';
 const logger = new Logger('Popup');
 
-class Popup {
-  audioSiteKeys: string[];
+export default class Popup {
   cfg: WebConfig;
+  disabledTab: boolean;
   domain: Domain;
   filterToggleProp: string;
   prefersDarkScheme: boolean;
   protected: boolean;
   status: number;
+  summaries: { number?: Summary };
   tab: chrome.tabs.Tab;
   themeElements: Element[];
   url: URL;
 
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  static get Config() { return WebConfig; }
+  static get Constants() { return Constants; }
+  static get Domain() { return Domain; }
+  static get Page() { return Page; }
+  get Class() { return (this.constructor as typeof Popup); }
+  //#endregion
+
   static readonly _requiredConfig = [
-    'audioWordlistId',
-    'customAudioSites',
     'darkMode',
     'domains',
     'enabledDomainsOnly',
     'filterMethod',
     'loggingLevel',
-    'muteAudio',
-    'muteAudioOnly',
     'password',
     'wordlistId',
     'wordlists',
@@ -51,22 +56,22 @@ class Popup {
   }
 
   static async load(instance: Popup) {
-    instance.cfg = await WebConfig.load(Popup._requiredConfig);
+    instance.cfg = await this.Config.load(this._requiredConfig);
     logger.setLevel(instance.cfg.loggingLevel);
-    instance.tab = await Domain.getCurrentTab() as chrome.tabs.Tab;
+    instance.tab = await this.Domain.getCurrentTab() as chrome.tabs.Tab;
     if (instance.tab.url) {
       instance.url = new URL(instance.tab.url);
-      instance.domain = Domain.byHostname(instance.url.hostname, instance.cfg.domains);
+      instance.domain = this.Domain.byHostname(instance.url.hostname, instance.cfg.domains);
     } else { // No URL (can be blank in Safari new tab)
       instance.url = null;
-      instance.domain = new Domain('');
+      instance.domain = new this.Domain('');
     }
     instance.filterToggleProp = instance.cfg.enabledDomainsOnly ? 'enabled' : 'disabled';
 
     // Request current tab status
     const statusMessage: Message = {
-      source: Constants.MESSAGING.POPUP,
-      destination: Constants.MESSAGING.BACKGROUND,
+      source: this.Constants.MESSAGING.POPUP,
+      destination: this.Constants.MESSAGING.BACKGROUND,
       getStatus: true,
       tabId: instance.tab.id,
     };
@@ -83,8 +88,11 @@ class Popup {
   }
 
   constructor() {
+    this.initializeMessaging();
+    this.disabledTab = false;
     this.prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
     this.protected = false;
+    this.summaries = {};
     this.themeElements = [document.body, document.querySelector('#footer')];
   }
 
@@ -116,99 +124,190 @@ class Popup {
     }
   }
 
+  disableDomainSwitch() {
+    const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
+    const domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
+    this.Class.disable(domainFilter);
+    this.Class.disable(domainToggle);
+  }
+
+  disableOptions() {
+    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+    const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    this.Class.disable(domainModeSelect);
+    this.Class.disable(filterMethodSelect);
+    this.Class.disable(wordlistSelect);
+  }
+
+  enableOptions() {
+    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+    const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    this.Class.enable(domainModeSelect);
+    this.Class.enable(filterMethodSelect);
+    this.Class.enable(wordlistSelect);
+  }
+
   async filterMethodSelect() {
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
     this.cfg.filterMethod = filterMethodSelect.selectedIndex;
     try {
       await this.cfg.save('filterMethod');
       chrome.tabs.reload();
+      this.populateOptions();
     } catch (err) {
       logger.error('Failed to update selected filter method.', err);
     }
   }
 
-  async populateOptions() {
-    await Popup.load(popup);
-    this.applyTheme();
+  getBackgroundData(): Promise<BackgroundData> {
+    return new Promise((resolve, reject) => {
+      const message = {
+        destination: this.Class.Constants.MESSAGING.BACKGROUND,
+        source: this.Class.Constants.MESSAGING.POPUP,
+        backgroundData: true,
+        tabId: this.tab.id,
+      };
+      chrome.runtime.sendMessage(message, (response) => {
+        if (!response) { response = { disabledTab: false }; }
+        resolve(response);
+      });
+    });
+  }
 
-    const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
-    const domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
-    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
-    const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+  handleDisabled() {
+    this.setDomainSwitch(false);
+    if (this.disabledTab) this.disableDomainSwitch();
+    this.disableOptions();
+  }
+
+  handleEnabled() {
+    this.setDomainSwitch(true);
+    this.enableOptions();
+  }
+
+  handlePasswordProtected() {
+    this.protected = true;
+    this.disableDomainSwitch();
+    this.disableOptions();
+  }
+
+  handleRestrictedPage() {
+    this.setDomainSwitch(false);
+    this.disableDomainSwitch();
+    this.disableOptions();
+  }
+
+  handleSummaryMessage(frameId: number, summary: Summary) {
+    if (Object.keys(summary).length) {
+      this.updateSummaries(frameId, summary);
+      this.populateSummary();
+    }
+  }
+
+  handleWordlistsEnabled() {
     const wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
-    const audioWordlistSelect = document.getElementById('audioWordlistSelect') as HTMLSelectElement;
-    let audioPage = false;
-    dynamicList(Constants.orderedArray(Constants.DOMAIN_MODES), domainModeSelect, true);
+    const wordlists = ['Default Wordlist'].concat(this.Class.Config._allWordlists, this.cfg.wordlists);
+    const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
+    dynamicList(wordlists, wordlistSelect);
+    wordlistSelect.selectedIndex = wordlistIndex;
+    this.Class.show(wordListContainer);
+  }
+
+  initializeMessaging() {
+    chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) => {
+      if (request.destination !== this.Class.Constants.MESSAGING.POPUP) return true;
+
+      if (request.summary) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (sender.tab.id == tabs[0].id) this.handleSummaryMessage(sender.frameId, request.summary);
+        });
+      } else if (request.status) {
+        this.updateStatus(request.status);
+      } else {
+        logger.error('Received unhandled message.', JSON.stringify(request));
+      }
+
+      sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
+    });
+
+    // Initial data request
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        { destination: this.Class.Constants.MESSAGING.CONTEXT, source: this.Class.Constants.MESSAGING.POPUP, summary: true },
+        () => chrome.runtime.lastError // Suppress error if no listener);
+      );
+    });
+  }
+
+  async initializePopup() {
+    await this.Class.load(this);
+    this.applyTheme();
+    this.populateOptions(true);
+  }
+
+  get isDisabled() {
+    return this.domain.disabled || this.disabledTab || (this.cfg.enabledDomainsOnly && !this.domain.enabled);
+  }
+
+  get isPasswordProtected() {
+    return this.cfg.password && this.cfg.password != '';
+  }
+
+  get isRestrictedPage() {
+    return (
+      !this.domain.hostname
+      || this.Class.Page.disabledProtocols.test(this.url.protocol)
+      || this.domain.hostname == 'chrome.google.com'
+    );
+  }
+
+  async populateOptions(init = false) {
+    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
+    const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
+    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.DOMAIN_MODES), domainModeSelect, true);
     domainModeSelect.selectedIndex = this.domain.getModeIndex();
-    dynamicList(Constants.orderedArray(Constants.FILTER_METHODS), filterMethodSelect, true);
+    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.FILTER_METHODS), filterMethodSelect, true);
     filterMethodSelect.selectedIndex = this.cfg.filterMethod;
 
-    if (this.cfg.wordlistsEnabled) {
-      const wordlists = ['Default Wordlist'].concat(WebConfig._allWordlists, this.cfg.wordlists);
-      const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
-      dynamicList(wordlists, wordlistSelect);
-      wordlistSelect.selectedIndex = wordlistIndex;
-      if (this.cfg.muteAudio) {
-        this.audioSiteKeys = Object.keys(WebAudio.supportedAndCustomSites(this.cfg.customAudioSites));
-        if (this.audioSiteKeys.includes(this.domain.cfgKey)) {
-          audioPage = true;
-          const audioWordlistIndex = this.domain.audioWordlistId >= 0 ? this.domain.audioWordlistId + 1 : 0;
-          dynamicList(wordlists, audioWordlistSelect);
-          audioWordlistSelect.selectedIndex = audioWordlistIndex;
-          const audioWordlistContainer = document.getElementById('audioWordlistContainer') as HTMLElement;
-          Popup.show(audioWordlistContainer);
-        }
-      }
-      Popup.show(wordListContainer);
+    if (init) {
+      const backgroundData = await this.getBackgroundData();
+      this.disabledTab = backgroundData.disabledTab;
+    } else {
+      this.updateStatus(null);
+      this.summaries = {};
+      this.populateSummary();
     }
 
-    if (this.cfg.password && this.cfg.password != '') {
-      this.protected = true;
-      Popup.disable(domainFilter);
-      Popup.disable(domainToggle);
-      Popup.disable(domainModeSelect);
-      Popup.disable(filterMethodSelect);
-      Popup.disable(wordlistSelect);
-      Popup.disable(audioWordlistSelect);
+    if (this.wordlistsEnabled) this.handleWordlistsEnabled();
+
+    if (this.isRestrictedPage) {
+      this.handleRestrictedPage();
+      return false;
     }
 
-    // Restricted pages
-    if (
-      !this.domain.hostname
-      || Page.disabledProtocols.test(this.url.protocol)
-      || this.domain.hostname == 'chrome.google.com'
-      || (this.cfg.muteAudio && this.cfg.muteAudioOnly && !audioPage)
-    ) {
-      domainFilter.checked = false;
-      Popup.disable(domainFilter);
-      Popup.disable(domainToggle);
-      Popup.disable(domainModeSelect);
-      Popup.disable(filterMethodSelect);
-      Popup.disable(wordlistSelect);
-      Popup.disable(audioWordlistSelect);
+    if (this.isPasswordProtected) {
+      this.handlePasswordProtected();
       return false;
     }
 
     // Set initial value for domain filter and disable options if they are not applicable
-    if (this.domain.disabled || (this.cfg.enabledDomainsOnly && !this.domain.enabled)) {
-      domainFilter.checked = false;
-      Popup.disable(domainModeSelect);
-      Popup.disable(filterMethodSelect);
-      Popup.disable(wordlistSelect);
-      Popup.disable(audioWordlistSelect);
-    }
+    this.isDisabled ? this.handleDisabled() : this.handleEnabled();
   }
 
-  populateSummary(summary: Summary) {
+  populateSummary() {
     const summaryContainer = document.getElementById('summary') as HTMLDivElement;
     const table = summaryContainer.querySelector('table') as HTMLTableElement;
     const oldTBody = table.tBodies[0];
     const tBody = document.createElement('tbody');
+    const summary = this.summary;
+    const sortedKeys = Object.keys(summary).sort((a, b) => summary[b].count - summary[a].count);
 
-    if (Object.keys(summary).length > 0) {
-      const sortedKeys = Object.keys(summary).sort((a, b) => summary[b].count - summary[a].count);
-      sortedKeys.forEach((key) => {
+    if (sortedKeys.length) {
+      for (const key of sortedKeys) {
         const row = tBody.insertRow();
         const wordCell = row.insertCell(0);
         wordCell.classList.add('w3-tooltip');
@@ -223,7 +322,7 @@ class Popup {
         const countCell = row.insertCell(1);
         countCell.classList.add('w3-right');
         countCell.textContent = summary[key].count.toString();
-      });
+      }
 
       summaryContainer.classList.remove('w3-hide');
     } else {
@@ -232,12 +331,32 @@ class Popup {
     table.replaceChild(tBody, oldTBody);
   }
 
+  setDomainSwitch(checked: boolean = true) {
+    const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
+    domainFilter.checked = checked;
+  }
+
+  get summary(): Summary {
+    const combined = {};
+    for (const frameId of Object.keys(this.summaries)) {
+      const frame = this.summaries[frameId];
+      for (const wordKey of Object.keys(frame)) {
+        const frameWord = frame[wordKey];
+        if (!combined[wordKey]) combined[wordKey] = { count: 0, filtered: frameWord.filtered };
+        combined[wordKey].count += frameWord.count;
+      }
+    }
+
+    return combined;
+  }
+
   async toggle(prop: string) {
     if (!this.protected) {
       this.domain[prop] = !this.domain[prop];
       try {
         await this.domain.save(this.cfg);
         chrome.tabs.reload();
+        this.populateOptions();
       } catch (err) {
         logger.error(`Failed to toggle domain '${this.domain.hostname}'.`, err);
       }
@@ -251,6 +370,7 @@ class Popup {
       try {
         await this.domain.save(this.cfg);
         chrome.tabs.reload();
+        this.populateOptions();
       } catch (err) {
         logger.error(`Failed to update mode for domain '${this.domain.hostname}'.`, err);
       }
@@ -262,68 +382,31 @@ class Popup {
     const container = document.getElementById('statusContainer');
     const statusText = document.getElementById('statusText');
 
-    if (this.status == Constants.STATUS.MUTE_PAGE) {
-      Popup.show(container);
-      statusText.textContent = 'Watching for captions';
-      statusText.classList.remove('active');
-      statusText.classList.add('available');
-    } else if (this.status == Constants.STATUS.CAPTIONS) {
-      statusText.textContent = 'Muting active';
-      Popup.show(container);
-      statusText.classList.add('active');
-      statusText.classList.remove('available');
-    } else {
-      Popup.hide(container);
-      statusText.textContent = '';
-    }
+    this.Class.hide(container);
+    statusText.textContent = '';
+  }
+
+  updateSummaries(frameId: number, summary: Summary) {
+    this.summaries[frameId] = summary;
   }
 
   async wordlistSelect(select: HTMLSelectElement) {
-    const type = select.id === 'wordlistSelect' ? 'wordlistId' : 'audioWordlistId';
+    const type = this.wordlistType(select);
     this.domain[type] = select.selectedIndex > 0 ? select.selectedIndex - 1 : undefined; // index 0 = use default (undefined)
     try {
       await this.domain.save(this.cfg);
       chrome.tabs.reload();
+      this.populateOptions();
     } catch (err) {
       logger.error(`Failed to select wordlist for domain ${this.domain.hostname}.`, err);
     }
   }
-}
 
-// Listen for data updates from filter
-chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) => {
-  if (request.destination !== Constants.MESSAGING.POPUP) return true;
-
-  if (request.summary) {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (sender.tab.id == tabs[0].id) { popup.populateSummary(request.summary); }
-    });
-  } else if (request.status) {
-    popup.updateStatus(request.status);
-  } else {
-    logger.error('Received unhandled message.', JSON.stringify(request));
+  get wordlistsEnabled() {
+    return !!this.cfg.wordlistsEnabled;
   }
 
-  sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
-});
-
-// Initial data request
-chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-  chrome.tabs.sendMessage(
-    tabs[0].id,
-    { destination: Constants.MESSAGING.CONTEXT, source: Constants.MESSAGING.POPUP, summary: true },
-    () => chrome.runtime.lastError // Suppress error if no listener);
-  );
-});
-
-const popup = new Popup;
-
-////
-// Listeners
-window.addEventListener('load', (evt) => { popup.populateOptions(); });
-document.getElementById('domainFilter').addEventListener('change', (evt) => { popup.toggle(popup.filterToggleProp); });
-document.getElementById('domainModeSelect').addEventListener('change', (evt) => { popup.updateDomainMode(); });
-document.getElementById('filterMethodSelect').addEventListener('change', (evt) => { popup.filterMethodSelect(); });
-document.getElementById('wordlistSelect').addEventListener('change', (evt) => { popup.wordlistSelect(evt.target as HTMLSelectElement); });
-document.getElementById('audioWordlistSelect').addEventListener('change', (evt) => { popup.wordlistSelect(evt.target as HTMLSelectElement); });
-document.getElementById('options').addEventListener('click', (evt) => { chrome.runtime.openOptionsPage(); });
+  wordlistType(select: HTMLSelectElement): string {
+    return select.id === 'wordlistSelect' ? 'wordlistId' : '';
+  }
+}
