@@ -4,6 +4,6 @@ const path = require('path');
 
 module.exports = merge(common, {
   output: {
-    clean: true,
+    clean: false,
   },
 });
