@@ -391,7 +391,7 @@ export default class WebFilter extends Filter {
 
   processMutationTargetNode(mutation: MutationRecord) {
     if (mutation.target.nodeName === '#text') {
-      this.processMutationTargetText(mutation);
+      if (this.shouldProcessMutationTargetText(mutation)) this.processMutationTargetText(mutation);
     } else if (this.processMutationTarget) {
       this.processNode(mutation.target, this.wordlistId);
     }
@@ -460,6 +460,10 @@ export default class WebFilter extends Filter {
 
   shouldProcessMutationTargetNode(mutation: MutationRecord) {
     return mutation.target != null;
+  }
+
+  shouldProcessMutationTargetText(mutation: MutationRecord) {
+    return !this.Class.Page.isForbiddenNode(mutation.target);
   }
 
   shouldProcessRemovedNodes(mutation: MutationRecord) {
