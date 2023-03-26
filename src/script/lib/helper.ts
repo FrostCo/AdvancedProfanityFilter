@@ -111,25 +111,6 @@ export function getElements(selector: string, root: Document | HTMLElement | Sha
   }
 }
 
-export function getGlobalVariable(code: string, id: string = 'APFData') {
-  const script = document.createElement('script');
-  script.id = id;
-  script.textContent = `document.getElementById("${id}").textContent = JSON.stringify(${code})`;
-  document.documentElement.appendChild(script);
-  const result = document.querySelector(`script#${id}`).textContent;
-  script.remove();
-  return JSON.parse(result);
-}
-
-export function getGlobalVariableFromBackground(globalVariable: string, source = 'context') {
-  return new Promise((resolve, reject) => {
-    const message: Message = { destination: 'background', globalVariable: globalVariable, source: source };
-    chrome.runtime.sendMessage(message, (response) => {
-      resolve(response);
-    });
-  });
-}
-
 export function getParent(node: HTMLElement, level: number = 1): HTMLElement {
   if (!node) {
     return null;

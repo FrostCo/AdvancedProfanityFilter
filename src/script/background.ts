@@ -136,28 +136,8 @@ export default class Background {
     this.LOGGER.info('disabling tab once.', tabId);
   }
 
-  static async getGlobalVariable(variableName: string, sender, sendResponse) {
-    const [{ result }] = await chrome.scripting.executeScript({
-      func: this.getWindowVariable,
-      args: [variableName],
-      target: { tabId: sender.tab.id, frameIds: [sender.frameId] },
-      world: 'MAIN',
-    });
-    sendResponse(result);
-  }
-
   static getTabOptions(storage: BackgroundStorage, tabId: number): TabStorageOptions {
     return storage.tabs[tabId] || this.newTabOptions(storage, tabId);
-  }
-
-  // variableName Supports '.' notation for nested values: window.nested.value
-  static getWindowVariable(variableName: string) {
-    try {
-      const properties = variableName.split('.');
-      return properties.reduce((prev, curr) => prev && prev[curr], window);
-    } catch {
-      return null;
-    }
   }
 
   static async handleBackgroundDataRequest(request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
@@ -284,11 +264,9 @@ export default class Background {
         } else if (request.fetch) {
           this.handleRequest(request.fetch, request.fetchMethod, sendResponse);
           return true; // return true when waiting on an async call
-        } else if (request.globalVariable) {
-          this.getGlobalVariable(request.globalVariable, sender, sendResponse);
-          return true; // return true when waiting on an async call
         } else {
           this.onContextMessageElse(chromeAction, request, sender, sendResponse);
+          return true; // return true when waiting on an async call
         }
         break;
 
