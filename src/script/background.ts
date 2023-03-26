@@ -289,6 +289,7 @@ export default class Background {
           return true; // return true when waiting on an async call
         } else {
           this.onContextMessageElse(chromeAction, request, sender, sendResponse);
+          return true; // return true when waiting on an async call
         }
         break;
 
