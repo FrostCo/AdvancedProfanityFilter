@@ -58,16 +58,16 @@ export function getElement(selector: string, root: Document | ShadowRoot | HTMLE
 //   Supports querying through a shadow DOM using '>>>'
 function getElementCore(selector: string, root: Document | HTMLElement | ShadowRoot = document, queryMethod = 'querySelector'): HTMLElement | NodeListOf<HTMLElement> {
   let element;
-  const selectors = selector.split('>>>');
+  const domLayers = selector.split('>>>');
 
   // No shadowRoot in selector: return native querySelector[All]
-  if (selectors.length == 1) return root[queryMethod](selector);
+  if (domLayers.length == 1) return root[queryMethod](selector);
 
   // shadowRoot in selector: return querySelector[All] through shadowRoot(s)
-  while (selectors.length) {
+  while (domLayers.length) {
     if (root) {
-      const currentSelector = selectors.shift().trim();
-      if (selectors.length == 0) {
+      const currentSelector = domLayers.shift().trim();
+      if (domLayers.length == 0) {
         return root[queryMethod](currentSelector);
       } else {
         element = root.querySelector(currentSelector);
