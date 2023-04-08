@@ -86,9 +86,7 @@ export function getElements(selector: string, root: Document | HTMLElement | Sha
   const selectors = selector.split('>>>');
 
   // No shadowRoot in selector: return native querySelectorAll
-  if (selectors.length == 1) {
-    return root.querySelectorAll(selector);
-  }
+  if (selectors.length == 1) return root.querySelectorAll(selector);
 
   // shadowRoot in selector: return querySelectorAll through shadowRoot(s)
   while (selectors.length) {
