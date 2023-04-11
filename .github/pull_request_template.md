@@ -1,8 +1,8 @@
-## ✨  New Features & Updates:
+## ✨  New Features & Updates
 - [hash] description
 
-## 🐛 Bugs Fixed:
+## 🐛 Bugs Fixed
 - [hash] description
 
-## 🔧 Development:
+## 🔧 Development
 - [hash] description
