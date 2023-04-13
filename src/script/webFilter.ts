@@ -84,7 +84,9 @@ export default class WebFilter extends Filter {
     }
   }
 
-  beforeProcessingPage(message: Message) {}
+  beforeProcessingPage(message: Message) {
+    this.setDomainWordlist();
+  }
 
   buildInitStateMessage(message: Message) {
     // Get status
@@ -173,8 +175,6 @@ export default class WebFilter extends Filter {
     this.beforeProcessingPage(message);
     this.sendInitState(message);
     if (message.disabled) return false;
-
-    this.setDomainWordlist();
     this.onMessage();
 
     // Filter text from the main document and watch for new nodes

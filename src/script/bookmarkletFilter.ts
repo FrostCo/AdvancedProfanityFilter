@@ -61,7 +61,9 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  beforeProcessingPage(message: Message) {}
+  beforeProcessingPage(message: Message) {
+    this.setDomainWordlist();
+  }
 
   cleanChildNode(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     if (node.nodeName) {
@@ -117,8 +119,6 @@ export default class BookmarkletFilter extends Filter {
     const message = { disabled: false } as Message;
     this.beforeProcessingPage(message);
     if (message.disabled) return false;
-
-    this.setDomainWordlist();
 
     // Filter text from the main document and watch for new nodes
     this.init();
