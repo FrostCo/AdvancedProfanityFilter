@@ -22,7 +22,7 @@ export function dynamicList(list: string[], select: HTMLSelectElement, upperCase
 }
 
 export function exportToFile(dataStr, fileName = 'data.txt') {
-  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+  const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
   const linkElement = document.createElement('a');
   linkElement.setAttribute('href', dataUri);
   linkElement.setAttribute('download', fileName);
@@ -85,7 +85,7 @@ function getElementCore(selector: string, root: Document | HTMLElement | ShadowR
 
 // Returns the elements found by selector string
 //   Supports querying through a shadow DOM using '>>>'
-export function getElements(selector: string, root: Document | HTMLElement | ShadowRoot  = document): NodeListOf<HTMLElement> {
+export function getElements(selector: string, root: Document | HTMLElement | ShadowRoot = document): NodeListOf<HTMLElement> {
   return getElementCore(selector, root, 'querySelectorAll') as NodeListOf<HTMLElement>;
 }
 
