@@ -5,6 +5,9 @@
 [![paypal](https://flat.badgen.net/badge/paypal/donate/FFC439)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XFL36QJY752R6&source=url)
 [![Patreon](https://flat.badgen.net/badge/icon/patreon/F96854?icon=patreon&label)](https://www.patreon.com/richardfrost)
 
+[![Github](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/FrostCo/AdvancedProfanityFilter)
+[![Codeberg - Mirror](https://badgen.net/badge/git/codeberg?icon=git&label)](https://codeberg.org/FrostCo/AdvancedProfanityFilter)
+
 A browser extension to filter profanity from webpages.
 
 For an overview of features and options, please head to the [wiki](https://github.com/FrostCo/AdvancedProfanityFilter/wiki).
