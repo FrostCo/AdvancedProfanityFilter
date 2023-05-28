@@ -47,10 +47,7 @@ function firefoxBuild() {
 function handleManifest() {
   const manifest = loadJSONFile(distManifestPath);
 
-  if (manifest.version != buildData.version) {
-    console.log(`Updating manifest.json version (${manifest.version} -> ${buildData.version})`);
-    manifest.version = buildData.version;
-  }
+  if (manifest.version != buildData.version) manifest.version = buildData.version;
 
   if (buildData.manifestVersion == 2) {
     manifest.permissions.splice(manifest.permissions.indexOf('scripting'), 1);
