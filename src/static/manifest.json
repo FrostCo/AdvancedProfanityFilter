@@ -46,7 +46,6 @@
     "default_popup": "popup.html"
   },
   "host_permissions": [
-    "https://*.crunchyroll.com/",
-    "https://*.vrv.co/"
+    "https://*.crunchyroll.com/"
   ]
 }
