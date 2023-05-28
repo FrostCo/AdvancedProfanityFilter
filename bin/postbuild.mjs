@@ -70,7 +70,6 @@ function handleManifestVersion() {
       default_popup: 'popup.html',
       default_title: 'Advanced Profanity Filter',
     };
-    manifest.host_permissions = undefined;
   }
 
   writeJSONFile(distManifestPath, manifest);

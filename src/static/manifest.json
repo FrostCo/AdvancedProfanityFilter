@@ -44,8 +44,5 @@
     },
     "default_title": "Advanced Profanity Filter",
     "default_popup": "popup.html"
-  },
-  "host_permissions": [
-    "https://*.crunchyroll.com/"
-  ]
+  }
 }
