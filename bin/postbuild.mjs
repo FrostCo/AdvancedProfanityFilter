@@ -48,8 +48,9 @@ function firefoxBuild() {
 }
 
 function handleManifestVersion() {
+  const manifest = loadJSONFile(distManifestPath);
+
   if (buildData.manifestVersion == 2) {
-    const manifest = loadJSONFile(distManifestPath);
     manifest.permissions.splice(manifest.permissions.indexOf('scripting'), 1);
     manifest.action = undefined;
     manifest.manifest_version = buildData.manifestVersion;
@@ -71,8 +72,9 @@ function handleManifestVersion() {
       default_title: 'Advanced Profanity Filter',
     };
     manifest.host_permissions = undefined;
-    writeJSONFile(distManifestPath, manifest);
   }
+
+  writeJSONFile(distManifestPath, manifest);
 }
 
 function handleVersion() {
