@@ -10,7 +10,6 @@ import {
 } from './lib.mjs';
 
 let buildData;
-let distDir = 'dist';
 
 function common() {
   handleManifestVersion();
