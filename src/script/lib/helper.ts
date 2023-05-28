@@ -118,15 +118,6 @@ export function hmsToSeconds(timeStr: string, precision: number = 3): number {
   return parseFloat(((hour * 3600) + (minute * 60) + second).toFixed(precision));
 }
 
-export function injectScript(file, node, id: string = '') {
-  const th = document.getElementsByTagName(node)[0];
-  const s = document.createElement('script');
-  s.setAttribute('type', 'text/javascript');
-  if (id) { s.id = id; }
-  s.setAttribute('src', file);
-  th.appendChild(s);
-}
-
 // Is the provided version lower than the minimum version?
 export function isVersionOlder(version: Version, minimum: Version): boolean {
   if (version.major < minimum.major) {
