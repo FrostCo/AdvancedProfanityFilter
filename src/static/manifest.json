@@ -13,7 +13,6 @@
   "permissions": [
     "contextMenus",
     "notifications",
-    "scripting",
     "storage",
     "tabs"
   ],
