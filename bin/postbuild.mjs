@@ -5,15 +5,13 @@ import {
   buildFilePath,
   distManifestPath,
   loadJSONFile,
-  srcManifestPath,
   writeJSONFile
 } from './lib.mjs';
 
 let buildData;
 
 function common() {
-  handleManifestVersion();
-  handleVersion();
+  handleManifest();
 }
 
 function edgeLegacyBuild() {
@@ -46,8 +44,13 @@ function firefoxBuild() {
   writeJSONFile(distManifestPath, manifest);
 }
 
-function handleManifestVersion() {
+function handleManifest() {
   const manifest = loadJSONFile(distManifestPath);
+
+  if (manifest.version != buildData.version) {
+    console.log(`Updating manifest.json version (${manifest.version} -> ${buildData.version})`);
+    manifest.version = buildData.version;
+  }
 
   if (buildData.manifestVersion == 2) {
     manifest.permissions.splice(manifest.permissions.indexOf('scripting'), 1);
@@ -73,21 +76,6 @@ function handleManifestVersion() {
   }
 
   writeJSONFile(distManifestPath, manifest);
-}
-
-function handleVersion() {
-  const manifest = loadJSONFile(distManifestPath);
-
-  if (manifest.version != buildData.version) {
-    console.log(`Updating manifest.json version (${manifest.version} -> ${buildData.version})`);
-    manifest.version = buildData.version;
-    writeJSONFile(distManifestPath, manifest);
-
-    // Update source manfiest.json
-    const srcManifest = loadJSONFile(srcManifestPath);
-    srcManifest.version = buildData.version;
-    writeJSONFile(srcManifestPath, srcManifest);
-  }
 }
 
 function main() {
