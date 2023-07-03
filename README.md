@@ -1,12 +1,12 @@
 # Advanced Profanity Filter
 [<img src="https://flat.badgen.net/chrome-web-store/users/piajkpdbaniagacofgklljacgjhefjeh?color=blue" alt="Chrome Web Store" width="71" height="20">](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
 [<img src="https://flat.badgen.net/chrome-web-store/stars/piajkpdbaniagacofgklljacgjhefjeh?color=blue" width="102" height="20">](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
-[<img src="https://flat.badgen.net/badge/icon/discord?icon=discord&label" alt="Discord" width="71" height="20">](https://discord.com/invite/MpE5Z3f)
+[<img src="https://flat.badgen.net/badge/icon/discord?icon=discord&label" alt="Discord" width="68" height="20">](https://discord.com/invite/MpE5Z3f)
 [<img src="https://flat.badgen.net/badge/paypal/donate/FFC439" alt="PayPal" width="95" height="20">](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XFL36QJY752R6&source=url)
-[<img src="https://flat.badgen.net/badge/icon/patreon/F96854?icon=patreon&label" alt="Patreon" width="74" height="20">](https://www.patreon.com/richardfrost)
+[<img src="https://flat.badgen.net/badge/icon/patreon/F96854?icon=patreon&label" alt="Patreon" width="71" height="20">](https://www.patreon.com/richardfrost)
 
-[<img src="https://badgen.net/badge/icon/github?icon=github&label" alt="GitHub" width="66" height="20">](https://github.com/FrostCo/AdvancedProfanityFilter)
-[<img src="https://badgen.net/badge/git/codeberg?icon=git&label" alt="Codeberg" width="82" height="20">](https://codeberg.org/FrostCo/AdvancedProfanityFilter)
+[<img src="https://badgen.net/badge/icon/github?icon=github&label" alt="GitHub" width="63" height="20">](https://github.com/FrostCo/AdvancedProfanityFilter)
+[<img src="https://badgen.net/badge/git/codeberg?icon=git&label" alt="Codeberg" width="79" height="20">](https://codeberg.org/FrostCo/AdvancedProfanityFilter)
 
 A browser extension to filter profanity from webpages.
 
