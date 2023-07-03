@@ -1,12 +1,12 @@
 # Advanced Profanity Filter
-[![Chrome Web Store](https://flat.badgen.net/chrome-web-store/users/piajkpdbaniagacofgklljacgjhefjeh?color=blue)](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
-[![](https://flat.badgen.net/chrome-web-store/stars/piajkpdbaniagacofgklljacgjhefjeh?color=blue)](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
-[![Discord](https://flat.badgen.net/badge/icon/discord?icon=discord&label)](https://discord.com/invite/MpE5Z3f)
-[![PayPal](https://flat.badgen.net/badge/paypal/donate/FFC439)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XFL36QJY752R6&source=url)
-[![Patreon](https://flat.badgen.net/badge/icon/patreon/F96854?icon=patreon&label)](https://www.patreon.com/richardfrost)
+[<img src="https://flat.badgen.net/chrome-web-store/users/piajkpdbaniagacofgklljacgjhefjeh?color=blue" alt="Chrome Web Store" width="71" height="20">](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
+[<img src="https://flat.badgen.net/chrome-web-store/stars/piajkpdbaniagacofgklljacgjhefjeh?color=blue" width="102" height="20">](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
+[<img src="https://flat.badgen.net/badge/icon/discord?icon=discord&label" alt="Discord" width="71" height="20">](https://discord.com/invite/MpE5Z3f)
+[<img src="https://flat.badgen.net/badge/paypal/donate/FFC439" alt="PayPal" width="95" height="20">](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XFL36QJY752R6&source=url)
+[<img src="https://flat.badgen.net/badge/icon/patreon/F96854?icon=patreon&label" alt="Patreon" width="74" height="20">](https://www.patreon.com/richardfrost)
 
-[![Github](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/FrostCo/AdvancedProfanityFilter)
-[![Codeberg - Mirror](https://badgen.net/badge/git/codeberg?icon=git&label)](https://codeberg.org/FrostCo/AdvancedProfanityFilter)
+[<img src="https://badgen.net/badge/icon/github?icon=github&label" alt="GitHub" width="66" height="20">](https://github.com/FrostCo/AdvancedProfanityFilter)
+[<img src="https://badgen.net/badge/git/codeberg?icon=git&label" alt="Codeberg" width="82" height="20">](https://codeberg.org/FrostCo/AdvancedProfanityFilter)
 
 A browser extension to filter profanity from webpages.
 
