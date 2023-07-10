@@ -235,6 +235,8 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 }
 
 .extraSmallInput {
+  margin: 2px;
+  padding: 2px;
   width: 70px;
   text-align: right;
 }
