@@ -35,12 +35,14 @@ export default class Logger {
   }
 
   static logTime(level: string, message: string, data: any[] = []) {
-    const now = new Date().toLocaleString();
+    const now = new Date();
+    const currentTime = now.toLocaleTimeString().replace(' ', `.${now.getMilliseconds().toString()} `);
+
     message = `[${Logger.app}] ${message}`;
     if (data.length) {
-      console[level](message, now, data);
+      console[level](message, currentTime, data);
     } else {
-      console[level](message, now);
+      console[level](message, currentTime);
     }
   }
 
