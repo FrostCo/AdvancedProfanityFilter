@@ -201,7 +201,7 @@ describe('Filter', () => {
           });
           filter.init();
           expect(filter.counter).to.equal(0);
-          expect(filter.replaceText('Words used to be okay, but now even a word is bad.', filter.wordlistId, false)).to.equal('___ used to be okay, but now even a ___ is bad.');
+          expect(filter.replaceText('Words used to be okay, but now even a word is bad.', filter.wordlistId, null)).to.equal('___ used to be okay, but now even a ___ is bad.');
           expect(filter.counter).to.equal(0);
         });
 
@@ -641,7 +641,7 @@ describe('Filter', () => {
           });
           filter.init();
           expect(filter.counter).to.equal(0);
-          expect(filter.replaceText('This Sample is a pretty good sampler to sample.', filter.wordlistId, false)).to.equal('This [piece] is a pretty good [piece]r to [piece].');
+          expect(filter.replaceText('This Sample is a pretty good sampler to sample.', filter.wordlistId, null)).to.equal('This [piece] is a pretty good [piece]r to [piece].');
           expect(filter.counter).to.equal(0);
         });
 
@@ -858,7 +858,7 @@ describe('Filter', () => {
           });
           filter.init();
           expect(filter.counter).to.equal(0);
-          expect(filter.replaceText('This Sample is a pretty good sampler to sample.', filter.wordlistId, false)).to.equal('This is a pretty good to.');
+          expect(filter.replaceText('This Sample is a pretty good sampler to sample.', filter.wordlistId, null)).to.equal('This is a pretty good to.');
           expect(filter.counter).to.equal(0);
         });
 
