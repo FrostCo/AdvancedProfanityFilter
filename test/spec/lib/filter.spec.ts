@@ -381,6 +381,88 @@ describe('Filter', () => {
           expect(filter.replaceText('За пределами Словении этнические словенцы компактно')).to.equal('За пределами С*****ии этнические словенцы компактно');
           expect(filter.counter).to.equal(1);
         });
+
+        it('censor unicode character: ぅ', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            censorCharacter: '*',
+            filterMethod: Constants.FILTER_METHODS.CENSOR,
+            preserveFirst: false,
+            preserveLast: false,
+            words: Object.assign({
+              'ぅ': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
+            }, testWords),
+          });
+          filter.init();
+          expect(filter.replaceText('ぁ あ ぃ い ぅ')).to.equal('ぁ あ ぃ い *');
+          expect(filter.counter).to.equal(1);
+        });
+
+        it('censor emoji in sentence', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            censorCharacter: '*',
+            filterMethod: Constants.FILTER_METHODS.CENSOR,
+            preserveFirst: false,
+            preserveLast: false,
+            words: Object.assign({
+              '🍕': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
+            }, testWords),
+          });
+          filter.init();
+          expect(filter.replaceText('I love to eat 🍕 so much!')).to.equal('I love to eat * so much!');
+          expect(filter.counter).to.equal(1);
+        });
+
+        it('censor just an emoji', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            censorCharacter: '*',
+            filterMethod: Constants.FILTER_METHODS.CENSOR,
+            preserveFirst: false,
+            preserveLast: false,
+            words: Object.assign({
+              '🔧': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
+            }, testWords),
+          });
+          filter.init();
+          expect(filter.replaceText('🔧')).to.equal('*');
+          expect(filter.counter).to.equal(1);
+        });
+
+        it('censor just an emoji wtih fixed length', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            censorCharacter: '*',
+            censorFixedLength: 3,
+            filterMethod: Constants.FILTER_METHODS.CENSOR,
+            preserveFirst: false,
+            preserveLast: false,
+            words: Object.assign({
+              '🔧': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
+            }, testWords),
+          });
+          filter.init();
+          expect(filter.replaceText('🔧')).to.equal('***');
+          expect(filter.counter).to.equal(1);
+        });
+
+        it('censor an emoji and preserve unfiltered emojis', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            censorCharacter: '*',
+            filterMethod: Constants.FILTER_METHODS.CENSOR,
+            censorFixedLength: 2,
+            preserveFirst: true,
+            preserveLast: true,
+            words: Object.assign({
+              '❤️': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
+            }, testWords),
+          });
+          filter.init();
+          expect(filter.replaceText('ℹ️❤️🍕!')).to.equal('ℹ️**🍕!');
+          expect(filter.counter).to.equal(1);
+        });
       });
     });
 
