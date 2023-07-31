@@ -116,16 +116,33 @@ export default class Filter {
             if (this.checkAllowlist(match, string, matchStartIndex, word)) { return match; } // Check for allowlisted match
             if (statsType) { this.foundMatch(word, statsType); }
 
+            // Handle Unicode matches (including emojis)
+            let processedMatch = match;
+            const unicodeMatch = word.unicode || Word.containsDoubleByte(match);
+
+            if (unicodeMatch) {
+              processedMatch = '';
+              const length = match.length;
+              for (let i = 0; i < length; i++) {
+                if (match.charCodeAt(i) > 255) {
+                  processedMatch += this.cfg.censorCharacter;
+                  i++; // Skip the second byte
+                } else {
+                  processedMatch += match[i];
+                }
+              }
+            }
+
             // Filter
             let censoredString = '';
-            const censorLength = this.cfg.censorFixedLength > 0 ? this.cfg.censorFixedLength : match.length;
+            const censorLength = this.cfg.censorFixedLength > 0 ? this.cfg.censorFixedLength : processedMatch.length;
 
             if (this.cfg.preserveFirst && this.cfg.preserveLast) {
-              censoredString = match[0] + this.cfg.censorCharacter.repeat(censorLength - 2) + match.slice(-1);
+              censoredString = processedMatch[0] + this.cfg.censorCharacter.repeat(censorLength - 2) + processedMatch.slice(-1);
             } else if (this.cfg.preserveFirst) {
-              censoredString = match[0] + this.cfg.censorCharacter.repeat(censorLength - 1);
+              censoredString = processedMatch[0] + this.cfg.censorCharacter.repeat(censorLength - 1);
             } else if (this.cfg.preserveLast) {
-              censoredString = this.cfg.censorCharacter.repeat(censorLength - 1) + match.slice(-1);
+              censoredString = this.cfg.censorCharacter.repeat(censorLength - 1) + processedMatch.slice(-1);
             } else {
               censoredString = this.cfg.censorCharacter.repeat(censorLength);
             }
