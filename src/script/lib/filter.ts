@@ -119,19 +119,7 @@ export default class Filter {
             // Handle Unicode matches (including emojis)
             let processedMatch = match;
             const unicodeMatch = word.unicode || Word.containsDoubleByte(match);
-
-            if (unicodeMatch) {
-              processedMatch = '';
-              const length = match.length;
-              for (let i = 0; i < length; i++) {
-                if (match.charCodeAt(i) > 255) {
-                  processedMatch += this.cfg.censorCharacter;
-                  i++; // Skip the second byte
-                } else {
-                  processedMatch += match[i];
-                }
-              }
-            }
+            if (unicodeMatch) processedMatch = match.replace(Word.emojiRegExp, this.cfg.censorCharacter);
 
             // Filter
             let censoredString = '';
