@@ -74,9 +74,10 @@ function main() {
   // Perform postbuild actions
   common();
 
-  if (buildData.target == 'edgeLegacy') edgeLegacyBuild();
-
-  if (buildData.target == 'firefox') firefoxBuild();
+  switch (buildTarget.target) {
+    case 'edgeLegacy': edgeLegacyBuild(); break;
+    case 'firefox': firefoxBuild(); break;
+  }
 
   writeJSONFile(distManifestPath, manifest);
 }
