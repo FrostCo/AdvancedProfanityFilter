@@ -6,7 +6,7 @@ import { buildFilePath, devBuildFilePath, loadJSONFile, parseArgv, releaseBuildF
 let data = {
   release: false,
   config: {},
-  manifestVersion: 2,
+  manifestVersion: 3,
   target: 'chrome',
   version: '1.0.0',
 };
@@ -25,7 +25,7 @@ function common() {
 }
 
 function defaultBuild() {
-  manifestV2Build();
+  manifestV3Build();
 }
 
 function edgeLegacyBuild() {
