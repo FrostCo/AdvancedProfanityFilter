@@ -4,9 +4,9 @@ import fse from 'fs-extra';
 import { buildFilePath, devBuildFilePath, loadJSONFile, parseArgv, releaseBuildFilePath, writeJSONFile } from './lib.mjs';
 
 let data = {
-  release: false,
   config: {},
   manifestVersion: 3,
+  release: false,
   target: 'chrome',
   version: '1.0.0',
 };
