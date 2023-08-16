@@ -61,24 +61,26 @@ function main() {
 
     common();
 
+    target = target.replace('--', '');
     switch (target) {
-      case '--bookmarklet':
+      case 'bookmarklet':
         bookmarkletBuild();
         break;
-      case '--edgeLegacy':
+      case 'edgeLegacy':
         edgeLegacyBuild();
         break;
-      case '--firefox':
+      case 'firefox':
         firefoxBuild();
         break;
-      case '--manifestV2':
+      case 'manifestV2':
         manifestV2Build();
         break;
-      case '--manifestV3':
+      case 'manifestV3':
         manifestV3Build();
         break;
       default:
-        defaultBuild();
+        throw new Error(`Invalid target: ${target}`);
+        // defaultBuild();
     }
 
     const filePath = data.release ? releaseBuildFilePath : devBuildFilePath;
@@ -103,10 +105,9 @@ function manifestV3Build() {
 function targetFromData() {
   switch (data.target) {
     case 'chrome':
-      return `--manifestV${data.manifestVersion}`;
-    case 'bookmarklet':
-    case 'firefox:':
-      return `--${data.target}`;
+      return `manifestV${data.manifestVersion}`;
+    default:
+      return `${data.target}`;
   }
 }
 
