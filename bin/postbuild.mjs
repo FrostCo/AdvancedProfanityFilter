@@ -81,13 +81,9 @@ function main() {
   // Perform postbuild actions
   common();
 
-  if (buildData.target == 'edgeLegacy') {
-    edgeLegacyBuild();
-  }
+  if (buildData.target == 'edgeLegacy') edgeLegacyBuild();
 
-  if (buildData.target == 'firefox') {
-    firefoxBuild();
-  }
+  if (buildData.target == 'firefox') firefoxBuild();
 }
 
 main();
