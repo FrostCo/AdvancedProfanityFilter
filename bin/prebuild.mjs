@@ -61,7 +61,7 @@ function main() {
 
     common();
 
-    target = target.replace('--', '');
+    target = target?.replace('--', '');
     switch (target) {
       case 'bookmarklet':
         bookmarkletBuild();
@@ -79,8 +79,9 @@ function main() {
         manifestV3Build();
         break;
       default:
-        throw new Error(`Invalid target: ${target}`);
-        // defaultBuild();
+        // throw new Error(`Invalid target: ${target}`);
+        console.warn('\n!!!!! NOTICE: using default build !!!!!\n');
+        defaultBuild();
     }
 
     const filePath = data.release ? releaseBuildFilePath : devBuildFilePath;
