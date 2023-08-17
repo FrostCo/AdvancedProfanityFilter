@@ -74,7 +74,7 @@ function main() {
   // Perform postbuild actions
   common();
 
-  switch (buildTarget.target) {
+  switch (buildData.target) {
     case 'edgeLegacy': edgeLegacyBuild(); break;
     case 'firefox': firefoxBuild(); break;
   }
