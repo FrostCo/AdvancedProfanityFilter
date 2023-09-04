@@ -59,6 +59,7 @@
     "test:lint:tests": "eslint \"test/spec/*.spec.ts\"",
     "test:lint": "eslint \"src/**/*.ts\"",
     "test:nocov": "ts-mocha -p tsconfig.test.json --paths",
+    "test:types:tests": "tsc --noEmit -p test/tsconfig.json",
     "test:types": "tsc --noEmit",
     "test": "npm run test:lint && npm run test:types && npm run test:addon && npm run test:cov",
     "type-check:watch": "npm run type-check -- --watch",
