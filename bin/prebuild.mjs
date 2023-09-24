@@ -29,11 +29,11 @@ function defaultBuild() {
 }
 
 function edgeLegacyBuild() {
-  data.target = 'edgeLegacy';
+  // Target customizations
 }
 
 function firefoxBuild() {
-  data.target = 'firefox';
+  // Target customizations
 }
 
 function main() {
