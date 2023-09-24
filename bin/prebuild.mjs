@@ -20,12 +20,27 @@ function bookmarkletBuild() {
   data.manifestVersion = 0;
 }
 
+function chromeBuild() {
+  switch (data.manifestVersion) {
+    case 2: chromeMv2Build(); break;
+    case 3: chromeMv3Build(); break;
+  }
+}
+
+function chromeMv2Build() {
+  // Customizations for manifest version
+}
+
+function chromeMv3Build() {
+  // Customizations for manifest version
+}
+
 function common() {
   data.version = process.env.npm_package_version;
 }
 
 function defaultBuild() {
-  manifestV3Build();
+  chromeBuild();
 }
 
 function edgeLegacyBuild() {
@@ -46,7 +61,11 @@ function main() {
     const target = argv.arguments[0]?.replace('--', '');
 
     if (target) {
-      data.target = target;
+      const targetArray = target.split('-');
+      data.target = targetArray[0];
+      if (targetArray.length == 2) {
+        data.manifestVersion = parseInt(targetArray[1].match(/\d$/)?.toString()) || data.manifestVersion;
+      }
     } else {
       // Use existing buildFile as starting point if no target was passed
       if (data.release && fse.existsSync(releaseBuildFilePath)) {
@@ -65,17 +84,14 @@ function main() {
       case 'bookmarklet':
         bookmarkletBuild();
         break;
+      case 'chrome':
+        chromeBuild();
+        break;
       case 'edgeLegacy':
         edgeLegacyBuild();
         break;
       case 'firefox':
         firefoxBuild();
-        break;
-      case 'manifestV2':
-        manifestV2Build();
-        break;
-      case 'manifestV3':
-        manifestV3Build();
         break;
       default:
         // throw new Error(`Invalid target: ${data.target}`);
@@ -92,14 +108,6 @@ function main() {
   } else {
     throw (new Error('Incorrect number of arguments.'));
   }
-}
-
-function manifestV2Build() {
-  data.manifestVersion = 2;
-}
-
-function manifestV3Build() {
-  data.manifestVersion = 3;
 }
 
 main();
