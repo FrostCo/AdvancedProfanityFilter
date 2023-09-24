@@ -43,25 +43,25 @@ function main() {
     if (data.release) {
       argv.arguments.splice(argv.arguments.indexOf('--release'), 1);
     }
-    let target = argv.arguments[0]?.replace('--', '');
+    const target = argv.arguments[0]?.replace('--', '');
 
     // Only show build details if no target was passed or if this is a release
     const showBuildDetails = (!target || data.release);
 
-    // Use existing buildFile as starting point if no target was passed
-    if (!target) {
+    if (target) {
+      data.target = target;
+    } else {
+      // Use existing buildFile as starting point if no target was passed
       if (data.release && fse.existsSync(releaseBuildFilePath)) {
         data = loadJSONFile(releaseBuildFilePath);
-        target = targetFromData();
       } else if (!data.release && fse.existsSync(devBuildFilePath)) {
         data = loadJSONFile(devBuildFilePath);
-        target = targetFromData();
       }
     }
 
     common();
 
-    switch (target) {
+    switch (data.target) {
       case 'bookmarklet':
         bookmarkletBuild();
         break;
@@ -78,7 +78,7 @@ function main() {
         manifestV3Build();
         break;
       default:
-        // throw new Error(`Invalid target: ${target}`);
+        // throw new Error(`Invalid target: ${data.target}`);
         console.warn('\n!!!!! NOTICE: using default build !!!!!\n');
         defaultBuild();
     }
@@ -100,15 +100,6 @@ function manifestV2Build() {
 
 function manifestV3Build() {
   data.manifestVersion = 3;
-}
-
-function targetFromData() {
-  switch (data.target) {
-    case 'chrome':
-      return `manifestV${data.manifestVersion}`;
-    default:
-      return `${data.target}`;
-  }
 }
 
 main();
