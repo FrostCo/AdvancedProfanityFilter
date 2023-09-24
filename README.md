@@ -81,7 +81,6 @@ Once the extension has been built, you can load the unpacked extension (found in
 | v3      | Chrome, Edge, etc. |
 | v2*     | Chrome, Edge, etc. |
 | firefox | Firefox            |
-| safari  | Safari (MacOS/iOS) |
 
 _* = default target_
 
@@ -94,8 +93,6 @@ For all scripts, please see `package.json`.
 | v3      | build   | `npm run build:v3`       | Development build for Manifest V3 |
 | v2      | build   | `npm run build:v2`       | Development build for Manifest V2 |
 | firefox | build   | `npm run build:firefox`  | Development build for Firefox     |
-| safari  | build   | `npm run build:safari`   | Development build for Safari      |
-| safari  | release | `npm run package:safari` | Official release for safari       |
 |         | release | `npm run release:all`    | Official relase for all targets   |
 
 ### State files
