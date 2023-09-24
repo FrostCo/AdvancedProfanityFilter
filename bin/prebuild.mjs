@@ -43,7 +43,7 @@ function main() {
     if (data.release) {
       argv.arguments.splice(argv.arguments.indexOf('--release'), 1);
     }
-    let target = argv.arguments[0];
+    let target = argv.arguments[0]?.replace('--', '');
 
     // Only show build details if no target was passed or if this is a release
     const showBuildDetails = (!target || data.release);
@@ -61,7 +61,6 @@ function main() {
 
     common();
 
-    target = target?.replace('--', '');
     switch (target) {
       case 'bookmarklet':
         bookmarkletBuild();
