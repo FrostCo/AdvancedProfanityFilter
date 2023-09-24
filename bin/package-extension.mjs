@@ -36,15 +36,7 @@ function main() {
 }
 
 function zipName() {
-  let name;
-
-  if (buildData.target == 'chrome') {
-    name = `extension-mv${buildData.manifestVersion}`;
-  } else {
-    name = `extension-${buildData.target}`;
-  }
-
-  return name;
+  return `${buildData.target}-mv${buildData.manifestVersion}`;
 }
 
 main();
