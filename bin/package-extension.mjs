@@ -36,7 +36,7 @@ function main() {
 }
 
 function zipName() {
-  return `${buildData.target}-mv${buildData.manifestVersion}`;
+  return `${buildData.target}-mv${buildData.manifestVersion}-v${buildData.version}`;
 }
 
 main();
