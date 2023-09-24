@@ -45,9 +45,6 @@ function main() {
     }
     const target = argv.arguments[0]?.replace('--', '');
 
-    // Only show build details if no target was passed or if this is a release
-    const showBuildDetails = (!target || data.release);
-
     if (target) {
       data.target = target;
     } else {
@@ -58,6 +55,9 @@ function main() {
         data = loadJSONFile(devBuildFilePath);
       }
     }
+
+    // Only show build details if no target was passed or if this is a release
+    const showBuildDetails = (!target || data.release);
 
     common();
 
