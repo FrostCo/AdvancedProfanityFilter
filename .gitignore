@@ -10,6 +10,7 @@ bin/git-filters/*.js
 # Packaged extensions
 /dist/*
 /*.zip
+/release/**/*.zip
 
 # Dev extensions for debugging
 /extension*/*

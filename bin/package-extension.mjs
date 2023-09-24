@@ -2,9 +2,12 @@
 import AdmZip from 'adm-zip';
 import { globbySync } from 'globby';
 import { buildFilePath, loadJSONFile, removeFiles } from './lib.mjs';
+import fse from 'fs-extra';
 
 let buildData;
 const dist = './dist/';
+const releaseDir = './release';
+fse.ensureDirSync(releaseDir);
 
 function buildArchive() {
   const zip = new AdmZip();
@@ -25,7 +28,7 @@ function main() {
     buildData = loadJSONFile(buildFilePath);
 
     const zip = buildArchive();
-    const packagePath = `./${zipName()}.zip`;
+    const packagePath = `${releaseDir}/${zipName()}.zip`;
     removeFiles(packagePath, true);
     console.log(`Building ${packagePath}`);
     zip.writeZip(packagePath);
