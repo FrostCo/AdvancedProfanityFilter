@@ -78,9 +78,9 @@ Once the extension has been built, you can load the unpacked extension (found in
 ### Targets
 | Target     | Manifest | Browsers           |
 |------------|---------:|--------------------|
-| chrome     |      2,3 | Chrome, Edge, etc. |
+| chrome     |    2, 3* | Chrome, Edge, etc. |
 | edgeLegacy |        2 | Legacy Edge        |
-| firefox    |      2,3 | Firefox            |
+| firefox    |     2, 3 | Firefox            |
 
 
 _* = default target_
@@ -91,9 +91,9 @@ For all scripts, please see `package.json`.
 #### Commonly used scripts
 | Target  | Manifest | Stage   | Script                      | Description                       |
 |---------|---------:|---------|-----------------------------|-----------------------------------|
-| chrome  |        3 | build   | `npm run build:chrome:mv3`  | Development build for Manifest V3 |
-| chrome  |        2 | build   | `npm run build:chrome:mv2`  | Development build for Manifest V2 |
-| firefox |        2 | build   | `npm run build:firefox:mv2` | Development build for Firefox     |
+| chrome  |        3 | build   | `npm run build:chrome:mv3`  | Dev build for Chrome Manifest V3  |
+| chrome  |        2 | build   | `npm run build:chrome:mv2`  | Dev build for Chrome Manifest V2  |
+| firefox |        2 | build   | `npm run build:firefox:mv2` | Dev build for Firefox Manifest V2 |
 |         |          | release | `npm run release:all`       | Official relase for all targets   |
 
 ### State files
