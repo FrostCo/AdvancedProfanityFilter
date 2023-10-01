@@ -142,7 +142,13 @@ export default class Background {
 
   static async handleBackgroundDataRequest(request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
     const storage = await this.loadBackgroundStorage();
-    const tabId = request.source == this.Constants.MESSAGING.CONTEXT ? sender.tab.id : request.tabId;
+    const tabId = request.source == this.Constants.MESSAGING.CONTEXT && sender && sender.tab && sender.tab.id ? sender.tab.id : request.tabId;
+    if (!tabId) {
+      // Firefox: sender.tab is not always defined
+      const response: BackgroundData = { disabledTab: false };
+      sendResponse(response);
+      return false;
+    }
     const tabOptions = this.getTabOptions(storage, tabId);
     const response: BackgroundData = { disabledTab: false };
     let updated = false;
@@ -299,7 +305,8 @@ export default class Background {
 
   static async onContextMessageElse(chromeAction: typeof chrome.browserAction, request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
     // Update tab's status and set badge color
-    if (request.status) {
+    if (request.status && sender && sender.tab && sender.tab.id) {
+      // Firefox: sender.tab is not always defined
       this.updateStatus(chromeAction, sender.tab.id, request.status, request.forceUpdate);
     }
 
