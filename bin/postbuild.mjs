@@ -37,7 +37,21 @@ function firefoxBuild() {
       id: '{853d1586-e2ab-4387-a7fd-1f7f894d2651}'
     }
   };
-  manifest.background.persistent = true; // Event pages are not currently supported.
+
+  switch (buildData.manifestVersion) {
+    case 2: firefoxMv2Build(); break;
+    case 3: firefoxMv3Build(); break;
+  }
+}
+
+function firefoxMv2Build() {
+  manifest.background.persistent = true; // Event pages are not supported
+}
+
+function firefoxMv3Build() {
+  manifest.background = {
+    scripts: ['background.js'],
+  };
 }
 
 function handleManifest() {
