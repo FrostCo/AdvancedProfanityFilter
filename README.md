@@ -69,18 +69,19 @@ npm run build
 Once the extension has been built, you can load the unpacked extension (found in `dist/`) in your browser.
 
 ### Stages
-| Stage   | Output                 | Description                                       |
-|---------|------------------------|---------------------------------------------------|
-| build   | `dist/`                | Build/compile the extension for local development |
-| package | `extension-target.zip` | Package the files for the target browser          |
-| release | `extension-target.zip` | Create an official release for a target browser   |
+| Stage   | Output                                | Description                                       |
+|---------|---------------------------------------|---------------------------------------------------|
+| build   | `dist/`                               | Build/compile the extension for local development |
+| package | `release/target-manifest-version.zip` | Package the files for the target browser          |
+| release | `release/target-manifest-version.zip` | Create an official release for a target browser   |
 
 ### Targets
-| Target  | Browser            |
-|---------|--------------------|
-| v3      | Chrome, Edge, etc. |
-| v2*     | Chrome, Edge, etc. |
-| firefox | Firefox            |
+| Target     | Manifest | Browsers           |
+|------------|---------:|--------------------|
+| chrome     |      2,3 | Chrome, Edge, etc. |
+| edgeLegacy |        2 | Legacy Edge        |
+| firefox    |      2,3 | Firefox            |
+
 
 _* = default target_
 
@@ -88,12 +89,12 @@ _* = default target_
 For all scripts, please see `package.json`.
 
 #### Commonly used scripts
-| Target  | Stage   | Script                   | Description                       |
-|---------|---------|--------------------------|-----------------------------------|
-| v3      | build   | `npm run build:v3`       | Development build for Manifest V3 |
-| v2      | build   | `npm run build:v2`       | Development build for Manifest V2 |
-| firefox | build   | `npm run build:firefox`  | Development build for Firefox     |
-|         | release | `npm run release:all`    | Official relase for all targets   |
+| Target  | Manifest | Stage   | Script                      | Description                       |
+|---------|---------:|---------|-----------------------------|-----------------------------------|
+| chrome  |        3 | build   | `npm run build:chrome:mv3`  | Development build for Manifest V3 |
+| chrome  |        2 | build   | `npm run build:chrome:mv2`  | Development build for Manifest V2 |
+| firefox |        2 | build   | `npm run build:firefox:mv2` | Development build for Firefox     |
+|         |          | release | `npm run release:all`       | Official relase for all targets   |
 
 ### State files
 The state files hold the details about the current build. These files are managed by `bin/prebuild.mjs`.
