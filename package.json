@@ -52,7 +52,7 @@
     "release:chrome:mv2": "npm run package:chrome:mv2",
     "release:chrome:mv3": "npm run package:chrome:mv3",
     "release": "node bin/prebuild.mjs --release && npm run release:build && npm run package",
-    "test:addon": "npm run package:firefox && npx addons-linter ./extension-firefox.zip",
+    "test:addon": "node bin/prebuild.mjs --release --firefox-mv2 && npm run release:build && npx addons-linter ./dist",
     "test:all": "npm run test && npm run test:lint:tests",
     "test:cov": "nyc --reporter=lcov --reporter=text npm run test:nocov",
     "test:debug": "node --inspect-brk node_modules/ts-mocha/bin/ts-mocha -p tsconfig.test.json --paths --reporter tap",
