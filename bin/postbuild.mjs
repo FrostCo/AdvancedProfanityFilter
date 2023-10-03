@@ -9,13 +9,13 @@ import {
 } from './lib.mjs';
 
 let buildData;
+let manifest;
 
 function common() {
   handleManifest();
 }
 
 function edgeLegacyBuild() {
-  const manifest = loadJSONFile(distManifestPath);
   const msPreload = {
     backgroundScript: 'backgroundScriptsAPIBridge.js',
     contentScript: 'contentScriptsAPIBridge.js'
@@ -29,24 +29,32 @@ function edgeLegacyBuild() {
   manifest['-ms-preload'] = msPreload;
   fse.copyFileSync('./store/edge/src/backgroundScriptsAPIBridge.js', './dist/backgroundScriptsAPIBridge.js');
   fse.copyFileSync('./store/edge/src/contentScriptsAPIBridge.js', './dist/contentScriptsAPIBridge.js');
-
-  writeJSONFile(distManifestPath, manifest);
 }
 
 function firefoxBuild() {
-  const manifest = loadJSONFile(distManifestPath);
   manifest.browser_specific_settings = {
     gecko: {
       id: '{853d1586-e2ab-4387-a7fd-1f7f894d2651}'
     }
   };
-  manifest.background.persistent = true; // Event pages are not currently supported.
-  writeJSONFile(distManifestPath, manifest);
+
+  switch (buildData.manifestVersion) {
+    case 2: firefoxMv2Build(); break;
+    case 3: firefoxMv3Build(); break;
+  }
+}
+
+function firefoxMv2Build() {
+  manifest.background.persistent = true; // Event pages are not supported
+}
+
+function firefoxMv3Build() {
+  manifest.background = {
+    scripts: ['background.js'],
+  };
 }
 
 function handleManifest() {
-  const manifest = loadJSONFile(distManifestPath);
-
   if (manifest.version != buildData.version) manifest.version = buildData.version;
 
   if (buildData.manifestVersion == 2) {
@@ -71,23 +79,21 @@ function handleManifest() {
       default_title: 'Advanced Profanity Filter',
     };
   }
-
-  writeJSONFile(distManifestPath, manifest);
 }
 
 function main() {
   buildData = loadJSONFile(buildFilePath);
+  manifest = loadJSONFile(distManifestPath);
 
   // Perform postbuild actions
   common();
 
-  if (buildData.target == 'edgeLegacy') {
-    edgeLegacyBuild();
+  switch (buildData.target) {
+    case 'edgeLegacy': edgeLegacyBuild(); break;
+    case 'firefox': firefoxBuild(); break;
   }
 
-  if (buildData.target == 'firefox') {
-    firefoxBuild();
-  }
+  writeJSONFile(distManifestPath, manifest);
 }
 
 main();

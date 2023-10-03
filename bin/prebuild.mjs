@@ -4,9 +4,9 @@ import fse from 'fs-extra';
 import { buildFilePath, devBuildFilePath, loadJSONFile, parseArgv, releaseBuildFilePath, writeJSONFile } from './lib.mjs';
 
 let data = {
-  release: false,
   config: {},
-  manifestVersion: 2,
+  manifestVersion: 3,
+  release: false,
   target: 'chrome',
   version: '1.0.0',
 };
@@ -20,20 +20,35 @@ function bookmarkletBuild() {
   data.manifestVersion = 0;
 }
 
+function chromeBuild() {
+  switch (data.manifestVersion) {
+    case 2: chromeMv2Build(); break;
+    case 3: chromeMv3Build(); break;
+  }
+}
+
+function chromeMv2Build() {
+  // Customizations for manifest version
+}
+
+function chromeMv3Build() {
+  // Customizations for manifest version
+}
+
 function common() {
   data.version = process.env.npm_package_version;
 }
 
 function defaultBuild() {
-  manifestV2Build();
+  chromeBuild();
 }
 
 function edgeLegacyBuild() {
-  data.target = 'edgeLegacy';
+  // Target customizations
 }
 
 function firefoxBuild() {
-  data.target = 'firefox';
+  // Target customizations
 }
 
 function main() {
@@ -43,41 +58,44 @@ function main() {
     if (data.release) {
       argv.arguments.splice(argv.arguments.indexOf('--release'), 1);
     }
-    let target = argv.arguments[0];
+    const target = argv.arguments[0]?.replace('--', '');
+
+    if (target) {
+      const targetArray = target.split('-');
+      data.target = targetArray[0];
+      if (targetArray.length == 2) {
+        data.manifestVersion = parseInt(targetArray[1].match(/\d$/)?.toString()) || data.manifestVersion;
+      }
+    } else {
+      // Use existing buildFile as starting point if no target was passed
+      if (data.release && fse.existsSync(releaseBuildFilePath)) {
+        data = loadJSONFile(releaseBuildFilePath);
+      } else if (!data.release && fse.existsSync(devBuildFilePath)) {
+        data = loadJSONFile(devBuildFilePath);
+      }
+    }
 
     // Only show build details if no target was passed or if this is a release
     const showBuildDetails = (!target || data.release);
 
-    // Use existing buildFile as starting point if no target was passed
-    if (!target) {
-      if (data.release && fse.existsSync(releaseBuildFilePath)) {
-        data = loadJSONFile(releaseBuildFilePath);
-        target = targetFromData();
-      } else if (!data.release && fse.existsSync(devBuildFilePath)) {
-        data = loadJSONFile(devBuildFilePath);
-        target = targetFromData();
-      }
-    }
-
     common();
 
-    switch (target) {
-      case '--bookmarklet':
+    switch (data.target) {
+      case 'bookmarklet':
         bookmarkletBuild();
         break;
-      case '--edgeLegacy':
+      case 'chrome':
+        chromeBuild();
+        break;
+      case 'edgeLegacy':
         edgeLegacyBuild();
         break;
-      case '--firefox':
+      case 'firefox':
         firefoxBuild();
         break;
-      case '--manifestV2':
-        manifestV2Build();
-        break;
-      case '--manifestV3':
-        manifestV3Build();
-        break;
       default:
+        // throw new Error(`Invalid target: ${data.target}`);
+        console.warn('\n!!!!! NOTICE: using default build !!!!!\n');
         defaultBuild();
     }
 
@@ -89,24 +107,6 @@ function main() {
     }
   } else {
     throw (new Error('Incorrect number of arguments.'));
-  }
-}
-
-function manifestV2Build() {
-  data.manifestVersion = 2;
-}
-
-function manifestV3Build() {
-  data.manifestVersion = 3;
-}
-
-function targetFromData() {
-  switch (data.target) {
-    case 'chrome':
-      return `--manifestV${data.manifestVersion}`;
-    case 'bookmarklet':
-    case 'firefox:':
-      return `--${data.target}`;
   }
 }
 
