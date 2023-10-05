@@ -13,7 +13,7 @@ npm run build
 
 Once the extension has been built, you can load the unpacked extension (found in `dist/`) in your browser.
 
-### Commonly used scripts
+### Commonly Used Scripts
 | Target  | Manifest | Stage   | Script                      | Description                       |
 |---------|---------:|---------|-----------------------------|-----------------------------------|
 | chrome  |        3 | build   | `npm run build:chrome:mv3`  | Dev build for Chrome Manifest V3  |
@@ -36,7 +36,7 @@ _* = default target_
 | build   | `dist/`                               | Build/compile the extension for local development |
 | release | `release/target-manifest-version.zip` | Create an official release for a target browser   |
 
-## State files
+## State Files
 The state files hold the details about the current build. These files are managed by `bin/prebuild.mjs`.
 - `.build.json`
   - Active build state file that is referenced when building/packaging/releasing
@@ -48,7 +48,7 @@ The state files hold the details about the current build. These files are manage
   - Holds the release build details
   - Overwrites `.build.json` when `--release` **is** passed to `bin/prebuild.mjs`
 
-### Details contained in state files:
+### Details Contained In State Files
 - `config`: Overrides for the target
 - `manifestVersion`: Manifest version from `src/static/manifest.json`
 - `target`: Target browser
@@ -57,7 +57,7 @@ The state files hold the details about the current build. These files are manage
 ## Scripts
 For all scripts, please see `package.json`.
 
-## Example build chains
+## Build Chains
 ### Build (Load Last Target From File)
 - `npm run build`
   - npm run prebuild
