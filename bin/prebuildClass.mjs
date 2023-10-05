@@ -129,6 +129,3 @@ export default class Prebuild {
     }
   }
 }
-
-const prebuild = new Prebuild(process.argv);
-prebuild.main();

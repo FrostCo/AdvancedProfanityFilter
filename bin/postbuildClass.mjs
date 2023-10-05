@@ -117,6 +117,3 @@ export default class Postbuild {
     writeJSONFile(distManifestPath, this.manifest);
   }
 }
-
-const postbuild = new Postbuild();
-postbuild.main();
