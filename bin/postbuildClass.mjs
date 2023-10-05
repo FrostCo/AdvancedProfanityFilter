@@ -100,7 +100,7 @@ export default class Postbuild {
     }
   }
 
-  main() {
+  run() {
     this.common();
     this.targetCustomizations();
     this.writeManifestFile();

@@ -88,7 +88,7 @@ export default class Prebuild {
     }
   }
 
-  main() {
+  run() {
     this.common();
     this.targetCustomizations();
     this.writeBuildData();
