@@ -3,7 +3,7 @@ import fse from 'fs-extra';
 // import Constants from '../src/script/lib/constants'; // Temp?
 import { buildFilePath, devBuildFilePath, loadJSONFile, parseArgv, releaseBuildFilePath, writeJSONFile } from './lib.mjs';
 
-export default class PreBuild {
+export default class Prebuild {
   constructor(args) {
     this.loadedFromFile = false;
     this.data = this.defaultBuildData();
@@ -130,5 +130,5 @@ export default class PreBuild {
   }
 }
 
-const preBuild = new PreBuild(process.argv);
-preBuild.main();
+const prebuild = new Prebuild(process.argv);
+prebuild.main();

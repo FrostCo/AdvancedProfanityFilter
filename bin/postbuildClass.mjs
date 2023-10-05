@@ -8,7 +8,7 @@ import {
   writeJSONFile
 } from './lib.mjs';
 
-export default class PostBuild {
+export default class Postbuild {
   constructor() {
     this.buildData = loadJSONFile(buildFilePath);
     this.manifest = loadJSONFile(distManifestPath);
@@ -118,5 +118,5 @@ export default class PostBuild {
   }
 }
 
-const postBuild = new PostBuild();
-postBuild.main();
+const postbuild = new Postbuild();
+postbuild.main();
