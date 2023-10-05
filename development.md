@@ -56,3 +56,60 @@ The state files hold the details about the current build. These files are manage
 
 ## Scripts
 For all scripts, please see `package.json`.
+
+## Example build chains
+### Build (Load Last Target From File)
+- `npm run build`
+  - npm run prebuild
+    - npm run clean:build
+      - node bin/clean.mjs --build
+    - node bin/prebuild.mjs --$npm_config_target
+      - NOTE: $npm_config_target will be blank (`--`)
+  - webpack --config bin/webpack.dev.js
+  - npm run build:static
+    - node bin/copy-static.mjs
+  - npm run postbuild
+    - node bin/postbuild.mjs
+
+### Build Chrome Manifest V2
+- `npm run build:chrome:mv2`
+  - npm run build --target=chrome-mv2
+    - npm run prebuild
+      - npm run clean:build
+        - node bin/clean.mjs --build
+      - node bin/prebuild.mjs --$npm_config_target
+    - npm run build
+      - webpack --config bin/webpack.dev.js
+      - npm run build:static
+        - node bin/copy-static.mjs
+      - npm run postbuild
+        - node bin/postbuild.mjs
+
+### Release Chrome Manifest V3
+- `npm run release:chrome:mv3`
+  - npm run release:build --target=chrome-mv3
+    - npm run prerelease:build
+      - npm run clean:build
+        - node bin/clean.mjs --build
+      - node bin/prebuild.mjs --release --$npm_config_target
+    - webpack --config bin/webpack.prod.js
+    - npm run build:static
+      - node bin/copy-static.mjs
+    - postrelease:build
+      - node bin/postbuild.mjs
+  - npm run package
+    - node bin/package-extension.mjs
+
+### Test Addon (Firefox Manifest V2)
+- `npm run test:addon`
+  - npm run release:build --target=firefox-mv2
+    - npm run prerelease:build
+      - npm run clean:build
+        - node bin/clean.mjs --build
+      - node bin/prebuild.mjs --release --$npm_config_target
+    - webpack --config bin/webpack.prod.js
+    - npm run build:static
+      - node bin/copy-static.mjs
+    - postrelease:build
+      - node bin/postbuild.mjs
+  - npx addons-linter ./dist
