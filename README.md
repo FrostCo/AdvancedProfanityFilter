@@ -72,7 +72,6 @@ Once the extension has been built, you can load the unpacked extension (found in
 | Stage   | Output                                | Description                                       |
 |---------|---------------------------------------|---------------------------------------------------|
 | build   | `dist/`                               | Build/compile the extension for local development |
-| package | `release/target-manifest-version.zip` | Package the files for the target browser          |
 | release | `release/target-manifest-version.zip` | Create an official release for a target browser   |
 
 ### Targets
