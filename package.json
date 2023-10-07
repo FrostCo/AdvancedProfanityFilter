@@ -30,7 +30,7 @@
     "clean:build": "node bin/clean.mjs --build",
     "clean:dist": "node bin/clean.mjs --dist",
     "clean": "node bin/clean.mjs --all",
-    "package": "node bin/package-extension.mjs",
+    "package": "node bin/packageExtension.mjs",
     "postbuild": "node bin/postbuild.mjs",
     "postrelease:all": "npm run build",
     "postrelease:build": "node bin/postbuild.mjs",

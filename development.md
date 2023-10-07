@@ -98,7 +98,7 @@ For all scripts, please see `package.json`.
     - postrelease:build
       - node bin/postbuild.mjs
   - npm run package
-    - node bin/package-extension.mjs
+    - node bin/packageExtension.mjs
 
 ### Test Addon (Firefox Manifest V2)
 - `npm run test:addon`
