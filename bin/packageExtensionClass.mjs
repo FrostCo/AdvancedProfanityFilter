@@ -4,42 +4,57 @@ import { globbySync } from 'globby';
 import { buildFilePath, loadJSONFile, removeFiles } from './lib.mjs';
 import fse from 'fs-extra';
 
-let buildData;
-const dist = './dist/';
-const releaseDir = './release';
-fse.ensureDirSync(releaseDir);
+export default class PackageExtension {
+  constructor() {
+    this.distDir = this.distDirectory;
+    this.releaseDir = this.releaseDirectory;
 
-function buildArchive() {
-  const zip = new AdmZip();
-  zip.addLocalFolder(dist, null);
-
-  // Remove unwanted files
-  const filesToRemove = globbySync(['dist/**/*.LICENSE.txt']);
-  for (const file of filesToRemove) {
-    const entry = file.replace(/^dist\//, '');
-    zip.deleteFile(entry);
+    try {
+      fse.ensureDirSync(this.releaseDir);
+      this.data = loadJSONFile(buildFilePath);
+    } catch (err) {
+      console.error(err.message);
+      throw (err);
+    }
   }
 
-  return zip;
-}
+  buildArchive() {
+    this.zip = new AdmZip();
+    this.zip.addLocalFolder(this.distDir, null);
 
-function main() {
-  try {
-    buildData = loadJSONFile(buildFilePath);
+    // Remove unwanted files
+    const filesToRemove = globbySync(['dist/**/*.LICENSE.txt']);
+    for (const file of filesToRemove) {
+      const entry = file.replace(/^dist\//, '');
+      this.zip.deleteFile(entry);
+    }
+  }
 
-    const zip = buildArchive();
-    const packagePath = `${releaseDir}/${zipName()}.zip`;
-    removeFiles(packagePath, true);
-    console.log(`Building ${packagePath}`);
-    zip.writeZip(packagePath);
-  } catch (err) {
-    console.error(err.message);
-    throw (err);
+  get distDirectory() {
+    return './dist';
+  }
+
+  get packagePath() {
+    return `${this.releaseDir}/${this.zipName}.zip`;
+  }
+
+  get releaseDirectory() {
+    return './release';
+  }
+
+  run() {
+    try {
+      this.buildArchive();
+      removeFiles(this.packagePath, true);
+      console.log(`Building ${this.packagePath}`);
+      this.zip.writeZip(this.packagePath);
+    } catch (err) {
+      console.error(err.message);
+      throw (err);
+    }
+  }
+
+  get zipName() {
+    return `${this.data.target}-mv${this.data.manifestVersion}-v${this.data.version}`;
   }
 }
-
-function zipName() {
-  return `${buildData.target}-mv${buildData.manifestVersion}-v${buildData.version}`;
-}
-
-main();
