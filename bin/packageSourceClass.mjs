@@ -29,7 +29,7 @@ export default class PackageSource {
   get binFiles() {
     return [
       'bin/clean.mjs',
-      'bin/copy-static.mjs',
+      'bin/copyStatic.mjs',
       'bin/lib.mjs',
       'bin/packageExtension.mjs',
       'bin/packageExtensionClass.mjs',

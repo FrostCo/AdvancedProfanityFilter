@@ -26,7 +26,7 @@
     "build:firefox:mv2": "npm run build --target=firefox-mv2",
     "build:firefox:mv3": "npm run build --target=firefox-mv3",
     "build:libs": "tsc -p ./src/script/lib/tsconfig.json",
-    "build:static": "node bin/copy-static.mjs",
+    "build:static": "node bin/copyStatic.mjs",
     "build:test": "tsc -p tsconfig.test.json",
     "build": "webpack --config bin/webpack.dev.js && npm run build:static",
     "clean:build": "node bin/clean.mjs --build",
