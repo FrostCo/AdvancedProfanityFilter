@@ -33,6 +33,8 @@ export default class PackageSource {
       'bin/lib.mjs',
       'bin/packageExtension.mjs',
       'bin/packageExtensionClass.mjs',
+      'bin/packageSource.mjs',
+      'bin/packageSourceClass.mjs',
       'bin/postbuild.mjs',
       'bin/postbuildClass.mjs',
       'bin/prebuild.mjs',
@@ -68,7 +70,7 @@ export default class PackageSource {
 
   showInstructions() {
     console.log(`Building ${this.filePath}`);
-    console.log('Build from source: npm install && npm run package:bookmarklet && npm run package:firefox');
+    console.log('Build from source: npm install && npm run release:bookmarklet && npm run release:firefox');
     console.log('  Unpacked: ./dist');
     console.log(`  Packed: ${this.filePath}`);
   }
