@@ -53,10 +53,10 @@ export default class PackageSource {
   get rootFiles() {
     return [
       '.build.json',
-      'README.md',
       'LICENSE',
       'package-lock.json',
       'package.json',
+      'README.md',
       'tsconfig.json',
     ];
   }
