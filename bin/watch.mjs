@@ -13,7 +13,7 @@ function copyStatic(file) {
   fse.copySync(file, path.join('./dist/', basename));
 
   // Copy all static files
-  // exec('npm run copy-static', function(err, stdout, stderr) {
+  // exec('npm run copyStatic', function(err, stdout, stderr) {
   //   if (err) throw err;
   //   else console.log(stdout);
   // });

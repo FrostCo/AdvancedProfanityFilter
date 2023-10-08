@@ -67,7 +67,7 @@ For all scripts, please see `package.json`.
       - NOTE: $npm_config_target will be blank (`--`)
   - webpack --config bin/webpack.dev.js
   - npm run build:static
-    - node bin/copy-static.mjs
+    - node bin/copyStatic.mjs
   - npm run postbuild
     - node bin/postbuild.mjs
 
@@ -81,7 +81,7 @@ For all scripts, please see `package.json`.
     - npm run build
       - webpack --config bin/webpack.dev.js
       - npm run build:static
-        - node bin/copy-static.mjs
+        - node bin/copyStatic.mjs
       - npm run postbuild
         - node bin/postbuild.mjs
 
@@ -94,11 +94,11 @@ For all scripts, please see `package.json`.
       - node bin/prebuild.mjs --release --$npm_config_target
     - webpack --config bin/webpack.prod.js
     - npm run build:static
-      - node bin/copy-static.mjs
+      - node bin/copyStatic.mjs
     - postrelease:build
       - node bin/postbuild.mjs
   - npm run package
-    - node bin/package-extension.mjs
+    - node bin/packageExtension.mjs
 
 ### Test Addon (Firefox Manifest V2)
 - `npm run test:addon`
@@ -109,7 +109,7 @@ For all scripts, please see `package.json`.
       - node bin/prebuild.mjs --release --$npm_config_target
     - webpack --config bin/webpack.prod.js
     - npm run build:static
-      - node bin/copy-static.mjs
+      - node bin/copyStatic.mjs
     - postrelease:build
       - node bin/postbuild.mjs
   - npx addons-linter ./dist
