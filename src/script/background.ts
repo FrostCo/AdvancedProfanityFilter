@@ -2,7 +2,7 @@ import Constants from '@APF/lib/constants';
 import DataMigration from '@APF/dataMigration';
 import Domain from '@APF/domain';
 import WebConfig from '@APF/webConfig';
-import { formatNumber, makeRequest } from '@APF/lib/helper';
+import { formatNumber } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
 
 export default class Background {
@@ -194,11 +194,6 @@ export default class Background {
     if (updated) await this.saveBackgroundStorage(storage);
   }
 
-  static async handleRequest(url: string, method: string = 'GET', sendResponse) {
-    const response = await makeRequest(url, method);
-    sendResponse(response);
-  }
-
   static async loadBackgroundStorage(): Promise<BackgroundStorage> {
     const data = await this.Config.getLocalStorage({ background: { tabs: {} } });
     return data['background'] as BackgroundStorage;
@@ -266,9 +261,6 @@ export default class Background {
           chromeAction.setIcon({ path: 'img/icon19-disabled.png', tabId: sender.tab.id });
         } else if (request.backgroundData === true) {
           this.handleBackgroundDataRequest(request, sender, sendResponse);
-          return true; // return true when waiting on an async call
-        } else if (request.fetch) {
-          this.handleRequest(request.fetch, request.fetchMethod, sendResponse);
           return true; // return true when waiting on an async call
         } else {
           this.onContextMessageElse(chromeAction, request, sender, sendResponse);

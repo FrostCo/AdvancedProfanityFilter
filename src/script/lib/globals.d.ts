@@ -32,8 +32,6 @@ interface Message {
   deep?: boolean;
   destination: string;
   disabled?: boolean;
-  fetch?: string;
-  fetchMethod?: string;
   forceUpdate?: boolean;
   getStatus?: boolean;
   globalVariable?: string;

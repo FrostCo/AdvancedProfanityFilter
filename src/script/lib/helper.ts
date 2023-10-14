@@ -4,10 +4,6 @@ export function booleanToNumber(value: boolean): number {
   return value ? Constants.TRUE : Constants.FALSE;
 }
 
-export function cloneWithJSON(object) {
-  return JSON.parse(JSON.stringify(object));
-}
-
 /* istanbul ignore next */
 export function dynamicList(list: string[], select: HTMLSelectElement, upperCaseFirstChar: boolean = false, title?: string) {
   removeChildren(select);
@@ -133,49 +129,6 @@ export function isVersionOlder(version: Version, minimum: Version): boolean {
 
 export function lastElement(array: any[]): any {
   return array[array.length - 1];
-}
-
-export function makeBackgroundRequest(url: string, method: string, source = 'context') {
-  return new Promise((resolve, reject) => {
-    const message: Message = { destination: 'background', fetch: url, fetchMethod: method.toUpperCase(), source: source };
-    chrome.runtime.sendMessage(message, (response) => {
-      resolve(response);
-    });
-  });
-}
-
-export async function makeFetchRequest(url: string, method: string = 'GET') {
-  const response = await fetch(url, { method: method });
-  const data = await response.text();
-  return data;
-}
-
-export async function makeRequest(url: string, method: string) {
-  return fetch ? await makeFetchRequest(url, method) : await makeXMLHttpRequest(url, method) ;
-}
-
-export function makeXMLHttpRequest(url: string, method: string) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open(method, url);
-    xhr.onload = function() {
-      if (this.status >= 200 && this.status < 300) {
-        resolve(this.response);
-      } else {
-        reject({
-          status: this.status,
-          statusText: this.statusText
-        });
-      }
-    };
-    xhr.onerror = function() {
-      reject({
-        status: this.status,
-        statusText: this.statusText
-      });
-    };
-    xhr.send();
-  });
 }
 
 export function numberToBoolean(value: number): boolean {
