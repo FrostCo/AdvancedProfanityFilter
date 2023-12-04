@@ -162,7 +162,7 @@ export default class WebConfig extends Config {
         if (data.syncLargeKeys === false) { // Use local storage for large keys
           // Add large keys from local storage to data
           localKeys.forEach((localKey) => {
-            if (localData[localKey] !== undefined) {
+            if (localData.hasOwnProperty(localKey)) {
               data[localKey] = localData[localKey];
             } else {
               // Ensure defaults
