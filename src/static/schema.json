@@ -1,0 +1,257 @@
+{
+  "type": "object",
+  "properties": {
+    "censorCharacter": {
+      "description": "Set the character to mask letters with. (Default: *) [Censor]",
+      "title": "Censor Character",
+      "type": "string"
+    },
+    "censorFixedLength": {
+      "description": "Set a fixed length for words masked by the filter. [Censor]",
+      "title": "Censor Fixed Length",
+      "type": "number"
+    },
+    "collectStats": {
+      "description": "Collect statistics on words filtered.",
+      "title": "Collect Stats",
+      "type": "boolean"
+    },
+    "contextMenu": {
+      "description": "Enable the Context Menu.",
+      "title": "Context Menu",
+      "type": "boolean"
+    },
+    "darkMode": {
+      "description": "Enable/disable Dark Mode.",
+      "title": "Dark Mode",
+      "type": "boolean"
+    },
+    "defaultSubstitution": {
+      "description": "Used as the substitution for words that don't have a substitution. [Substitute]",
+      "title": "Default Substitution",
+      "type": "string"
+    },
+    "defaultWordMatchMethod": {
+      "description": "Default match method for new words.",
+      "title": "Default Word Match Method",
+      "type": "number"
+    },
+    "defaultWordRepeat": {
+      "description": "Default selection for matching repeated characters on new words.",
+      "title": "Default Word Repeat",
+      "type": "number"
+    },
+    "defaultWordSeparators": {
+      "description": "Default selection for matching separators on new words.",
+      "title": "Default Word Separators",
+      "type": "number"
+    },
+    "domains": {
+      "description": "Object with customized settings for domains.",
+      "title": "Domains",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "adv": {
+            "description": "When set to true the domain will use Advanced mode.",
+            "title": "Domain Advanced Mode",
+            "type": "boolean"
+          },
+          "deep": {
+            "description": "When set to true the domain will use Deep mode.",
+            "title": "Domain Deep Mode",
+            "type": "boolean"
+          },
+          "disabled": {
+            "description": "When set to true the filter will be disabled on the domain. [Domain Mode: Normal]",
+            "title": "Domain Disabled",
+            "type": "boolean"
+          },
+          "enabled": {
+            "description": "When set to true the filter will be enabled on the domain. [Domain Mode: Minimal]",
+            "title": "Domain Enabled",
+            "type": "boolean"
+          },
+          "framesOff": {
+            "description": "When set to true the filter will not filter frames on the domain. [Domain Frame Mode: All]",
+            "title": "Domain Frames Off",
+            "type": "boolean"
+          },
+          "framesOn": {
+            "description": "When set to true the filter will filter frames on the domain. [Domain Frame Mode: None]",
+            "title": "Domain Frames On",
+            "type": "boolean"
+          },
+          "wordlist": {
+            "description": "Set the desired wordlist for the domain.",
+            "title": "Domain Word List",
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "enabledDomainsOnly": {
+      "description": "When set to true the filter will only run on provided domains.",
+      "title": "Enabled Domains Only",
+      "type": "boolean"
+    },
+    "enabledFramesOnly": {
+      "description": "When set to true the filter will only filter frames on provided domains.",
+      "title": "Enabled Frames Only",
+      "type": "boolean"
+    },
+    "filterMethod": {
+      "description": "Determines which filter method (Censor, Substitute, etc.) will be used.",
+      "title": "Filter Method",
+      "type": "number"
+    },
+    "filterWordList": {
+      "description": "When set to true the Word list in the Option's page will be filtered.",
+      "title": "Filter Word List",
+      "type": "boolean"
+    },
+    "iWordAllowlist": {
+      "description": "Words included here won't be filtered (case-insensitive).",
+      "title": "Case-Insensitive Word Allowlist",
+      "type": "array",
+      "items": {
+        "description": "Case-insensitive word that won't be filtered.",
+        "title": "Case-Insensitive Word Allowlist Word",
+        "type": "string"
+      }
+    },
+    "loggingLevel": {
+      "description": "Set desired logging level. (Default: 2, Warn)",
+      "title": "Logging Level",
+      "type": "number"
+    },
+    "password": {
+      "description": "Require password to access the Options page or to make changes.",
+      "title": "Password",
+      "type": "string"
+    },
+    "preserveCase": {
+      "description": "Preserve case of filtered word. [Substitute]",
+      "title": "Preserve Case",
+      "type": "boolean"
+    },
+    "preserveFirst": {
+      "description": "Preserve first character of filtered word. [Censor]",
+      "title": "Preserve First",
+      "type": "boolean"
+    },
+    "preserveLast": {
+      "description": "Preserve last character of filtered word. [Censor]",
+      "title": "Preserve Last",
+      "type": "boolean"
+    },
+    "showCounter": {
+      "description": "When set to true a badge by the extension icon will show the number of filtered words for the current page.",
+      "title": "Show Counter",
+      "type": "boolean"
+    },
+    "showSummary": {
+      "description": "When set to true the extension popup window will show a summary of the filtered words for the current page.",
+      "title": "Show Summary",
+      "type": "boolean"
+    },
+    "showUpdateNotification": {
+      "description": "When set to true the extension will show a notification when an update is installed.",
+      "title": "Show Update Notification",
+      "type": "boolean"
+    },
+    "substitutionMark": {
+      "description": "When set to true the extension will add a mark ([]) around filtered words. [Substitute]",
+      "title": "Substitution Mark",
+      "type": "boolean"
+    },
+    "syncLargeKeys": {
+      "description": "When set to true the extension will attempt to sync large parts of the config, such as words.",
+      "title": "Sync Large Keys",
+      "type": "boolean"
+    },
+    "wordAllowlist": {
+      "description": "Words included here won't be filtered (case-sensitive).",
+      "title": "Case-sensitive Word Allowlist",
+      "type": "array",
+      "items": {
+        "description": "Case-sensitive word that won't be filtered.",
+        "title": "Case-Sensitive Word Allowlist Word",
+        "type": "string"
+      }
+    },
+    "wordSubSeparator": {
+      "description": "Change the word separator for multiple substitutions. (Default: ';;') [Substitute]",
+      "title": "Word Sub Separator",
+      "type": "string"
+    },
+    "wordlistId": {
+      "description": "Default wordlist to use. (Default: 0)",
+      "title": "Wordlist ID",
+      "type": "number"
+    },
+    "wordlists": {
+      "description": "Array of wordlist names.",
+      "title": "Wordlists",
+      "type": "array",
+      "items": {
+        "description": "Wordlist name.",
+        "title": "Wordlist Name",
+        "type": "string"
+      }
+    },
+    "wordlistsEnabled": {
+      "description": "When set to true the extension will allow use of wordlists. (Default: true)",
+      "title": "Wordlists Enabled",
+      "type": "boolean"
+    },
+    "words": {
+      "description": "Words to filter.",
+      "title": "Words",
+      "type": "object",
+      "additionalProperties": {
+        "description": "Word to filter.",
+        "title": "Word",
+        "type": "object",
+        "properties": {
+          "case": {
+            "description": "Word to filter.",
+            "title": "Word",
+            "type": "integer"
+          },
+          "lists": {
+            "description": "Wordlist ids to include word in.",
+            "title": "Word Lists",
+            "type": "array",
+            "items": {
+              "description": "Wordlist id to include word in.",
+              "title": "Word List ID",
+              "type": "number"
+            }
+          },
+          "matchMethod": {
+            "description": "Match Method to use for word.",
+            "title": "Word Match Method",
+            "type": "integer"
+          },
+          "repeat": {
+            "description": "Match repeating characters when filtering word.",
+            "title": "Word Match Repeat",
+            "type": "integer"
+          },
+          "separators": {
+            "description": "Match separator (-_ ) characters when filtering word.",
+            "title": "Word Match Separators",
+            "type": "integer"
+          },
+          "sub": {
+            "description": "Substitution to replace filtered word with. [Substitute]",
+            "title": "Word Substitute",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
