@@ -1,6 +1,7 @@
 import Config from '@APF/lib/config';
 import { prettyPrintArray, stringArray } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
+import Constants from './lib/constants';
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
 /* eslint-disable-next-line @typescript-eslint/naming-convention */
@@ -10,6 +11,8 @@ const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
   _lastSplitKeys: { [key: string]: number };
+  _managed: number;
+  _protectedKeys: string[];
   collectStats: boolean;
   contextMenu: boolean;
   darkMode: boolean;
@@ -137,7 +140,7 @@ export default class WebConfig extends Config {
   // Note: syncLargeKeys will be returned when required
   static async load(keys: string | string[] = []) {
     keys = stringArray(keys);
-    const data = {} as any;
+    const data = { _managed: Constants.MANAGED.NONE, _protectedKeys: [] } as any;
     let localData;
     const localKeys = [];
     let syncKeys = [];
@@ -145,14 +148,44 @@ export default class WebConfig extends Config {
     // No keys provided, load everything
     if (keys.length === 0) keys = this._persistableKeys;
 
+    // Attempt to load Managed Storage if available
+    // https://developer.chrome.com/docs/extensions/mv3/manifest/storage
+    // https://www.chromium.org/administrators/configuring-policy-for-extensions
     try {
+      if (this.BUILD.target === Constants.BUILD_TARGET_CHROME && this.BUILD.manifestVersion == 3) {
+        if (!keys.includes('_managed')) keys.push('_managed');
+        const managedConfig = await chrome.storage.managed.get(keys);
+        const managedKeys = Object.keys(managedConfig);
+
+        for (const key of keys) {
+          if (key == 'words' && !managedConfig.hasOwnProperty(key)) {
+            data[key] = this._defaultWords;
+          } else {
+            data[key] = managedConfig.hasOwnProperty(key) ? managedConfig[key] : this._defaults[key];
+          }
+        }
+
+        if (data._managed == Constants.MANAGED.ALL || data._managed == Constants.MANAGED.PARTIAL) {
+          data._protectedKeys = managedKeys;
+        }
+
+        if (data._managed == Constants.MANAGED.ALL) return new this(data);
+      }
+    } catch (err) {
+      // No managed config loaded
+    }
+
+    try {
+      // Remove '_managed' key from keys (if present)
+      keys = keys.filter((key) => { return key !== '_managed'; });
+
       if (this.includesLargeKeys(keys)) {
         // Add syncLargeKeys if any largeKeys were requested
         if (!keys.includes('syncLargeKeys')) keys.push('syncLargeKeys');
 
         // Load large keys from LocalStorage if necessary
         this._localConfigKeys.forEach((localKey) => {
-          if (keys.includes(localKey)) {
+          if (keys.includes(localKey) && !data._protectedKeys.includes(localKey)) {
             localKeys.push(localKey);
           }
         });
@@ -164,7 +197,7 @@ export default class WebConfig extends Config {
           for (const localKey of localKeys) {
             if (localData.hasOwnProperty(localKey)) {
               data[localKey] = localData[localKey];
-            } else {
+            } else if (data._managed !== Constants.MANAGED.NONE) { // Don't load defaults again
               // Ensure defaults
               // 'words' are not included in Webconfig._defaults
               if (localKey === 'words') {
@@ -175,15 +208,21 @@ export default class WebConfig extends Config {
             }
           }
 
-          // Get all keys from sync storage except the ones found in local storage
-          syncKeys = keys.filter((key) => { return !this._localConfigKeys.includes(key); });
+          // Get all keys from sync storage except the ones found in local storage & protectedKeys
+          syncKeys = keys.filter((key) => {
+            return !this._localConfigKeys.includes(key) || !data._protectedKeys.includes(key);
+          });
         } else { // Use sync storage for large keys
-          // Get all keys from sync storage (except syncLargeKeys)
-          syncKeys = keys.filter((key) => { return key !== 'syncLargeKeys'; });
+          // Get all keys from sync storage (except syncLargeKeys & protectedKeys)
+          syncKeys = keys.filter((key) => {
+            return key !== 'syncLargeKeys' || !data._protectedKeys.includes(key);
+          });
         }
       } else {
-        // Get all keys from sync storage (except syncLargeKeys)
-        syncKeys = keys.filter((key) => { return key !== 'syncLargeKeys'; });
+        // Get all keys from sync storage (except syncLargeKeys & protectedKeys)
+        syncKeys = keys.filter((key) => {
+          return key !== 'syncLargeKeys' || !data._protectedKeys.includes(key);
+        });
       }
 
       if (syncKeys.length) {
@@ -216,7 +255,7 @@ export default class WebConfig extends Config {
                 data[key] = this._defaults[key];
               }
             }
-          } else {
+          } else if (data._managed === Constants.MANAGED.NONE) { // Don't load defaults again
             // Assign values to data and fill in defaults for missing keys
             if (syncData[key] === undefined) {
               data[key] = this._defaults[key];

@@ -11,6 +11,7 @@ export default class Constants {
   static readonly FALSE = 0;
   static readonly FILTER_METHODS = { CENSOR: 0, SUBSTITUTE: 1, REMOVE: 2, OFF: 3 };
   static readonly LOGGING_LEVELS = { DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3 };
+  static readonly MANAGED = { NONE: 0, DEFAULTS: 1, PARTIAL: 2, ALL: 3 };
   static readonly MATCH_METHODS = { EXACT: 0, PARTIAL: 1, WHOLE: 2, REGEX: 3 };
   static readonly MESSAGING = { BACKGROUND: 'background', CONTEXT: 'context', OPTION: 'option', POPUP: 'popup' };
   static readonly STATS_TYPE_TEXT = 'text';
