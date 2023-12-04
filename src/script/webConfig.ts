@@ -162,16 +162,16 @@ export default class WebConfig extends Config {
         if (data.syncLargeKeys === false) { // Use local storage for large keys
           // Add large keys from local storage to data
           localKeys.forEach((localKey) => {
-            // Ensure defaults
-            if (localData[localKey] === undefined) {
+            if (localData[localKey] !== undefined) {
+              data[localKey] = localData[localKey];
+            } else {
+              // Ensure defaults
               // 'words' are not included in Webconfig._defaults
               if (localKey === 'words') {
                 data[localKey] = this._defaultWords;
               } else {
                 data[localKey] = this._defaults[localKey];
               }
-            } else {
-              data[localKey] = localData[localKey];
             }
           });
 
