@@ -161,7 +161,7 @@ export default class WebConfig extends Config {
 
         if (data.syncLargeKeys === false) { // Use local storage for large keys
           // Add large keys from local storage to data
-          localKeys.forEach((localKey) => {
+          for (const localKey of localKeys) {
             if (localData.hasOwnProperty(localKey)) {
               data[localKey] = localData[localKey];
             } else {
@@ -173,7 +173,7 @@ export default class WebConfig extends Config {
                 data[localKey] = this._defaults[localKey];
               }
             }
-          });
+          }
 
           // Get all keys from sync storage except the ones found in local storage
           syncKeys = keys.filter((key) => { return !this._localConfigKeys.includes(key); });
