@@ -218,7 +218,7 @@ export default class Background {
   }
 
   // Actions for extension install or upgrade
-  static onInstalled(details: chrome.runtime.InstalledDetails) {
+  static async onInstalled(details: chrome.runtime.InstalledDetails) {
     if (details.reason == 'install') {
       chrome.runtime.openOptionsPage();
     } else if (details.reason == 'update') {
@@ -233,9 +233,10 @@ export default class Background {
       this.runUpdateMigrations(details.previousVersion);
 
       // Display update notification
-      if (chrome.notifications != null) { // Not available in Safari
-        chrome.storage.sync.get({ showUpdateNotification: true }, (data) => {
-          if (data.showUpdateNotification) {
+      try {
+        if (chrome.notifications != null) { // Not available in Safari
+          const showNotification = await this.Config.getSyncStorage({ showUpdateNotification: true });
+          if (showNotification) {
             chrome.notifications.create('extensionUpdate', {
               'type': 'basic',
               'title': 'Advanced Profanity Filter',
@@ -244,7 +245,9 @@ export default class Background {
               'isClickable': true,
             });
           }
-        });
+        }
+      } catch (err) {
+        this.LOGGER.warn('Error while displaying update notification', err);
       }
     }
   }
