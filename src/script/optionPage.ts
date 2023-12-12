@@ -17,7 +17,7 @@ import {
   removeChildren,
   removeFromArray,
   stringArray,
-  upperCaseFirst
+  upperCaseFirst,
 } from '@APF/lib/helper';
 
 const logger = new Logger('OptionPage');
