@@ -100,6 +100,18 @@ export default class WebConfig extends Config {
     });
   }
 
+  static getManagedStorage(keys: string | string[] | Record<string, unknown>) {
+    if (typeof keys === 'string') { keys = [keys]; }
+
+    return new Promise((resolve, reject) => {
+      chrome.storage.managed.get(keys, (data) => {
+        chrome.runtime.lastError
+          ? reject(chrome.runtime.lastError)
+          : resolve(data);
+      });
+    });
+  }
+
   static getMaxSplitKeyFromArray(splitKeys: string[] = []): number {
     if (Array.isArray(splitKeys)) {
       const maxKey = splitKeys.sort()[splitKeys.length - 1];
@@ -154,7 +166,7 @@ export default class WebConfig extends Config {
     try {
       if (this.BUILD.target === Constants.BUILD_TARGET_CHROME && this.BUILD.manifestVersion == 3) {
         if (!keys.includes('_managed')) keys.push('_managed');
-        const managedConfig = await chrome.storage.managed.get(keys);
+        const managedConfig = await this.getManagedStorage(keys);
         const managedKeys = Object.keys(managedConfig);
 
         for (const key of keys) {
