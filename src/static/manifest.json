@@ -43,5 +43,8 @@
     },
     "default_title": "Advanced Profanity Filter",
     "default_popup": "popup.html"
+  },
+  "storage": {
+    "managed_schema": "schema.json"
   }
 }
