@@ -1,5 +1,5 @@
 import Config from '@APF/lib/config';
-import { prettyPrintArray, stringArray } from '@APF/lib/helper';
+import { prettyPrintArray, sortObjectKeys, stringArray } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
@@ -317,10 +317,7 @@ export default class WebConfig extends Config {
 
   // Order and remove `_` prefixed values
   ordered() {
-    return Object.keys(this).sort().reduce((obj, key) => {
-      if (key[0] != '_') { obj[key] = this[key]; }
-      return obj;
-    }, {});
+    return sortObjectKeys(this);
   }
 
   // Note: Defaults are not automatically loaded after removing an item
