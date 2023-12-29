@@ -97,7 +97,7 @@ For all scripts, please see `package.json`.
       - node bin/copyStatic.mjs
     - postrelease:build
       - node bin/postbuild.mjs
-  - npm run package
+      - npm run package
     - node bin/packageExtension.mjs
 
 ### Test Addon (Firefox Manifest V2)
@@ -112,4 +112,5 @@ For all scripts, please see `package.json`.
       - node bin/copyStatic.mjs
     - postrelease:build
       - node bin/postbuild.mjs
+      - npm run package
   - npx addons-linter ./dist
