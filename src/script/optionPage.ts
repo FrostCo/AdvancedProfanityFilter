@@ -16,6 +16,7 @@ import {
   readFile,
   removeChildren,
   removeFromArray,
+  sortObjectKeys,
   stringArray,
   upperCaseFirst,
 } from '@APF/lib/helper';
@@ -709,7 +710,8 @@ export default class OptionPage {
 
     if (input.checked) { // inline editor
       const configText = document.getElementById('configText') as HTMLTextAreaElement;
-      configText.value = JSON.stringify(this.cfg.ordered(), null, 2);
+      const config = this.shouldOutputManagedConfig ? this.outputManagedConfig() : this.cfg.ordered();
+      configText.value = JSON.stringify(config, null, 2);
     } else {
       this.backupConfig();
     }
@@ -830,6 +832,17 @@ export default class OptionPage {
 
   newWordWordlistChecked(index: number): boolean {
     return index == (this.cfg.wordlistId - 1);
+  }
+
+  outputManagedConfig() {
+    const output = {};
+    const keys = Object.keys(this.Class.Config._defaults).concat('words');
+
+    for (const key of keys) {
+      output[key] = { value: this.cfg[key] };
+    }
+
+    return sortObjectKeys(output, false);
   }
 
   populateBookmarkletPage() {
@@ -1662,6 +1675,10 @@ export default class OptionPage {
       this.darkModeButton.classList.remove('w3-hide');
       this.lightModeButton.classList.add('w3-hide');
     }
+  }
+
+  get shouldOutputManagedConfig() {
+    return !!window['managedConfig'];
   }
 
   showBulkWordEditor() {
