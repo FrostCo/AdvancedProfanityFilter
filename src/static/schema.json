@@ -1,6 +1,11 @@
 {
   "type": "object",
   "properties": {
+    "_managed": {
+      "description": "Choose level of restriction for managed config",
+      "title": "Managed Storage Level",
+      "type": "number"
+    },
     "censorCharacter": {
       "description": "Set the character to mask letters with. (Default: *) [Censor]",
       "title": "Censor Character",
