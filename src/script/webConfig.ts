@@ -131,18 +131,24 @@ export default class WebConfig extends Config {
     return keys.some((key) => { return this._largeKeys.includes(key); });
   }
 
+  static keysToLoad(keys: string | string[] = []) {
+    keys = stringArray(keys);
+
+    // No keys provided, load everything
+    if (keys.length === 0) keys = this._persistableKeys;
+
+    return keys;
+  }
+
   // keys: Requested keys (defaults to all)
   // syncKeys: Keys to get from browser.storage.sync
   // localKeys: Keys to get from browser.storage.local
   // Note: syncLargeKeys will be returned when required
   static async load(keys: string | string[] = [], data: Partial<WebConfig> = {}) {
-    keys = stringArray(keys);
     let localData;
     const localKeys = [];
     let syncKeys = [];
-
-    // No keys provided, load everything
-    if (keys.length === 0) keys = this._persistableKeys;
+    keys = this.keysToLoad(keys);
 
     try {
       if (this.includesLargeKeys(keys)) {
