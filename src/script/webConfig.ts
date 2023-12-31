@@ -191,52 +191,55 @@ export default class WebConfig extends Config {
         syncKeys = removeFromArray(keys, 'syncLargreKeys');
       }
 
-      if (syncKeys.length) {
-        // Prepare to get large keys from sync storage if needed
-        let syncKeysSplit = [].concat(syncKeys);
-        this._largeKeys.forEach((largeKey) => {
-          if (syncKeys.includes(largeKey)) {
-            // Prepare to get split large keys (_words0..N)
-            syncKeysSplit.splice(syncKeysSplit.indexOf(largeKey), 1);
-            syncKeysSplit = syncKeysSplit.concat(this.splitKeyNames(largeKey));
-          }
-        });
-
-        const syncData = await this.getSyncStorage(syncKeysSplit);
-        data._lastSplitKeys = {};
-
-        syncKeys.forEach((key) => {
-          // If we are getting large keys from sync storage combine them
-          if (this._largeKeys.includes(key)) {
-            // Add values for large keys or fill in defaults
-            const splitKeys = this.combineData(syncData, key);
-            if (splitKeys) {
-              data._lastSplitKeys[key] = this.getMaxSplitKeyFromArray(splitKeys);
-              data[key] = syncData[key];
-            } else { // Add defaults if nothing was returned
-              data._lastSplitKeys[key] = 0;
-              if (key === 'words') {
-                data[key] = this._defaultWords;
-              } else {
-                data[key] = this._defaults[key];
-              }
-            }
-          } else {
-            // Assign values to data and fill in defaults for missing keys
-            if (syncData[key] === undefined) {
-              data[key] = this._defaults[key];
-            } else {
-              data[key] = syncData[key];
-            }
-          }
-        });
-      }
-
+      await this.loadFromSyncStorage(syncKeys, data);
       return new this(data);
     } catch (err) {
       logger.error('Failed to load items.', keys, err);
       throw new Error(`Failed to load items: ${prettyPrintArray(keys)}. [${err.message}]`);
     }
+  }
+
+  static async loadFromSyncStorage(syncKeys: string[], data: Partial<WebConfig> = {}) {
+    if (!syncKeys.length) return;
+
+    // Prepare to get large keys from sync storage if needed
+    let syncKeysSplit = [].concat(syncKeys);
+    this._largeKeys.forEach((largeKey) => {
+      if (syncKeys.includes(largeKey)) {
+        // Prepare to get split large keys (_words0..N)
+        syncKeysSplit.splice(syncKeysSplit.indexOf(largeKey), 1);
+        syncKeysSplit = syncKeysSplit.concat(this.splitKeyNames(largeKey));
+      }
+    });
+
+    const syncData = await this.getSyncStorage(syncKeysSplit);
+    data._lastSplitKeys = {};
+
+    syncKeys.forEach((key) => {
+      // If we are getting large keys from sync storage combine them
+      if (this._largeKeys.includes(key)) {
+        // Add values for large keys or fill in defaults
+        const splitKeys = this.combineData(syncData, key);
+        if (splitKeys) {
+          data._lastSplitKeys[key] = this.getMaxSplitKeyFromArray(splitKeys);
+          data[key] = syncData[key];
+        } else { // Add defaults if nothing was returned
+          data._lastSplitKeys[key] = 0;
+          if (key === 'words') {
+            data[key] = this._defaultWords;
+          } else {
+            data[key] = this._defaults[key];
+          }
+        }
+      } else {
+        // Assign values to data and fill in defaults for missing keys
+        if (syncData[key] === undefined) {
+          data[key] = this._defaults[key];
+        } else {
+          data[key] = syncData[key];
+        }
+      }
+    });
   }
 
   static removeLocalStorage(keys: string | string[]) {
