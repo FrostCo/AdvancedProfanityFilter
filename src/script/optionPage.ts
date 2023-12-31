@@ -838,6 +838,7 @@ export default class OptionPage {
     const output = {
       // Add 'managed only' options (adjust in the output as desired)
       _managed: this.Class.Constants.MANAGED.DEFAULTS,
+      _openOptionsOnInstall: false,
     };
     const keys = Object.keys(this.Class.Config._defaults).concat('words');
 

@@ -225,7 +225,18 @@ export default class Background {
   // Actions for extension install or upgrade
   static async onInstalled(details: chrome.runtime.InstalledDetails) {
     if (details.reason == 'install') {
-      chrome.runtime.openOptionsPage();
+      let showOptions = true;
+      try {
+        if (this.Config.BUILD.target == Constants.BUILD_TARGET_CHROME && this.Config.BUILD.manifestVersion == 3) {
+          const defaults = { _openOptionsOnInstall: showOptions };
+          const config = (await this.Config.getManagedStorage(defaults));
+          showOptions = config['_openOptionsOnInstall'];
+        }
+      } catch (err) {
+        this.LOGGER.warn('Error while trying to load managed config', err);
+      }
+
+      if (showOptions) chrome.runtime.openOptionsPage();
     } else if (details.reason == 'update') {
       this.contextMenuSetup();
       const thisVersion = chrome.runtime.getManifest().version;

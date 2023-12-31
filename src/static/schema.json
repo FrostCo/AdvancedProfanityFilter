@@ -6,6 +6,11 @@
       "title": "Managed Storage Level",
       "type": "number"
     },
+    "_openOptionsOnInstall": {
+      "description": "Control whether the Option's page should be opened on installation",
+      "title": "Open Options On Install",
+      "type": "boolean"
+    },
     "censorCharacter": {
       "description": "Set the character to mask letters with. (Default: *) [Censor]",
       "title": "Censor Character",
