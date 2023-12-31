@@ -59,6 +59,15 @@ export default class WebConfig extends Config {
     }
   }
 
+  static assignLocalStorageDefault(key: string, data: Partial<WebConfig>) {
+    // 'words' are not included in Webconfig._defaults
+    if (key === 'words') {
+      data[key] = this._defaultWords;
+    } else {
+      data[key] = this._defaults[key];
+    }
+  }
+
   static chromeStorageAvailable(): boolean {
     return !!(typeof chrome == 'object' && chrome.storage && chrome.storage.sync && chrome.storage.local);
   }
@@ -180,13 +189,7 @@ export default class WebConfig extends Config {
         if (localData.hasOwnProperty(localKey)) {
           data[localKey] = localData[localKey];
         } else {
-          // Ensure defaults
-          // 'words' are not included in Webconfig._defaults
-          if (localKey === 'words') {
-            data[localKey] = this._defaultWords;
-          } else {
-            data[localKey] = this._defaults[localKey];
-          }
+          this.assignLocalStorageDefault(localKey, data);
         }
       }
 
