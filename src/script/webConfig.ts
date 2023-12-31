@@ -145,42 +145,12 @@ export default class WebConfig extends Config {
   // localKeys: Keys to get from browser.storage.local
   // Note: syncLargeKeys will be returned when required
   static async load(keys: string | string[] = [], data: Partial<WebConfig> = {}) {
-    let localData;
-    let syncKeys = [];
+    let syncKeys;
     keys = this.keysToLoad(keys);
 
     try {
       if (this.includesLargeKeys(keys)) {
-        // Add syncLargeKeys if any largeKeys were requested
-        if (!keys.includes('syncLargeKeys')) keys.push('syncLargeKeys');
-
-        // Load large keys from LocalStorage if necessary
-        const localKeys = this._localConfigKeys.filter((localKey) => keys.includes(localKey));
-        localData = await this.getLocalStorage(localKeys);
-        data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : this._defaults.syncLargeKeys;
-
-        if (data.syncLargeKeys === false) { // Use local storage for large keys
-          // Add large keys from local storage to data
-          for (const localKey of localKeys) {
-            if (localData.hasOwnProperty(localKey)) {
-              data[localKey] = localData[localKey];
-            } else {
-              // Ensure defaults
-              // 'words' are not included in Webconfig._defaults
-              if (localKey === 'words') {
-                data[localKey] = this._defaultWords;
-              } else {
-                data[localKey] = this._defaults[localKey];
-              }
-            }
-          }
-
-          // Get all keys from sync storage except the ones found in local storage
-          syncKeys = removeFromArray(keys, this._localConfigKeys);
-        } else { // Use sync storage for large keys
-          // Get all keys from sync storage (except syncLargeKeys)
-          syncKeys = removeFromArray(keys, 'syncLargreKeys');
-        }
+        syncKeys = await this.loadLargeKeysFromLocalStorage(keys, data);
       } else {
         // Get all keys from sync storage (except syncLargeKeys)
         syncKeys = removeFromArray(keys, 'syncLargreKeys');
@@ -191,6 +161,40 @@ export default class WebConfig extends Config {
     } catch (err) {
       logger.error('Failed to load items.', keys, err);
       throw new Error(`Failed to load items: ${prettyPrintArray(keys)}. [${err.message}]`);
+    }
+  }
+
+  // Returns list of keys to get from storage.sync
+  static async loadLargeKeysFromLocalStorage(keys: string[], data: Partial<WebConfig>): Promise<string[]> {
+    // Add syncLargeKeys if any largeKeys were requested
+    if (!keys.includes('syncLargeKeys')) keys.push('syncLargeKeys');
+
+    // Load large keys from LocalStorage if necessary
+    const localKeys = this._localConfigKeys.filter((localKey) => keys.includes(localKey));
+    const localData = await this.getLocalStorage(localKeys) as Partial<WebConfig>;
+    data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : this._defaults.syncLargeKeys;
+
+    if (data.syncLargeKeys === false) { // Use local storage for large keys
+      // Add large keys from local storage to data
+      for (const localKey of localKeys) {
+        if (localData.hasOwnProperty(localKey)) {
+          data[localKey] = localData[localKey];
+        } else {
+          // Ensure defaults
+          // 'words' are not included in Webconfig._defaults
+          if (localKey === 'words') {
+            data[localKey] = this._defaultWords;
+          } else {
+            data[localKey] = this._defaults[localKey];
+          }
+        }
+      }
+
+      // Get all keys from sync storage except the ones found in local storage
+      return removeFromArray(keys, this._localConfigKeys);
+    } else { // Use sync storage for large keys
+      // Get all keys from sync storage (except syncLargeKeys)
+      return removeFromArray(keys, 'syncLargreKeys');
     }
   }
 
