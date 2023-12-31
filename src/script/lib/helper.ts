@@ -191,8 +191,10 @@ export function removeChildren(element) {
   }
 }
 
-export function removeFromArray(array: string[], element: string) {
-  return array.filter((e) => e !== element);
+export function removeFromArray(array: string[], toRemove: string | string[]) {
+  if (typeof toRemove === 'string') return array.filter((e) => e !== toRemove);
+
+  return array.filter((e) => !toRemove.includes(e));
 }
 
 export function secondsToHMS(seconds: number): string {
