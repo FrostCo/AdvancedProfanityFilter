@@ -207,9 +207,7 @@ export function sortObjectKeys(object: any, ignoreUnderscores = true) {
 }
 
 export function stringArray(data: string | string[]): string[] {
-  if (typeof data === 'string') {
-    data = [data];
-  }
+  if (typeof data === 'string') data = [data];
 
   return data;
 }
