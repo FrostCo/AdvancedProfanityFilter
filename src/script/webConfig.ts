@@ -146,7 +146,6 @@ export default class WebConfig extends Config {
   // Note: syncLargeKeys will be returned when required
   static async load(keys: string | string[] = [], data: Partial<WebConfig> = {}) {
     let localData;
-    const localKeys = [];
     let syncKeys = [];
     keys = this.keysToLoad(keys);
 
@@ -156,11 +155,7 @@ export default class WebConfig extends Config {
         if (!keys.includes('syncLargeKeys')) keys.push('syncLargeKeys');
 
         // Load large keys from LocalStorage if necessary
-        this._localConfigKeys.forEach((localKey) => {
-          if (keys.includes(localKey)) {
-            localKeys.push(localKey);
-          }
-        });
+        const localKeys = this._localConfigKeys.filter((localKey) => keys.includes(localKey));
         localData = await this.getLocalStorage(localKeys);
         data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : this._defaults.syncLargeKeys;
 
