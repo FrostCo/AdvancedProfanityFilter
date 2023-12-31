@@ -1,5 +1,5 @@
 import Config from '@APF/lib/config';
-import { prettyPrintArray, sortObjectKeys, stringArray } from '@APF/lib/helper';
+import { prettyPrintArray, removeFromArray, sortObjectKeys, stringArray } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
@@ -181,14 +181,14 @@ export default class WebConfig extends Config {
           }
 
           // Get all keys from sync storage except the ones found in local storage
-          syncKeys = keys.filter((key) => { return !this._localConfigKeys.includes(key); });
+          syncKeys = removeFromArray(keys, this._localConfigKeys);
         } else { // Use sync storage for large keys
           // Get all keys from sync storage (except syncLargeKeys)
-          syncKeys = keys.filter((key) => { return key !== 'syncLargeKeys'; });
+          syncKeys = removeFromArray(keys, 'syncLargreKeys');
         }
       } else {
         // Get all keys from sync storage (except syncLargeKeys)
-        syncKeys = keys.filter((key) => { return key !== 'syncLargeKeys'; });
+        syncKeys = removeFromArray(keys, 'syncLargreKeys');
       }
 
       if (syncKeys.length) {
