@@ -162,7 +162,7 @@ export default class WebConfig extends Config {
         syncKeys = await this.loadLargeKeysFromLocalStorage(keys, data);
       } else {
         // Get all keys from sync storage (except syncLargeKeys)
-        syncKeys = removeFromArray(keys, 'syncLargreKeys');
+        syncKeys = removeFromArray(keys, 'syncLargeKeys');
       }
 
       await this.loadFromSyncStorage(syncKeys, data);
@@ -197,7 +197,7 @@ export default class WebConfig extends Config {
       return removeFromArray(keys, this._localConfigKeys);
     } else { // Use sync storage for large keys
       // Get all keys from sync storage (except syncLargeKeys)
-      return removeFromArray(keys, 'syncLargreKeys');
+      return removeFromArray(keys, 'syncLargeKeys');
     }
   }
 
