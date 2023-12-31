@@ -170,7 +170,7 @@ export default class WebConfig extends Config {
     if (!keys.includes('syncLargeKeys')) keys.push('syncLargeKeys');
 
     // Load large keys from LocalStorage if necessary
-    const localKeys = this._localConfigKeys.filter((localKey) => keys.includes(localKey));
+    const localKeys = this.requestedkeysForLocalStorage(keys, data);
     const localData = await this.getLocalStorage(localKeys) as Partial<WebConfig>;
     data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : this._defaults.syncLargeKeys;
 
@@ -263,6 +263,10 @@ export default class WebConfig extends Config {
           : resolve(0);
       });
     });
+  }
+
+  static requestedkeysForLocalStorage(keys: string[], data: Partial<WebConfig>) {
+    return this._localConfigKeys.filter((localKey) => keys.includes(localKey));
   }
 
   static resetLocalStorage() {
