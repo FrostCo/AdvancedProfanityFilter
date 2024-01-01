@@ -59,7 +59,7 @@ export default class WebConfig extends Config {
     }
   }
 
-  static assignLocalStorageDefault(key: string, data: Partial<WebConfig>) {
+  static assignDefaultValue(key: string, data: Partial<WebConfig>) {
     // 'words' are not included in Webconfig._defaults
     if (key === 'words') {
       data[key] = this._defaultWords;
@@ -189,7 +189,7 @@ export default class WebConfig extends Config {
         if (localData.hasOwnProperty(localKey)) {
           data[localKey] = localData[localKey];
         } else {
-          this.assignLocalStorageDefault(localKey, data);
+          this.assignDefaultValue(localKey, data);
         }
       }
 
@@ -226,17 +226,12 @@ export default class WebConfig extends Config {
           data._lastSplitKeys[key] = this.getMaxSplitKeyFromArray(splitKeys);
           data[key] = syncData[key];
         } else { // Add defaults if nothing was returned
-          data._lastSplitKeys[key] = 0;
-          if (key === 'words') {
-            data[key] = this._defaultWords;
-          } else {
-            data[key] = this._defaults[key];
-          }
+          this.assignDefaultValue(key, data);
         }
       } else {
         // Assign values to data and fill in defaults for missing keys
         if (syncData[key] === undefined) {
-          data[key] = this._defaults[key];
+          this.assignDefaultValue(key, data);
         } else {
           data[key] = syncData[key];
         }
