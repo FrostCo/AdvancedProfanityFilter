@@ -203,9 +203,6 @@ export default class Background {
     const thisVersion = chrome.runtime.getManifest().version;
     this.LOGGER.info(`Updated from ${details.previousVersion} to ${thisVersion}.`);
 
-    // Open options page to show new features
-    // chrome.runtime.openOptionsPage();
-
     // Run any data migrations on update
     this.runUpdateMigrations(details.previousVersion);
 
