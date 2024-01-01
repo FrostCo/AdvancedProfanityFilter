@@ -265,6 +265,11 @@ export default class OptionPage {
     exportToFile(JSON.stringify(this.cfg.ordered(), null, 2), `apf-backup-${today}_${time}.json`);
   }
 
+  backupConfigInline() {
+    const configText = document.getElementById('configText') as HTMLTextAreaElement;
+    configText.value = JSON.stringify(this.cfg.ordered(), null, 2);
+  }
+
   bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
     const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
     if (data === undefined) {
@@ -707,9 +712,8 @@ export default class OptionPage {
   exportConfig() {
     const input = document.getElementById('configInlineInput') as HTMLInputElement;
 
-    if (input.checked) { // inline editor
-      const configText = document.getElementById('configText') as HTMLTextAreaElement;
-      configText.value = JSON.stringify(this.cfg.ordered(), null, 2);
+    if (input.checked) {
+      this.backupConfigInline();
     } else {
       this.backupConfig();
     }
