@@ -198,6 +198,36 @@ export default class Background {
     chrome.runtime.openOptionsPage();
   }
 
+  static async handleUpdate(details: chrome.runtime.InstalledDetails) {
+    this.contextMenuSetup();
+    const thisVersion = chrome.runtime.getManifest().version;
+    this.LOGGER.info(`Updated from ${details.previousVersion} to ${thisVersion}.`);
+
+    // Open options page to show new features
+    // chrome.runtime.openOptionsPage();
+
+    // Run any data migrations on update
+    this.runUpdateMigrations(details.previousVersion);
+
+    // Display update notification
+    try {
+      if (chrome.notifications != null) { // Not available in Safari
+        const showNotification = await this.Config.getSyncStorage({ showUpdateNotification: true });
+        if (showNotification) {
+          chrome.notifications.create('extensionUpdate', {
+            'type': 'basic',
+            'title': 'Advanced Profanity Filter',
+            'message': 'Update installed, click for changelog.',
+            'iconUrl': 'img/icon64.png',
+            'isClickable': true,
+          });
+        }
+      }
+    } catch (err) {
+      this.LOGGER.warn('Error while displaying update notification', err);
+    }
+  }
+
   static async loadBackgroundStorage(): Promise<BackgroundStorage> {
     const data = await this.Config.getLocalStorage({ background: { tabs: {} } });
     return data['background'] as BackgroundStorage;
@@ -226,33 +256,7 @@ export default class Background {
     if (details.reason == 'install') {
       await this.handleInstall(details);
     } else if (details.reason == 'update') {
-      this.contextMenuSetup();
-      const thisVersion = chrome.runtime.getManifest().version;
-      this.LOGGER.info(`Updated from ${details.previousVersion} to ${thisVersion}.`);
-
-      // Open options page to show new features
-      // chrome.runtime.openOptionsPage();
-
-      // Run any data migrations on update
-      this.runUpdateMigrations(details.previousVersion);
-
-      // Display update notification
-      try {
-        if (chrome.notifications != null) { // Not available in Safari
-          const showNotification = await this.Config.getSyncStorage({ showUpdateNotification: true });
-          if (showNotification) {
-            chrome.notifications.create('extensionUpdate', {
-              'type': 'basic',
-              'title': 'Advanced Profanity Filter',
-              'message': 'Update installed, click for changelog.',
-              'iconUrl': 'img/icon64.png',
-              'isClickable': true,
-            });
-          }
-        }
-      } catch (err) {
-        this.LOGGER.warn('Error while displaying update notification', err);
-      }
+      await this.handleUpdate(details);
     }
   }
 
