@@ -194,6 +194,10 @@ export default class Background {
     if (updated) await this.saveBackgroundStorage(storage);
   }
 
+  static async handleInstall(details: chrome.runtime.InstalledDetails) {
+    chrome.runtime.openOptionsPage();
+  }
+
   static async loadBackgroundStorage(): Promise<BackgroundStorage> {
     const data = await this.Config.getLocalStorage({ background: { tabs: {} } });
     return data['background'] as BackgroundStorage;
@@ -220,7 +224,7 @@ export default class Background {
   // Actions for extension install or upgrade
   static async onInstalled(details: chrome.runtime.InstalledDetails) {
     if (details.reason == 'install') {
-      chrome.runtime.openOptionsPage();
+      await this.handleInstall(details);
     } else if (details.reason == 'update') {
       this.contextMenuSetup();
       const thisVersion = chrome.runtime.getManifest().version;
