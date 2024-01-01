@@ -151,7 +151,7 @@ export default class WebConfig extends Config {
 
   // keys: Requested keys (defaults to all)
   // Note: syncLargeKeys will be returned when required
-  static async load(keys: string | string[] = [], data: Partial<WebConfig> = {}) {
+  static async load(keys: string | string[] = [], data: Partial<WebConfig> = {}): Promise<WebConfig> {
     let syncKeys;
     keys = this.keysToLoad(keys);
 
