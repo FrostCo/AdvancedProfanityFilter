@@ -150,8 +150,6 @@ export default class WebConfig extends Config {
   }
 
   // keys: Requested keys (defaults to all)
-  // syncKeys: Keys to get from browser.storage.sync
-  // localKeys: Keys to get from browser.storage.local
   // Note: syncLargeKeys will be returned when required
   static async load(keys: string | string[] = [], data: Partial<WebConfig> = {}) {
     let syncKeys;
