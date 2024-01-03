@@ -150,12 +150,7 @@ export default class OptionPage {
     if (error.message) {
       const chromeQuotaError = '[QUOTA_BYTES quota exceeded]';
       const firefoxQuotaError = '[QuotaExceededError: storage.sync API call exceeded its quota limitations.]';
-      const safariQuotaError = 'Storage quota exceeded.';
-      return (
-        error.message.includes(chromeQuotaError)
-        || error.message.includes(firefoxQuotaError)
-        || error.message.includes(safariQuotaError)
-      );
+      return error.message.includes(chromeQuotaError) || error.message.includes(firefoxQuotaError);
     }
 
     return false;
