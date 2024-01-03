@@ -149,6 +149,15 @@ export default class WebConfig extends Config {
     return keys;
   }
 
+  keysToSave(keys: string | string[] = []): string[] {
+    keys = stringArray(keys);
+
+    // No keys provided, load everything
+    if (keys.length === 0) keys = this._persistableKeys;
+
+    return keys;
+  }
+
   // keys: Requested keys (defaults to all)
   // Note: syncLargeKeys will be returned when required
   static async load(keys: string | string[] = [], data: Partial<WebConfig> = {}): Promise<WebConfig> {
@@ -393,12 +402,9 @@ export default class WebConfig extends Config {
   }
 
   async save(keys: string | string[] = []) {
-    keys = stringArray(keys);
+    keys = this.keysToSave(keys);
     const syncData = {};
     const localData = {};
-
-    // No keys provided, save everything
-    if (keys.length === 0) keys = this._persistableKeys;
 
     let unusedSplitKeys = [];
     keys.forEach((key) => {
