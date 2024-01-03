@@ -340,9 +340,9 @@ export default class WebConfig extends Config {
     return sortObjectKeys(this);
   }
 
-  prepareLocalDataForSave(localData: Partial<WebConfig>) {}
+  async prepareLocalDataForSave(localData: Partial<WebConfig>) {}
 
-  prepareSyncDataForSave(syncData: Partial<WebConfig>) {}
+  async prepareSyncDataForSave(syncData: Partial<WebConfig>) {}
 
   // Note: Defaults are not automatically loaded after removing an item
   async remove(keys: string | string[]) {
@@ -437,8 +437,8 @@ export default class WebConfig extends Config {
     });
 
     try {
-      this.prepareLocalDataForSave(localData);
-      this.prepareSyncDataForSave(syncData);
+      await this.prepareLocalDataForSave(localData);
+      await this.prepareSyncDataForSave(syncData);
 
       // Persist the data
       if (Object.keys(syncData).length) await this.Class.saveSyncStorage(syncData);
