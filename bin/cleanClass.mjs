@@ -4,6 +4,7 @@ import { parseArgv, removeFiles } from './lib.mjs';
 
 export default class Clean {
   constructor() {
+    this.arguments = this.parseArgs();
     this.toRemove = [];
   }
 
@@ -27,20 +28,19 @@ export default class Clean {
     this.addRemovePath(path.join('dist-lib'));
   }
 
-  run() {
+  get defaultArgs() {
+    return ['--built', '--dist', '--test'];
+  }
+
+  parseArgs() {
     try {
       const argv = parseArgv(process.argv);
       if (argv.count >= 2) {
         if (argv.arguments.length == 0 || argv.arguments.includes('--all')) {
-          argv.arguments = ['--built', '--dist', '--test'];
+          return this.defaultArgs;
         }
 
-        if (argv.arguments.includes('--build')) this.addBuildPaths();
-        if (argv.arguments.includes('--built')) this.addBuiltPaths();
-        if (argv.arguments.includes('--dist')) this.addDistPaths();
-        if (argv.arguments.includes('--test')) this.addTestPaths();
-
-        removeFiles(this.toRemove);
+        return argv.arguments;
       } else {
         this.usage();
       }
@@ -48,6 +48,15 @@ export default class Clean {
       console.log(error);
       this.usage();
     }
+  }
+
+  run() {
+    if (this.arguments.includes('--build')) this.addBuildPaths();
+    if (this.arguments.includes('--built')) this.addBuiltPaths();
+    if (this.arguments.includes('--dist')) this.addDistPaths();
+    if (this.arguments.includes('--test')) this.addTestPaths();
+
+    removeFiles(this.toRemove);
   }
 
   addTestPaths() {
