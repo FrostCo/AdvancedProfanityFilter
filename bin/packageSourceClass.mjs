@@ -47,7 +47,7 @@ export default class PackageSource {
   }
 
   get filePath() {
-    return './release/source.zip';
+    return `./release/source-${this.version}.zip`;
   }
 
   get rootFiles() {
@@ -73,5 +73,9 @@ export default class PackageSource {
     console.log('Build from source: npm install && npm run release:bookmarklet && npm run release:firefox');
     console.log('  Unpacked: ./dist');
     console.log(`  Packed: ${this.filePath}`);
+  }
+
+  get version() {
+    return process.env.npm_package_version;
   }
 }
