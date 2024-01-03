@@ -62,7 +62,7 @@ export default class Popup {
     if (instance.tab.url) {
       instance.url = new URL(instance.tab.url);
       instance.domain = this.Domain.byHostname(instance.url.hostname, instance.cfg.domains);
-    } else { // No URL (can be blank in Safari new tab)
+    } else { // No URL
       instance.url = null;
       instance.domain = new this.Domain('');
     }
