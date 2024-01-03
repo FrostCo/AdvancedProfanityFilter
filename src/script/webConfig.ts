@@ -340,6 +340,10 @@ export default class WebConfig extends Config {
     return sortObjectKeys(this);
   }
 
+  prepareLocalDataForSave(localData: Partial<WebConfig>) {}
+
+  prepareSyncDataForSave(syncData: Partial<WebConfig>) {}
+
   // Note: Defaults are not automatically loaded after removing an item
   async remove(keys: string | string[]) {
     keys = stringArray(keys);
@@ -433,19 +437,8 @@ export default class WebConfig extends Config {
     });
 
     try {
-      // Safari won't store null values
-      if (this.Class.BUILD.target === 'safari') {
-        const nullLocalKeys = Object.keys(localData).filter((key) => localData[key] == null);
-        const nullSyncKeys = Object.keys(syncData).filter((key) => syncData[key] == null);
-        if (nullLocalKeys.length) {
-          await this.Class.removeLocalStorage(nullLocalKeys);
-          nullLocalKeys.forEach((key) => delete localData[key]);
-        }
-        if (nullSyncKeys.length) {
-          await this.Class.removeSyncStorage(nullSyncKeys);
-          nullSyncKeys.forEach((key) => delete syncData[key]);
-        }
-      }
+      this.prepareLocalDataForSave(localData);
+      this.prepareSyncDataForSave(syncData);
 
       if (Object.keys(syncData).length) {
         await this.Class.saveSyncStorage(syncData);
