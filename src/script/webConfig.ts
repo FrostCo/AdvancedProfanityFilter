@@ -440,15 +440,10 @@ export default class WebConfig extends Config {
       this.prepareLocalDataForSave(localData);
       this.prepareSyncDataForSave(syncData);
 
-      if (Object.keys(syncData).length) {
-        await this.Class.saveSyncStorage(syncData);
-      }
-      if (Object.keys(localData).length) {
-        await this.Class.saveLocalStorage(localData);
-      }
-      if (unusedSplitKeys.length) {
-        await this.remove(unusedSplitKeys);
-      }
+      // Persist the data
+      if (Object.keys(syncData).length) await this.Class.saveSyncStorage(syncData);
+      if (Object.keys(localData).length) await this.Class.saveLocalStorage(localData);
+      if (unusedSplitKeys.length) await this.remove(unusedSplitKeys);
     } catch (err) {
       logger.error('Failed to save items.', keys, err);
       throw new Error(`Failed to save items: ${prettyPrintArray(keys)}. [${err.message}]`);
