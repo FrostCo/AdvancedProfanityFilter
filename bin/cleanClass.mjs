@@ -5,29 +5,26 @@ import { parseArgv, removeFiles } from './lib.mjs';
 export default class Clean {
   constructor() {
     this.toRemove = [];
-    this.arguments = [];
   }
 
-  get buildPaths() {
-    return [
-      path.join('dist', 'backgroundScriptsAPIBridge.js'),
-      path.join('dist', 'contentScriptsAPIBridge.js'),
-    ];
+  addRemovePath(removePath) {
+    this.toRemove.push(removePath);
   }
 
-  get builtPaths() {
-    return [
-      path.join('extension'),
-      path.join('extension-firefox'),
-      path.join('extension-edgeLegacy'),
-    ];
+  addBuildPaths() {
+    this.addRemovePath(path.join('dist', 'backgroundScriptsAPIBridge.js'));
+    this.addRemovePath(path.join('dist', 'contentScriptsAPIBridge.js'));
   }
 
-  get distPaths() {
-    return [
-      path.join('dist'),
-      path.join('dist-lib'),
-    ];
+  addBuiltPaths() {
+    this.addRemovePath(path.join('extension'));
+    this.addRemovePath(path.join('extension-firefox'));
+    this.addRemovePath(path.join('extension-edgeLegacy'));
+  }
+
+  addDistPaths() {
+    this.addRemovePath(path.join('dist'));
+    this.addRemovePath(path.join('dist-lib'));
   }
 
   run() {
@@ -38,10 +35,10 @@ export default class Clean {
           argv.arguments = ['--built', '--dist', '--test'];
         }
 
-        if (argv.arguments.includes('--build')) this.toRemove = this.toRemove.concat(this.buildPaths);
-        if (argv.arguments.includes('--built')) this.toRemove = this.toRemove.concat(this.builtPaths);
-        if (argv.arguments.includes('--dist')) this.toRemove = this.toRemove.concat(this.distPaths);
-        if (argv.arguments.includes('--test')) this.toRemove = this.toRemove.concat(this.testPaths);
+        if (argv.arguments.includes('--build')) this.addBuildPaths();
+        if (argv.arguments.includes('--built')) this.addBuiltPaths();
+        if (argv.arguments.includes('--dist')) this.addDistPaths();
+        if (argv.arguments.includes('--test')) this.addTestPaths();
 
         removeFiles(this.toRemove);
       } else {
@@ -53,10 +50,8 @@ export default class Clean {
     }
   }
 
-  get testPaths() {
-    return [
-      path.join('test', 'built'),
-    ];
+  addTestPaths() {
+    this.addRemovePath(path.join('test', 'built'));
   }
 
   usage() {
