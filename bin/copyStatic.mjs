@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
-import fse from 'fs-extra';
+import CopyStatic from './copyStaticClass.mjs';
 
-console.log('Copying static assets to ./dist folder...');
-fse.copySync('./src/static', './dist');
-fse.copySync('./src/img', './dist/img');
+const copyStatic = new CopyStatic();
+copyStatic.run();
