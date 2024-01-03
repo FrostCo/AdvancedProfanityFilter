@@ -208,7 +208,7 @@ export default class Background {
 
     // Display update notification
     try {
-      if (chrome.notifications != null) { // Not available in Safari
+      if (chrome.notifications != null) {
         const showNotification = await this.Config.getSyncStorage({ showUpdateNotification: true });
         if (showNotification) {
           chrome.notifications.create('extensionUpdate', {

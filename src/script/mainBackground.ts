@@ -6,6 +6,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { return
 chrome.runtime.onStartup.addListener(() => { Background.onStartup(); });
 chrome.tabs.onRemoved.addListener((tabId) => { Background.tabsOnRemoved(tabId); });
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => { Background.tabsOnUpdated(tabId, changeInfo, tab); });
-if (chrome.notifications != null) { // Not available in Safari
+if (chrome.notifications != null) {
   chrome.notifications.onClicked.addListener((notificationId) => { Background.notificationsOnClick(notificationId); });
 }
