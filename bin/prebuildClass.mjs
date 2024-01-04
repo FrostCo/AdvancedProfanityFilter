@@ -72,7 +72,8 @@ export default class Prebuild {
         const targetArray = target.split('-');
         this.data.target = targetArray[0];
         if (targetArray.length == 2) {
-          this.data.manifestVersion = parseInt(targetArray[1].match(/\d$/)?.toString()) || this.data.manifestVersion;
+          const manifestVersion = parseInt(targetArray[1].match(/\d$/)?.toString());
+          if (manifestVersion) this.data.manifestVersion = manifestVersion;
         }
       } else {
         this.loadedFromFile = true;
