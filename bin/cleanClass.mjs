@@ -40,7 +40,18 @@ export default class Clean {
     return ['built', 'dist', 'test'];
   }
 
+  get validArgs() {
+    return ['all', 'build', 'built', 'dist', 'test'];
+  }
+
   processArgs() {
+    const invalidArgs = this.arguments.filter((arg) => !this.validArgs.includes(arg));
+    if (invalidArgs.length) {
+      console.error(`Unsupported arg: ${invalidArgs}`);
+      this.usage();
+      process.exit(1);
+    }
+
     if (this.arguments.length === 0) {
       this.arguments = this.defaultArgs;
     } else if (this.arguments.includes('all')) {
