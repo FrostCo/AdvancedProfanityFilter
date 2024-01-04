@@ -32,21 +32,19 @@ export default class Clean {
     this.addRemovePath(path.join('dist-lib'));
   }
 
+  get allArgs() {
+    return ['build', 'built', 'dist', 'test'];
+  }
+
   get defaultArgs() {
     return ['built', 'dist', 'test'];
   }
 
-  parseArgs() {
-    try {
-      const argv = Common.parseArgv(process.argv);
-      if (argv.count >= 2) {
-        if (argv.arguments.length == 0 || argv.arguments.includes('--all')) {
-          return this.defaultArgs;
-        }
-
   processArgs() {
-    if (this.arguments.length === 0 || argv.arguments.includes('all')) {
-      this.arguments = this.defaultArgs();
+    if (this.arguments.length === 0) {
+      this.arguments = this.defaultArgs;
+    } else if (this.arguments.includes('all')) {
+      this.arguments = this.allArgs;
     }
   }
 
