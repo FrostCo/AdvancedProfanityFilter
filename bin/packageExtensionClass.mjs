@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import AdmZip from 'adm-zip';
 import { globbySync } from 'globby';
-import { buildFilePath, loadJSONFile, removeFiles } from './lib.mjs';
+import { buildFilePath, loadJSONFile, removeFiles } from './common.mjs';
 import fse from 'fs-extra';
 
 export default class PackageExtension {

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import AdmZip from 'adm-zip';
-import { removeFiles } from './lib.mjs';
+import { removeFiles } from './common.mjs';
 
 // Required for Firefox due to bundled code
 export default class PackageSource {

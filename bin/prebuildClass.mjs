@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import fse from 'fs-extra';
 // import Constants from '../src/script/lib/constants'; // Temp?
-import { buildFilePath, buildFilePathByEnv, loadJSONFile, parseArgv, writeJSONFile } from './lib.mjs';
+import { buildFilePath, buildFilePathByEnv, loadJSONFile, parseArgv, writeJSONFile } from './common.mjs';
 
 export default class Prebuild {
   constructor(args) {

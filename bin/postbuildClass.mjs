@@ -6,7 +6,7 @@ import {
   distManifestPath,
   loadJSONFile,
   writeJSONFile
-} from './lib.mjs';
+} from './common.mjs';
 
 export default class Postbuild {
   constructor() {

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import path from 'path';
-import { parseArgv, removeFiles } from './lib.mjs';
+import { parseArgv, removeFiles } from './common.mjs';
 
 export default class Clean {
   constructor() {
