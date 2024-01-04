@@ -8,7 +8,10 @@ export default class Prebuild {
     this.loadedFromFile = false;
     this.data = this.defaultBuildData();
     this.environment = 'dev';
-    this.loadBuildData(args);
+    this.environmentProvided = false;
+    this.targetProvided = false;
+
+    this.processArguments(args);
   }
 
   activateBuildFile(sourceFile) {
@@ -66,43 +69,54 @@ export default class Prebuild {
     // Target customizations
   }
 
-  loadBuildData(args) {
-    const argv = Common.parseArgv(args);
-    if (argv.count >= 2 && argv.count <= 4) {
-      if (argv.arguments.includes('--release')) {
-        argv.arguments.splice(argv.arguments.indexOf('--release'), 1);
-        this.environment = 'release';
-        this.data.release = true;
-      }
-
-      if (argv.arguments.includes('--test')) {
-        argv.arguments.splice(argv.arguments.indexOf('--test'), 1);
-        this.environment = 'test';
-      }
-
-      const target = argv.arguments[0]?.replace('--', '');
-      if (target) {
-        const targetArray = target.split('-');
-        this.data.target = targetArray[0];
-        if (targetArray.length == 2) {
-          const manifestVersion = parseInt(targetArray[1].match(/\d$/)?.toString());
-          if (manifestVersion) this.data.manifestVersion = manifestVersion;
-        }
-      } else {
-        this.loadedFromFile = true;
-        const envBuildFilePath = Common.buildFilePathByEnv(this.environment);
-
-        try {
-          // Use existing buildFile as starting point if no target was passed
-          this.data = Common.loadJSONFile(envBuildFilePath);
-        } catch (err) {
-          console.warn(`${envBuildFilePath} doesn't exist, creating...`);
-          Common.writeJSONFile(envBuildFilePath, this.data);
-        }
-      }
-    } else {
-      throw (new Error('Incorrect number of arguments.'));
+  handleEnvArg(arg) {
+    if (Common.environments.includes(arg)) {
+      this.environmentProvided = true;
+      return this.environment = arg;
     }
+  }
+
+  handleTargetArg(arg) {
+    const [targetName, manifestVersion] = arg.split('-');
+    if (!targetName) return;
+
+    if (Common.targets.includes(targetName)) {
+      this.data.target = targetName;
+      if (manifestVersion) this.data.manifestVersion = parseInt(manifestVersion.match(/\d$/)?.toString());
+      return this.targetProvided = true;
+    }
+  }
+
+  loadDataFromFile() {
+    this.loadedFromFile = true;
+    const envBuildFilePath = Common.buildFilePathByEnv(this.environment);
+
+    try {
+      // Use existing buildFile as starting point if no target was passed
+      this.data = Common.loadJSONFile(envBuildFilePath);
+    } catch (err) {
+      console.warn(`${envBuildFilePath} doesn't exist, creating with defaults...`);
+      Common.writeJSONFile(envBuildFilePath, this.data);
+    }
+  }
+
+  processArguments(args) {
+    const argv = Common.parseArgv(args);
+    argv.removeArgumentPrefixes('--');
+    argv.removeEmptyArguments();
+    if (argv.arguments.length > 2) this.error('Too many arguments provided.');
+
+    if (argv.arguments.length >= 1) {
+      for (const arg of argv.arguments) {
+        if (this.handleEnvArg(arg)) continue;
+        if (this.handleTargetArg(arg)) continue;
+        this.error(`Unsupported argument: ${arg}`);
+      }
+    }
+
+    if (argv.arguments.length == 0 || !this.targetProvided) this.loadDataFromFile();
+
+    if (this.environment === 'release') this.data.release = true;
   }
 
   run() {
