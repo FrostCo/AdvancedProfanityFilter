@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import AdmZip from 'adm-zip';
 import { globbySync } from 'globby';
-import { buildFilePath, loadJSONFile, removeFiles } from './common.mjs';
+import Common from './common.mjs';
 import fse from 'fs-extra';
 
 export default class PackageExtension {
@@ -11,7 +11,7 @@ export default class PackageExtension {
 
     try {
       fse.ensureDirSync(this.releaseDir);
-      this.data = loadJSONFile(buildFilePath);
+      this.data = Common.loadJSONFile(Common.buildFilePath);
     } catch (err) {
       console.error(err.message);
       throw (err);
@@ -45,7 +45,7 @@ export default class PackageExtension {
   run() {
     try {
       this.buildArchive();
-      removeFiles(this.packagePath, true);
+      Common.removeFiles(this.packagePath, true);
       console.log(`Building ${this.packagePath}`);
       this.zip.writeZip(this.packagePath);
     } catch (err) {

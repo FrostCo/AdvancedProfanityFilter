@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import fse from 'fs-extra';
 // import Constants from '../src/script/lib/constants'; // Temp?
-import { buildFilePath, buildFilePathByEnv, loadJSONFile, parseArgv, writeJSONFile } from './common.mjs';
+import Common from './common.mjs';
 
 export default class Prebuild {
   constructor(args) {
@@ -12,7 +12,7 @@ export default class Prebuild {
   }
 
   activateBuildFile(sourceFile) {
-    fse.copyFileSync(sourceFile, buildFilePath);
+    fse.copyFileSync(sourceFile, Common.buildFilePath);
   }
 
   bookmarkletBuild() {
@@ -62,7 +62,7 @@ export default class Prebuild {
   }
 
   loadBuildData(args) {
-    const argv = parseArgv(args);
+    const argv = Common.parseArgv(args);
     if (argv.count >= 2 && argv.count <= 4) {
       if (argv.arguments.includes('--release')) {
         argv.arguments.splice(argv.arguments.indexOf('--release'), 1);
@@ -85,14 +85,14 @@ export default class Prebuild {
         }
       } else {
         this.loadedFromFile = true;
-        const envBuildFilePath = buildFilePathByEnv(this.environment);
+        const envBuildFilePath = Common.buildFilePathByEnv(this.environment);
 
         try {
           // Use existing buildFile as starting point if no target was passed
-          this.data = loadJSONFile(envBuildFilePath);
+          this.data = Common.loadJSONFile(envBuildFilePath);
         } catch (err) {
           console.warn(`${envBuildFilePath} doesn't exist, creating...`);
-          writeJSONFile(envBuildFilePath, this.data);
+          Common.writeJSONFile(envBuildFilePath, this.data);
         }
       }
     } else {
@@ -133,8 +133,8 @@ export default class Prebuild {
   }
 
   writeBuildData() {
-    const filePath = buildFilePathByEnv(this.environment);
-    writeJSONFile(filePath, this.data);
+    const filePath = Common.buildFilePathByEnv(this.environment);
+    Common.writeJSONFile(filePath, this.data);
     this.activateBuildFile(filePath);
     if (this.showBuildDetails) {
       console.log(`Build details:\n${JSON.stringify(this.data, null, 2)}`);

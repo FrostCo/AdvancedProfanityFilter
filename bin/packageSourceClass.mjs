@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import AdmZip from 'adm-zip';
-import { removeFiles } from './common.mjs';
+import Common from './common.mjs';
 
 // Required for Firefox due to bundled code
 export default class PackageSource {
@@ -62,7 +62,7 @@ export default class PackageSource {
   }
 
   run() {
-    removeFiles(this.filePath, true);
+    Common.removeFiles(this.filePath, true);
     this.showInstructions();
     this.addFiles();
     this.zip.writeZip(this.filePath);

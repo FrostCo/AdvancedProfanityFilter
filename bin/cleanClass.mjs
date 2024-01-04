@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import path from 'path';
-import { parseArgv, removeFiles } from './common.mjs';
+import Common from './common.mjs';
 
 export default class Clean {
   constructor() {
@@ -34,7 +34,7 @@ export default class Clean {
 
   parseArgs() {
     try {
-      const argv = parseArgv(process.argv);
+      const argv = Common.parseArgv(process.argv);
       if (argv.count >= 2) {
         if (argv.arguments.length == 0 || argv.arguments.includes('--all')) {
           return this.defaultArgs;
@@ -56,7 +56,7 @@ export default class Clean {
     if (this.arguments.includes('--dist')) this.addDistPaths();
     if (this.arguments.includes('--test')) this.addTestPaths();
 
-    removeFiles(this.toRemove);
+    Common.removeFiles(this.toRemove);
   }
 
   addTestPaths() {
