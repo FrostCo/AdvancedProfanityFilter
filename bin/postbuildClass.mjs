@@ -1,17 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-console */
 import fse from 'fs-extra';
-import {
-  buildFilePath,
-  distManifestPath,
-  loadJSONFile,
-  writeJSONFile
-} from './lib.mjs';
+import Common from './common.mjs';
 
 export default class Postbuild {
   constructor() {
-    this.buildData = loadJSONFile(buildFilePath);
-    this.manifest = loadJSONFile(distManifestPath);
+    this.buildData = Common.loadJSONFile(Common.buildFilePath);
+    this.manifest = Common.loadJSONFile(Common.distManifestPath);
   }
 
   common() {
@@ -114,6 +109,6 @@ export default class Postbuild {
   }
 
   writeManifestFile() {
-    writeJSONFile(distManifestPath, this.manifest);
+    Common.writeJSONFile(Common.distManifestPath, this.manifest);
   }
 }

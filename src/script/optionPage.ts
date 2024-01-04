@@ -17,7 +17,7 @@ import {
   removeChildren,
   removeFromArray,
   stringArray,
-  upperCaseFirst
+  upperCaseFirst,
 } from '@APF/lib/helper';
 
 const logger = new Logger('OptionPage');
@@ -150,12 +150,7 @@ export default class OptionPage {
     if (error.message) {
       const chromeQuotaError = '[QUOTA_BYTES quota exceeded]';
       const firefoxQuotaError = '[QuotaExceededError: storage.sync API call exceeded its quota limitations.]';
-      const safariQuotaError = 'Storage quota exceeded.';
-      return (
-        error.message.includes(chromeQuotaError)
-        || error.message.includes(firefoxQuotaError)
-        || error.message.includes(safariQuotaError)
-      );
+      return error.message.includes(chromeQuotaError) || error.message.includes(firefoxQuotaError);
     }
 
     return false;
@@ -257,12 +252,17 @@ export default class OptionPage {
     }
   }
 
-  backupConfig() {
+  backupConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
     const padded = (num: number) => { return ('0' + num).slice(-2); };
     const date = new Date;
     const today = `${date.getFullYear()}-${padded(date.getMonth()+1)}-${padded(date.getDate())}`;
     const time = `${padded(date.getHours())}${padded(date.getMinutes())}${padded(date.getSeconds())}`;
-    exportToFile(JSON.stringify(this.cfg.ordered(), null, 2), `apf-backup-${today}_${time}.json`);
+    exportToFile(JSON.stringify(config, null, 2), `${filePrefix}-${today}_${time}.json`);
+  }
+
+  backupConfigInline(config = this.cfg.ordered()) {
+    const configText = document.getElementById('configText') as HTMLTextAreaElement;
+    configText.value = JSON.stringify(config, null, 2);
   }
 
   bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
@@ -704,14 +704,13 @@ export default class OptionPage {
     return newDomainCfg;
   }
 
-  exportConfig() {
+  exportConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
     const input = document.getElementById('configInlineInput') as HTMLInputElement;
 
-    if (input.checked) { // inline editor
-      const configText = document.getElementById('configText') as HTMLTextAreaElement;
-      configText.value = JSON.stringify(this.cfg.ordered(), null, 2);
+    if (input.checked) {
+      this.backupConfigInline(config);
     } else {
-      this.backupConfig();
+      this.backupConfig(config, filePrefix);
     }
   }
 

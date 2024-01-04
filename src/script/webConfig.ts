@@ -1,5 +1,5 @@
 import Config from '@APF/lib/config';
-import { prettyPrintArray, stringArray } from '@APF/lib/helper';
+import { prettyPrintArray, removeFromArray, sortObjectKeys, stringArray } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
@@ -56,6 +56,15 @@ export default class WebConfig extends Config {
     } catch (err) {
       // 8192 https://developer.chrome.com/apps/storage
       return 8028;
+    }
+  }
+
+  static assignDefaultValue(key: string, data: Partial<WebConfig>) {
+    // 'words' are not included in Webconfig._defaults
+    if (key === 'words') {
+      data[key] = this._defaultWords;
+    } else {
+      data[key] = this._defaults[key];
     }
   }
 
@@ -131,107 +140,110 @@ export default class WebConfig extends Config {
     return keys.some((key) => { return this._largeKeys.includes(key); });
   }
 
-  // keys: Requested keys (defaults to all)
-  // syncKeys: Keys to get from browser.storage.sync
-  // localKeys: Keys to get from browser.storage.local
-  // Note: syncLargeKeys will be returned when required
-  static async load(keys: string | string[] = []) {
+  static keysToLoad(keys: string | string[] = []) {
     keys = stringArray(keys);
-    const data = {} as any;
-    let localData;
-    const localKeys = [];
-    let syncKeys = [];
 
     // No keys provided, load everything
     if (keys.length === 0) keys = this._persistableKeys;
 
+    return keys;
+  }
+
+  keysToSave(keys: string | string[] = []): string[] {
+    keys = stringArray(keys);
+
+    // No keys provided, load everything
+    if (keys.length === 0) keys = this._persistableKeys;
+
+    return keys;
+  }
+
+  // keys: Requested keys (defaults to all)
+  // Note: syncLargeKeys will be returned when required
+  static async load(keys: string | string[] = [], data: Partial<WebConfig> = {}): Promise<WebConfig> {
+    let syncKeys;
+    keys = this.keysToLoad(keys);
+
     try {
       if (this.includesLargeKeys(keys)) {
-        // Add syncLargeKeys if any largeKeys were requested
-        if (!keys.includes('syncLargeKeys')) keys.push('syncLargeKeys');
-
-        // Load large keys from LocalStorage if necessary
-        this._localConfigKeys.forEach((localKey) => {
-          if (keys.includes(localKey)) {
-            localKeys.push(localKey);
-          }
-        });
-        localData = await this.getLocalStorage(localKeys);
-        data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : this._defaults.syncLargeKeys;
-
-        if (data.syncLargeKeys === false) { // Use local storage for large keys
-          // Add large keys from local storage to data
-          localKeys.forEach((localKey) => {
-            // Ensure defaults
-            if (localData[localKey] === undefined) {
-              // 'words' are not included in Webconfig._defaults
-              if (localKey === 'words') {
-                data[localKey] = this._defaultWords;
-              } else {
-                data[localKey] = this._defaults[localKey];
-              }
-            } else {
-              data[localKey] = localData[localKey];
-            }
-          });
-
-          // Get all keys from sync storage except the ones found in local storage
-          syncKeys = keys.filter((key) => { return !this._localConfigKeys.includes(key); });
-        } else { // Use sync storage for large keys
-          // Get all keys from sync storage (except syncLargeKeys)
-          syncKeys = keys.filter((key) => { return key !== 'syncLargeKeys'; });
-        }
+        syncKeys = await this.loadLargeKeysFromLocalStorage(keys, data);
       } else {
         // Get all keys from sync storage (except syncLargeKeys)
-        syncKeys = keys.filter((key) => { return key !== 'syncLargeKeys'; });
+        syncKeys = this.requestedkeysForSyncStorage(keys, 'syncLargeKeys', data);
       }
 
-      if (syncKeys.length) {
-        // Prepare to get large keys from sync storage if needed
-        let syncKeysSplit = [].concat(syncKeys);
-        this._largeKeys.forEach((largeKey) => {
-          if (syncKeys.includes(largeKey)) {
-            // Prepare to get split large keys (_words0..N)
-            syncKeysSplit.splice(syncKeysSplit.indexOf(largeKey), 1);
-            syncKeysSplit = syncKeysSplit.concat(this.splitKeyNames(largeKey));
-          }
-        });
-
-        const syncData = await this.getSyncStorage(syncKeysSplit);
-        data._lastSplitKeys = {};
-
-        syncKeys.forEach((key) => {
-          // If we are getting large keys from sync storage combine them
-          if (this._largeKeys.includes(key)) {
-            // Add values for large keys or fill in defaults
-            const splitKeys = this.combineData(syncData, key);
-            if (splitKeys) {
-              data._lastSplitKeys[key] = this.getMaxSplitKeyFromArray(splitKeys);
-              data[key] = syncData[key];
-            } else { // Add defaults if nothing was returned
-              data._lastSplitKeys[key] = 0;
-              if (key === 'words') {
-                data[key] = this._defaultWords;
-              } else {
-                data[key] = this._defaults[key];
-              }
-            }
-          } else {
-            // Assign values to data and fill in defaults for missing keys
-            if (syncData[key] === undefined) {
-              data[key] = this._defaults[key];
-            } else {
-              data[key] = syncData[key];
-            }
-          }
-        });
-      }
-
+      await this.loadFromSyncStorage(syncKeys, data);
       return new this(data);
     } catch (err) {
       logger.error('Failed to load items.', keys, err);
       throw new Error(`Failed to load items: ${prettyPrintArray(keys)}. [${err.message}]`);
     }
+  }
+
+  // Returns list of keys to get from storage.sync
+  static async loadLargeKeysFromLocalStorage(keys: string[], data: Partial<WebConfig>): Promise<string[]> {
+    // Add syncLargeKeys if any largeKeys were requested
+    if (!keys.includes('syncLargeKeys')) keys.push('syncLargeKeys');
+
+    // Load large keys from LocalStorage if necessary
+    const localKeys = this.requestedkeysForLocalStorage(keys, data);
+    const localData = await this.getLocalStorage(localKeys) as Partial<WebConfig>;
+    data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : this._defaults.syncLargeKeys;
+
+    if (data.syncLargeKeys === false) { // Use local storage for large keys
+      // Add large keys from local storage to data
+      for (const localKey of localKeys) {
+        if (localData.hasOwnProperty(localKey)) {
+          data[localKey] = localData[localKey];
+        } else {
+          this.assignDefaultValue(localKey, data);
+        }
+      }
+
+      // Get all keys from sync storage except the ones found in local storage
+      return this.requestedkeysForSyncStorage(keys, this._localConfigKeys, data);
+    } else { // Use sync storage for large keys
+      // Get all keys from sync storage (except syncLargeKeys)
+      return this.requestedkeysForSyncStorage(keys, 'syncLargeKeys', data);
+    }
+  }
+
+  static async loadFromSyncStorage(syncKeys: string[], data: Partial<WebConfig> = {}) {
+    if (!syncKeys.length) return;
+
+    // Prepare to get large keys from sync storage if needed
+    let syncKeysSplit = [].concat(syncKeys);
+    this._largeKeys.forEach((largeKey) => {
+      if (syncKeys.includes(largeKey)) {
+        // Prepare to get split large keys (_words0..N)
+        syncKeysSplit.splice(syncKeysSplit.indexOf(largeKey), 1);
+        syncKeysSplit = syncKeysSplit.concat(this.splitKeyNames(largeKey));
+      }
+    });
+
+    const syncData = await this.getSyncStorage(syncKeysSplit);
+    data._lastSplitKeys = {};
+
+    syncKeys.forEach((key) => {
+      // If we are getting large keys from sync storage combine them
+      if (this._largeKeys.includes(key)) {
+        // Add values for large keys or fill in defaults
+        const splitKeys = this.combineData(syncData, key);
+        if (splitKeys) {
+          data._lastSplitKeys[key] = this.getMaxSplitKeyFromArray(splitKeys);
+          data[key] = syncData[key];
+        } else { // Add defaults if nothing was returned
+          this.assignDefaultValue(key, data);
+        }
+      } else {
+        // Assign values to data and fill in defaults for missing keys
+        if (syncData[key] === undefined) {
+          this.assignDefaultValue(key, data);
+        } else {
+          data[key] = syncData[key];
+        }
+      }
+    });
   }
 
   static removeLocalStorage(keys: string | string[]) {
@@ -256,6 +268,14 @@ export default class WebConfig extends Config {
           : resolve(0);
       });
     });
+  }
+
+  static requestedkeysForLocalStorage(keys: string[], data: Partial<WebConfig>) {
+    return this._localConfigKeys.filter((localKey) => keys.includes(localKey));
+  }
+
+  static requestedkeysForSyncStorage(keys: string[], toRemove: string | string[], data: Partial<WebConfig>) {
+    return removeFromArray(keys, toRemove);
   }
 
   static resetLocalStorage() {
@@ -317,11 +337,12 @@ export default class WebConfig extends Config {
 
   // Order and remove `_` prefixed values
   ordered() {
-    return Object.keys(this).sort().reduce((obj, key) => {
-      if (key[0] != '_') { obj[key] = this[key]; }
-      return obj;
-    }, {});
+    return sortObjectKeys(this);
   }
+
+  async prepareLocalDataForSave(localData: Partial<WebConfig>) {}
+
+  async prepareSyncDataForSave(syncData: Partial<WebConfig>) {}
 
   // Note: Defaults are not automatically loaded after removing an item
   async remove(keys: string | string[]) {
@@ -385,12 +406,9 @@ export default class WebConfig extends Config {
   }
 
   async save(keys: string | string[] = []) {
-    keys = stringArray(keys);
+    keys = this.keysToSave(keys);
     const syncData = {};
     const localData = {};
-
-    // No keys provided, save everything
-    if (keys.length === 0) keys = this._persistableKeys;
 
     let unusedSplitKeys = [];
     keys.forEach((key) => {
@@ -419,29 +437,13 @@ export default class WebConfig extends Config {
     });
 
     try {
-      // Safari won't store null values
-      if (this.Class.BUILD.target === 'safari') {
-        const nullLocalKeys = Object.keys(localData).filter((key) => localData[key] == null);
-        const nullSyncKeys = Object.keys(syncData).filter((key) => syncData[key] == null);
-        if (nullLocalKeys.length) {
-          await this.Class.removeLocalStorage(nullLocalKeys);
-          nullLocalKeys.forEach((key) => delete localData[key]);
-        }
-        if (nullSyncKeys.length) {
-          await this.Class.removeSyncStorage(nullSyncKeys);
-          nullSyncKeys.forEach((key) => delete syncData[key]);
-        }
-      }
+      await this.prepareLocalDataForSave(localData);
+      await this.prepareSyncDataForSave(syncData);
 
-      if (Object.keys(syncData).length) {
-        await this.Class.saveSyncStorage(syncData);
-      }
-      if (Object.keys(localData).length) {
-        await this.Class.saveLocalStorage(localData);
-      }
-      if (unusedSplitKeys.length) {
-        await this.remove(unusedSplitKeys);
-      }
+      // Persist the data
+      if (Object.keys(syncData).length) await this.Class.saveSyncStorage(syncData);
+      if (Object.keys(localData).length) await this.Class.saveLocalStorage(localData);
+      if (unusedSplitKeys.length) await this.remove(unusedSplitKeys);
     } catch (err) {
       logger.error('Failed to save items.', keys, err);
       throw new Error(`Failed to save items: ${prettyPrintArray(keys)}. [${err.message}]`);

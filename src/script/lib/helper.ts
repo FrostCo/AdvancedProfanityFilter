@@ -191,18 +191,25 @@ export function removeChildren(element) {
   }
 }
 
-export function removeFromArray(array: string[], element: string) {
-  return array.filter((e) => e !== element);
+export function removeFromArray(array: string[], toRemove: string | string[]) {
+  if (typeof toRemove === 'string') return array.filter((e) => e !== toRemove);
+
+  return array.filter((e) => !toRemove.includes(e));
 }
 
 export function secondsToHMS(seconds: number): string {
   return new Date(seconds * 1000).toISOString().slice(11, (11 + 12));
 }
 
+export function sortObjectKeys(object: any, ignoreUnderscores = true) {
+  return Object.keys(object).sort().reduce((obj, key) => {
+    if (!ignoreUnderscores || key[0] != '_') obj[key] = object[key];
+    return obj;
+  }, {});
+}
+
 export function stringArray(data: string | string[]): string[] {
-  if (typeof data === 'string') {
-    data = [data];
-  }
+  if (typeof data === 'string') data = [data];
 
   return data;
 }

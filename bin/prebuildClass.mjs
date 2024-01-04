@@ -1,17 +1,21 @@
 /* eslint-disable no-console */
 import fse from 'fs-extra';
 // import Constants from '../src/script/lib/constants'; // Temp?
-import { buildFilePath, devBuildFilePath, loadJSONFile, parseArgv, releaseBuildFilePath, writeJSONFile } from './lib.mjs';
+import Common from './common.mjs';
 
 export default class Prebuild {
   constructor(args) {
     this.loadedFromFile = false;
     this.data = this.defaultBuildData();
-    this.loadBuildData(args);
+    this.environment = 'dev';
+    this.environmentProvided = false;
+    this.targetProvided = false;
+
+    this.processArguments(args);
   }
 
   activateBuildFile(sourceFile) {
-    fse.copyFileSync(sourceFile, buildFilePath);
+    fse.copyFileSync(sourceFile, Common.buildFilePath);
   }
 
   bookmarkletBuild() {
@@ -56,36 +60,63 @@ export default class Prebuild {
     // Target customizations
   }
 
+  error(msg) {
+    console.error(msg);
+    process.exit(1);
+  }
+
   firefoxBuild() {
     // Target customizations
   }
 
-  loadBuildData(args) {
-    const argv = parseArgv(args);
-    if (argv.count >= 2 && argv.count <= 4) {
-      this.data.release = argv.arguments.includes('--release');
-      if (this.data.release) {
-        argv.arguments.splice(argv.arguments.indexOf('--release'), 1);
-      }
-      const target = argv.arguments[0]?.replace('--', '');
-      if (target) {
-        const targetArray = target.split('-');
-        this.data.target = targetArray[0];
-        if (targetArray.length == 2) {
-          this.data.manifestVersion = parseInt(targetArray[1].match(/\d$/)?.toString()) || this.data.manifestVersion;
-        }
-      } else {
-        this.loadedFromFile = true;
-        // Use existing buildFile as starting point if no target was passed
-        if (this.data.release && fse.existsSync(releaseBuildFilePath)) {
-          this.data = loadJSONFile(releaseBuildFilePath);
-        } else if (!this.data.release && fse.existsSync(devBuildFilePath)) {
-          this.data = loadJSONFile(devBuildFilePath);
-        }
-      }
-    } else {
-      throw (new Error('Incorrect number of arguments.'));
+  handleEnvArg(arg) {
+    if (Common.environments.includes(arg)) {
+      this.environmentProvided = true;
+      return this.environment = arg;
     }
+  }
+
+  handleTargetArg(arg) {
+    const [targetName, manifestVersion] = arg.split('-');
+    if (!targetName) return;
+
+    if (Common.targets.includes(targetName)) {
+      this.data.target = targetName;
+      if (manifestVersion) this.data.manifestVersion = parseInt(manifestVersion.match(/\d$/)?.toString());
+      return this.targetProvided = true;
+    }
+  }
+
+  loadDataFromFile() {
+    this.loadedFromFile = true;
+    const envBuildFilePath = Common.buildFilePathByEnv(this.environment);
+
+    try {
+      // Use existing buildFile as starting point if no target was passed
+      this.data = Common.loadJSONFile(envBuildFilePath);
+    } catch (err) {
+      console.warn(`${envBuildFilePath} doesn't exist, creating with defaults...`);
+      Common.writeJSONFile(envBuildFilePath, this.data);
+    }
+  }
+
+  processArguments(args) {
+    const argv = Common.parseArgv(args);
+    argv.removeArgumentPrefixes('--');
+    argv.removeEmptyArguments();
+    if (argv.arguments.length > 2) this.error('Too many arguments provided.');
+
+    if (argv.arguments.length >= 1) {
+      for (const arg of argv.arguments) {
+        if (this.handleEnvArg(arg)) continue;
+        if (this.handleTargetArg(arg)) continue;
+        this.error(`Unsupported argument: ${arg}`);
+      }
+    }
+
+    if (argv.arguments.length == 0 || !this.targetProvided) this.loadDataFromFile();
+
+    if (this.environment === 'release') this.data.release = true;
   }
 
   run() {
@@ -121,8 +152,8 @@ export default class Prebuild {
   }
 
   writeBuildData() {
-    const filePath = this.data.release ? releaseBuildFilePath : devBuildFilePath;
-    writeJSONFile(filePath, this.data);
+    const filePath = Common.buildFilePathByEnv(this.environment);
+    Common.writeJSONFile(filePath, this.data);
     this.activateBuildFile(filePath);
     if (this.showBuildDetails) {
       console.log(`Build details:\n${JSON.stringify(this.data, null, 2)}`);

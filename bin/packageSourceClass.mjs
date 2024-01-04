@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import AdmZip from 'adm-zip';
-import { removeFiles } from './lib.mjs';
+import Common from './common.mjs';
 
 // Required for Firefox due to bundled code
 export default class PackageSource {
@@ -29,8 +29,10 @@ export default class PackageSource {
   get binFiles() {
     return [
       'bin/clean.mjs',
+      'bin/cleanClass.mjs',
+      'bin/common.mjs',
       'bin/copyStatic.mjs',
-      'bin/lib.mjs',
+      'bin/copyStaticClass.mjs',
       'bin/packageExtension.mjs',
       'bin/packageExtensionClass.mjs',
       'bin/packageSource.mjs',
@@ -47,7 +49,7 @@ export default class PackageSource {
   }
 
   get filePath() {
-    return './release/source.zip';
+    return `./release/source-${this.version}.zip`;
   }
 
   get rootFiles() {
@@ -62,7 +64,7 @@ export default class PackageSource {
   }
 
   run() {
-    removeFiles(this.filePath, true);
+    Common.removeFiles(this.filePath, true);
     this.showInstructions();
     this.addFiles();
     this.zip.writeZip(this.filePath);
@@ -73,5 +75,9 @@ export default class PackageSource {
     console.log('Build from source: npm install && npm run release:bookmarklet && npm run release:firefox');
     console.log('  Unpacked: ./dist');
     console.log(`  Packed: ${this.filePath}`);
+  }
+
+  get version() {
+    return process.env.npm_package_version;
   }
 }
