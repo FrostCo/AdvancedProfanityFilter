@@ -3,8 +3,12 @@ import path from 'path';
 import Common from './common.mjs';
 
 export default class Clean {
-  constructor() {
-    this.arguments = this.parseArgs();
+  constructor(args) {
+    this.argv = Common.parseArgv(args);
+    this.argv.removeArgumentPrefixes('--');
+    this.argv.removeEmptyArguments();
+    this.arguments = argv.arguments;
+    this.processArgs();
     this.toRemove = [];
   }
 
@@ -29,7 +33,7 @@ export default class Clean {
   }
 
   get defaultArgs() {
-    return ['--built', '--dist', '--test'];
+    return ['built', 'dist', 'test'];
   }
 
   parseArgs() {
@@ -40,21 +44,17 @@ export default class Clean {
           return this.defaultArgs;
         }
 
-        return argv.arguments;
-      } else {
-        this.usage();
-      }
-    } catch (error) {
-      console.log(error);
-      this.usage();
+  processArgs() {
+    if (this.arguments.length === 0 || argv.arguments.includes('all')) {
+      this.arguments = this.defaultArgs();
     }
   }
 
   run() {
-    if (this.arguments.includes('--build')) this.addBuildPaths();
-    if (this.arguments.includes('--built')) this.addBuiltPaths();
-    if (this.arguments.includes('--dist')) this.addDistPaths();
-    if (this.arguments.includes('--test')) this.addTestPaths();
+    if (this.arguments.includes('build')) this.addBuildPaths();
+    if (this.arguments.includes('built')) this.addBuiltPaths();
+    if (this.arguments.includes('dist')) this.addDistPaths();
+    if (this.arguments.includes('test')) this.addTestPaths();
 
     Common.removeFiles(this.toRemove);
   }
