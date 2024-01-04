@@ -57,6 +57,11 @@ export default class Prebuild {
     // Target customizations
   }
 
+  error(msg) {
+    console.error(msg);
+    process.exit(1);
+  }
+
   firefoxBuild() {
     // Target customizations
   }
