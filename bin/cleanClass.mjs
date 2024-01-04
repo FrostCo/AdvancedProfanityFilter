@@ -7,7 +7,7 @@ export default class Clean {
     this.argv = Common.parseArgv(args);
     this.argv.removeArgumentPrefixes('--');
     this.argv.removeEmptyArguments();
-    this.arguments = argv.arguments;
+    this.arguments = this.argv.arguments;
     this.processArgs();
     this.toRemove = [];
   }
