@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import fse from 'fs-extra';
 import path from 'path';
 
@@ -48,7 +49,6 @@ export default class Common {
 
     files.forEach((file) => {
       if (!silent) {
-        // eslint-disable-next-line no-console
         console.log(`Removing ${file}`);
       }
       fse.removeSync(file);
