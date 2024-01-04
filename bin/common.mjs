@@ -46,6 +46,10 @@ export default class Common {
     });
   }
 
+  static get targets() {
+    return ['bookmarklet', 'chrome', 'firefox', 'edgeLegacy'];
+  }
+
   static writeJSONFile(file, object) {
     const content = JSON.stringify(object, null, 2);
     fse.writeFileSync(file, content);
