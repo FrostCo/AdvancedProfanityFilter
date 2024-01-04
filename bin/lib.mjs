@@ -9,6 +9,12 @@ export const distManifestPath = path.join('dist', 'manifest.json');
 export const releaseBuildFilePath = path.join('.build.release.json');
 export const srcManifestPath = path.join('src', 'static', 'manifest.json');
 
+export function buildFilePathByEnv(env = 'dev') {
+  if (env == 'dev') return devBuildFilePath;
+  if (env == 'release') return releaseBuildFilePath;
+  return '';
+}
+
 export function loadJSONFile(file) {
   return JSON.parse(fse.readFileSync(file));
 }

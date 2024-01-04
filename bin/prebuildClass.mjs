@@ -1,12 +1,13 @@
 /* eslint-disable no-console */
 import fse from 'fs-extra';
 // import Constants from '../src/script/lib/constants'; // Temp?
-import { buildFilePath, devBuildFilePath, loadJSONFile, parseArgv, releaseBuildFilePath, writeJSONFile } from './lib.mjs';
+import { buildFilePath, buildFilePathByEnv, loadJSONFile, parseArgv, writeJSONFile } from './lib.mjs';
 
 export default class Prebuild {
   constructor(args) {
     this.loadedFromFile = false;
     this.data = this.defaultBuildData();
+    this.environment = 'dev';
     this.loadBuildData(args);
   }
 
@@ -63,10 +64,12 @@ export default class Prebuild {
   loadBuildData(args) {
     const argv = parseArgv(args);
     if (argv.count >= 2 && argv.count <= 4) {
-      this.data.release = argv.arguments.includes('--release');
-      if (this.data.release) {
+      if (argv.arguments.includes('--release')) {
         argv.arguments.splice(argv.arguments.indexOf('--release'), 1);
+        this.environment = 'release';
+        this.data.release = true;
       }
+
       const target = argv.arguments[0]?.replace('--', '');
       if (target) {
         const targetArray = target.split('-');
@@ -77,11 +80,14 @@ export default class Prebuild {
         }
       } else {
         this.loadedFromFile = true;
-        // Use existing buildFile as starting point if no target was passed
-        if (this.data.release && fse.existsSync(releaseBuildFilePath)) {
-          this.data = loadJSONFile(releaseBuildFilePath);
-        } else if (!this.data.release && fse.existsSync(devBuildFilePath)) {
-          this.data = loadJSONFile(devBuildFilePath);
+        const envBuildFilePath = buildFilePathByEnv(this.environment);
+
+        try {
+          // Use existing buildFile as starting point if no target was passed
+          this.data = loadJSONFile(envBuildFilePath);
+        } catch (err) {
+          console.warn(`${envBuildFilePath} doesn't exist, creating...`);
+          writeJSONFile(envBuildFilePath, this.data);
         }
       }
     } else {
@@ -122,7 +128,7 @@ export default class Prebuild {
   }
 
   writeBuildData() {
-    const filePath = this.data.release ? releaseBuildFilePath : devBuildFilePath;
+    const filePath = buildFilePathByEnv(this.environment);
     writeJSONFile(filePath, this.data);
     this.activateBuildFile(filePath);
     if (this.showBuildDetails) {
