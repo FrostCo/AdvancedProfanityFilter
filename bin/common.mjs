@@ -33,6 +33,11 @@ export default class Common {
     parsed.process = argv[0]; // process (node)
     parsed.script = argv[1]; // script
     parsed.arguments = argv.slice(2);
+    parsed.removeArgumentPrefixes = (prefix = '--') => {
+      const regex = new RegExp(`^${prefix}`);
+      parsed.arguments = parsed.arguments.map((arg) => arg.replace(regex, ''));
+    };
+    parsed.removeEmptyArguments = (blank = '') => parsed.arguments = parsed.arguments.filter((arg) => arg !== blank);
     return parsed;
   }
 
