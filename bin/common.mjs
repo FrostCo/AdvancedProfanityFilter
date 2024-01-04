@@ -19,6 +19,10 @@ export default class Common {
     return '';
   }
 
+  static get environments() {
+    return ['dev', 'release', 'test'];
+  }
+
   static loadJSONFile(file) {
     return JSON.parse(fse.readFileSync(file));
   }
