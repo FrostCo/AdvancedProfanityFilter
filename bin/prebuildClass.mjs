@@ -70,6 +70,11 @@ export default class Prebuild {
         this.data.release = true;
       }
 
+      if (argv.arguments.includes('--test')) {
+        argv.arguments.splice(argv.arguments.indexOf('--test'), 1);
+        this.environment = 'test';
+      }
+
       const target = argv.arguments[0]?.replace('--', '');
       if (target) {
         const targetArray = target.split('-');

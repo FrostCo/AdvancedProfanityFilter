@@ -8,10 +8,12 @@ export const devBuildFilePath = path.join('.build.dev.json');
 export const distManifestPath = path.join('dist', 'manifest.json');
 export const releaseBuildFilePath = path.join('.build.release.json');
 export const srcManifestPath = path.join('src', 'static', 'manifest.json');
+export const testBuildFilePath = path.join('.build.test.json');
 
 export function buildFilePathByEnv(env = 'dev') {
   if (env == 'dev') return devBuildFilePath;
   if (env == 'release') return releaseBuildFilePath;
+  if (env == 'test') return testBuildFilePath;
   return '';
 }
 
