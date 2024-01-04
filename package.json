@@ -51,7 +51,7 @@
     "release:firefox:mv3": "npm run release:build --target=firefox-mv3",
     "release:firefox": "npm run release:firefox:mv2",
     "release": "npm run release:build",
-    "test:addon": "npm run build --target=firefox-mv2 && npx addons-linter ./dist",
+    "test:addon": "npm run clean:build && node bin/prebuild.mjs --test --firefox-mv2 && npm run postbuild && npx addons-linter ./dist",
     "test:all": "npm run test && npm run test:lint:tests",
     "test:cov": "nyc --reporter=lcov --reporter=text npm run test:nocov",
     "test:debug": "node --inspect-brk node_modules/ts-mocha/bin/ts-mocha -p tsconfig.test.json --paths --reporter tap",
