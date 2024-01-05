@@ -5,12 +5,9 @@ import path from 'path';
 export default class Common {
   // Paths are relative from the project root
   // Should be correct when running with `npm run ...`
-  static buildFilePath = path.join('.build.json');
-  static devBuildFilePath = path.join('.build.dev.json');
-  static distManifestPath = path.join('dist', 'manifest.json');
-  static releaseBuildFilePath = path.join('.build.release.json');
-  static srcManifestPath = path.join('src', 'static', 'manifest.json');
-  static testBuildFilePath = path.join('.build.test.json');
+  static get buildFilePath() {
+    return path.join('.build.json');
+  }
 
   // Class Methods
   static buildFilePathByEnv(env = 'dev') {
@@ -18,6 +15,14 @@ export default class Common {
     if (env == 'release') return this.releaseBuildFilePath;
     if (env == 'test') return this.testBuildFilePath;
     return '';
+  }
+
+  static get devBuildFilePath() {
+    return path.join('.build.dev.json');
+  }
+
+  static get distManifestPath() {
+    return path.join('dist', 'manifest.json');
   }
 
   static get environments() {
@@ -42,6 +47,10 @@ export default class Common {
     return parsed;
   }
 
+  static get releaseBuildFilePath() {
+    return path.join('.build.release.json');
+  }
+
   static removeFiles(files, silent = false) {
     if (typeof files === 'string') {
       files = [files];
@@ -55,8 +64,16 @@ export default class Common {
     });
   }
 
+  static get srcManifestPath() {
+    return path.join('src', 'static', 'manifest.json');
+  }
+
   static get targets() {
     return ['bookmarklet', 'chrome', 'firefox', 'edgeLegacy'];
+  }
+
+  static get testBuildFilePath() {
+    return path.join('.build.test.json');
   }
 
   static writeJSONFile(file, object) {
