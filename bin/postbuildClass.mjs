@@ -4,9 +4,14 @@ import fse from 'fs-extra';
 import Common from './common.mjs';
 
 export default class Postbuild {
+  //#region Class reference helpers
+  static get Common() { return Common; }
+  get Class() { return (this.constructor); }
+  //#endregion
+
   constructor() {
-    this.buildData = Common.loadJSONFile(Common.buildFilePath);
-    this.manifest = Common.loadJSONFile(Common.distManifestPath);
+    this.buildData = this.Class.Common.loadJSONFile(this.Class.Common.buildFilePath);
+    this.manifest = this.Class.Common.loadJSONFile(this.Class.Common.distManifestPath);
   }
 
   common() {

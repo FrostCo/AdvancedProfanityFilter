@@ -3,8 +3,13 @@ import path from 'path';
 import Common from './common.mjs';
 
 export default class Clean {
+  //#region Class reference helpers
+  static get Common() { return Common; }
+  get Class() { return (this.constructor); }
+  //#endregion
+
   constructor(args) {
-    this.argv = Common.parseArgv(args);
+    this.argv = this.Class.Common.parseArgv(args);
     this.argv.removeArgumentPrefixes('--');
     this.argv.removeEmptyArguments();
     this.arguments = this.argv.arguments;
@@ -65,7 +70,7 @@ export default class Clean {
     if (this.arguments.includes('dist')) this.addDistPaths();
     if (this.arguments.includes('test')) this.addTestPaths();
 
-    Common.removeFiles(this.toRemove);
+    this.Class.Common.removeFiles(this.toRemove);
   }
 
   addTestPaths() {

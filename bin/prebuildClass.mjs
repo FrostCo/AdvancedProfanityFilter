@@ -4,6 +4,11 @@ import fse from 'fs-extra';
 import Common from './common.mjs';
 
 export default class Prebuild {
+  //#region Class reference helpers
+  static get Common() { return Common; }
+  get Class() { return (this.constructor); }
+  //#endregion
+
   constructor(args) {
     this.loadedFromFile = false;
     this.data = this.defaultBuildData();
@@ -15,7 +20,7 @@ export default class Prebuild {
   }
 
   activateBuildFile(sourceFile) {
-    fse.copyFileSync(sourceFile, Common.buildFilePath);
+    fse.copyFileSync(sourceFile, this.Class.Common.buildFilePath);
   }
 
   bookmarkletBuild() {
@@ -70,7 +75,7 @@ export default class Prebuild {
   }
 
   handleEnvArg(arg) {
-    if (Common.environments.includes(arg)) {
+    if (this.Class.Common.environments.includes(arg)) {
       this.environmentProvided = true;
       return this.environment = arg;
     }
@@ -80,7 +85,7 @@ export default class Prebuild {
     const [targetName, manifestVersion] = arg.split('-');
     if (!targetName) return;
 
-    if (Common.targets.includes(targetName)) {
+    if (this.Class.Common.targets.includes(targetName)) {
       this.data.target = targetName;
       if (manifestVersion) this.data.manifestVersion = parseInt(manifestVersion.match(/\d$/)?.toString());
       return this.targetProvided = true;
@@ -89,19 +94,19 @@ export default class Prebuild {
 
   loadDataFromFile() {
     this.loadedFromFile = true;
-    const envBuildFilePath = Common.buildFilePathByEnv(this.environment);
+    const envBuildFilePath = this.Class.Common.buildFilePathByEnv(this.environment);
 
     try {
       // Use existing buildFile as starting point if no target was passed
-      this.data = Common.loadJSONFile(envBuildFilePath);
+      this.data = this.Class.Common.loadJSONFile(envBuildFilePath);
     } catch (err) {
       console.warn(`${envBuildFilePath} doesn't exist, creating with defaults...`);
-      Common.writeJSONFile(envBuildFilePath, this.data);
+      this.Class.Common.writeJSONFile(envBuildFilePath, this.data);
     }
   }
 
   processArguments(args) {
-    const argv = Common.parseArgv(args);
+    const argv = this.Class.Common.parseArgv(args);
     argv.removeArgumentPrefixes('--');
     argv.removeEmptyArguments();
     if (argv.arguments.length > 2) this.error('Too many arguments provided.');
@@ -152,8 +157,8 @@ export default class Prebuild {
   }
 
   writeBuildData() {
-    const filePath = Common.buildFilePathByEnv(this.environment);
-    Common.writeJSONFile(filePath, this.data);
+    const filePath = this.Class.Common.buildFilePathByEnv(this.environment);
+    this.Class.Common.writeJSONFile(filePath, this.data);
     this.activateBuildFile(filePath);
     if (this.showBuildDetails) {
       console.log(`Build details:\n${JSON.stringify(this.data, null, 2)}`);

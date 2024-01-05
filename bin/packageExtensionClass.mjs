@@ -5,13 +5,18 @@ import Common from './common.mjs';
 import fse from 'fs-extra';
 
 export default class PackageExtension {
+  //#region Class reference helpers
+  static get Common() { return Common; }
+  get Class() { return (this.constructor); }
+  //#endregion
+
   constructor() {
     this.distDir = this.distDirectory;
     this.releaseDir = this.releaseDirectory;
 
     try {
       fse.ensureDirSync(this.releaseDir);
-      this.data = Common.loadJSONFile(Common.buildFilePath);
+      this.data = this.Class.Common.loadJSONFile(this.Class.Common.buildFilePath);
     } catch (err) {
       console.error(err.message);
       throw (err);
@@ -45,7 +50,7 @@ export default class PackageExtension {
   run() {
     try {
       this.buildArchive();
-      Common.removeFiles(this.packagePath, true);
+      this.Class.Common.removeFiles(this.packagePath, true);
       console.log(`Building ${this.packagePath}`);
       this.zip.writeZip(this.packagePath);
     } catch (err) {

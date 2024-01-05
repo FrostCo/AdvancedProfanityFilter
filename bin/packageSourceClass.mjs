@@ -4,6 +4,11 @@ import Common from './common.mjs';
 
 // Required for Firefox due to bundled code
 export default class PackageSource {
+  //#region Class reference helpers
+  static get Common() { return Common; }
+  get Class() { return (this.constructor); }
+  //#endregion
+
   constructor() {
     this.zip = new AdmZip();
   }
@@ -64,7 +69,7 @@ export default class PackageSource {
   }
 
   run() {
-    Common.removeFiles(this.filePath, true);
+    this.Class.Common.removeFiles(this.filePath, true);
     this.showInstructions();
     this.addFiles();
     this.zip.writeZip(this.filePath);
