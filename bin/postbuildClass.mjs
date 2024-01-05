@@ -14,7 +14,7 @@ export default class Postbuild {
     this.manifest = this.Class.Common.loadJSONFile(this.Class.Common.distManifestPath);
   }
 
-  common() {
+  commonBuild() {
     this.handleManifest();
   }
 
@@ -101,7 +101,7 @@ export default class Postbuild {
   }
 
   run() {
-    this.common();
+    this.commonBuild();
     this.targetCustomizations();
     this.writeManifestFile();
   }

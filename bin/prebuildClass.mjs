@@ -43,7 +43,7 @@ export default class Prebuild {
     // Customizations for manifest version
   }
 
-  common() {
+  commonBuild() {
     this.data.version = process.env.npm_package_version;
   }
 
@@ -125,7 +125,7 @@ export default class Prebuild {
   }
 
   run() {
-    this.common();
+    this.commonBuild();
     this.targetCustomizations();
     this.writeBuildData();
   }
