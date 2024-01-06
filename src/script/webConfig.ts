@@ -251,6 +251,8 @@ export default class WebConfig extends Config {
 
     return new Promise((resolve, reject) => {
       chrome.storage.local.remove(keys, () => {
+        if (!keys.length) resolve(0);
+
         chrome.runtime.lastError
           ? reject(chrome.runtime.lastError)
           : resolve(0);
@@ -262,6 +264,8 @@ export default class WebConfig extends Config {
     keys = stringArray(keys);
 
     return new Promise((resolve, reject) => {
+      if (!keys.length) resolve(0);
+
       chrome.storage.sync.remove(keys, () => {
         chrome.runtime.lastError
           ? reject(chrome.runtime.lastError)
