@@ -144,7 +144,7 @@ export default class WebConfig extends Config {
     keys = stringArray(keys);
 
     // No keys provided, load everything
-    if (keys.length === 0) keys = this._persistableKeys;
+    if (keys.length === 0) keys = keys.concat(this._persistableKeys);
 
     return keys;
   }
@@ -153,7 +153,7 @@ export default class WebConfig extends Config {
     keys = stringArray(keys);
 
     // No keys provided, load everything
-    if (keys.length === 0) keys = this._persistableKeys;
+    if (keys.length === 0) keys = keys.concat(this._persistableKeys);
 
     return keys;
   }
