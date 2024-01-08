@@ -52,7 +52,7 @@ export default class Postbuild {
   }
 
   firefoxMv2Build() {
-    this.manifest.background.persistent = true; // Event pages are not supported
+    this.manifest.background.persistent = false;
   }
 
   firefoxMv3Build() {
