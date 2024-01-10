@@ -874,6 +874,19 @@ describe('Filter', () => {
           expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love Do you?');
           expect(filter.replaceText('I love this! Do you?')).to.equal('I love Do you?');
         });
+
+        it('Ending with colon', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            filterMethod: Constants.FILTER_METHODS.REMOVE,
+            words: {
+              'app. rate:': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
+            },
+          });
+          filter.init();
+          expect(filter.replaceText('app. rate:')).to.equal('');
+          expect(filter.replaceText('app. rate: 5.93%')).to.equal('5.93%');
+        });
       });
 
       it('Should filter a RegExp', () => {
