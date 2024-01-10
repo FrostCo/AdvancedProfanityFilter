@@ -67,7 +67,6 @@ export default class Postbuild {
   }
 
   handleManifestV2() {
-    this.manifest.permissions.splice(this.manifest.permissions.indexOf('scripting'), 1);
     this.manifest.action = undefined;
     this.manifest.manifest_version = this.buildData.manifestVersion;
     this.manifest.options_ui = {
