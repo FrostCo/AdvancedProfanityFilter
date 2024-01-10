@@ -135,6 +135,11 @@ describe('Word', function() {
         expect(word.regExp).to.eql(/(^|\s)([\w-]*word![\w-]*)(\s|$)/gi);
       });
 
+      it('should build RegExp with ending colon', function() {
+        const word = new Word('app. rate:', { matchMethod: Constants.MATCH_METHODS.PARTIAL }, Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }));
+        expect(word.regExp).to.eql(/(^|\s)([\w-]*app\. rate:[\w-]*)(\s|$)/gi);
+      });
+
       // Work around for lack of word boundary support for unicode characters
       describe('Unicode', function() {
         it('should build RegExp', function() {

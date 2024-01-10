@@ -134,6 +134,20 @@ describe('Filter', () => {
           filter.init();
           expect(filter.replaceText('You deserve an A+')).to.equal('You deserve an __');
         });
+
+        it('Ending with tilde', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            censorCharacter: '_',
+            filterMethod: Constants.FILTER_METHODS.CENSOR,
+            preserveFirst: false,
+            words: {
+              'waves~': { matchMethod: Constants.MATCH_METHODS.EXACT },
+            },
+          });
+          filter.init();
+          expect(filter.replaceText('Look at those waves~')).to.equal('Look at those ______');
+        });
       });
 
       describe('Partial', () => {
@@ -185,6 +199,22 @@ describe('Filter', () => {
           expect(filter.replaceText('I love allthat+')).to.equal('I love all_____');
           expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love all_____ Do you?');
           expect(filter.replaceText('I love this! Do you?')).to.equal('I love _____ Do you?');
+        });
+
+        it('Ending with brackets and braces', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            censorCharacter: '_',
+            filterMethod: Constants.FILTER_METHODS.CENSOR,
+            preserveFirst: false,
+            words:{
+              '{cool}': { matchMethod: Constants.MATCH_METHODS.PARTIAL },
+              '[tag]': { matchMethod: Constants.MATCH_METHODS.PARTIAL },
+            },
+          });
+          filter.init();
+          expect(filter.replaceText('Check the [tag] for the sale')).to.equal('Check the _____ for the sale');
+          expect(filter.replaceText('You are so {cool}!')).to.equal('You are so ______!');
         });
       });
 
@@ -832,6 +862,19 @@ describe('Filter', () => {
           expect(filter.replaceText('I love this!')).to.equal('I love');
         });
 
+        it('Ending with semicolon', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            filterMethod: Constants.FILTER_METHODS.REMOVE,
+            words: {
+              'and more;': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.FALSE },
+            },
+          });
+          filter.init();
+          expect(filter.replaceText('and more;')).to.equal('');
+          expect(filter.replaceText('you can have it all, and more;')).to.equal('you can have it all,');
+        });
+
         it('With separators', () => {
           const filter = new Filter;
           filter.cfg = new Config({
@@ -873,6 +916,35 @@ describe('Filter', () => {
           filter.init();
           expect(filter.replaceText('I love allthis! Do you?')).to.equal('I love Do you?');
           expect(filter.replaceText('I love this! Do you?')).to.equal('I love Do you?');
+        });
+
+        it('Ending with colon', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            filterMethod: Constants.FILTER_METHODS.REMOVE,
+            words: {
+              'app. rate:': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
+            },
+          });
+          filter.init();
+          expect(filter.replaceText('app. rate:')).to.equal('');
+          expect(filter.replaceText('app. rate: 5.93%')).to.equal('5.93%');
+        });
+
+        it('Ending with special characters', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            filterMethod: Constants.FILTER_METHODS.REMOVE,
+            words: {
+              'check-mate/': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
+              'cheese()': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
+              '{cake': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
+            },
+          });
+          filter.init();
+          expect(filter.replaceText('Surprise! Check-mate/')).to.equal('Surprise!');
+          expect(filter.replaceText('Say cheese()')).to.equal('Say');
+          expect(filter.replaceText('Do you want any {cake')).to.equal('Do you want any');
         });
       });
 
