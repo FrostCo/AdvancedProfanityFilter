@@ -261,7 +261,10 @@ export default class Popup {
     return (
       !this.domain.hostname
       || this.Class.Page.disabledProtocols.test(this.url.protocol)
-      || this.domain.hostname == 'chrome.google.com'
+      || (
+        this.Class.Config.BUILD.target == this.Class.Constants.BUILD_TARGET_CHROME
+        && this.Class.Page.disabledChromePages.includes(this.domain.hostname)
+      )
     );
   }
 
