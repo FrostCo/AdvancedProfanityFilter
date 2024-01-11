@@ -3,6 +3,7 @@ export default class Page {
   xpathNodeText: string;
 
   static readonly disabledChromePages = ['chrome.google.com', 'chromewebstore.google.com'];
+  static readonly disabledFirefoxPages = ['addons.mozilla.org'];
   static readonly disabledProtocols = new RegExp('(^chrome:|^about:|^[a-zA-Z]+-extension:)', 'i');
   static readonly forbiddenNodeRegExp = new RegExp('^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)');
   static readonly forbiddenTags = ['SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA', 'IFRAME', 'LINK'];
