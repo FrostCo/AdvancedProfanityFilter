@@ -205,6 +205,15 @@
           "trailingUnderscore": "allow"
         },
         {
+          "selector": "import",
+          "format": [
+            "camelCase",
+            "PascalCase"
+          ],
+          "leadingUnderscore": "forbid",
+          "trailingUnderscore": "forbid"
+        },
+        {
           "selector": "interface",
           "format": [
             "PascalCase"
