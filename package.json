@@ -55,13 +55,13 @@
     "test:addon": "npm run build --environment=test --target=firefox-mv2 && npx addons-linter ./dist",
     "test:all": "npm run test && npm run test:lint:tests",
     "test:cov": "nyc --reporter=lcov --reporter=text npm run test:nocov",
-    "test:debug": "node --inspect-brk node_modules/ts-mocha/bin/ts-mocha -p tsconfig.test.json --paths --reporter tap",
+    "test:debug": "node --inspect-brk node_modules/mocha/bin/_mocha --paths --reporter tap",
     "test:lint:all": "npm run test:lint && npm run test:lint:bin && npm run test:lint:tests",
     "test:lint:bin": "eslint \"bin/**/*.*js\"",
     "test:lint:nibble": "npx eslint-nibble \"src/**/*.ts\"",
     "test:lint:tests": "eslint \"test/spec/*.spec.ts\"",
     "test:lint": "eslint \"src/**/*.ts\"",
-    "test:nocov": "ts-mocha -p tsconfig.test.json --paths",
+    "test:nocov": "mocha --paths",
     "test:types:tests": "tsc --noEmit -p test/tsconfig.json",
     "test:types": "tsc --noEmit",
     "test": "npm run test:lint && npm run test:types && npm run test:addon && npm run test:cov",
@@ -89,9 +89,9 @@
     "nyc": "^15.1.0",
     "terser-webpack-plugin": "^5.3.10",
     "ts-loader": "^9.5.1",
-    "ts-mocha": "^10.0.0",
     "tsconfig-paths": "^4.2.0",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
+    "tsx": "^4.7.0",
     "typescript": "^5.3.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4"
@@ -245,7 +245,9 @@
     }
   },
   "mocha": {
+    "$schema": "https://json.schemastore.org/mocharc.json",
     "reporter": "dot",
+    "require": "tsx",
     "spec": [
       "test/spec/**/*.spec.ts"
     ]
