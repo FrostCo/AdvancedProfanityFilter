@@ -20,7 +20,7 @@ For an overview of features and options, please head to the [wiki](https://githu
 | Edge    | [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/lhnbdlbhcokmgpjenkjolnhdnkphnkam) |
 | Safari  | [App Store](https://apps.apple.com/app/advanced-profanity-filter/id1593810102) |
 | Opera   | [Opera addons](https://addons.opera.com/en/extensions/details/advanced-profanity-filter/) |
-| Android | [Kiwi](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser) or [Firefox](https://github.com/FrostCo/AdvancedProfanityFilter/issues/243#issuecomment-726218625) |
+| Android | [Kiwi](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser) or [Firefox](https://play.google.com/store/apps/details?id=org.mozilla.firefox) |
 | Other   | [Bookmarklet Info](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Bookmarklet) |
 | TV Cast | [Instructions](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Audio#watch-on-tv) - [Discussion](https://github.com/FrostCo/AdvancedProfanityFilter/issues/206) |
 
