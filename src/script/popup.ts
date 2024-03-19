@@ -131,6 +131,15 @@ export default class Popup {
     this.Class.disable(domainToggle);
   }
 
+  get disabledReason() {
+    if (this.isRestrictedPage) return 'Popup disabled by browser';
+    if (this.isPasswordProtected) return 'Popup disabled by password';
+    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return 'Popup disabled by domain mode';
+    if (this.disabledTab) return 'Popup disabled for tab';
+    if (this.domain.disabled) return 'Popup disabled for domain';
+    return '';
+  }
+
   disableOptions() {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
@@ -180,6 +189,12 @@ export default class Popup {
     this.setDomainSwitch(false);
     if (this.disabledTab) this.disableDomainSwitch();
     this.disableOptions();
+  }
+
+  handleDisabledMessage() {
+    const element = document.querySelector('#disabledMessage') as HTMLElement;
+    element.textContent = ` ${this.disabledReason}`;
+    this.isDisabled ? this.Class.show(element) : this.Class.hide(element);
   }
 
   handleEnabled() {
@@ -296,6 +311,8 @@ export default class Popup {
     }
 
     if (this.wordlistsEnabled) this.handleWordlistsEnabled();
+
+    this.handleDisabledMessage();
 
     if (this.isRestrictedPage) {
       this.handleRestrictedPage();
