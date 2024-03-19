@@ -254,6 +254,8 @@ export default class Popup {
       this.domain.disabled
       || this.disabledTab
       || (this.cfg.enabledDomainsOnly && !this.domain.enabled)
+      || this.isRestrictedPage
+      || this.isPasswordProtected
     );
   }
 
