@@ -250,7 +250,11 @@ export default class Popup {
   }
 
   get isDisabled() {
-    return this.domain.disabled || this.disabledTab || (this.cfg.enabledDomainsOnly && !this.domain.enabled);
+    return (
+      this.domain.disabled
+      || this.disabledTab
+      || (this.cfg.enabledDomainsOnly && !this.domain.enabled)
+    );
   }
 
   get isPasswordProtected() {
