@@ -46,58 +46,61 @@ export default class Background {
 
     const requiredConfig = {
       contextMenu: this.Config._defaults.contextMenu,
+      password: this.Config._defaults.password,
     };
     const config = await this.Config.getSyncStorage(requiredConfig) as Partial<WebConfig>;
 
     if (config.contextMenu) {
-      chrome.contextMenus.create({
-        id: 'addSelection',
-        title: 'Add selection to filter',
-        contexts: ['selection'],
-        documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
-      });
+      if (!config.password) {
+        chrome.contextMenus.create({
+          id: 'addSelection',
+          title: 'Add selection to filter',
+          contexts: ['selection'],
+          documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+        });
 
-      chrome.contextMenus.create({
-        id: 'removeSelection',
-        title: 'Remove selection from filter',
-        contexts: ['selection'],
-        documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
-      });
+        chrome.contextMenus.create({
+          id: 'removeSelection',
+          title: 'Remove selection from filter',
+          contexts: ['selection'],
+          documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+        });
 
-      chrome.contextMenus.create({
-        id: 'disableTabOnce',
-        title: 'Disable once',
-        contexts: ['all'],
-        documentUrlPatterns: ['http://*/*', 'https://*/*']
-      });
+        chrome.contextMenus.create({
+          id: 'disableTabOnce',
+          title: 'Disable once',
+          contexts: ['all'],
+          documentUrlPatterns: ['http://*/*', 'https://*/*']
+        });
 
-      chrome.contextMenus.create({
-        id: 'toggleTabDisable',
-        title: 'Toggle for tab',
-        contexts: ['all'],
-        documentUrlPatterns: ['http://*/*', 'https://*/*']
-      });
+        chrome.contextMenus.create({
+          id: 'toggleTabDisable',
+          title: 'Toggle for tab',
+          contexts: ['all'],
+          documentUrlPatterns: ['http://*/*', 'https://*/*']
+        });
 
-      chrome.contextMenus.create({
-        id: 'toggleForDomain',
-        title: 'Toggle for domain',
-        contexts: ['all'],
-        documentUrlPatterns: ['http://*/*', 'https://*/*']
-      });
+        chrome.contextMenus.create({
+          id: 'toggleForDomain',
+          title: 'Toggle for domain',
+          contexts: ['all'],
+          documentUrlPatterns: ['http://*/*', 'https://*/*']
+        });
 
-      chrome.contextMenus.create({
-        id: 'toggleAdvancedForDomain',
-        title: 'Toggle advanced for domain',
-        contexts: ['all'],
-        documentUrlPatterns: ['http://*/*', 'https://*/*']
-      });
+        chrome.contextMenus.create({
+          id: 'toggleAdvancedForDomain',
+          title: 'Toggle advanced for domain',
+          contexts: ['all'],
+          documentUrlPatterns: ['http://*/*', 'https://*/*']
+        });
 
-      chrome.contextMenus.create({
-        id: 'toggleFramesForDomain',
-        title: 'Toggle frames for domain',
-        contexts: ['all'],
-        documentUrlPatterns: ['http://*/*', 'https://*/*']
-      });
+        chrome.contextMenus.create({
+          id: 'toggleFramesForDomain',
+          title: 'Toggle frames for domain',
+          contexts: ['all'],
+          documentUrlPatterns: ['http://*/*', 'https://*/*']
+        });
+      }
 
       chrome.contextMenus.create({
         id: 'options',

@@ -36,6 +36,7 @@ export default class OptionAuth {
       await this.optionPage.cfg.save('password');
       password.value = '';
       this.setPasswordButton();
+      if (this.optionPage.cfg.contextMenu) this.optionPage.sendUpdateContextMenuMessage();
     } catch (err) {
       this.Class.OptionPage.handleError('Failed to update password.', err);
     }
