@@ -18,6 +18,7 @@ export default class Popup {
   tab: chrome.tabs.Tab;
   themeElements: Element[];
   url: URL;
+  webFilterActive: boolean;
 
   //#region Class reference helpers
   // Can be overridden in children classes
@@ -88,6 +89,7 @@ export default class Popup {
   }
 
   constructor() {
+    this.webFilterActive = true;
     this.initializeMessaging();
     this.disabledTab = false;
     this.prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -137,6 +139,7 @@ export default class Popup {
     if (this.disabledTab) return 'Popup disabled for tab';
     if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return 'Popup disabled by domain mode';
     if (this.domain.disabled) return 'Popup disabled for domain';
+    if (this.isDisconnected) return 'Disconnected, please refresh page';
     return '';
   }
 
@@ -251,7 +254,7 @@ export default class Popup {
     const message = { destination: this.Class.Constants.MESSAGING.CONTEXT, source: this.Class.Constants.MESSAGING.POPUP, summary: true };
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       chrome.tabs.sendMessage(tabs[0].id, message, () => {
-        chrome.runtime.lastError; // Suppress error if no listener);
+        if (chrome.runtime.lastError) this.webFilterActive = false;
       });
     });
   }
@@ -262,6 +265,16 @@ export default class Popup {
     this.populateOptions(true);
   }
 
+  get isDisconnected() {
+    return (
+      !this.webFilterActive
+      && !this.disabledTab
+      && !this.isRestrictedPage
+      && !this.domain.disabled
+      && !(this.cfg.enabledDomainsOnly && !this.domain.enabled)
+    );
+  }
+
   get isDisabled() {
     return (
       this.domain.disabled
@@ -269,6 +282,7 @@ export default class Popup {
       || (this.cfg.enabledDomainsOnly && !this.domain.enabled)
       || this.isRestrictedPage
       || this.isPasswordProtected
+      || this.isDisconnected
     );
   }
 
@@ -312,7 +326,7 @@ export default class Popup {
 
     this.handleDisabledMessage();
 
-    if (this.isRestrictedPage) {
+    if (this.isRestrictedPage || this.isDisconnected) {
       this.handleRestrictedPage();
       return false;
     }
