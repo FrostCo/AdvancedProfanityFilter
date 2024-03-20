@@ -30,7 +30,7 @@ Once the extension has been built, you can load the unpacked extension (found in
 |------------|---------:|--------------------|
 | chrome     |    2, 3* | Chrome, Edge, etc. |
 | edgeLegacy |        2 | Legacy Edge        |
-| firefox    |     2, 3 | Firefox            |
+| firefox    |    2*, 3 | Firefox            |
 
 \* = _default target_
 
