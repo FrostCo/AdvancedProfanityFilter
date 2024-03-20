@@ -248,12 +248,11 @@ export default class Popup {
     });
 
     // Initial data request
+    const message = { destination: this.Class.Constants.MESSAGING.CONTEXT, source: this.Class.Constants.MESSAGING.POPUP, summary: true };
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(
-        tabs[0].id,
-        { destination: this.Class.Constants.MESSAGING.CONTEXT, source: this.Class.Constants.MESSAGING.POPUP, summary: true },
-        () => chrome.runtime.lastError // Suppress error if no listener);
-      );
+      chrome.tabs.sendMessage(tabs[0].id, message, () => {
+        chrome.runtime.lastError; // Suppress error if no listener);
+      });
     });
   }
 
