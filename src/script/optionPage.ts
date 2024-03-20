@@ -1636,6 +1636,15 @@ export default class OptionPage {
     }
   }
 
+  sendUpdateContextMenuMessage() {
+    const message: Message = {
+      destination: this.Class.Constants.MESSAGING.BACKGROUND,
+      source: this.Class.Constants.MESSAGING.OPTION,
+      updateContextMenus: this.cfg.contextMenu,
+    };
+    chrome.runtime.sendMessage(message);
+  }
+
   async setDefaultWordlist(element: HTMLSelectElement) {
     const prop = this.wordlistTypeFromElement(element);
     this.cfg[prop] = element.selectedIndex;
@@ -1737,12 +1746,7 @@ export default class OptionPage {
   async updateContextMenu(input: HTMLInputElement) {
     this.cfg.contextMenu = input.checked;
     await this.cfg.save('contextMenu');
-    const message: Message = {
-      destination: this.Class.Constants.MESSAGING.BACKGROUND,
-      source: this.Class.Constants.MESSAGING.OPTION,
-      updateContextMenus: this.cfg.contextMenu,
-    };
-    chrome.runtime.sendMessage(message);
+    this.sendUpdateContextMenuMessage();
   }
 
   updateFilterOptions() {
