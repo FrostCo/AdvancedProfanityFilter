@@ -32,6 +32,7 @@ interface Message {
   deep?: boolean;
   destination: string;
   disabled?: boolean;
+  enableTab?: boolean;
   forceUpdate?: boolean;
   getStatus?: boolean;
   globalVariable?: string;

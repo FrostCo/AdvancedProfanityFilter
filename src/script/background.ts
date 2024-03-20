@@ -291,6 +291,9 @@ export default class Background {
         } else if (request.backgroundData) {
           this.handleBackgroundDataRequest(request, sender, sendResponse);
           return true; // return true when waiting on an async call
+        } else if (request.enableTab) {
+          this.toggleTabDisable(request.tabId, false, sendResponse);
+          return true; // return true when waiting on an async call
         } else {
           this.LOGGER.error('Received unhandled message.', JSON.stringify(request));
         }
@@ -393,12 +396,13 @@ export default class Background {
     }
   }
 
-  static async toggleTabDisable(tabId: number) {
+  static async toggleTabDisable(tabId: number, reload = true, sendResponse = null) {
     const storage = await this.loadBackgroundStorage();
     const tabOptions = this.getTabOptions(storage, tabId);
     tabOptions.disabled = !tabOptions.disabled;
     await this.saveBackgroundStorage(storage);
-    chrome.tabs.reload(tabId);
+    if (reload) chrome.tabs.reload(tabId);
+    if (sendResponse) sendResponse(tabOptions.disabled);
   }
 
   static async updatePopupStatus(tabId: number, status?: number, sendResponse?) {

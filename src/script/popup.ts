@@ -187,7 +187,6 @@ export default class Popup {
 
   handleDisabled() {
     this.setDomainSwitch(false);
-    if (this.disabledTab) this.disableDomainSwitch();
     this.disableOptions();
   }
 
@@ -382,9 +381,19 @@ export default class Popup {
 
   async toggle(prop: string) {
     if (!this.protected) {
-      this.domain[prop] = !this.domain[prop];
       try {
-        await this.domain.save(this.cfg);
+        if (this.disabledTab) {
+          const message = {
+            source: this.Class.Constants.MESSAGING.POPUP,
+            destination: this.Class.Constants.MESSAGING.BACKGROUND,
+            enableTab: true,
+            tabId: this.tab.id,
+          };
+          this.disabledTab = await chrome.runtime.sendMessage(message);
+        } else {
+          this.domain[prop] = !this.domain[prop];
+          await this.domain.save(this.cfg);
+        }
         chrome.tabs.reload();
         this.populateOptions();
       } catch (err) {
