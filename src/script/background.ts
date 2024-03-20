@@ -41,14 +41,15 @@ export default class Background {
     });
   }
 
-  static async contextMenuSetup(enabled?: boolean) {
+  static async contextMenuSetup() {
     await this.contextMenuRemoveAll();
 
-    if (enabled == null) {
-      enabled = (await this.Config.getSyncStorage({ contextMenu: this.Config._defaults.contextMenu }) as WebConfig).contextMenu;
-    }
+    const requiredConfig = {
+      contextMenu: this.Config._defaults.contextMenu,
+    };
+    const config = await this.Config.getSyncStorage(requiredConfig) as Partial<WebConfig>;
 
-    if (enabled) {
+    if (config.contextMenu) {
       chrome.contextMenus.create({
         id: 'addSelection',
         title: 'Add selection to filter',
@@ -278,7 +279,7 @@ export default class Background {
 
       case this.Constants.MESSAGING.OPTION:
         if (request.updateContextMenus != null) {
-          this.contextMenuSetup(request.updateContextMenus);
+          this.contextMenuSetup();
         } else {
           this.LOGGER.error('Received unhandled message.', JSON.stringify(request));
         }
