@@ -372,6 +372,16 @@ export default class Background {
     }
   }
 
+  static async tabsOnReplaced(addedTabId: number, removedTabId: number) {
+    const storage = await this.loadBackgroundStorage();
+    if (storage.tabs[removedTabId]) {
+      storage.tabs[addedTabId] = storage.tabs[removedTabId];
+      storage.tabs[addedTabId].id = addedTabId;
+      delete storage.tabs[removedTabId];
+      await this.saveBackgroundStorage(storage);
+    }
+  }
+
   static async tabsOnUpdated(tabId, changeInfo, tab) {
     if (changeInfo.url) {
       const message: Message = { source: this.Constants.MESSAGING.BACKGROUND, destination: this.Constants.MESSAGING.CONTEXT, urlUpdate: changeInfo.url };
