@@ -41,62 +41,66 @@ export default class Background {
     });
   }
 
-  static async contextMenuSetup(enabled?: boolean) {
+  static async contextMenuSetup() {
     await this.contextMenuRemoveAll();
 
-    if (enabled == null) {
-      enabled = (await this.Config.getSyncStorage({ contextMenu: this.Config._defaults.contextMenu }) as WebConfig).contextMenu;
-    }
+    const requiredConfig = {
+      contextMenu: this.Config._defaults.contextMenu,
+      password: this.Config._defaults.password,
+    };
+    const config = await this.Config.getSyncStorage(requiredConfig) as Partial<WebConfig>;
 
-    if (enabled) {
-      chrome.contextMenus.create({
-        id: 'addSelection',
-        title: 'Add selection to filter',
-        contexts: ['selection'],
-        documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
-      });
+    if (config.contextMenu) {
+      if (!config.password) {
+        chrome.contextMenus.create({
+          id: 'addSelection',
+          title: 'Add selection to filter',
+          contexts: ['selection'],
+          documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+        });
 
-      chrome.contextMenus.create({
-        id: 'removeSelection',
-        title: 'Remove selection from filter',
-        contexts: ['selection'],
-        documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
-      });
+        chrome.contextMenus.create({
+          id: 'removeSelection',
+          title: 'Remove selection from filter',
+          contexts: ['selection'],
+          documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+        });
 
-      chrome.contextMenus.create({
-        id: 'disableTabOnce',
-        title: 'Disable once',
-        contexts: ['all'],
-        documentUrlPatterns: ['http://*/*', 'https://*/*']
-      });
+        chrome.contextMenus.create({
+          id: 'disableTabOnce',
+          title: 'Disable once',
+          contexts: ['all'],
+          documentUrlPatterns: ['http://*/*', 'https://*/*']
+        });
 
-      chrome.contextMenus.create({
-        id: 'toggleTabDisable',
-        title: 'Toggle for tab',
-        contexts: ['all'],
-        documentUrlPatterns: ['http://*/*', 'https://*/*']
-      });
+        chrome.contextMenus.create({
+          id: 'toggleTabDisable',
+          title: 'Toggle for tab',
+          contexts: ['all'],
+          documentUrlPatterns: ['http://*/*', 'https://*/*']
+        });
 
-      chrome.contextMenus.create({
-        id: 'toggleForDomain',
-        title: 'Toggle for domain',
-        contexts: ['all'],
-        documentUrlPatterns: ['http://*/*', 'https://*/*']
-      });
+        chrome.contextMenus.create({
+          id: 'toggleForDomain',
+          title: 'Toggle for domain',
+          contexts: ['all'],
+          documentUrlPatterns: ['http://*/*', 'https://*/*']
+        });
 
-      chrome.contextMenus.create({
-        id: 'toggleAdvancedForDomain',
-        title: 'Toggle advanced for domain',
-        contexts: ['all'],
-        documentUrlPatterns: ['http://*/*', 'https://*/*']
-      });
+        chrome.contextMenus.create({
+          id: 'toggleAdvancedForDomain',
+          title: 'Toggle advanced for domain',
+          contexts: ['all'],
+          documentUrlPatterns: ['http://*/*', 'https://*/*']
+        });
 
-      chrome.contextMenus.create({
-        id: 'toggleFramesForDomain',
-        title: 'Toggle frames for domain',
-        contexts: ['all'],
-        documentUrlPatterns: ['http://*/*', 'https://*/*']
-      });
+        chrome.contextMenus.create({
+          id: 'toggleFramesForDomain',
+          title: 'Toggle frames for domain',
+          contexts: ['all'],
+          documentUrlPatterns: ['http://*/*', 'https://*/*']
+        });
+      }
 
       chrome.contextMenus.create({
         id: 'options',
@@ -278,7 +282,7 @@ export default class Background {
 
       case this.Constants.MESSAGING.OPTION:
         if (request.updateContextMenus != null) {
-          this.contextMenuSetup(request.updateContextMenus);
+          this.contextMenuSetup();
         } else {
           this.LOGGER.error('Received unhandled message.', JSON.stringify(request));
         }
@@ -290,6 +294,9 @@ export default class Background {
           return true; // return true when waiting on an async call
         } else if (request.backgroundData) {
           this.handleBackgroundDataRequest(request, sender, sendResponse);
+          return true; // return true when waiting on an async call
+        } else if (request.enableTab) {
+          this.toggleTabDisable(request.tabId, false, true, sendResponse);
           return true; // return true when waiting on an async call
         } else {
           this.LOGGER.error('Received unhandled message.', JSON.stringify(request));
@@ -365,6 +372,16 @@ export default class Background {
     }
   }
 
+  static async tabsOnReplaced(addedTabId: number, removedTabId: number) {
+    const storage = await this.loadBackgroundStorage();
+    if (storage.tabs[removedTabId]) {
+      storage.tabs[addedTabId] = storage.tabs[removedTabId];
+      storage.tabs[addedTabId].id = addedTabId;
+      delete storage.tabs[removedTabId];
+      await this.saveBackgroundStorage(storage);
+    }
+  }
+
   static async tabsOnUpdated(tabId, changeInfo, tab) {
     if (changeInfo.url) {
       const message: Message = { source: this.Constants.MESSAGING.BACKGROUND, destination: this.Constants.MESSAGING.CONTEXT, urlUpdate: changeInfo.url };
@@ -393,12 +410,13 @@ export default class Background {
     }
   }
 
-  static async toggleTabDisable(tabId: number) {
+  static async toggleTabDisable(tabId: number, reload = true, forceEnable = false, sendResponse = null) {
     const storage = await this.loadBackgroundStorage();
     const tabOptions = this.getTabOptions(storage, tabId);
-    tabOptions.disabled = !tabOptions.disabled;
+    tabOptions.disabled = forceEnable ? false : !tabOptions.disabled;
     await this.saveBackgroundStorage(storage);
-    chrome.tabs.reload(tabId);
+    if (reload) chrome.tabs.reload(tabId);
+    if (sendResponse) sendResponse(tabOptions.disabled);
   }
 
   static async updatePopupStatus(tabId: number, status?: number, sendResponse?) {

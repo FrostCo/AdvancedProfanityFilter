@@ -77,6 +77,12 @@ body {
   font-size: 10px;
 }
 
+#footer #disabledMessage {
+  color: red;
+  font-size: small;
+  text-align: center;
+}
+
 h4 {
   margin-bottom: 5px;
 }

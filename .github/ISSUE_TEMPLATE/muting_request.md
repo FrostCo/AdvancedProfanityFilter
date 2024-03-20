@@ -10,10 +10,13 @@ assignees: ''
 _Instructions: This template is written in Markdown. Click the "Preview" tab to see what it will look like when submitted. Fill in the applicable sections (you can erase the examples if you'd like). For more information, please see [this page](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/New-Audio-Muting-Site)._
 
 #### :movie_camera: The Site
+
 _Example: www.youtube.com_
 
 #### :speech_balloon: Subtitle Element/Node
+
 _Example:_
+
 ```html
 <div class="subtitle-container">
   <p class="subtitle-text">Subtitle text</p>
@@ -21,4 +24,5 @@ _Example:_
 ```
 
 #### :pencil: Additional notes
+
 _Add any other context or screenshots about the request here._

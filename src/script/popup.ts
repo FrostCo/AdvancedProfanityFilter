@@ -18,6 +18,7 @@ export default class Popup {
   tab: chrome.tabs.Tab;
   themeElements: Element[];
   url: URL;
+  webFilterActive: boolean;
 
   //#region Class reference helpers
   // Can be overridden in children classes
@@ -88,6 +89,7 @@ export default class Popup {
   }
 
   constructor() {
+    this.webFilterActive = true;
     this.initializeMessaging();
     this.disabledTab = false;
     this.prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -129,6 +131,16 @@ export default class Popup {
     const domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
     this.Class.disable(domainFilter);
     this.Class.disable(domainToggle);
+  }
+
+  get disabledReason(): string {
+    if (this.isRestrictedPage) return 'Popup disabled by browser';
+    if (this.isPasswordProtected) return 'Popup disabled by password';
+    if (this.disabledTab) return 'Popup disabled for tab';
+    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return 'Popup disabled by domain mode';
+    if (this.domain.disabled) return 'Popup disabled for domain';
+    if (this.isDisconnected) return 'Disconnected, please refresh page';
+    return '';
   }
 
   disableOptions() {
@@ -178,8 +190,13 @@ export default class Popup {
 
   handleDisabled() {
     this.setDomainSwitch(false);
-    if (this.disabledTab) this.disableDomainSwitch();
     this.disableOptions();
+  }
+
+  handleDisabledMessage() {
+    const element = document.querySelector('#disabledMessage') as HTMLElement;
+    element.textContent = this.disabledReason;
+    this.isDisabled ? this.Class.show(element) : this.Class.hide(element);
   }
 
   handleEnabled() {
@@ -234,12 +251,11 @@ export default class Popup {
     });
 
     // Initial data request
+    const message = { destination: this.Class.Constants.MESSAGING.CONTEXT, source: this.Class.Constants.MESSAGING.POPUP, summary: true };
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(
-        tabs[0].id,
-        { destination: this.Class.Constants.MESSAGING.CONTEXT, source: this.Class.Constants.MESSAGING.POPUP, summary: true },
-        () => chrome.runtime.lastError // Suppress error if no listener);
-      );
+      chrome.tabs.sendMessage(tabs[0].id, message, () => {
+        if (chrome.runtime.lastError) this.webFilterActive = false;
+      });
     });
   }
 
@@ -249,8 +265,26 @@ export default class Popup {
     this.populateOptions(true);
   }
 
+  get isDisconnected() {
+    return (
+      false // Disable for now because its not stable and can break when toggling
+      && !this.webFilterActive
+      && !this.disabledTab
+      && !this.isRestrictedPage
+      && !this.domain.disabled
+      && !(this.cfg.enabledDomainsOnly && !this.domain.enabled)
+    );
+  }
+
   get isDisabled() {
-    return this.domain.disabled || this.disabledTab || (this.cfg.enabledDomainsOnly && !this.domain.enabled);
+    return (
+      this.domain.disabled
+      || this.disabledTab
+      || (this.cfg.enabledDomainsOnly && !this.domain.enabled)
+      || this.isRestrictedPage
+      || this.isPasswordProtected
+      || this.isDisconnected
+    );
   }
 
   get isPasswordProtected() {
@@ -291,7 +325,9 @@ export default class Popup {
 
     if (this.wordlistsEnabled) this.handleWordlistsEnabled();
 
-    if (this.isRestrictedPage) {
+    this.handleDisabledMessage();
+
+    if (this.isRestrictedPage || this.isDisconnected) {
       this.handleRestrictedPage();
       return false;
     }
@@ -359,9 +395,19 @@ export default class Popup {
 
   async toggle(prop: string) {
     if (!this.protected) {
-      this.domain[prop] = !this.domain[prop];
       try {
-        await this.domain.save(this.cfg);
+        if (this.disabledTab) {
+          const message = {
+            source: this.Class.Constants.MESSAGING.POPUP,
+            destination: this.Class.Constants.MESSAGING.BACKGROUND,
+            enableTab: true,
+            tabId: this.tab.id,
+          };
+          this.disabledTab = await chrome.runtime.sendMessage(message);
+        } else {
+          this.domain[prop] = !this.domain[prop];
+          await this.domain.save(this.cfg);
+        }
         chrome.tabs.reload();
         this.populateOptions();
       } catch (err) {

@@ -1,4 +1,5 @@
 # Advanced Profanity Filter
+
 [<img src="https://flat.badgen.net/chrome-web-store/users/piajkpdbaniagacofgklljacgjhefjeh?color=blue" alt="Chrome Web Store" width="71" height="20">](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
 [<img src="https://flat.badgen.net/chrome-web-store/stars/piajkpdbaniagacofgklljacgjhefjeh?color=blue" width="102" height="20">](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)
 [<img src="https://flat.badgen.net/badge/icon/discord?icon=discord&label" alt="Discord" width="68" height="20">](https://discord.com/invite/MpE5Z3f)
@@ -13,6 +14,7 @@ A browser extension to filter profanity from webpages.
 For an overview of features and options, please head to the [wiki](https://github.com/FrostCo/AdvancedProfanityFilter/wiki).
 
 ## Installation
+
 | Browser | Download |
 |---------|----------|
 | Chrome  | [Chrome Web Store](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh) |
@@ -25,34 +27,38 @@ For an overview of features and options, please head to the [wiki](https://githu
 | TV Cast | [Instructions](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Audio#watch-on-tv) - [Discussion](https://github.com/FrostCo/AdvancedProfanityFilter/issues/206) |
 
 ## Features
+
 * Filter modes
-    * Censor - Hide offending words
-    * Substitute - Replace offensive words
-    * Remove - Remove offensive words
+  * Censor - Hide offending words
+  * Substitute - Replace offensive words
+  * Remove - Remove offensive words
 * Customizable word and substitution lists
 * Works everywhere, including popular pages such as:
-    * Facebook
-    * Pinterest
-    * Reddit
-    * Twitter
+  * Facebook
+  * Pinterest
+  * Reddit
+* Twitter
 * [Audio muting](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Audio) for videos on supported sites:
-    * Amazon Video
-    * Hulu
-    * Netflix
-    * Plex
-    * Vudu
-    * YouTube
-    * And more! see [all supported sites here](https://apf.frostco.dev/status)
-    * You can even add your own! ([advanced](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site))
+  * Amazon Video
+  * Hulu
+  * Netflix
+  * Plex
+  * Vudu
+  * YouTube
+  * And more! see [all supported sites here](https://apf.frostco.dev/status)
+  * You can even add your own! ([advanced](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site))
 
 For a detailed overview of the features and settings, please see the [Getting Started page](https://github.com/FrostCo/AdvancedProfanityFilter/wiki).
 
 ## Issues, Suggestions or Feedback?
+
 * Found a bug? Please open an [issue](https://github.com/FrostCo/AdvancedProfanityFilter/issues/new).
 * Have a great idea to improve the project? Want to share some feedback? Head over [here](https://goo.gl/forms/LTqFpJ0mCTsrgGgf2).
 
 ## Beta Testing
+
 If you would like to help with development, but don't have experience coding, its very helpful to have users test a release candidate before actually publishing it to everyone. If you are interested in testing new versions see [this page](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Beta-Testing) for more information.
 
 ## Development
+
 See [development.md](development.md) for development documentation.

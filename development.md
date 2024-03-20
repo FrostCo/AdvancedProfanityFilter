@@ -1,5 +1,7 @@
 # Development
+
 ## Quick Start
+
 After downloading/cloning the repository, run the following commands to get started:
 
 ```sh
@@ -14,6 +16,7 @@ npm run build
 Once the extension has been built, you can load the unpacked extension (found in `dist/`) in your browser.
 
 ### Commonly Used Scripts
+
 | Target  | Manifest | Stage   | Script                      | Description                       |
 |---------|---------:|---------|-----------------------------|-----------------------------------|
 | chrome  |        3 | build   | `npm run build:chrome:mv3`  | Dev build for Chrome Manifest V3  |
@@ -22,22 +25,26 @@ Once the extension has been built, you can load the unpacked extension (found in
 |         |          | release | `npm run release:all`       | Official relase for all targets   |
 
 ## Build Targets
+
 | Target     | Manifest | Browsers           |
 |------------|---------:|--------------------|
 | chrome     |    2, 3* | Chrome, Edge, etc. |
 | edgeLegacy |        2 | Legacy Edge        |
-| firefox    |     2, 3 | Firefox            |
+| firefox    |    2*, 3 | Firefox            |
 
-_* = default target_
+\* = _default target_
 
 ## Build Stages
+
 | Stage   | Output                                | Description                                       |
 |---------|---------------------------------------|---------------------------------------------------|
 | build   | `dist/`                               | Build/compile the extension for local development |
 | release | `release/target-manifest-version.zip` | Create an official release for a target browser   |
 
 ## State Files
+
 The state files hold the details about the current build. These files are managed by `bin/prebuild.mjs`.
+
 - `.build.json`
   - Active build state file that is referenced when building/packaging/releasing
   - Gets replaced by the dev or release build files outlined below
@@ -49,16 +56,20 @@ The state files hold the details about the current build. These files are manage
   - Overwrites `.build.json` when `--release` **is** passed to `bin/prebuild.mjs`
 
 ### Details Contained In State Files
+
 - `config`: Overrides for the target
 - `manifestVersion`: Manifest version from `src/static/manifest.json`
 - `target`: Target browser
 - `version`: Build version from `package.json`
 
 ## Scripts
+
 For all scripts, please see `package.json`.
 
 ## Build Chains
+
 ### Build (Load Last Target From File)
+
 - `npm run build`
   - npm run prebuild
     - npm run clean:build
@@ -72,6 +83,7 @@ For all scripts, please see `package.json`.
     - node bin/postbuild.mjs
 
 ### Build Chrome Manifest V2
+
 - `npm run build:chrome:mv2`
   - npm run build --target=chrome-mv2
     - npm run prebuild
@@ -86,6 +98,7 @@ For all scripts, please see `package.json`.
         - node bin/postbuild.mjs
 
 ### Release Chrome Manifest V3
+
 - `npm run release:chrome:mv3`
   - npm run release:build --target=chrome-mv3
     - npm run prerelease:build
@@ -101,6 +114,7 @@ For all scripts, please see `package.json`.
     - node bin/packageExtension.mjs
 
 ### Test Addon (Firefox Manifest V2)
+
 - `npm run test:addon`
   - npm run release:build --target=firefox-mv2
     - npm run prerelease:build
