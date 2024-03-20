@@ -131,7 +131,7 @@ export default class Popup {
     this.Class.disable(domainToggle);
   }
 
-  get disabledReason() {
+  get disabledReason(): string {
     if (this.isRestrictedPage) return 'Popup disabled by browser';
     if (this.isPasswordProtected) return 'Popup disabled by password';
     if (this.disabledTab) return 'Popup disabled for tab';
