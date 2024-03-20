@@ -267,7 +267,8 @@ export default class Popup {
 
   get isDisconnected() {
     return (
-      !this.webFilterActive
+      false // Disable for now because its not stable and can break when toggling
+      && !this.webFilterActive
       && !this.disabledTab
       && !this.isRestrictedPage
       && !this.domain.disabled
