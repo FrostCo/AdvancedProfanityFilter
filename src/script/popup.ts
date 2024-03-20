@@ -134,8 +134,8 @@ export default class Popup {
   get disabledReason() {
     if (this.isRestrictedPage) return 'Popup disabled by browser';
     if (this.isPasswordProtected) return 'Popup disabled by password';
-    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return 'Popup disabled by domain mode';
     if (this.disabledTab) return 'Popup disabled for tab';
+    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return 'Popup disabled by domain mode';
     if (this.domain.disabled) return 'Popup disabled for domain';
     return '';
   }
