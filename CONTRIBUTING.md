@@ -9,6 +9,7 @@ All contributors and community members should always be polite, courteous, and h
 ## Ways to contribute
 
 We want to make contributing to this project as easy and transparent as possible, whether it's:
+
 - Reporting an issue
 - Discussing the current state of the code
 - Submitting a fix
@@ -25,11 +26,11 @@ If you have any substantial changes that you would like to make, please [open an
 2. Install Node.js
 3. Install needed dev dependencies: `npm install`
 4. Create a new branch: `git checkout -b my-branch-name`
-6. Run tests and make sure they are all passing: `npm run test`
-5. Make your changes, add tests (if applicable)
-6. Run tests again to make sure they still pass
-7. Push to your fork and [submit a pull request](https://github.com/FrostCo/AdvancedProfanityFilter/compare)
-8. Wait for your pull request to be reviewed, and be willing to answer questions or make adjustments as needed so that it can get merged
+5. Run tests and make sure they are all passing: `npm run test`
+6. Make your changes, add tests (if applicable)
+7. Run tests again to make sure they still pass
+8. Push to your fork and [submit a pull request](https://github.com/FrostCo/AdvancedProfanityFilter/compare)
+9. Wait for your pull request to be reviewed, and be willing to answer questions or make adjustments as needed so that it can get merged
 
 Tips for a good review process:
 
