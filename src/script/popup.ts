@@ -192,7 +192,7 @@ export default class Popup {
 
   handleDisabledMessage() {
     const element = document.querySelector('#disabledMessage') as HTMLElement;
-    element.textContent = ` ${this.disabledReason}`;
+    element.textContent = this.disabledReason;
     this.isDisabled ? this.Class.show(element) : this.Class.hide(element);
   }
 
