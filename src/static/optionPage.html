@@ -639,6 +639,7 @@
     <li><strong>Unmute delay</strong> - Global/default (applies to all sites) unmute delay value (in seconds). This delays when the audio is unmuted after a filtered word. Useful when the captions are not lining up quite right and you want to mute the audio longer to increase the success of muting during a filtered word.</li>
     <li><strong>Mute pre-censored captions on YouTube</strong> - YouTube sometimes pre-censors profanity in auto-generated captions and replaces them with <code>[ _ ]</code>. When enabled, this option will attempt to mute those words. <em>(The default on)</em></li>
     <li><strong>YouTube Minimum Muting</strong> - Set a minimum amount of time (in seconds) that the filter will mute matched words in a YouTube video using auto-generated subtitles. <em>(The default is 0)</em></li>
+    <li><strong>YouTube Maximum Muting</strong> - Similar to Minimum muting, but this will only allow a single mute to last this long in seconds. Most commonly used when YouTube auto-generated subtitles have a break between words, like the end of a conversation, and the last word is a filtered word. When that happens the last word may stay there for several seconds (or longer) until the next word is spoken.</li>
     <li><strong>Custom Sites</strong> - Add support for <a href="https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Audio#custom-audio-sites-advanced">Custom Audio Muting Sites</a>.</li>
     </ul>
     <h1>🔖 Bookmarklet</h1>
@@ -711,6 +712,15 @@
     <li><strong>Text Wordlist</strong> - Change the active wordlist for text for the current domain (Only when wordlists are enabled)</li>
     <li><strong>Audio Wordlist</strong> - Change the active wordlist for audio for the current domain (Only when both wordlists and audio muting are enabled, and this is an audio page).</li>
     <li><strong>Summary</strong> - A summary will appear when words have been filtered on the current page detailing what was filtered. The words are censored, but the original word can be seen by hovering over a word.</li>
+    <li>If the Popup is disabled, look at the bottom of the Popup to see why.<ul>
+    <li><code>Popup disabled by browser</code>: Your browser doesn&#39;t allow extensions to run on the current page</li>
+    <li><code>Popup disabled by password</code>: A password has been set which locks all settings (Options page &gt; Config tab)</li>
+    <li><code>Popup disabled by only mute audio</code>: &quot;Only mute audio&quot; is selected (Options page &gt; Audio tab)</li>
+    <li><code>Popup disabled for tab</code>: The current tab was disabled using the context menu, click the switch to enable it</li>
+    <li><code>Popup disabled by domain mode</code>: Your domain mode is set to minimal (Options page &gt; Domain tab)</li>
+    <li><code>Popup disabled for domain</code>: The filter has been disabled for this domain, click the switch to enable it</li>
+    </ul>
+    </li>
     </ul>
     <p>In addition to the above, there are links to the Options page and support pages.</p>
     <h1>📃 Context Menu</h1>
