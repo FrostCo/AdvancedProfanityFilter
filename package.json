@@ -86,6 +86,7 @@
     "mocha": "^10.2.0",
     "npm-check-updates": "^16.14.12",
     "nyc": "^15.1.0",
+    "sinon": "^17.0.2",
     "terser-webpack-plugin": "^5.3.10",
     "ts-loader": "^9.5.1",
     "tsconfig-paths": "^4.2.0",
