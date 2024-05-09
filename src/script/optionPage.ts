@@ -747,12 +747,11 @@ export default class OptionPage {
     }
   }
 
-  async importConfigFile(files: FileList) {
+  async importConfigFile(input: HTMLInputElement, files: FileList) {
     const file = files[0];
-    const importFileInput = document.getElementById('importFileInput') as HTMLInputElement;
     const fileText = await readFile(file) as string;
     this.importConfigText(fileText);
-    importFileInput.value = '';
+    input.value = '';
   }
 
   async importConfigRetry() {

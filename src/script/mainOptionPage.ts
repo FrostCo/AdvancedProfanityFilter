@@ -65,7 +65,7 @@ document.querySelectorAll('#bookmarkletConfigInputs input').forEach((el) => { el
 // Config
 document.getElementById('configSyncLargeKeys').addEventListener('click', (evt) => { option.confirm('convertStorageLocation'); });
 document.getElementById('configInlineInput').addEventListener('click', (evt) => { option.configInlineToggle(); });
-document.getElementById('importFileInput').addEventListener('change', (evt) => { option.importConfigFile((evt.target as HTMLInputElement).files); });
+document.getElementById('importFileInput').addEventListener('change', (evt) => { option.importConfigFile(evt.target as HTMLInputElement, (evt.target as HTMLInputElement).files); });
 document.getElementById('configReset').addEventListener('click', (evt) => { option.confirm('restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', (evt) => { option.exportConfig(); });
 document.getElementById('configImport').addEventListener('click', (evt) => { option.confirm('importConfig'); });
