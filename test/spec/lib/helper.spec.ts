@@ -9,6 +9,7 @@ import {
   isVersionOlder,
   lastElement,
   numberToBoolean,
+  numberWithCommas,
   removeFromArray,
   secondsToHMS,
   timeForFileName,
@@ -172,6 +173,14 @@ describe('Helper', function() {
       expect(numberToBoolean(5)).to.eql(true);
       expect(numberToBoolean(undefined)).to.eql(false);
       expect(numberToBoolean(null)).to.eql(false);
+    });
+  });
+
+  describe('numberWithCommas()', function() {
+    it('Works with numbers', function() {
+      expect(numberWithCommas(123)).to.eql('123');
+      expect(numberWithCommas(1234)).to.eql('1,234');
+      expect(numberWithCommas(1234567890)).to.eql('1,234,567,890');
     });
   });
 
