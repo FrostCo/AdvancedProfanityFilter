@@ -15,6 +15,7 @@ import {
   removeFromArray,
   secondsToHMS,
   sortObjectKeys,
+  stringArray,
   timeForFileName,
 } from '@APF/lib/helper';
 
@@ -244,6 +245,16 @@ describe('Helper', function() {
 
     it('Sorts object keys including underscore-prefixed keys', function() {
       expect(Object.keys(sortObjectKeys(object, false))).to.eql(['_z', 'a', 'b', 'c']);
+    });
+  });
+
+  describe('stringArray()', function() {
+    it('Ensures array when passed a string', function() {
+      expect(stringArray('abc')).to.eql(['abc']);
+    });
+
+    it('Returns provided array', function() {
+      expect(['abc', 'def']).to.eql(['abc', 'def']);
     });
   });
 
