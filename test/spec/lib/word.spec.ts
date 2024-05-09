@@ -59,6 +59,14 @@ describe('Word', function() {
           );
         });
       });
+
+      it('should throw error on invalid regexp', function() {
+        // Using a function wrapper to test for constructor exceptions
+        const constructorWrapper = () => {
+          new Word('$\\z+(^', { matchMethod: Constants.MATCH_METHODS.REGEX }, Config._defaults);
+        };
+        expect(constructorWrapper).to.throw(Error);
+      });
     });
 
     describe('Partial Match', function() {
@@ -312,6 +320,10 @@ describe('Word', function() {
 
     it('should return false when string does not include a double-byte UTF character', function() {
       expect(Word.containsDoubleByte('$p[cialC@se')).to.equal(false);
+    });
+
+    it('should return false on empty string', function() {
+      expect(Word.containsDoubleByte('')).to.equal(false);
     });
   });
 
