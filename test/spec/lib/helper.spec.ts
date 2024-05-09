@@ -17,6 +17,7 @@ import {
   sortObjectKeys,
   stringArray,
   timeForFileName,
+  upperCaseFirst,
 } from '@APF/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
@@ -261,6 +262,24 @@ describe('Helper', function() {
   describe('timeForFileName()', function() {
     it('Returns time string', function() {
       expect(timeForFileName()).to.match(/\d{4}-\d{2}-\d{2}_\d{6}/);
+    });
+  });
+
+  describe('upperCaseFirst()', function() {
+    it('Returns string with first character uppercased', function() {
+      expect(upperCaseFirst('abc', false)).to.eql('Abc');
+    });
+
+    it('Returns string with first character uppercased and the rest lowercased', function() {
+      expect(upperCaseFirst('aBC', true)).to.eql('Abc');
+    });
+
+    it('Returns string with first character uppercased and the rest lowercased', function() {
+      expect(upperCaseFirst('hello WORLD', true)).to.eql('Hello world');
+    });
+
+    it('Returns string with first character uppercased leaving the rest alone', function() {
+      expect(upperCaseFirst('hello WORLD', false)).to.eql('Hello WORLD');
     });
   });
 });
