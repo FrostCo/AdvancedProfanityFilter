@@ -7,6 +7,7 @@ import {
   getVersion,
   hmsToSeconds,
   isVersionOlder,
+  lastElement,
   numberToBoolean,
   removeFromArray,
   secondsToHMS,
@@ -153,6 +154,14 @@ describe('Helper', function() {
       version = getVersion('1.5.11');
       minimum = getVersion('1.5.10');
       expect(isVersionOlder(version, minimum)).to.equal(false);
+    });
+  });
+
+  describe('lastElement()', function() {
+    it('Returns last element in array', function() {
+      expect(lastElement([1])).to.eql(1);
+      expect(lastElement([1, 2, 3])).to.eql(3);
+      expect(lastElement([])).to.eql(undefined);
     });
   });
 
