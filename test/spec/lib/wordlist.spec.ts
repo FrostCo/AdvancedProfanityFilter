@@ -37,6 +37,11 @@ describe('Wordlist', function() {
       expect(wordlist.find(1).value).to.equal('sample');
     });
 
+    it('return undefined with null', function() {
+      const wordlist = new Wordlist({ words: testWords }, 2);
+      expect(wordlist.find(null)).to.equal(undefined);
+    });
+
     it('non-existent word', function() {
       const wordlist = new Wordlist({ words: testWords }, 2);
       expect(wordlist.find(99)).to.equal(undefined);
