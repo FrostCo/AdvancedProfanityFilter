@@ -155,14 +155,8 @@ export default class Filter {
                 sub = sub.replace(`\\${i + 1}`, this.cfg.preserveCase ? captureGroup : captureGroup.toLowerCase());
               });
 
-              // Only return if something was substituted
-              if (sub !== word.sub) {
-                if (this.cfg.substitutionMark) {
-                  sub = '[' + sub + ']';
-                }
-
-                return sub;
-              }
+              if (this.cfg.substitutionMark) sub = '[' + sub + ']';
+              return sub;
             }
 
             // Make substitution match case of original match
