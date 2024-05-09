@@ -65,7 +65,7 @@ document.querySelectorAll('#bookmarkletConfigInputs input').forEach((el) => { el
 // Config
 document.getElementById('configSyncLargeKeys').addEventListener('click', (evt) => { option.confirm('convertStorageLocation'); });
 document.getElementById('configInlineInput').addEventListener('click', (evt) => { option.configInlineToggle(); });
-document.getElementById('importFileInput').addEventListener('change', (evt) => { option.importConfigFile((evt.target as HTMLInputElement).files); });
+document.getElementById('importFileInput').addEventListener('change', (evt) => { option.importConfigFile(evt.target as HTMLInputElement, (evt.target as HTMLInputElement).files); });
 document.getElementById('configReset').addEventListener('click', (evt) => { option.confirm('restoreDefaults'); });
 document.getElementById('configExport').addEventListener('click', (evt) => { option.exportConfig(); });
 document.getElementById('configImport').addEventListener('click', (evt) => { option.confirm('importConfig'); });
@@ -76,6 +76,9 @@ document.getElementById('setPasswordBtn').addEventListener('click', (evt) => { o
 document.getElementById('testText').addEventListener('input', (evt) => { option.populateTest(); });
 // Stats
 document.getElementById('collectStats').addEventListener('click', (evt) => { option.saveOptions(); });
+document.getElementById('statsExport').addEventListener('click', (evt) => { option.exportStats(); });
+document.getElementById('statsImport').addEventListener('click', (evt) => { option.confirm('statsImport'); });
+document.getElementById('statsImportInput').addEventListener('change', (evt) => { option.importStatsFile(evt.target as HTMLInputElement, (evt.target as HTMLInputElement).files); });
 document.getElementById('statsReset').addEventListener('click', (evt) => { option.confirm('statsReset'); });
 document.getElementById('lessUsedWordsNumber').addEventListener('input', (evt) => { OptionPage.hideInputError(evt.target as HTMLInputElement); });
 document.getElementById('removeLessUsedWords').addEventListener('click', (evt) => { option.confirm('removeLessUsedWords'); });

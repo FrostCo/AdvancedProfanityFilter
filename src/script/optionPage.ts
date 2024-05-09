@@ -17,6 +17,7 @@ import {
   removeChildren,
   removeFromArray,
   stringArray,
+  timeForFileName,
   upperCaseFirst,
 } from '@APF/lib/helper';
 
@@ -253,11 +254,7 @@ export default class OptionPage {
   }
 
   backupConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
-    const padded = (num: number) => { return ('0' + num).slice(-2); };
-    const date = new Date;
-    const today = `${date.getFullYear()}-${padded(date.getMonth()+1)}-${padded(date.getDate())}`;
-    const time = `${padded(date.getHours())}${padded(date.getMinutes())}${padded(date.getSeconds())}`;
-    exportToFile(JSON.stringify(config, null, 2), `${filePrefix}-${today}_${time}.json`);
+    exportToFile(JSON.stringify(config, null, 2), `${filePrefix}-${timeForFileName()}.json`);
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
@@ -613,6 +610,11 @@ export default class OptionPage {
           }
         }
         break;
+      case 'statsImport':
+        this.Class.configureConfirmModal({ content: 'Are you sure you want to overwrite your statistics?' });
+        this._confirmEventListeners.push(this.importStats.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
+        break;
       case 'statsReset':
         this.Class.configureConfirmModal({ content: 'Are you sure you want to reset filter statistics?' });
         this._confirmEventListeners.push(this.statsReset.bind(this));
@@ -734,6 +736,11 @@ export default class OptionPage {
     }
   }
 
+  async exportStats(filePrefix = 'apf-stats') {
+    const stats = await this.getStatsFromStorage();
+    exportToFile(JSON.stringify(stats, null, 2), `${filePrefix}-${timeForFileName()}.json`);
+  }
+
   async getStatsFromStorage() {
     const { stats }: { stats: Statistics } = await this.Class.Config.getLocalStorage({ stats: { words: {} } }) as any;
     return stats;
@@ -750,12 +757,11 @@ export default class OptionPage {
     }
   }
 
-  async importConfigFile(files: FileList) {
+  async importConfigFile(input: HTMLInputElement, files: FileList) {
     const file = files[0];
-    const importFileInput = document.getElementById('importFileInput') as HTMLInputElement;
     const fileText = await readFile(file) as string;
     this.importConfigText(fileText);
-    importFileInput.value = '';
+    input.value = '';
   }
 
   async importConfigRetry() {
@@ -793,6 +799,28 @@ export default class OptionPage {
       }
     } catch (err) {
       this.Class.showErrorModal(['Failed to process new settings.', `Error: ${err.message}`]);
+    }
+  }
+
+  importStats() {
+    const fileImportInput = document.getElementById('statsImportInput') as HTMLInputElement;
+    fileImportInput.click();
+  }
+
+  async importStatsFile(input: HTMLInputElement, files: FileList) {
+    const backupStats = await this.getStatsFromStorage();
+
+    try {
+      const file = files[0];
+      const fileText = await readFile(file) as string;
+      const stats = JSON.parse(fileText);
+      if (!this.validStatsForImport(stats)) throw new Error('Invalid stats file.');
+      await this.Class.Config.saveLocalStorage({ stats: stats });
+      input.value = '';
+      await this.populateStats();
+    } catch (err) {
+      await this.Class.Config.saveLocalStorage({ stats: backupStats });
+      this.Class.handleError('Failed to import stats.', err);
     }
   }
 
@@ -1831,6 +1859,10 @@ export default class OptionPage {
     }
 
     return valid;
+  }
+
+  validStatsForImport(stats) {
+    return stats && stats?.startedAt > 1 && stats.words[Object.keys(stats.words)[0]].text >= 0;
   }
 
   wordlistTypeFromElement(element: HTMLSelectElement) {

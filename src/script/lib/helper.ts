@@ -214,6 +214,14 @@ export function stringArray(data: string | string[]): string[] {
   return data;
 }
 
+export function timeForFileName() {
+  const padded = (num: number) => { return ('0' + num).slice(-2); };
+  const date = new Date;
+  const today = `${date.getFullYear()}-${padded(date.getMonth()+1)}-${padded(date.getDate())}`;
+  const time = `${padded(date.getHours())}${padded(date.getMinutes())}${padded(date.getSeconds())}`;
+  return `${today}_${time}`;
+}
+
 export function upperCaseFirst(str: string, lowerCaseRest: boolean = true): string {
   let value = str.charAt(0).toUpperCase();
   value += lowerCaseRest ? str.toLowerCase().slice(1) : str.slice(1);

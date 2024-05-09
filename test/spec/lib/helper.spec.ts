@@ -1,6 +1,17 @@
 import { expect } from 'chai';
 import Constants from '@APF/lib/constants';
-import { booleanToNumber, formatNumber, getParent, getVersion, hmsToSeconds, isVersionOlder, numberToBoolean, removeFromArray, secondsToHMS } from '@APF/lib/helper';
+import {
+  booleanToNumber,
+  formatNumber,
+  getParent,
+  getVersion,
+  hmsToSeconds,
+  isVersionOlder,
+  numberToBoolean,
+  removeFromArray,
+  secondsToHMS,
+  timeForFileName,
+} from '@APF/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 
@@ -177,6 +188,12 @@ describe('Helper', function() {
       expect(secondsToHMS(355.55)).to.eql('00:05:55.550');
       expect(secondsToHMS(4937.79)).to.eql('01:22:17.790');
       expect(secondsToHMS(10818.5)).to.eql('03:00:18.500');
+    });
+  });
+
+  describe('timeForFileName()', function() {
+    it('Returns time string', function() {
+      expect(timeForFileName()).to.match(/\d{4}-\d{2}-\d{2}_\d{6}/);
     });
   });
 });

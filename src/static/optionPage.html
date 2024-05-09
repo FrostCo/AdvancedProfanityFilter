@@ -443,7 +443,12 @@
     <span class="notes">(Only stored locally)</span>
   </label>
 
-  <button id="statsReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESET STATS</button>
+  <div class="w3-right">
+    <input type="file" id="statsImportInput" accept=".json" style="display:none"/>
+    <button id="statsExport" class="w3-btn w3-round-large w3-flat-peter-river">EXPORT</button>
+    <button id="statsImport" class="w3-btn w3-round-large w3-flat-peter-river">IMPORT</button>
+    <button id="statsReset" class="w3-btn w3-round-large w3-flat-pomegranate">RESET</button>
+  </div>
 
   <h4 class="sectionHeader">Summary</h4>
   <div id="statsSummaryContainer">
