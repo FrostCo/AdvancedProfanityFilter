@@ -17,6 +17,7 @@ import {
   removeChildren,
   removeFromArray,
   stringArray,
+  timeForFileName,
   upperCaseFirst,
 } from '@APF/lib/helper';
 
@@ -253,11 +254,7 @@ export default class OptionPage {
   }
 
   backupConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
-    const padded = (num: number) => { return ('0' + num).slice(-2); };
-    const date = new Date;
-    const today = `${date.getFullYear()}-${padded(date.getMonth()+1)}-${padded(date.getDate())}`;
-    const time = `${padded(date.getHours())}${padded(date.getMinutes())}${padded(date.getSeconds())}`;
-    exportToFile(JSON.stringify(config, null, 2), `${filePrefix}-${today}_${time}.json`);
+    exportToFile(JSON.stringify(config, null, 2), `${filePrefix}-${timeForFileName()}.json`);
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
