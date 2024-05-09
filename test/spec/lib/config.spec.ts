@@ -19,6 +19,13 @@ describe('Config', function() {
     });
   });
 
+  describe('_persistableKeys()', function() {
+    it('should return list of persistable keys', function() {
+      const config = new Config();
+      expect(config._persistableKeys).to.equal(Config._persistableKeys);
+    });
+  });
+
   describe('addWord()', function() {
     const config = new Config(Config._defaults);
     config.words = Object.assign({}, Config._defaultWords);
@@ -40,6 +47,14 @@ describe('Config', function() {
       expect(config.words['newer-word'].sub).to.equal(wordOptions.sub.toLowerCase());
     });
 
+    it('should add a new word and not lower substitution when case-sensitive', function() {
+      const word = 'mountain';
+      const sub = 'MoLeHiLl';
+      const options = { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, case: Constants.TRUE, sub: sub };
+      expect(config.addWord(word, options)).to.equal(true);
+      expect(config.words[word].sub).to.equal(sub);
+    });
+
     it('should sanitize a new word before adding', function() {
       expect(config.addWord('anotherNewWord')).to.equal(true);
       expect(Object.keys(config.words)).to.include('anothernewword');
@@ -59,6 +74,36 @@ describe('Config', function() {
     it('should return false when word is already present', function() {
       expect(config.addWord('anotherWord')).to.equal(true);
       expect(config.addWord('anotherWord')).to.equal(false);
+    });
+  });
+
+  describe('removeWord()', function() {
+    let config;
+    beforeEach(function() {
+      config = new Config(Config._defaults);
+      config.words = Object.assign({}, Config._defaultWords);
+    });
+
+    it('should remove an existing word', function() {
+      const wordKey = 'newword';
+      config.addWord(wordKey);
+      expect(config.words[wordKey]).to.exist;
+      expect(config.removeWord(wordKey)).to.equal(true);
+      expect(config.words[wordKey]).to.not.exist;
+    });
+
+    it('should remove a case-sensitive regex word', function() {
+      const wordKey = 'newWord';
+      config.addWord(wordKey, { lists: [], matchMethod: Constants.MATCH_METHODS.REGEX });
+      expect(config.words[wordKey]).to.exist;
+      expect(config.removeWord(wordKey)).to.equal(true);
+      expect(config.words[wordKey]).to.not.exist;
+    });
+
+    it('should return false when no word to remove', function() {
+      const wordKey = 'nonexistant';
+      expect(config.words[wordKey]).to.not.exist;
+      expect(config.removeWord(wordKey)).to.equal(false);
     });
   });
 

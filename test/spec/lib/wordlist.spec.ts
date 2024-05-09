@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import sinon from 'sinon';
 import Constants from '@APF/lib/constants';
 import Wordlist from '@APF/lib/wordlist';
 
@@ -24,6 +25,16 @@ describe('Wordlist', function() {
       expect(wordlist.list).to.eql(['placeholder', 'example', 'word']);
       expect(wordlist.regExps.length).to.equal(3);
     });
+
+    it('should report warning on error adding word', function() {
+      const logSpy = sinon.spy(Wordlist.logger, 'warn');
+      const word = '$\\z+(^';
+      const words = { [word]: { lists: [1], matchMethod: Constants.MATCH_METHODS.REGEX } };
+      const wordlist = new Wordlist({ words: words }, 1);
+      expect(wordlist.regExps.length).to.equal(0);
+      expect(logSpy.callCount).to.equal(1);
+      expect(logSpy.firstCall.args[0]).to.equal(`Failed to add '${word}' to wordlist.`);
+    });
   });
 
   describe('find()', function() {
@@ -35,6 +46,11 @@ describe('Wordlist', function() {
     it('by id', function() {
       const wordlist = new Wordlist({ words: testWords }, 2);
       expect(wordlist.find(1).value).to.equal('sample');
+    });
+
+    it('return undefined with null', function() {
+      const wordlist = new Wordlist({ words: testWords }, 2);
+      expect(wordlist.find(null)).to.equal(undefined);
     });
 
     it('non-existent word', function() {

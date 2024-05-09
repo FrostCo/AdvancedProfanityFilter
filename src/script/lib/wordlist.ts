@@ -2,18 +2,24 @@ import Constants from './constants';
 import Word from './word';
 import Config from './config';
 import Logger from './logger';
-const logger = new Logger('Wordlist');
 
 export default class Wordlist {
   all: Word[];
   list: string[];
   regExps: RegExp[];
 
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  get Class() { return (this.constructor as typeof Wordlist); }
+  //#endregion
+
+  static readonly logger = new Logger('Wordlist');
+
   constructor(cfg: Config, wordlistId: number) {
     this.all = [];
     this.list = [];
     this.regExps = [];
-    logger.setLevel(cfg.loggingLevel);
+    this.Class.logger.setLevel(cfg.loggingLevel);
 
     // Sort the words array by longest (most-specific) first
     const sorted = Object.keys(cfg.words).sort((a, b) => {
@@ -29,7 +35,7 @@ export default class Wordlist {
           this.all.push(word);
           this.regExps.push(word.regExp);
         } catch (err) {
-          logger.warn(`Failed to add '${wordStr}' to wordlist.`, err);
+          this.Class.logger.warn(`Failed to add '${wordStr}' to wordlist.`, err);
         }
       }
     });

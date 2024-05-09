@@ -7,10 +7,17 @@ import {
   getVersion,
   hmsToSeconds,
   isVersionOlder,
+  lastElement,
   numberToBoolean,
+  numberWithCommas,
+  prettyPrintArray,
+  randomArrayElement,
   removeFromArray,
   secondsToHMS,
+  sortObjectKeys,
+  stringArray,
   timeForFileName,
+  upperCaseFirst,
 } from '@APF/lib/helper';
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
@@ -100,6 +107,10 @@ describe('Helper', function() {
       expect(hmsToSeconds('1:22:17.79')).to.eql(4937.79);
       expect(hmsToSeconds('3:00:18.500')).to.eql(10818.5);
     });
+
+    it('should handle empty input string', function() {
+      expect(hmsToSeconds('')).to.eql(0);
+    });
   });
 
   describe('isVersionOlder()', function() {
@@ -156,6 +167,14 @@ describe('Helper', function() {
     });
   });
 
+  describe('lastElement()', function() {
+    it('Returns last element in array', function() {
+      expect(lastElement([1])).to.eql(1);
+      expect(lastElement([1, 2, 3])).to.eql(3);
+      expect(lastElement([])).to.eql(undefined);
+    });
+  });
+
   describe('numberToBoolean()', function() {
     it('Return a boolean from a number', function() {
       expect(numberToBoolean(Constants.FALSE)).to.eql(false);
@@ -166,9 +185,44 @@ describe('Helper', function() {
     });
   });
 
+  describe('numberWithCommas()', function() {
+    it('Works with numbers', function() {
+      expect(numberWithCommas(123)).to.eql('123');
+      expect(numberWithCommas(1234)).to.eql('1,234');
+      expect(numberWithCommas(1234567890)).to.eql('1,234,567,890');
+    });
+
+    it('Works with number string', function() {
+      expect(numberWithCommas('123')).to.eql('123');
+      expect(numberWithCommas('1234')).to.eql('1,234');
+      expect(numberWithCommas('1234567890')).to.eql('1,234,567,890');
+    });
+  });
+
+  describe('prettyPrintArray()', function() {
+    it('Single element', function() {
+      expect(prettyPrintArray(['abc'])).to.eql('[abc]');
+    });
+
+    it('Multiple element', function() {
+      expect(prettyPrintArray(['abc', '123', 'zyx'])).to.eql('[abc, 123, zyx]');
+    });
+  });
+
+  describe('randomArrayElement()', function() {
+    it('Returns random item from array', function() {
+      const values = ['abc', 123];
+      expect(randomArrayElement(values)).to.be.oneOf(values);
+    });
+  });
+
   describe('removeFromArray()', function() {
     it('should return an array with the matching element removed', function() {
       expect(removeFromArray(array, 'needle')).to.eql(['a', 'in', 'a', 'large', 'haystack']);
+    });
+
+    it('should return an array with multiple removed values', function() {
+      expect(removeFromArray(array, ['a', 'needle', 'in'])).to.eql(['large', 'haystack']);
     });
 
     it('should return an array with the same values if no match is found', function() {
@@ -191,9 +245,49 @@ describe('Helper', function() {
     });
   });
 
+  describe('sortObjectKeys()', function() {
+    const object = { c: 3, b: 2, a: 1, _z: 0 };
+    it('Sorts object keys ignoring underscore-prefixed keys', function() {
+      expect(Object.keys(object)).to.eql(['c', 'b', 'a', '_z']);
+      expect(Object.keys(sortObjectKeys(object, true))).to.eql(['a', 'b', 'c']);
+    });
+
+    it('Sorts object keys including underscore-prefixed keys', function() {
+      expect(Object.keys(sortObjectKeys(object, false))).to.eql(['_z', 'a', 'b', 'c']);
+    });
+  });
+
+  describe('stringArray()', function() {
+    it('Ensures array when passed a string', function() {
+      expect(stringArray('abc')).to.eql(['abc']);
+    });
+
+    it('Returns provided array', function() {
+      expect(stringArray(['abc', 'def'])).to.eql(['abc', 'def']);
+    });
+  });
+
   describe('timeForFileName()', function() {
     it('Returns time string', function() {
       expect(timeForFileName()).to.match(/\d{4}-\d{2}-\d{2}_\d{6}/);
+    });
+  });
+
+  describe('upperCaseFirst()', function() {
+    it('Returns string with first character uppercased', function() {
+      expect(upperCaseFirst('abc', false)).to.eql('Abc');
+    });
+
+    it('Returns string with first character uppercased and the rest lowercased', function() {
+      expect(upperCaseFirst('aBC', true)).to.eql('Abc');
+    });
+
+    it('Returns string with first character uppercased and the rest lowercased', function() {
+      expect(upperCaseFirst('hello WORLD', true)).to.eql('Hello world');
+    });
+
+    it('Returns string with first character uppercased leaving the rest alone', function() {
+      expect(upperCaseFirst('hello WORLD', false)).to.eql('Hello WORLD');
     });
   });
 });

@@ -91,6 +91,24 @@ describe('Filter', () => {
   });
 
   describe('replaceText()', () => {
+    describe('Off', () => {
+      describe('Should still filter even when off if called', () => {
+        it('preserveFirst', () => {
+          const filter = new Filter;
+          filter.cfg = new Config({
+            censorCharacter: '*',
+            censorFixedLength: 0,
+            filterMethod: Constants.FILTER_METHODS.OFF,
+            preserveFirst: true,
+            preserveLast: false,
+            words: Object.assign({}, testWords),
+          });
+          filter.init();
+          expect(filter.replaceText('this is a placeholder placeholder.')).to.equal('this is a p********** p**********.');
+        });
+      });
+    });
+
     describe('Censor', () => {
       describe('Exact', () => {
         it('preserveFirst', () => {
