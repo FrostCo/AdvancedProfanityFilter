@@ -11,6 +11,7 @@ import {
   numberToBoolean,
   numberWithCommas,
   prettyPrintArray,
+  randomArrayElement,
   removeFromArray,
   secondsToHMS,
   timeForFileName,
@@ -198,6 +199,13 @@ describe('Helper', function() {
 
     it('Multiple element', function() {
       expect(prettyPrintArray(['abc', '123', 'zyx'])).to.eql('[abc, 123, zyx]');
+    });
+  });
+
+  describe('randomArrayElement()', function() {
+    it('Returns random item from array', function() {
+      const values = ['abc', 123];
+      expect(randomArrayElement(values)).to.be.oneOf(values);
     });
   });
 
