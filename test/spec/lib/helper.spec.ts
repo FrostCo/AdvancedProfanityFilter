@@ -14,6 +14,7 @@ import {
   randomArrayElement,
   removeFromArray,
   secondsToHMS,
+  sortObjectKeys,
   timeForFileName,
 } from '@APF/lib/helper';
 
@@ -231,6 +232,18 @@ describe('Helper', function() {
       expect(secondsToHMS(355.55)).to.eql('00:05:55.550');
       expect(secondsToHMS(4937.79)).to.eql('01:22:17.790');
       expect(secondsToHMS(10818.5)).to.eql('03:00:18.500');
+    });
+  });
+
+  describe('sortObjectKeys()', function() {
+    const object = { c: 3, b: 2, a: 1, _z: 0 };
+    it('Sorts object keys ignoring underscore-prefixed keys', function() {
+      expect(Object.keys(object)).to.eql(['c', 'b', 'a', '_z']);
+      expect(Object.keys(sortObjectKeys(object, true))).to.eql(['a', 'b', 'c']);
+    });
+
+    it('Sorts object keys including underscore-prefixed keys', function() {
+      expect(Object.keys(sortObjectKeys(object, false))).to.eql(['_z', 'a', 'b', 'c']);
     });
   });
 
