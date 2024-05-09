@@ -107,6 +107,10 @@ describe('Helper', function() {
       expect(hmsToSeconds('1:22:17.79')).to.eql(4937.79);
       expect(hmsToSeconds('3:00:18.500')).to.eql(10818.5);
     });
+
+    it('should handle empty input string', function() {
+      expect(hmsToSeconds('')).to.eql(0);
+    });
   });
 
   describe('isVersionOlder()', function() {
@@ -217,6 +221,10 @@ describe('Helper', function() {
       expect(removeFromArray(array, 'needle')).to.eql(['a', 'in', 'a', 'large', 'haystack']);
     });
 
+    it('should return an array with multiple removed values', function() {
+      expect(removeFromArray(array, ['a', 'needle', 'in'])).to.eql(['large', 'haystack']);
+    });
+
     it('should return an array with the same values if no match is found', function() {
       expect(removeFromArray(array, 'pin')).to.eql(array);
     });
@@ -255,7 +263,7 @@ describe('Helper', function() {
     });
 
     it('Returns provided array', function() {
-      expect(['abc', 'def']).to.eql(['abc', 'def']);
+      expect(stringArray(['abc', 'def'])).to.eql(['abc', 'def']);
     });
   });
 
