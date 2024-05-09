@@ -10,6 +10,7 @@ import {
   lastElement,
   numberToBoolean,
   numberWithCommas,
+  prettyPrintArray,
   removeFromArray,
   secondsToHMS,
   timeForFileName,
@@ -187,6 +188,16 @@ describe('Helper', function() {
       expect(numberWithCommas('123')).to.eql('123');
       expect(numberWithCommas('1234')).to.eql('1,234');
       expect(numberWithCommas('1234567890')).to.eql('1,234,567,890');
+    });
+  });
+
+  describe('prettyPrintArray()', function() {
+    it('Single element', function() {
+      expect(prettyPrintArray(['abc'])).to.eql('[abc]');
+    });
+
+    it('Multiple element', function() {
+      expect(prettyPrintArray(['abc', '123', 'zyx'])).to.eql('[abc, 123, zyx]');
     });
   });
 
