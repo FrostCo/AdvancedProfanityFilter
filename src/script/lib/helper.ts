@@ -137,10 +137,7 @@ export function numberToBoolean(value: number): boolean {
 
 export function numberWithCommas(number: number | string): string {
   if (typeof Intl == 'object' && typeof Intl.NumberFormat == 'function') {
-    if (typeof number === 'string') {
-      number = parseInt(number).toString();
-    }
-
+    if (typeof number === 'string') number = parseInt(number);
     return number.toLocaleString();
   } else {
     number = number.toString();
