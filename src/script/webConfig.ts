@@ -135,10 +135,6 @@ export default class WebConfig extends Config {
     });
   }
 
-  static includesLargeKeys(keys: string[]) {
-    return keys.some((key) => { return this._largeKeys.includes(key); });
-  }
-
   static keysToLoad(keys: string | string[] = []) {
     keys = stringArray(keys);
 
