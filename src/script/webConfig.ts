@@ -41,8 +41,7 @@ export default class WebConfig extends Config {
 
   static _defaults = this.initializeDefaults({}, this._configDefaults, this._webDefaults) as WebConfig;
   static _persistableKeys = Object.keys(this._defaults); // Make sure _defaults has already been assigned before this
-  static readonly _localConfigKeys = ['domains', 'syncLargeKeys', 'words'];
-  static readonly _localOnlyKeys = ['background', 'stats'];
+  static readonly _localOnlyKeys = ['background', 'stats', 'syncLargeKeys'];
   static readonly _maxSplitKeys = 64;
   static readonly _largeKeys = ['domains', 'words'];
 
@@ -402,7 +401,7 @@ export default class WebConfig extends Config {
   async resetPreserveStats() {
     try {
       await this.Class.resetSyncStorage();
-      await this.Class.removeLocalStorage(this.Class._localConfigKeys);
+      await this.Class.removeLocalStorage(removeFromArray(this.Class._localOnlyKeys, 'stats'));
     } catch (err) {
       logger.error('Failed to clear storage.', err);
       throw new Error(`Failed to clear storage. ${err.message}`);
