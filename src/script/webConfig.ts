@@ -414,8 +414,7 @@ export default class WebConfig extends Config {
 
     let unusedSplitKeys = [];
     keys.forEach((key) => {
-      if (key == 'syncLargeKeys') {
-        // syncLargeKeys is always stored in local storage
+      if (this.Class._localOnlyKeys.includes(key)) {
         localData[key] = this[key];
       } else if (this.Class._largeKeys.includes(key)) {
         if (this.syncLargeKeys) {
