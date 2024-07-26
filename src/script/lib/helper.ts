@@ -219,6 +219,14 @@ export function timeForFileName() {
   return `${today}_${time}`;
 }
 
+export function truncateString(string: string, length: number, elipses: boolean = true, countElipses: boolean = true) {
+  const arr = Array.from(string);
+  if (arr.length <= length) return string;
+  const truncateLength = elipses && countElipses ? length - 3 : length;
+  const truncated = arr.slice(0, truncateLength).join('').trim();
+  return elipses ? truncated + '...' : truncated;
+}
+
 export function upperCaseFirst(str: string, lowerCaseRest: boolean = true): string {
   let value = str.charAt(0).toUpperCase();
   value += lowerCaseRest ? str.toLowerCase().slice(1) : str.slice(1);
