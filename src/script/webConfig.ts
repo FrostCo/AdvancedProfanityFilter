@@ -41,8 +41,7 @@ export default class WebConfig extends Config {
 
   static _defaults = this.initializeDefaults({}, this._configDefaults, this._webDefaults) as WebConfig;
   static _persistableKeys = Object.keys(this._defaults); // Make sure _defaults has already been assigned before this
-  static readonly _localConfigKeys = ['domains', 'syncLargeKeys', 'words'];
-  static readonly _localOnlyKeys = ['background', 'stats'];
+  static readonly _localOnlyKeys = ['background', 'stats', 'syncLargeKeys'];
   static readonly _maxSplitKeys = 64;
   static readonly _largeKeys = ['domains', 'words'];
 
@@ -136,10 +135,6 @@ export default class WebConfig extends Config {
     });
   }
 
-  static includesLargeKeys(keys: string[]) {
-    return keys.some((key) => { return this._largeKeys.includes(key); });
-  }
-
   static keysToLoad(keys: string | string[] = []) {
     keys = stringArray(keys);
 
@@ -161,18 +156,17 @@ export default class WebConfig extends Config {
   // keys: Requested keys (defaults to all)
   // Note: syncLargeKeys will be returned when required
   static async load(keys: string | string[] = [], data: Partial<WebConfig> = {}): Promise<WebConfig> {
-    let syncKeys;
     keys = this.keysToLoad(keys);
 
     try {
-      if (this.includesLargeKeys(keys)) {
-        syncKeys = await this.loadLargeKeysFromLocalStorage(keys, data);
-      } else {
-        // Get all keys from sync storage (except syncLargeKeys)
-        syncKeys = this.requestedkeysForSyncStorage(keys, 'syncLargeKeys', data);
-      }
+      // Local storage
+      const localKeys = this.requestedkeysForLocalStorage(keys, data);
+      const appliedLocalKeys =  await this.loadKeysFromLocalStorage(localKeys, data);
 
+      // Sync storage
+      const syncKeys = this.requestedkeysForSyncStorage(keys, appliedLocalKeys, data);
       await this.loadFromSyncStorage(syncKeys, data);
+
       return new this(data);
     } catch (err) {
       logger.error('Failed to load items.', keys, err);
@@ -180,32 +174,28 @@ export default class WebConfig extends Config {
     }
   }
 
-  // Returns list of keys to get from storage.sync
-  static async loadLargeKeysFromLocalStorage(keys: string[], data: Partial<WebConfig>): Promise<string[]> {
-    // Add syncLargeKeys if any largeKeys were requested
-    if (!keys.includes('syncLargeKeys')) keys.push('syncLargeKeys');
+  // Returns list of keys applied to data
+  static async loadKeysFromLocalStorage(keys: string[], data: Partial<WebConfig>): Promise<string[]> { // Rename
+    if (!keys.length) return [];
 
     // Load large keys from LocalStorage if necessary
-    const localKeys = this.requestedkeysForLocalStorage(keys, data);
-    const localData = await this.getLocalStorage(localKeys) as Partial<WebConfig>;
+    const retrievedKeys = [];
+    const localData = await this.getLocalStorage(keys) as Partial<WebConfig>;
     data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : this._defaults.syncLargeKeys;
 
-    if (data.syncLargeKeys === false) { // Use local storage for large keys
-      // Add large keys from local storage to data
-      for (const localKey of localKeys) {
-        if (localData.hasOwnProperty(localKey)) {
-          data[localKey] = localData[localKey];
-        } else {
-          this.assignDefaultValue(localKey, data);
-        }
-      }
+    for (const key of keys) {
+      if (key === 'syncLargeKeys') continue;
+      if (data.syncLargeKeys && this._largeKeys.includes(key)) continue;
 
-      // Get all keys from sync storage except the ones found in local storage
-      return this.requestedkeysForSyncStorage(keys, this._localConfigKeys, data);
-    } else { // Use sync storage for large keys
-      // Get all keys from sync storage (except syncLargeKeys)
-      return this.requestedkeysForSyncStorage(keys, 'syncLargeKeys', data);
+      if (localData.hasOwnProperty(key)) {
+        data[key] = localData[key];
+      } else {
+        this.assignDefaultValue(key, data);
+      }
+      retrievedKeys.push(key);
     }
+
+    return retrievedKeys;
   }
 
   static async loadFromSyncStorage(syncKeys: string[], data: Partial<WebConfig> = {}) {
@@ -274,8 +264,12 @@ export default class WebConfig extends Config {
     });
   }
 
-  static requestedkeysForLocalStorage(keys: string[], data: Partial<WebConfig>) {
-    return this._localConfigKeys.filter((localKey) => keys.includes(localKey));
+  static requestedkeysForLocalStorage(keys: string[], data: Partial<WebConfig>): string[] {
+    const largeKeys = this._largeKeys.filter((key) => keys.includes(key));
+    const localOnlyKeys = this._localOnlyKeys.filter((key) => keys.includes(key));
+    const localKeys = largeKeys.concat(localOnlyKeys);
+    if (largeKeys.length && !keys.includes('syncLargeKeys')) localKeys.push('syncLargeKeys');
+    return localKeys;
   }
 
   static requestedkeysForSyncStorage(keys: string[], toRemove: string | string[], data: Partial<WebConfig>) {
@@ -402,7 +396,7 @@ export default class WebConfig extends Config {
   async resetPreserveStats() {
     try {
       await this.Class.resetSyncStorage();
-      await this.Class.removeLocalStorage(this.Class._localConfigKeys);
+      await this.Class.removeLocalStorage(removeFromArray(this.Class._localOnlyKeys, 'stats'));
     } catch (err) {
       logger.error('Failed to clear storage.', err);
       throw new Error(`Failed to clear storage. ${err.message}`);
@@ -416,8 +410,7 @@ export default class WebConfig extends Config {
 
     let unusedSplitKeys = [];
     keys.forEach((key) => {
-      if (key == 'syncLargeKeys') {
-        // syncLargeKeys is always stored in local storage
+      if (this.Class._localOnlyKeys.includes(key)) {
         localData[key] = this[key];
       } else if (this.Class._largeKeys.includes(key)) {
         if (this.syncLargeKeys) {

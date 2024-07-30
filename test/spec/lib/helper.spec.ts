@@ -17,6 +17,7 @@ import {
   sortObjectKeys,
   stringArray,
   timeForFileName,
+  truncateString,
   upperCaseFirst,
 } from '@APF/lib/helper';
 
@@ -270,6 +271,32 @@ describe('Helper', function() {
   describe('timeForFileName()', function() {
     it('Returns time string', function() {
       expect(timeForFileName()).to.match(/\d{4}-\d{2}-\d{2}_\d{6}/);
+    });
+  });
+
+  describe('truncateString()', function() {
+    it('Does not truncate short string', function() {
+      expect(truncateString('short', 10)).to.eql('short');
+    });
+
+    it('truncates long string', function() {
+      expect(truncateString('this is a long string', 14)).to.eql('this is a l...');
+    });
+
+    it('truncates long string with elipses', function() {
+      expect(truncateString('this is a long string', 10, true)).to.eql('this is...');
+    });
+
+    it('truncates long string with elipses and count elipses', function() {
+      expect(truncateString('this is a long string', 20, true)).to.eql('this is a long st...');
+    });
+
+    it('truncates long string with elipses and not count elipses', function() {
+      expect(truncateString('this is a long string', 20, true, false)).to.eql('this is a long strin...');
+    });
+
+    it('truncates long string without elipses', function() {
+      expect(truncateString('this is a long string', 10, false)).to.eql('this is a');
     });
   });
 
