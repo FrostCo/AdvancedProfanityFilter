@@ -2,6 +2,7 @@
 import WebConfig from '@APF/webConfig';
 import BookmarkletFilter from '@APF/bookmarkletFilter';
 
+/* @preserve - Advanced Profanity Filter by Richard Frost (FrostCo) */
 /* @preserve - Start User Config */
 const config = WebConfig._defaults as WebConfig;
 /* @preserve - End User Config */
