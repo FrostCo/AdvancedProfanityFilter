@@ -840,7 +840,7 @@ export default class OptionPage {
       this.Class.show(document.getElementById('main'));
     }
 
-    if (!this.bookmarklet) this.bookmarklet = await this.Class.Bookmarklet.create();
+    if (this.shouldCreateBookmarklet) this.bookmarklet = await this.Class.Bookmarklet.create();
     this.populateOptions();
 
     // Route to page based on URL
@@ -1698,6 +1698,10 @@ export default class OptionPage {
       this.darkModeButton.classList.remove('w3-hide');
       this.lightModeButton.classList.add('w3-hide');
     }
+  }
+
+  get shouldCreateBookmarklet(): boolean {
+    return this.bookmarklet === undefined;
   }
 
   showBulkWordEditor() {
