@@ -104,6 +104,7 @@ export default class BookmarkletFilter extends Filter {
 
   cleanPage(config?: WebConfig) {
     this.cfg = new this.Class.Config(config);
+    this.cfg.collectStats = false; // Bookmarklet: Force disable collection of stats
     this.filterText = this.cfg.filterMethod !== this.Class.Constants.FILTER_METHODS.OFF;
     this.domain = this.Class.Domain.byHostname(this.hostname, this.cfg.domains);
 
