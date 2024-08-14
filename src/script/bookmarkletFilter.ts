@@ -19,7 +19,6 @@ export default class BookmarkletFilter extends Filter {
   processNode: (node: Document | HTMLElement | Node | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
   shadowObserver: MutationObserver;
   stats?: Statistics; // Bookmarklet: Not used
-  updateCounterBadge: () => void; // Bookmarklet: Not used - Needed to match signature of WebFilter
 
   //#region Class reference helpers
   // Can be overridden in children classes
@@ -286,5 +285,9 @@ export default class BookmarkletFilter extends Filter {
     const mutations = observer.takeRecords();
     observer.disconnect();
     if (mutations) { this.processMutations(mutations); }
+  }
+
+  updateCounterBadge() {
+    // Bookmarklet: Not used - Needed to match signature of WebFilter
   }
 }
