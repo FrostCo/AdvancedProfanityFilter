@@ -8,6 +8,7 @@ import Bookmarklet from '@APF/bookmarklet';
 import Logger from '@APF/lib/logger';
 import {
   booleanToNumber,
+  deepCloneJson,
   dynamicList,
   exportToFile,
   lastElement,
@@ -260,6 +261,15 @@ export default class OptionPage {
   backupConfigInline(config = this.cfg.ordered()) {
     const configText = document.getElementById('configText') as HTMLTextAreaElement;
     configText.value = JSON.stringify(config, null, 2);
+  }
+
+  get bookmarkletConfig() {
+    const clone = deepCloneJson(this.cfg);
+    const keysToRemove = [...this.cfg.Class._localOnlyKeys];
+    Object.keys(clone).forEach((key) => {
+      if (keysToRemove.includes(key)) delete clone[key];
+    });
+    return clone;
   }
 
   bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
@@ -864,7 +874,7 @@ export default class OptionPage {
 
     const bookmarkletConfig = document.querySelector('input[name="bookmarkletConfig"]:checked') as HTMLInputElement;
     const bookmarkletLink = document.getElementById('bookmarkletLink') as HTMLAnchorElement;
-    const cfg = bookmarkletConfig.value == 'default' ? null : this.cfg;
+    const cfg = bookmarkletConfig.value == 'default' ? null : this.bookmarkletConfig;
     const href = this.bookmarklet.href(cfg);
     bookmarkletLink.href = href;
     this.Class.enableBtn(bookmarkletLink);

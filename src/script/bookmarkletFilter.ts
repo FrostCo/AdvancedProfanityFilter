@@ -19,7 +19,6 @@ export default class BookmarkletFilter extends Filter {
   processNode: (node: Document | HTMLElement | Node | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
   shadowObserver: MutationObserver;
   stats?: Statistics; // Bookmarklet: Not used
-  updateCounterBadge: () => void; // Bookmarklet: Not used - Needed to match signature of WebFilter
 
   //#region Class reference helpers
   // Can be overridden in children classes
@@ -104,6 +103,7 @@ export default class BookmarkletFilter extends Filter {
 
   cleanPage(config?: WebConfig) {
     this.cfg = new this.Class.Config(config);
+    this.cfg.collectStats = false; // Bookmarklet: Force disable collection of stats
     this.filterText = this.cfg.filterMethod !== this.Class.Constants.FILTER_METHODS.OFF;
     this.domain = this.Class.Domain.byHostname(this.hostname, this.cfg.domains);
 
@@ -285,5 +285,9 @@ export default class BookmarkletFilter extends Filter {
     const mutations = observer.takeRecords();
     observer.disconnect();
     if (mutations) { this.processMutations(mutations); }
+  }
+
+  updateCounterBadge() {
+    // Bookmarklet: Not used - Needed to match signature of WebFilter
   }
 }

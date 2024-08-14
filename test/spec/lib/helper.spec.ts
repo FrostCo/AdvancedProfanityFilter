@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import Constants from '@APF/lib/constants';
 import {
   booleanToNumber,
+  deepCloneJson,
   formatNumber,
   getParent,
   getVersion,
@@ -30,6 +31,50 @@ describe('Helper', function() {
       expect(booleanToNumber(false)).to.eql(Constants.FALSE);
       expect(booleanToNumber(undefined)).to.eql(Constants.FALSE);
       expect(booleanToNumber(null)).to.eql(Constants.FALSE);
+    });
+  });
+
+  describe('deepJsonClone()', function() {
+    const deepObject = {
+      children: {
+        deep: false,
+        name: 'shallow',
+        shallow: true,
+      },
+      deep: true,
+      name: 'deep',
+      numbers: [1, 2],
+      shallow: false,
+      strings: ['one', 'two'],
+    };
+
+    const shallowObject = {
+      deep: false,
+      name: 'shallow',
+      shallow: true,
+    };
+
+    it('Shallow clones object', function() {
+      expect(JSON.stringify(deepCloneJson(shallowObject))).to.eql(JSON.stringify(shallowObject));
+    });
+
+    it('Deep clones object', function() {
+      expect(JSON.stringify(deepCloneJson(deepObject))).to.eql(JSON.stringify(deepObject));
+    });
+
+    it('Is a clone (delete)', function() {
+      const clone = deepCloneJson(deepObject);
+      delete clone.name;
+      expect(clone.name).to.be.undefined;
+      expect(deepObject.name).to.not.be.undefined;
+    });
+
+    it('Is a clone (update)', function() {
+      const clone = deepCloneJson(deepObject);
+      const key = 'name2';
+      clone[key] = 'deep2';
+      expect(clone[key]).to.not.be.undefined;
+      expect(deepObject[key]).to.be.undefined;
     });
   });
 
