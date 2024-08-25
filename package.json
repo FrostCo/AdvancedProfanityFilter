@@ -69,6 +69,10 @@
     "update:help": "node bin/updateHelp.mjs",
     "watch": "node bin/watch.js"
   },
+  "dependencies": {
+    "i18next": "^23.14.0",
+    "i18next-http-backend": "^2.6.1"
+  },
   "devDependencies": {
     "@types/chrome": "^0.0.256",
     "@types/mocha": "^10.0.6",
