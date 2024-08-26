@@ -4,6 +4,8 @@ import WebConfig from '@APF/webConfig';
 import Domain from '@APF/domain';
 import Page from '@APF/page';
 import Logger from '@APF/lib/logger';
+import i18next from 'i18next';
+import i18nextHttpBackend from 'i18next-http-backend';
 const logger = new Logger('Popup');
 
 export default class Popup {
@@ -40,6 +42,21 @@ export default class Popup {
     'wordlists',
     'wordlistsEnabled',
   ];
+
+  static applyTranslation(language = null) {
+    i18next.use(i18nextHttpBackend).init({
+      lng: language?.split('-')[0] || navigator.language.split('-')[0],
+      fallbackLng: 'en',
+      backend: {
+        loadPath: 'locales/{{lng}}/translation.json'
+      }
+    }, function (err, t) {
+      if (err) {
+        logger.error('Failed to load translations:', err);
+        return;
+      }
+    });
+  }
 
   static disable(element) {
     element.disabled = true;
