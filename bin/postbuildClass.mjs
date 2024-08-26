@@ -16,6 +16,7 @@ export default class Postbuild {
 
   commonBuild() {
     this.handleManifest();
+    this.localeFiles();
   }
 
   edgeLegacyBuild() {
@@ -32,6 +33,10 @@ export default class Postbuild {
     this.manifest['-ms-preload'] = msPreload;
     fse.copyFileSync('./store/edge/src/backgroundScriptsAPIBridge.js', './dist/backgroundScriptsAPIBridge.js');
     fse.copyFileSync('./store/edge/src/contentScriptsAPIBridge.js', './dist/contentScriptsAPIBridge.js');
+  }
+
+  localeFiles() {
+    fse.copySync('./locales', './dist/locales');
   }
 
   updateManifestVersion() {
