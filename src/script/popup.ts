@@ -156,12 +156,12 @@ export default class Popup {
   }
 
   get disabledReason(): string {
-    if (this.isRestrictedPage) return 'Popup disabled by browser';
-    if (this.isPasswordProtected) return 'Popup disabled by password';
-    if (this.disabledTab) return 'Popup disabled for tab';
-    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return 'Popup disabled by domain mode';
-    if (this.domain.disabled) return 'Popup disabled for domain';
-    if (this.isDisconnected) return 'Disconnected, please refresh page';
+    if (this.isRestrictedPage) return i18next.t('popupDisabledRestrictedPage');
+    if (this.isPasswordProtected) return i18next.t('popupDisabledPasswordProtected');
+    if (this.disabledTab) return i18next.t('popupDisabledTab');
+    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return i18next.t('popupDisabledDomainMode');
+    if (this.domain.disabled) return i18next.t('popupDisabledDomain');
+    if (this.isDisconnected) return i18next.t('popupDisabledDisconnected');
     return '';
   }
 
