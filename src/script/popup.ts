@@ -43,26 +43,6 @@ export default class Popup {
     'wordlistsEnabled',
   ];
 
-  static async loadTranslation(language = null) {
-    try {
-      return await i18next.use(i18nextHttpBackend).init({
-        lng: language?.split('-')[0] || navigator.language.split('-')[0],
-        fallbackLng: 'en',
-        backend: {
-          loadPath: 'locales/{{lng}}/translation.json',
-        },
-      });
-    } catch (err) {
-      logger.error('Failed to load translation:', err);
-    }
-  }
-
-  applyTranslation() {
-    document.getElementById('domainModeLabel').textContent = i18next.t('domainModeLabel');
-    document.getElementById('filterMethodLabel').textContent = i18next.t('filterMethodLabel');
-    document.getElementById('textWordlistLabel').textContent = i18next.t('textWordlistLabel');
-  }
-
   static disable(element) {
     element.disabled = true;
     element.classList.add('disabled');
@@ -103,6 +83,20 @@ export default class Popup {
     });
 
     return instance;
+  }
+
+  static async loadTranslation(language = null) {
+    try {
+      return await i18next.use(i18nextHttpBackend).init({
+        lng: language?.split('-')[0] || navigator.language.split('-')[0],
+        fallbackLng: 'en',
+        backend: {
+          loadPath: 'locales/{{lng}}/translation.json',
+        },
+      });
+    } catch (err) {
+      logger.error('Failed to load translation:', err);
+    }
   }
 
   static show(element: HTMLElement) {
@@ -146,6 +140,12 @@ export default class Popup {
     } else {
       this.cfg.darkMode ?  this.applyDarkTheme() : this.applyLightTheme();
     }
+  }
+
+  applyTranslation() {
+    document.getElementById('domainModeLabel').textContent = i18next.t('domainModeLabel');
+    document.getElementById('filterMethodLabel').textContent = i18next.t('filterMethodLabel');
+    document.getElementById('textWordlistLabel').textContent = i18next.t('textWordlistLabel');
   }
 
   disableDomainSwitch() {
