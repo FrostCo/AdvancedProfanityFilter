@@ -146,6 +146,11 @@ export default class Popup {
     document.getElementById('domainModeLabel').textContent = i18next.t('domainModeLabel');
     document.getElementById('filterMethodLabel').textContent = i18next.t('filterMethodLabel');
     document.getElementById('textWordlistLabel').textContent = i18next.t('textWordlistLabel');
+    document.getElementById('summaryTableHeader').textContent = i18next.t('summaryTableHeader');
+    document.getElementById('options').textContent = i18next.t('optionsButton');
+    document.getElementById('gettingStarted').textContent = i18next.t('help');
+    document.getElementById('changelogLink').textContent = i18next.t('changelog');
+    document.getElementById('supportLink').textContent = i18next.t('support');
   }
 
   disableDomainSwitch() {
