@@ -55,6 +55,11 @@ export default class Popup {
         logger.error('Failed to load translations:', err);
         return;
       }
+
+      // Initialize the UI with the translated text
+      document.getElementById('domainModeLabel').textContent = i18next.t('domainModeLabel');
+      document.getElementById('filterMethodLabel').textContent = i18next.t('filterMethodLabel');
+      document.getElementById('textWordlistLabel').textContent = i18next.t('textWordlistLabel');
     });
   }
 
