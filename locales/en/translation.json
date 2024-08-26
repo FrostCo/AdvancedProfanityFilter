@@ -1,0 +1,18 @@
+{
+  "changelog": "Changelog",
+  "domainModeLabel": "Mode",
+  "filterMethodLabel": "Filter",
+  "greeting": "Hello, User!",
+  "help": "Help",
+  "optionsButton": "Options",
+  "popupDisabledDisconnected": "Disconnected, please refresh page",
+  "popupDisabledDomain": "Popup disabled for domain",
+  "popupDisabledDomainMode": "Popup disabled by domain mode",
+  "popupDisabledPasswordProtected": "Popup disabled by password",
+  "popupDisabledRestrictedPage": "Popup disabled by browser",
+  "popupDisabledTab": "Popup disabled for tab",
+  "summaryTableHeader": "Filtered Words",
+  "support": "Support",
+  "textWordlistLabel": "Text",
+  "title": "Welcome to My Extension"
+}
