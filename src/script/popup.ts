@@ -43,24 +43,24 @@ export default class Popup {
     'wordlistsEnabled',
   ];
 
-  static applyTranslation(language = null) {
-    i18next.use(i18nextHttpBackend).init({
-      lng: language?.split('-')[0] || navigator.language.split('-')[0],
-      fallbackLng: 'en',
-      backend: {
-        loadPath: 'locales/{{lng}}/translation.json'
-      }
-    }, function (err, t) {
-      if (err) {
-        logger.error('Failed to load translations:', err);
-        return;
-      }
+  static async loadTranslation(language = null) {
+    try {
+      return await i18next.use(i18nextHttpBackend).init({
+        lng: language?.split('-')[0] || navigator.language.split('-')[0],
+        fallbackLng: 'en',
+        backend: {
+          loadPath: 'locales/{{lng}}/translation.json',
+        },
+      });
+    } catch (err) {
+      logger.error('Failed to load translation:', err);
+    }
+  }
 
-      // Initialize the UI with the translated text
-      document.getElementById('domainModeLabel').textContent = i18next.t('domainModeLabel');
-      document.getElementById('filterMethodLabel').textContent = i18next.t('filterMethodLabel');
-      document.getElementById('textWordlistLabel').textContent = i18next.t('textWordlistLabel');
-    });
+  applyTranslation() {
+    document.getElementById('domainModeLabel').textContent = i18next.t('domainModeLabel');
+    document.getElementById('filterMethodLabel').textContent = i18next.t('filterMethodLabel');
+    document.getElementById('textWordlistLabel').textContent = i18next.t('textWordlistLabel');
   }
 
   static disable(element) {
@@ -282,6 +282,8 @@ export default class Popup {
   }
 
   async initializePopup() {
+    await this.Class.loadTranslation();
+    this.applyTranslation();
     await this.Class.load(this);
     this.applyTheme();
     this.populateOptions(true);
