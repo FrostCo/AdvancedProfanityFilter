@@ -1,5 +1,4 @@
 import Constants from '@APF/lib/constants';
-import { dynamicList } from '@APF/lib/helper';
 import WebConfig from '@APF/webConfig';
 import Domain from '@APF/domain';
 import Page from '@APF/page';
@@ -260,10 +259,14 @@ export default class Popup {
   handleWordlistsEnabled() {
     const wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
-    const wordlists = ['Default Wordlist'].concat(this.Class.Config._allWordlists, this.cfg.wordlists);
     const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
-    dynamicList(wordlists, wordlistSelect);
     wordlistSelect.selectedIndex = wordlistIndex;
+    document.getElementById('wordlist1').textContent = this.cfg.wordlists[0];
+    document.getElementById('wordlist2').textContent = this.cfg.wordlists[1];
+    document.getElementById('wordlist3').textContent = this.cfg.wordlists[2];
+    document.getElementById('wordlist4').textContent = this.cfg.wordlists[3];
+    document.getElementById('wordlist5').textContent = this.cfg.wordlists[4];
+    document.getElementById('wordlist6').textContent = this.cfg.wordlists[5];
     this.Class.show(wordListContainer);
   }
 
