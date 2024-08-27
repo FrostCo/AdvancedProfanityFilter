@@ -3,8 +3,7 @@ import WebConfig from '@APF/webConfig';
 import Domain from '@APF/domain';
 import Page from '@APF/page';
 import Logger from '@APF/lib/logger';
-import i18next from 'i18next';
-import i18nextHttpBackend from 'i18next-http-backend';
+import Translation from '@APF/translation';
 const logger = new Logger('Popup');
 
 export default class Popup {
@@ -18,6 +17,7 @@ export default class Popup {
   summaries: { number?: Summary };
   tab: chrome.tabs.Tab;
   themeElements: Element[];
+  translation: Translation;
   url: URL;
   webFilterActive: boolean;
 
@@ -27,6 +27,7 @@ export default class Popup {
   static get Constants() { return Constants; }
   static get Domain() { return Domain; }
   static get Page() { return Page; }
+  static get Translation() { return Translation; }
   get Class() { return (this.constructor as typeof Popup); }
   //#endregion
 
@@ -84,20 +85,6 @@ export default class Popup {
     return instance;
   }
 
-  static async loadTranslation(language = null) {
-    try {
-      return await i18next.use(i18nextHttpBackend).init({
-        lng: language?.split('-')[0] || navigator.language.split('-')[0],
-        fallbackLng: 'en',
-        backend: {
-          loadPath: 'locales/{{lng}}/translation.json',
-        },
-      });
-    } catch (err) {
-      logger.error('Failed to load translation:', err);
-    }
-  }
-
   static show(element: HTMLElement) {
     element.classList.remove('w3-hide');
     element.classList.add('w3-show');
@@ -142,21 +129,21 @@ export default class Popup {
   }
 
   applyTranslation() {
-    document.getElementById('domainModeLabel').textContent = i18next.t('domainModeLabel');
-    document.getElementById('filterMethodLabel').textContent = i18next.t('filterMethodLabel');
-    document.getElementById('textWordlistLabel').textContent = i18next.t('textWordlistLabel');
-    document.getElementById('summaryTableHeader').textContent = i18next.t('summaryTableHeader');
-    document.getElementById('options').textContent = i18next.t('optionsButton');
-    document.getElementById('gettingStarted').textContent = i18next.t('help');
-    document.getElementById('changelogLink').textContent = i18next.t('changelog');
-    document.getElementById('supportLink').textContent = i18next.t('support');
-    document.getElementById('domainModeNormal').textContent = i18next.t('domainModeNormal');
-    document.getElementById('domainModeAdvanced').textContent = i18next.t('domainModeAdvanced');
-    document.getElementById('domainModeDeep').textContent = i18next.t('domainModeDeep');
-    document.getElementById('filterMethodCensor').textContent = i18next.t('FilterMethodCensor');
-    document.getElementById('filterMethodSubstitute').textContent = i18next.t('FilterMethodCSubstitute');
-    document.getElementById('filterMethoRemove').textContent = i18next.t('FilterMethodOff');
-    document.getElementById('filterMethoOff').textContent = i18next.t('FilterMethodRemove');
+    document.getElementById('domainModeLabel').textContent = this.translation.t('domainModeLabel');
+    document.getElementById('filterMethodLabel').textContent = this.translation.t('filterMethodLabel');
+    document.getElementById('textWordlistLabel').textContent = this.translation.t('textWordlistLabel');
+    document.getElementById('summaryTableHeader').textContent = this.translation.t('summaryTableHeader');
+    document.getElementById('options').textContent = this.translation.t('optionsButton');
+    document.getElementById('gettingStarted').textContent = this.translation.t('help');
+    document.getElementById('changelogLink').textContent = this.translation.t('changelog');
+    document.getElementById('supportLink').textContent = this.translation.t('support');
+    document.getElementById('domainModeNormal').textContent = this.translation.t('domainModeNormal');
+    document.getElementById('domainModeAdvanced').textContent = this.translation.t('domainModeAdvanced');
+    document.getElementById('domainModeDeep').textContent = this.translation.t('domainModeDeep');
+    document.getElementById('filterMethodCensor').textContent = this.translation.t('FilterMethodCensor');
+    document.getElementById('filterMethodSubstitute').textContent = this.translation.t('FilterMethodCSubstitute');
+    document.getElementById('filterMethoRemove').textContent = this.translation.t('FilterMethodOff');
+    document.getElementById('filterMethoOff').textContent = this.translation.t('FilterMethodRemove');
   }
 
   disableDomainSwitch() {
@@ -167,12 +154,12 @@ export default class Popup {
   }
 
   get disabledReason(): string {
-    if (this.isRestrictedPage) return i18next.t('popupDisabledRestrictedPage');
-    if (this.isPasswordProtected) return i18next.t('popupDisabledPasswordProtected');
-    if (this.disabledTab) return i18next.t('popupDisabledTab');
-    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return i18next.t('popupDisabledDomainMode');
-    if (this.domain.disabled) return i18next.t('popupDisabledDomain');
-    if (this.isDisconnected) return i18next.t('popupDisabledDisconnected');
+    if (this.isRestrictedPage) return this.translation.t('popupDisabledRestrictedPage');
+    if (this.isPasswordProtected) return this.translation.t('popupDisabledPasswordProtected');
+    if (this.disabledTab) return this.translation.t('popupDisabledTab');
+    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return this.translation.t('popupDisabledDomainMode');
+    if (this.domain.disabled) return this.translation.t('popupDisabledDomain');
+    if (this.isDisconnected) return this.translation.t('popupDisabledDisconnected');
     return '';
   }
 
@@ -261,8 +248,8 @@ export default class Popup {
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
     wordlistSelect.selectedIndex = wordlistIndex;
-    document.getElementById('wordlistDefault').textContent = i18next.t('wordlistDefault');
-    document.getElementById('wordlistAllWords').textContent = i18next.t('wordlistAllWords');
+    document.getElementById('wordlistDefault').textContent = this.translation.t('wordlistDefault');
+    document.getElementById('wordlistAllWords').textContent = this.translation.t('wordlistAllWords');
     document.getElementById('wordlist1').textContent = this.cfg.wordlists[0];
     document.getElementById('wordlist2').textContent = this.cfg.wordlists[1];
     document.getElementById('wordlist3').textContent = this.cfg.wordlists[2];
@@ -299,7 +286,7 @@ export default class Popup {
   }
 
   async initializePopup() {
-    await this.Class.loadTranslation();
+    this.translation = new this.Class.Translation('translation');
     this.applyTranslation();
     await this.Class.load(this);
     this.applyTheme();
