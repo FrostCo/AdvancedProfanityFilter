@@ -9,7 +9,6 @@
   "filterMethodLabel": "Filter",
   "FilterMethodOff": "Off",
   "FilterMethodRemove": "Remove",
-  "greeting": "Hello, User!",
   "help": "Help",
   "optionsButton": "Options",
   "popupDisabledDisconnected": "Disconnected, please refresh page",
@@ -20,6 +19,5 @@
   "popupDisabledTab": "Popup disabled for tab",
   "summaryTableHeader": "Filtered Words",
   "support": "Support",
-  "textWordlistLabel": "Text",
-  "title": "Welcome to My Extension"
+  "textWordlistLabel": "Text"
 }
