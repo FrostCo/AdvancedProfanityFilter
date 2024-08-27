@@ -261,6 +261,8 @@ export default class Popup {
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
     wordlistSelect.selectedIndex = wordlistIndex;
+    document.getElementById('wordlistDefault').textContent = i18next.t('wordlistDefault');
+    document.getElementById('wordlistAllWords').textContent = i18next.t('wordlistAllWords');
     document.getElementById('wordlist1').textContent = this.cfg.wordlists[0];
     document.getElementById('wordlist2').textContent = this.cfg.wordlists[1];
     document.getElementById('wordlist3').textContent = this.cfg.wordlists[2];
