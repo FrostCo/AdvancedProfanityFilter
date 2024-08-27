@@ -71,8 +71,7 @@
     "watch": "node bin/watch.js"
   },
   "dependencies": {
-    "i18next": "^23.14.0",
-    "i18next-http-backend": "^2.6.1"
+    "i18next": "^23.14.0"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.256",
