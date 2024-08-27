@@ -22,12 +22,21 @@
 
   <div id="domainModeContainer" class="container">
     <label id="domainModeLabel" for="domainModeSelect" class="selectLabel">Mode</label>
-    <select id="domainModeSelect" class="w3-select w3-border smallSelect"></select>
+    <select id="domainModeSelect" class="w3-select w3-border smallSelect">
+      <option id="domainModeNormal" value="0">Normal</option>
+      <option id="domainModeAdvanced" value="1">Advanced</option>
+      <option id="domainModeDeep" value="2">Deep</option>
+    </select>
   </div>
 
   <div id="filterMethodContainer" class="container">
     <label id="filterMethodLabel" for="filterMethodSelect" class="selectLabel">Filter</label>
-    <select id="filterMethodSelect" class="w3-select w3-border smallSelect"></select>
+    <select id="filterMethodSelect" class="w3-select w3-border smallSelect">
+      <option id="filterMethodCensor" value="0">Censor</option>
+      <option id="filterMethodSubstitute" value="1">Substitute</option>
+      <option id="filterMethoRemove" value="2">Remove</option>
+      <option id="filterMethoOff" value="3">Off</option>
+    </select>
   </div>
 
   <div id="wordListContainer" class="container w3-hide">
