@@ -7,6 +7,9 @@ bin/git-filters/*.js
 # Build state files
 /.build.*json
 
+# Combined translation file
+/src/script/translations.js
+
 # Packaged extensions
 /dist/*
 /*.zip
