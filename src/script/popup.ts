@@ -151,6 +151,13 @@ export default class Popup {
     document.getElementById('gettingStarted').textContent = i18next.t('help');
     document.getElementById('changelogLink').textContent = i18next.t('changelog');
     document.getElementById('supportLink').textContent = i18next.t('support');
+    document.getElementById('domainModeNormal').textContent = i18next.t('domainModeNormal');
+    document.getElementById('domainModeAdvanced').textContent = i18next.t('domainModeAdvanced');
+    document.getElementById('domainModeDeep').textContent = i18next.t('domainModeDeep');
+    document.getElementById('filterMethodCensor').textContent = i18next.t('FilterMethodCensor');
+    document.getElementById('filterMethodSubstitute').textContent = i18next.t('FilterMethodCSubstitute');
+    document.getElementById('filterMethoRemove').textContent = i18next.t('FilterMethodOff');
+    document.getElementById('filterMethoOff').textContent = i18next.t('FilterMethodRemove');
   }
 
   disableDomainSwitch() {
