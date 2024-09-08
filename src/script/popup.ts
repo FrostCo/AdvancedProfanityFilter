@@ -129,21 +129,21 @@ export default class Popup {
   }
 
   applyTranslation() {
-    document.getElementById('domainModeLabel').textContent = this.translation.t('domainModeLabel');
-    document.getElementById('filterMethodLabel').textContent = this.translation.t('filterMethodLabel');
-    document.getElementById('textWordlistLabel').textContent = this.translation.t('textWordlistLabel');
-    document.getElementById('summaryTableHeader').textContent = this.translation.t('summaryTableHeader');
-    document.getElementById('options').textContent = this.translation.t('optionsButton');
-    document.getElementById('gettingStarted').textContent = this.translation.t('help');
-    document.getElementById('changelogLink').textContent = this.translation.t('changelog');
-    document.getElementById('supportLink').textContent = this.translation.t('support');
-    document.getElementById('domainModeNormal').textContent = this.translation.t('domainModeNormal');
-    document.getElementById('domainModeAdvanced').textContent = this.translation.t('domainModeAdvanced');
-    document.getElementById('domainModeDeep').textContent = this.translation.t('domainModeDeep');
-    document.getElementById('filterMethodCensor').textContent = this.translation.t('FilterMethodCensor');
-    document.getElementById('filterMethodSubstitute').textContent = this.translation.t('FilterMethodCSubstitute');
-    document.getElementById('filterMethoRemove').textContent = this.translation.t('FilterMethodOff');
-    document.getElementById('filterMethoOff').textContent = this.translation.t('FilterMethodRemove');
+    document.getElementById('domainModeLabel').textContent = this.translation.t('popup:domainModeLabel');
+    document.getElementById('filterMethodLabel').textContent = this.translation.t('popup:filterMethodLabel');
+    document.getElementById('textWordlistLabel').textContent = this.translation.t('popup:textWordlistLabel');
+    document.getElementById('summaryTableHeader').textContent = this.translation.t('popup:summaryTableHeader');
+    document.getElementById('options').textContent = this.translation.t('popup:optionsButton');
+    document.getElementById('gettingStarted').textContent = this.translation.t('common:help');
+    document.getElementById('changelogLink').textContent = this.translation.t('common:changelog');
+    document.getElementById('supportLink').textContent = this.translation.t('common:support');
+    document.getElementById('domainModeNormal').textContent = this.translation.t('common:domainModeNormal');
+    document.getElementById('domainModeAdvanced').textContent = this.translation.t('common:domainModeAdvanced');
+    document.getElementById('domainModeDeep').textContent = this.translation.t('common:domainModeDeep');
+    document.getElementById('filterMethodCensor').textContent = this.translation.t('common:FilterMethodCensor');
+    document.getElementById('filterMethodSubstitute').textContent = this.translation.t('common:FilterMethodCSubstitute');
+    document.getElementById('filterMethoRemove').textContent = this.translation.t('common:FilterMethodOff');
+    document.getElementById('filterMethoOff').textContent = this.translation.t('common:FilterMethodRemove');
   }
 
   disableDomainSwitch() {
@@ -154,12 +154,12 @@ export default class Popup {
   }
 
   get disabledReason(): string {
-    if (this.isRestrictedPage) return this.translation.t('popupDisabledRestrictedPage');
-    if (this.isPasswordProtected) return this.translation.t('popupDisabledPasswordProtected');
-    if (this.disabledTab) return this.translation.t('popupDisabledTab');
-    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return this.translation.t('popupDisabledDomainMode');
-    if (this.domain.disabled) return this.translation.t('popupDisabledDomain');
-    if (this.isDisconnected) return this.translation.t('popupDisabledDisconnected');
+    if (this.isRestrictedPage) return this.translation.t('popup:disabledRestrictedPage');
+    if (this.isPasswordProtected) return this.translation.t('popup:disabledPasswordProtected');
+    if (this.disabledTab) return this.translation.t('popup:disabledTab');
+    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return this.translation.t('popup:disabledDomainMode');
+    if (this.domain.disabled) return this.translation.t('popup:disabledDomain');
+    if (this.isDisconnected) return this.translation.t('popup:disabledDisconnected');
     return '';
   }
 
@@ -248,8 +248,8 @@ export default class Popup {
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
     wordlistSelect.selectedIndex = wordlistIndex;
-    document.getElementById('wordlistDefault').textContent = this.translation.t('wordlistDefault');
-    document.getElementById('wordlistAllWords').textContent = this.translation.t('wordlistAllWords');
+    document.getElementById('wordlistDefault').textContent = this.translation.t('common:wordlistDefault');
+    document.getElementById('wordlistAllWords').textContent = this.translation.t('common:wordlistAllWords');
     document.getElementById('wordlist1').textContent = this.cfg.wordlists[0];
     document.getElementById('wordlist2').textContent = this.cfg.wordlists[1];
     document.getElementById('wordlist3').textContent = this.cfg.wordlists[2];
@@ -286,7 +286,7 @@ export default class Popup {
   }
 
   async initializePopup() {
-    this.translation = new this.Class.Translation('translation');
+    this.translation = new this.Class.Translation(['common', 'popup']);
     this.applyTranslation();
     await this.Class.load(this);
     this.applyTheme();

@@ -1,0 +1,13 @@
+{
+  "domainModeLabel": "Mode",
+  "filterMethodLabel": "Filter",
+  "optionsButton": "Options",
+  "disabledDisconnected": "Disconnected, please refresh page",
+  "disabledDomain": "Popup disabled for domain",
+  "disabledDomainMode": "Popup disabled by domain mode",
+  "disabledPasswordProtected": "Popup disabled by password",
+  "disabledRestrictedPage": "Popup disabled by browser",
+  "disabledTab": "Popup disabled for tab",
+  "summaryTableHeader": "Filtered Words",
+  "textWordlistLabel": "Text"
+}
