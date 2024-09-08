@@ -1,6 +1,7 @@
 import Constants from '@APF/lib/constants';
 import DataMigration from '@APF/dataMigration';
 import Domain from '@APF/domain';
+import Translation from '@APF/translation';
 import WebConfig from '@APF/webConfig';
 import { formatNumber } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
@@ -12,6 +13,7 @@ export default class Background {
   static get Constants() { return Constants; }
   static get DataMigration() { return DataMigration; }
   static get Domain() { return Domain; }
+  static get Translation() { return Translation; }
   //#endregion
 
   // #region Constants
@@ -43,6 +45,7 @@ export default class Background {
 
   static async contextMenuSetup() {
     await this.contextMenuRemoveAll();
+    const translation = new this.Translation(['common', 'background']);
 
     const requiredConfig = {
       contextMenu: this.Config._defaults.contextMenu,
@@ -54,49 +57,49 @@ export default class Background {
       if (!config.password) {
         chrome.contextMenus.create({
           id: 'addSelection',
-          title: 'Add selection to filter',
+          title: translation.t('background:addSelection'),
           contexts: ['selection'],
           documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
         });
 
         chrome.contextMenus.create({
           id: 'removeSelection',
-          title: 'Remove selection from filter',
+          title: translation.t('background:removeSelection'),
           contexts: ['selection'],
           documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
         });
 
         chrome.contextMenus.create({
           id: 'disableTabOnce',
-          title: 'Disable once',
+          title: translation.t('background:disableOnce'),
           contexts: ['all'],
           documentUrlPatterns: ['http://*/*', 'https://*/*']
         });
 
         chrome.contextMenus.create({
           id: 'toggleTabDisable',
-          title: 'Toggle for tab',
+          title: translation.t('background:toggleForTab'),
           contexts: ['all'],
           documentUrlPatterns: ['http://*/*', 'https://*/*']
         });
 
         chrome.contextMenus.create({
           id: 'toggleForDomain',
-          title: 'Toggle for domain',
+          title: translation.t('background:toggleForDomain'),
           contexts: ['all'],
           documentUrlPatterns: ['http://*/*', 'https://*/*']
         });
 
         chrome.contextMenus.create({
           id: 'toggleAdvancedForDomain',
-          title: 'Toggle advanced for domain',
+          title: translation.t('background:toggleAdvancedForDomain'),
           contexts: ['all'],
           documentUrlPatterns: ['http://*/*', 'https://*/*']
         });
 
         chrome.contextMenus.create({
           id: 'toggleFramesForDomain',
-          title: 'Toggle frames for domain',
+          title: translation.t('background:toggleFramesForDomain'),
           contexts: ['all'],
           documentUrlPatterns: ['http://*/*', 'https://*/*']
         });
@@ -104,7 +107,7 @@ export default class Background {
 
       chrome.contextMenus.create({
         id: 'options',
-        title: 'Options',
+        title: translation.t('common:options'),
         contexts: ['all']
       });
     }
@@ -215,10 +218,11 @@ export default class Background {
       if (chrome.notifications != null) {
         const showNotification = await this.Config.getSyncStorage({ showUpdateNotification: true });
         if (showNotification) {
+          const translation = new this.Translation(['common', 'background']);
           chrome.notifications.create('extensionUpdate', {
             'type': 'basic',
-            'title': 'Advanced Profanity Filter',
-            'message': 'Update installed, click for changelog.',
+            'title': translation.t('common:appName'),
+            'message': translation.t('background:updateNotificationMessage'),
             'iconUrl': 'img/icon64.png',
             'isClickable': true,
           });
