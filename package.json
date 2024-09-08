@@ -38,7 +38,7 @@
     "postrelease:all": "npm run build",
     "postrelease:build": "node bin/postbuild.mjs && npm run package",
     "postrelease:firefox:mv2": "node bin/packageSource.mjs",
-    "prebuild": "npm run clean:build && node bin/prebuild.mjs --$npm_config_environment --$npm_config_target",
+    "prebuild": "npm run clean:build && npm run build:translations && node bin/prebuild.mjs --$npm_config_environment --$npm_config_target",
     "prerelease:all": "npm run clean && npm run release:bookmarklet",
     "prerelease:build": "npm run clean:build && node bin/prebuild.mjs --release --$npm_config_target",
     "release:all": "npm run release:chrome:mv2 && npm run release:chrome:mv3 && npm run release:edgeLegacy && npm run release:firefox:mv2 && npm run release:firefox:mv3",
