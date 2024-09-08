@@ -133,7 +133,7 @@ export default class Popup {
     document.getElementById('filterMethodLabel').textContent = this.translation.t('popup:filterMethodLabel');
     document.getElementById('textWordlistLabel').textContent = this.translation.t('popup:textWordlistLabel');
     document.getElementById('summaryTableHeader').textContent = this.translation.t('popup:summaryTableHeader');
-    document.getElementById('options').textContent = this.translation.t('popup:optionsButton');
+    document.getElementById('options').textContent = this.translation.t('common:options');
     document.getElementById('gettingStarted').textContent = this.translation.t('common:help');
     document.getElementById('changelogLink').textContent = this.translation.t('common:changelog');
     document.getElementById('supportLink').textContent = this.translation.t('common:support');

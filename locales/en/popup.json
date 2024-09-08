@@ -1,7 +1,6 @@
 {
   "domainModeLabel": "Mode",
   "filterMethodLabel": "Filter",
-  "optionsButton": "Options",
   "disabledDisconnected": "Disconnected, please refresh page",
   "disabledDomain": "Popup disabled for domain",
   "disabledDomainMode": "Popup disabled by domain mode",
