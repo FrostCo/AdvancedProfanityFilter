@@ -1777,12 +1777,14 @@ export default class OptionPage {
     currentTab.classList.remove(this.Class.activeClass);
     newTab.classList.add(this.Class.activeClass);
 
-    const currentPage = document.getElementById(currentTab.textContent.toLowerCase() + 'Page') as HTMLElement;
-    const newPage = document.getElementById(newTab.textContent.toLowerCase() + 'Page') as HTMLElement;
+    const oldTabName = currentTab.id.replace('Tab', '').toLowerCase();
+    const newTabName = newTab.id.replace('Tab', '').toLowerCase();
+    const currentPage = document.getElementById(`${oldTabName}Page`) as HTMLElement;
+    const newPage = document.getElementById(`${newTabName}Page`) as HTMLElement;
     this.Class.hide(currentPage);
     this.Class.show(newPage);
 
-    switch (newTab.textContent.toLowerCase()) {
+    switch (newTabName) {
       case 'test':
         document.getElementById('testText').focus();
         break;
