@@ -6,6 +6,7 @@ import OptionAuth from '@APF/optionAuth';
 import DataMigration from '@APF/dataMigration';
 import Bookmarklet from '@APF/bookmarklet';
 import Logger from '@APF/lib/logger';
+import Translation from '@APF/translation';
 import {
   booleanToNumber,
   deepCloneJson,
@@ -35,6 +36,7 @@ export default class OptionPage {
   lightModeButton: Element;
   prefersDarkScheme: boolean;
   themeElements: Element[];
+  translation: Translation;
 
   //#region Class reference helpers
   // Can be overridden in children classes
@@ -45,6 +47,7 @@ export default class OptionPage {
   static get Domain() { return Domain; }
   static get Filter() { return Filter; }
   static get OptionAuth() { return OptionAuth; }
+  static get Translation() { return Translation; }
   get Class() { return (this.constructor as typeof OptionPage); }
   //#endregion
 
@@ -204,6 +207,8 @@ export default class OptionPage {
     this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
     this.setHelpVersion();
     this.filter = new this.Class.Filter;
+    this.translation = new this.Class.Translation;
+    this.applyTranslation();
   }
 
   applyDarkTheme(allElements = true) {
@@ -256,6 +261,22 @@ export default class OptionPage {
 
   backupConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
     exportToFile(JSON.stringify(config, null, 2), `${filePrefix}-${timeForFileName()}.json`);
+  }
+
+  applyTranslation() {
+    // Page and Header
+    document.getElementById('headTitle').textContent = this.translation.t('common:appName');
+    document.getElementById('title').textContent = this.translation.t('common:appName');
+    // Tabs
+    document.getElementById('bookmarkletTab').textContent = this.translation.t('options:bookmarkletTab');
+    document.getElementById('configTab').textContent = this.translation.t('options:configTab');
+    document.getElementById('domainsTab').textContent = this.translation.t('options:domainsTab');
+    document.getElementById('helpTab').textContent = this.translation.t('options:helpTab');
+    document.getElementById('listsTab').textContent = this.translation.t('options:listsTab');
+    document.getElementById('settingsTab').textContent = this.translation.t('options:settingsTab');
+    document.getElementById('statsTab').textContent = this.translation.t('options:statsTab');
+    document.getElementById('testTab').textContent = this.translation.t('options:testTab');
+    document.getElementById('wordsTab').textContent = this.translation.t('options:wordsTab');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
