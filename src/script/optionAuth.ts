@@ -38,7 +38,7 @@ export default class OptionAuth {
       this.setPasswordButton();
       if (this.optionPage.cfg.contextMenu) this.optionPage.sendUpdateContextMenuMessage();
     } catch (err) {
-      this.Class.OptionPage.handleError('Failed to update password.', err);
+      this.Class.OptionPage.handleError(this.optionPage.translation.t('options:passwordUpdateFailed'), err);
     }
   }
 
@@ -49,12 +49,12 @@ export default class OptionAuth {
     if (this.optionPage.cfg.password) { // Password already set
       this.Class.OptionPage.enableBtn(passwordBtn);
       if (passwordText.value) { // Password field filled
-        passwordBtn.innerText = 'SET';
+        passwordBtn.innerText = this.optionPage.translation.t('options:passwordUpdateButton');
       } else { // Empty password field
-        passwordBtn.innerText = 'REMOVE';
+        passwordBtn.innerText = this.optionPage.translation.t('options:passwordRemoveButton');
       }
     } else { // Password not already set
-      passwordBtn.innerText = 'SET';
+      passwordBtn.innerText = this.optionPage.translation.t('options:passwordUpdateButton');
       if (passwordText.value) { // Password field filled
         this.Class.OptionPage.enableBtn(passwordBtn);
       } else { // Empty password field
