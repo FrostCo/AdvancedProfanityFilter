@@ -231,12 +231,12 @@ export default class OptionPage {
     document.getElementById('domainFramesEnabledName').textContent = this.t('options:domainFramesEnabled');
     document.getElementById('domainFramesEnabledNote').textContent = this.t('options:domainFramesEnabledNote');
     document.getElementById('domainHeader').textContent = this.t('options:domainHeader');
-    document.getElementById('domainModeHeader').textContent = this.t('options:domainModeHeader');
+    document.getElementById('domainMatchModeHeader').textContent = this.t('options:domainMatchModeHeader');
     document.getElementById('domainMatchModeMinimalName').textContent = this.t('options:domainMatchModeMinimal');
     document.getElementById('domainMatchModeMinimalNote').textContent = this.t('options:domainMatchModeMinimalNote');
     document.getElementById('domainMatchModeNormalName').textContent = this.t('options:domainMatchModeNormal');
     document.getElementById('domainMatchModeNormalNote').textContent = this.t('options:domainMatchModeNormalNote');
-    document.getElementById('domainMatchModeHeader').textContent = this.t('options:domainMatchModeHeader');
+    document.getElementById('domainModeHeader').textContent = this.t('options:domainModeHeader');
     document.getElementById('domainRemove').textContent = this.t('common:removeButton');
     document.getElementById('domainSave').textContent = this.t('common:saveButton');
     document.getElementById('domainsHeader').textContent = this.t('options:domainsHeader');
