@@ -76,6 +76,7 @@
   "matchMethodPartial": "Partial",
   "matchMethodRegex": "Regex",
   "matchMethodWhole": "Whole",
+  "passwordModalHeader": "Enter Password",
   "passwordRemoveButton": "REMOVE",
   "passwordUpdateButton": "SET",
   "passwordUpdateFailed": "Failed to update password.",

@@ -430,6 +430,9 @@ export default class OptionPage {
     document.getElementById('confirmModalBackup').textContent = this.translation.t('common:backupButton');
     document.getElementById('confirmModalCancel').textContent = this.translation.t('common:cancelButton');
     document.getElementById('confirmModalOK').textContent = this.translation.t('common:okButton');
+    // Password
+    document.getElementById('passwordModalHeader').textContent = this.translation.t('options:passwordModalHeader');
+    document.getElementById('submitPassword').textContent = this.translation.t('options:submitButton');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
