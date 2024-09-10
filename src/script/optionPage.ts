@@ -416,6 +416,9 @@ export default class OptionPage {
     document.getElementById('statsTotalFilteredName').textContent = this.translation.t('options:statsSummaryTotalWordsFiltered');
     document.getElementById('statsTrackingSinceName').textContent = this.translation.t('options:statsSummaryTrackingSince');
     document.getElementById('statsWordsFilteredHeader').textContent = this.translation.t('options:statsWordsFilteredHeader');
+    // Test page
+    document.getElementById('testFilteredHeader').textContent = this.translation.t('options:testFilteredHeader');
+    document.getElementById('testHeader').textContent = this.translation.t('options:testHeader');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
