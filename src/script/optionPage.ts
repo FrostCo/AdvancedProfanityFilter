@@ -284,6 +284,14 @@ export default class OptionPage {
     document.getElementById('bulkEditorAddWords').textContent = this.translation.t('options:bulkWordEditorAddWordsButton');
     document.getElementById('bulkEditorCancel').textContent = this.translation.t('common:cancelButton');
     document.getElementById('bulkEditorSave').textContent = this.translation.t('common:save');
+    document.getElementById('bulkWordEditorMatchMethodHeader').textContent = this.translation.t('options:bulkWordEditorMatchMethodHeader');
+    document.getElementById('bulkWordEditorRemoveAllHeader').textContent = this.translation.t('options:bulkWordEditorRemoveAllHeader');
+    document.getElementById('bulkWordEditorRepeatedHeader').textContent = this.translation.t('options:bulkWordEditorRepeatedHeader');
+    document.getElementById('bulkWordEditorSeparatorsHeader').textContent = this.translation.t('options:bulkWordEditorSeparatorsHeader');
+    document.getElementById('bulkWordEditorSubstitutionCaseHeader').textContent = this.translation.t('options:bulkWordEditorSubstitutionCaseHeader');
+    document.getElementById('bulkWordEditorSubstitutionHeader').textContent = this.translation.t('options:bulkWordEditorSubstitutionHeader');
+    document.getElementById('bulkWordEditorTitle').textContent = this.translation.t('options:bulkWordEditorTitle');
+    document.getElementById('bulkWordEditorWordHeader').textContent = this.translation.t('options:bulkWordEditorWordHeader');
     // Confirm
     document.getElementById('confirmModalBackup').textContent = this.translation.t('common:backupButton');
     document.getElementById('confirmModalCancel').textContent = this.translation.t('common:cancelButton');
@@ -476,15 +484,15 @@ export default class OptionPage {
     try {
       await this.cfg.save('words');
       this.closeModal('bulkWordEditorModal');
-      this.showStatusModal('Words saved successfully.');
+      this.showStatusModal(this.translation.t('bulkWordEditorSavedStatusMessage'));
       this.filter.rebuildWordlists();
       this.populateOptions();
     } catch (err) {
       if (this.isStorageError(err) && this.cfg.syncLargeKeys) {
         this.confirm('bulkEditorSaveRetry');
       } else {
-        logger.warn('Failed to save.', err);
-        this.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
+        logger.warn(this.translation.t('bulkWordEditorFailedMessage'), err);
+        this.showErrorModal([this.translation.t('bulkWordEditorFailedMessage'), `Error: ${err.message}`]);
       }
     }
   }
@@ -496,7 +504,7 @@ export default class OptionPage {
       await this.convertStorageLocation(null, true);
       await this.bulkEditorSave();
     } catch (err) {
-      this.handleError('Failed to save.', err);
+      this.handleError(this.translation.t('bulkWordEditorFailedMessage'), err);
     }
   }
 
@@ -507,46 +515,6 @@ export default class OptionPage {
       words.push(wordText.value);
     });
     return words;
-  }
-
-  bulkWordEditorHeaderRow(): HTMLTableRowElement {
-    const row = document.createElement('tr');
-    const removeCell = document.createElement('th');
-    const removeButton = document.createElement('button');
-    removeButton.textContent = 'X';
-    removeButton.id = 'bulkEditorRemoveAll';
-    removeButton.addEventListener('click', (evt) => { this.bulkEditorRemoveAll(); });
-    const removeSpan = document.createElement('span');
-    removeSpan.textContent = 'Remove';
-    removeCell.appendChild(removeButton);
-    removeCell.appendChild(removeSpan);
-    row.appendChild(removeCell);
-
-    const normalHeaders = ['Word', 'Substitution', 'Substitution Case', 'Match Method', 'Repeated', 'Separators'];
-    normalHeaders.forEach((item) => {
-      const cell = document.createElement('th');
-      const cellSpan = document.createElement('span');
-      cellSpan.textContent = item;
-      cell.appendChild(cellSpan);
-      row.appendChild(cell);
-    });
-
-    this.cfg.wordlists.forEach((wordlist, i) => {
-      const cell = document.createElement('th');
-      const inputLabel = document.createElement('label');
-      const input = document.createElement('input');
-      const span = document.createElement('span');
-      input.type = 'checkbox';
-      input.classList.add('wordlistHeader');
-      input.dataset.col = (i + 1).toString();
-      span.textContent = `${wordlist}`;
-      inputLabel.appendChild(input);
-      inputLabel.appendChild(span);
-      cell.appendChild(inputLabel);
-      row.appendChild(cell);
-    });
-
-    return row;
   }
 
   bulkEditorWordlistCheckbox(checkbox: HTMLInputElement) {
@@ -1869,13 +1837,15 @@ export default class OptionPage {
 
   showBulkWordEditor() {
     const modalId = 'bulkWordEditorModal';
-    const title = document.querySelector(`#${modalId} h5.modalTitle`) as HTMLHeadingElement;
     const tableContainer = document.querySelector(`#${modalId} div.tableContainer`) as HTMLDivElement;
     const table = tableContainer.querySelector('table') as HTMLTableElement;
-    title.textContent = 'Bulk Word Editor';
-    if (table.tHead.rows.length === 0) { table.tHead.appendChild(this.bulkWordEditorHeaderRow()); }
     const tBody = table.querySelector('tbody') as HTMLTableSectionElement;
     removeChildren(tBody);
+
+    // Add wordlist names to header
+    this.cfg.wordlists.forEach((wordlist, i) => {
+      document.getElementById(`bulkWordEditorWordlist${i + 1}`).textContent = wordlist;
+    });
 
     // Add current words to the table
     const wordKeys = Object.keys(this.cfg.words);

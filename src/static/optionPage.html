@@ -777,11 +777,27 @@
 
 <div id="bulkWordEditorModal" class="w3-modal">
   <div class="w3-modal-content w3-card-4 w3-animate-opacity">
-    <header class="w3-container w3-flat-peter-river"><h5 class="modalTitle"></h5></header>
+    <header class="w3-container w3-flat-peter-river"><h5 id="bulkWordEditorTitle" class="modalTitle">Bulk Word Editor</h5></header>
     <div class="w3-container w3-margin w3-padding">
       <div class="tableContainer w3-card">
         <table id="bulkWordEditorTable" class="w3-table w3-striped w3-centered w3-tiny w3-hoverable">
-          <thead></thead>
+          <thead>
+            <tr>
+              <th><button id="bulkEditorRemoveAll">X</button><span id="bulkWordEditorRemoveAllHeader">Remove</span></th>
+              <th><span id="bulkWordEditorWordHeader">Word</span></th>
+              <th><span id="bulkWordEditorSubstitutionHeader">Substitution</span></th>
+              <th><span id="bulkWordEditorSubstitutionCaseHeader">Substitution Case</span></th>
+              <th><span id="bulkWordEditorMatchMethodHeader">Match Method</span></th>
+              <th><span id="bulkWordEditorRepeatedHeader">Repeated</span></th>
+              <th><span id="bulkWordEditorSeparatorsHeader">Separators</span></th>
+              <th><label><input type="checkbox" class="wordlistHeader" data-col="1"><span id="bulkWordEditorWordlist1"></span></label></th>
+              <th><label><input type="checkbox" class="wordlistHeader" data-col="2"><span id="bulkWordEditorWordlist2"></span></label></th>
+              <th><label><input type="checkbox" class="wordlistHeader" data-col="3"><span id="bulkWordEditorWordlist3"></span></label></th>
+              <th><label><input type="checkbox" class="wordlistHeader" data-col="4"><span id="bulkWordEditorWordlist4"></span></label></th>
+              <th><label><input type="checkbox" class="wordlistHeader" data-col="5"><span id="bulkWordEditorWordlist5"></span></label></th>
+              <th><label><input type="checkbox" class="wordlistHeader" data-col="6"><span id="bulkWordEditorWordlist6"></span></label></th>
+            </tr>
+          </thead>
           <tbody></tbody>
         </table>
       </div>

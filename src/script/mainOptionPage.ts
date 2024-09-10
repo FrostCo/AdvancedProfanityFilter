@@ -17,6 +17,7 @@ document.getElementById('bulkEditorAddWord').addEventListener('click', (evt) => 
 document.getElementById('bulkEditorAddWords').addEventListener('click', (evt) => { option.bulkEditorAddWords(); });
 document.getElementById('bulkEditorCancel').addEventListener('click', (evt) => { option.closeModal('bulkWordEditorModal'); });
 document.getElementById('bulkEditorSave').addEventListener('click', (evt) => { option.confirm('bulkEditorSave'); });
+document.getElementById('bulkEditorRemoveAll').addEventListener('click', (evt) => { option.bulkEditorRemoveAll(); });
 // Settings
 document.querySelectorAll('#filterMethod input').forEach((el) => { el.addEventListener('click', (evt) => { option.selectFilterMethod(evt.target as HTMLInputElement); }); });
 document.getElementById('censorCharacterSelect').addEventListener('change', (evt) => { option.saveOptions(); });
