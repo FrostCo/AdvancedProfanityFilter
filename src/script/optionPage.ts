@@ -608,8 +608,8 @@ export default class OptionPage {
 
     switch (action) {
       case 'bulkEditorSave':
-        paragraph.textContent = 'Are you sure you want to save these changes?';
-        italics.textContent = 'Make sure you have a backup first!';
+        paragraph.textContent = this.translation.t('options:confirmBulkWordEditorSaveMessage');
+        italics.textContent = this.translation.t('options:confirmBulkWordEditorSaveNoteMessage');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: true }, content);
@@ -617,8 +617,8 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'bulkEditorSaveRetry':
-        paragraph.textContent = 'Failed to save changes because they were too large to be stored. Retry using local storage?';
-        italics.textContent = 'Local storage can store more, but things like words and domains will no longer sync between devices.';
+        paragraph.textContent = this.translation.t('options:confirmBulkWordEditorSaveRetryMessage');
+        italics.textContent = this.translation.t('options:confirmLocalStorageNoteMessage');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: true, titleClass: 'w3-red' }, content);
@@ -627,11 +627,11 @@ export default class OptionPage {
         break;
       case 'convertStorageLocation':
         if (this.cfg.syncLargeKeys) {
-          paragraph.textContent = 'This will prevent large settings like words and domains from syncing, but allow you to store more.';
+          paragraph.textContent = this.translation.t('options:confirmConvertStorageToLocalMessage');
         } else {
-          paragraph.textContent = 'This will allow large settings like words and domains to sync, but has stricter limits on how much you can store.';
+          paragraph.textContent = this.translation.t('options:confirmConvertStorageToSyncMessage');
         }
-        italics.textContent = 'Make sure you have a backup first!';
+        italics.textContent = this.translation.t('options:confirmConvertStorageNoteMessage');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: true }, content);
@@ -641,13 +641,13 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfig':
-        this.configureConfirmModal({ content: 'Are you sure you want to overwrite your existing settings?', backup: true });
+        this.configureConfirmModal({ content: this.translation.t('options:confirmImportConfigMessage'), backup: true });
         this._confirmEventListeners.push(this.importConfig.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfigRetry':
-        paragraph.textContent = 'Import failed due to storage limitations. Would you like to try again using local storage?';
-        italics.textContent = 'Local storage can store more, but things like words and domains will no longer sync between devices.';
+        paragraph.textContent = this.translation.t('options:confirmImportConfigRetryMessage');
+        italics.textContent = this.translation.t('options:confirmLocalStorageNoteMessage');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
@@ -657,7 +657,7 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'removeAllWords':
-        paragraph.textContent = 'Are you sure you want to remove all words?';
+        paragraph.textContent = this.translation.t('options:confirmRemoveAllWordsMessage');
         content.appendChild(paragraph);
         this.configureConfirmModal({ backup: true }, content);
         this._confirmEventListeners.push(this.removeAllWords.bind(this));
@@ -667,30 +667,35 @@ export default class OptionPage {
         validated = this.validateLessUsedWordsNumber();
         if (validated) {
           await this.prepareLessUsedWords();
-          if (Object.keys(this.lessUsedWords).length) {
-            this.configureConfirmModal({ backup: true, content: `Are you sure you want to remove ${Object.keys(this.lessUsedWords).length} words?` });
+          const count = Object.keys(this.lessUsedWords).length;
+          if (count) {
+            this.configureConfirmModal({
+              backup: true,
+              content: this.translation.t('options:confirmRemoveLessUsedWordsMessage', { count: count }),
+            });
             this._confirmEventListeners.push(this.removeLessUsedWords.bind(this));
             ok.addEventListener('click', lastElement(this._confirmEventListeners));
           } else {
             validated = false;
-            this.showStatusModal(
-              'All words have been filtered more times than the provided number.\n\nTry increasing the number to include more words.'
-            );
+            this.showStatusModal(`
+              ${this.translation.t('options:confirmRemoveLessUsedWordsUnderMessage')}
+              ${this.translation.t('options:confirmRemoveLessUsedWordsUnderMessageNote')}
+            `);
           }
         }
         break;
       case 'statsImport':
-        this.configureConfirmModal({ content: 'Are you sure you want to overwrite your statistics?' });
+        this.configureConfirmModal({ content: this.translation.t('options:confirmStatsImportMessage') });
         this._confirmEventListeners.push(this.importStats.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'statsReset':
-        this.configureConfirmModal({ content: 'Are you sure you want to reset filter statistics?' });
+        this.configureConfirmModal({ content: this.translation.t('options:confirmStatsResetMessage') });
         this._confirmEventListeners.push(this.statsReset.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'restoreDefaults':
-        this.configureConfirmModal({ content: 'Are you sure you want to restore defaults?', backup: true });
+        this.configureConfirmModal({ content: this.translation.t('options:confirmRestoreDefaultsMessage'), backup: true });
         this._confirmEventListeners.push(this.restoreDefaults.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
@@ -699,7 +704,10 @@ export default class OptionPage {
         const passwordBtn = document.getElementById('setPasswordBtn') as HTMLInputElement;
         if (passwordBtn.classList.contains('disabled')) return false;
 
-        const message = passwordText.value == '' ? 'Are you sure you want to remove the password?' : `Are you sure you want to set the password to '${passwordText.value}'?`;
+        const message = passwordText.value == ''
+          ? this.translation.t('options:confirmPasswordRemoveMessage')
+          : this.translation.t('options:confirmPasswordSetMessage', { password: passwordText.value })
+        ;
         this.configureConfirmModal({ content: message });
         this._confirmEventListeners.push(this.auth.setPassword.bind(this.auth));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
