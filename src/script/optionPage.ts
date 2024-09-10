@@ -550,8 +550,8 @@ export default class OptionPage {
 
     const defaults = {
       backup: false,
-      content: this.translation.t('confirmModalDefaultContent'),
-      title: this.translation.t('confirmModalDefaultTitle'),
+      content: this.translation.t('options:confirmModalDefaultContent'),
+      title: this.translation.t('options:confirmModalDefaultTitle'),
       titleClass: 'w3-flat-peter-river',
     };
     settings = Object.assign(defaults, settings);
@@ -740,19 +740,19 @@ export default class OptionPage {
         }
 
         if (!silent) {
-          this.showStatusModal(this.translation.t('storageConvertedMessage'));
+          this.showStatusModal(this.translation.t('options:storageConvertedMessage'));
         }
       } catch (err) {
         // Revert UI and export a backup of config.
         this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
         this.backupConfig();
-        this.handleError(this.translation.t('storageCovnersionCleanupFailedMessage'), err);
+        this.handleError(this.translation.t('options:storageCovnersionCleanupFailedMessage'), err);
         await this.cfg.save('syncLargeKeys');
         this.populateConfig();
       }
     } catch (err) {
       // Revert UI
-      this.handleError(this.translation.t('storageConvertsionFailedMessage'), err);
+      this.handleError(this.translation.t('options:storageConvertsionFailedMessage'), err);
       this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
       this.populateConfig();
     }
