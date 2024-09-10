@@ -1,6 +1,7 @@
 {
   "appName": "Advanced Profanity Filter",
   "appShortName": "APF",
+  "backupButton": "BACKUP",
   "cancelButton": "CANCEL",
   "changelog": "Changelog",
   "domainModeAdvanced": "Advanced",
@@ -13,6 +14,7 @@
   "filterMethodSubstitute": "Substitute",
   "help": "Help",
   "import": "IMPORT",
+  "okButton": "OK",
   "options": "Options",
   "remove": "REMOVE",
   "removeAll": "REMOVE ALL",

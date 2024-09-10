@@ -426,6 +426,10 @@ export default class OptionPage {
     document.getElementById('bulkEditorAddWords').textContent = this.translation.t('options:bulkWordEditorAddWordsButton');
     document.getElementById('bulkEditorCancel').textContent = this.translation.t('common:cancelButton');
     document.getElementById('bulkEditorSave').textContent = this.translation.t('common:save');
+    // Confirm
+    document.getElementById('confirmModalBackup').textContent = this.translation.t('common:backupButton');
+    document.getElementById('confirmModalCancel').textContent = this.translation.t('common:cancelButton');
+    document.getElementById('confirmModalOK').textContent = this.translation.t('common:okButton');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
