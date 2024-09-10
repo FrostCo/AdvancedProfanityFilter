@@ -13,10 +13,10 @@ document.getElementById('confirmModalBackup').addEventListener('click', (evt) =>
 document.getElementById('confirmModalOK').addEventListener('click', (evt) => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('confirmModalCancel').addEventListener('click', (evt) => { OptionPage.closeModal('confirmModal'); });
 document.getElementById('statusModalOK').addEventListener('click', (evt) => { OptionPage.closeModal('statusModal'); });
-document.querySelector('#bulkWordEditorModal button.modalAddWord').addEventListener('click', (evt) => { option.bulkEditorAddRow(); });
-document.querySelector('#bulkWordEditorModal button.modalBulkAddWords').addEventListener('click', (evt) => { option.bulkEditorAddWords(); });
-document.querySelector('#bulkWordEditorModal button.modalCancel').addEventListener('click', (evt) => { OptionPage.closeModal('bulkWordEditorModal'); });
-document.querySelector('#bulkWordEditorModal button.modalSave').addEventListener('click', (evt) => { option.confirm('bulkEditorSave'); });
+document.getElementById('bulkEditorAddWord').addEventListener('click', (evt) => { option.bulkEditorAddRow(); });
+document.getElementById('bulkEditorAddWords').addEventListener('click', (evt) => { option.bulkEditorAddWords(); });
+document.getElementById('bulkEditorCancel').addEventListener('click', (evt) => { OptionPage.closeModal('bulkWordEditorModal'); });
+document.getElementById('bulkEditorSave').addEventListener('click', (evt) => { option.confirm('bulkEditorSave'); });
 // Settings
 document.querySelectorAll('#filterMethod input').forEach((el) => { el.addEventListener('click', (evt) => { option.selectFilterMethod(evt.target as HTMLInputElement); }); });
 document.getElementById('censorCharacterSelect').addEventListener('change', (evt) => { option.saveOptions(); });

@@ -419,6 +419,13 @@ export default class OptionPage {
     // Test page
     document.getElementById('testFilteredHeader').textContent = this.translation.t('options:testFilteredHeader');
     document.getElementById('testHeader').textContent = this.translation.t('options:testHeader');
+    // Modals
+    // Word Bulk Editor
+    (document.getElementById('bulkAddWordsText') as HTMLTextAreaElement).placeholder = this.translation.t('options:bulkWordEditorBoxPlaceholder');
+    document.getElementById('bulkEditorAddWord').textContent = this.translation.t('options:bulkWordEditorAddWordButton');
+    document.getElementById('bulkEditorAddWords').textContent = this.translation.t('options:bulkWordEditorAddWordsButton');
+    document.getElementById('bulkEditorCancel').textContent = this.translation.t('common:cancelButton');
+    document.getElementById('bulkEditorSave').textContent = this.translation.t('common:save');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {

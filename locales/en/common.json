@@ -1,6 +1,7 @@
 {
   "appName": "Advanced Profanity Filter",
   "appShortName": "APF",
+  "cancelButton": "CANCEL",
   "changelog": "Changelog",
   "domainModeAdvanced": "Advanced",
   "domainModeDeep": "Deep",
