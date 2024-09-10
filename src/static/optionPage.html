@@ -342,66 +342,66 @@
 
 <div id="domainsPage" class="w3-container w3-hide">
   <div id="disabledDomainContainer" class="w3-half">
-    <h4 class="sectionHeader">Domain Mode</h4>
+    <h4 id="domainPageModeHeader" class="sectionHeader">Domain Mode</h4>
 
     <div id="domainMode">
       <label>
         <input id="domainModeNormal" type="radio" class="w3-radio" name="domainMode" value="normal">
-        Normal
-        <span class="notes">Filter all domains</span>
+        <span id="domainModeNormalName">Normal</span>
+        <span id="domainModeNormalNote" class="notes">Filter all domains</span>
       </label>
 
       <br>
       <label>
         <input id="domainModeMinimal" type="radio" class="w3-radio" name="domainMode" value="minimal">
-        Minimal
-        <span class="notes">Only filter enabled domains</span>
+        <span id="domainModeMinimalName">Minimal</span>
+        <span id="domainModeMinimalNote" class="notes">Only filter enabled domains</span>
       </label>
     </div>
 
     <br>
-    <h4 class="sectionHeader">Frame Mode</h4>
+    <h4 id="domainFrameModeHeader" class="sectionHeader">Frame Mode</h4>
     <label>
       <input id="domainFilterAllFrames" type="checkbox" class="w3-check">
-      Filter all frames
-      <span class="notes">Filter frames on all domains</span>
+      <span id="domainFilterAllFramesName">Filter all frames</span>
+      <span id="domainFilterAllFramesNote" class="notes">Filter frames on all domains</span>
     </label>
   </div>
 
   <div id="domainRightContainer" class="w3-half w3-right">
-    <h4 class="sectionHeader">Domains</h4>
+    <h4 id="domainsHeader" class="sectionHeader">Domains</h4>
     <select id="domainSelect" class="w3-select w3-border small textInput" style="display:block"></select>
-    <h4 class="sectionHeader">Domain</h4>
+    <h4 id="domainHeader" class="sectionHeader">Domain</h4>
     <input id="domainText" class="w3-input w3-border small" type="text" pattern="^([a-zA-Z0-9\.-]+\.[a-zA-Z0-9\.-]+|localhost)$"/>
-    <span class="notes">Example: "google.com" or "mail.google.com"</span>
+    <span id="domainTextNote" class="notes">Example: 'google.com' or 'mail.google.com'</span>
 
     <div style="padding-top: 8px;">
       <label id="domainDisabledLabel" class="w3-hide">
         <input id="domainDisabledCheck" type="checkbox" class="w3-check">
-        Filter disabled
-        <span class="notes">Don't filter pages on this domain</span>
+        <span id="domainDisabledName">Filter disabled</span>
+        <span id="domainDisabledNote" class="notes">Don't filter pages on this domain</span>
       </label>
       <label id="domainEnabledLabel" class="w3-hide">
         <input id="domainEnabledCheck" type="checkbox" class="w3-check">
-        Filter enabled
-        <span class="notes">Filter pages on this domain</span>
+        <span id="domainEnabledName">Filter enabled</span>
+        <span id="domainEnabledNote" class="notes">Filter pages on this domain</span>
       </label>
       <label id="domainFramesOffLabel" class="w3-hide">
         <input id="domainFramesOffCheck" type="checkbox" class="w3-check">
-        Frames disabled
-        <span class="notes">Disable filtering frames on this domain</span>
+        <span id="domainFramesDisabledName">Frames disabled</span>
+        <span id="domainFramesDisabledNote" class="notes">Disable filtering frames on this domain</span>
       </label>
       <label id="domainFramesOnLabel" class="w3-hide">
         <input id="domainFramesOnCheck" type="checkbox" class="w3-check">
-        Frames enabled
-        <span class="notes">Filter frames on this domain</span>
+        <span id="domainFramesEnabledName">Frames enabled</span>
+        <span id="domainFramesEnabledNote" class="notes">Filter frames on this domain</span>
       </label>
-      <h4 class="sectionHeader">Mode</h4>
+      <h4 id="domainModeHeader" class="sectionHeader">Mode</h4>
       <select id="domainModeSelect" class="w3-select w3-border small textInput"></select>
     </div>
 
     <div id="domainWordlistContainer" class="w3-hide">
-      <h4 class="sectionHeader">Text Wordlist</h4>
+      <h4 id="domainTextWordlistHeader" class="sectionHeader">Text Wordlist</h4>
       <select id="domainWordlistSelect" class="w3-select w3-border small textInput"></select><span class="notes"></span>
     </div>
 

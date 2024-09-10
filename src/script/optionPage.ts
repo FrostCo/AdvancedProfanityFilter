@@ -356,6 +356,32 @@ export default class OptionPage {
     document.getElementById('wordlistNameHeader').textContent = this.translation.t('options:wordlistNameHeader');
     document.getElementById('wordlistRename').textContent = this.translation.t('common:rename');
     document.getElementById('wordlistsHeader').textContent = this.translation.t('common:wordlists');
+    // Domains page
+    document.getElementById('domainDisabledName').textContent = this.translation.t('options:domainDisabled');
+    document.getElementById('domainDisabledName').textContent = this.translation.t('options:domainDisabled');
+    document.getElementById('domainDisabledNote').textContent = this.translation.t('options:domainDisabledNote');
+    document.getElementById('domainDisabledNote').textContent = this.translation.t('options:domainDisabledNote');
+    document.getElementById('domainEnabledName').textContent = this.translation.t('options:domainEnabled');
+    document.getElementById('domainEnabledNote').textContent = this.translation.t('options:domainEnabledNote');
+    document.getElementById('domainFilterAllFramesName').textContent = this.translation.t('options:domainFilterAllFramesName');
+    document.getElementById('domainFilterAllFramesNote').textContent = this.translation.t('options:domainFilterAllFramesNote');
+    document.getElementById('domainFrameModeHeader').textContent = this.translation.t('options:domainFrameModeHeader');
+    document.getElementById('domainFramesDisabledName').textContent = this.translation.t('options:domainFramesDisabled');
+    document.getElementById('domainFramesDisabledNote').textContent = this.translation.t('options:domainFramesDisabledNote');
+    document.getElementById('domainFramesEnabledName').textContent = this.translation.t('options:domainFramesEnabled');
+    document.getElementById('domainFramesEnabledNote').textContent = this.translation.t('options:domainFramesEnabledNote');
+    document.getElementById('domainHeader').textContent = this.translation.t('options:domainHeader');
+    document.getElementById('domainModeHeader').textContent = this.translation.t('options:domainModeHeader');
+    document.getElementById('domainModeMinimalName').textContent = this.translation.t('options:domainModeMinimal');
+    document.getElementById('domainModeMinimalNote').textContent = this.translation.t('options:domainModeMinimalNote');
+    document.getElementById('domainModeNormalName').textContent = this.translation.t('options:domainModeNormal');
+    document.getElementById('domainModeNormalNote').textContent = this.translation.t('options:domainModeNormalNote');
+    document.getElementById('domainPageModeHeader').textContent = this.translation.t('options:domainPageModeHeader');
+    document.getElementById('domainRemove').textContent = this.translation.t('common:remove');
+    document.getElementById('domainSave').textContent = this.translation.t('common:save');
+    document.getElementById('domainsHeader').textContent = this.translation.t('options:domainsHeader');
+    document.getElementById('domainTextNote').textContent = this.translation.t('options:domainNote');
+    document.getElementById('domainTextWordlistHeader').textContent = this.translation.t('options:domainTextWordlistHeader');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
