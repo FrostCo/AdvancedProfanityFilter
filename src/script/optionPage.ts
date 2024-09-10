@@ -125,184 +125,184 @@ export default class OptionPage {
 
   applyTranslation() {
     // Page and Header
-    document.getElementById('headTitle').textContent = this.translation.t('common:appName');
-    document.getElementById('title').textContent = this.translation.t('common:appName');
+    document.getElementById('headTitle').textContent = this.t('common:appName');
+    document.getElementById('title').textContent = this.t('common:appName');
     // Tabs
-    document.getElementById('bookmarkletTab').textContent = this.translation.t('options:bookmarkletTab');
-    document.getElementById('configTab').textContent = this.translation.t('options:configTab');
-    document.getElementById('domainsTab').textContent = this.translation.t('options:domainsTab');
-    document.getElementById('helpTab').textContent = this.translation.t('options:helpTab');
-    document.getElementById('listsTab').textContent = this.translation.t('options:listsTab');
-    document.getElementById('settingsTab').textContent = this.translation.t('options:settingsTab');
-    document.getElementById('statsTab').textContent = this.translation.t('options:statsTab');
-    document.getElementById('testTab').textContent = this.translation.t('options:testTab');
-    document.getElementById('wordsTab').textContent = this.translation.t('options:wordsTab');
+    document.getElementById('bookmarkletTab').textContent = this.t('options:bookmarkletTab');
+    document.getElementById('configTab').textContent = this.t('options:configTab');
+    document.getElementById('domainsTab').textContent = this.t('options:domainsTab');
+    document.getElementById('helpTab').textContent = this.t('options:helpTab');
+    document.getElementById('listsTab').textContent = this.t('options:listsTab');
+    document.getElementById('settingsTab').textContent = this.t('options:settingsTab');
+    document.getElementById('statsTab').textContent = this.t('options:statsTab');
+    document.getElementById('testTab').textContent = this.t('options:testTab');
+    document.getElementById('wordsTab').textContent = this.t('options:wordsTab');
     // Settings page
-    document.getElementById('censorCharacterName').textContent = this.translation.t('options:censorCharacter');
-    document.getElementById('censorFixedLengthName').textContent = this.translation.t('options:censorFixedLength');
-    document.getElementById('censorFixedLengthOriginal').textContent = this.translation.t('options:censorFixedLengthOriginal');
-    document.getElementById('censorSettingsHeader').textContent = this.translation.t('options:censorSettingsHeader');
-    document.getElementById('defaultSettingsHeader').textContent = this.translation.t('options:defaultSettingsHeader');
-    document.getElementById('defaultSubstitutionName').textContent = this.translation.t('options:substitutionDefaultSubstitution');
-    document.getElementById('defaultWordMatchMethodName').textContent = this.translation.t('options:defaultWordMatchMethod');
-    document.getElementById('defaultWordMatchRepeatedName').textContent = this.translation.t('options:defaultWordMatchRepeated');
-    document.getElementById('defaultWordMatchRepeatedNote').textContent = this.translation.t('options:defaultWordMatchRepeatedNote');
-    document.getElementById('defaultWordMatchSeparatorsName').textContent = this.translation.t('options:defaultWordMatchSeparators');
-    document.getElementById('defaultWordMatchSeparatorsNote').textContent = this.translation.t('options:defaultWordMatchSeparatorsNote');
-    document.getElementById('filterCensorName').textContent = this.translation.t('common:filterMethodCensor');
-    document.getElementById('filterMethodCensorNote').textContent = this.translation.t('options:filterMethodCensorNote');
-    document.getElementById('filterMethodHeader').textContent = this.translation.t('options:filterMethodHeader');
-    document.getElementById('filterMethodOffNote').textContent = this.translation.t('options:filterMethodOffNote');
-    document.getElementById('filterMethodRemoveNote').textContent = this.translation.t('options:filterMethodRemoveNote');
-    document.getElementById('filterMethodSubstituteNote').textContent = this.translation.t('options:filterMethodSubstituteNote');
-    document.getElementById('filterOffName').textContent = this.translation.t('common:filterMethodOff');
-    document.getElementById('filterRemoveName').textContent = this.translation.t('common:filterMethodRemove');
-    document.getElementById('filterSubstituteName').textContent = this.translation.t('common:filterMethodSubstitute');
-    document.getElementById('generalSettingsHeader').textContent = this.translation.t('options:generalSettingsHeader');
-    document.getElementById('preserveFirstName').textContent = this.translation.t('options:censorPreserveFirst');
-    document.getElementById('preserveFirstNote').textContent = this.translation.t('options:censorPreserveFirstNote');
-    document.getElementById('preserveLastName').textContent = this.translation.t('options:censorPreserveLast');
-    document.getElementById('preserveLastNote').textContent = this.translation.t('options:censorPreserveLastNote');
-    document.getElementById('showContextMenuName').textContent = this.translation.t('options:showContextMenu');
-    document.getElementById('showContextMenuNote').textContent = this.translation.t('options:showContextMenuNote');
-    document.getElementById('showCounterName').textContent = this.translation.t('options:showCounter');
-    document.getElementById('showCounterNote').textContent = this.translation.t('options:showCounterNote');
-    document.getElementById('showSummaryName').textContent = this.translation.t('options:showSummary');
-    document.getElementById('showSummaryNote').textContent = this.translation.t('options:showSummaryNote');
-    document.getElementById('showUpdateNotificationName').textContent = this.translation.t('options:showContextMenuNote');
-    document.getElementById('substitutionMarkName').textContent = this.translation.t('options:substitutionMark');
-    document.getElementById('substitutionMarkNote').textContent = this.translation.t('options:substitutionMarkNote');
-    document.getElementById('substitutionPreserveCaseName').textContent = this.translation.t('options:substitutionPreserveCase');
-    document.getElementById('substitutionPreserveCaseNote').textContent = this.translation.t('options:substitutionPreserveCaseNote');
-    document.getElementById('substitutionSettingsHeader').textContent = this.translation.t('options:substitutionSettingsHeader');
-    document.getElementById('useDeviceThemeName').textContent = this.translation.t('options:useDeviceTheme');
-    document.getElementById('useDeviceThemeNote').textContent = this.translation.t('options:useDeviceThemeNote');
+    document.getElementById('censorCharacterName').textContent = this.t('options:censorCharacter');
+    document.getElementById('censorFixedLengthName').textContent = this.t('options:censorFixedLength');
+    document.getElementById('censorFixedLengthOriginal').textContent = this.t('options:censorFixedLengthOriginal');
+    document.getElementById('censorSettingsHeader').textContent = this.t('options:censorSettingsHeader');
+    document.getElementById('defaultSettingsHeader').textContent = this.t('options:defaultSettingsHeader');
+    document.getElementById('defaultSubstitutionName').textContent = this.t('options:substitutionDefaultSubstitution');
+    document.getElementById('defaultWordMatchMethodName').textContent = this.t('options:defaultWordMatchMethod');
+    document.getElementById('defaultWordMatchRepeatedName').textContent = this.t('options:defaultWordMatchRepeated');
+    document.getElementById('defaultWordMatchRepeatedNote').textContent = this.t('options:defaultWordMatchRepeatedNote');
+    document.getElementById('defaultWordMatchSeparatorsName').textContent = this.t('options:defaultWordMatchSeparators');
+    document.getElementById('defaultWordMatchSeparatorsNote').textContent = this.t('options:defaultWordMatchSeparatorsNote');
+    document.getElementById('filterCensorName').textContent = this.t('common:filterMethodCensor');
+    document.getElementById('filterMethodCensorNote').textContent = this.t('options:filterMethodCensorNote');
+    document.getElementById('filterMethodHeader').textContent = this.t('options:filterMethodHeader');
+    document.getElementById('filterMethodOffNote').textContent = this.t('options:filterMethodOffNote');
+    document.getElementById('filterMethodRemoveNote').textContent = this.t('options:filterMethodRemoveNote');
+    document.getElementById('filterMethodSubstituteNote').textContent = this.t('options:filterMethodSubstituteNote');
+    document.getElementById('filterOffName').textContent = this.t('common:filterMethodOff');
+    document.getElementById('filterRemoveName').textContent = this.t('common:filterMethodRemove');
+    document.getElementById('filterSubstituteName').textContent = this.t('common:filterMethodSubstitute');
+    document.getElementById('generalSettingsHeader').textContent = this.t('options:generalSettingsHeader');
+    document.getElementById('preserveFirstName').textContent = this.t('options:censorPreserveFirst');
+    document.getElementById('preserveFirstNote').textContent = this.t('options:censorPreserveFirstNote');
+    document.getElementById('preserveLastName').textContent = this.t('options:censorPreserveLast');
+    document.getElementById('preserveLastNote').textContent = this.t('options:censorPreserveLastNote');
+    document.getElementById('showContextMenuName').textContent = this.t('options:showContextMenu');
+    document.getElementById('showContextMenuNote').textContent = this.t('options:showContextMenuNote');
+    document.getElementById('showCounterName').textContent = this.t('options:showCounter');
+    document.getElementById('showCounterNote').textContent = this.t('options:showCounterNote');
+    document.getElementById('showSummaryName').textContent = this.t('options:showSummary');
+    document.getElementById('showSummaryNote').textContent = this.t('options:showSummaryNote');
+    document.getElementById('showUpdateNotificationName').textContent = this.t('options:showContextMenuNote');
+    document.getElementById('substitutionMarkName').textContent = this.t('options:substitutionMark');
+    document.getElementById('substitutionMarkNote').textContent = this.t('options:substitutionMarkNote');
+    document.getElementById('substitutionPreserveCaseName').textContent = this.t('options:substitutionPreserveCase');
+    document.getElementById('substitutionPreserveCaseNote').textContent = this.t('options:substitutionPreserveCaseNote');
+    document.getElementById('substitutionSettingsHeader').textContent = this.t('options:substitutionSettingsHeader');
+    document.getElementById('useDeviceThemeName').textContent = this.t('options:useDeviceTheme');
+    document.getElementById('useDeviceThemeNote').textContent = this.t('options:useDeviceThemeNote');
     // Words page
-    document.getElementById('bulkWordEditorButton').textContent = this.translation.t('options:wordBulkEditorButton');
-    document.getElementById('filterWordListName').textContent = this.translation.t('options:filterWordList');
-    document.getElementById('includeInWordlistsHeader').textContent = this.translation.t('options:includeInWordlistsHeader');
-    document.getElementById('wordCaseSensitive').textContent = this.translation.t('options:wordCaseSensitive');
-    document.getElementById('wordMatchExactName').textContent = this.translation.t('options:matchMethodExact');
-    document.getElementById('wordMatchExactNote').textContent = this.translation.t('options:wordMatchExactNote');
-    document.getElementById('wordMatchMethodHeader').textContent = this.translation.t('options:wordMatchMethodHeader');
-    document.getElementById('wordMatchPartialName').textContent = this.translation.t('options:matchMethodPartial');
-    document.getElementById('wordMatchPartialNote').textContent = this.translation.t('options:wordMatchPartialNote');
-    document.getElementById('wordMatchRegexName').textContent = this.translation.t('options:matchMethodRegex');
-    document.getElementById('wordMatchRegexNote').textContent = this.translation.t('options:wordMatchRegexNote');
-    document.getElementById('wordMatchRepeatedName').textContent = this.translation.t('options:wordMatchRepeated');
-    document.getElementById('wordMatchRepeatedNote').textContent = this.translation.t('options:wordMatchRepeatedNote');
-    document.getElementById('wordMatchSeparatorsName').textContent = this.translation.t('options:wordMatchSeparators');
-    document.getElementById('wordMatchSeparatorsNote').textContent = this.translation.t('options:wordMatchSeparatorsNote');
-    document.getElementById('wordMatchWholeName').textContent = this.translation.t('options:matchMethodWhole');
-    document.getElementById('wordMatchWholeNote').textContent = this.translation.t('options:wordMatchWholeNote');
-    document.getElementById('wordOtherHeader').textContent = this.translation.t('options:wordOtherHeader');
-    document.getElementById('wordPhraseHeader').textContent = this.translation.t('options:wordPhraseHeader');
-    document.getElementById('wordRemove').textContent = this.translation.t('common:remove');
-    document.getElementById('wordRemoveAll').textContent = this.translation.t('common:removeAll');
-    document.getElementById('wordSave').textContent = this.translation.t('common:save');
-    document.getElementById('wordsHeader').textContent = this.translation.t('options:wordsAndPhrasesHeader');
-    document.getElementById('wordSubstitutionHeader').textContent = this.translation.t('options:wordSubstitutionHeader');
+    document.getElementById('bulkWordEditorButton').textContent = this.t('options:wordBulkEditorButton');
+    document.getElementById('filterWordListName').textContent = this.t('options:filterWordList');
+    document.getElementById('includeInWordlistsHeader').textContent = this.t('options:includeInWordlistsHeader');
+    document.getElementById('wordCaseSensitive').textContent = this.t('options:wordCaseSensitive');
+    document.getElementById('wordMatchExactName').textContent = this.t('options:matchMethodExact');
+    document.getElementById('wordMatchExactNote').textContent = this.t('options:wordMatchExactNote');
+    document.getElementById('wordMatchMethodHeader').textContent = this.t('options:wordMatchMethodHeader');
+    document.getElementById('wordMatchPartialName').textContent = this.t('options:matchMethodPartial');
+    document.getElementById('wordMatchPartialNote').textContent = this.t('options:wordMatchPartialNote');
+    document.getElementById('wordMatchRegexName').textContent = this.t('options:matchMethodRegex');
+    document.getElementById('wordMatchRegexNote').textContent = this.t('options:wordMatchRegexNote');
+    document.getElementById('wordMatchRepeatedName').textContent = this.t('options:wordMatchRepeated');
+    document.getElementById('wordMatchRepeatedNote').textContent = this.t('options:wordMatchRepeatedNote');
+    document.getElementById('wordMatchSeparatorsName').textContent = this.t('options:wordMatchSeparators');
+    document.getElementById('wordMatchSeparatorsNote').textContent = this.t('options:wordMatchSeparatorsNote');
+    document.getElementById('wordMatchWholeName').textContent = this.t('options:matchMethodWhole');
+    document.getElementById('wordMatchWholeNote').textContent = this.t('options:wordMatchWholeNote');
+    document.getElementById('wordOtherHeader').textContent = this.t('options:wordOtherHeader');
+    document.getElementById('wordPhraseHeader').textContent = this.t('options:wordPhraseHeader');
+    document.getElementById('wordRemove').textContent = this.t('common:remove');
+    document.getElementById('wordRemoveAll').textContent = this.t('common:removeAll');
+    document.getElementById('wordSave').textContent = this.t('common:save');
+    document.getElementById('wordsHeader').textContent = this.t('options:wordsAndPhrasesHeader');
+    document.getElementById('wordSubstitutionHeader').textContent = this.t('options:wordSubstitutionHeader');
     // Lists page
-    document.getElementById('allowlistHeader').textContent = this.translation.t('options:allowlistHeader');
-    document.getElementById('allowlistInsensitiveName').textContent = this.translation.t('options:allowlistInsensitive');
-    document.getElementById('allowlistInsensitiveNote').textContent = this.translation.t('options:allowlistInsensitiveNote');
-    document.getElementById('allowlistNote').textContent = this.translation.t('options:allowlistNote');
-    document.getElementById('allowlistRemove').textContent = this.translation.t('common:remove');
-    document.getElementById('allowlistSave').textContent = this.translation.t('common:save');
-    document.getElementById('allowlistSensitiveName').textContent = this.translation.t('options:allowlistSensitive');
-    document.getElementById('allowlistSensitiveNote').textContent = this.translation.t('options:allowlistSensitiveNote');
-    document.getElementById('defaultTextWordlistHeader').textContent = this.translation.t('options:defaultTextWordlistHeader');
-    document.getElementById('listWordPhraseHeader').textContent = this.translation.t('options:wordPhraseHeader');
-    document.getElementById('wordlistNameHeader').textContent = this.translation.t('options:wordlistNameHeader');
-    document.getElementById('wordlistRename').textContent = this.translation.t('common:rename');
-    document.getElementById('wordlistsHeader').textContent = this.translation.t('common:wordlists');
+    document.getElementById('allowlistHeader').textContent = this.t('options:allowlistHeader');
+    document.getElementById('allowlistInsensitiveName').textContent = this.t('options:allowlistInsensitive');
+    document.getElementById('allowlistInsensitiveNote').textContent = this.t('options:allowlistInsensitiveNote');
+    document.getElementById('allowlistNote').textContent = this.t('options:allowlistNote');
+    document.getElementById('allowlistRemove').textContent = this.t('common:remove');
+    document.getElementById('allowlistSave').textContent = this.t('common:save');
+    document.getElementById('allowlistSensitiveName').textContent = this.t('options:allowlistSensitive');
+    document.getElementById('allowlistSensitiveNote').textContent = this.t('options:allowlistSensitiveNote');
+    document.getElementById('defaultTextWordlistHeader').textContent = this.t('options:defaultTextWordlistHeader');
+    document.getElementById('listWordPhraseHeader').textContent = this.t('options:wordPhraseHeader');
+    document.getElementById('wordlistNameHeader').textContent = this.t('options:wordlistNameHeader');
+    document.getElementById('wordlistRename').textContent = this.t('common:rename');
+    document.getElementById('wordlistsHeader').textContent = this.t('common:wordlists');
     // Domains page
-    document.getElementById('domainDisabledName').textContent = this.translation.t('options:domainDisabled');
-    document.getElementById('domainDisabledName').textContent = this.translation.t('options:domainDisabled');
-    document.getElementById('domainDisabledNote').textContent = this.translation.t('options:domainDisabledNote');
-    document.getElementById('domainDisabledNote').textContent = this.translation.t('options:domainDisabledNote');
-    document.getElementById('domainEnabledName').textContent = this.translation.t('options:domainEnabled');
-    document.getElementById('domainEnabledNote').textContent = this.translation.t('options:domainEnabledNote');
-    document.getElementById('domainFilterAllFramesName').textContent = this.translation.t('options:domainFilterAllFramesName');
-    document.getElementById('domainFilterAllFramesNote').textContent = this.translation.t('options:domainFilterAllFramesNote');
-    document.getElementById('domainFrameModeHeader').textContent = this.translation.t('options:domainFrameModeHeader');
-    document.getElementById('domainFramesDisabledName').textContent = this.translation.t('options:domainFramesDisabled');
-    document.getElementById('domainFramesDisabledNote').textContent = this.translation.t('options:domainFramesDisabledNote');
-    document.getElementById('domainFramesEnabledName').textContent = this.translation.t('options:domainFramesEnabled');
-    document.getElementById('domainFramesEnabledNote').textContent = this.translation.t('options:domainFramesEnabledNote');
-    document.getElementById('domainHeader').textContent = this.translation.t('options:domainHeader');
-    document.getElementById('domainModeHeader').textContent = this.translation.t('options:domainModeHeader');
-    document.getElementById('domainModeMinimalName').textContent = this.translation.t('options:domainModeMinimal');
-    document.getElementById('domainModeMinimalNote').textContent = this.translation.t('options:domainModeMinimalNote');
-    document.getElementById('domainModeNormalName').textContent = this.translation.t('options:domainModeNormal');
-    document.getElementById('domainModeNormalNote').textContent = this.translation.t('options:domainModeNormalNote');
-    document.getElementById('domainPageModeHeader').textContent = this.translation.t('options:domainPageModeHeader');
-    document.getElementById('domainRemove').textContent = this.translation.t('common:remove');
-    document.getElementById('domainSave').textContent = this.translation.t('common:save');
-    document.getElementById('domainsHeader').textContent = this.translation.t('options:domainsHeader');
-    document.getElementById('domainTextNote').textContent = this.translation.t('options:domainNote');
-    document.getElementById('domainTextWordlistHeader').textContent = this.translation.t('options:domainTextWordlistHeader');
+    document.getElementById('domainDisabledName').textContent = this.t('options:domainDisabled');
+    document.getElementById('domainDisabledName').textContent = this.t('options:domainDisabled');
+    document.getElementById('domainDisabledNote').textContent = this.t('options:domainDisabledNote');
+    document.getElementById('domainDisabledNote').textContent = this.t('options:domainDisabledNote');
+    document.getElementById('domainEnabledName').textContent = this.t('options:domainEnabled');
+    document.getElementById('domainEnabledNote').textContent = this.t('options:domainEnabledNote');
+    document.getElementById('domainFilterAllFramesName').textContent = this.t('options:domainFilterAllFramesName');
+    document.getElementById('domainFilterAllFramesNote').textContent = this.t('options:domainFilterAllFramesNote');
+    document.getElementById('domainFrameModeHeader').textContent = this.t('options:domainFrameModeHeader');
+    document.getElementById('domainFramesDisabledName').textContent = this.t('options:domainFramesDisabled');
+    document.getElementById('domainFramesDisabledNote').textContent = this.t('options:domainFramesDisabledNote');
+    document.getElementById('domainFramesEnabledName').textContent = this.t('options:domainFramesEnabled');
+    document.getElementById('domainFramesEnabledNote').textContent = this.t('options:domainFramesEnabledNote');
+    document.getElementById('domainHeader').textContent = this.t('options:domainHeader');
+    document.getElementById('domainModeHeader').textContent = this.t('options:domainModeHeader');
+    document.getElementById('domainModeMinimalName').textContent = this.t('options:domainModeMinimal');
+    document.getElementById('domainModeMinimalNote').textContent = this.t('options:domainModeMinimalNote');
+    document.getElementById('domainModeNormalName').textContent = this.t('options:domainModeNormal');
+    document.getElementById('domainModeNormalNote').textContent = this.t('options:domainModeNormalNote');
+    document.getElementById('domainPageModeHeader').textContent = this.t('options:domainPageModeHeader');
+    document.getElementById('domainRemove').textContent = this.t('common:remove');
+    document.getElementById('domainSave').textContent = this.t('common:save');
+    document.getElementById('domainsHeader').textContent = this.t('options:domainsHeader');
+    document.getElementById('domainTextNote').textContent = this.t('options:domainNote');
+    document.getElementById('domainTextWordlistHeader').textContent = this.t('options:domainTextWordlistHeader');
     // Bookmarklet page
-    document.getElementById('bookmarkletButtonNote').textContent = this.translation.t('options:bookmarkletButtonNote');
-    document.getElementById('bookmarkletExplanation').textContent = this.translation.t('options:bookmarkletExplanation');
-    document.getElementById('bookmarkletHeader').textContent = this.translation.t('options:bookmarkletHeader');
-    document.getElementById('bookmarkletLearnMore').textContent = this.translation.t('options:bookmarkletLearnMore');
-    document.getElementById('bookmarkletLink').textContent = this.translation.t('common:appShortName');
-    document.getElementById('bookmarkletUseDefaultConfig').textContent = this.translation.t('options:bookmarkletUseDefaultConfig');
-    document.getElementById('bookmarkletUseMyConfig').textContent = this.translation.t('options:bookmarkletUseMyConfig');
+    document.getElementById('bookmarkletButtonNote').textContent = this.t('options:bookmarkletButtonNote');
+    document.getElementById('bookmarkletExplanation').textContent = this.t('options:bookmarkletExplanation');
+    document.getElementById('bookmarkletHeader').textContent = this.t('options:bookmarkletHeader');
+    document.getElementById('bookmarkletLearnMore').textContent = this.t('options:bookmarkletLearnMore');
+    document.getElementById('bookmarkletLink').textContent = this.t('common:appShortName');
+    document.getElementById('bookmarkletUseDefaultConfig').textContent = this.t('options:bookmarkletUseDefaultConfig');
+    document.getElementById('bookmarkletUseMyConfig').textContent = this.t('options:bookmarkletUseMyConfig');
     // Config page
-    document.getElementById('configExport').textContent = this.translation.t('common:export');
-    document.getElementById('configHeader').textContent = this.translation.t('options:configHeader');
-    document.getElementById('configImport').textContent = this.translation.t('common:import');
-    document.getElementById('configInlineEditorName').textContent = this.translation.t('options:configInlineEditor');
-    document.getElementById('configLoggingLevelHeader').textContent = this.translation.t('options:configLoggingLevelHeader');
-    document.getElementById('configPasswordHeader').textContent = this.translation.t('options:configPasswordHeader');
-    document.getElementById('configReset').textContent = this.translation.t('common:restoreDefaults');
-    document.getElementById('configStorageHeader').textContent = this.translation.t('options:configStorageHeader');
-    document.getElementById('configSyncLargeSettingsName').textContent = this.translation.t('options:configSyncLargeSettings');
-    document.getElementById('configSyncLargeSettingsNote').textContent = this.translation.t('options:configSyncLargeSettingsNote');
+    document.getElementById('configExport').textContent = this.t('common:export');
+    document.getElementById('configHeader').textContent = this.t('options:configHeader');
+    document.getElementById('configImport').textContent = this.t('common:import');
+    document.getElementById('configInlineEditorName').textContent = this.t('options:configInlineEditor');
+    document.getElementById('configLoggingLevelHeader').textContent = this.t('options:configLoggingLevelHeader');
+    document.getElementById('configPasswordHeader').textContent = this.t('options:configPasswordHeader');
+    document.getElementById('configReset').textContent = this.t('common:restoreDefaults');
+    document.getElementById('configStorageHeader').textContent = this.t('options:configStorageHeader');
+    document.getElementById('configSyncLargeSettingsName').textContent = this.t('options:configSyncLargeSettings');
+    document.getElementById('configSyncLargeSettingsNote').textContent = this.t('options:configSyncLargeSettingsNote');
     // Stats page
-    document.getElementById('collectStatsName').textContent = this.translation.t('options:collectStats');
-    document.getElementById('collectStatsNote').textContent = this.translation.t('options:collectStatsNote');
-    document.getElementById('removeLessUsedWords').textContent = this.translation.t('options:statsRemoveLessUsedWordsButton');
-    document.getElementById('statsExport').textContent = this.translation.t('common:export');
-    document.getElementById('statsFilteredSummaryTotal').textContent = this.translation.t('options:statsFilteredSummaryTotal');
-    document.getElementById('statsFilteredSummaryWord').textContent = this.translation.t('options:statsFilteredSummaryWord');
-    document.getElementById('statsHeader').textContent = this.translation.t('options:statsHeader');
-    document.getElementById('statsImport').textContent = this.translation.t('common:import');
-    document.getElementById('statsRemoveLessUsedWordsExplanation').textContent = this.translation.t('options:statsRemoveLessUsedWordsExplanation');
-    document.getElementById('statsReset').textContent = this.translation.t('common:reset');
-    document.getElementById('statsSummaryHeader').textContent = this.translation.t('options:statsSummaryHeader');
-    document.getElementById('statsTotalFilteredName').textContent = this.translation.t('options:statsSummaryTotalWordsFiltered');
-    document.getElementById('statsTrackingSinceName').textContent = this.translation.t('options:statsSummaryTrackingSince');
-    document.getElementById('statsWordsFilteredHeader').textContent = this.translation.t('options:statsWordsFilteredHeader');
+    document.getElementById('collectStatsName').textContent = this.t('options:collectStats');
+    document.getElementById('collectStatsNote').textContent = this.t('options:collectStatsNote');
+    document.getElementById('removeLessUsedWords').textContent = this.t('options:statsRemoveLessUsedWordsButton');
+    document.getElementById('statsExport').textContent = this.t('common:export');
+    document.getElementById('statsFilteredSummaryTotal').textContent = this.t('options:statsFilteredSummaryTotal');
+    document.getElementById('statsFilteredSummaryWord').textContent = this.t('options:statsFilteredSummaryWord');
+    document.getElementById('statsHeader').textContent = this.t('options:statsHeader');
+    document.getElementById('statsImport').textContent = this.t('common:import');
+    document.getElementById('statsRemoveLessUsedWordsExplanation').textContent = this.t('options:statsRemoveLessUsedWordsExplanation');
+    document.getElementById('statsReset').textContent = this.t('common:reset');
+    document.getElementById('statsSummaryHeader').textContent = this.t('options:statsSummaryHeader');
+    document.getElementById('statsTotalFilteredName').textContent = this.t('options:statsSummaryTotalWordsFiltered');
+    document.getElementById('statsTrackingSinceName').textContent = this.t('options:statsSummaryTrackingSince');
+    document.getElementById('statsWordsFilteredHeader').textContent = this.t('options:statsWordsFilteredHeader');
     // Test page
-    document.getElementById('testFilteredHeader').textContent = this.translation.t('options:testFilteredHeader');
-    document.getElementById('testHeader').textContent = this.translation.t('options:testHeader');
+    document.getElementById('testFilteredHeader').textContent = this.t('options:testFilteredHeader');
+    document.getElementById('testHeader').textContent = this.t('options:testHeader');
     // Modals
     // Word Bulk Editor
-    (document.getElementById('bulkAddWordsText') as HTMLTextAreaElement).placeholder = this.translation.t('options:bulkWordEditorBoxPlaceholder');
-    document.getElementById('bulkEditorAddWord').textContent = this.translation.t('options:bulkWordEditorAddWordButton');
-    document.getElementById('bulkEditorAddWords').textContent = this.translation.t('options:bulkWordEditorAddWordsButton');
-    document.getElementById('bulkEditorCancel').textContent = this.translation.t('common:cancelButton');
-    document.getElementById('bulkEditorSave').textContent = this.translation.t('common:save');
-    document.getElementById('bulkWordEditorMatchMethodHeader').textContent = this.translation.t('options:bulkWordEditorMatchMethodHeader');
-    document.getElementById('bulkWordEditorRemoveAllHeader').textContent = this.translation.t('options:bulkWordEditorRemoveAllHeader');
-    document.getElementById('bulkWordEditorRepeatedHeader').textContent = this.translation.t('options:bulkWordEditorRepeatedHeader');
-    document.getElementById('bulkWordEditorSeparatorsHeader').textContent = this.translation.t('options:bulkWordEditorSeparatorsHeader');
-    document.getElementById('bulkWordEditorSubstitutionCaseHeader').textContent = this.translation.t('options:bulkWordEditorSubstitutionCaseHeader');
-    document.getElementById('bulkWordEditorSubstitutionHeader').textContent = this.translation.t('options:bulkWordEditorSubstitutionHeader');
-    document.getElementById('bulkWordEditorTitle').textContent = this.translation.t('options:bulkWordEditorTitle');
-    document.getElementById('bulkWordEditorWordHeader').textContent = this.translation.t('options:bulkWordEditorWordHeader');
+    (document.getElementById('bulkAddWordsText') as HTMLTextAreaElement).placeholder = this.t('options:bulkWordEditorBoxPlaceholder');
+    document.getElementById('bulkEditorAddWord').textContent = this.t('options:bulkWordEditorAddWordButton');
+    document.getElementById('bulkEditorAddWords').textContent = this.t('options:bulkWordEditorAddWordsButton');
+    document.getElementById('bulkEditorCancel').textContent = this.t('common:cancelButton');
+    document.getElementById('bulkEditorSave').textContent = this.t('common:save');
+    document.getElementById('bulkWordEditorMatchMethodHeader').textContent = this.t('options:bulkWordEditorMatchMethodHeader');
+    document.getElementById('bulkWordEditorRemoveAllHeader').textContent = this.t('options:bulkWordEditorRemoveAllHeader');
+    document.getElementById('bulkWordEditorRepeatedHeader').textContent = this.t('options:bulkWordEditorRepeatedHeader');
+    document.getElementById('bulkWordEditorSeparatorsHeader').textContent = this.t('options:bulkWordEditorSeparatorsHeader');
+    document.getElementById('bulkWordEditorSubstitutionCaseHeader').textContent = this.t('options:bulkWordEditorSubstitutionCaseHeader');
+    document.getElementById('bulkWordEditorSubstitutionHeader').textContent = this.t('options:bulkWordEditorSubstitutionHeader');
+    document.getElementById('bulkWordEditorTitle').textContent = this.t('options:bulkWordEditorTitle');
+    document.getElementById('bulkWordEditorWordHeader').textContent = this.t('options:bulkWordEditorWordHeader');
     // Confirm
-    document.getElementById('confirmModalBackup').textContent = this.translation.t('common:backupButton');
-    document.getElementById('confirmModalCancel').textContent = this.translation.t('common:cancelButton');
-    document.getElementById('confirmModalOK').textContent = this.translation.t('common:okButton');
+    document.getElementById('confirmModalBackup').textContent = this.t('common:backupButton');
+    document.getElementById('confirmModalCancel').textContent = this.t('common:cancelButton');
+    document.getElementById('confirmModalOK').textContent = this.t('common:okButton');
     // Password
-    document.getElementById('passwordModalHeader').textContent = this.translation.t('options:passwordModalHeader');
-    document.getElementById('submitPassword').textContent = this.translation.t('options:submitButton');
+    document.getElementById('passwordModalHeader').textContent = this.t('options:passwordModalHeader');
+    document.getElementById('submitPassword').textContent = this.t('options:submitButton');
     // Status
-    document.getElementById('statusModalOK').textContent = this.translation.t('common:okButton');
+    document.getElementById('statusModalOK').textContent = this.t('common:okButton');
   }
 
   backupConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
@@ -486,15 +486,15 @@ export default class OptionPage {
     try {
       await this.cfg.save('words');
       this.closeModal('bulkWordEditorModal');
-      this.showStatusModal(this.translation.t('bulkWordEditorSavedStatusMessage'));
+      this.showStatusModal(this.t('bulkWordEditorSavedStatusMessage'));
       this.filter.rebuildWordlists();
       this.populateOptions();
     } catch (err) {
       if (this.isStorageError(err) && this.cfg.syncLargeKeys) {
         this.confirm('bulkEditorSaveRetry');
       } else {
-        logger.warn(this.translation.t('bulkWordEditorFailedMessage'), err);
-        this.showErrorModal([this.translation.t('bulkWordEditorFailedMessage'), `Error: ${err.message}`]);
+        logger.warn(this.t('bulkWordEditorFailedMessage'), err);
+        this.showErrorModal([this.t('bulkWordEditorFailedMessage'), `Error: ${err.message}`]);
       }
     }
   }
@@ -506,7 +506,7 @@ export default class OptionPage {
       await this.convertStorageLocation(null, true);
       await this.bulkEditorSave();
     } catch (err) {
-      this.handleError(this.translation.t('bulkWordEditorFailedMessage'), err);
+      this.handleError(this.t('bulkWordEditorFailedMessage'), err);
     }
   }
 
@@ -552,8 +552,8 @@ export default class OptionPage {
 
     const defaults = {
       backup: false,
-      content: this.translation.t('options:confirmModalDefaultContent'),
-      title: this.translation.t('options:confirmModalDefaultTitle'),
+      content: this.t('options:confirmModalDefaultContent'),
+      title: this.t('options:confirmModalDefaultTitle'),
       titleClass: 'w3-flat-peter-river',
     };
     settings = Object.assign(defaults, settings);
@@ -610,8 +610,8 @@ export default class OptionPage {
 
     switch (action) {
       case 'bulkEditorSave':
-        paragraph.textContent = this.translation.t('options:confirmBulkWordEditorSaveMessage');
-        italics.textContent = this.translation.t('options:confirmBulkWordEditorSaveNoteMessage');
+        paragraph.textContent = this.t('options:confirmBulkWordEditorSaveMessage');
+        italics.textContent = this.t('options:confirmBulkWordEditorSaveNoteMessage');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: true }, content);
@@ -619,8 +619,8 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'bulkEditorSaveRetry':
-        paragraph.textContent = this.translation.t('options:confirmBulkWordEditorSaveRetryMessage');
-        italics.textContent = this.translation.t('options:confirmLocalStorageNoteMessage');
+        paragraph.textContent = this.t('options:confirmBulkWordEditorSaveRetryMessage');
+        italics.textContent = this.t('options:confirmLocalStorageNoteMessage');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: true, titleClass: 'w3-red' }, content);
@@ -629,11 +629,11 @@ export default class OptionPage {
         break;
       case 'convertStorageLocation':
         if (this.cfg.syncLargeKeys) {
-          paragraph.textContent = this.translation.t('options:confirmConvertStorageToLocalMessage');
+          paragraph.textContent = this.t('options:confirmConvertStorageToLocalMessage');
         } else {
-          paragraph.textContent = this.translation.t('options:confirmConvertStorageToSyncMessage');
+          paragraph.textContent = this.t('options:confirmConvertStorageToSyncMessage');
         }
-        italics.textContent = this.translation.t('options:confirmConvertStorageNoteMessage');
+        italics.textContent = this.t('options:confirmConvertStorageNoteMessage');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: true }, content);
@@ -643,13 +643,13 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfig':
-        this.configureConfirmModal({ content: this.translation.t('options:confirmImportConfigMessage'), backup: true });
+        this.configureConfirmModal({ content: this.t('options:confirmImportConfigMessage'), backup: true });
         this._confirmEventListeners.push(this.importConfig.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfigRetry':
-        paragraph.textContent = this.translation.t('options:confirmImportConfigRetryMessage');
-        italics.textContent = this.translation.t('options:confirmLocalStorageNoteMessage');
+        paragraph.textContent = this.t('options:confirmImportConfigRetryMessage');
+        italics.textContent = this.t('options:confirmLocalStorageNoteMessage');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
@@ -659,7 +659,7 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'removeAllWords':
-        paragraph.textContent = this.translation.t('options:confirmRemoveAllWordsMessage');
+        paragraph.textContent = this.t('options:confirmRemoveAllWordsMessage');
         content.appendChild(paragraph);
         this.configureConfirmModal({ backup: true }, content);
         this._confirmEventListeners.push(this.removeAllWords.bind(this));
@@ -673,31 +673,31 @@ export default class OptionPage {
           if (count) {
             this.configureConfirmModal({
               backup: true,
-              content: this.translation.t('options:confirmRemoveLessUsedWordsMessage', { count: count }),
+              content: this.t('options:confirmRemoveLessUsedWordsMessage', { count: count }),
             });
             this._confirmEventListeners.push(this.removeLessUsedWords.bind(this));
             ok.addEventListener('click', lastElement(this._confirmEventListeners));
           } else {
             validated = false;
             this.showStatusModal(`
-              ${this.translation.t('options:confirmRemoveLessUsedWordsUnderMessage')}
-              ${this.translation.t('options:confirmRemoveLessUsedWordsUnderMessageNote')}
+              ${this.t('options:confirmRemoveLessUsedWordsUnderMessage')}
+              ${this.t('options:confirmRemoveLessUsedWordsUnderMessageNote')}
             `);
           }
         }
         break;
       case 'statsImport':
-        this.configureConfirmModal({ content: this.translation.t('options:confirmStatsImportMessage') });
+        this.configureConfirmModal({ content: this.t('options:confirmStatsImportMessage') });
         this._confirmEventListeners.push(this.importStats.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'statsReset':
-        this.configureConfirmModal({ content: this.translation.t('options:confirmStatsResetMessage') });
+        this.configureConfirmModal({ content: this.t('options:confirmStatsResetMessage') });
         this._confirmEventListeners.push(this.statsReset.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'restoreDefaults':
-        this.configureConfirmModal({ content: this.translation.t('options:confirmRestoreDefaultsMessage'), backup: true });
+        this.configureConfirmModal({ content: this.t('options:confirmRestoreDefaultsMessage'), backup: true });
         this._confirmEventListeners.push(this.restoreDefaults.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
@@ -707,8 +707,8 @@ export default class OptionPage {
         if (passwordBtn.classList.contains('disabled')) return false;
 
         const message = passwordText.value == ''
-          ? this.translation.t('options:confirmPasswordRemoveMessage')
-          : this.translation.t('options:confirmPasswordSetMessage', { password: passwordText.value })
+          ? this.t('options:confirmPasswordRemoveMessage')
+          : this.t('options:confirmPasswordSetMessage', { password: passwordText.value })
         ;
         this.configureConfirmModal({ content: message });
         this._confirmEventListeners.push(this.auth.setPassword.bind(this.auth));
@@ -750,19 +750,19 @@ export default class OptionPage {
         }
 
         if (!silent) {
-          this.showStatusModal(this.translation.t('options:storageConvertedMessage'));
+          this.showStatusModal(this.t('options:storageConvertedMessage'));
         }
       } catch (err) {
         // Revert UI and export a backup of config.
         this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
         this.backupConfig();
-        this.handleError(this.translation.t('options:storageConversionCleanupFailedMessage'), err);
+        this.handleError(this.t('options:storageConversionCleanupFailedMessage'), err);
         await this.cfg.save('syncLargeKeys');
         this.populateConfig();
       }
     } catch (err) {
       // Revert UI
-      this.handleError(this.translation.t('options:storageConversionFailedMessage'), err);
+      this.handleError(this.t('options:storageConversionFailedMessage'), err);
       this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
       this.populateConfig();
     }
