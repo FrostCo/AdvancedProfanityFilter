@@ -413,24 +413,27 @@
 </div>
 
 <div id="bookmarkletPage" class="w3-container w3-hide">
-  <h4 class="sectionHeader">Bookmarklet</h4>
-  <p>Create a "bookmarklet" of Advanced Profanity Filter that can be used when you can't install the extension. Learn more <a href="https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Bookmarklet" target="_blank">here</a>.</p>
+  <h4 id="bookmarkletHeader" class="sectionHeader">Bookmarklet</h4>
+  <p>
+    <span id="bookmarkletExplanation">Create a 'bookmarklet' of Advanced Profanity Filter that can be used when you can't install the extension</span>
+    (<a id="bookmarkletLearnMore" href="https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Bookmarklet" target="_blank">learn more</a>).
+  </p>
 
   <div id="bookmarkletConfigInputs">
     <label>
       <input id="bookmarkletConfigDefault" type="radio" class="w3-radio" name="bookmarkletConfig" value="default">
-      Use default config
+      <span id="bookmarkletUseDefaultConfig" >Use default config</span>
     </label>
     <br>
     <label>
       <input id="bookmarkletConfigCustom" type="radio" class="w3-radio" name="bookmarkletConfig" value="custom" checked>
-      Use my config
+      <span id="bookmarkletUseMyConfig">Use my config</span>
     </label>
   </div>
 
   <br>
   <a id="bookmarkletLink" href="#0" class="w3-btn w3-round-large w3-flat-peter-river w3-flat-silver disabled">APF</a>
-  <span class="notes">Drag to your bookmarks bar or copy the URL</span>
+  <span id="bookmarkletButtonNote" class="notes">Drag to your bookmarks bar or copy the URL</span>
 </div>
 
 <div id="configPage" class="w3-container w3-hide">

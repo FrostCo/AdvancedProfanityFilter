@@ -382,6 +382,14 @@ export default class OptionPage {
     document.getElementById('domainsHeader').textContent = this.translation.t('options:domainsHeader');
     document.getElementById('domainTextNote').textContent = this.translation.t('options:domainNote');
     document.getElementById('domainTextWordlistHeader').textContent = this.translation.t('options:domainTextWordlistHeader');
+    // Bookmarklet page
+    document.getElementById('bookmarkletButtonNote').textContent = this.translation.t('options:bookmarkletButtonNote');
+    document.getElementById('bookmarkletExplanation').textContent = this.translation.t('options:bookmarkletExplanation');
+    document.getElementById('bookmarkletHeader').textContent = this.translation.t('options:bookmarkletHeader');
+    document.getElementById('bookmarkletLearnMore').textContent = this.translation.t('options:bookmarkletLearnMore');
+    document.getElementById('bookmarkletLink').textContent = this.translation.t('common:appShortName');
+    document.getElementById('bookmarkletUseDefaultConfig').textContent = this.translation.t('options:bookmarkletUseDefaultConfig');
+    document.getElementById('bookmarkletUseMyConfig').textContent = this.translation.t('options:bookmarkletUseMyConfig');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
