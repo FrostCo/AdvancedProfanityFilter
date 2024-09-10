@@ -44,6 +44,8 @@
   "configSyncLargeSettings": "Sync large settings",
   "configSyncLargeSettingsNote": "Words, domains, etc. Disable if you run out of space",
   "configTab": "Config",
+  "confirmModalDefaultContent": "Are you sure?",
+  "confirmModalDefaultTitle": "Please confirm",
   "defaultSettingsHeader": "Default Settings (for new words/phrases)",
   "defaultTextWordlistHeader": "Default Text Wordlist",
   "defaultWordMatchMethod": "Match Method",

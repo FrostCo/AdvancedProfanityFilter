@@ -550,8 +550,8 @@ export default class OptionPage {
 
     const defaults = {
       backup: false,
-      content: 'Are you sure?',
-      title: 'Please Confirm',
+      content: this.translation.t('confirmModalDefaultContent'),
+      title: this.translation.t('confirmModalDefaultTitle'),
       titleClass: 'w3-flat-peter-river',
     };
     settings = Object.assign(defaults, settings);
