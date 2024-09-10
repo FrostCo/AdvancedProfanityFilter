@@ -76,8 +76,8 @@ export default class OptionPage {
 
   applyDarkTheme(allElements = true) {
     document.documentElement.style.setProperty('color-scheme', 'dark');
-    const statsWordTable = document.querySelector('table#statsWordTable') as HTMLTableElement;
-    const bulkWordEditorTable = document.querySelector('table#bulkWordEditorTable') as HTMLTableElement;
+    const statsWordTable = document.getElementById('statsWordTable') as HTMLTableElement;
+    const bulkWordEditorTable = document.getElementById('bulkWordEditorTable') as HTMLTableElement;
     statsWordTable.classList.remove('w3-striped');
     bulkWordEditorTable.classList.remove('w3-striped');
     this.setThemeButton(true);
@@ -92,8 +92,8 @@ export default class OptionPage {
 
   applyLightTheme(allElements = true) {
     document.documentElement.style.setProperty('color-scheme', 'light');
-    const statsWordTable = document.querySelector('table#statsWordTable') as HTMLTableElement;
-    const bulkWordEditorTable = document.querySelector('table#bulkWordEditorTable') as HTMLTableElement;
+    const statsWordTable = document.getElementById('statsWordTable') as HTMLTableElement;
+    const bulkWordEditorTable = document.getElementById('bulkWordEditorTable') as HTMLTableElement;
     statsWordTable.classList.add('w3-striped');
     bulkWordEditorTable.classList.add('w3-striped');
     this.setThemeButton(false);
@@ -324,7 +324,7 @@ export default class OptionPage {
   }
 
   bulkEditorAddRow(word: string = '', data: WordOptions | undefined = undefined) {
-    const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
+    const table = document.getElementById('bulkWordEditorTable') as HTMLTableElement;
     if (data === undefined) {
       data = {
         lists: [],
@@ -414,10 +414,10 @@ export default class OptionPage {
   }
 
   bulkEditorAddWords() {
-    const bulkAddWordsText = document.querySelector('#bulkWordEditorModal textarea#bulkAddWordsText') as HTMLTextAreaElement;
+    const bulkAddWordsText = document.getElementById('bulkAddWordsText') as HTMLTextAreaElement;
     const text = bulkAddWordsText.value;
     if (text != '') {
-      const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
+      const table = document.getElementById('bulkWordEditorTable') as HTMLTableElement;
       const lines = text.toLowerCase().split('\n');
       const words = lines.map((line) => line.trim());
       const uniqueWords = words.filter((word, index) => words.indexOf(word) === index);
@@ -446,7 +446,7 @@ export default class OptionPage {
   }
 
   bulkEditorRemoveRow(button: HTMLButtonElement) {
-    const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
+    const table = document.getElementById('bulkWordEditorTable') as HTMLTableElement;
     const row = button.parentElement.parentElement as HTMLTableRowElement;
     table.deleteRow(row.rowIndex);
     if (table.rows.length == 1) {
@@ -456,7 +456,7 @@ export default class OptionPage {
   }
 
   async bulkEditorSave() {
-    const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
+    const table = document.getElementById('bulkWordEditorTable') as HTMLTableElement;
     const failed = {};
     this.cfg.words = {};
 
@@ -511,7 +511,7 @@ export default class OptionPage {
   }
 
   bulkEditorCurrentWords() {
-    const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
+    const table = document.getElementById('bulkWordEditorTable') as HTMLTableElement;
     const words = [];
     table.querySelectorAll('tr > td > input.bulkAddWordText').forEach((wordText: HTMLInputElement, index) => {
       words.push(wordText.value);
@@ -1194,8 +1194,7 @@ export default class OptionPage {
       const alphaSortedWords = allWords.sort();
       const sortedWords = alphaSortedWords.sort((a, b) => stats.words[b].total - stats.words[a].total);
 
-      const statsWordContainer = document.querySelector('div#statsWordContainer') as HTMLDivElement;
-      const statsWordTable = statsWordContainer.querySelector('table#statsWordTable') as HTMLTableElement;
+      const statsWordTable = document.getElementById('statsWordTable') as HTMLTableElement;
 
       // Table body
       const tBody = document.createElement('tbody');
@@ -1229,9 +1228,9 @@ export default class OptionPage {
   }
 
   populateStatsSummary(stats, totalFiltered: number) {
-    const statsSummaryTotal = document.querySelector('table#statsSummaryTable td#statsSummaryTotal') as HTMLTableCellElement;
+    const statsSummaryTotal = document.getElementById('statsSummaryTotal') as HTMLTableCellElement;
     statsSummaryTotal.textContent = numberWithCommas(totalFiltered);
-    const statsSummarySince = document.querySelector('table#statsSummaryTable td#statsSummarySince') as HTMLTableCellElement;
+    const statsSummarySince = document.getElementById('statsSummarySince') as HTMLTableCellElement;
     statsSummarySince.textContent = stats.startedAt ? new Date(stats.startedAt).toLocaleString() : '';
   }
 
