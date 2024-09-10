@@ -16,6 +16,7 @@
   "remove": "REMOVE",
   "removeAll": "REMOVE ALL",
   "rename": "RENAME",
+  "reset": "RESET",
   "restoreDefaults": "RESTORE DEFAULTS",
   "save": "SAVE",
   "support": "Support",

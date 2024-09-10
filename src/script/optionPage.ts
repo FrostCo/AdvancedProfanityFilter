@@ -401,6 +401,21 @@ export default class OptionPage {
     document.getElementById('configStorageHeader').textContent = this.translation.t('options:configStorageHeader');
     document.getElementById('configSyncLargeSettingsName').textContent = this.translation.t('options:configSyncLargeSettings');
     document.getElementById('configSyncLargeSettingsNote').textContent = this.translation.t('options:configSyncLargeSettingsNote');
+    // Stats page
+    document.getElementById('collectStatsName').textContent = this.translation.t('options:collectStats');
+    document.getElementById('collectStatsNote').textContent = this.translation.t('options:collectStatsNote');
+    document.getElementById('removeLessUsedWords').textContent = this.translation.t('options:statsRemoveLessUsedWordsButton');
+    document.getElementById('statsExport').textContent = this.translation.t('common:export');
+    document.getElementById('statsFilteredSummaryTotal').textContent = this.translation.t('options:statsFilteredSummaryTotal');
+    document.getElementById('statsFilteredSummaryWord').textContent = this.translation.t('options:statsFilteredSummaryWord');
+    document.getElementById('statsHeader').textContent = this.translation.t('options:statsHeader');
+    document.getElementById('statsImport').textContent = this.translation.t('common:import');
+    document.getElementById('statsRemoveLessUsedWordsExplanation').textContent = this.translation.t('options:statsRemoveLessUsedWordsExplanation');
+    document.getElementById('statsReset').textContent = this.translation.t('common:reset');
+    document.getElementById('statsSummaryHeader').textContent = this.translation.t('options:statsSummaryHeader');
+    document.getElementById('statsTotalFilteredName').textContent = this.translation.t('options:statsSummaryTotalWordsFiltered');
+    document.getElementById('statsTrackingSinceName').textContent = this.translation.t('options:statsSummaryTrackingSince');
+    document.getElementById('statsWordsFilteredHeader').textContent = this.translation.t('options:statsWordsFilteredHeader');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {

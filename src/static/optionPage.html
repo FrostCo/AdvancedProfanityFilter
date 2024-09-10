@@ -468,11 +468,11 @@
 </div>
 
 <div id="statsPage" class="w3-container w3-hide">
-  <h4 class="sectionHeader">Stats</h4>
+  <h4 id="statsHeader" class="sectionHeader">Stats</h4>
   <label>
     <input id="collectStats" type="checkbox" class="w3-check">
-    Collect stats
-    <span class="notes">(Only stored locally)</span>
+    <span id="collectStatsName">Collect stats</span>
+    <span id="collectStatsNote" class="notes">(Only stored locally)</span>
   </label>
 
   <div class="w3-right">
@@ -482,29 +482,29 @@
     <button id="statsReset" class="w3-btn w3-round-large w3-flat-pomegranate">RESET</button>
   </div>
 
-  <h4 class="sectionHeader">Summary</h4>
+  <h4 id="statsSummaryHeader" class="sectionHeader">Summary</h4>
   <div id="statsSummaryContainer">
     <table id="statsSummaryTable" class="w3-table w3-border w3-bordered w3-card w3-small">
       <tbody>
         <tr>
-          <td>Total words filtered</td>
+          <td id="statsTotalFilteredName">Total words filtered</td>
           <td id="statsSummaryTotal"></td>
         </tr>
         <tr>
-          <td>Tracking since</td>
+          <td id="statsTrackingSinceName">Tracking since</td>
           <td id="statsSummarySince"></td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <h4 class="sectionHeader">Words Filtered</h4>
+  <h4 id="statsWordsFilteredHeader" class="sectionHeader">Words Filtered</h4>
   <div id="statsWordContainer">
     <table id="statsWordTable" class="w3-table w3-striped w3-border w3-bordered w3-card w3-small">
       <thead class="w3-flat-peter-river">
         <tr>
-          <th>Word</th>
-          <th>Total</th>
+          <th id="statsFilteredSummaryWord">Word</th>
+          <th id="statsFilteredSummaryTotal">Total</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -512,9 +512,8 @@
   </div>
 
   <label>
-    Remove words filtered less than
+    <span id="statsRemoveLessUsedWordsExplanation">Remove words filtered fewer times than</span>
     <input id="lessUsedWordsNumber" class="w3-input w3-border extraSmallInput" style="display:inline;">
-    times
   </label>
   <button id="removeLessUsedWords" class="w3-btn w3-round-large w3-flat-pomegranate" pattern="">REMOVE WORDS</button>
 </div>
