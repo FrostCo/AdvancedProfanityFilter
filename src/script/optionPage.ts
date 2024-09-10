@@ -232,11 +232,11 @@ export default class OptionPage {
     document.getElementById('domainFramesEnabledNote').textContent = this.t('options:domainFramesEnabledNote');
     document.getElementById('domainHeader').textContent = this.t('options:domainHeader');
     document.getElementById('domainModeHeader').textContent = this.t('options:domainModeHeader');
-    document.getElementById('domainModeMinimalName').textContent = this.t('options:domainModeMinimal');
-    document.getElementById('domainModeMinimalNote').textContent = this.t('options:domainModeMinimalNote');
-    document.getElementById('domainModeNormalName').textContent = this.t('options:domainModeNormal');
-    document.getElementById('domainModeNormalNote').textContent = this.t('options:domainModeNormalNote');
-    document.getElementById('domainPageModeHeader').textContent = this.t('options:domainPageModeHeader');
+    document.getElementById('domainMatchModeMinimalName').textContent = this.t('options:domainMatchModeMinimal');
+    document.getElementById('domainMatchModeMinimalNote').textContent = this.t('options:domainMatchModeMinimalNote');
+    document.getElementById('domainMatchModeNormalName').textContent = this.t('options:domainMatchModeNormal');
+    document.getElementById('domainMatchModeNormalNote').textContent = this.t('options:domainMatchModeNormalNote');
+    document.getElementById('domainMatchModeHeader').textContent = this.t('options:domainMatchModeHeader');
     document.getElementById('domainRemove').textContent = this.t('common:removeButton');
     document.getElementById('domainSave').textContent = this.t('common:saveButton');
     document.getElementById('domainsHeader').textContent = this.t('options:domainsHeader');
@@ -1065,9 +1065,9 @@ export default class OptionPage {
     const domainsSelect = document.getElementById('domainSelect') as HTMLSelectElement;
     const domainText = document.getElementById('domainText') as HTMLInputElement;
     const mode = this.cfg.enabledDomainsOnly ? 'minimal' : 'normal';
-    const domainMode = document.querySelector(`input[name=domainMode][value='${mode}']`) as HTMLInputElement;
+    const domainMatchMode = document.querySelector(`input[name=domainMatchMode][value='${mode}']`) as HTMLInputElement;
     const wordlistContainer = document.getElementById('domainWordlistContainer') as HTMLInputElement;
-    domainMode.checked = true;
+    domainMatchMode.checked = true;
     const domainDisabledLabel = document.getElementById('domainDisabledLabel') as HTMLLabelElement;
     const domainEnabledLabel = document.getElementById('domainEnabledLabel') as HTMLLabelElement;
     const domainFramesOffLabel = document.getElementById('domainFramesOffLabel') as HTMLLabelElement;
@@ -1991,7 +1991,7 @@ export default class OptionPage {
     const showUpdateNotification = document.getElementById('showUpdateNotification') as HTMLInputElement;
     const substitutionMark = document.getElementById('substitutionMark') as HTMLInputElement;
     const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
-    const domainMode = document.querySelector('input[name="domainMode"]:checked') as HTMLInputElement;
+    const domainMatchMode = document.querySelector('input[name="domainMatchMode"]:checked') as HTMLInputElement;
     const domainFilterAllFrames = document.getElementById('domainFilterAllFrames') as HTMLInputElement;
     const wordlistsEnabledInput = document.getElementById('wordlistsEnabled') as HTMLInputElement;
     const collectStats = document.getElementById('collectStats') as HTMLInputElement;
@@ -2009,7 +2009,7 @@ export default class OptionPage {
     this.cfg.showUpdateNotification = showUpdateNotification.checked;
     this.cfg.substitutionMark = substitutionMark.checked;
     this.cfg.defaultSubstitution = defaultWordSubstitution.value.trim().toLowerCase();
-    this.cfg.enabledDomainsOnly = (domainMode.value === 'minimal');
+    this.cfg.enabledDomainsOnly = (domainMatchMode.value === 'minimal');
     this.cfg.enabledFramesOnly = !domainFilterAllFrames.checked;
     this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
     this.cfg.collectStats = collectStats.checked;

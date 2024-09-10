@@ -55,7 +55,7 @@ document.getElementById('wordlistSelect').addEventListener('change', (evt) => { 
 document.getElementById('wordlistText').addEventListener('input', (evt) => { option.hideInputError(evt.target as HTMLInputElement); });
 document.getElementById('textWordlistSelect').addEventListener('change', (evt) => { option.setDefaultWordlist(evt.target as HTMLSelectElement); });
 // Domains
-document.querySelectorAll('#domainMode input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
+document.querySelectorAll('#domainMatchMode input').forEach((el) => { el.addEventListener('click', (evt) => { option.saveOptions(); }); });
 document.getElementById('domainFilterAllFrames').addEventListener('change', (evt) => { option.saveOptions(); });
 document.getElementById('domainSelect').addEventListener('change', (evt) => { option.populateDomain(); });
 document.getElementById('domainText').addEventListener('input', (evt) => { option.hideInputError(evt.target as HTMLInputElement); });
