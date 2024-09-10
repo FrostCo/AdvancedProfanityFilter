@@ -390,6 +390,17 @@ export default class OptionPage {
     document.getElementById('bookmarkletLink').textContent = this.translation.t('common:appShortName');
     document.getElementById('bookmarkletUseDefaultConfig').textContent = this.translation.t('options:bookmarkletUseDefaultConfig');
     document.getElementById('bookmarkletUseMyConfig').textContent = this.translation.t('options:bookmarkletUseMyConfig');
+    // Config page
+    document.getElementById('configExport').textContent = this.translation.t('common:export');
+    document.getElementById('configHeader').textContent = this.translation.t('options:configHeader');
+    document.getElementById('configImport').textContent = this.translation.t('common:import');
+    document.getElementById('configInlineEditorName').textContent = this.translation.t('options:configInlineEditor');
+    document.getElementById('configLoggingLevelHeader').textContent = this.translation.t('options:configLoggingLevelHeader');
+    document.getElementById('configPasswordHeader').textContent = this.translation.t('options:configPasswordHeader');
+    document.getElementById('configReset').textContent = this.translation.t('common:restoreDefaults');
+    document.getElementById('configStorageHeader').textContent = this.translation.t('options:configStorageHeader');
+    document.getElementById('configSyncLargeSettingsName').textContent = this.translation.t('options:configSyncLargeSettings');
+    document.getElementById('configSyncLargeSettingsNote').textContent = this.translation.t('options:configSyncLargeSettingsNote');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
