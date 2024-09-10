@@ -199,6 +199,6 @@
   "wordPhraseInvalidMessage": "Please enter a valid word/phrase.",
   "wordRemoveFailedMessage": "Failed to remove word '{{word}}'.",
   "wordsAndPhrasesHeader": "Words & Phrases",
-  "wordSubstitutionHeader": "Substitution",
-  "wordsTab": "Words"
+  "wordsTab": "Words",
+  "wordSubstitutionHeader": "Substitution"
 }
