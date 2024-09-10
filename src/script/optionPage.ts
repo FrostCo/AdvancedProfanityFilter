@@ -277,6 +277,46 @@ export default class OptionPage {
     document.getElementById('statsTab').textContent = this.translation.t('options:statsTab');
     document.getElementById('testTab').textContent = this.translation.t('options:testTab');
     document.getElementById('wordsTab').textContent = this.translation.t('options:wordsTab');
+    // Settings page
+    document.getElementById('censorCharacterName').textContent = this.translation.t('options:censorCharacter');
+    document.getElementById('censorFixedLengthName').textContent = this.translation.t('options:censorFixedLength');
+    document.getElementById('censorFixedLengthOriginal').textContent = this.translation.t('options:censorFixedLengthOriginal');
+    document.getElementById('censorSettingsHeader').textContent = this.translation.t('options:censorSettingsHeader');
+    document.getElementById('defaultSettingsHeader').textContent = this.translation.t('options:defaultSettingsHeader');
+    document.getElementById('defaultSubstitutionName').textContent = this.translation.t('options:substitutionDefaultSubstitution');
+    document.getElementById('defaultWordMatchMethodName').textContent = this.translation.t('options:defaultWordMatchMethod');
+    document.getElementById('defaultWordMatchRepeatedName').textContent = this.translation.t('options:defaultWordMatchRepeated');
+    document.getElementById('defaultWordMatchRepeatedNote').textContent = this.translation.t('options:defaultWordMatchRepeatedNote');
+    document.getElementById('defaultWordMatchSeparatorsName').textContent = this.translation.t('options:defaultWordMatchSeparators');
+    document.getElementById('defaultWordMatchSeparatorsNote').textContent = this.translation.t('options:defaultWordMatchSeparatorsNote');
+    document.getElementById('filterCensorName').textContent = this.translation.t('common:filterMethodCensor');
+    document.getElementById('filterMethodCensorNote').textContent = this.translation.t('options:filterMethodCensorNote');
+    document.getElementById('filterMethodHeader').textContent = this.translation.t('options:filterMethodHeader');
+    document.getElementById('filterMethodOffNote').textContent = this.translation.t('options:filterMethodOffNote');
+    document.getElementById('filterMethodRemoveNote').textContent = this.translation.t('options:filterMethodRemoveNote');
+    document.getElementById('filterMethodSubstituteNote').textContent = this.translation.t('options:filterMethodSubstituteNote');
+    document.getElementById('filterOffName').textContent = this.translation.t('common:filterMethodOff');
+    document.getElementById('filterRemoveName').textContent = this.translation.t('common:filterMethodRemove');
+    document.getElementById('filterSubstituteName').textContent = this.translation.t('common:filterMethodSubstitute');
+    document.getElementById('generalSettingsHeader').textContent = this.translation.t('options:generalSettingsHeader');
+    document.getElementById('preserveFirstName').textContent = this.translation.t('options:censorPreserveFirst');
+    document.getElementById('preserveFirstNote').textContent = this.translation.t('options:censorPreserveFirstNote');
+    document.getElementById('preserveLastName').textContent = this.translation.t('options:censorPreserveLast');
+    document.getElementById('preserveLastNote').textContent = this.translation.t('options:censorPreserveLastNote');
+    document.getElementById('showContextMenuName').textContent = this.translation.t('options:showContextMenu');
+    document.getElementById('showContextMenuNote').textContent = this.translation.t('options:showContextMenuNote');
+    document.getElementById('showCounterName').textContent = this.translation.t('options:showCounter');
+    document.getElementById('showCounterNote').textContent = this.translation.t('options:showCounterNote');
+    document.getElementById('showSummaryName').textContent = this.translation.t('options:showSummary');
+    document.getElementById('showSummaryNote').textContent = this.translation.t('options:showSummaryNote');
+    document.getElementById('showUpdateNotificationName').textContent = this.translation.t('options:showContextMenuNote');
+    document.getElementById('substitutionMarkName').textContent = this.translation.t('options:substitutionMark');
+    document.getElementById('substitutionMarkNote').textContent = this.translation.t('options:substitutionMarkNote');
+    document.getElementById('substitutionPreserveCaseName').textContent = this.translation.t('options:substitutionPreserveCase');
+    document.getElementById('substitutionPreserveCaseNote').textContent = this.translation.t('options:substitutionPreserveCaseNote');
+    document.getElementById('substitutionSettingsHeader').textContent = this.translation.t('options:substitutionSettingsHeader');
+    document.getElementById('useDeviceThemeName').textContent = this.translation.t('options:useDeviceTheme');
+    document.getElementById('useDeviceThemeNote').textContent = this.translation.t('options:useDeviceThemeNote');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {

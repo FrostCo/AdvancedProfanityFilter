@@ -50,48 +50,53 @@
 
 <div id="main" class="w3-hide">
 <div id="settingsPage" class="w3-container">
-  <h4 class="sectionHeader">Filter Method</h4>
+  <h4 id="filterMethodHeader" class="sectionHeader">Filter Method</h4>
 
   <div id="filterMethod">
     <label>
       <input id="filterCensor" class="w3-radio" type="radio" name="filterMethod" value="CENSOR">
-      Censor<span class="notes">(dog: dog = d**)</span>
+      <span id="filterCensorName">Censor</span>
+      <span id="filterMethodCensorNote" class="notes">(dog: dog = d**)</span>
     </label>
 
     <br/>
     <label>
       <input id="filterSubstitute" class="w3-radio" type="radio" name="filterMethod" value="SUBSTITUTE">
-      Substitute<span class="notes">(dog > cat: dog = cat)</span>
+      <span id="filterSubstituteName">Substitute</span>
+      <span id="filterMethodSubstituteNote" class="notes">(dog > cat: dog = cat)</span>
     </label>
 
     <br/>
     <label>
       <input id="filterRemove" class="w3-radio" type="radio" name="filterMethod" value="REMOVE">
-      Remove<span class="notes">(dog: doghouse = house)</span>
+      <span id="filterRemoveName">Remove</span>
+      <span id="filterMethodRemoveNote" class="notes">(dog: doghouse = house)</span>
     </label>
 
     <br/>
     <label>
       <input id="filterOff" class="w3-radio" type="radio" name="filterMethod" value="OFF">
-      Off<span class="notes">(disabled/summary only)</span>
+      <span id="filterOffName">Off</span>
+      <span id="filterMethodOffNote" class="notes">(disabled/summary only)</span>
     </label>
   </div>
 
   <div id="censorSettings" class="w3-hide">
-    <h4 class="sectionHeader">Censor Settings</h4>
+    <h4 id="censorSettingsHeader" class="sectionHeader">Censor Settings</h4>
     <label>
       <input id="preserveFirst" type="checkbox" class="w3-check">
-      Preserve the first letter
-      <span class="notes">(dog: dog = d**)</span>
+      <span id="preserveFirstName">Preserve the first letter</span>
+      <span id="preserveFirstNote" class="notes">(dog: dog = d**)</span>
     </label>
     <br />
     <label>
       <input id="preserveLast" type="checkbox" class="w3-check">
-      Preserve the last letter
-      <span class="notes">(dog: dog = **g)</span>
+      <span id="preserveLastName">Preserve the last letter</span>
+      <span id="preserveLastNote" class="notes">(dog: dog = **g)</span>
     </label>
     <br />
-    <label>Censor character:
+    <label>
+      <span id="censorCharacterName">Censor character:</span>
       <select id="censorCharacterSelect" class="w3-select w3-border small textInput" style="margin-top:8px;">
         <option value="*">*</option>
         <option value="&">&amp;</option>
@@ -113,9 +118,10 @@
       </select>
     </label>
     <br />
-    <label>Fixed length:
+    <label>
+      <span id="censorFixedLengthName">Fixed length:</span>
       <select id="censorFixedLengthSelect" class="w3-select w3-border small textInput" style="margin-top:8px;">
-        <option value="0">Original</option>
+        <option id="censorFixedLengthOriginal" value="0">Original</option>
         <option value="1">1</option>
         <option value="2">2</option>
         <option value="3">3</option>
@@ -130,72 +136,74 @@
   </div>
 
   <div id="substitutionSettings" class="w3-hide">
-    <h4 class="sectionHeader">Substitution Settings</h4>
+    <h4 id="substitutionSettingsHeader" class="sectionHeader">Substitution Settings</h4>
     <label>
       <input id="preserveCase" type="checkbox" class="w3-check">
-      Preserve case of filtered words
-      <span class="notes">(dog: Dog = Cat)</span>
+      <span id="substitutionPreserveCaseName">Preserve case of filtered words</span>
+      <span id="substitutionPreserveCaseNote" class="notes">(dog: Dog = Cat)</span>
     </label>
     <br />
     <label>
       <input id="substitutionMark" type="checkbox" class="w3-check">
-      Mark substituted words with [ ]
-      <span class="notes">(dog: dog = [cat])</span>
+      <span id="substitutionMarkName">Mark substituted words with [ ]</span>
+      <span id="substitutionMarkNote" class="notes">(dog: dog = [cat])</span>
     </label>
     <div style="padding-top:8px;">
-      <label>Default Substitution
+      <label>
+        <span id="defaultSubstitutionName">Default Substitution</span>
         <input id="defaultWordSubstitutionText" class="w3-input w3-border small" style="display:inline;">
       </label>
     </div>
   </div>
 
   <div id="generalOptions">
-    <h4 class="sectionHeader">General Settings</h4>
+    <h4 id="generalSettingsHeader" class="sectionHeader">General Settings</h4>
     <label>
       <input id="useDeviceTheme" type="checkbox" class="w3-check">
-      Use device theme
-      <span class="notes">(Light/dark mode)</span>
+      <span id="useDeviceThemeName">Use device theme</span>
+      <span id="useDeviceThemeNote" class="notes">(Light/dark mode)</span>
     </label>
     <br>
     <label>
       <input id="showContextMenu" type="checkbox" class="w3-check">
-      Show context menu
-      <span class="notes">(Right-click menu)</span>
+      <span id="showContextMenuName">Show context menu</span>
+      <span id="showContextMenuNote" class="notes">(Right-click menu)</span>
     </label>
     <br>
     <label>
       <input id="showCounter" type="checkbox" class="w3-check">
-      Show number of filtered words
-      <span class="notes">(Shown over the extension icon)</span>
+      <span id="showCounterName">Show number of filtered words</span>
+      <span id="showCounterNote" class="notes">(Shown over the extension icon)</span>
     </label>
     <br>
     <label>
       <input id="showSummary" type="checkbox" class="w3-check">
-      Show summary of filtered words
-      <span class="notes">(Shown in the extension popup)</span>
+      <span id="showSummaryName">Show summary of filtered words</span>
+      <span id="showSummaryNote" class="notes">(Shown in the extension popup)</span>
     </label>
     <br>
     <label>
       <input id="showUpdateNotification" type="checkbox" class="w3-check">
-      Show update notification
+      <span id="showUpdateNotificationName">Show update notification</span>
     </label>
   </div>
 
   <div id="defaultOptions">
-    <h4 class="sectionHeader">Default Settings (for new words/phrases)</h4>
+    <h4 id="defaultSettingsHeader" class="sectionHeader">Default Settings (for new words/phrases)</h4>
     <label>
       <input id="defaultWordRepeat" type="checkbox" class="w3-check">
-      Match repeated characters
-      <span class="notes">(dog: dddoooggg)</span>
+      <span id="defaultWordMatchRepeatedName">Match repeated characters</span>
+      <span id="defaultWordMatchRepeatedNote" class="notes">(dog: dddoooggg)</span>
     </label>
     <br>
     <label>
       <input id="defaultWordSeparators" type="checkbox" class="w3-check">
-      Match separator characters
-      <span class="notes">([-_ ] dog matches: D-o _g)</span>
+      <span id="defaultWordMatchSeparatorsName">Match separator characters</span>
+      <span id="defaultWordMatchSeparatorsNote" class="notes">([-_ ] dog matches: D-o _g)</span>
     </label>
     <div id="defaultMatchMethod" style="padding-top:8px;">
-      <label>Match Method
+      <label>
+        <span id="defaultWordMatchMethodName">Match Method</span>
         <select id="defaultWordMatchMethodSelect" class="w3-select w3-border small textInput"></select>
       </label>
     </div>
