@@ -35,6 +35,7 @@ export default class OptionPage {
   lessUsedWords: { [word: string]: number };
   lightModeButton: Element;
   prefersDarkScheme: boolean;
+  t: typeof Translation.prototype.t;
   themeElements: Element[];
   translation: Translation;
 
@@ -69,6 +70,7 @@ export default class OptionPage {
     this.setHelpVersion();
     this.filter = new this.Class.Filter;
     this.translation = new this.Class.Translation;
+    this.t = this.translation.t;
     this.applyTranslation();
   }
 
