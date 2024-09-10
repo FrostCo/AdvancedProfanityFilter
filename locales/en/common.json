@@ -16,8 +16,8 @@
   "importButton": "IMPORT",
   "okButton": "OK",
   "options": "Options",
-  "removeButton": "REMOVE",
   "removeAllButton": "REMOVE ALL",
+  "removeButton": "REMOVE",
   "renameButton": "RENAME",
   "resetButton": "RESET",
   "restoreDefaultsButton": "RESTORE DEFAULTS",
@@ -31,6 +31,6 @@
   "wordlist5": "Wordlist 5",
   "wordlist6": "Wordlist 6",
   "wordlistAllWords": "All Words",
-  "wordlists": "Wordlists",
-  "wordlistDefault": "Default Wordlist"
+  "wordlistDefault": "Default Wordlist",
+  "wordlists": "Wordlists"
 }
