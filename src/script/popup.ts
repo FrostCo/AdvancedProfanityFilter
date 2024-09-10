@@ -140,10 +140,10 @@ export default class Popup {
     document.getElementById('domainModeNormal').textContent = this.translation.t('common:domainModeNormal');
     document.getElementById('domainModeAdvanced').textContent = this.translation.t('common:domainModeAdvanced');
     document.getElementById('domainModeDeep').textContent = this.translation.t('common:domainModeDeep');
-    document.getElementById('filterMethodCensor').textContent = this.translation.t('common:FilterMethodCensor');
-    document.getElementById('filterMethodSubstitute').textContent = this.translation.t('common:FilterMethodCSubstitute');
-    document.getElementById('filterMethoRemove').textContent = this.translation.t('common:FilterMethodOff');
-    document.getElementById('filterMethoOff').textContent = this.translation.t('common:FilterMethodRemove');
+    document.getElementById('filterMethodCensor').textContent = this.translation.t('common:filterMethodCensor');
+    document.getElementById('filterMethodSubstitute').textContent = this.translation.t('common:filterMethodSubstitute');
+    document.getElementById('filterMethoRemove').textContent = this.translation.t('common:filterMethodOff');
+    document.getElementById('filterMethoOff').textContent = this.translation.t('common:filterMethodRemove');
   }
 
   disableDomainSwitch() {
