@@ -795,6 +795,11 @@ export default class OptionPage {
     }
   }
 
+  async exportStats(filePrefix = 'apf-stats') {
+    const stats = await this.getStatsFromStorage();
+    exportToFile(JSON.stringify(stats, null, 2), `${filePrefix}-${timeForFileName()}.json`);
+  }
+
   async filterWordListUpdate() {
     const filterWordList = document.getElementById('filterWordList') as HTMLInputElement;
     const wordList = document.getElementById('wordList') as HTMLSelectElement;
@@ -813,11 +818,6 @@ export default class OptionPage {
       this.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
       return false;
     }
-  }
-
-  async exportStats(filePrefix = 'apf-stats') {
-    const stats = await this.getStatsFromStorage();
-    exportToFile(JSON.stringify(stats, null, 2), `${filePrefix}-${timeForFileName()}.json`);
   }
 
   handleError(message: string, error?: Error) {
