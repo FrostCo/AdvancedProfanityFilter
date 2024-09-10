@@ -123,7 +123,7 @@
   "passwordModalHeader": "Enter Password",
   "passwordRemoveButton": "REMOVE",
   "passwordUpdateButton": "SET",
-  "passwordUpdateFailed": "Failed to update password.",
+  "passwordUpdateFailedMessage": "Failed to update password.",
   "saveAllowlistDuplicateMessage": "Already allowlisted.",
   "saveAllowlistFailedMessage": "Failed to update allowlist.",
   "saveFailedMessage": "Failed to save.",

@@ -38,7 +38,7 @@ export default class OptionAuth {
       this.setPasswordButton();
       if (this.optionPage.cfg.contextMenu) this.optionPage.sendUpdateContextMenuMessage();
     } catch (err) {
-      this.optionPage.handleError(this.optionPage.translation.t('options:passwordUpdateFailed'), err);
+      this.optionPage.handleError(this.optionPage.translation.t('options:passwordUpdateFailedMessage'), err);
     }
   }
 
