@@ -12,6 +12,7 @@
   "options": "Options",
   "remove": "REMOVE",
   "removeAll": "REMOVE ALL",
+  "rename": "RENAME",
   "save": "SAVE",
   "support": "Support",
   "wordlist1": "Wordlist 1",
@@ -21,5 +22,6 @@
   "wordlist5": "Wordlist 5",
   "wordlist6": "Wordlist 6",
   "wordlistAllWords": "All Words",
+  "wordlists": "Wordlists",
   "wordlistDefault": "Default Wordlist"
 }

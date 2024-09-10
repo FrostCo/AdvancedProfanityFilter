@@ -293,22 +293,25 @@
 
 <div id="listsPage" class="w3-container w3-hide">
   <div class="w3-half w3">
-    <h4 class="sectionHeader">Allowlist</h4>
-    <select id="allowlistSelect" class="w3-select w3-border small textInput"></select><span class="notes">(* Case-sensitive)</span>
+    <h4 id="allowlistHeader" class="sectionHeader">Allowlist</h4>
+    <select id="allowlistSelect" class="w3-select w3-border small textInput"></select>
+    <span id="allowlistNote" class="notes">(* Case-sensitive)</span>
 
-    <h4 class="sectionHeader">Word/Phrase</h4>
+    <h4 id="listWordPhraseHeader" class="sectionHeader">Word/Phrase</h4>
     <input id="allowlistText" class="w3-input w3-border small" type="text" pattern=".+">
 
     <br>
     <label>
       <input id="allowlistInsensitive" type="radio" class="w3-radio" name="allowlistCase" value="insensitive">
-      Case-insensitive<span class="notes">(doghouse: Don't filter "DogHouse")</span>
+      <span id="allowlistInsensitiveName">Case-insensitive</span>
+      <span id="allowlistInsensitiveNote" class="notes">(doghouse: Don't filter 'DogHouse')</span>
     </label>
 
     <br>
     <label>
       <input id="allowlistSensitive" type="radio" class="w3-radio" name="allowlistCase" value="sensitive">
-      Case-sensitive<span class="notes">(Doghouse: Don't filter "Doghouse")</span>
+      <span id="allowlistSensitiveName">Case-sensitive</span>
+      <span id="allowlistSensitiveNote" class="notes">(Doghouse: Don't filter 'Doghouse')</span>
     </label>
 
     <br>
@@ -320,18 +323,18 @@
 
   <div class="w3-half w3-right">
     <label style="display: block;">
-      <h4 class="sectionHeader" style="display: inline-block; height: 30px;">Wordlists</h4>
+      <h4 id="wordlistsHeader" class="sectionHeader" style="display: inline-block; height: 30px;">Wordlists</h4>
       <input id="wordlistsEnabled" type="checkbox" class="w3-check">
     </label>
 
     <div id="wordlistContainer" class="w3-hide">
       <select id="wordlistSelect" class="w3-select w3-border small textInput"></select>
 
-      <h4 class="sectionHeader">Name</h4>
+      <h4 id="wordlistNameHeader" class="sectionHeader">Name</h4>
       <input id="wordlistText" class="w3-input w3-border small" type="text" pattern="^\S.*" required style="display: inline; margin-right: 8px;">
       <button id="wordlistRename" class="w3-btn w3-round-large w3-flat-peter-river">RENAME</button>
 
-      <h4 class="sectionHeader">Default Text Wordlist</h4>
+      <h4 id="defaultTextWordlistHeader" class="sectionHeader">Default Text Wordlist</h4>
       <select id="textWordlistSelect" class="w3-select w3-border small textInput"></select><span class="notes"></span>
     </div>
   </div>

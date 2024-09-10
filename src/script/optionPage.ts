@@ -342,6 +342,20 @@ export default class OptionPage {
     document.getElementById('wordSave').textContent = this.translation.t('common:save');
     document.getElementById('wordsHeader').textContent = this.translation.t('options:wordsAndPhrasesHeader');
     document.getElementById('wordSubstitutionHeader').textContent = this.translation.t('options:wordSubstitutionHeader');
+    // Lists page
+    document.getElementById('allowlistHeader').textContent = this.translation.t('options:allowlistHeader');
+    document.getElementById('allowlistInsensitiveName').textContent = this.translation.t('options:allowlistInsensitive');
+    document.getElementById('allowlistInsensitiveNote').textContent = this.translation.t('options:allowlistInsensitiveNote');
+    document.getElementById('allowlistNote').textContent = this.translation.t('options:allowlistNote');
+    document.getElementById('allowlistRemove').textContent = this.translation.t('common:remove');
+    document.getElementById('allowlistSave').textContent = this.translation.t('common:save');
+    document.getElementById('allowlistSensitiveName').textContent = this.translation.t('options:allowlistSensitive');
+    document.getElementById('allowlistSensitiveNote').textContent = this.translation.t('options:allowlistSensitiveNote');
+    document.getElementById('defaultTextWordlistHeader').textContent = this.translation.t('options:defaultTextWordlistHeader');
+    document.getElementById('listWordPhraseHeader').textContent = this.translation.t('options:wordPhraseHeader');
+    document.getElementById('wordlistNameHeader').textContent = this.translation.t('options:wordlistNameHeader');
+    document.getElementById('wordlistRename').textContent = this.translation.t('common:rename');
+    document.getElementById('wordlistsHeader').textContent = this.translation.t('common:wordlists');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
