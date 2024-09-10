@@ -255,7 +255,11 @@ export default class OptionPage {
     document.getElementById('configHeader').textContent = this.t('options:configHeader');
     document.getElementById('configImport').textContent = this.t('common:importButton');
     document.getElementById('configInlineEditorName').textContent = this.t('options:configInlineEditor');
+    document.getElementById('configLoggingLevelDebug').textContent = this.t('common:logLevelDebug');
+    document.getElementById('configLoggingLevelError').textContent = this.t('common:logLevelError');
     document.getElementById('configLoggingLevelHeader').textContent = this.t('options:configLoggingLevelHeader');
+    document.getElementById('configLoggingLevelInfo').textContent = this.t('common:logLevelInfo');
+    document.getElementById('configLoggingLevelWarn').textContent = this.t('common:logLevelWarn');
     document.getElementById('configPasswordHeader').textContent = this.t('options:configPasswordHeader');
     document.getElementById('configReset').textContent = this.t('common:restoreDefaultsButton');
     document.getElementById('configStorageHeader').textContent = this.t('options:configStorageHeader');
@@ -1009,7 +1013,6 @@ export default class OptionPage {
   populateConfig() {
     const configSyncLargeKeys = document.getElementById('configSyncLargeKeys') as HTMLInputElement;
     const configLoggingLevelSelect = document.getElementById('configLoggingLevelSelect') as HTMLSelectElement;
-    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.LOGGING_LEVELS), configLoggingLevelSelect, true);
     configLoggingLevelSelect.selectedIndex = this.cfg.loggingLevel;
     configSyncLargeKeys.checked = this.cfg.syncLargeKeys;
     this.auth.setPasswordButton();
@@ -2010,7 +2013,7 @@ export default class OptionPage {
     this.cfg.enabledFramesOnly = !domainFilterAllFrames.checked;
     this.cfg.wordlistsEnabled = wordlistsEnabledInput.checked;
     this.cfg.collectStats = collectStats.checked;
-    this.cfg.loggingLevel = this.Class.Constants.LOGGING_LEVELS[configLoggingLevelSelect.value.toUpperCase()];
+    this.cfg.loggingLevel = configLoggingLevelSelect.selectedIndex;
   }
 
   async updateUseSystemTheme(useDeviceThemeInput: HTMLInputElement) {
