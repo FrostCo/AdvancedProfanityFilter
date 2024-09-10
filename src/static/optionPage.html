@@ -212,62 +212,74 @@
 
 <div id="wordsPage" class="w3-container w3-hide">
   <div class="w3-half">
-    <h4 class="sectionHeader">Words & Phrases</h4>
+    <h4 id="wordsHeader" class="sectionHeader">Words & Phrases</h4>
     <select id="wordList" class="w3-select w3-border small textInput"></select>
-    <label><input id="filterWordList" type="checkbox" class="w3-check">  Filter list</label>
+    <label>
+      <input id="filterWordList" type="checkbox" class="w3-check">
+      <span id="filterWordListName">Filter list</span>
+    </label>
 
-    <h4 class="sectionHeader">Word/Phrase</h4>
+    <h4 id="wordPhraseHeader" class="sectionHeader">Word/Phrase</h4>
     <input id="wordText" class="w3-input w3-border small" type="text" pattern=".+">
 
     <div id="wordSubstitution" class="w3-hide">
-      <h4 class="sectionHeader">Substitution</h4>
+      <h4 id="wordSubstitutionHeader" class="sectionHeader">Substitution</h4>
       <input id="substitutionText" class="w3-input w3-border small"/>
-      <label><input id="substitutionCase" type="checkbox" class="w3-check">  Case-sensitive</label>
+      <label>
+        <input id="substitutionCase" type="checkbox" class="w3-check">
+        <span id="wordCaseSensitive">Case-sensitive</span>
+      </label>
     </div>
 
     <div id="wordMatchMethod">
-      <h4 class="sectionHeader">Match Method</h4>
+      <h4 id="wordMatchMethodHeader" class="sectionHeader">Match Method</h4>
       <label>
         <input id="wordMatchExact" type="radio" class="w3-radio" name="wordMatchMethod" value="EXACT">
-        Exact<span class="notes">(dog: *** in the doghouse)</span>
+        <span id="wordMatchExactName">Exact</span>
+        <span id="wordMatchExactNote" class="notes">(dog: *** in the doghouse)</span>
       </label>
 
       <br>
       <label>
         <input id="wordMatchPartial" type="radio" class="w3-radio" name="wordMatchMethod" value="PARTIAL">
-        Partial<span class="notes">(dog: *** in the ***house)</span>
+        <span id="wordMatchPartialName">Partial</span>
+        <span id="wordMatchPartialNote" class="notes">(dog: *** in the ***house)</span>
       </label>
 
       <br>
       <label>
         <input id="wordMatchWhole" type="radio" class="w3-radio" name="wordMatchMethod" value="WHOLE">
-        Whole<span class="notes">(dog: *** in the ********)</span>
+        <span id="wordMatchWholeName">Whole</span>
+        <span id="wordMatchWholeNote" class="notes">(dog: *** in the ********)</span>
       </label>
 
       <br>
       <label>
         <input id="wordMatchRegex" type="radio" class="w3-radio" name="wordMatchMethod" value="REGEX">
-        Regex<span class="notes">(Regular expression)</span>
+        <span id="wordMatchRegexName">Regex</span>
+        <span id="wordMatchRegexNote" class="notes">(Regular expression)</span>
       </label>
     </div>
   </div>
 
   <div class="w3-half w3-right">
     <div id="wordWordlistDiv" class="w3-hide">
-      <h4 class="sectionHeader">Include in Wordlists</h4>
+      <h4 id="includeInWordlistsHeader" class="sectionHeader">Include in Wordlists</h4>
       <div id="wordlistSelections"></div>
     </div>
 
-    <h4 class="sectionHeader">Other</h4>
+    <h4 id="wordOtherHeader" class="sectionHeader">Other</h4>
     <label>
       <input id="wordMatchRepeated" type="checkbox" class="w3-check" name="matchRepeat"/>
-      Match repeated characters<span class="notes">(dog: dddoooggg)</span>
+      <span id="wordMatchRepeatedName">Match repeated characters</span>
+      <span id="wordMatchRepeatedNote" class="notes">(dog: dddoooggg)</span>
     </label>
 
     <br>
     <label>
       <input id="wordMatchSeparators" type="checkbox" class="w3-check" name="matchSeparators"/>
-      Match separators<span class="notes">([-_ ] dog matches: D-o _g)</span>
+      <span id="wordMatchSeparatorsName">Match separators</span>
+      <span id="wordMatchSeparatorsNote" class="notes">([-_ ] dog matches: D-o _g)</span>
     </label>
   </div>
 

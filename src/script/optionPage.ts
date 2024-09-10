@@ -317,6 +317,31 @@ export default class OptionPage {
     document.getElementById('substitutionSettingsHeader').textContent = this.translation.t('options:substitutionSettingsHeader');
     document.getElementById('useDeviceThemeName').textContent = this.translation.t('options:useDeviceTheme');
     document.getElementById('useDeviceThemeNote').textContent = this.translation.t('options:useDeviceThemeNote');
+    // Words page
+    document.getElementById('bulkWordEditorButton').textContent = this.translation.t('options:wordBulkEditorButton');
+    document.getElementById('filterWordListName').textContent = this.translation.t('options:filterWordList');
+    document.getElementById('includeInWordlistsHeader').textContent = this.translation.t('options:includeInWordlistsHeader');
+    document.getElementById('wordCaseSensitive').textContent = this.translation.t('options:wordCaseSensitive');
+    document.getElementById('wordMatchExactName').textContent = this.translation.t('options:matchMethodExact');
+    document.getElementById('wordMatchExactNote').textContent = this.translation.t('options:wordMatchExactNote');
+    document.getElementById('wordMatchMethodHeader').textContent = this.translation.t('options:wordMatchMethodHeader');
+    document.getElementById('wordMatchPartialName').textContent = this.translation.t('options:matchMethodPartial');
+    document.getElementById('wordMatchPartialNote').textContent = this.translation.t('options:wordMatchPartialNote');
+    document.getElementById('wordMatchRegexName').textContent = this.translation.t('options:matchMethodRegex');
+    document.getElementById('wordMatchRegexNote').textContent = this.translation.t('options:wordMatchRegexNote');
+    document.getElementById('wordMatchRepeatedName').textContent = this.translation.t('options:wordMatchRepeated');
+    document.getElementById('wordMatchRepeatedNote').textContent = this.translation.t('options:wordMatchRepeatedNote');
+    document.getElementById('wordMatchSeparatorsName').textContent = this.translation.t('options:wordMatchSeparators');
+    document.getElementById('wordMatchSeparatorsNote').textContent = this.translation.t('options:wordMatchSeparatorsNote');
+    document.getElementById('wordMatchWholeName').textContent = this.translation.t('options:matchMethodWhole');
+    document.getElementById('wordMatchWholeNote').textContent = this.translation.t('options:wordMatchWholeNote');
+    document.getElementById('wordOtherHeader').textContent = this.translation.t('options:wordOtherHeader');
+    document.getElementById('wordPhraseHeader').textContent = this.translation.t('options:wordPhraseHeader');
+    document.getElementById('wordRemove').textContent = this.translation.t('common:remove');
+    document.getElementById('wordRemoveAll').textContent = this.translation.t('common:removeAll');
+    document.getElementById('wordSave').textContent = this.translation.t('common:save');
+    document.getElementById('wordsHeader').textContent = this.translation.t('options:wordsAndPhrasesHeader');
+    document.getElementById('wordSubstitutionHeader').textContent = this.translation.t('options:wordSubstitutionHeader');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
