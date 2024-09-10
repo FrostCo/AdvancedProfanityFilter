@@ -756,13 +756,13 @@ export default class OptionPage {
         // Revert UI and export a backup of config.
         this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
         this.backupConfig();
-        this.handleError(this.translation.t('options:storageCovnersionCleanupFailedMessage'), err);
+        this.handleError(this.translation.t('options:storageConversionCleanupFailedMessage'), err);
         await this.cfg.save('syncLargeKeys');
         this.populateConfig();
       }
     } catch (err) {
       // Revert UI
-      this.handleError(this.translation.t('options:storageConvertsionFailedMessage'), err);
+      this.handleError(this.translation.t('options:storageConversionFailedMessage'), err);
       this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
       this.populateConfig();
     }
@@ -825,7 +825,7 @@ export default class OptionPage {
         this.populateWord();
       }
     } catch (err) {
-      this.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
+      this.showErrorModal([this.t('options:saveFailedMessage'), `Error: ${err.message}`]);
       return false;
     }
   }
@@ -888,10 +888,10 @@ export default class OptionPage {
     try {
       await this.convertStorageLocation(null, true);
       await this.cfg.save();
-      this.showStatusModal('Settings imported successfully.');
+      this.showStatusModal(this.t('options:configImportedMessage'));
       await this.init();
     } catch (err) {
-      this.handleError('Failed to import config.', err);
+      this.handleError(this.t('options:configImportFailedMessage'), err);
     }
   }
 
@@ -909,18 +909,18 @@ export default class OptionPage {
         try {
           this.cfg = importedCfg;
           await this.cfg.save();
-          this.showStatusModal('Settings imported successfully.');
+          this.showStatusModal(this.t('options:configImportedMessage'));
           await this.init(true);
         } catch (err) {
           if (this.isStorageError(err) && this.cfg.syncLargeKeys) {
             this.confirm('importConfigRetry');
           } else {
-            this.handleError('Failed to import settings.', err);
+            this.handleError(this.t('options:configImportFailedMessage'), err);
           }
         }
       }
     } catch (err) {
-      this.showErrorModal(['Failed to process new settings.', `Error: ${err.message}`]);
+      this.showErrorModal([this.t('options:configImportFailedProcessingMessage'), `Error: ${err.message}`]);
     }
   }
 
@@ -936,13 +936,13 @@ export default class OptionPage {
       const file = files[0];
       const fileText = await readFile(file) as string;
       const stats = JSON.parse(fileText);
-      if (!this.validStatsForImport(stats)) throw new Error('Invalid stats file.');
+      if (!this.validStatsForImport(stats)) throw new Error(this.t('statsFileImportInvalidMessage'));
       await this.Class.Config.saveLocalStorage({ stats: stats });
       input.value = '';
       await this.populateStats();
     } catch (err) {
       await this.Class.Config.saveLocalStorage({ stats: backupStats });
-      this.handleError('Failed to import stats.', err);
+      this.handleError(this.t('statsFileImportFailedMessage'), err);
     }
   }
 
@@ -1074,7 +1074,7 @@ export default class OptionPage {
     removeChildren(domainsSelect);
 
     const domains = this.Class.Domain.sortedKeys(this.cfg.domains);
-    domains.unshift('Add, or update existing...');
+    domains.unshift(this.t('options:addOrUpdateExistingOption'));
     domains.forEach((domain) => {
       const optionElement = document.createElement('option');
       optionElement.textContent = domain;
@@ -1211,8 +1211,8 @@ export default class OptionPage {
 
       this.populateStatsSummary(stats, totalFiltered);
     } catch (err) {
-      logger.warn('Failed to populate stats.', err);
-      this.showErrorModal(['Failed to populate stats.', `Error: ${err.message}`]);
+      logger.warn(this.t('options:statsFailedToPopulateMessage'), err);
+      this.showErrorModal([this.t('options:statsFailedToPopulateMessage'), `Error: ${err.message}`]);
     }
   }
 
@@ -1259,7 +1259,7 @@ export default class OptionPage {
     const filteredTestText = document.getElementById('filteredTestText') as HTMLElement;
 
     if (testText.value === '') {
-      filteredTestText.textContent = 'Enter some text above to test the filter...';
+      filteredTestText.textContent = this.t('options.testFilteredTextPlaceholder');
     } else {
       if (this.cfg.filterMethod === this.Class.Constants.FILTER_METHODS.OFF) {
         filteredTestText.textContent = testText.value;
@@ -1275,7 +1275,7 @@ export default class OptionPage {
     const list = [].concat(sensitiveList, this.filter.cfg.iWordAllowlist).sort();
     const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
     removeChildren(allowlist);
-    list.unshift('Add, or update existing...');
+    list.unshift(this.t('options:addOrUpdateExistingOption'));
     list.forEach((item) => {
       const optionElement = document.createElement('option');
       optionElement.value = item === list[0] ? '' : item.replace(regExp, '');
@@ -1397,7 +1397,7 @@ export default class OptionPage {
     }
 
     const words = Object.keys(this.cfg.words).sort();
-    words.unshift('Add, or update existing...');
+    words.unshift(this.t('options:addOrUpdateExistingOption'));
     words.forEach((word) => {
       let filteredWord = word;
       if (word != words[0] && wordlistFilter.cfg.filterWordList) {
@@ -1451,7 +1451,7 @@ export default class OptionPage {
         }
       }
     } catch (err) {
-      logger.warn('Error while prepapring less-used words.', err);
+      logger.warn(this.t('options:statsLessUsedWordsErrorMessage'), err);
       return {};
     }
   }
@@ -1474,8 +1474,8 @@ export default class OptionPage {
         await this.cfg.save('domains');
         this.populateDomainPage();
       } catch (err) {
-        logger.warn(`Failed to remove domain '${domainsSelect.value}'.`, err);
-        this.showErrorModal([`Failed to remove domain '${domainsSelect.value}'.`, `Error: ${err.message}`]);
+        logger.warn(this.t('options:domainRemoveFailedMessage', { domain: domainsSelect.value }), err);
+        this.showErrorModal([this.t('options:domainRemoveFailedMessage', { domain: domainsSelect.value }), `Error: ${err.message}`]);
         return false;
       }
     }
@@ -1502,8 +1502,8 @@ export default class OptionPage {
       this.filter.init();
       this.populateOptions();
     } catch (err) {
-      logger.warn(`Failed to remove '${originalWord}' from allowlist.`, err);
-      this.showErrorModal([`Failed to remove '${originalWord}' from allowlist.`, `Error: ${err.message}`]);
+      logger.warn(this.t('options:allowlistRemoveFailedMessage', { word: originalWord }), err);
+      this.showErrorModal([this.t('options:allowlistRemoveFailedMessage', { word: originalWord }), `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1523,8 +1523,8 @@ export default class OptionPage {
         this.filter.rebuildWordlists();
         this.populateOptions();
       } catch (err) {
-        logger.warn(`Failed to remove '${word}'.`, err);
-        this.showErrorModal([`Failed to remove '${word}'.`, `Error: ${err.message}`]);
+        logger.warn(this.t('options:wordRemoveFailedMessage', { word: word }), err);
+        this.showErrorModal([this.t('options:wordRemoveFailedMessage', { word: word }), `Error: ${err.message}`]);
       }
     }
   }
@@ -1538,7 +1538,7 @@ export default class OptionPage {
     if (wordlistText.checkValidity()) {
       // Make sure there are no duplicates
       if (this.cfg.wordlists.includes(name)) {
-        this.showInputError(wordlistText, 'Please enter a unique name.');
+        this.showInputError(wordlistText, this.t('options:wordlistRenameDuplicate'));
         return false;
       }
 
@@ -1548,22 +1548,22 @@ export default class OptionPage {
         this.populateWordlists(index);
         this.populateWordPage();
       } catch (err) {
-        this.handleError('Failed to save wordlist name.', err);
+        this.handleError(this.t('options:wordlistSaveFailedMessage'), err);
       }
     } else {
-      this.showInputError(wordlistText, 'Please enter a valid name.');
+      this.showInputError(wordlistText, this.t('options:wordlistRenameInvalidMessage'));
     }
   }
 
   async restoreDefaults(evt: Event = null, silent = false) {
     try {
       await this.cfg.resetPreserveStats();
-      if (!silent) this.showStatusModal('Default settings restored.');
+      if (!silent) this.showStatusModal(this.t('options:configDefaultsRestoredMessage'));
       await this.init(true);
       return true;
     } catch (err) {
-      logger.warn('Failed to restore defaults.', err);
-      this.showErrorModal(['Failed to restore defaults.', `Error: ${err.message}`]);
+      logger.warn(this.t('options:configDefaultsFailedMessage'), err);
+      this.showErrorModal([this.t('options:configDefaultsFailedMessage'), `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1573,7 +1573,7 @@ export default class OptionPage {
     const newKey = domainText.value.trim().toLowerCase();
 
     if (newKey == '') { // No data
-      this.showInputError(domainText, 'Please enter a value.');
+      this.showInputError(domainText, this.t('options:domainSaveEmptyMessage'));
       return false;
     }
 
@@ -1581,7 +1581,7 @@ export default class OptionPage {
       this.hideInputError(domainText);
       const domainCfg = this.domainCfgFromPage();
       if (!domainCfg) {
-        this.showInputError('Failed to gather domain settings.');
+        this.showInputError(this.t('options:domainSaveFailedGettingSettingsMessage'));
         return false;
       }
 
@@ -1600,11 +1600,11 @@ export default class OptionPage {
         await domain.save(this.cfg);
         this.populateDomainPage();
       } catch (err) {
-        this.showErrorModal(['Failed to save.', `Error: ${err.message}`]);
+        this.showErrorModal([this.t('options:saveFailedMessage'), `Error: ${err.message}`]);
         return false;
       }
     } else {
-      this.showInputError(domainText, 'Valid domain example: google.com or www.google.com');
+      this.showInputError(domainText, this.t('options:domainSaveExample'));
       return false;
     }
   }
@@ -1617,8 +1617,8 @@ export default class OptionPage {
       await this.init();
       return true;
     } catch (err) {
-      logger.warn('Settings not saved! Please try again.', err);
-      this.showErrorModal(['Settings not saved! Please try again.', `Error: ${err.message}`]);
+      logger.warn(this.t('options:saveOptionsFailedMessage'), err);
+      this.showErrorModal([this.t('options:saveOptionsFailedMessage'), `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1635,12 +1635,12 @@ export default class OptionPage {
     const newListName = newCase === 'sensitive' ? 'wordAllowlist' : 'iWordAllowlist';
 
     if (allowlistText.value === '') {
-      this.showInputError(allowlistText, 'Please enter a valid word/phrase.');
+      this.showInputError(allowlistText, this.t('options:wordPhraseInvalidMessage'));
       return false;
     }
 
     if (this.cfg[newListName].indexOf(newWord) > -1) {
-      this.showInputError(allowlistText, 'Already allowlisted.');
+      this.showInputError(allowlistText, this.t('options:saveAllowlistDuplicateMessage'));
       return false;
     }
 
@@ -1669,13 +1669,13 @@ export default class OptionPage {
           this.filter.init();
           this.populateOptions();
         } catch (err) {
-          logger.warn('Failed to update allowlist.', err);
-          this.showErrorModal(['Failed to update allowlist.', `Error: ${err.message}`]);
+          logger.warn(this.t('options:saveAllowlistFailedMessage'), err);
+          this.showErrorModal([this.t('options:saveAllowlistFailedMessage'), `Error: ${err.message}`]);
           return false;
         }
       }
     } else {
-      this.showInputError(allowlistText, 'Please enter a valid word/phrase.');
+      this.showInputError(allowlistText, this.t('options:wordPhraseInvalidMessage'));
     }
   }
 
@@ -1699,13 +1699,13 @@ export default class OptionPage {
     }
 
     if (word == '') {
-      this.showInputError(wordText, 'Please enter a valid word/phrase.');
+      this.showInputError(wordText, this.t('options:wordPhraseInvalidMessage'));
       return false;
     }
 
     // Make sure word and substitution are different
     if (word == sub) {
-      this.showInputError(substitutionText, 'Word and substitution must be different.');
+      this.showInputError(substitutionText, this.t('options:saveWordSubstitutionCollisionMessage'));
       return false;
     }
 
@@ -1732,7 +1732,7 @@ export default class OptionPage {
         const first = subFilter.replaceTextResult(word, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
         const second = subFilter.replaceTextResult(first.filtered, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
         if (first.filtered != second.filtered) {
-          this.showInputError(substitutionText, "Substitution can't contain word (causes an endless loop).");
+          this.showInputError(substitutionText, this.t('options:saveWordSubstitutionEmbeddedMessage'));
           return false;
         }
       }
@@ -1745,7 +1745,7 @@ export default class OptionPage {
         subFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { words: words }));
         subFilter.init();
         if (subFilter.wordlists[subFilter.wordlistId].regExps.length === 0) {
-          this.showInputError(wordText, 'Invalid Regex.');
+          this.showInputError(wordText, this.t('options:saveWordRegexInvalidMessage'));
           return false;
         }
       }
@@ -1764,7 +1764,7 @@ export default class OptionPage {
           if (added) {
             delete this.cfg.words[originalWord];
           } else {
-            this.showInputError(wordText, `'${word}' already in list.`);
+            this.showInputError(wordText, this.t('options:saveWordDuplicateMessage', { word: word }));
           }
         }
       }
@@ -1776,16 +1776,16 @@ export default class OptionPage {
           this.filter.rebuildWordlists();
           this.populateOptions();
         } catch (err) {
-          logger.warn(`Failed to update word '${word}'.`, err);
-          this.showErrorModal([`Failed to update word '${word}'.`, `Error: ${err.message}`]);
+          logger.warn(this.t('options:saveWordUpdateFailedMessage', { word: word }), err);
+          this.showErrorModal([this.t('options:saveWordUpdateFailedMessage', { word: word }), `Error: ${err.message}`]);
           this.cfg.removeWord(word);
           return false;
         }
       } else {
-        this.showInputError(wordText, `'${word}' already in list.`);
+        this.showInputError(wordText, this.t('options:saveWordDuplicateMessage', { word: word }));
       }
     } else {
-      this.showInputError(wordText, 'Please enter a valid word/phrase.');
+      this.showInputError(wordText, this.t('options:wordPhraseInvalidMessage'));
     }
   }
 
@@ -1796,7 +1796,7 @@ export default class OptionPage {
       this.filter.rebuildWordlists();
       this.populateOptions();
     } catch (err) {
-      this.handleError('Failed to set filter method.', err);
+      this.handleError(this.t('options:saveFilterMethodFailedMessage'), err);
     }
   }
 
@@ -1817,7 +1817,7 @@ export default class OptionPage {
       await this.cfg.save(prop);
       this.populateOptions();
     } catch (err) {
-      this.showErrorModal('Failed to update defult wordlist.', err);
+      this.showErrorModal(this.t('options:saveWordlistDefaultFailedMessage'), err);
     }
   }
 
@@ -1878,12 +1878,12 @@ export default class OptionPage {
       await this.Class.Config.removeLocalStorage('stats');
       this.populateStats();
     } catch (err) {
-      logger.warn('Failed to reset stats.', err);
-      this.showErrorModal(['Failed to reset stats.', `Error: ${err.message}`]);
+      logger.warn(this.t('options:statsResetFailedMessage'), err);
+      this.showErrorModal([this.t('options:statsResetFailedMessage'), `Error: ${err.message}`]);
     }
   }
 
-  showErrorModal(content: string | string[] = ['The requested action failed. Please try again or contact support.'], title = 'Error', titleColor = 'w3-red') {
+  showErrorModal(content: string | string[] = [this.t('options:errorModalDefaultContent')], title = this.t('options:errorModalDefaultTitle'), titleColor = 'w3-red') {
     this.configureStatusModal(content, title, titleColor);
     this.openModal('statusModal');
   }
@@ -1900,12 +1900,12 @@ export default class OptionPage {
     }
   }
 
-  showStatusModal(content: string | string[] = ['Status updated.'], title = 'Status', titleColor = 'w3-flat-peter-river') {
+  showStatusModal(content: string | string[] = [this.t('options:statusModalDefaultContent')], title = this.t('options:statusModalDefaultTitle'), titleColor = 'w3-flat-peter-river') {
     this.configureStatusModal(content, title, titleColor);
     this.openModal('statusModal');
   }
 
-  showWarningModal(content: string | string[] = ['Invalid input.'], title = 'Warning', titleColor = 'w3-orange') {
+  showWarningModal(content: string | string[] = [this.t('options:warningModalDefaultContent')], title = this.t('options:warningModalDefaultTitle'), titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
     this.openModal('statusModal');
   }
@@ -2020,7 +2020,7 @@ export default class OptionPage {
       await this.cfg.save('darkMode');
       this.applyTheme(true);
     } catch (err) {
-      this.handleError('Failed to update theme selection.', err);
+      this.handleError(this.t('options:themeSaveFailedMessage'), err);
     }
   }
 
@@ -2031,7 +2031,7 @@ export default class OptionPage {
     if (lessUsedWordsNumber.value.match(/^\d+$/) && parseInt(lessUsedWordsNumber.value) > 0) {
       valid = true;
     } else {
-      this.showInputError(lessUsedWordsNumber, 'Enter a positive whole number.');
+      this.showInputError(lessUsedWordsNumber, this.t('options:statsLessUsedWordsInvalidMessage'));
     }
 
     return valid;
