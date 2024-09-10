@@ -433,6 +433,8 @@ export default class OptionPage {
     // Password
     document.getElementById('passwordModalHeader').textContent = this.translation.t('options:passwordModalHeader');
     document.getElementById('submitPassword').textContent = this.translation.t('options:submitButton');
+    // Status
+    document.getElementById('statusModalOK').textContent = this.translation.t('common:okButton');
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
