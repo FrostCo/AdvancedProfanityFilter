@@ -58,145 +58,6 @@ export default class OptionPage {
     'div.w3-modal',
   ];
 
-  closeModal(id: string) {
-    this.hide(document.getElementById(id));
-  }
-
-  configureConfirmModal(settings: ConfirmModalSettings = {}, contentElement?: HTMLElement) {
-    const modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
-    const modalContent = document.getElementById('confirmModalContent') as HTMLElement;
-    const modalHeader = document.querySelector('#confirmModal header') as HTMLElement;
-    const backupButtonContainer = document.querySelector('#confirmModal span.confirmBackupButton') as HTMLElement;
-    const backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
-    removeChildren(modalContent);
-
-    const defaults = {
-      backup: false,
-      content: 'Are you sure?',
-      title: 'Please Confirm',
-      titleClass: 'w3-flat-peter-river',
-    };
-    settings = Object.assign(defaults, settings);
-
-    if (!contentElement) {
-      contentElement = document.createElement('span');
-      contentElement.textContent = settings.content;
-    }
-
-    modalTitle.textContent = settings.title;
-    modalContent.appendChild(contentElement);
-    modalHeader.className = `w3-container ${settings.titleClass}`;
-    if (settings.backup) {
-      this.show(backupButtonContainer);
-      this.enableBtn(backupButton);
-    } else {
-      this.hide(backupButtonContainer);
-      this.disableBtn(backupButton);
-    }
-  }
-
-  configureStatusModal(content: string | string[], title: string, titleColor: string) {
-    const modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
-    const modalContent = document.getElementById('statusModalContent') as HTMLElement;
-    const modalHeader = document.querySelector('#statusModal header') as HTMLElement;
-    removeChildren(modalContent);
-
-    modalHeader.className = `w3-container ${titleColor}`;
-    modalTitle.textContent = title;
-
-    content = stringArray(content);
-    content.forEach((textPart) => {
-      const contentElement = document.createElement('p') as HTMLParagraphElement;
-      contentElement.textContent = textPart;
-      modalContent.appendChild(contentElement);
-    });
-  }
-
-  disableBtn(element: HTMLElement) {
-    element.classList.add('disabled');
-    element.classList.add('w3-flat-silver');
-  }
-
-  enableBtn(element: HTMLElement) {
-    element.classList.remove('disabled');
-    element.classList.remove('w3-flat-silver');
-  }
-
-  handleError(message: string, error?: Error) {
-    if (error) {
-      logger.error(message, error);
-      this.showErrorModal([message, `Error: ${error.message}`]);
-    } else {
-      logger.error(message);
-      this.showErrorModal([message]);
-    }
-  }
-
-  hide(element: HTMLElement) {
-    element.classList.remove('w3-show');
-    element.classList.add('w3-hide');
-  }
-
-  hideInputError(element: HTMLInputElement) {
-    element.classList.remove('w3-border-red');
-    try {
-      element.setCustomValidity('');
-    } catch (err) {
-      // If HTML5 validation not supported, the modal will suffice
-    }
-  }
-
-  hideStatus() {
-    const notificationPanel = document.getElementById('notificationPanel') as HTMLElement;
-    this.hide(notificationPanel);
-  }
-
-  isStorageError(error: Error): boolean {
-    if (error.message) {
-      const chromeQuotaError = '[QUOTA_BYTES quota exceeded]';
-      const firefoxQuotaError = '[QuotaExceededError: storage.sync API call exceeded its quota limitations.]';
-      return error.message.includes(chromeQuotaError) || error.message.includes(firefoxQuotaError);
-    }
-
-    return false;
-  }
-
-  openModal(id: string) {
-    this.show(document.getElementById(id));
-  }
-
-  show(element: HTMLElement) {
-    element.classList.remove('w3-hide');
-    element.classList.add('w3-show');
-  }
-
-  showErrorModal(content: string | string[] = ['The requested action failed. Please try again or contact support.'], title = 'Error', titleColor = 'w3-red') {
-    this.configureStatusModal(content, title, titleColor);
-    this.openModal('statusModal');
-  }
-
-  showInputError(element, message = '') {
-    element.classList.add('w3-border-red');
-    if (message) {
-      try {
-        element.setCustomValidity(message);
-        element.reportValidity();
-      } catch (err) {
-        this.showWarningModal(message);
-      }
-    }
-  }
-
-  showStatusModal(content: string | string[] = ['Status updated.'], title = 'Status', titleColor = 'w3-flat-peter-river') {
-    this.configureStatusModal(content, title, titleColor);
-    this.openModal('statusModal');
-  }
-
-  showWarningModal(content: string | string[] = ['Invalid input.'], title = 'Warning', titleColor = 'w3-orange') {
-    this.configureStatusModal(content, title, titleColor);
-    this.openModal('statusModal');
-  }
-
   constructor() {
     this._confirmEventListeners = [];
     this.darkModeButton = document.querySelector('div.themes > div.moon');
@@ -639,17 +500,6 @@ export default class OptionPage {
     }
   }
 
-  async importConfigRetryCancel() {
-    await this.init();
-  }
-
-  bulkEditorWordlistCheckbox(checkbox: HTMLInputElement) {
-    const checked = checkbox.checked;
-    document.querySelectorAll(`#bulkWordEditorModal table td input.wordlistData[data-col="${checkbox.dataset.col}"]`).forEach((box: HTMLInputElement) => {
-      box.checked = checked;
-    });
-  }
-
   bulkEditorCurrentWords() {
     const table = document.querySelector('#bulkWordEditorModal table#bulkWordEditorTable') as HTMLTableElement;
     const words = [];
@@ -699,6 +549,17 @@ export default class OptionPage {
     return row;
   }
 
+  bulkEditorWordlistCheckbox(checkbox: HTMLInputElement) {
+    const checked = checkbox.checked;
+    document.querySelectorAll(`#bulkWordEditorModal table td input.wordlistData[data-col="${checkbox.dataset.col}"]`).forEach((box: HTMLInputElement) => {
+      box.checked = checked;
+    });
+  }
+
+  closeModal(id: string) {
+    this.hide(document.getElementById(id));
+  }
+
   configInlineToggle() {
     const input = document.getElementById('configInlineInput') as HTMLInputElement;
     const configText = document.getElementById('configText') as HTMLTextAreaElement;
@@ -709,6 +570,56 @@ export default class OptionPage {
       this.hide(configText);
       configText.value = '';
     }
+  }
+
+  configureConfirmModal(settings: ConfirmModalSettings = {}, contentElement?: HTMLElement) {
+    const modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
+    const modalContent = document.getElementById('confirmModalContent') as HTMLElement;
+    const modalHeader = document.querySelector('#confirmModal header') as HTMLElement;
+    const backupButtonContainer = document.querySelector('#confirmModal span.confirmBackupButton') as HTMLElement;
+    const backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
+    removeChildren(modalContent);
+
+    const defaults = {
+      backup: false,
+      content: 'Are you sure?',
+      title: 'Please Confirm',
+      titleClass: 'w3-flat-peter-river',
+    };
+    settings = Object.assign(defaults, settings);
+
+    if (!contentElement) {
+      contentElement = document.createElement('span');
+      contentElement.textContent = settings.content;
+    }
+
+    modalTitle.textContent = settings.title;
+    modalContent.appendChild(contentElement);
+    modalHeader.className = `w3-container ${settings.titleClass}`;
+    if (settings.backup) {
+      this.show(backupButtonContainer);
+      this.enableBtn(backupButton);
+    } else {
+      this.hide(backupButtonContainer);
+      this.disableBtn(backupButton);
+    }
+  }
+
+  configureStatusModal(content: string | string[], title: string, titleColor: string) {
+    const modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
+    const modalContent = document.getElementById('statusModalContent') as HTMLElement;
+    const modalHeader = document.querySelector('#statusModal header') as HTMLElement;
+    removeChildren(modalContent);
+
+    modalHeader.className = `w3-container ${titleColor}`;
+    modalTitle.textContent = title;
+
+    content = stringArray(content);
+    content.forEach((textPart) => {
+      const contentElement = document.createElement('p') as HTMLParagraphElement;
+      contentElement.textContent = textPart;
+      modalContent.appendChild(contentElement);
+    });
   }
 
   async confirm(action: string) {
@@ -879,6 +790,11 @@ export default class OptionPage {
     }
   }
 
+  disableBtn(element: HTMLElement) {
+    element.classList.add('disabled');
+    element.classList.add('w3-flat-silver');
+  }
+
   domainCfgFromPage(): DomainCfg {
     const domainDisabledCheck = document.getElementById('domainDisabledCheck') as HTMLInputElement;
     const domainEnabledCheck = document.getElementById('domainEnabledCheck') as HTMLInputElement;
@@ -894,6 +810,11 @@ export default class OptionPage {
       wordlist: wordlist,
     };
     return newDomainCfg;
+  }
+
+  enableBtn(element: HTMLElement) {
+    element.classList.remove('disabled');
+    element.classList.remove('w3-flat-silver');
   }
 
   exportConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
@@ -931,6 +852,35 @@ export default class OptionPage {
     exportToFile(JSON.stringify(stats, null, 2), `${filePrefix}-${timeForFileName()}.json`);
   }
 
+  handleError(message: string, error?: Error) {
+    if (error) {
+      logger.error(message, error);
+      this.showErrorModal([message, `Error: ${error.message}`]);
+    } else {
+      logger.error(message);
+      this.showErrorModal([message]);
+    }
+  }
+
+  hide(element: HTMLElement) {
+    element.classList.remove('w3-show');
+    element.classList.add('w3-hide');
+  }
+
+  hideInputError(element: HTMLInputElement) {
+    element.classList.remove('w3-border-red');
+    try {
+      element.setCustomValidity('');
+    } catch (err) {
+      // If HTML5 validation not supported, the modal will suffice
+    }
+  }
+
+  hideStatus() {
+    const notificationPanel = document.getElementById('notificationPanel') as HTMLElement;
+    this.hide(notificationPanel);
+  }
+
   async getStatsFromStorage() {
     const { stats }: { stats: Statistics } = await this.Class.Config.getLocalStorage({ stats: { words: {} } }) as any;
     return stats;
@@ -965,6 +915,10 @@ export default class OptionPage {
     } catch (err) {
       this.handleError('Failed to import config.', err);
     }
+  }
+
+  async importConfigRetryCancel() {
+    await this.init();
   }
 
   async importConfigText(cfg: string) {
@@ -1045,8 +999,22 @@ export default class OptionPage {
     this.cfg = await this.Class.Config.load();
   }
 
+  isStorageError(error: Error): boolean {
+    if (error.message) {
+      const chromeQuotaError = '[QUOTA_BYTES quota exceeded]';
+      const firefoxQuotaError = '[QuotaExceededError: storage.sync API call exceeded its quota limitations.]';
+      return error.message.includes(chromeQuotaError) || error.message.includes(firefoxQuotaError);
+    }
+
+    return false;
+  }
+
   newWordWordlistChecked(index: number): boolean {
     return index == (this.cfg.wordlistId - 1);
+  }
+
+  openModal(id: string) {
+    this.show(document.getElementById(id));
   }
 
   populateBookmarkletPage() {
@@ -1894,6 +1862,11 @@ export default class OptionPage {
     return this.bookmarklet === undefined;
   }
 
+  show(element: HTMLElement) {
+    element.classList.remove('w3-hide');
+    element.classList.add('w3-show');
+  }
+
   showBulkWordEditor() {
     const modalId = 'bulkWordEditorModal';
     const title = document.querySelector(`#${modalId} h5.modalTitle`) as HTMLHeadingElement;
@@ -1928,6 +1901,33 @@ export default class OptionPage {
       logger.warn('Failed to reset stats.', err);
       this.showErrorModal(['Failed to reset stats.', `Error: ${err.message}`]);
     }
+  }
+
+  showErrorModal(content: string | string[] = ['The requested action failed. Please try again or contact support.'], title = 'Error', titleColor = 'w3-red') {
+    this.configureStatusModal(content, title, titleColor);
+    this.openModal('statusModal');
+  }
+
+  showInputError(element, message = '') {
+    element.classList.add('w3-border-red');
+    if (message) {
+      try {
+        element.setCustomValidity(message);
+        element.reportValidity();
+      } catch (err) {
+        this.showWarningModal(message);
+      }
+    }
+  }
+
+  showStatusModal(content: string | string[] = ['Status updated.'], title = 'Status', titleColor = 'w3-flat-peter-river') {
+    this.configureStatusModal(content, title, titleColor);
+    this.openModal('statusModal');
+  }
+
+  showWarningModal(content: string | string[] = ['Invalid input.'], title = 'Warning', titleColor = 'w3-orange') {
+    this.configureStatusModal(content, title, titleColor);
+    this.openModal('statusModal');
   }
 
   switchPage(newTab: HTMLAnchorElement) {
