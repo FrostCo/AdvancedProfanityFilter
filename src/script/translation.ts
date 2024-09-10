@@ -20,7 +20,7 @@ export default class Translation {
     return await i18next.changeLanguage(language);
   }
 
-  t(key, options = {}) {
+  t(key: string, options = {}): string {
     return i18next.t(key, options);
   }
 }
