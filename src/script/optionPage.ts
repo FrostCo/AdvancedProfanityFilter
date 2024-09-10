@@ -259,9 +259,6 @@ export default class OptionPage {
     }
   }
 
-  backupConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
-    exportToFile(JSON.stringify(config, null, 2), `${filePrefix}-${timeForFileName()}.json`);
-  }
 
   applyTranslation() {
     // Page and Header
@@ -435,6 +432,10 @@ export default class OptionPage {
     document.getElementById('submitPassword').textContent = this.translation.t('options:submitButton');
     // Status
     document.getElementById('statusModalOK').textContent = this.translation.t('common:okButton');
+  }
+
+  backupConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
+    exportToFile(JSON.stringify(config, null, 2), `${filePrefix}-${timeForFileName()}.json`);
   }
 
   backupConfigInline(config = this.cfg.ordered()) {
