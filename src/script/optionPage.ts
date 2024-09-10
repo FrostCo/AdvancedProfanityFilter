@@ -740,19 +740,19 @@ export default class OptionPage {
         }
 
         if (!silent) {
-          this.showStatusModal('Storage converted successfully.');
+          this.showStatusModal(this.translation.t('storageConvertedMessage'));
         }
       } catch (err) {
         // Revert UI and export a backup of config.
         this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
         this.backupConfig();
-        this.handleError('Failed to cleanup old storage, backup automatically exported.', err);
+        this.handleError(this.translation.t('storageCovnersionCleanupFailedMessage'), err);
         await this.cfg.save('syncLargeKeys');
         this.populateConfig();
       }
     } catch (err) {
       // Revert UI
-      this.handleError('Failed to update storage preference.', err);
+      this.handleError(this.translation.t('storageConvertsionFailedMessage'), err);
       this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
       this.populateConfig();
     }
