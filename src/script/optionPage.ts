@@ -144,7 +144,10 @@ export default class OptionPage {
     document.getElementById('censorSettingsHeader').textContent = this.t('options:censorSettingsHeader');
     document.getElementById('defaultSettingsHeader').textContent = this.t('options:defaultSettingsHeader');
     document.getElementById('defaultSubstitutionName').textContent = this.t('options:substitutionDefaultSubstitution');
+    document.getElementById('defaultWordMatchMethodExact').textContent = this.t('options:matchMethodExact');
     document.getElementById('defaultWordMatchMethodName').textContent = this.t('options:defaultWordMatchMethod');
+    document.getElementById('defaultWordMatchMethodPartial').textContent = this.t('options:matchMethodPartial');
+    document.getElementById('defaultWordMatchMethodWhole').textContent = this.t('options:matchMethodWhole');
     document.getElementById('defaultWordMatchRepeatedName').textContent = this.t('options:defaultWordMatchRepeated');
     document.getElementById('defaultWordMatchRepeatedNote').textContent = this.t('options:defaultWordMatchRepeatedNote');
     document.getElementById('defaultWordMatchSeparatorsName').textContent = this.t('options:defaultWordMatchSeparators');
@@ -1172,14 +1175,6 @@ export default class OptionPage {
     defaultWordSeparators.checked = numberToBoolean(this.cfg.defaultWordSeparators);
     const defaultWordSubstitution = document.getElementById('defaultWordSubstitutionText') as HTMLInputElement;
     defaultWordSubstitution.value = this.cfg.defaultSubstitution;
-    removeChildren(defaultWordMatchMethodSelect);
-    for (let i = 0; i < 3; i++) { // Skip Regex
-      const optionElement = document.createElement('option');
-      const matchMethodName = upperCaseFirst(this.Class.Constants.matchMethodName(i));
-      optionElement.value = matchMethodName;
-      optionElement.textContent = matchMethodName;
-      defaultWordMatchMethodSelect.appendChild(optionElement);
-    }
     defaultWordMatchMethodSelect.selectedIndex = this.cfg.defaultWordMatchMethod;
   }
 
