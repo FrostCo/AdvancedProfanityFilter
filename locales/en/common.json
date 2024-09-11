@@ -29,12 +29,7 @@
   "saveButton": "SAVE",
   "submitButton": "SUBMIT",
   "support": "Support",
-  "wordlist1": "Wordlist 1",
-  "wordlist2": "Wordlist 2",
-  "wordlist3": "Wordlist 3",
-  "wordlist4": "Wordlist 4",
-  "wordlist5": "Wordlist 5",
-  "wordlist6": "Wordlist 6",
+  "wordlist": "Wordlist",
   "wordlistAllWords": "All Words",
   "wordlistDefault": "Default Wordlist",
   "wordlists": "Wordlists"
