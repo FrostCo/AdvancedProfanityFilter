@@ -1,6 +1,7 @@
 import Config from '@APF/lib/config';
 import { prettyPrintArray, removeFromArray, sortObjectKeys, stringArray } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
+import Translation from '@APF/translation';
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
 /* eslint-disable-next-line @typescript-eslint/naming-convention */
@@ -343,6 +344,12 @@ export default class WebConfig extends Config {
     if (!this._defaultsLoaded) this._defaultsLoaded = [];
     const defaultKeys = Object.keys(this.Class._defaults);
     this._defaultsLoaded = defaultKeys.filter((key) => config[key] === undefined);
+
+    this.localizeDefaults();
+  }
+
+  localizeDefaults() {
+    if (!this._defaultsLoaded || !this._defaultsLoaded.length) return;
   }
 
   // Order and remove `_` prefixed values
