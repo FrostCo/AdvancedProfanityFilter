@@ -236,7 +236,10 @@ export default class OptionPage {
     document.getElementById('domainMatchModeMinimalNote').textContent = this.t('options:domainMatchModeMinimalNote');
     document.getElementById('domainMatchModeNormalName').textContent = this.t('options:domainMatchModeNormal');
     document.getElementById('domainMatchModeNormalNote').textContent = this.t('options:domainMatchModeNormalNote');
+    document.getElementById('domainModeAdvanced').textContent = this.t('common:domainModeAdvanced');
+    document.getElementById('domainModeDeep').textContent = this.t('common:domainModeDeep');
     document.getElementById('domainModeHeader').textContent = this.t('options:domainModeHeader');
+    document.getElementById('domainModeNormal').textContent = this.t('common:domainModeNormal');
     document.getElementById('domainRemove').textContent = this.t('common:removeButton');
     document.getElementById('domainSave').textContent = this.t('common:saveButton');
     document.getElementById('domainsHeader').textContent = this.t('options:domainsHeader');
@@ -1060,7 +1063,6 @@ export default class OptionPage {
   }
 
   populateDomainPage() {
-    const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const domainFilterAllFrames = document.getElementById('domainFilterAllFrames') as HTMLInputElement;
     const domainsSelect = document.getElementById('domainSelect') as HTMLSelectElement;
     const domainText = document.getElementById('domainText') as HTMLInputElement;
@@ -1101,8 +1103,6 @@ export default class OptionPage {
       this.hide(domainFramesOnLabel);
       this.show(domainFramesOffLabel);
     }
-
-    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.DOMAIN_MODES), domainModeSelect, true);
 
     if (this.cfg.wordlistsEnabled) {
       this.show(wordlistContainer);
