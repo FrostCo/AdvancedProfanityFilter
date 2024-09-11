@@ -1,12 +1,12 @@
 {
-  "domainModeLabel": "Mode",
-  "filterMethodLabel": "Filter",
   "disabledDisconnected": "Disconnected, please refresh page",
   "disabledDomain": "Popup disabled for domain",
   "disabledDomainMode": "Popup disabled by domain mode",
   "disabledPasswordProtected": "Popup disabled by password",
   "disabledRestrictedPage": "Popup disabled by browser",
   "disabledTab": "Popup disabled for tab",
+  "domainModeLabel": "Mode",
+  "filterMethodLabel": "Filter",
   "summaryTableHeader": "Filtered Words",
   "textWordlistLabel": "Text"
 }
