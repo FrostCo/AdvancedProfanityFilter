@@ -1256,7 +1256,7 @@ export default class OptionPage {
     const filteredTestText = document.getElementById('filteredTestText') as HTMLElement;
 
     if (testText.value === '') {
-      filteredTestText.textContent = this.t('options.testFilteredTextPlaceholder');
+      filteredTestText.textContent = this.t('options:testFilteredTextPlaceholder');
     } else {
       if (this.cfg.filterMethod === this.Class.Constants.FILTER_METHODS.OFF) {
         filteredTestText.textContent = testText.value;
