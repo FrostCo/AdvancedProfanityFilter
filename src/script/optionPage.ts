@@ -1108,7 +1108,7 @@ export default class OptionPage {
       this.show(wordlistContainer);
       const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
 
-      const wordlists = ['Default'].concat(this.Class.Config._allWordlists, this.cfg.wordlists);
+      const wordlists = [this.t('common:wordlistDefault'), this.t('common:wordlistAllWords')].concat(this.cfg.wordlists);
       dynamicList(wordlists, domainWordlistSelect);
     } else {
       this.hide(wordlistContainer);
@@ -1365,7 +1365,7 @@ export default class OptionPage {
       const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
       const textWordlistSelect = document.getElementById('textWordlistSelect') as HTMLSelectElement;
       dynamicList(this.cfg.wordlists, wordlistSelect);
-      dynamicList(this.Class.Config._allWordlists.concat(this.cfg.wordlists), textWordlistSelect);
+      dynamicList([this.t('common:wordlistAllWords')].concat(this.cfg.wordlists), textWordlistSelect);
       wordlistSelect.selectedIndex = selectedIndex;
       textWordlistSelect.selectedIndex = this.cfg.wordlistId;
 
