@@ -357,6 +357,12 @@ export default class WebConfig extends Config {
       const options = { defaultValue: this.Class._defaults.defaultSubstitution };
       this.defaultSubstitution = translation.t('common:defaultWordSubstitution', options);
     }
+
+    if (this._defaultsLoaded.includes('wordlists')) {
+      this.wordlists = Config._configDefaults.wordlists.map((wordlist, index) => {
+        return translation.t(`common:wordlist${index + 1}`, { defaultValue: wordlist });
+      });
+    }
   }
 
   // Order and remove `_` prefixed values
