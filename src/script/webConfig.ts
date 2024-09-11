@@ -329,6 +329,12 @@ export default class WebConfig extends Config {
     // Apply the Config defaults
     super(config);
 
+    // Overcome Object.assign not overwriting undefined values for underscore keys
+    const underscoreKeys = Object.keys(config).filter((key) => key[0] === '_');
+    for (const underscoreKey of underscoreKeys) {
+      if (config[underscoreKey]) this[underscoreKey] = config[underscoreKey];
+    }
+
     // Apply class defaults
     Object.assign(this, this.Class._webDefaults, config);
   }
