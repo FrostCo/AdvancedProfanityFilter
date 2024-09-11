@@ -9,6 +9,7 @@ const BUILD_DEFAULTS = { config: {}, manifestVersion: 3, release: true, target: 
 const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
+  _defaultsLoaded: string[];
   _lastSplitKeys: { [key: string]: number };
   collectStats: boolean;
   contextMenu: boolean;
@@ -337,6 +338,11 @@ export default class WebConfig extends Config {
 
     // Apply class defaults
     Object.assign(this, this.Class._webDefaults, config);
+
+    // Compile list of defaults that were applied
+    if (!this._defaultsLoaded) this._defaultsLoaded = [];
+    const defaultKeys = Object.keys(this.Class._defaults);
+    this._defaultsLoaded = defaultKeys.filter((key) => config[key] === undefined);
   }
 
   // Order and remove `_` prefixed values
