@@ -250,12 +250,7 @@ export default class Popup {
     wordlistSelect.selectedIndex = wordlistIndex;
     document.getElementById('wordlistDefault').textContent = this.translation.t('common:wordlistDefault');
     document.getElementById('wordlistAllWords').textContent = this.translation.t('common:wordlistAllWords');
-    document.getElementById('wordlist1').textContent = this.cfg.wordlists[0];
-    document.getElementById('wordlist2').textContent = this.cfg.wordlists[1];
-    document.getElementById('wordlist3').textContent = this.cfg.wordlists[2];
-    document.getElementById('wordlist4').textContent = this.cfg.wordlists[3];
-    document.getElementById('wordlist5').textContent = this.cfg.wordlists[4];
-    document.getElementById('wordlist6').textContent = this.cfg.wordlists[5];
+    this.cfg.wordlists.forEach((wordlist, index) => { document.getElementById(`wordlist${index + 1}`).textContent = wordlist; });
     this.Class.show(wordListContainer);
   }
 
