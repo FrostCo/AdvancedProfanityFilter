@@ -382,11 +382,8 @@ export default class OptionPage {
 
     const matchMethodSelect = document.createElement('select');
     this.Class.Constants.orderedArray(this.Class.Constants.MATCH_METHODS).forEach((matchMethod, index) => {
-      const matchMethodUpper = matchMethod.toUpperCase();
       const optionElement = document.createElement('option');
-      optionElement.value = this.Class.Constants.MATCH_METHODS[matchMethodUpper].toString();
-      optionElement.classList.add(`bulkMatchMethod${this.Class.Constants.MATCH_METHODS[matchMethodUpper]}`);
-      optionElement.textContent = matchMethod;
+      optionElement.textContent = this.t(`options:matchMethod${matchMethod}`);
       matchMethodSelect.appendChild(optionElement);
     });
     matchMethodSelect.selectedIndex = data.matchMethod;
