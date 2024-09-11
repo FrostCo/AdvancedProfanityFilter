@@ -4,6 +4,7 @@
   "backupButton": "BACKUP",
   "cancelButton": "CANCEL",
   "changelog": "Changelog",
+  "defaultWordSubstitution": "censored",
   "domainModeAdvanced": "Advanced",
   "domainModeDeep": "Deep",
   "domainModeNormal": "Normal",
