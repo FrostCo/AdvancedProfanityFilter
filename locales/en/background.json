@@ -1,10 +1,12 @@
 {
-  "addSelection": "Add selection to filter",
-  "disableOnce": "Disable once",
-  "removeSelection": "Remove selection from filter",
-  "toggleAdvancedForDomain": "Toggle advanced for domain",
-  "toggleForDomain": "Toggle for domain",
-  "toggleForTab": "Toggle for tab",
-  "toggleFramesForDomain": "Toggle frames for domain",
+  "contextMenu": {
+    "addSelection": "Add selection to filter",
+    "disableOnce": "Disable once",
+    "removeSelection": "Remove selection from filter",
+    "toggleAdvancedForDomain": "Toggle advanced for domain",
+    "toggleForDomain": "Toggle for domain",
+    "toggleForTab": "Toggle for tab",
+    "toggleFramesForDomain": "Toggle frames for domain"
+  },
   "updateNotificationMessage": "Update installed, click for changelog."
 }

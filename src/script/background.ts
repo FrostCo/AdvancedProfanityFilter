@@ -57,49 +57,49 @@ export default class Background {
       if (!config.password) {
         chrome.contextMenus.create({
           id: 'addSelection',
-          title: translation.t('background:addSelection'),
+          title: translation.t('background:contextMenu.addSelection'),
           contexts: ['selection'],
           documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
         });
 
         chrome.contextMenus.create({
           id: 'removeSelection',
-          title: translation.t('background:removeSelection'),
+          title: translation.t('background:contextMenu.removeSelection'),
           contexts: ['selection'],
           documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
         });
 
         chrome.contextMenus.create({
           id: 'disableTabOnce',
-          title: translation.t('background:disableOnce'),
+          title: translation.t('background:contextMenu.disableOnce'),
           contexts: ['all'],
           documentUrlPatterns: ['http://*/*', 'https://*/*']
         });
 
         chrome.contextMenus.create({
           id: 'toggleTabDisable',
-          title: translation.t('background:toggleForTab'),
+          title: translation.t('background:contextMenu.toggleForTab'),
           contexts: ['all'],
           documentUrlPatterns: ['http://*/*', 'https://*/*']
         });
 
         chrome.contextMenus.create({
           id: 'toggleForDomain',
-          title: translation.t('background:toggleForDomain'),
+          title: translation.t('background:contextMenu.toggleForDomain'),
           contexts: ['all'],
           documentUrlPatterns: ['http://*/*', 'https://*/*']
         });
 
         chrome.contextMenus.create({
           id: 'toggleAdvancedForDomain',
-          title: translation.t('background:toggleAdvancedForDomain'),
+          title: translation.t('background:contextMenu.toggleAdvancedForDomain'),
           contexts: ['all'],
           documentUrlPatterns: ['http://*/*', 'https://*/*']
         });
 
         chrome.contextMenus.create({
           id: 'toggleFramesForDomain',
-          title: translation.t('background:toggleFramesForDomain'),
+          title: translation.t('background:contextMenu.toggleFramesForDomain'),
           contexts: ['all'],
           documentUrlPatterns: ['http://*/*', 'https://*/*']
         });
