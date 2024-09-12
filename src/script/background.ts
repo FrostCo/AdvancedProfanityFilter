@@ -107,7 +107,7 @@ export default class Background {
 
       chrome.contextMenus.create({
         id: 'options',
-        title: translation.t('common:options'),
+        title: translation.t('common:words.options'),
         contexts: ['all']
       });
     }
@@ -221,7 +221,7 @@ export default class Background {
           const translation = new this.Translation(['common', 'background']);
           chrome.notifications.create('extensionUpdate', {
             'type': 'basic',
-            'title': translation.t('common:appName'),
+            'title': translation.t('common:app.name'),
             'message': translation.t('background:updateNotificationMessage'),
             'iconUrl': 'img/icon64.png',
             'isClickable': true,

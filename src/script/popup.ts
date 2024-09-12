@@ -133,17 +133,17 @@ export default class Popup {
     document.getElementById('filterMethodLabel').textContent = this.translation.t('popup:labels.filterMethod');
     document.getElementById('textWordlistLabel').textContent = this.translation.t('popup:labels.textWordlist');
     document.getElementById('summaryTableHeader').textContent = this.translation.t('popup:summaryTableHeader');
-    document.getElementById('options').textContent = this.translation.t('common:options');
-    document.getElementById('gettingStarted').textContent = this.translation.t('common:help');
-    document.getElementById('changelogLink').textContent = this.translation.t('common:changelog');
-    document.getElementById('supportLink').textContent = this.translation.t('common:support');
-    document.getElementById('domainModeNormal').textContent = this.translation.t('common:domainModeNormal');
-    document.getElementById('domainModeAdvanced').textContent = this.translation.t('common:domainModeAdvanced');
-    document.getElementById('domainModeDeep').textContent = this.translation.t('common:domainModeDeep');
-    document.getElementById('filterMethodCensor').textContent = this.translation.t('common:filterMethodCensor');
-    document.getElementById('filterMethodSubstitute').textContent = this.translation.t('common:filterMethodSubstitute');
-    document.getElementById('filterMethoRemove').textContent = this.translation.t('common:filterMethodOff');
-    document.getElementById('filterMethoOff').textContent = this.translation.t('common:filterMethodRemove');
+    document.getElementById('options').textContent = this.translation.t('common:words.options');
+    document.getElementById('gettingStarted').textContent = this.translation.t('common:words.help');
+    document.getElementById('changelogLink').textContent = this.translation.t('common:words.changelog');
+    document.getElementById('supportLink').textContent = this.translation.t('common:words.support');
+    document.getElementById('domainModeNormal').textContent = this.translation.t('common:domainModes.normal');
+    document.getElementById('domainModeAdvanced').textContent = this.translation.t('common:domainModes.advanced');
+    document.getElementById('domainModeDeep').textContent = this.translation.t('common:domainModes.deep');
+    document.getElementById('filterMethodCensor').textContent = this.translation.t('common:filterMethods.censor');
+    document.getElementById('filterMethodSubstitute').textContent = this.translation.t('common:filterMethods.substitute');
+    document.getElementById('filterMethoRemove').textContent = this.translation.t('common:filterMethods.off');
+    document.getElementById('filterMethoOff').textContent = this.translation.t('common:filterMethods.remove');
   }
 
   disableDomainSwitch() {
@@ -248,8 +248,8 @@ export default class Popup {
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
     wordlistSelect.selectedIndex = wordlistIndex;
-    document.getElementById('wordlistDefault').textContent = this.translation.t('common:wordlistDefault');
-    document.getElementById('wordlistAllWords').textContent = this.translation.t('common:wordlistAllWords');
+    document.getElementById('wordlistDefault').textContent = this.translation.t('common:wordlists.default');
+    document.getElementById('wordlistAllWords').textContent = this.translation.t('common:wordlists.allWords');
     this.cfg.wordlists.forEach((wordlist, index) => { document.getElementById(`wordlist${index + 1}`).textContent = wordlist; });
     this.Class.show(wordListContainer);
   }

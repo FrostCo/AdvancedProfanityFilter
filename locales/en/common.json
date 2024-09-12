@@ -1,36 +1,52 @@
 {
-  "appName": "Advanced Profanity Filter",
-  "appShortName": "APF",
-  "backupButton": "BACKUP",
-  "cancelButton": "CANCEL",
-  "changelog": "Changelog",
-  "defaultWordSubstitution": "censored",
-  "domainModeAdvanced": "Advanced",
-  "domainModeDeep": "Deep",
-  "domainModeNormal": "Normal",
-  "exportButton": "EXPORT",
-  "filterMethodCensor": "Censor",
-  "filterMethodOff": "Off",
-  "filterMethodRemove": "Remove",
-  "filterMethodSubstitute": "Substitute",
-  "help": "Help",
-  "importButton": "IMPORT",
-  "logLevelDebug": "Debug",
-  "logLevelError": "Error",
-  "logLevelInfo": "Info",
-  "logLevelWarn": "Warn",
-  "okButton": "OK",
-  "options": "Options",
-  "removeAllButton": "REMOVE ALL",
-  "removeButton": "REMOVE",
-  "renameButton": "RENAME",
-  "resetButton": "RESET",
-  "restoreDefaultsButton": "RESTORE DEFAULTS",
-  "saveButton": "SAVE",
-  "submitButton": "SUBMIT",
-  "support": "Support",
-  "wordlist": "Wordlist",
-  "wordlistAllWords": "All Words",
-  "wordlistDefault": "Default Wordlist",
-  "wordlists": "Wordlists"
+  "app": {
+    "name": "Advanced Profanity Filter",
+    "shortName": "APF"
+  },
+  "buttons": {
+    "backup": "BACKUP",
+    "cancel": "CANCEL",
+    "export": "EXPORT",
+    "import": "IMPORT",
+    "ok": "OK",
+    "removeAll": "REMOVE ALL",
+    "remove": "REMOVE",
+    "rename": "RENAME",
+    "reset": "RESET",
+    "restoreDefaults": "RESTORE DEFAULTS",
+    "save": "SAVE",
+    "submit": "SUBMIT"
+  },
+  "config": {
+    "defaultWordSubstitution": "censored",
+    "wordlistName": "Wordlist"
+  },
+  "domainModes": {
+    "advanced": "Advanced",
+    "deep": "Deep",
+    "normal": "Normal"
+  },
+  "filterMethods": {
+    "censor": "Censor",
+    "off": "Off",
+    "remove": "Remove",
+    "substitute": "Substitute"
+  },
+  "logLevels": {
+    "debug": "Debug",
+    "error": "Error",
+    "info": "Info",
+    "warn": "Warn"
+  },
+  "wordlists": {
+    "allWords": "All Words",
+    "default": "Default Wordlist",
+    "plural": "Wordlists"
+  },
+  "words": {
+    "changelog": "Changelog",
+    "help": "Help",
+    "options": "Options",
+    "support": "Support"
+  }
 }

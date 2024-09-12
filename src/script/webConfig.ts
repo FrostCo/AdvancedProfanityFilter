@@ -355,12 +355,12 @@ export default class WebConfig extends Config {
 
     if (this._defaultsLoaded.includes('defaultSubstitution')) {
       const options = { defaultValue: this.Class._defaults.defaultSubstitution };
-      this.defaultSubstitution = translation.t('common:defaultWordSubstitution', options);
+      this.defaultSubstitution = translation.t('common:config.defaultWordSubstitution', options);
     }
 
     if (this._defaultsLoaded.includes('wordlists')) {
       this.wordlists = Config._configDefaults.wordlists.map((wordlist, index) => {
-        return translation.t(`common:wordlist${index + 1}`, { defaultValue: wordlist });
+        return translation.t(`common:config.wordlist${index + 1}`, { defaultValue: wordlist });
       });
     }
   }
