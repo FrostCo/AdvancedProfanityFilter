@@ -1,12 +1,16 @@
 {
-  "disabledDisconnected": "Disconnected, please refresh page",
-  "disabledDomain": "Popup disabled for domain",
-  "disabledDomainMode": "Popup disabled by domain mode",
-  "disabledPasswordProtected": "Popup disabled by password",
-  "disabledRestrictedPage": "Popup disabled by browser",
-  "disabledTab": "Popup disabled for tab",
-  "domainModeLabel": "Mode",
-  "filterMethodLabel": "Filter",
-  "summaryTableHeader": "Filtered Words",
-  "textWordlistLabel": "Text"
+  "disabledMessages": {
+    "disconnected": "Disconnected, please refresh page",
+    "domain": "Popup disabled for domain",
+    "domainMode": "Popup disabled by domain mode",
+    "passwordProtected": "Popup disabled by password",
+    "restrictedPage": "Popup disabled by browser",
+    "tab": "Popup disabled for tab"
+  },
+  "labels": {
+    "domainMode": "Mode",
+    "filterMethod": "Filter",
+    "textWordlist": "Text"
+  },
+  "summaryTableHeader": "Filtered Words"
 }

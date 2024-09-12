@@ -129,9 +129,9 @@ export default class Popup {
   }
 
   applyTranslation() {
-    document.getElementById('domainModeLabel').textContent = this.translation.t('popup:domainModeLabel');
-    document.getElementById('filterMethodLabel').textContent = this.translation.t('popup:filterMethodLabel');
-    document.getElementById('textWordlistLabel').textContent = this.translation.t('popup:textWordlistLabel');
+    document.getElementById('domainModeLabel').textContent = this.translation.t('popup:labels.domainMode');
+    document.getElementById('filterMethodLabel').textContent = this.translation.t('popup:labels.filterMethod');
+    document.getElementById('textWordlistLabel').textContent = this.translation.t('popup:labels.textWordlist');
     document.getElementById('summaryTableHeader').textContent = this.translation.t('popup:summaryTableHeader');
     document.getElementById('options').textContent = this.translation.t('common:options');
     document.getElementById('gettingStarted').textContent = this.translation.t('common:help');
@@ -154,12 +154,12 @@ export default class Popup {
   }
 
   get disabledReason(): string {
-    if (this.isRestrictedPage) return this.translation.t('popup:disabledRestrictedPage');
-    if (this.isPasswordProtected) return this.translation.t('popup:disabledPasswordProtected');
-    if (this.disabledTab) return this.translation.t('popup:disabledTab');
-    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return this.translation.t('popup:disabledDomainMode');
-    if (this.domain.disabled) return this.translation.t('popup:disabledDomain');
-    if (this.isDisconnected) return this.translation.t('popup:disabledDisconnected');
+    if (this.isRestrictedPage) return this.translation.t('popup:disabledMessages.restrictedPage');
+    if (this.isPasswordProtected) return this.translation.t('popup:disabledMessages.passwordProtected');
+    if (this.disabledTab) return this.translation.t('popup:disabledMessages.tab');
+    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return this.translation.t('popup:disabledMessages.domainMode');
+    if (this.domain.disabled) return this.translation.t('popup:disabledMessages.domain');
+    if (this.isDisconnected) return this.translation.t('popup:disabledMessages.disconnected');
     return '';
   }
 
