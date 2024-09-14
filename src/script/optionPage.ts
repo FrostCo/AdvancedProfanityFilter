@@ -221,8 +221,6 @@ export default class OptionPage {
     document.getElementById('wordlistsHeader').textContent = this.t('common:wordlists.plural');
     // Domains page
     document.getElementById('domainDisabledName').textContent = this.t('options:domainDisabled');
-    document.getElementById('domainDisabledName').textContent = this.t('options:domainDisabled');
-    document.getElementById('domainDisabledNote').textContent = this.t('options:domainDisabledNote');
     document.getElementById('domainDisabledNote').textContent = this.t('options:domainDisabledNote');
     document.getElementById('domainEnabledName').textContent = this.t('options:domainEnabled');
     document.getElementById('domainEnabledNote').textContent = this.t('options:domainEnabledNote');
