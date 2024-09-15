@@ -8,5 +8,7 @@
     "toggleForTab": "Toggle for tab",
     "toggleFramesForDomain": "Toggle frames for domain"
   },
-  "updateNotificationMessage": "Update installed, click for changelog."
+  "messages": {
+    "updateNotification": "Update installed, click for changelog."
+  }
 }

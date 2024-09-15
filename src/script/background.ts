@@ -222,7 +222,7 @@ export default class Background {
           chrome.notifications.create('extensionUpdate', {
             'type': 'basic',
             'title': translation.t('common:app.name'),
-            'message': translation.t('background:updateNotificationMessage'),
+            'message': translation.t('background:messages.updateNotification'),
             'iconUrl': 'img/icon64.png',
             'isClickable': true,
           });
