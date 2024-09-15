@@ -15,11 +15,16 @@
     "reset": "RESET",
     "restoreDefaults": "RESTORE DEFAULTS",
     "save": "SAVE",
+    "set": "SET",
     "submit": "SUBMIT"
   },
   "config": {
     "defaultWordSubstitution": "censored",
     "wordlistName": "Wordlist"
+  },
+  "domainMatchModes": {
+    "minimal": "Minimal",
+    "normal": "Normal"
   },
   "domainModes": {
     "advanced": "Advanced",
@@ -42,6 +47,12 @@
     "allWords": "All Words",
     "default": "Default Wordlist",
     "plural": "Wordlists"
+  },
+  "wordMatchMethods": {
+    "exact": "Exact",
+    "partial": "Partial",
+    "regex": "Regex",
+    "whole": "Whole"
   },
   "words": {
     "changelog": "Changelog",

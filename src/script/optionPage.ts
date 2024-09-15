@@ -128,186 +128,186 @@ export default class OptionPage {
     document.getElementById('headTitle').textContent = this.t('common:app.name');
     document.getElementById('title').textContent = this.t('common:app.name');
     // Tabs
-    document.getElementById('bookmarkletTab').textContent = this.t('options:bookmarkletTab');
-    document.getElementById('configTab').textContent = this.t('options:configTab');
-    document.getElementById('domainsTab').textContent = this.t('options:domainsTab');
-    document.getElementById('helpTab').textContent = this.t('options:helpTab');
-    document.getElementById('listsTab').textContent = this.t('options:listsTab');
-    document.getElementById('settingsTab').textContent = this.t('options:settingsTab');
-    document.getElementById('statsTab').textContent = this.t('options:statsTab');
-    document.getElementById('testTab').textContent = this.t('options:testTab');
-    document.getElementById('wordsTab').textContent = this.t('options:wordsTab');
+    document.getElementById('bookmarkletTab').textContent = this.t('options:tabs.bookmarklet');
+    document.getElementById('configTab').textContent = this.t('options:tabs.config');
+    document.getElementById('domainsTab').textContent = this.t('options:tabs.domains');
+    document.getElementById('helpTab').textContent = this.t('options:tabs.help');
+    document.getElementById('listsTab').textContent = this.t('options:tabs.lists');
+    document.getElementById('settingsTab').textContent = this.t('options:tabs.settings');
+    document.getElementById('statsTab').textContent = this.t('options:tabs.stats');
+    document.getElementById('testTab').textContent = this.t('options:tabs.test');
+    document.getElementById('wordsTab').textContent = this.t('options:tabs.words');
     // Settings page
-    document.getElementById('censorCharacterName').textContent = this.t('options:censorCharacter');
-    document.getElementById('censorFixedLengthName').textContent = this.t('options:censorFixedLength');
-    document.getElementById('censorFixedLengthOriginal').textContent = this.t('options:censorFixedLengthOriginal');
-    document.getElementById('censorSettingsHeader').textContent = this.t('options:censorSettingsHeader');
-    document.getElementById('defaultSettingsHeader').textContent = this.t('options:defaultSettingsHeader');
-    document.getElementById('defaultSubstitutionName').textContent = this.t('options:substitutionDefaultSubstitution');
-    document.getElementById('defaultWordMatchMethodExact').textContent = this.t('options:matchMethodExact');
-    document.getElementById('defaultWordMatchMethodName').textContent = this.t('options:defaultWordMatchMethod');
-    document.getElementById('defaultWordMatchMethodPartial').textContent = this.t('options:matchMethodPartial');
-    document.getElementById('defaultWordMatchMethodWhole').textContent = this.t('options:matchMethodWhole');
-    document.getElementById('defaultWordMatchRepeatedName').textContent = this.t('options:defaultWordMatchRepeated');
-    document.getElementById('defaultWordMatchRepeatedNote').textContent = this.t('options:defaultWordMatchRepeatedNote');
-    document.getElementById('defaultWordMatchSeparatorsName').textContent = this.t('options:defaultWordMatchSeparators');
-    document.getElementById('defaultWordMatchSeparatorsNote').textContent = this.t('options:defaultWordMatchSeparatorsNote');
+    document.getElementById('censorCharacterName').textContent = this.t('options:settingsPage.labels.censorCharacter');
+    document.getElementById('censorFixedLengthName').textContent = this.t('options:settingsPage.labels.censorFixedLength');
+    document.getElementById('censorFixedLengthOriginal').textContent = this.t('options:settingsPage.values.censorFixedLengthOriginal');
+    document.getElementById('censorSettingsHeader').textContent = this.t('options:settingsPage.headers.censorSettings');
+    document.getElementById('defaultSettingsHeader').textContent = this.t('options:settingsPage.headers.defaultSettings');
+    document.getElementById('defaultSubstitutionName').textContent = this.t('options:settingsPage.labels.defaultSubstitution');
+    document.getElementById('defaultWordMatchMethodExact').textContent = this.t('common:wordMatchMethods.exact');
+    document.getElementById('defaultWordMatchMethodName').textContent = this.t('options:settingsPage.labels.defaultWordMatchMethod');
+    document.getElementById('defaultWordMatchMethodPartial').textContent = this.t('common:wordMatchMethods.partial');
+    document.getElementById('defaultWordMatchMethodWhole').textContent = this.t('common:wordMatchMethods.whole');
+    document.getElementById('defaultWordMatchRepeatedName').textContent = this.t('options:settingsPage.labels.defaultWordMatchRepeated');
+    document.getElementById('defaultWordMatchRepeatedNote').textContent = this.t('options:settingsPage.notes.defaultWordMatchRepeated');
+    document.getElementById('defaultWordMatchSeparatorsName').textContent = this.t('options:settingsPage.labels.defaultWordMatchSeparators');
+    document.getElementById('defaultWordMatchSeparatorsNote').textContent = this.t('options:settingsPage.notes.defaultWordMatchSeparators');
     document.getElementById('filterCensorName').textContent = this.t('common:filterMethods.censor');
-    document.getElementById('filterMethodCensorNote').textContent = this.t('options:filterMethodCensorNote');
-    document.getElementById('filterMethodHeader').textContent = this.t('options:filterMethodHeader');
-    document.getElementById('filterMethodOffNote').textContent = this.t('options:filterMethodOffNote');
-    document.getElementById('filterMethodRemoveNote').textContent = this.t('options:filterMethodRemoveNote');
-    document.getElementById('filterMethodSubstituteNote').textContent = this.t('options:filterMethodSubstituteNote');
+    document.getElementById('filterMethodCensorNote').textContent = this.t('options:settingsPage.notes.filterMethodCensor');
+    document.getElementById('filterMethodHeader').textContent = this.t('options:settingsPage.headers.filterMethod');
+    document.getElementById('filterMethodOffNote').textContent = this.t('options:settingsPage.notes.filterMethodOff');
+    document.getElementById('filterMethodRemoveNote').textContent = this.t('options:settingsPage.notes.filterMethodRemove');
+    document.getElementById('filterMethodSubstituteNote').textContent = this.t('options:settingsPage.notes.filterMethodSubstitute');
     document.getElementById('filterOffName').textContent = this.t('common:filterMethods.off');
     document.getElementById('filterRemoveName').textContent = this.t('common:filterMethods.remove');
     document.getElementById('filterSubstituteName').textContent = this.t('common:filterMethods.substitute');
-    document.getElementById('generalSettingsHeader').textContent = this.t('options:generalSettingsHeader');
-    document.getElementById('preserveFirstName').textContent = this.t('options:censorPreserveFirst');
-    document.getElementById('preserveFirstNote').textContent = this.t('options:censorPreserveFirstNote');
-    document.getElementById('preserveLastName').textContent = this.t('options:censorPreserveLast');
-    document.getElementById('preserveLastNote').textContent = this.t('options:censorPreserveLastNote');
-    document.getElementById('showContextMenuName').textContent = this.t('options:showContextMenu');
-    document.getElementById('showContextMenuNote').textContent = this.t('options:showContextMenuNote');
-    document.getElementById('showCounterName').textContent = this.t('options:showCounter');
-    document.getElementById('showCounterNote').textContent = this.t('options:showCounterNote');
-    document.getElementById('showSummaryName').textContent = this.t('options:showSummary');
-    document.getElementById('showSummaryNote').textContent = this.t('options:showSummaryNote');
-    document.getElementById('showUpdateNotificationName').textContent = this.t('options:showContextMenuNote');
-    document.getElementById('substitutionMarkName').textContent = this.t('options:substitutionMark');
-    document.getElementById('substitutionMarkNote').textContent = this.t('options:substitutionMarkNote');
-    document.getElementById('substitutionPreserveCaseName').textContent = this.t('options:substitutionPreserveCase');
-    document.getElementById('substitutionPreserveCaseNote').textContent = this.t('options:substitutionPreserveCaseNote');
-    document.getElementById('substitutionSettingsHeader').textContent = this.t('options:substitutionSettingsHeader');
-    document.getElementById('useDeviceThemeName').textContent = this.t('options:useDeviceTheme');
-    document.getElementById('useDeviceThemeNote').textContent = this.t('options:useDeviceThemeNote');
+    document.getElementById('generalSettingsHeader').textContent = this.t('options:settingsPage.headers.generalSettings');
+    document.getElementById('preserveFirstName').textContent = this.t('options:settingsPage.labels.censorPreserveFirst');
+    document.getElementById('preserveFirstNote').textContent = this.t('options:settingsPage.notes.censorPreserveFirst');
+    document.getElementById('preserveLastName').textContent = this.t('options:settingsPage.labels.censorPreserveLast');
+    document.getElementById('preserveLastNote').textContent = this.t('options:settingsPage.notes.censorPreserveLast');
+    document.getElementById('showContextMenuName').textContent = this.t('options:settingsPage.labels.showContextMenu');
+    document.getElementById('showContextMenuNote').textContent = this.t('options:settingsPage.notes.showContextMenu');
+    document.getElementById('showCounterName').textContent = this.t('options:settingsPage.labels.showCounter');
+    document.getElementById('showCounterNote').textContent = this.t('options:settingsPage.notes.showCounter');
+    document.getElementById('showSummaryName').textContent = this.t('options:settingsPage.labels.showSummary');
+    document.getElementById('showSummaryNote').textContent = this.t('options:settingsPage.notes.showSummary');
+    document.getElementById('showUpdateNotificationName').textContent = this.t('options:settingsPage.labels.showUpdateNotification');
+    document.getElementById('substitutionMarkName').textContent = this.t('options:settingsPage.labels.substitutionMark');
+    document.getElementById('substitutionMarkNote').textContent = this.t('options:settingsPage.notes.substitutionMark');
+    document.getElementById('substitutionPreserveCaseName').textContent = this.t('options:settingsPage.labels.substitutionPreserveCase');
+    document.getElementById('substitutionPreserveCaseNote').textContent = this.t('options:settingsPage.notes.substitutionPreserveCase');
+    document.getElementById('substitutionSettingsHeader').textContent = this.t('options:settingsPage.headers.substitutionSettings');
+    document.getElementById('useDeviceThemeName').textContent = this.t('options:settingsPage.labels.useDeviceTheme');
+    document.getElementById('useDeviceThemeNote').textContent = this.t('options:settingsPage.notes.useDeviceTheme');
     // Words page
-    document.getElementById('bulkWordEditorButton').textContent = this.t('options:wordBulkEditorButton');
-    document.getElementById('filterWordListName').textContent = this.t('options:filterWordList');
-    document.getElementById('includeInWordlistsHeader').textContent = this.t('options:includeInWordlistsHeader');
-    document.getElementById('wordCaseSensitive').textContent = this.t('options:wordCaseSensitive');
-    document.getElementById('wordMatchExactName').textContent = this.t('options:matchMethodExact');
-    document.getElementById('wordMatchExactNote').textContent = this.t('options:wordMatchExactNote');
-    document.getElementById('wordMatchMethodHeader').textContent = this.t('options:wordMatchMethodHeader');
-    document.getElementById('wordMatchPartialName').textContent = this.t('options:matchMethodPartial');
-    document.getElementById('wordMatchPartialNote').textContent = this.t('options:wordMatchPartialNote');
-    document.getElementById('wordMatchRegexName').textContent = this.t('options:matchMethodRegex');
-    document.getElementById('wordMatchRegexNote').textContent = this.t('options:wordMatchRegexNote');
-    document.getElementById('wordMatchRepeatedName').textContent = this.t('options:wordMatchRepeated');
-    document.getElementById('wordMatchRepeatedNote').textContent = this.t('options:wordMatchRepeatedNote');
-    document.getElementById('wordMatchSeparatorsName').textContent = this.t('options:wordMatchSeparators');
-    document.getElementById('wordMatchSeparatorsNote').textContent = this.t('options:wordMatchSeparatorsNote');
-    document.getElementById('wordMatchWholeName').textContent = this.t('options:matchMethodWhole');
-    document.getElementById('wordMatchWholeNote').textContent = this.t('options:wordMatchWholeNote');
-    document.getElementById('wordOtherHeader').textContent = this.t('options:wordOtherHeader');
-    document.getElementById('wordPhraseHeader').textContent = this.t('options:wordPhraseHeader');
+    document.getElementById('bulkWordEditorButton').textContent = this.t('options:wordsPage.buttons.openBulkWordEditor');
+    document.getElementById('filterWordListName').textContent = this.t('options:wordsPage.labels.filterWordList');
+    document.getElementById('includeInWordlistsHeader').textContent = this.t('options:wordsPage.headers.includeInWordlists');
+    document.getElementById('wordCaseSensitive').textContent = this.t('options:wordsPage.labels.caseSensitive');
+    document.getElementById('wordMatchExactName').textContent = this.t('common:wordMatchMethods.exact');
+    document.getElementById('wordMatchExactNote').textContent = this.t('options:wordsPage.notes.matchExact');
+    document.getElementById('wordMatchMethodHeader').textContent = this.t('options:wordsPage.headers.matchMethod');
+    document.getElementById('wordMatchPartialName').textContent = this.t('common:wordMatchMethods.partial');
+    document.getElementById('wordMatchPartialNote').textContent = this.t('options:wordsPage.notes.matchPartial');
+    document.getElementById('wordMatchRegexName').textContent = this.t('common:wordMatchMethods.regex');
+    document.getElementById('wordMatchRegexNote').textContent = this.t('options:wordsPage.notes.matchRegex');
+    document.getElementById('wordMatchRepeatedName').textContent = this.t('options:wordsPage.labels.matchRepeated');
+    document.getElementById('wordMatchRepeatedNote').textContent = this.t('options:wordsPage.notes.matchRepeated');
+    document.getElementById('wordMatchSeparatorsName').textContent = this.t('options:wordsPage.labels.matchSeparators');
+    document.getElementById('wordMatchSeparatorsNote').textContent = this.t('options:wordsPage.notes.matchSeparators');
+    document.getElementById('wordMatchWholeName').textContent = this.t('common:wordMatchMethods.whole');
+    document.getElementById('wordMatchWholeNote').textContent = this.t('options:wordsPage.notes.matchWhole');
+    document.getElementById('wordOtherHeader').textContent = this.t('options:wordsPage.headers.other');
+    document.getElementById('wordPhraseHeader').textContent = this.t('options:wordsPage.headers.wordPhrase');
     document.getElementById('wordRemove').textContent = this.t('common:buttons.remove');
     document.getElementById('wordRemoveAll').textContent = this.t('common:buttons.removeAll');
     document.getElementById('wordSave').textContent = this.t('common:buttons.save');
-    document.getElementById('wordsHeader').textContent = this.t('options:wordsAndPhrasesHeader');
-    document.getElementById('wordSubstitutionHeader').textContent = this.t('options:wordSubstitutionHeader');
+    document.getElementById('wordsHeader').textContent = this.t('options:wordsPage.headers.wordsAndPhrases');
+    document.getElementById('wordSubstitutionHeader').textContent = this.t('options:wordsPage.headers.substitution');
     // Lists page
-    document.getElementById('allowlistHeader').textContent = this.t('options:allowlistHeader');
-    document.getElementById('allowlistInsensitiveName').textContent = this.t('options:allowlistInsensitive');
-    document.getElementById('allowlistInsensitiveNote').textContent = this.t('options:allowlistInsensitiveNote');
-    document.getElementById('allowlistNote').textContent = this.t('options:allowlistNote');
+    document.getElementById('allowlistHeader').textContent = this.t('options:listsPage.headers.allowlist');
+    document.getElementById('allowlistInsensitiveName').textContent = this.t('options:listsPage.labels.caseInsensitive');
+    document.getElementById('allowlistInsensitiveNote').textContent = this.t('options:listsPage.notes.caseInsensitive');
+    document.getElementById('allowlistNote').textContent = this.t('options:listsPage.notes.allowlistCaseSensitive');
     document.getElementById('allowlistRemove').textContent = this.t('common:buttons.remove');
     document.getElementById('allowlistSave').textContent = this.t('common:buttons.save');
-    document.getElementById('allowlistSensitiveName').textContent = this.t('options:allowlistSensitive');
-    document.getElementById('allowlistSensitiveNote').textContent = this.t('options:allowlistSensitiveNote');
-    document.getElementById('defaultTextWordlistHeader').textContent = this.t('options:defaultTextWordlistHeader');
-    document.getElementById('listWordPhraseHeader').textContent = this.t('options:wordPhraseHeader');
-    document.getElementById('wordlistNameHeader').textContent = this.t('options:wordlistNameHeader');
+    document.getElementById('allowlistSensitiveName').textContent = this.t('options:listsPage.labels.caseSensitive');
+    document.getElementById('allowlistSensitiveNote').textContent = this.t('options:listsPage.notes.caseSensitive');
+    document.getElementById('defaultTextWordlistHeader').textContent = this.t('options:listsPage.headers.defaultTextWordlist');
+    document.getElementById('listWordPhraseHeader').textContent = this.t('options:listsPage.headers.wordPhrase');
+    document.getElementById('wordlistNameHeader').textContent = this.t('options:listsPage.headers.wordlistName');
     document.getElementById('wordlistRename').textContent = this.t('common:buttons.rename');
     document.getElementById('wordlistsHeader').textContent = this.t('common:wordlists.plural');
     // Domains page
-    document.getElementById('domainDisabledName').textContent = this.t('options:domainDisabled');
-    document.getElementById('domainDisabledNote').textContent = this.t('options:domainDisabledNote');
-    document.getElementById('domainEnabledName').textContent = this.t('options:domainEnabled');
-    document.getElementById('domainEnabledNote').textContent = this.t('options:domainEnabledNote');
-    document.getElementById('domainFilterAllFramesName').textContent = this.t('options:domainFilterAllFramesName');
-    document.getElementById('domainFilterAllFramesNote').textContent = this.t('options:domainFilterAllFramesNote');
-    document.getElementById('domainFrameModeHeader').textContent = this.t('options:domainFrameModeHeader');
-    document.getElementById('domainFramesDisabledName').textContent = this.t('options:domainFramesDisabled');
-    document.getElementById('domainFramesDisabledNote').textContent = this.t('options:domainFramesDisabledNote');
-    document.getElementById('domainFramesEnabledName').textContent = this.t('options:domainFramesEnabled');
-    document.getElementById('domainFramesEnabledNote').textContent = this.t('options:domainFramesEnabledNote');
-    document.getElementById('domainHeader').textContent = this.t('options:domainHeader');
-    document.getElementById('domainMatchModeHeader').textContent = this.t('options:domainMatchModeHeader');
-    document.getElementById('domainMatchModeMinimalName').textContent = this.t('options:domainMatchModeMinimal');
-    document.getElementById('domainMatchModeMinimalNote').textContent = this.t('options:domainMatchModeMinimalNote');
-    document.getElementById('domainMatchModeNormalName').textContent = this.t('options:domainMatchModeNormal');
-    document.getElementById('domainMatchModeNormalNote').textContent = this.t('options:domainMatchModeNormalNote');
+    document.getElementById('domainDisabledName').textContent = this.t('options:domainsPage.labels.filterDisabled');
+    document.getElementById('domainDisabledNote').textContent = this.t('options:domainsPage.notes.filterDisabled');
+    document.getElementById('domainEnabledName').textContent = this.t('options:domainsPage.labels.filterEnabled');
+    document.getElementById('domainEnabledNote').textContent = this.t('options:domainsPage.notes.filterEnabled');
+    document.getElementById('domainFilterAllFramesName').textContent = this.t('options:domainsPage.labels.filterAllFrames');
+    document.getElementById('domainFilterAllFramesNote').textContent = this.t('options:domainsPage.notes.filterAllFrames');
+    document.getElementById('domainFrameModeHeader').textContent = this.t('options:domainsPage.headers.frameMode');
+    document.getElementById('domainFramesDisabledName').textContent = this.t('options:domainsPage.labels.framesDisabled');
+    document.getElementById('domainFramesDisabledNote').textContent = this.t('options:domainsPage.notes.framesDisabled');
+    document.getElementById('domainFramesEnabledName').textContent = this.t('options:domainsPage.labels.framesEnabled');
+    document.getElementById('domainFramesEnabledNote').textContent = this.t('options:domainsPage.notes.framesEnabled');
+    document.getElementById('domainHeader').textContent = this.t('options:domainsPage.headers.domain');
+    document.getElementById('domainMatchModeHeader').textContent = this.t('options:domainsPage.headers.matchMode');
+    document.getElementById('domainMatchModeMinimalName').textContent = this.t('common:domainMatchModes.minimal');
+    document.getElementById('domainMatchModeMinimalNote').textContent = this.t('options:domainsPage.notes.matchModeMinimal');
+    document.getElementById('domainMatchModeNormalName').textContent = this.t('common:domainMatchModes.normal');
+    document.getElementById('domainMatchModeNormalNote').textContent = this.t('options:domainsPage.notes.matchModeNormal');
     document.getElementById('domainModeAdvanced').textContent = this.t('common:domainModes.advanced');
     document.getElementById('domainModeDeep').textContent = this.t('common:domainModes.deep');
-    document.getElementById('domainModeHeader').textContent = this.t('options:domainModeHeader');
+    document.getElementById('domainModeHeader').textContent = this.t('options:domainModes.headers.mode');
     document.getElementById('domainModeNormal').textContent = this.t('common:domainModes.normal');
     document.getElementById('domainRemove').textContent = this.t('common:buttons.remove');
     document.getElementById('domainSave').textContent = this.t('common:buttons.save');
-    document.getElementById('domainsHeader').textContent = this.t('options:domainsHeader');
-    document.getElementById('domainTextNote').textContent = this.t('options:domainNote');
-    document.getElementById('domainTextWordlistHeader').textContent = this.t('options:domainTextWordlistHeader');
+    document.getElementById('domainsHeader').textContent = this.t('options:domainsPage.headers.domains');
+    document.getElementById('domainTextNote').textContent = this.t('options:domainsPage.notes.domainExample');
+    document.getElementById('domainTextWordlistHeader').textContent = this.t('options:domainsPage.headers.textWordlist');
     // Bookmarklet page
-    document.getElementById('bookmarkletButtonNote').textContent = this.t('options:bookmarkletButtonNote');
-    document.getElementById('bookmarkletExplanation').textContent = this.t('options:bookmarkletExplanation');
-    document.getElementById('bookmarkletHeader').textContent = this.t('options:bookmarkletHeader');
-    document.getElementById('bookmarkletLearnMore').textContent = this.t('options:bookmarkletLearnMore');
-    document.getElementById('bookmarkletLink').textContent = this.t('common:app.shortName');
-    document.getElementById('bookmarkletUseDefaultConfig').textContent = this.t('options:bookmarkletUseDefaultConfig');
-    document.getElementById('bookmarkletUseMyConfig').textContent = this.t('options:bookmarkletUseMyConfig');
+    document.getElementById('bookmarkletButtonNote').textContent = this.t('options:bookmarkletsPage.notes.installBookmarklet');
+    document.getElementById('bookmarkletExplanation').textContent = this.t('options:bookmarkletsPage.notes.explanation');
+    document.getElementById('bookmarkletHeader').textContent = this.t('options:bookmarkletsPage.headers.bookmarklet');
+    document.getElementById('bookmarkletLearnMore').textContent = this.t('options:bookmarkletsPage.notes.learnMore');
+    document.getElementById('bookmarkletLink').textContent = this.t('options:bookmarkletsPage.buttons.installBookmarklet');
+    document.getElementById('bookmarkletUseDefaultConfig').textContent = this.t('options:bookmarkletsPage.labels.useDefaultConfig');
+    document.getElementById('bookmarkletUseMyConfig').textContent = this.t('options:bookmarkletsPage.labels.useMyConfig');
     // Config page
     document.getElementById('configExport').textContent = this.t('common:buttons.export');
-    document.getElementById('configHeader').textContent = this.t('options:configHeader');
+    document.getElementById('configHeader').textContent = this.t('options:configsPage.headers.configuration');
     document.getElementById('configImport').textContent = this.t('common:buttons.import');
-    document.getElementById('configInlineEditorName').textContent = this.t('options:configInlineEditor');
+    document.getElementById('configInlineEditorName').textContent = this.t('options:configsPage.labels.inlineEditor');
     document.getElementById('configLoggingLevelDebug').textContent = this.t('common:logLevels.debug');
     document.getElementById('configLoggingLevelError').textContent = this.t('common:logLevels.error');
-    document.getElementById('configLoggingLevelHeader').textContent = this.t('options:configLoggingLevelHeader');
+    document.getElementById('configLoggingLevelHeader').textContent = this.t('options:configsPage.headers.loggingLevel');
     document.getElementById('configLoggingLevelInfo').textContent = this.t('common:logLevels.info');
     document.getElementById('configLoggingLevelWarn').textContent = this.t('common:logLevels.warn');
-    document.getElementById('configPasswordHeader').textContent = this.t('options:configPasswordHeader');
+    document.getElementById('configPasswordHeader').textContent = this.t('options:configsPage.headers.password');
     document.getElementById('configReset').textContent = this.t('common:buttons.restoreDefaults');
-    document.getElementById('configStorageHeader').textContent = this.t('options:configStorageHeader');
-    document.getElementById('configSyncLargeSettingsName').textContent = this.t('options:configSyncLargeSettings');
-    document.getElementById('configSyncLargeSettingsNote').textContent = this.t('options:configSyncLargeSettingsNote');
+    document.getElementById('configStorageHeader').textContent = this.t('options:configsPage.headers.storage');
+    document.getElementById('configSyncLargeSettingsName').textContent = this.t('options:configsPage.labels.syncLargeSettings');
+    document.getElementById('configSyncLargeSettingsNote').textContent = this.t('options:configsPage.notes.syncLargeSettings');
     // Stats page
-    document.getElementById('collectStatsName').textContent = this.t('options:collectStats');
-    document.getElementById('collectStatsNote').textContent = this.t('options:collectStatsNote');
-    document.getElementById('removeLessUsedWords').textContent = this.t('options:statsRemoveLessUsedWordsButton');
+    document.getElementById('collectStatsName').textContent = this.t('options:statsPage.labels.collectStats');
+    document.getElementById('collectStatsNote').textContent = this.t('options:statsPage.notes.collectStats');
+    document.getElementById('removeLessUsedWords').textContent = this.t('options:statsPage.buttons.removeLessUsedWords');
     document.getElementById('statsExport').textContent = this.t('common:buttons.export');
-    document.getElementById('statsFilteredSummaryTotal').textContent = this.t('options:statsFilteredSummaryTotal');
-    document.getElementById('statsFilteredSummaryWord').textContent = this.t('options:statsFilteredSummaryWord');
-    document.getElementById('statsHeader').textContent = this.t('options:statsHeader');
+    document.getElementById('statsFilteredSummaryTotal').textContent = this.t('options:statsPage.tableHeaders.summaryTotal');
+    document.getElementById('statsFilteredSummaryWord').textContent = this.t('options:statsPage.tableHeaders.summaryWords');
+    document.getElementById('statsHeader').textContent = this.t('options:statsPage.headers.stats');
     document.getElementById('statsImport').textContent = this.t('common:buttons.import');
-    document.getElementById('statsRemoveLessUsedWordsExplanation').textContent = this.t('options:statsRemoveLessUsedWordsExplanation');
+    document.getElementById('statsRemoveLessUsedWordsExplanation').textContent = this.t('options:statsPage.notes.removeLessUsedWords');
     document.getElementById('statsReset').textContent = this.t('common:buttons.reset');
-    document.getElementById('statsSummaryHeader').textContent = this.t('options:statsSummaryHeader');
-    document.getElementById('statsTotalFilteredName').textContent = this.t('options:statsSummaryTotalWordsFiltered');
-    document.getElementById('statsTrackingSinceName').textContent = this.t('options:statsSummaryTrackingSince');
-    document.getElementById('statsWordsFilteredHeader').textContent = this.t('options:statsWordsFilteredHeader');
+    document.getElementById('statsSummaryHeader').textContent = this.t('options:statsPage.headers.summary');
+    document.getElementById('statsTotalFilteredName').textContent = this.t('options:statsPage.labels.totalWordsFiltered');
+    document.getElementById('statsTrackingSinceName').textContent = this.t('options:statsPage.labels.trackingSince');
+    document.getElementById('statsWordsFilteredHeader').textContent = this.t('options:statsPage.headers.wordsFiltered');
     // Test page
-    document.getElementById('testFilteredHeader').textContent = this.t('options:testFilteredHeader');
-    document.getElementById('testHeader').textContent = this.t('options:testHeader');
+    document.getElementById('testFilteredHeader').textContent = this.t('options:testsPage.headers.filtered');
+    document.getElementById('testHeader').textContent = this.t('options:testsPage.headers.test');
     // Modals
     // Word Bulk Editor
-    (document.getElementById('bulkAddWordsText') as HTMLTextAreaElement).placeholder = this.t('options:bulkWordEditorBoxPlaceholder');
-    document.getElementById('bulkEditorAddWord').textContent = this.t('options:bulkWordEditorAddWordButton');
-    document.getElementById('bulkEditorAddWords').textContent = this.t('options:bulkWordEditorAddWordsButton');
+    (document.getElementById('bulkAddWordsText') as HTMLTextAreaElement).placeholder = this.t('options:bulkWordEditor.notes.bulkAddWordsPlaceholder');
+    document.getElementById('bulkEditorAddWord').textContent = this.t('options:bulkWordEditor.buttons.addWord');
+    document.getElementById('bulkEditorAddWords').textContent = this.t('options:bulkWordEditor.buttons.addWords');
     document.getElementById('bulkEditorCancel').textContent = this.t('common:buttons.cancel');
     document.getElementById('bulkEditorSave').textContent = this.t('common:buttons.save');
-    document.getElementById('bulkWordEditorMatchMethodHeader').textContent = this.t('options:bulkWordEditorMatchMethodHeader');
-    document.getElementById('bulkWordEditorRemoveAllHeader').textContent = this.t('options:bulkWordEditorRemoveAllHeader');
-    document.getElementById('bulkWordEditorRepeatedHeader').textContent = this.t('options:bulkWordEditorRepeatedHeader');
-    document.getElementById('bulkWordEditorSeparatorsHeader').textContent = this.t('options:bulkWordEditorSeparatorsHeader');
-    document.getElementById('bulkWordEditorSubstitutionCaseHeader').textContent = this.t('options:bulkWordEditorSubstitutionCaseHeader');
-    document.getElementById('bulkWordEditorSubstitutionHeader').textContent = this.t('options:bulkWordEditorSubstitutionHeader');
-    document.getElementById('bulkWordEditorTitle').textContent = this.t('options:bulkWordEditorTitle');
-    document.getElementById('bulkWordEditorWordHeader').textContent = this.t('options:bulkWordEditorWordHeader');
+    document.getElementById('bulkWordEditorMatchMethodHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.matchMethod');
+    document.getElementById('bulkWordEditorRemoveAllHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.remove');
+    document.getElementById('bulkWordEditorRepeatedHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.repeated');
+    document.getElementById('bulkWordEditorSeparatorsHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.separators');
+    document.getElementById('bulkWordEditorSubstitutionCaseHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.substitutionCase');
+    document.getElementById('bulkWordEditorSubstitutionHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.substitution');
+    document.getElementById('bulkWordEditorTitle').textContent = this.t('options:bulkWordEditor.headers.bulkWordEditor');
+    document.getElementById('bulkWordEditorWordHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.word');
     // Confirm
     document.getElementById('confirmModalBackup').textContent = this.t('common:buttons.backup');
     document.getElementById('confirmModalCancel').textContent = this.t('common:buttons.cancel');
     document.getElementById('confirmModalOK').textContent = this.t('common:buttons.ok');
     // Password
-    document.getElementById('passwordModalHeader').textContent = this.t('options:passwordModalHeader');
+    document.getElementById('passwordModalHeader').textContent = this.t('options:modals.titles.enterPassword');
     document.getElementById('submitPassword').textContent = this.t('options:buttons.submit');
     // Status
     document.getElementById('statusModalOK').textContent = this.t('common:buttons.ok');
@@ -491,15 +491,15 @@ export default class OptionPage {
     try {
       await this.cfg.save('words');
       this.closeModal('bulkWordEditorModal');
-      this.showStatusModal(this.t('bulkWordEditorSavedStatusMessage'));
+      this.showStatusModal(this.t('options:bulkWordEditor.messages.saveSuccess'));
       this.filter.rebuildWordlists();
       this.populateOptions();
     } catch (err) {
       if (this.isStorageError(err) && this.cfg.syncLargeKeys) {
         this.confirm('bulkEditorSaveRetry');
       } else {
-        logger.warn(this.t('bulkWordEditorFailedMessage'), err);
-        this.showErrorModal([this.t('bulkWordEditorFailedMessage'), `Error: ${err.message}`]);
+        logger.warn(this.t('options:bulkWordEditor.messages.saveFailed'), err);
+        this.showErrorModal([this.t('options:.bulkWordEditor.messages.saveFailed'), `Error: ${err.message}`]);
       }
     }
   }
@@ -511,7 +511,7 @@ export default class OptionPage {
       await this.convertStorageLocation(null, true);
       await this.bulkEditorSave();
     } catch (err) {
-      this.handleError(this.t('bulkWordEditorFailedMessage'), err);
+      this.handleError(this.t('options:bulkWordEditor.messages.saveFailed'), err);
     }
   }
 
@@ -557,8 +557,8 @@ export default class OptionPage {
 
     const defaults = {
       backup: false,
-      content: this.t('options:confirmModalDefaultContent'),
-      title: this.t('options:confirmModalDefaultTitle'),
+      content: this.t('options:modals.messages.confirmDefault'),
+      title: this.t('options:modals.titles.confirmDefault'),
       titleClass: 'w3-flat-peter-river',
     };
     settings = Object.assign(defaults, settings);
@@ -615,8 +615,8 @@ export default class OptionPage {
 
     switch (action) {
       case 'bulkEditorSave':
-        paragraph.textContent = this.t('options:confirmBulkWordEditorSaveMessage');
-        italics.textContent = this.t('options:confirmBulkWordEditorSaveNoteMessage');
+        paragraph.textContent = this.t('options:bulkWordEditor.messages.confirmSave');
+        italics.textContent = this.t('options:bulkWordEditor.messages.confirmSaveNote');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: true }, content);
@@ -624,8 +624,8 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'bulkEditorSaveRetry':
-        paragraph.textContent = this.t('options:confirmBulkWordEditorSaveRetryMessage');
-        italics.textContent = this.t('options:confirmLocalStorageNoteMessage');
+        paragraph.textContent = this.t('options:bulkWordEditor.messages.confirmSaveRetryStorage');
+        italics.textContent = this.t('options:modals.notes.confirmConvertStorageToLocal');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: true, titleClass: 'w3-red' }, content);
@@ -634,11 +634,11 @@ export default class OptionPage {
         break;
       case 'convertStorageLocation':
         if (this.cfg.syncLargeKeys) {
-          paragraph.textContent = this.t('options:confirmConvertStorageToLocalMessage');
+          paragraph.textContent = this.t('options:modals.messages.confirmConvertStorageToLocal');
         } else {
-          paragraph.textContent = this.t('options:confirmConvertStorageToSyncMessage');
+          paragraph.textContent = this.t('options:modals.messages.confirmConvertStorageToSync');
         }
-        italics.textContent = this.t('options:confirmConvertStorageNoteMessage');
+        italics.textContent = this.t('options:modals.messages.confirmConvertStorage');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: true }, content);
@@ -648,13 +648,13 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfig':
-        this.configureConfirmModal({ content: this.t('options:confirmImportConfigMessage'), backup: true });
+        this.configureConfirmModal({ content: this.t('options:modals.messages.confirmImportConfig'), backup: true });
         this._confirmEventListeners.push(this.importConfig.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfigRetry':
-        paragraph.textContent = this.t('options:confirmImportConfigRetryMessage');
-        italics.textContent = this.t('options:confirmLocalStorageNoteMessage');
+        paragraph.textContent = this.t('options:modals.messages.confirmImportConfigRetry');
+        italics.textContent = this.t('options:modals.notes.confirmConvertStorageToLocal');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
@@ -664,7 +664,7 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'removeAllWords':
-        paragraph.textContent = this.t('options:confirmRemoveAllWordsMessage');
+        paragraph.textContent = this.t('options:modals.messages.confirmRemoveAllWords');
         content.appendChild(paragraph);
         this.configureConfirmModal({ backup: true }, content);
         this._confirmEventListeners.push(this.removeAllWords.bind(this));
@@ -678,31 +678,31 @@ export default class OptionPage {
           if (count) {
             this.configureConfirmModal({
               backup: true,
-              content: this.t('options:confirmRemoveLessUsedWordsMessage', { count: count }),
+              content: this.t('options:statsPage.messages.confirmRemoveLessUsedWords', { count: count }),
             });
             this._confirmEventListeners.push(this.removeLessUsedWords.bind(this));
             ok.addEventListener('click', lastElement(this._confirmEventListeners));
           } else {
             validated = false;
             this.showStatusModal(`
-              ${this.t('options:confirmRemoveLessUsedWordsUnderMessage')}
-              ${this.t('options:confirmRemoveLessUsedWordsUnderMessageNote')}
+              ${this.t('options:statsPage.messages.confirmRemoveLessUsedWordsNone')}
+              ${this.t('options:statsPage.notes.confirmRemoveLessUsedWordsNone')}
             `);
           }
         }
         break;
       case 'statsImport':
-        this.configureConfirmModal({ content: this.t('options:confirmStatsImportMessage') });
+        this.configureConfirmModal({ content: this.t('options:statsPage.messages.confirmImportStats') });
         this._confirmEventListeners.push(this.importStats.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'statsReset':
-        this.configureConfirmModal({ content: this.t('options:confirmStatsResetMessage') });
+        this.configureConfirmModal({ content: this.t('options:statsPage.messages.confirmResetStats') });
         this._confirmEventListeners.push(this.statsReset.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'restoreDefaults':
-        this.configureConfirmModal({ content: this.t('options:confirmRestoreDefaultsMessage'), backup: true });
+        this.configureConfirmModal({ content: this.t('options:modals.messages.confirmRestoreDefaults'), backup: true });
         this._confirmEventListeners.push(this.restoreDefaults.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
@@ -712,8 +712,8 @@ export default class OptionPage {
         if (passwordBtn.classList.contains('disabled')) return false;
 
         const message = passwordText.value == ''
-          ? this.t('options:confirmPasswordRemoveMessage')
-          : this.t('options:confirmPasswordSetMessage', { password: passwordText.value })
+          ? this.t('options:modals.messages.confirmRemovePassword')
+          : this.t('options:modals.messages.confirmSetPassword', { password: passwordText.value })
         ;
         this.configureConfirmModal({ content: message });
         this._confirmEventListeners.push(this.auth.setPassword.bind(this.auth));
@@ -755,19 +755,19 @@ export default class OptionPage {
         }
 
         if (!silent) {
-          this.showStatusModal(this.t('options:storageConvertedMessage'));
+          this.showStatusModal(this.t('options:configsPage.messages.convertStorageSuccess'));
         }
       } catch (err) {
         // Revert UI and export a backup of config.
         this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
         this.backupConfig();
-        this.handleError(this.t('options:storageConversionCleanupFailedMessage'), err);
+        this.handleError(this.t('options:configsPage.messages.convertStorageCleanupFailed'), err);
         await this.cfg.save('syncLargeKeys');
         this.populateConfig();
       }
     } catch (err) {
       // Revert UI
-      this.handleError(this.t('options:storageConversionFailedMessage'), err);
+      this.handleError(this.t('options:configsPage.messages.convertStorageFailed'), err);
       this.cfg.syncLargeKeys = !this.cfg.syncLargeKeys;
       this.populateConfig();
     }
@@ -830,7 +830,7 @@ export default class OptionPage {
         this.populateWord();
       }
     } catch (err) {
-      this.showErrorModal([this.t('options:saveFailedMessage'), `Error: ${err.message}`]);
+      this.showErrorModal([this.t('options:modals.messages.saveFailed'), `Error: ${err.message}`]);
       return false;
     }
   }
@@ -893,10 +893,10 @@ export default class OptionPage {
     try {
       await this.convertStorageLocation(null, true);
       await this.cfg.save();
-      this.showStatusModal(this.t('options:configImportedMessage'));
+      this.showStatusModal(this.t('options:configsPage.messages.importSuccess'));
       await this.init();
     } catch (err) {
-      this.handleError(this.t('options:configImportFailedMessage'), err);
+      this.handleError(this.t('options:configsPage.messages.importFailed'), err);
     }
   }
 
@@ -914,18 +914,18 @@ export default class OptionPage {
         try {
           this.cfg = importedCfg;
           await this.cfg.save();
-          this.showStatusModal(this.t('options:configImportedMessage'));
+          this.showStatusModal(this.t('options:configsPage.messages.importSuccess'));
           await this.init(true);
         } catch (err) {
           if (this.isStorageError(err) && this.cfg.syncLargeKeys) {
             this.confirm('importConfigRetry');
           } else {
-            this.handleError(this.t('options:configImportFailedMessage'), err);
+            this.handleError(this.t('options:configsPage.messages.importFailed'), err);
           }
         }
       }
     } catch (err) {
-      this.showErrorModal([this.t('options:configImportFailedProcessingMessage'), `Error: ${err.message}`]);
+      this.showErrorModal([this.t('options:configsPage.messages.importProcessingFailed'), `Error: ${err.message}`]);
     }
   }
 
@@ -941,13 +941,13 @@ export default class OptionPage {
       const file = files[0];
       const fileText = await readFile(file) as string;
       const stats = JSON.parse(fileText);
-      if (!this.validStatsForImport(stats)) throw new Error(this.t('statsFileImportInvalidMessage'));
+      if (!this.validStatsForImport(stats)) throw new Error(this.t('options:statsPage.importInvalid'));
       await this.Class.Config.saveLocalStorage({ stats: stats });
       input.value = '';
       await this.populateStats();
     } catch (err) {
       await this.Class.Config.saveLocalStorage({ stats: backupStats });
-      this.handleError(this.t('statsFileImportFailedMessage'), err);
+      this.handleError(this.t('options:statsPage.messages.importFailed'), err);
     }
   }
 
@@ -1077,7 +1077,7 @@ export default class OptionPage {
     removeChildren(domainsSelect);
 
     const domains = this.Class.Domain.sortedKeys(this.cfg.domains);
-    domains.unshift(this.t('options:addOrUpdateExistingOption'));
+    domains.unshift(this.t('options:values.addOrUpdateExistingOption'));
     domains.forEach((domain) => {
       const optionElement = document.createElement('option');
       optionElement.textContent = domain;
@@ -1203,8 +1203,8 @@ export default class OptionPage {
 
       this.populateStatsSummary(stats, totalFiltered);
     } catch (err) {
-      logger.warn(this.t('options:statsFailedToPopulateMessage'), err);
-      this.showErrorModal([this.t('options:statsFailedToPopulateMessage'), `Error: ${err.message}`]);
+      logger.warn(this.t('options:statsPage.messages.loadFailed'), err);
+      this.showErrorModal([this.t('options:statsPage.messages.loadFailed'), `Error: ${err.message}`]);
     }
   }
 
@@ -1251,7 +1251,7 @@ export default class OptionPage {
     const filteredTestText = document.getElementById('filteredTestText') as HTMLElement;
 
     if (testText.value === '') {
-      filteredTestText.textContent = this.t('options:testFilteredTextPlaceholder');
+      filteredTestText.textContent = this.t('options:testsPage.notes.filteredTextPlaceholder');
     } else {
       if (this.cfg.filterMethod === this.Class.Constants.FILTER_METHODS.OFF) {
         filteredTestText.textContent = testText.value;
@@ -1267,7 +1267,7 @@ export default class OptionPage {
     const list = [].concat(sensitiveList, this.filter.cfg.iWordAllowlist).sort();
     const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
     removeChildren(allowlist);
-    list.unshift(this.t('options:addOrUpdateExistingOption'));
+    list.unshift(this.t('options:values.addOrUpdateExistingOption'));
     list.forEach((item) => {
       const optionElement = document.createElement('option');
       optionElement.value = item === list[0] ? '' : item.replace(regExp, '');
@@ -1389,7 +1389,7 @@ export default class OptionPage {
     }
 
     const words = Object.keys(this.cfg.words).sort();
-    words.unshift(this.t('options:addOrUpdateExistingOption'));
+    words.unshift(this.t('options:values.addOrUpdateExistingOption'));
     words.forEach((word) => {
       let filteredWord = word;
       if (word != words[0] && wordlistFilter.cfg.filterWordList) {
@@ -1443,7 +1443,7 @@ export default class OptionPage {
         }
       }
     } catch (err) {
-      logger.warn(this.t('options:statsLessUsedWordsErrorMessage'), err);
+      logger.warn(this.t('options:statsPage.lessUsedWords.messages.prepareLessUsedWordsError'), err);
       return {};
     }
   }
@@ -1466,8 +1466,8 @@ export default class OptionPage {
         await this.cfg.save('domains');
         this.populateDomainPage();
       } catch (err) {
-        logger.warn(this.t('options:domainRemoveFailedMessage', { domain: domainsSelect.value }), err);
-        this.showErrorModal([this.t('options:domainRemoveFailedMessage', { domain: domainsSelect.value }), `Error: ${err.message}`]);
+        logger.warn(this.t('options:domainsPage.removeFailed', { domain: domainsSelect.value }), err);
+        this.showErrorModal([this.t('options:domainsPage.removeFailed', { domain: domainsSelect.value }), `Error: ${err.message}`]);
         return false;
       }
     }
@@ -1494,8 +1494,8 @@ export default class OptionPage {
       this.filter.init();
       this.populateOptions();
     } catch (err) {
-      logger.warn(this.t('options:allowlistRemoveFailedMessage', { word: originalWord }), err);
-      this.showErrorModal([this.t('options:allowlistRemoveFailedMessage', { word: originalWord }), `Error: ${err.message}`]);
+      logger.warn(this.t('options:listPage.messages.removeWordFromAllowlistFailed', { word: originalWord }), err);
+      this.showErrorModal([this.t('options:listPage.messages.removeWordFromAllowlistFailed', { word: originalWord }), `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1515,8 +1515,8 @@ export default class OptionPage {
         this.filter.rebuildWordlists();
         this.populateOptions();
       } catch (err) {
-        logger.warn(this.t('options:wordRemoveFailedMessage', { word: word }), err);
-        this.showErrorModal([this.t('options:wordRemoveFailedMessage', { word: word }), `Error: ${err.message}`]);
+        logger.warn(this.t('options:wordsPage.messages.removeFailed', { word: word }), err);
+        this.showErrorModal([this.t('options:wordsPage.messages.removeFailed', { word: word }), `Error: ${err.message}`]);
       }
     }
   }
@@ -1530,7 +1530,7 @@ export default class OptionPage {
     if (wordlistText.checkValidity()) {
       // Make sure there are no duplicates
       if (this.cfg.wordlists.includes(name)) {
-        this.showInputError(wordlistText, this.t('options:wordlistRenameDuplicate'));
+        this.showInputError(wordlistText, this.t('options:listsPage.validations.wordlistNameNotUnique'));
         return false;
       }
 
@@ -1540,22 +1540,22 @@ export default class OptionPage {
         this.populateWordlists(index);
         this.populateWordPage();
       } catch (err) {
-        this.handleError(this.t('options:wordlistSaveFailedMessage'), err);
+        this.handleError(this.t('options:listsPage.messages.renameWordlistFailed'), err);
       }
     } else {
-      this.showInputError(wordlistText, this.t('options:wordlistRenameInvalidMessage'));
+      this.showInputError(wordlistText, this.t('options:listsPage.validations.wordlistNameInvalid'));
     }
   }
 
   async restoreDefaults(evt: Event = null, silent = false) {
     try {
       await this.cfg.resetPreserveStats();
-      if (!silent) this.showStatusModal(this.t('options:configDefaultsRestoredMessage'));
+      if (!silent) this.showStatusModal(this.t('options:configsPage.messages.restoreDefaultsSuccess'));
       await this.init(true);
       return true;
     } catch (err) {
-      logger.warn(this.t('options:configDefaultsFailedMessage'), err);
-      this.showErrorModal([this.t('options:configDefaultsFailedMessage'), `Error: ${err.message}`]);
+      logger.warn(this.t('options:configsPage.messages.restoreDefaultsFailed'), err);
+      this.showErrorModal([this.t('options:configsPage.messages.restoreDefaultsFailed'), `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1565,7 +1565,7 @@ export default class OptionPage {
     const newKey = domainText.value.trim().toLowerCase();
 
     if (newKey == '') { // No data
-      this.showInputError(domainText, this.t('options:domainSaveEmptyMessage'));
+      this.showInputError(domainText, this.t('options:domainsPage.validations.emptyInputError'));
       return false;
     }
 
@@ -1573,7 +1573,7 @@ export default class OptionPage {
       this.hideInputError(domainText);
       const domainCfg = this.domainCfgFromPage();
       if (!domainCfg) {
-        this.showInputError(this.t('options:domainSaveFailedGettingSettingsMessage'));
+        this.showInputError(this.t('options:domainsPage.saveFailedGettingSettings'));
         return false;
       }
 
@@ -1592,11 +1592,11 @@ export default class OptionPage {
         await domain.save(this.cfg);
         this.populateDomainPage();
       } catch (err) {
-        this.showErrorModal([this.t('options:saveFailedMessage'), `Error: ${err.message}`]);
+        this.showErrorModal([this.t('options:modals.messages.saveFailed'), `Error: ${err.message}`]);
         return false;
       }
     } else {
-      this.showInputError(domainText, this.t('options:domainSaveExample'));
+      this.showInputError(domainText, this.t('options:domainsPage.validations.domainExample'));
       return false;
     }
   }
@@ -1609,8 +1609,8 @@ export default class OptionPage {
       await this.init();
       return true;
     } catch (err) {
-      logger.warn(this.t('options:saveOptionsFailedMessage'), err);
-      this.showErrorModal([this.t('options:saveOptionsFailedMessage'), `Error: ${err.message}`]);
+      logger.warn(this.t('options:modals.messages.saveOptionsFailed'), err);
+      this.showErrorModal([this.t('options:modals.messages.saveOptionsFailed'), `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1627,12 +1627,12 @@ export default class OptionPage {
     const newListName = newCase === 'sensitive' ? 'wordAllowlist' : 'iWordAllowlist';
 
     if (allowlistText.value === '') {
-      this.showInputError(allowlistText, this.t('options:wordPhraseInvalidMessage'));
+      this.showInputError(allowlistText, this.t('options:validations.wordPhraseInvalid'));
       return false;
     }
 
     if (this.cfg[newListName].indexOf(newWord) > -1) {
-      this.showInputError(allowlistText, this.t('options:saveAllowlistDuplicateMessage'));
+      this.showInputError(allowlistText, this.t('options:listsPage.validations.wordAlreadyAllowed'));
       return false;
     }
 
@@ -1661,13 +1661,13 @@ export default class OptionPage {
           this.filter.init();
           this.populateOptions();
         } catch (err) {
-          logger.warn(this.t('options:saveAllowlistFailedMessage'), err);
-          this.showErrorModal([this.t('options:saveAllowlistFailedMessage'), `Error: ${err.message}`]);
+          logger.warn(this.t('options:listsPage.messages.saveAllowlistFailed'), err);
+          this.showErrorModal([this.t('options:listsPage.messages.saveAllowlistFailed'), `Error: ${err.message}`]);
           return false;
         }
       }
     } else {
-      this.showInputError(allowlistText, this.t('options:wordPhraseInvalidMessage'));
+      this.showInputError(allowlistText, this.t('options:validations.wordPhraseInvalid'));
     }
   }
 
@@ -1691,13 +1691,13 @@ export default class OptionPage {
     }
 
     if (word == '') {
-      this.showInputError(wordText, this.t('options:wordPhraseInvalidMessage'));
+      this.showInputError(wordText, this.t('options:validations.wordPhraseInvalid'));
       return false;
     }
 
     // Make sure word and substitution are different
     if (word == sub) {
-      this.showInputError(substitutionText, this.t('options:saveWordSubstitutionCollisionMessage'));
+      this.showInputError(substitutionText, this.t('options:wordsPage.validations.substitutionCollision'));
       return false;
     }
 
@@ -1724,7 +1724,7 @@ export default class OptionPage {
         const first = subFilter.replaceTextResult(word, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
         const second = subFilter.replaceTextResult(first.filtered, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
         if (first.filtered != second.filtered) {
-          this.showInputError(substitutionText, this.t('options:saveWordSubstitutionEmbeddedMessage'));
+          this.showInputError(substitutionText, this.t('options:wordsPage.validations.substitutionContainsWord'));
           return false;
         }
       }
@@ -1737,7 +1737,7 @@ export default class OptionPage {
         subFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { words: words }));
         subFilter.init();
         if (subFilter.wordlists[subFilter.wordlistId].regExps.length === 0) {
-          this.showInputError(wordText, this.t('options:saveWordRegexInvalidMessage'));
+          this.showInputError(wordText, this.t('options:wordsPage.validations.regexInvalid'));
           return false;
         }
       }
@@ -1756,7 +1756,7 @@ export default class OptionPage {
           if (added) {
             delete this.cfg.words[originalWord];
           } else {
-            this.showInputError(wordText, this.t('options:saveWordDuplicateMessage', { word: word }));
+            this.showInputError(wordText, this.t('options:wordsPage.validations.wordAlreadyListed', { word: word }));
           }
         }
       }
@@ -1768,16 +1768,16 @@ export default class OptionPage {
           this.filter.rebuildWordlists();
           this.populateOptions();
         } catch (err) {
-          logger.warn(this.t('options:saveWordUpdateFailedMessage', { word: word }), err);
-          this.showErrorModal([this.t('options:saveWordUpdateFailedMessage', { word: word }), `Error: ${err.message}`]);
+          logger.warn(this.t('options:wordsPage.messages.updateFailed', { word: word }), err);
+          this.showErrorModal([this.t('options:wordsPage.messages.updateFailed', { word: word }), `Error: ${err.message}`]);
           this.cfg.removeWord(word);
           return false;
         }
       } else {
-        this.showInputError(wordText, this.t('options:saveWordDuplicateMessage', { word: word }));
+        this.showInputError(wordText, this.t('options:wordsPage.validations.wordAlreadyListed', { word: word }));
       }
     } else {
-      this.showInputError(wordText, this.t('options:wordPhraseInvalidMessage'));
+      this.showInputError(wordText, this.t('options:validations.wordPhraseInvalid'));
     }
   }
 
@@ -1788,7 +1788,7 @@ export default class OptionPage {
       this.filter.rebuildWordlists();
       this.populateOptions();
     } catch (err) {
-      this.handleError(this.t('options:saveFilterMethodFailedMessage'), err);
+      this.handleError(this.t('options:settingsPage.messages.saveFilterMethodFailed'), err);
     }
   }
 
@@ -1809,7 +1809,7 @@ export default class OptionPage {
       await this.cfg.save(prop);
       this.populateOptions();
     } catch (err) {
-      this.showErrorModal(this.t('options:saveWordlistDefaultFailedMessage'), err);
+      this.showErrorModal(this.t('options:listsPage.messages.saveDefaultWordlistFailed'), err);
     }
   }
 
@@ -1870,12 +1870,12 @@ export default class OptionPage {
       await this.Class.Config.removeLocalStorage('stats');
       this.populateStats();
     } catch (err) {
-      logger.warn(this.t('options:statsResetFailedMessage'), err);
-      this.showErrorModal([this.t('options:statsResetFailedMessage'), `Error: ${err.message}`]);
+      logger.warn(this.t('options:statsPage.messages.resetFailed'), err);
+      this.showErrorModal([this.t('options:statsPage.messages.resetFailed'), `Error: ${err.message}`]);
     }
   }
 
-  showErrorModal(content: string | string[] = [this.t('options:errorModalDefaultContent')], title = this.t('options:errorModalDefaultTitle'), titleColor = 'w3-red') {
+  showErrorModal(content: string | string[] = [this.t('options:modals.messages.errorDefault')], title = this.t('options:modals.messages.titles.errorDefault'), titleColor = 'w3-red') {
     this.configureStatusModal(content, title, titleColor);
     this.openModal('statusModal');
   }
@@ -1892,12 +1892,12 @@ export default class OptionPage {
     }
   }
 
-  showStatusModal(content: string | string[] = [this.t('options:statusModalDefaultContent')], title = this.t('options:statusModalDefaultTitle'), titleColor = 'w3-flat-peter-river') {
+  showStatusModal(content: string | string[] = [this.t('options:modals.messages.statusDefault')], title = this.t('options:modals.titles.statusDefault'), titleColor = 'w3-flat-peter-river') {
     this.configureStatusModal(content, title, titleColor);
     this.openModal('statusModal');
   }
 
-  showWarningModal(content: string | string[] = [this.t('options:warningModalDefaultContent')], title = this.t('options:warningModalDefaultTitle'), titleColor = 'w3-orange') {
+  showWarningModal(content: string | string[] = [this.t('options:modals.messages.warningDefault')], title = this.t('options:modals.titles.warningDefault'), titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
     this.openModal('statusModal');
   }
@@ -2012,7 +2012,7 @@ export default class OptionPage {
       await this.cfg.save('darkMode');
       this.applyTheme(true);
     } catch (err) {
-      this.handleError(this.t('options:themeSaveFailedMessage'), err);
+      this.handleError(this.t('options:settingsPage.messages.saveThemeFailed'), err);
     }
   }
 
@@ -2023,7 +2023,7 @@ export default class OptionPage {
     if (lessUsedWordsNumber.value.match(/^\d+$/) && parseInt(lessUsedWordsNumber.value) > 0) {
       valid = true;
     } else {
-      this.showInputError(lessUsedWordsNumber, this.t('options:statsLessUsedWordsInvalidMessage'));
+      this.showInputError(lessUsedWordsNumber, this.t('options:statsPage.validations.lessUsedWordsInvalid'));
     }
 
     return valid;

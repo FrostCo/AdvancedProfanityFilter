@@ -1,205 +1,320 @@
 {
-  "addOrUpdateExistingOption": "Add, or update existing...",
-  "allowlistHeader": "Allowlist",
-  "allowlistInsensitive": "Case-insensitive",
-  "allowlistInsensitiveNote": "(doghouse: Don't filter 'DogHouse')",
-  "allowlistNote": "(* Case-sensitive)",
-  "allowlistRemoveFailedMessage": "Failed to remove '{{word}}' from allowlist.",
-  "allowlistSensitive": "Case-sensitive",
-  "allowlistSensitiveNote": "(Doghouse: Don't filter 'Doghouse')",
-  "bookmarkletButtonNote": "Drag to your bookmarks bar or copy the URL",
-  "bookmarkletExplanation": "Create a 'bookmarklet' of Advanced Profanity Filter that can be used when you can't install the extension",
-  "bookmarkletHeader": "Bookmarklet",
-  "bookmarkletLearnMore": "learn more",
-  "bookmarkletTab": "Bookmarklet",
-  "bookmarkletUseDefaultConfig": "Use default config",
-  "bookmarkletUseMyConfig": "Use my config",
-  "bulkWordEditorAddWordButton": "ADD WORD",
-  "bulkWordEditorAddWordsButton": "BULK ADD WORDS",
-  "bulkWordEditorBoxPlaceholder": "Bulk add words (one word/phrase per line)",
-  "bulkWordEditorFailedMessage": "Failed to save.",
-  "bulkWordEditorMatchMethodHeader": "Match Method",
-  "bulkWordEditorRemoveAllHeader": "Remove",
-  "bulkWordEditorRepeatedHeader": "Repeated",
-  "bulkWordEditorRetryMessage": "",
-  "bulkWordEditorSavedStatusMessage": "Words saved successfully.",
-  "bulkWordEditorSeparatorsHeader": "Separators",
-  "bulkWordEditorSubstitutionCaseHeader": "Substitution Case",
-  "bulkWordEditorSubstitutionHeader": "Substitution",
-  "bulkWordEditorTitle": "Bulk Word Editor",
-  "bulkWordEditorWordHeader": "Word",
-  "censorCharacter": "Censor character:",
-  "censorFixedLength": "Fixed length:",
-  "censorFixedLengthOriginal": "Original",
-  "censorPreserveFirst": "Preserve the first letter",
-  "censorPreserveFirstNote": "(dog: dog = d**)",
-  "censorPreserveLast": "Preserve the last letter",
-  "censorPreserveLastNote": "(dog: dog = **g)",
-  "censorSettingsHeader": "Censor Settings",
-  "collectStats": "Collect stats",
-  "collectStatsNote": "(Only stored locally)",
-  "configDefaultsFailedMessage": "Failed to restore defaults.",
-  "configDefaultsRestoredMessage": "Default settings restored.",
-  "configHeader": "Configuration",
-  "configImportedMessage": "Settings imported successfully.",
-  "configImportFailedMessage": "Failed to import config.",
-  "configImportFailedProcessingMessage": "Failed to process new settings.",
-  "configInlineEditor": "Inline editor",
-  "configLoggingLevelHeader": "Logging Level",
-  "configPasswordHeader": "Password",
-  "configStorageHeader": "Storage",
-  "configSyncLargeSettings": "Sync large settings",
-  "configSyncLargeSettingsNote": "Words, domains, etc. Disable if you run out of space",
-  "configTab": "Config",
-  "confirmBulkWordEditorSaveMessage": "Are you sure you want to save these changes?",
-  "confirmBulkWordEditorSaveNoteMessage": "Make sure you have a backup first!",
-  "confirmBulkWordEditorSaveRetryMessage": "Failed to save changes because they were too large to be stored. Retry using local storage?",
-  "confirmConvertStorageNoteMessage": "Make sure you have a backup first!",
-  "confirmConvertStorageToLocalMessage": "This will prevent large settings like words and domains from syncing, but allow you to store more.",
-  "confirmConvertStorageToSyncMessage": "This will allow large settings like words and domains to sync, but has stricter limits on how much you can store.",
-  "confirmImportConfigMessage": "Are you sure you want to overwrite your existing settings?",
-  "confirmImportConfigRetryMessage": "Import failed due to storage limitations. Would you like to try again using local storage?",
-  "confirmLocalStorageNoteMessage": "Local storage can store more, but things like words and domains will no longer sync between devices.",
-  "confirmModalDefaultContent": "Are you sure?",
-  "confirmModalDefaultTitle": "Please confirm",
-  "confirmPasswordRemoveMessage": "Are you sure you want to remove the password?",
-  "confirmPasswordSetMessage": "Are you sure you want to set the password to '{{password}}'?",
-  "confirmRemoveAllWordsMessage": "Are you sure you want to remove all words?",
-  "confirmRemoveLessUsedWordsMessage_one": "Are you sure you want to remove {{count}} word?",
-  "confirmRemoveLessUsedWordsMessage_other": "Are you sure you want to remove {{count}} words?",
-  "confirmRemoveLessUsedWordsUnderMessage": "All words have been filtered more times than the provided number.",
-  "confirmRemoveLessUsedWordsUnderMessageNote": "Try increasing the number to include more words.",
-  "confirmRestoreDefaultsMessage": "Are you sure you want to restore defaults?",
-  "confirmStatsImportMessage": "Are you sure you want to overwrite your statistics?",
-  "confirmStatsResetMessage": "Are you sure you want to reset filter statistics?",
-  "defaultSettingsHeader": "Default Settings (for new words/phrases)",
-  "defaultTextWordlistHeader": "Default Text Wordlist",
-  "defaultWordMatchMethod": "Match Method",
-  "defaultWordMatchRepeated": "Match repeated characters",
-  "defaultWordMatchRepeatedNote": "(dog: dddoooggg)",
-  "defaultWordMatchSeparators": "Match separator characters",
-  "defaultWordMatchSeparatorsNote": "([-_ ] dog matches: D-o _g)",
-  "domainDisabled": "Filter disabled",
-  "domainDisabledNote": "Don't filter pages on this domain",
-  "domainEnabled": "Filter enabled",
-  "domainEnabledNote": "Filter pages on this domain",
-  "domainFilterAllFramesName": "Filter all frames",
-  "domainFilterAllFramesNote": "Filter frames on all domains",
-  "domainFrameModeHeader": "Frame Mode",
-  "domainFramesDisabled": "Frames disabled",
-  "domainFramesDisabledNote": "Disable filtering frames on this domain",
-  "domainFramesEnabled": "Frames enabled",
-  "domainFramesEnabledNote": "Filter frames on this domain",
-  "domainHeader": "Domain",
-  "domainMatchModeHeader": "Domain Match Mode",
-  "domainMatchModeMinimal": "Minimal",
-  "domainMatchModeMinimalNote": "Only filter enabled domains",
-  "domainMatchModeNormal": "Normal",
-  "domainMatchModeNormalNote": "Filter all domains",
-  "domainModeHeader": "Mode",
-  "domainNote": "Example: 'google.com' or 'mail.google.com'",
-  "domainRemoveFailedMessage": "Failed to remove domain '{{ domain }}'.",
-  "domainSaveEmptyMessage": "Please enter a value.",
-  "domainSaveExample": "Valid domain example: google.com or www.google.com'",
-  "domainSaveFailedGettingSettingsMessage": "Failed to gather domain settings.",
-  "domainsHeader": "Domains",
-  "domainsTab": "Domains",
-  "domainTextWordlistHeader": "Text Wordlist",
-  "errorModalDefaultContent": "The requested action failed. Please try again or contact support.",
-  "errorModalDefaultTitle": "Error",
-  "filterMethodCensorNote": "(dog: dog = d**)",
-  "filterMethodHeader": "Filter Method",
-  "filterMethodOffNote": "(disabled/summary only)",
-  "filterMethodRemoveNote": "(dog: doghouse = house)",
-  "filterMethodSubstituteNote": "(dog > cat: dog = cat)",
-  "filterWordList": "Filter list",
-  "generalSettingsHeader": "General Settings",
-  "helpTab": "Help",
-  "includeInWordlistsHeader": "Include in Wordlists",
-  "listsTab": "Lists",
-  "matchMethodExact": "Exact",
-  "matchMethodPartial": "Partial",
-  "matchMethodRegex": "Regex",
-  "matchMethodWhole": "Whole",
-  "passwordModalHeader": "Enter Password",
-  "passwordRemoveButton": "REMOVE",
-  "passwordUpdateButton": "SET",
-  "passwordUpdateFailedMessage": "Failed to update password.",
-  "saveAllowlistDuplicateMessage": "Already allowlisted.",
-  "saveAllowlistFailedMessage": "Failed to update allowlist.",
-  "saveFailedMessage": "Failed to save.",
-  "saveFilterMethodFailedMessage": "Failed to set filter method.",
-  "saveOptionsFailedMessage": "Settings not saved! Please try again.",
-  "saveWordDuplicateMessage": "'{{word}}' already in list.",
-  "saveWordlistDefaultFailedMessage": "Failed to update default wordlist.",
-  "saveWordRegexInvalidMessage": "Invalid Regex.",
-  "saveWordSubstitutionCollisionMessage": "Word and substitution must be different.",
-  "saveWordSubstitutionEmbeddedMessage": "Substitution can't contain word (causes an endless loop).",
-  "saveWordUpdateFailedMessage": "Failed to update word '{{word}}'.",
-  "settingsTab": "Settings",
-  "showContextMenu": "Show context menu",
-  "showContextMenuNote": "(Right-click menu)",
-  "showCounter": "Show number of filtered words",
-  "showCounterNote": "(Shown over the extension icon)",
-  "showSummary": "Show summary of filtered words",
-  "showSummaryNote": "(Shown in the extension popup)",
-  "showUpdateNotification": "Show update notification",
-  "statsFailedToPopulateMessage": "Failed to populate stats.",
-  "statsFileImportFailedMessage": "Failed to import stats.",
-  "statsFileImportInvalidMessage": "Invalid stats file.",
-  "statsFilteredSummaryTotal": "Total",
-  "statsFilteredSummaryWord": "Word",
-  "statsHeader": "Stats",
-  "statsLessUsedWordsErrorMessage": "Error while preparing less-used words.",
-  "statsLessUsedWordsInvalidMessage": "Enter a positive whole number.",
-  "statsRemoveLessUsedWordsButton": "REMOVE WORDS",
-  "statsRemoveLessUsedWordsExplanation": "Remove words filtered fewer times than",
-  "statsResetFailedMessage": "Failed to reset stats.",
-  "statsSummaryHeader": "Summary",
-  "statsSummaryTotalWordsFiltered": "Total words filtered",
-  "statsSummaryTrackingSince": "Tracking since",
-  "statsTab": "Stats",
-  "statsWordsFilteredHeader": "Words Filtered",
-  "statusModalDefaultContent": "Status updated.",
-  "statusModalDefaultTitle": "Status",
-  "storageConversionCleanupFailedMessage": "Failed to cleanup old storage, backup automatically exported.",
-  "storageConversionFailedMessage": "Failed to update storage preference.",
-  "storageConvertedMessage": "Storage converted successfully.",
-  "substitutionDefaultSubstitution": "Default Substitution",
-  "substitutionMark": "Mark substituted words with [ ]",
-  "substitutionMarkNote": "(dog: dog = [cat])",
-  "substitutionPreserveCase": "Preserve case of filtered words",
-  "substitutionPreserveCaseNote": "(dog: Dog = Cat)",
-  "substitutionSettingsHeader": "Substitution Settings",
-  "testFilteredHeader": "Filtered",
-  "testFilteredTextPlaceholder": "Enter some text above to test the filter...",
-  "testHeader": "Test",
-  "testTab": "Test",
-  "themeSaveFailedMessage": "Failed to update theme selection.",
-  "useDeviceTheme": "Use device theme",
-  "useDeviceThemeNote": "(Light/dark mode)",
-  "warningModalDefaultContent": "Invalid input.",
-  "warningModalDefaultTitle": "Warning",
-  "wordBulkEditorButton": "BULK EDITOR",
-  "wordCaseSensitive": "Case-sensitive",
-  "wordlistNameHeader": "Name",
-  "wordlistRenameDuplicateMessage": "Please enter a unique name.",
-  "wordlistRenameInvalidMessage": "Please enter a valid name.",
-  "wordlistSaveFailedMessage": "Failed to save wordlist name.",
-  "wordMatchExactNote": "(dog: *** in the doghouse)",
-  "wordMatchMethodHeader": "Match Method",
-  "wordMatchPartialNote": "(dog: *** in the ***house)",
-  "wordMatchRegexNote": "(Regular expression)",
-  "wordMatchRepeated": "Match repeated characters",
-  "wordMatchRepeatedNote": "(dog: dddoooggg)",
-  "wordMatchSeparators": "Match separators",
-  "wordMatchSeparatorsNote": "([-_ ] dog matches: D-o _g)",
-  "wordMatchWholeNote": "(dog: *** in the ********)",
-  "wordOtherHeader": "Other",
-  "wordPhraseHeader": "Word/Phrase",
-  "wordPhraseInvalidMessage": "Please enter a valid word/phrase.",
-  "wordRemoveFailedMessage": "Failed to remove word '{{word}}'.",
-  "wordsAndPhrasesHeader": "Words & Phrases",
-  "wordsTab": "Words",
-  "wordSubstitutionHeader": "Substitution"
+  "bookmarkletsPage": {
+    "buttons": {
+      "installBookmarklet": "APF"
+    },
+    "headers": {
+      "bookmarklet": "Bookmarklet"
+    },
+    "labels": {
+      "useDefaultConfig": "Use default config",
+      "useMyConfig": "Use my config"
+    },
+    "notes": {
+      "explanation": "Create a 'bookmarklet' of Advanced Profanity Filter that can be used when you can't install the extension",
+      "installBookmarklet": "Drag to your bookmarks bar or copy the URL",
+      "learnMore": "learn more"
+    }
+  },
+  "bulkWordEditor": {
+    "buttons": {
+      "addWord": "ADD WORD",
+      "addWords": "BULK ADD WORDS"
+    },
+    "headers": {
+      "bulkWordEditor": "Bulk Word Editor"
+    },
+    "messages": {
+      "confirmSave": "Are you sure you want to save these changes?",
+      "confirmSaveNote": "Make sure you have a backup first!",
+      "confirmSaveRetryStorage": "Failed to save changes because they were too large to be stored. Retry using local storage?",
+      "saveFailed": "$t(options:modals.messages.saveFailed)",
+      "saveSuccess": "Words saved successfully."
+    },
+    "notes": {
+      "bulkAddWordsPlaceholder": "Bulk add words (one word/phrase per line)"
+    },
+    "tableHeaders": {
+      "matchMethod": "Match Method",
+      "remove": "Remove",
+      "repeated": "Repeated",
+      "separators": "Separators",
+      "substitution": "Substitution",
+      "substitutionCase": "Substitution Case",
+      "word": "Word"
+    }
+  },
+  "configsPage": {
+    "buttons": {
+      "removePassword": "REMOVE",
+      "setPassword": "SET"
+    },
+    "headers": {
+      "configuration": "Configuration",
+      "loggingLevel": "Logging Level",
+      "password": "Password",
+      "storage": "Storage"
+    },
+    "labels": {
+      "inlineEditor": "Inline editor",
+      "syncLargeSettings": "Sync large settings"
+    },
+    "messages": {
+      "convertStorageCleanupFailed": "Failed to cleanup old storage, backup automatically exported.",
+      "convertStorageFailed": "Failed to update storage preference.",
+      "convertStorageSuccess": "Storage converted successfully.",
+      "importFailed": "Failed to import config.",
+      "importProcessingFailed": "Failed to process new settings.",
+      "importSuccess": "Settings imported successfully.",
+      "restoreDefaultsFailed": "Failed to restore defaults.",
+      "restoreDefaultsSuccess": "Default settings restored.",
+      "updatePasswordFailed": "Failed to update password."
+    },
+    "notes": {
+      "syncLargeSettings": "Words, domains, etc. Disable if you run out of space"
+    }
+  },
+  "domainsPage": {
+    "headers": {
+      "domain": "Domain",
+      "domains": "Domains",
+      "frameMode": "Frame Mode",
+      "matchMode": "Domain Match Mode",
+      "mode": "Mode",
+      "textWordlist": "Text Wordlist"
+    },
+    "labels": {
+      "filterAllFrames": "Filter all frames",
+      "filterDisabled": "Filter disabled",
+      "filterEnabled": "Filter enabled",
+      "framesDisabled": "Frames disabled",
+      "framesEnabled": "Frames enabled"
+    },
+    "messages": {
+      "removeFailed": "Failed to remove domain '{{ domain }}'.",
+      "saveFailedGettingSettings": "Failed to gather domain settings."
+    },
+    "notes": {
+      "domainEnabled": "Filter pages on this domain",
+      "domainExample": "Example: 'google.com' or 'mail.google.com'",
+      "filterAllFrames": "Filter frames on all domains",
+      "filterDisabled": "Don't filter pages on this domain",
+      "framesDisabled": "Disable filtering frames on this domain",
+      "framesEnabled": "Filter frames on this domain",
+      "matchModeMinimal": "Only filter enabled domains",
+      "matchModeNormal": "Filter all domains"
+    },
+    "validations": {
+      "domainExample": "Valid domain example: google.com or www.google.com",
+      "emptyInputError": "Please enter a value."
+    }
+  },
+  "listsPage": {
+    "headers": {
+      "allowlist": "Allowlist",
+      "defaultTextWordlist": "Default Text Wordlist",
+      "wordlistName": "Name",
+      "wordPhrase": "Word/Phrase"
+    },
+    "labels": {
+      "caseInsensitive": "Case-insensitive",
+      "caseSensitive": "Case-sensitive"
+    },
+    "messages": {
+      "removeWordFromAllowlistFailed": "Failed to remove '{{word}}' from allowlist.",
+      "renameWordlistFailed": "Failed to save wordlist name.",
+      "saveAllowlistFailed": "Failed to update allowlist.",
+      "saveDefaultWordlistFailed": "Failed to update default wordlist."
+    },
+    "notes": {
+      "allowlistCaseSensitive": "(* Case-sensitive)",
+      "caseInsensitive": "(doghouse: Don't filter 'DogHouse')",
+      "caseSensitive": "(Doghouse: Don't filter 'Doghouse')"
+    },
+    "validations": {
+      "wordAlreadyAllowed": "Already allowlisted.",
+      "wordlistNameInvalid": "Please enter a valid name.",
+      "wordlistNameNotUnique": "Please enter a unique name."
+    }
+  },
+  "modals": {
+    "messages": {
+      "confirmConvertStorageToLocal": "This will prevent large settings like words and domains from syncing, but allow you to store more.",
+      "confirmConvertStorageToSync": "This will allow large settings like words and domains to sync, but has stricter limits on how much you can store.",
+      "confirmDefault": "Are you sure?",
+      "confirmImportConfig": "Are you sure you want to overwrite your existing settings?",
+      "confirmImportConfigRetry": "Import failed due to storage limitations. Would you like to try again using local storage?",
+      "confirmRemoveAllWords": "Are you sure you want to remove all words?",
+      "confirmRemovePassword": "Are you sure you want to remove the password?",
+      "confirmRestoreDefaults": "Are you sure you want to restore defaults?",
+      "confirmSetPassword": "Are you sure you want to set the password to '{{password}}'?",
+      "defaultWarning": "Invalid input.",
+      "errorDefault": "The requested action failed. Please try again or contact support.",
+      "saveFailed": "Failed to save.",
+      "saveOptionsFailed": "Settings not saved! Please try again.",
+      "statusDefault": "Status updated."
+    },
+    "notes": {
+      "confirmConvertStorage": "Make sure you have a backup first!",
+      "confirmConvertStorageToLocal": "Local storage can store more, but things like words and domains will no longer sync between devices."
+    },
+    "titles": {
+      "confirmDefault": "Please confirm",
+      "enterPassword": "Enter Password",
+      "errorDefault": "Error",
+      "statusDefault": "Status",
+      "warningDefault": "Warning"
+    }
+  },
+  "settingsPage": {
+    "headers": {
+      "censorSettings": "Censor Settings",
+      "defaultSettings": "Default Settings (for new words/phrases)",
+      "filterMethod": "Filter Method",
+      "generalSettings": "General Settings",
+      "substitutionSettings": "Substitution Settings"
+    },
+    "labels": {
+      "censorCharacter": "Censor character:",
+      "censorFixedLength": "Fixed length:",
+      "censorPreserveFirst": "Preserve the first letter",
+      "censorPreserveLast": "Preserve the last letter",
+      "defaultSubstitution": "Default Substitution",
+      "defaultWordMatchMethod": "Match Method",
+      "defaultWordMatchRepeated": "Match repeated characters",
+      "defaultWordMatchSeparators": "Match separator characters",
+      "showContextMenu": "Show context menu",
+      "showCounter": "Show number of filtered words",
+      "showSummary": "Show summary of filtered words",
+      "showUpdateNotification": "Show update notification",
+      "substitutionMark": "Mark substituted words with [ ]",
+      "substitutionPreserveCase": "Preserve case of filtered words",
+      "useDeviceTheme": "Use device theme"
+    },
+    "messages": {
+      "saveFilterMethodFailed": "Failed to set filter method.",
+      "saveThemeFailed": "Failed to update theme selection."
+    },
+    "notes": {
+      "censorPreserveFirst": "(dog: dog = d**)",
+      "censorPreserveLast": "(dog: dog = **g)",
+      "defaultWordMatchRepeated": "(dog: dddoooggg)",
+      "defaultWordMatchSeparators": "([-_ ] dog matches: D-o _g)",
+      "filterMethodCensor": "(dog: dog = d**)",
+      "filterMethodOff": "(disabled/summary only)",
+      "filterMethodRemove": "(dog: doghouse = house)",
+      "filterMethodSubstitute": "(dog > cat: dog = cat)",
+      "showContextMenu": "(Right-click menu)",
+      "showCounter": "(Shown over the extension icon)",
+      "showSummary": "(Shown in the extension popup)",
+      "substitutionMark": "(dog: dog = [cat])",
+      "substitutionPreserveCase": "(dog: Dog = Cat)",
+      "useDeviceTheme": "(Light/dark mode)"
+    },
+    "values": {
+      "censorFixedLengthOriginal": "Original"
+    }
+  },
+  "statsPage": {
+    "buttons": {
+      "removeLessUsedWords": "REMOVE WORDS"
+    },
+    "headers": {
+      "stats": "$t(options:tabs.stats)",
+      "summary": "Summary",
+      "wordsFiltered": "Words Filtered"
+    },
+    "labels": {
+      "collectStats": "Collect stats",
+      "totalWordsFiltered": "Total words filtered",
+      "trackingSince": "Tracking since"
+    },
+    "messages": {
+      "confirmRemoveLessUsedWords_one": "Are you sure you want to remove {{count}} word?",
+      "confirmImportStats": "Are you sure you want to overwrite your statistics?",
+      "confirmRemoveLessUsedWords_other": "Are you sure you want to remove {{count}} words?",
+      "confirmRemoveLessUsedWordsNone": "All words have been filtered more times than the provided number.",
+      "confirmResetStats": "Are you sure you want to reset filter statistics?",
+      "importFailed": "Failed to import stats.",
+      "importInvalid": "Invalid stats file.",
+      "loadFailed": "Failed to populate stats.",
+      "prepareLessUsedWordsError": "Error while preparing less-used words.",
+      "resetFailed": "Failed to reset stats."
+    },
+    "notes": {
+      "collectStats": "(Only stored locally)",
+      "confirmRemoveLessUsedWordsNone": "Try increasing the number to include more words.",
+      "removeLessUsedWords": "Remove words filtered fewer times than"
+    },
+    "tableHeaders": {
+      "summaryTotal": "Total",
+      "summaryWords": "Word"
+    },
+    "validations": {
+      "lessUsedWordsInvalid": "Enter a positive whole number."
+    }
+  },
+  "testsPage": {
+    "headers": {
+      "test": "$t(options:tabs.test)",
+      "filtered": "Filtered"
+    },
+    "notes": {
+      "filteredTextPlaceholder": "Enter some text above to test the filter..."
+    }
+  },
+  "tabs": {
+    "bookmarklet": "Bookmarklet",
+    "config": "Config",
+    "domains": "Domains",
+    "help": "Help",
+    "lists": "Lists",
+    "settings": "Settings",
+    "stats": "Stats",
+    "test": "Test",
+    "words": "Words"
+  },
+  "wordsPage": {
+    "buttons": {
+      "openBulkWordEditor": "BULK EDITOR"
+    },
+    "headers": {
+      "includeInWordlists": "Include in Wordlists",
+      "matchMethod": "Match Method",
+      "other": "Other",
+      "substitution": "Substitution",
+      "wordPhrase": "Word/Phrase",
+      "wordsAndPhrases": "Words & Phrases"
+    },
+    "labels": {
+      "caseSensitive": "Case-sensitive",
+      "filterWordList": "Filter list",
+      "matchRepeated": "Match repeated characters",
+      "matchSeparators": "Match separators"
+    },
+    "messages": {
+      "removeFailed": "Failed to remove word '{{word}}'.",
+      "updateFailed": "Failed to update word '{{word}}'."
+    },
+    "notes": {
+      "matchExact": "(dog: *** in the doghouse)",
+      "matchPartial": "(dog: *** in the ***house)",
+      "matchRegex": "(Regular expression)",
+      "matchRepeated": "(dog: dddoooggg)",
+      "matchSeparators": "([-_ ] dog matches: D-o _g)",
+      "matchWhole": "(dog: *** in the ********)"
+    },
+    "validations": {
+      "regexInvalid": "Invalid Regex.",
+      "substitutionCollision": "Word and substitution must be different.",
+      "substitutionContainsWord": "Substitution can't contain word (causes an endless loop).",
+      "wordAlreadyListed": "'{{word}}' already in list."
+    }
+  },
+  "validations": {
+    "wordPhraseInvalid": "Please enter a valid word/phrase."
+  },
+  "values": {
+    "addOrUpdateExistingOption": "Add, or update existing..."
+  }
 }
