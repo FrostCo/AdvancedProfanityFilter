@@ -133,10 +133,10 @@ export default class Popup {
     document.getElementById('filterMethodLabel').textContent = this.translation.t('popup:labels.filterMethod');
     document.getElementById('textWordlistLabel').textContent = this.translation.t('popup:labels.textWordlist');
     document.getElementById('summaryTableHeader').textContent = this.translation.t('popup:summaryTableHeader');
-    document.getElementById('options').textContent = this.translation.t('common:words.options');
-    document.getElementById('gettingStarted').textContent = this.translation.t('common:words.help');
-    document.getElementById('changelogLink').textContent = this.translation.t('common:words.changelog');
-    document.getElementById('supportLink').textContent = this.translation.t('common:words.support');
+    document.getElementById('options').textContent = this.translation.t('common:names.options');
+    document.getElementById('gettingStarted').textContent = this.translation.t('common:names.help');
+    document.getElementById('changelogLink').textContent = this.translation.t('common:names.changelog');
+    document.getElementById('supportLink').textContent = this.translation.t('common:names.support');
     document.getElementById('domainModeNormal').textContent = this.translation.t('common:domainModes.normal');
     document.getElementById('domainModeAdvanced').textContent = this.translation.t('common:domainModes.advanced');
     document.getElementById('domainModeDeep').textContent = this.translation.t('common:domainModes.deep');

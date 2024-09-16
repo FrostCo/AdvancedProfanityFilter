@@ -107,7 +107,7 @@ export default class Background {
 
       chrome.contextMenus.create({
         id: 'options',
-        title: translation.t('common:words.options'),
+        title: translation.t('common:names.options'),
         contexts: ['all']
       });
     }
