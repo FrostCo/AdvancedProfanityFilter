@@ -49,12 +49,12 @@ export default class OptionAuth {
     if (this.optionPage.cfg.password) { // Password already set
       this.optionPage.enableBtn(passwordBtn);
       if (passwordText.value) { // Password field filled
-        passwordBtn.innerText = this.optionPage.translation.t('options:configsPage.buttons.setPassword');
+        passwordBtn.innerText = this.optionPage.translation.t('options:configsPage.buttons.setPassword').toUpperCase();
       } else { // Empty password field
-        passwordBtn.innerText = this.optionPage.translation.t('options:configsPage.buttons.removePassword');
+        passwordBtn.innerText = this.optionPage.translation.t('options:configsPage.buttons.removePassword').toUpperCase();
       }
     } else { // Password not already set
-      passwordBtn.innerText = this.optionPage.translation.t('options:configsPage.buttons.setPassword');
+      passwordBtn.innerText = this.optionPage.translation.t('options:configsPage.buttons.setPassword').toUpperCase();
       if (passwordText.value) { // Password field filled
         this.optionPage.enableBtn(passwordBtn);
       } else { // Empty password field

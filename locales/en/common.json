@@ -4,19 +4,19 @@
     "shortName": "APF"
   },
   "buttons": {
-    "backup": "BACKUP",
-    "cancel": "CANCEL",
-    "export": "EXPORT",
-    "import": "IMPORT",
+    "backup": "Backup",
+    "cancel": "Cancel",
+    "export": "Export",
+    "import": "Import",
     "ok": "OK",
-    "removeAll": "REMOVE ALL",
-    "remove": "REMOVE",
-    "rename": "RENAME",
-    "reset": "RESET",
-    "restoreDefaults": "RESTORE DEFAULTS",
-    "save": "SAVE",
-    "set": "SET",
-    "submit": "SUBMIT"
+    "removeAll": "Remove All",
+    "remove": "Remove",
+    "rename": "Rename",
+    "reset": "Reset",
+    "restoreDefaults": "Restore Defaults",
+    "save": "Save",
+    "set": "Set",
+    "submit": "Submit"
   },
   "config": {
     "defaultWordSubstitution": "censored",
