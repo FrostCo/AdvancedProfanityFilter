@@ -289,28 +289,28 @@ export default class OptionPage {
     document.getElementById('testHeader').textContent = this.t('options:testsPage.headers.test');
     // Modals
     // Word Bulk Editor
-    (document.getElementById('bulkAddWordsText') as HTMLTextAreaElement).placeholder = this.t('options:bulkWordEditor.notes.bulkAddWordsPlaceholder');
-    document.getElementById('bulkEditorAddWord').textContent = this.t('options:bulkWordEditor.buttons.addWord');
-    document.getElementById('bulkEditorAddWords').textContent = this.t('options:bulkWordEditor.buttons.addWords');
-    document.getElementById('bulkEditorCancel').textContent = this.t('options:bulkWordEditor.buttons.cancel');
-    document.getElementById('bulkEditorSave').textContent = this.t('options:bulkWordEditor.buttons.save');
-    document.getElementById('bulkWordEditorMatchMethodHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.matchMethod');
-    document.getElementById('bulkWordEditorRemoveAllHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.remove');
-    document.getElementById('bulkWordEditorRepeatedHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.repeated');
-    document.getElementById('bulkWordEditorSeparatorsHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.separators');
-    document.getElementById('bulkWordEditorSubstitutionCaseHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.substitutionCase');
-    document.getElementById('bulkWordEditorSubstitutionHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.substitution');
-    document.getElementById('bulkWordEditorTitle').textContent = this.t('options:bulkWordEditor.headers.bulkWordEditor');
-    document.getElementById('bulkWordEditorWordHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.word');
+    (document.getElementById('bulkAddWordsText') as HTMLTextAreaElement).placeholder = this.t('options:bulkWordEditorModal.notes.bulkAddWordsPlaceholder');
+    document.getElementById('bulkEditorAddWord').textContent = this.t('options:bulkWordEditorModal.buttons.addWord');
+    document.getElementById('bulkEditorAddWords').textContent = this.t('options:bulkWordEditorModal.buttons.addWords');
+    document.getElementById('bulkEditorCancel').textContent = this.t('options:bulkWordEditorModal.buttons.cancel');
+    document.getElementById('bulkEditorSave').textContent = this.t('options:bulkWordEditorModal.buttons.save');
+    document.getElementById('bulkWordEditorMatchMethodHeader').textContent = this.t('options:bulkWordEditorModal.tableHeaders.matchMethod');
+    document.getElementById('bulkWordEditorRemoveAllHeader').textContent = this.t('options:bulkWordEditorModal.tableHeaders.remove');
+    document.getElementById('bulkWordEditorRepeatedHeader').textContent = this.t('options:bulkWordEditorModal.tableHeaders.repeated');
+    document.getElementById('bulkWordEditorSeparatorsHeader').textContent = this.t('options:bulkWordEditorModal.tableHeaders.separators');
+    document.getElementById('bulkWordEditorSubstitutionCaseHeader').textContent = this.t('options:bulkWordEditorModal.tableHeaders.substitutionCase');
+    document.getElementById('bulkWordEditorSubstitutionHeader').textContent = this.t('options:bulkWordEditorModal.tableHeaders.substitution');
+    document.getElementById('bulkWordEditorTitle').textContent = this.t('options:bulkWordEditorModal.headers.bulkWordEditor');
+    document.getElementById('bulkWordEditorWordHeader').textContent = this.t('options:bulkWordEditorModal.tableHeaders.word');
     // Confirm
-    document.getElementById('confirmModalBackup').textContent = this.t('options:modals.buttons.backup');
-    document.getElementById('confirmModalCancel').textContent = this.t('options:modals.buttons.cancel');
-    document.getElementById('confirmModalOK').textContent = this.t('options:modals.buttons.ok');
+    document.getElementById('confirmModalBackup').textContent = this.t('options:confirmModal.buttons.backup');
+    document.getElementById('confirmModalCancel').textContent = this.t('options:confirmModal.buttons.cancel');
+    document.getElementById('confirmModalOK').textContent = this.t('options:confirmModal.buttons.ok');
     // Password
-    document.getElementById('passwordModalHeader').textContent = this.t('options:modals.titles.enterPassword');
-    document.getElementById('submitPassword').textContent = this.t('options:buttons.submit');
+    document.getElementById('passwordModalHeader').textContent = this.t('options:passwordModal.headers.enterPassword');
+    document.getElementById('submitPassword').textContent = this.t('options:passwordModal.buttons.submitPassword');
     // Status
-    document.getElementById('statusModalOK').textContent = this.t('options:modals.buttons.ok');
+    document.getElementById('statusModalOK').textContent = this.t('options:statusModal.buttons.ok');
   }
 
   backupConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
@@ -491,14 +491,14 @@ export default class OptionPage {
     try {
       await this.cfg.save('words');
       this.closeModal('bulkWordEditorModal');
-      this.showStatusModal(this.t('options:bulkWordEditor.messages.saveSuccess'));
+      this.showStatusModal(this.t('options:bulkWordEditorModal.messages.saveSuccess'));
       this.filter.rebuildWordlists();
       this.populateOptions();
     } catch (err) {
       if (this.isStorageError(err) && this.cfg.syncLargeKeys) {
         this.confirm('bulkEditorSaveRetry');
       } else {
-        logger.warn(this.t('options:bulkWordEditor.messages.saveFailed'), err);
+        logger.warn(this.t('options:bulkWordEditorModal.messages.saveFailed'), err);
         this.showErrorModal([this.t('options:.bulkWordEditor.messages.saveFailed'), `Error: ${err.message}`]);
       }
     }
@@ -511,7 +511,7 @@ export default class OptionPage {
       await this.convertStorageLocation(null, true);
       await this.bulkEditorSave();
     } catch (err) {
-      this.handleError(this.t('options:bulkWordEditor.messages.saveFailed'), err);
+      this.handleError(this.t('options:bulkWordEditorModal.messages.saveFailed'), err);
     }
   }
 
@@ -557,8 +557,8 @@ export default class OptionPage {
 
     const defaults = {
       backup: false,
-      content: this.t('options:modals.messages.confirmDefault'),
-      title: this.t('options:modals.titles.confirmDefault'),
+      content: this.t('options:confirmModal.messages.default'),
+      title: this.t('options:confirmModal.headers.default'),
       titleClass: 'w3-flat-peter-river',
     };
     settings = Object.assign(defaults, settings);
@@ -615,8 +615,8 @@ export default class OptionPage {
 
     switch (action) {
       case 'bulkEditorSave':
-        paragraph.textContent = this.t('options:bulkWordEditor.messages.confirmSave');
-        italics.textContent = this.t('options:bulkWordEditor.messages.confirmSaveNote');
+        paragraph.textContent = this.t('options:bulkWordEditorModal.messages.confirmSave');
+        italics.textContent = this.t('options:bulkWordEditorModal.messages.confirmSaveNote');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: true }, content);
@@ -624,8 +624,8 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'bulkEditorSaveRetry':
-        paragraph.textContent = this.t('options:bulkWordEditor.messages.confirmSaveRetryStorage');
-        italics.textContent = this.t('options:modals.notes.confirmConvertStorageToLocal');
+        paragraph.textContent = this.t('options:bulkWordEditorModal.messages.confirmSaveRetryStorage');
+        italics.textContent = this.t('options:confirmModal.notes.convertStorageToLocal');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: true, titleClass: 'w3-red' }, content);
@@ -634,11 +634,11 @@ export default class OptionPage {
         break;
       case 'convertStorageLocation':
         if (this.cfg.syncLargeKeys) {
-          paragraph.textContent = this.t('options:modals.messages.confirmConvertStorageToLocal');
+          paragraph.textContent = this.t('options:confirmModal.messages.convertStorageToLocal');
         } else {
-          paragraph.textContent = this.t('options:modals.messages.confirmConvertStorageToSync');
+          paragraph.textContent = this.t('options:confirmModal.messages.convertStorageToSync');
         }
-        italics.textContent = this.t('options:modals.messages.confirmConvertStorage');
+        italics.textContent = this.t('options:confirmModal.messages.convertStorage');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: true }, content);
@@ -648,13 +648,13 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfig':
-        this.configureConfirmModal({ content: this.t('options:modals.messages.confirmImportConfig'), backup: true });
+        this.configureConfirmModal({ content: this.t('options:confirmModal.messages.importConfig'), backup: true });
         this._confirmEventListeners.push(this.importConfig.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'importConfigRetry':
-        paragraph.textContent = this.t('options:modals.messages.confirmImportConfigRetry');
-        italics.textContent = this.t('options:modals.notes.confirmConvertStorageToLocal');
+        paragraph.textContent = this.t('options:confirmModal.messages.importConfigRetry');
+        italics.textContent = this.t('options:confirmModal.notes.convertStorageToLocal');
         content.appendChild(paragraph);
         content.appendChild(italics);
         this.configureConfirmModal({ backup: false, titleClass: 'w3-red' }, content);
@@ -664,7 +664,7 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'removeAllWords':
-        paragraph.textContent = this.t('options:modals.messages.confirmRemoveAllWords');
+        paragraph.textContent = this.t('options:confirmModal.messages.removeAllWords');
         content.appendChild(paragraph);
         this.configureConfirmModal({ backup: true }, content);
         this._confirmEventListeners.push(this.removeAllWords.bind(this));
@@ -702,7 +702,7 @@ export default class OptionPage {
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'restoreDefaults':
-        this.configureConfirmModal({ content: this.t('options:modals.messages.confirmRestoreDefaults'), backup: true });
+        this.configureConfirmModal({ content: this.t('options:confirmModal.messages.restoreDefaults'), backup: true });
         this._confirmEventListeners.push(this.restoreDefaults.bind(this));
         ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
@@ -712,8 +712,8 @@ export default class OptionPage {
         if (passwordBtn.classList.contains('disabled')) return false;
 
         const message = passwordText.value == ''
-          ? this.t('options:modals.messages.confirmRemovePassword')
-          : this.t('options:modals.messages.confirmSetPassword', { password: passwordText.value })
+          ? this.t('options:confirmModal.messages.removePassword')
+          : this.t('options:confirmModal.messages.setPassword', { password: passwordText.value })
         ;
         this.configureConfirmModal({ content: message });
         this._confirmEventListeners.push(this.auth.setPassword.bind(this.auth));
@@ -830,7 +830,7 @@ export default class OptionPage {
         this.populateWord();
       }
     } catch (err) {
-      this.showErrorModal([this.t('options:modals.messages.saveFailed'), `Error: ${err.message}`]);
+      this.showErrorModal([this.t('options:statusModal.messages.saveFailed'), `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1592,7 +1592,7 @@ export default class OptionPage {
         await domain.save(this.cfg);
         this.populateDomainPage();
       } catch (err) {
-        this.showErrorModal([this.t('options:modals.messages.saveFailed'), `Error: ${err.message}`]);
+        this.showErrorModal([this.t('options:statusModal.messages.saveFailed'), `Error: ${err.message}`]);
         return false;
       }
     } else {
@@ -1609,8 +1609,8 @@ export default class OptionPage {
       await this.init();
       return true;
     } catch (err) {
-      logger.warn(this.t('options:modals.messages.saveOptionsFailed'), err);
-      this.showErrorModal([this.t('options:modals.messages.saveOptionsFailed'), `Error: ${err.message}`]);
+      logger.warn(this.t('options:statusModal.messages.saveOptionsFailed'), err);
+      this.showErrorModal([this.t('options:statusModal.messages.saveOptionsFailed'), `Error: ${err.message}`]);
       return false;
     }
   }
@@ -1875,7 +1875,7 @@ export default class OptionPage {
     }
   }
 
-  showErrorModal(content: string | string[] = [this.t('options:modals.messages.errorDefault')], title = this.t('options:modals.messages.titles.errorDefault'), titleColor = 'w3-red') {
+  showErrorModal(content: string | string[] = [this.t('options:statusModal.messages.error')], title = this.t('options:statusModal.messages.titles.error'), titleColor = 'w3-red') {
     this.configureStatusModal(content, title, titleColor);
     this.openModal('statusModal');
   }
@@ -1892,12 +1892,12 @@ export default class OptionPage {
     }
   }
 
-  showStatusModal(content: string | string[] = [this.t('options:modals.messages.statusDefault')], title = this.t('options:modals.titles.statusDefault'), titleColor = 'w3-flat-peter-river') {
+  showStatusModal(content: string | string[] = [this.t('options:statusModal.messages.status')], title = this.t('options:statusModal.titles.status'), titleColor = 'w3-flat-peter-river') {
     this.configureStatusModal(content, title, titleColor);
     this.openModal('statusModal');
   }
 
-  showWarningModal(content: string | string[] = [this.t('options:modals.messages.warningDefault')], title = this.t('options:modals.titles.warningDefault'), titleColor = 'w3-orange') {
+  showWarningModal(content: string | string[] = [this.t('options:statusModal.messages.warning')], title = this.t('options:statusModal.titles.warning'), titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
     this.openModal('statusModal');
   }

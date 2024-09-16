@@ -16,7 +16,7 @@
       "learnMore": "learn more"
     }
   },
-  "bulkWordEditor": {
+  "bulkWordEditorModal": {
     "buttons": {
       "addWord": "ADD WORD",
       "addWords": "BULK ADD WORDS",
@@ -77,6 +77,31 @@
     },
     "notes": {
       "syncLargeSettings": "Words, domains, etc. Disable if you run out of space"
+    }
+  },
+  "confirmModal": {
+    "buttons": {
+      "backup": "$t(common:buttons.backup)",
+      "cancel": "$t(common:buttons.cancel)",
+      "ok": "$t(common:buttons.ok)"
+    },
+    "headers": {
+      "default": "Please confirm"
+    },
+    "messages": {
+      "convertStorageToLocal": "This will prevent large settings like words and domains from syncing, but allow you to store more.",
+      "convertStorageToSync": "This will allow large settings like words and domains to sync, but has stricter limits on how much you can store.",
+      "default": "Are you sure?",
+      "importConfig": "Are you sure you want to overwrite your existing settings?",
+      "importConfigRetry": "Import failed due to storage limitations. Would you like to try again using local storage?",
+      "removeAllWords": "Are you sure you want to remove all words?",
+      "removePassword": "Are you sure you want to remove the password?",
+      "restoreDefaults": "Are you sure you want to restore defaults?",
+      "setPassword": "Are you sure you want to set the password to '{{password}}'?"
+    },
+    "notes": {
+      "convertStorage": "Make sure you have a backup first!",
+      "convertStorageToLocal": "Local storage can store more, but things like words and domains will no longer sync between devices."
     }
   },
   "domainsPage": {
@@ -151,38 +176,12 @@
       "wordlistNameNotUnique": "Please enter a unique name."
     }
   },
-  "modals": {
+  "passwordModal": {
     "buttons": {
-      "backup": "$t(common:buttons.backup)",
-      "cancel": "$t(common:buttons.cancel)",
-      "ok": "$t(common:buttons.ok)"
+      "submitPassword": "$(common:buttons.submit)"
     },
-    "messages": {
-      "confirmConvertStorageToLocal": "This will prevent large settings like words and domains from syncing, but allow you to store more.",
-      "confirmConvertStorageToSync": "This will allow large settings like words and domains to sync, but has stricter limits on how much you can store.",
-      "confirmDefault": "Are you sure?",
-      "confirmImportConfig": "Are you sure you want to overwrite your existing settings?",
-      "confirmImportConfigRetry": "Import failed due to storage limitations. Would you like to try again using local storage?",
-      "confirmRemoveAllWords": "Are you sure you want to remove all words?",
-      "confirmRemovePassword": "Are you sure you want to remove the password?",
-      "confirmRestoreDefaults": "Are you sure you want to restore defaults?",
-      "confirmSetPassword": "Are you sure you want to set the password to '{{password}}'?",
-      "defaultWarning": "Invalid input.",
-      "errorDefault": "The requested action failed. Please try again or contact support.",
-      "saveFailed": "Failed to save.",
-      "saveOptionsFailed": "Settings not saved! Please try again.",
-      "statusDefault": "Status updated."
-    },
-    "notes": {
-      "confirmConvertStorage": "Make sure you have a backup first!",
-      "confirmConvertStorageToLocal": "Local storage can store more, but things like words and domains will no longer sync between devices."
-    },
-    "titles": {
-      "confirmDefault": "Please confirm",
-      "enterPassword": "Enter Password",
-      "errorDefault": "Error",
-      "statusDefault": "Status",
-      "warningDefault": "Warning"
+    "headers": {
+      "enterPassword": "Enter Password"
     }
   },
   "settingsPage": {
@@ -274,6 +273,23 @@
     },
     "validations": {
       "lessUsedWordsInvalid": "Enter a positive whole number."
+    }
+  },
+  "statusModal": {
+    "buttons": {
+      "ok": "$t(common:buttons.ok)"
+    },
+    "headers": {
+      "error": "Error",
+      "status": "Status",
+      "warning": "Warning"
+    },
+    "messages": {
+      "error": "The requested action failed. Please try again or contact support.",
+      "saveFailed": "Failed to save.",
+      "saveOptionsFailed": "Settings not saved! Please try again.",
+      "status": "Status updated.",
+      "warning": "Invalid input."
     }
   },
   "testsPage": {
