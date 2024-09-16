@@ -200,9 +200,9 @@ export default class OptionPage {
     document.getElementById('wordMatchWholeNote').textContent = this.t('options:wordsPage.notes.matchWhole');
     document.getElementById('wordOtherHeader').textContent = this.t('options:wordsPage.headers.other');
     document.getElementById('wordPhraseHeader').textContent = this.t('options:wordsPage.headers.wordPhrase');
-    document.getElementById('wordRemove').textContent = this.t('common:buttons.remove');
-    document.getElementById('wordRemoveAll').textContent = this.t('common:buttons.removeAll');
-    document.getElementById('wordSave').textContent = this.t('common:buttons.save');
+    document.getElementById('wordRemove').textContent = this.t('options:wordsPage.buttons.removeWord');
+    document.getElementById('wordRemoveAll').textContent = this.t('options:wordsPage.buttons.removeAllWords');
+    document.getElementById('wordSave').textContent = this.t('options:wordsPage.buttons.saveWord');
     document.getElementById('wordsHeader').textContent = this.t('options:wordsPage.headers.wordsAndPhrases');
     document.getElementById('wordSubstitutionHeader').textContent = this.t('options:wordsPage.headers.substitution');
     // Lists page
@@ -210,14 +210,14 @@ export default class OptionPage {
     document.getElementById('allowlistInsensitiveName').textContent = this.t('options:listsPage.labels.caseInsensitive');
     document.getElementById('allowlistInsensitiveNote').textContent = this.t('options:listsPage.notes.caseInsensitive');
     document.getElementById('allowlistNote').textContent = this.t('options:listsPage.notes.allowlistCaseSensitive');
-    document.getElementById('allowlistRemove').textContent = this.t('common:buttons.remove');
-    document.getElementById('allowlistSave').textContent = this.t('common:buttons.save');
+    document.getElementById('allowlistRemove').textContent = this.t('options:listsPage.buttons.removeWordFromList');
+    document.getElementById('allowlistSave').textContent = this.t('options:listsPage.buttons.saveWordToList');
     document.getElementById('allowlistSensitiveName').textContent = this.t('options:listsPage.labels.caseSensitive');
     document.getElementById('allowlistSensitiveNote').textContent = this.t('options:listsPage.notes.caseSensitive');
     document.getElementById('defaultTextWordlistHeader').textContent = this.t('options:listsPage.headers.defaultTextWordlist');
     document.getElementById('listWordPhraseHeader').textContent = this.t('options:listsPage.headers.wordPhrase');
     document.getElementById('wordlistNameHeader').textContent = this.t('options:listsPage.headers.wordlistName');
-    document.getElementById('wordlistRename').textContent = this.t('common:buttons.rename');
+    document.getElementById('wordlistRename').textContent = this.t('options:listsPage.buttons.renameWordlist');
     document.getElementById('wordlistsHeader').textContent = this.t('common:wordlists.plural');
     // Domains page
     document.getElementById('domainDisabledName').textContent = this.t('options:domainsPage.labels.filterDisabled');
@@ -241,8 +241,8 @@ export default class OptionPage {
     document.getElementById('domainModeDeep').textContent = this.t('common:domainModes.deep');
     document.getElementById('domainModeHeader').textContent = this.t('options:domainModes.headers.mode');
     document.getElementById('domainModeNormal').textContent = this.t('common:domainModes.normal');
-    document.getElementById('domainRemove').textContent = this.t('common:buttons.remove');
-    document.getElementById('domainSave').textContent = this.t('common:buttons.save');
+    document.getElementById('domainRemove').textContent = this.t('options:domainsPage.buttons.removeDomain');
+    document.getElementById('domainSave').textContent = this.t('options:domainsPage.buttons.saveDomain');
     document.getElementById('domainsHeader').textContent = this.t('options:domainsPage.headers.domains');
     document.getElementById('domainTextNote').textContent = this.t('options:domainsPage.notes.domainExample');
     document.getElementById('domainTextWordlistHeader').textContent = this.t('options:domainsPage.headers.textWordlist');
@@ -255,9 +255,9 @@ export default class OptionPage {
     document.getElementById('bookmarkletUseDefaultConfig').textContent = this.t('options:bookmarkletsPage.labels.useDefaultConfig');
     document.getElementById('bookmarkletUseMyConfig').textContent = this.t('options:bookmarkletsPage.labels.useMyConfig');
     // Config page
-    document.getElementById('configExport').textContent = this.t('common:buttons.export');
+    document.getElementById('configExport').textContent = this.t('options:configsPage.buttons.exportConfig');
     document.getElementById('configHeader').textContent = this.t('options:configsPage.headers.configuration');
-    document.getElementById('configImport').textContent = this.t('common:buttons.import');
+    document.getElementById('configImport').textContent = this.t('options:configsPage.buttons.importConfig');
     document.getElementById('configInlineEditorName').textContent = this.t('options:configsPage.labels.inlineEditor');
     document.getElementById('configLoggingLevelDebug').textContent = this.t('common:logLevels.debug');
     document.getElementById('configLoggingLevelError').textContent = this.t('common:logLevels.error');
@@ -265,7 +265,7 @@ export default class OptionPage {
     document.getElementById('configLoggingLevelInfo').textContent = this.t('common:logLevels.info');
     document.getElementById('configLoggingLevelWarn').textContent = this.t('common:logLevels.warn');
     document.getElementById('configPasswordHeader').textContent = this.t('options:configsPage.headers.password');
-    document.getElementById('configReset').textContent = this.t('common:buttons.restoreDefaults');
+    document.getElementById('configReset').textContent = this.t('options:configsPage.buttons.restoreDefaultConfig');
     document.getElementById('configStorageHeader').textContent = this.t('options:configsPage.headers.storage');
     document.getElementById('configSyncLargeSettingsName').textContent = this.t('options:configsPage.labels.syncLargeSettings');
     document.getElementById('configSyncLargeSettingsNote').textContent = this.t('options:configsPage.notes.syncLargeSettings');
@@ -273,13 +273,13 @@ export default class OptionPage {
     document.getElementById('collectStatsName').textContent = this.t('options:statsPage.labels.collectStats');
     document.getElementById('collectStatsNote').textContent = this.t('options:statsPage.notes.collectStats');
     document.getElementById('removeLessUsedWords').textContent = this.t('options:statsPage.buttons.removeLessUsedWords');
-    document.getElementById('statsExport').textContent = this.t('common:buttons.export');
+    document.getElementById('statsExport').textContent = this.t('options:statsPage.buttons.exportStats');
     document.getElementById('statsFilteredSummaryTotal').textContent = this.t('options:statsPage.tableHeaders.summaryTotal');
     document.getElementById('statsFilteredSummaryWord').textContent = this.t('options:statsPage.tableHeaders.summaryWords');
     document.getElementById('statsHeader').textContent = this.t('options:statsPage.headers.stats');
-    document.getElementById('statsImport').textContent = this.t('common:buttons.import');
+    document.getElementById('statsImport').textContent = this.t('options:statsPage.buttons.importStats');
     document.getElementById('statsRemoveLessUsedWordsExplanation').textContent = this.t('options:statsPage.notes.removeLessUsedWords');
-    document.getElementById('statsReset').textContent = this.t('common:buttons.reset');
+    document.getElementById('statsReset').textContent = this.t('options:statsPage.buttons.resetStats');
     document.getElementById('statsSummaryHeader').textContent = this.t('options:statsPage.headers.summary');
     document.getElementById('statsTotalFilteredName').textContent = this.t('options:statsPage.labels.totalWordsFiltered');
     document.getElementById('statsTrackingSinceName').textContent = this.t('options:statsPage.labels.trackingSince');
@@ -292,8 +292,8 @@ export default class OptionPage {
     (document.getElementById('bulkAddWordsText') as HTMLTextAreaElement).placeholder = this.t('options:bulkWordEditor.notes.bulkAddWordsPlaceholder');
     document.getElementById('bulkEditorAddWord').textContent = this.t('options:bulkWordEditor.buttons.addWord');
     document.getElementById('bulkEditorAddWords').textContent = this.t('options:bulkWordEditor.buttons.addWords');
-    document.getElementById('bulkEditorCancel').textContent = this.t('common:buttons.cancel');
-    document.getElementById('bulkEditorSave').textContent = this.t('common:buttons.save');
+    document.getElementById('bulkEditorCancel').textContent = this.t('options:bulkWordEditor.buttons.cancel');
+    document.getElementById('bulkEditorSave').textContent = this.t('options:bulkWordEditor.buttons.save');
     document.getElementById('bulkWordEditorMatchMethodHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.matchMethod');
     document.getElementById('bulkWordEditorRemoveAllHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.remove');
     document.getElementById('bulkWordEditorRepeatedHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.repeated');
@@ -303,14 +303,14 @@ export default class OptionPage {
     document.getElementById('bulkWordEditorTitle').textContent = this.t('options:bulkWordEditor.headers.bulkWordEditor');
     document.getElementById('bulkWordEditorWordHeader').textContent = this.t('options:bulkWordEditor.tableHeaders.word');
     // Confirm
-    document.getElementById('confirmModalBackup').textContent = this.t('common:buttons.backup');
-    document.getElementById('confirmModalCancel').textContent = this.t('common:buttons.cancel');
-    document.getElementById('confirmModalOK').textContent = this.t('common:buttons.ok');
+    document.getElementById('confirmModalBackup').textContent = this.t('options:modals.buttons.backup');
+    document.getElementById('confirmModalCancel').textContent = this.t('options:modals.buttons.cancel');
+    document.getElementById('confirmModalOK').textContent = this.t('options:modals.buttons.ok');
     // Password
     document.getElementById('passwordModalHeader').textContent = this.t('options:modals.titles.enterPassword');
     document.getElementById('submitPassword').textContent = this.t('options:buttons.submit');
     // Status
-    document.getElementById('statusModalOK').textContent = this.t('common:buttons.ok');
+    document.getElementById('statusModalOK').textContent = this.t('options:modals.buttons.ok');
   }
 
   backupConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {

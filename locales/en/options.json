@@ -1,7 +1,7 @@
 {
   "bookmarkletsPage": {
     "buttons": {
-      "installBookmarklet": "APF"
+      "installBookmarklet": "$t(common:app.shortNamea)"
     },
     "headers": {
       "bookmarklet": "Bookmarklet"
@@ -19,7 +19,9 @@
   "bulkWordEditor": {
     "buttons": {
       "addWord": "ADD WORD",
-      "addWords": "BULK ADD WORDS"
+      "addWords": "BULK ADD WORDS",
+      "cancel": "$t(common:buttons.cancel)",
+      "save": "$t(common:buttons.save)"
     },
     "headers": {
       "bulkWordEditor": "Bulk Word Editor"
@@ -46,8 +48,11 @@
   },
   "configsPage": {
     "buttons": {
-      "removePassword": "REMOVE",
-      "setPassword": "SET"
+      "exportConfig": "$t(common:buttons.export)",
+      "importConfig": "$t(common:buttons.import)",
+      "removePassword": "$t(common:buttons.remove)",
+      "restoreDefaultConfig": "$t(common:buttons.restoreDefaults)",
+      "setPassword": "$t(common:buttons.set)"
     },
     "headers": {
       "configuration": "Configuration",
@@ -75,6 +80,10 @@
     }
   },
   "domainsPage": {
+    "buttons": {
+      "removeDomain": "$t(common:buttons.remove)",
+      "saveDomain": "$t(common:buttons.save)"
+    },
     "headers": {
       "domain": "Domain",
       "domains": "Domains",
@@ -110,6 +119,11 @@
     }
   },
   "listsPage": {
+    "buttons": {
+      "removeWordFromList": "$t(common:buttons.remove)",
+      "renameWordlist": "$t(common:buttons.rename)",
+      "saveWordToList": "$t(common:buttons.save)"
+    },
     "headers": {
       "allowlist": "Allowlist",
       "defaultTextWordlist": "Default Text Wordlist",
@@ -138,6 +152,11 @@
     }
   },
   "modals": {
+    "buttons": {
+      "backup": "$t(common:buttons.backup)",
+      "cancel": "$t(common:buttons.cancel)",
+      "ok": "$t(common:buttons.ok)"
+    },
     "messages": {
       "confirmConvertStorageToLocal": "This will prevent large settings like words and domains from syncing, but allow you to store more.",
       "confirmConvertStorageToSync": "This will allow large settings like words and domains to sync, but has stricter limits on how much you can store.",
@@ -217,7 +236,10 @@
   },
   "statsPage": {
     "buttons": {
-      "removeLessUsedWords": "REMOVE WORDS"
+      "exportStats": "$t(common:buttons.export)",
+      "importStats": "$t(common:buttons.import)",
+      "removeLessUsedWords": "REMOVE WORDS",
+      "resetStats": "$t(common:buttons.reset)"
     },
     "headers": {
       "stats": "$t(options:tabs.stats)",
@@ -276,7 +298,10 @@
   },
   "wordsPage": {
     "buttons": {
-      "openBulkWordEditor": "BULK EDITOR"
+      "openBulkWordEditor": "BULK EDITOR",
+      "removeAllWords": "$t(common:buttons.removeAll)",
+      "removeWord": "$t(common:buttons.remove)",
+      "saveWord": "$t(common:buttons.save)"
     },
     "headers": {
       "includeInWordlists": "Include in Wordlists",
