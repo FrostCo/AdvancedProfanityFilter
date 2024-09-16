@@ -1,7 +1,7 @@
 {
   "bookmarkletsPage": {
     "buttons": {
-      "installBookmarklet": "$t(common:app.shortNamea)"
+      "installBookmarklet": "$t(common:app.shortName)"
     },
     "headers": {
       "bookmarklet": "Bookmarklet"
