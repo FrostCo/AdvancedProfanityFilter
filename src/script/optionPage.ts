@@ -1626,7 +1626,7 @@ export default class OptionPage {
     const newListName = newCase === 'sensitive' ? 'wordAllowlist' : 'iWordAllowlist';
 
     if (allowlistText.value === '') {
-      this.showInputError(allowlistText, this.t('options:validations.wordPhraseInvalid'));
+      this.showInputError(allowlistText, this.t('options:listsPage.validations.wordPhraseInvalid'));
       return false;
     }
 
@@ -1666,7 +1666,7 @@ export default class OptionPage {
         }
       }
     } else {
-      this.showInputError(allowlistText, this.t('options:validations.wordPhraseInvalid'));
+      this.showInputError(allowlistText, this.t('options:listsPage.validations.wordPhraseInvalid'));
     }
   }
 
@@ -1690,7 +1690,7 @@ export default class OptionPage {
     }
 
     if (word == '') {
-      this.showInputError(wordText, this.t('options:validations.wordPhraseInvalid'));
+      this.showInputError(wordText, this.t('options:wordsPage.validations.wordPhraseInvalid'));
       return false;
     }
 

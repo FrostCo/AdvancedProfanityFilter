@@ -197,7 +197,8 @@
     "validations": {
       "wordAlreadyAllowed": "Already allowlisted.",
       "wordlistNameInvalid": "Please enter a valid name.",
-      "wordlistNameNotUnique": "Please enter a unique name."
+      "wordlistNameNotUnique": "Please enter a unique name.",
+      "wordPhraseInvalid": "$t(options:validations.wordPhraseInvalid)"
     }
   },
   "options": {
@@ -393,7 +394,8 @@
       "regexInvalid": "Invalid Regex.",
       "substitutionCollision": "Word and substitution must be different.",
       "substitutionContainsWord": "Substitution can't contain word (causes an endless loop).",
-      "wordAlreadyListed": "'{{word}}' already in list."
+      "wordAlreadyListed": "'{{word}}' already in list.",
+      "wordPhraseInvalid": "$t(options:validations.wordPhraseInvalid)"
     }
   }
 }
