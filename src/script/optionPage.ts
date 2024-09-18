@@ -380,7 +380,7 @@ export default class OptionPage {
     const matchMethodSelect = document.createElement('select');
     this.Class.Constants.orderedArray(this.Class.Constants.MATCH_METHODS).forEach((matchMethod, index) => {
       const optionElement = document.createElement('option');
-      optionElement.textContent = this.t(`options:matchMethod${matchMethod}`);
+      optionElement.textContent = this.t(`options:bulkWordEditorModal.options.${matchMethod.toLowerCase()}MatchMethod`);
       matchMethodSelect.appendChild(optionElement);
     });
     matchMethodSelect.selectedIndex = data.matchMethod;

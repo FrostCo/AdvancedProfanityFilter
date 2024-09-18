@@ -36,6 +36,12 @@
     "notes": {
       "bulkAddWordsPlaceholder": "Bulk add words (one word/phrase per line)"
     },
+    "options": {
+      "exactMatchMethod": "$t(common:wordMatchMethods.exact)",
+      "partialMatchMethod": "$t(common:wordMatchMethods.partial)",
+      "regexMatchMethod": "$t(common:wordMatchMethods.regex)",
+      "wholeMatchMethod": "$t(common:wordMatchMethods.whole)"
+    },
     "tableHeaders": {
       "matchMethod": "Match Method",
       "remove": "Remove",
