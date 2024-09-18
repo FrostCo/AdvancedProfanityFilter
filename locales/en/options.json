@@ -77,6 +77,12 @@
     },
     "notes": {
       "syncLargeSettings": "Words, domains, etc. Disable if you run out of space"
+    },
+    "options": {
+      "debugLogLevel": "$t(common:logLevels.debug)",
+      "errorLogLevel": "$t(common:logLevels.error)",
+      "infoLogLevel": "$t(common:logLevels.info)",
+      "warnLogLevel": "$t(common:logLevels.warn)"
     }
   },
   "confirmModal": {
@@ -138,10 +144,22 @@
       "matchModeMinimal": "Only filter enabled domains",
       "matchModeNormal": "Filter all domains"
     },
+    "options": {
+      "advancedDomainMode": "$t(common:domainModes.advanced)",
+      "allWordsWordlist": "$t(common:wordlists.allWords)",
+      "deepDomainMode": "$t(common:domainModes.deep)",
+      "defaultWordlist": "$t(common:wordlists.default)",
+      "minimalDomainMatchMode": "$t(common:domainMatchModes.minimal)",
+      "normalDomainMatchMode": "$t(common:domainMatchModes.normal)",
+      "normalDomainMode": "$t(common:domainModes.normal)"
+    },
     "validations": {
       "domainExample": "Valid domain example: google.com or www.google.com",
       "emptyInputError": "Please enter a value."
     }
+  },
+  "headers": {
+    "title": "$t(common:app.name)"
   },
   "listsPage": {
     "buttons": {
@@ -153,6 +171,7 @@
       "allowlist": "Allowlist",
       "defaultTextWordlist": "Default Text Wordlist",
       "wordlistName": "Name",
+      "wordlists": "$t(common:wordlists.plural)",
       "wordPhrase": "Word/Phrase"
     },
     "labels": {
@@ -169,6 +188,9 @@
       "allowlistCaseSensitive": "(* Case-sensitive)",
       "caseInsensitive": "(doghouse: Don't filter 'DogHouse')",
       "caseSensitive": "(Doghouse: Don't filter 'Doghouse')"
+    },
+    "options": {
+      "allWordsWordlist": "$t(common:wordlists.allWords)"
     },
     "validations": {
       "wordAlreadyAllowed": "Already allowlisted.",
@@ -228,6 +250,15 @@
       "substitutionMark": "(dog: dog = [cat])",
       "substitutionPreserveCase": "(dog: Dog = Cat)",
       "useDeviceTheme": "(Light/dark mode)"
+    },
+    "options": {
+      "censorFilterMethod": "$t(common:filterMethods.censor)",
+      "exactMatchMethod": "$t(common:wordMatchMethods.exact)",
+      "offFilterMethod": "$t(common:filterMethods.off)",
+      "partialMatchMethod": "$t(common:wordMatchMethods.partial)",
+      "removeFilterMethod": "$t(common:filterMethods.remove)",
+      "substituteFilterMethod": "$t(common:filterMethods.substitute)",
+      "wholeMatchMethod": "$t(common:wordMatchMethods.whole)"
     },
     "values": {
       "censorFixedLengthOriginal": "Original"
@@ -344,6 +375,12 @@
       "matchRepeated": "(dog: dddoooggg)",
       "matchSeparators": "([-_ ] dog matches: D-o _g)",
       "matchWhole": "(dog: *** in the ********)"
+    },
+    "options": {
+      "exactMatchMethod": "$t(common:wordMatchMethods.exact)",
+      "partialMatchMethod": "$t(common:wordMatchMethods.partial)",
+      "regexMatchMethod": "$t(common:wordMatchMethods.regex)",
+      "wholeMatchMethod": "$t(common:wordMatchMethods.whole)"
     },
     "validations": {
       "regexInvalid": "Invalid Regex.",

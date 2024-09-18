@@ -122,11 +122,10 @@ export default class OptionPage {
     }
   }
 
-
   applyTranslation() {
     // Page and Header
-    document.getElementById('headTitle').textContent = this.t('common:app.name');
-    document.getElementById('title').textContent = this.t('common:app.name');
+    document.getElementById('headTitle').textContent = this.t('options:headers.title');
+    document.getElementById('title').textContent = this.t('options:headers.title');
     // Tabs
     document.getElementById('bookmarkletTab').textContent = this.t('options:tabs.bookmarklet');
     document.getElementById('configTab').textContent = this.t('options:tabs.config');
@@ -144,23 +143,23 @@ export default class OptionPage {
     document.getElementById('censorSettingsHeader').textContent = this.t('options:settingsPage.headers.censorSettings');
     document.getElementById('defaultSettingsHeader').textContent = this.t('options:settingsPage.headers.defaultSettings');
     document.getElementById('defaultSubstitutionName').textContent = this.t('options:settingsPage.labels.defaultSubstitution');
-    document.getElementById('defaultWordMatchMethodExact').textContent = this.t('common:wordMatchMethods.exact');
+    document.getElementById('defaultWordMatchMethodExact').textContent = this.t('options:settingsPage.options.exactMatchMethod');
     document.getElementById('defaultWordMatchMethodName').textContent = this.t('options:settingsPage.labels.defaultWordMatchMethod');
-    document.getElementById('defaultWordMatchMethodPartial').textContent = this.t('common:wordMatchMethods.partial');
-    document.getElementById('defaultWordMatchMethodWhole').textContent = this.t('common:wordMatchMethods.whole');
+    document.getElementById('defaultWordMatchMethodPartial').textContent = this.t('options:settingsPage.options.partialMatchMethod');
+    document.getElementById('defaultWordMatchMethodWhole').textContent = this.t('options:settingsPage.options.wholeMatchMethod');
     document.getElementById('defaultWordMatchRepeatedName').textContent = this.t('options:settingsPage.labels.defaultWordMatchRepeated');
     document.getElementById('defaultWordMatchRepeatedNote').textContent = this.t('options:settingsPage.notes.defaultWordMatchRepeated');
     document.getElementById('defaultWordMatchSeparatorsName').textContent = this.t('options:settingsPage.labels.defaultWordMatchSeparators');
     document.getElementById('defaultWordMatchSeparatorsNote').textContent = this.t('options:settingsPage.notes.defaultWordMatchSeparators');
-    document.getElementById('filterCensorName').textContent = this.t('common:filterMethods.censor');
+    document.getElementById('filterCensorName').textContent = this.t('options:settingsPage.options.censorFilterMethod');
     document.getElementById('filterMethodCensorNote').textContent = this.t('options:settingsPage.notes.filterMethodCensor');
     document.getElementById('filterMethodHeader').textContent = this.t('options:settingsPage.headers.filterMethod');
     document.getElementById('filterMethodOffNote').textContent = this.t('options:settingsPage.notes.filterMethodOff');
     document.getElementById('filterMethodRemoveNote').textContent = this.t('options:settingsPage.notes.filterMethodRemove');
     document.getElementById('filterMethodSubstituteNote').textContent = this.t('options:settingsPage.notes.filterMethodSubstitute');
-    document.getElementById('filterOffName').textContent = this.t('common:filterMethods.off');
-    document.getElementById('filterRemoveName').textContent = this.t('common:filterMethods.remove');
-    document.getElementById('filterSubstituteName').textContent = this.t('common:filterMethods.substitute');
+    document.getElementById('filterOffName').textContent = this.t('options:settingsPage.options.offFilterMethod');
+    document.getElementById('filterRemoveName').textContent = this.t('options:settingsPage.options.removeFilterMethod');
+    document.getElementById('filterSubstituteName').textContent = this.t('options:settingsPage.options.substituteFilterMethod');
     document.getElementById('generalSettingsHeader').textContent = this.t('options:settingsPage.headers.generalSettings');
     document.getElementById('preserveFirstName').textContent = this.t('options:settingsPage.labels.censorPreserveFirst');
     document.getElementById('preserveFirstNote').textContent = this.t('options:settingsPage.notes.censorPreserveFirst');
@@ -185,18 +184,18 @@ export default class OptionPage {
     document.getElementById('filterWordListName').textContent = this.t('options:wordsPage.labels.filterWordList');
     document.getElementById('includeInWordlistsHeader').textContent = this.t('options:wordsPage.headers.includeInWordlists');
     document.getElementById('wordCaseSensitive').textContent = this.t('options:wordsPage.labels.caseSensitive');
-    document.getElementById('wordMatchExactName').textContent = this.t('common:wordMatchMethods.exact');
+    document.getElementById('wordMatchExactName').textContent = this.t('options:wordsPage.options.exactMatchMethod');
     document.getElementById('wordMatchExactNote').textContent = this.t('options:wordsPage.notes.matchExact');
     document.getElementById('wordMatchMethodHeader').textContent = this.t('options:wordsPage.headers.matchMethod');
-    document.getElementById('wordMatchPartialName').textContent = this.t('common:wordMatchMethods.partial');
+    document.getElementById('wordMatchPartialName').textContent = this.t('options:wordsPage.options.partialMatchMethod');
     document.getElementById('wordMatchPartialNote').textContent = this.t('options:wordsPage.notes.matchPartial');
-    document.getElementById('wordMatchRegexName').textContent = this.t('common:wordMatchMethods.regex');
+    document.getElementById('wordMatchRegexName').textContent = this.t('options:wordsPage.options.regexMatchMethod');
     document.getElementById('wordMatchRegexNote').textContent = this.t('options:wordsPage.notes.matchRegex');
     document.getElementById('wordMatchRepeatedName').textContent = this.t('options:wordsPage.labels.matchRepeated');
     document.getElementById('wordMatchRepeatedNote').textContent = this.t('options:wordsPage.notes.matchRepeated');
     document.getElementById('wordMatchSeparatorsName').textContent = this.t('options:wordsPage.labels.matchSeparators');
     document.getElementById('wordMatchSeparatorsNote').textContent = this.t('options:wordsPage.notes.matchSeparators');
-    document.getElementById('wordMatchWholeName').textContent = this.t('common:wordMatchMethods.whole');
+    document.getElementById('wordMatchWholeName').textContent = this.t('options:wordsPage.options.wholeMatchMethod');
     document.getElementById('wordMatchWholeNote').textContent = this.t('options:wordsPage.notes.matchWhole');
     document.getElementById('wordOtherHeader').textContent = this.t('options:wordsPage.headers.other');
     document.getElementById('wordPhraseHeader').textContent = this.t('options:wordsPage.headers.wordPhrase');
@@ -218,7 +217,7 @@ export default class OptionPage {
     document.getElementById('listWordPhraseHeader').textContent = this.t('options:listsPage.headers.wordPhrase');
     document.getElementById('wordlistNameHeader').textContent = this.t('options:listsPage.headers.wordlistName');
     document.getElementById('wordlistRename').textContent = this.t('options:listsPage.buttons.renameWordlist').toUpperCase();
-    document.getElementById('wordlistsHeader').textContent = this.t('common:wordlists.plural');
+    document.getElementById('wordlistsHeader').textContent = this.t('options:listsPage.headers.wordlists');
     // Domains page
     document.getElementById('domainDisabledName').textContent = this.t('options:domainsPage.labels.filterDisabled');
     document.getElementById('domainDisabledNote').textContent = this.t('options:domainsPage.notes.filterDisabled');
@@ -233,14 +232,14 @@ export default class OptionPage {
     document.getElementById('domainFramesEnabledNote').textContent = this.t('options:domainsPage.notes.framesEnabled');
     document.getElementById('domainHeader').textContent = this.t('options:domainsPage.headers.domain');
     document.getElementById('domainMatchModeHeader').textContent = this.t('options:domainsPage.headers.matchMode');
-    document.getElementById('domainMatchModeMinimalName').textContent = this.t('common:domainMatchModes.minimal');
+    document.getElementById('domainMatchModeMinimalName').textContent = this.t('options:listsPage.options.minimalDomainMatchModes.');
     document.getElementById('domainMatchModeMinimalNote').textContent = this.t('options:domainsPage.notes.matchModeMinimal');
-    document.getElementById('domainMatchModeNormalName').textContent = this.t('common:domainMatchModes.normal');
+    document.getElementById('domainMatchModeNormalName').textContent = this.t('options:listsPage.options.normalDomainMatchModes.');
     document.getElementById('domainMatchModeNormalNote').textContent = this.t('options:domainsPage.notes.matchModeNormal');
-    document.getElementById('domainModeAdvanced').textContent = this.t('common:domainModes.advanced');
-    document.getElementById('domainModeDeep').textContent = this.t('common:domainModes.deep');
+    document.getElementById('domainModeAdvanced').textContent = this.t('options:domainsPage.options.advancedDomainMode');
+    document.getElementById('domainModeDeep').textContent = this.t('options:domainsPage.options.deepDomainMode');
     document.getElementById('domainModeHeader').textContent = this.t('options:domainModes.headers.mode');
-    document.getElementById('domainModeNormal').textContent = this.t('common:domainModes.normal');
+    document.getElementById('domainModeNormal').textContent = this.t('options:domainsPage.options.normalDomainMode');
     document.getElementById('domainRemove').textContent = this.t('options:domainsPage.buttons.removeDomain').toUpperCase();
     document.getElementById('domainSave').textContent = this.t('options:domainsPage.buttons.saveDomain').toUpperCase();
     document.getElementById('domainsHeader').textContent = this.t('options:domainsPage.headers.domains');
@@ -259,11 +258,11 @@ export default class OptionPage {
     document.getElementById('configHeader').textContent = this.t('options:configsPage.headers.configuration');
     document.getElementById('configImport').textContent = this.t('options:configsPage.buttons.importConfig').toUpperCase();
     document.getElementById('configInlineEditorName').textContent = this.t('options:configsPage.labels.inlineEditor');
-    document.getElementById('configLoggingLevelDebug').textContent = this.t('common:logLevels.debug');
-    document.getElementById('configLoggingLevelError').textContent = this.t('common:logLevels.error');
+    document.getElementById('configLoggingLevelDebug').textContent = this.t('options:configsPage.options.debugLoveLevel');
+    document.getElementById('configLoggingLevelError').textContent = this.t('options:configsPage.options.errorLoveLevel');
     document.getElementById('configLoggingLevelHeader').textContent = this.t('options:configsPage.headers.loggingLevel');
-    document.getElementById('configLoggingLevelInfo').textContent = this.t('common:logLevels.info');
-    document.getElementById('configLoggingLevelWarn').textContent = this.t('common:logLevels.warn');
+    document.getElementById('configLoggingLevelInfo').textContent = this.t('options:configsPage.options.infoLoveLevel');
+    document.getElementById('configLoggingLevelWarn').textContent = this.t('options:configsPage.options.warnLoveLevel');
     document.getElementById('configPasswordHeader').textContent = this.t('options:configsPage.headers.password');
     document.getElementById('configReset').textContent = this.t('options:configsPage.buttons.restoreDefaultConfig').toUpperCase();
     document.getElementById('configStorageHeader').textContent = this.t('options:configsPage.headers.storage');
@@ -1106,7 +1105,7 @@ export default class OptionPage {
       this.show(wordlistContainer);
       const domainWordlistSelect = document.getElementById('domainWordlistSelect') as HTMLSelectElement;
 
-      const wordlists = [this.t('common:wordlists.default'), this.t('common:wordlists.allWords')].concat(this.cfg.wordlists);
+      const wordlists = [this.t('options:domainsPage.options.defaultWordlist'), this.t('options:domainsPage.options.allWordsWordlist')].concat(this.cfg.wordlists);
       dynamicList(wordlists, domainWordlistSelect);
     } else {
       this.hide(wordlistContainer);
@@ -1363,7 +1362,7 @@ export default class OptionPage {
       const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
       const textWordlistSelect = document.getElementById('textWordlistSelect') as HTMLSelectElement;
       dynamicList(this.cfg.wordlists, wordlistSelect);
-      dynamicList([this.t('common:wordlists.allWords')].concat(this.cfg.wordlists), textWordlistSelect);
+      dynamicList([this.t('options:listsPage.options.allWordsWordlist')].concat(this.cfg.wordlists), textWordlistSelect);
       wordlistSelect.selectedIndex = selectedIndex;
       textWordlistSelect.selectedIndex = this.cfg.wordlistId;
 
