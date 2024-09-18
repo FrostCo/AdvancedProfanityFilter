@@ -323,15 +323,6 @@
       "warning": "Invalid input."
     }
   },
-  "testsPage": {
-    "headers": {
-      "test": "$t(options:tabs.test)",
-      "filtered": "Filtered"
-    },
-    "notes": {
-      "filteredTextPlaceholder": "Enter some text above to test the filter..."
-    }
-  },
   "tabs": {
     "bookmarklet": "Bookmarklet",
     "config": "Config",
@@ -342,6 +333,21 @@
     "stats": "Stats",
     "test": "Test",
     "words": "Words"
+  },
+  "testsPage": {
+    "headers": {
+      "filtered": "Filtered",
+      "test": "$t(options:tabs.test)"
+    },
+    "notes": {
+      "filteredTextPlaceholder": "Enter some text above to test the filter..."
+    }
+  },
+  "validations": {
+    "wordPhraseInvalid": "Please enter a valid word/phrase."
+  },
+  "values": {
+    "addOrUpdateExistingOption": "Add, or update existing..."
   },
   "wordsPage": {
     "buttons": {
@@ -388,11 +394,5 @@
       "substitutionContainsWord": "Substitution can't contain word (causes an endless loop).",
       "wordAlreadyListed": "'{{word}}' already in list."
     }
-  },
-  "validations": {
-    "wordPhraseInvalid": "Please enter a valid word/phrase."
-  },
-  "values": {
-    "addOrUpdateExistingOption": "Add, or update existing..."
   }
 }
