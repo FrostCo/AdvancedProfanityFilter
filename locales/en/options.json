@@ -251,8 +251,8 @@
       "trackingSince": "Tracking since"
     },
     "messages": {
-      "confirmRemoveLessUsedWords_one": "Are you sure you want to remove {{count}} word?",
       "confirmImportStats": "Are you sure you want to overwrite your statistics?",
+      "confirmRemoveLessUsedWords_one": "Are you sure you want to remove {{count}} word?",
       "confirmRemoveLessUsedWords_other": "Are you sure you want to remove {{count}} words?",
       "confirmRemoveLessUsedWordsNone": "All words have been filtered more times than the provided number.",
       "confirmResetStats": "Are you sure you want to reset filter statistics?",
