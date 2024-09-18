@@ -1076,7 +1076,7 @@ export default class OptionPage {
     removeChildren(domainsSelect);
 
     const domains = this.Class.Domain.sortedKeys(this.cfg.domains);
-    domains.unshift(this.t('options:options.addOrUpdateExistingOption'));
+    domains.unshift(this.t('options:domainsPage.options.addOrUpdateExistingDomain'));
     domains.forEach((domain) => {
       const optionElement = document.createElement('option');
       optionElement.textContent = domain;
@@ -1266,7 +1266,7 @@ export default class OptionPage {
     const list = [].concat(sensitiveList, this.filter.cfg.iWordAllowlist).sort();
     const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
     removeChildren(allowlist);
-    list.unshift(this.t('options:options.addOrUpdateExistingOption'));
+    list.unshift(this.t('options:listsPage.options.addOrUpdateExistingWord'));
     list.forEach((item) => {
       const optionElement = document.createElement('option');
       optionElement.value = item === list[0] ? '' : item.replace(regExp, '');
@@ -1388,7 +1388,7 @@ export default class OptionPage {
     }
 
     const words = Object.keys(this.cfg.words).sort();
-    words.unshift(this.t('options:options.addOrUpdateExistingOption'));
+    words.unshift(this.t('options:wordsPage.options.addOrUpdateExistingWord'));
     words.forEach((word) => {
       let filteredWord = word;
       if (word != words[0] && wordlistFilter.cfg.filterWordList) {

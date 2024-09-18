@@ -145,6 +145,7 @@
       "matchModeNormal": "Filter all domains"
     },
     "options": {
+      "addOrUpdateExistingDomain": "$t(options:options.addOrUpdateExisting)",
       "advancedDomainMode": "$t(common:domainModes.advanced)",
       "allWordsWordlist": "$t(common:wordlists.allWords)",
       "deepDomainMode": "$t(common:domainModes.deep)",
@@ -190,6 +191,7 @@
       "caseSensitive": "(Doghouse: Don't filter 'Doghouse')"
     },
     "options": {
+      "addOrUpdateExistingWord": "$t(options:options.addOrUpdateExisting)",
       "allWordsWordlist": "$t(common:wordlists.allWords)"
     },
     "validations": {
@@ -381,6 +383,7 @@
       "matchWhole": "(dog: *** in the ********)"
     },
     "options": {
+      "addOrUpdateExistingWord": "$t(options:options.addOrUpdateExisting)",
       "exactMatchMethod": "$t(common:wordMatchMethods.exact)",
       "partialMatchMethod": "$t(common:wordMatchMethods.partial)",
       "regexMatchMethod": "$t(common:wordMatchMethods.regex)",
