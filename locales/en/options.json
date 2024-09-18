@@ -198,6 +198,9 @@
       "wordlistNameNotUnique": "Please enter a unique name."
     }
   },
+  "options": {
+    "addOrUpdateExisting": "Add, or update existing..."
+  },
   "passwordModal": {
     "buttons": {
       "submitPassword": "$t(common:buttons.submit)"
@@ -255,13 +258,11 @@
       "censorFilterMethod": "$t(common:filterMethods.censor)",
       "exactMatchMethod": "$t(common:wordMatchMethods.exact)",
       "offFilterMethod": "$t(common:filterMethods.off)",
+      "originalCcensorFixedLength": "Original",
       "partialMatchMethod": "$t(common:wordMatchMethods.partial)",
       "removeFilterMethod": "$t(common:filterMethods.remove)",
       "substituteFilterMethod": "$t(common:filterMethods.substitute)",
       "wholeMatchMethod": "$t(common:wordMatchMethods.whole)"
-    },
-    "values": {
-      "censorFixedLengthOriginal": "Original"
     }
   },
   "statsPage": {
@@ -345,9 +346,6 @@
   },
   "validations": {
     "wordPhraseInvalid": "Please enter a valid word/phrase."
-  },
-  "values": {
-    "addOrUpdateExistingOption": "Add, or update existing..."
   },
   "wordsPage": {
     "buttons": {

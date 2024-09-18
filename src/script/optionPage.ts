@@ -139,7 +139,7 @@ export default class OptionPage {
     // Settings page
     document.getElementById('censorCharacterName').textContent = this.t('options:settingsPage.labels.censorCharacter');
     document.getElementById('censorFixedLengthName').textContent = this.t('options:settingsPage.labels.censorFixedLength');
-    document.getElementById('censorFixedLengthOriginal').textContent = this.t('options:settingsPage.values.censorFixedLengthOriginal');
+    document.getElementById('censorFixedLengthOriginal').textContent = this.t('options:settingsPage.options.originalCcensorFixedLength');
     document.getElementById('censorSettingsHeader').textContent = this.t('options:settingsPage.headers.censorSettings');
     document.getElementById('defaultSettingsHeader').textContent = this.t('options:settingsPage.headers.defaultSettings');
     document.getElementById('defaultSubstitutionName').textContent = this.t('options:settingsPage.labels.defaultSubstitution');
@@ -1076,7 +1076,7 @@ export default class OptionPage {
     removeChildren(domainsSelect);
 
     const domains = this.Class.Domain.sortedKeys(this.cfg.domains);
-    domains.unshift(this.t('options:values.addOrUpdateExistingOption'));
+    domains.unshift(this.t('options:options.addOrUpdateExistingOption'));
     domains.forEach((domain) => {
       const optionElement = document.createElement('option');
       optionElement.textContent = domain;
@@ -1266,7 +1266,7 @@ export default class OptionPage {
     const list = [].concat(sensitiveList, this.filter.cfg.iWordAllowlist).sort();
     const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
     removeChildren(allowlist);
-    list.unshift(this.t('options:values.addOrUpdateExistingOption'));
+    list.unshift(this.t('options:options.addOrUpdateExistingOption'));
     list.forEach((item) => {
       const optionElement = document.createElement('option');
       optionElement.value = item === list[0] ? '' : item.replace(regExp, '');
@@ -1388,7 +1388,7 @@ export default class OptionPage {
     }
 
     const words = Object.keys(this.cfg.words).sort();
-    words.unshift(this.t('options:values.addOrUpdateExistingOption'));
+    words.unshift(this.t('options:options.addOrUpdateExistingOption'));
     words.forEach((word) => {
       let filteredWord = word;
       if (word != words[0] && wordlistFilter.cfg.filterWordList) {
