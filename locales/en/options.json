@@ -4,7 +4,7 @@
       "installBookmarklet": "$t(common:app.shortName)"
     },
     "headers": {
-      "bookmarklet": "Bookmarklet"
+      "bookmarklet": "$t(options:tabs.bookmarklet)"
     },
     "labels": {
       "useDefaultConfig": "Use default config",
@@ -111,7 +111,7 @@
     },
     "headers": {
       "domain": "Domain",
-      "domains": "Domains",
+      "domains": "$t(options:tabs.domains)",
       "frameMode": "Frame Mode",
       "matchMode": "Domain Match Mode",
       "mode": "Mode",
