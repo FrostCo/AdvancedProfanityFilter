@@ -1875,7 +1875,7 @@ export default class OptionPage {
     }
   }
 
-  showErrorModal(content: string | string[] = [this.t('options:statusModal.messages.error')], title = this.t('options:statusModal.messages.titles.error'), titleColor = 'w3-red') {
+  showErrorModal(content: string | string[] = [this.t('options:statusModal.messages.error')], title = this.t('options:statusModal.headers.error'), titleColor = 'w3-red') {
     this.configureStatusModal(content, title, titleColor);
     this.openModal('statusModal');
   }
@@ -1892,12 +1892,12 @@ export default class OptionPage {
     }
   }
 
-  showStatusModal(content: string | string[] = [this.t('options:statusModal.messages.status')], title = this.t('options:statusModal.titles.status'), titleColor = 'w3-flat-peter-river') {
+  showStatusModal(content: string | string[] = [this.t('options:statusModal.messages.status')], title = this.t('options:statusModal.headers.status'), titleColor = 'w3-flat-peter-river') {
     this.configureStatusModal(content, title, titleColor);
     this.openModal('statusModal');
   }
 
-  showWarningModal(content: string | string[] = [this.t('options:statusModal.messages.warning')], title = this.t('options:statusModal.titles.warning'), titleColor = 'w3-orange') {
+  showWarningModal(content: string | string[] = [this.t('options:statusModal.messages.warning')], title = this.t('options:statusModal.headers.warning'), titleColor = 'w3-orange') {
     this.configureStatusModal(content, title, titleColor);
     this.openModal('statusModal');
   }
