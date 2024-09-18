@@ -12,5 +12,7 @@
     "filterMethod": "Filter",
     "textWordlist": "Text"
   },
-  "summaryTableHeader": "Filtered Words"
+  "summaryTableHeaders": {
+    "filteredWords": "Filtered Words"
+  }
 }
