@@ -178,7 +178,7 @@
   },
   "passwordModal": {
     "buttons": {
-      "submitPassword": "$(common:buttons.submit)"
+      "submitPassword": "$t(common:buttons.submit)"
     },
     "headers": {
       "enterPassword": "Enter Password"
