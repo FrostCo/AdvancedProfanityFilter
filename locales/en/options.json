@@ -18,8 +18,8 @@
   },
   "bulkWordEditorModal": {
     "buttons": {
-      "addWord": "ADD WORD",
-      "addWords": "BULK ADD WORDS",
+      "addWord": "Add Word",
+      "addWords": "Bulk Add Words",
       "cancel": "$t(common:buttons.cancel)",
       "save": "$t(common:buttons.save)"
     },
@@ -286,7 +286,7 @@
     "buttons": {
       "exportStats": "$t(common:buttons.export)",
       "importStats": "$t(common:buttons.import)",
-      "removeLessUsedWords": "REMOVE WORDS",
+      "removeLessUsedWords": "Remove Words",
       "resetStats": "$t(common:buttons.reset)"
     },
     "headers": {
@@ -366,7 +366,7 @@
   },
   "wordsPage": {
     "buttons": {
-      "openBulkWordEditor": "BULK EDITOR",
+      "openBulkWordEditor": "Bulk Editor",
       "removeAllWords": "$t(common:buttons.removeAll)",
       "removeWord": "$t(common:buttons.remove)",
       "saveWord": "$t(common:buttons.save)"
