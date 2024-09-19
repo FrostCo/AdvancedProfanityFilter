@@ -43,13 +43,13 @@
       "wholeMatchMethod": "$t(common:wordMatchMethods.whole)"
     },
     "tableHeaders": {
-      "matchMethod": "Match Method",
+      "matchMethod": "$t(options:headers.matchMethod)",
       "remove": "Remove",
       "repeated": "Repeated",
       "separators": "Separators",
-      "substitution": "Substitution",
+      "substitution": "$t(common:names.substitution)",
       "substitutionCase": "Substitution Case",
-      "word": "Word"
+      "word": "$t(common:names.word)"
     }
   },
   "configsPage": {
@@ -166,7 +166,15 @@
     }
   },
   "headers": {
-    "title": "$t(common:app.name)"
+    "matchMethod": "Match Method",
+    "title": "$t(common:app.name)",
+    "wordPhrase": "Word/Phrase"
+  },
+  "labels": {
+    "caseInsensitive": "Case-insensitive",
+    "caseSensitive": "Case-sensitive",
+    "matchRepeatedCharacters": "Match repeated characters",
+    "matchSeparators": "Match separators"
   },
   "listsPage": {
     "buttons": {
@@ -179,11 +187,11 @@
       "defaultTextWordlist": "Default Text Wordlist",
       "wordlistName": "Name",
       "wordlists": "$t(common:wordlists.plural)",
-      "wordPhrase": "Word/Phrase"
+      "wordPhrase": "$t(options:headers.wordPhrase)"
     },
     "labels": {
-      "caseInsensitive": "Case-insensitive",
-      "caseSensitive": "Case-sensitive"
+      "caseInsensitive": "$t(options:labels.caseInsensitive)",
+      "caseSensitive": "$t(options:labels.caseSensitive)"
     },
     "messages": {
       "removeWordFromAllowlistFailed": "Failed to remove '{{word}}' from allowlist.",
@@ -192,7 +200,7 @@
       "saveDefaultWordlistFailed": "Failed to update default wordlist."
     },
     "notes": {
-      "allowlistCaseSensitive": "(* Case-sensitive)",
+      "allowlistCaseSensitive": "(* $t(options:labels.caseSensitive))",
       "caseInsensitive": "(doghouse: Don't filter 'DogHouse')",
       "caseSensitive": "(Doghouse: Don't filter 'Doghouse')"
     },
@@ -232,8 +240,8 @@
       "censorPreserveFirst": "Preserve the first letter",
       "censorPreserveLast": "Preserve the last letter",
       "defaultSubstitution": "Default Substitution",
-      "defaultWordMatchMethod": "Match Method",
-      "defaultWordMatchRepeated": "Match repeated characters",
+      "defaultWordMatchMethod": "$t(options:headers.matchMethod)",
+      "defaultWordMatchRepeated": "$t(common:labels.matchRepeatedCharacters)",
       "defaultWordMatchSeparators": "Match separator characters",
       "showContextMenu": "Show context menu",
       "showCounter": "Show number of filtered words",
@@ -310,7 +318,7 @@
     },
     "tableHeaders": {
       "summaryTotal": "Total",
-      "summaryWords": "Word"
+      "summaryWords": "$t(common:names.word)"
     },
     "validations": {
       "lessUsedWordsInvalid": "Enter a positive whole number."
@@ -337,12 +345,12 @@
     "bookmarklet": "Bookmarklet",
     "config": "Config",
     "domains": "Domains",
-    "help": "Help",
+    "help": "$t(common:names.help)",
     "lists": "Lists",
     "settings": "Settings",
     "stats": "Stats",
     "test": "Test",
-    "words": "Words"
+    "words": "$t(common:names.words)"
   },
   "testsPage": {
     "headers": {
@@ -365,17 +373,17 @@
     },
     "headers": {
       "includeInWordlists": "Include in Wordlists",
-      "matchMethod": "Match Method",
+      "matchMethod": "$t(options:headers.matchMethod)",
       "other": "Other",
-      "substitution": "Substitution",
-      "wordPhrase": "Word/Phrase",
+      "substitution": "$t(common:names.substitution)",
+      "wordPhrase": "$t(options:headers.wordPhrase)",
       "wordsAndPhrases": "Words & Phrases"
     },
     "labels": {
-      "caseSensitive": "Case-sensitive",
+      "caseSensitive": "$t(options:labels.caseSensitive)",
       "filterWordList": "Filter list",
-      "matchRepeated": "Match repeated characters",
-      "matchSeparators": "Match separators"
+      "matchRepeated": "$t(options:labels.matchRepeatedCharacters)",
+      "matchSeparators": "$t(options:labels.matchSeparators)"
     },
     "messages": {
       "removeFailed": "Failed to remove word '{{word}}'.",

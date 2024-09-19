@@ -274,7 +274,7 @@ export default class OptionPage {
     document.getElementById('removeLessUsedWords').textContent = this.t('options:statsPage.buttons.removeLessUsedWords').toUpperCase();
     document.getElementById('statsExport').textContent = this.t('options:statsPage.buttons.exportStats').toUpperCase();
     document.getElementById('statsFilteredSummaryTotal').textContent = this.t('options:statsPage.tableHeaders.summaryTotal');
-    document.getElementById('statsFilteredSummaryWord').textContent = this.t('options:statsPage.tableHeaders.summaryWords');
+    document.getElementById('statsFilteredSummaryWord').textContent = this.t('options:statsPage.tableHeaders.summaryWord');
     document.getElementById('statsHeader').textContent = this.t('options:statsPage.headers.stats');
     document.getElementById('statsImport').textContent = this.t('options:statsPage.buttons.importStats').toUpperCase();
     document.getElementById('statsRemoveLessUsedWordsExplanation').textContent = this.t('options:statsPage.notes.removeLessUsedWords');
