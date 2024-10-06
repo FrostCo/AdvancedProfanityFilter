@@ -1,8 +1,10 @@
-const BUILD = require('../.build.json');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const webpack = require('webpack');
+import fs from 'fs-extra';
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
+import webpack from 'webpack';
 
-module.exports = {
+const BUILD = fs.readJsonSync('.build.json');
+
+export default {
   entry: {
     background: './src/script/mainBackground.ts',
     optionPage: './src/script/mainOptionPage.ts',

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import fse from 'fs-extra';
 // import Constants from '../src/script/lib/constants'; // Temp?
-import Common from './common.mjs';
+import Common from './common.js';
 
 export default class Prebuild {
   //#region Class reference helpers

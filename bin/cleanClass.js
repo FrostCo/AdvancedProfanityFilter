@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import path from 'path';
-import Common from './common.mjs';
+import Common from './common.js';
 
 export default class Clean {
   //#region Class reference helpers
