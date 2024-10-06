@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import AdmZip from 'adm-zip';
 import { globbySync } from 'globby';
-import Common from './common.mjs';
+import Common from './common.js';
 import fse from 'fs-extra';
 
 export default class PackageExtension {

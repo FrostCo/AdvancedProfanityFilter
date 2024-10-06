@@ -43,17 +43,17 @@ Once the extension has been built, you can load the unpacked extension (found in
 
 ## State Files
 
-The state files hold the details about the current build. These files are managed by `bin/prebuild.mjs`.
+The state files hold the details about the current build. These files are managed by `bin/prebuild.js`.
 
 - `.build.json`
   - Active build state file that is referenced when building/packaging/releasing
   - Gets replaced by the dev or release build files outlined below
 - `.build.dev.json`
   - Holds the development build details and allows the developer to omit the target from commands such as `npm run build` to rebuild the project for the target specified in the file
-  - Overwrites `.build.json` when `--release` is **not** passed to `bin/prebuild.mjs`
+  - Overwrites `.build.json` when `--release` is **not** passed to `bin/prebuild.js`
 - `.build.release.json`
   - Holds the release build details
-  - Overwrites `.build.json` when `--release` **is** passed to `bin/prebuild.mjs`
+  - Overwrites `.build.json` when `--release` **is** passed to `bin/prebuild.js`
 
 ### Details Contained In State Files
 
@@ -73,14 +73,14 @@ For all scripts, please see `package.json`.
 - `npm run build`
   - npm run prebuild
     - npm run clean:build
-      - node bin/clean.mjs --build
-    - node bin/prebuild.mjs --$npm_config_target
+      - node bin/clean.js --build
+    - node bin/prebuild.js --$npm_config_target
       - NOTE: $npm_config_target will be blank (`--`)
   - webpack --config bin/webpack.dev.js
   - npm run build:static
-    - node bin/copyStatic.mjs
+    - node bin/copyStatic.js
   - npm run postbuild
-    - node bin/postbuild.mjs
+    - node bin/postbuild.js
 
 ### Build Chrome Manifest V2
 
@@ -88,14 +88,14 @@ For all scripts, please see `package.json`.
   - npm run build --target=chrome-mv2
     - npm run prebuild
       - npm run clean:build
-        - node bin/clean.mjs --build
-      - node bin/prebuild.mjs --$npm_config_target
+        - node bin/clean.js --build
+      - node bin/prebuild.js --$npm_config_target
     - npm run build
       - webpack --config bin/webpack.dev.js
       - npm run build:static
-        - node bin/copyStatic.mjs
+        - node bin/copyStatic.js
       - npm run postbuild
-        - node bin/postbuild.mjs
+        - node bin/postbuild.js
 
 ### Release Chrome Manifest V3
 
@@ -103,15 +103,15 @@ For all scripts, please see `package.json`.
   - npm run release:build --target=chrome-mv3
     - npm run prerelease:build
       - npm run clean:build
-        - node bin/clean.mjs --build
-      - node bin/prebuild.mjs --release --$npm_config_target
+        - node bin/clean.js --build
+      - node bin/prebuild.js --release --$npm_config_target
     - webpack --config bin/webpack.prod.js
     - npm run build:static
-      - node bin/copyStatic.mjs
+      - node bin/copyStatic.js
     - postrelease:build
-      - node bin/postbuild.mjs
+      - node bin/postbuild.js
       - npm run package
-    - node bin/packageExtension.mjs
+    - node bin/packageExtension.js
 
 ### Test Addon (Firefox Manifest V2)
 
@@ -119,12 +119,12 @@ For all scripts, please see `package.json`.
   - npm run release:build --target=firefox-mv2
     - npm run prerelease:build
       - npm run clean:build
-        - node bin/clean.mjs --build
-      - node bin/prebuild.mjs --release --$npm_config_target
+        - node bin/clean.js --build
+      - node bin/prebuild.js --release --$npm_config_target
     - webpack --config bin/webpack.prod.js
     - npm run build:static
-      - node bin/copyStatic.mjs
+      - node bin/copyStatic.js
     - postrelease:build
-      - node bin/postbuild.mjs
+      - node bin/postbuild.js
       - npm run package
   - npx addons-linter ./dist

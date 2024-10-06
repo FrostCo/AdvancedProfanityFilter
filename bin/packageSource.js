@@ -1,4 +1,4 @@
-import PackageSource from './packageSourceClass.mjs';
+import PackageSource from './packageSourceClass.js';
 
 const packageSource = new PackageSource();
 packageSource.run();

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import AdmZip from 'adm-zip';
-import Common from './common.mjs';
+import Common from './common.js';
 
 // Required for Firefox due to bundled code
 export default class PackageSource {
@@ -33,19 +33,19 @@ export default class PackageSource {
 
   get binFiles() {
     return [
-      'bin/clean.mjs',
-      'bin/cleanClass.mjs',
-      'bin/common.mjs',
-      'bin/copyStatic.mjs',
-      'bin/copyStaticClass.mjs',
-      'bin/packageExtension.mjs',
-      'bin/packageExtensionClass.mjs',
-      'bin/packageSource.mjs',
-      'bin/packageSourceClass.mjs',
-      'bin/postbuild.mjs',
-      'bin/postbuildClass.mjs',
-      'bin/prebuild.mjs',
-      'bin/prebuildClass.mjs',
+      'bin/clean.js',
+      'bin/cleanClass.js',
+      'bin/common.js',
+      'bin/copyStatic.js',
+      'bin/copyStaticClass.js',
+      'bin/packageExtension.js',
+      'bin/packageExtensionClass.js',
+      'bin/packageSource.js',
+      'bin/packageSourceClass.js',
+      'bin/postbuild.js',
+      'bin/postbuildClass.js',
+      'bin/prebuild.js',
+      'bin/prebuildClass.js',
       'bin/webpack.bookmarklet.js',
       'bin/webpack.common.js',
       'bin/webpack.dev.js',
