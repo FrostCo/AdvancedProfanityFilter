@@ -26,10 +26,10 @@ module.exports = {
           },
         ],
       },
-    ]
+    ],
   },
   optimization: {
-    minimize: true
+    minimize: true,
   },
   plugins: [
     new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) }),

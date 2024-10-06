@@ -17,7 +17,7 @@ module.exports = {
           {
             loader: 'ts-loader',
             options: {
-              // Ignore typescript errors
+              // Ignore TypeScript errors
               transpileOnly: false,
             },
           },
