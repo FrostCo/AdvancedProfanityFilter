@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable no-console */
 import fse from 'fs-extra';
-import Common from './common.mjs';
+import Common from './common.js';
 
 export default class Postbuild {
   //#region Class reference helpers
