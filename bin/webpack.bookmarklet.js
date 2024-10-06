@@ -1,9 +1,9 @@
-const BUILD = require('../.build.json');
-const TerserPlugin = require('terser-webpack-plugin');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const webpack = require('webpack');
+import BUILD from '../.build.json' assert { type: 'json' };
+import TerserPlugin from 'terser-webpack-plugin';
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
+import webpack from 'webpack';
 
-module.exports = {
+export default {
   entry: {
     bookmarkletFilter: './src/script/mainBookmarklet.ts',
   },

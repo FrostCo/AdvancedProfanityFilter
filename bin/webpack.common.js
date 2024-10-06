@@ -1,8 +1,8 @@
-const BUILD = require('../.build.json');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const webpack = require('webpack');
+import BUILD from '../.build.json' assert { type: 'json' };
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
+import webpack from 'webpack';
 
-module.exports = {
+export default {
   entry: {
     background: './src/script/mainBackground.ts',
     optionPage: './src/script/mainOptionPage.ts',
