@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 const BUILD = require('../.build.json');
-const TerserPlugin = require('terser-webpack-plugin'); // eslint-disable-line @typescript-eslint/no-var-requires
+const TerserPlugin = require('terser-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const webpack = require('webpack');
 
@@ -18,7 +17,7 @@ module.exports = {
           {
             loader: 'ts-loader',
             options: {
-              // Ignore typescript errors
+              // Ignore TypeScript errors
               transpileOnly: false,
             },
           },

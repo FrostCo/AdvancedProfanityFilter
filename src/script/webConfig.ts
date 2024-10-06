@@ -25,7 +25,6 @@ export default class WebConfig extends Config {
   get Class() { return (this.constructor as typeof WebConfig); }
   //#endregion
 
-  /* eslint-disable-next-line @typescript-eslint/naming-convention */
   static readonly BUILD = typeof __BUILD__ == 'undefined' ? BUILD_DEFAULTS  : __BUILD__;
   static readonly _webDefaults = {
     collectStats: true,
