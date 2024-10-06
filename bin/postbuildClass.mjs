@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable no-console */
 import fse from 'fs-extra';
 import Common from './common.mjs';
 
