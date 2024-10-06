@@ -1,6 +1,8 @@
-import BUILD from '../.build.json' assert { type: 'json' };
+import fs from 'fs-extra';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
+
+const BUILD = fs.readJsonSync('.build.json');
 
 export default {
   entry: {
