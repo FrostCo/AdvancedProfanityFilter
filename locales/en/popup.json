@@ -1,0 +1,41 @@
+{
+  "buttons": {
+    "options": "$t(common:names.options)"
+  },
+  "disabledMessages": {
+    "disconnected": "Disconnected, please refresh page",
+    "domain": "Popup disabled for domain",
+    "domainMode": "Popup disabled by domain mode",
+    "passwordProtected": "Popup disabled by password",
+    "restrictedPage": "Popup disabled by browser",
+    "tab": "Popup disabled for tab"
+  },
+  "domainModes": {
+    "advanced": "$t(common:domainModes.advanced)",
+    "deep": "$t(common:domainModes.deep)",
+    "normal": "$t(common:domainModes.normal)"
+  },
+  "filterMethods": {
+    "censor": "$t(common:filterMethods.censor)",
+    "off": "$t(common:filterMethods.off)",
+    "remove": "$t(common:filterMethods.remove)",
+    "substitute": "$t(common:filterMethods.substitute)"
+  },
+  "footer": {
+    "changelog": "$t(common:names.changelog)",
+    "help": "$t(common:names.help)",
+    "support": "$t(common:names.support)"
+  },
+  "labels": {
+    "domainMode": "Mode",
+    "filterMethod": "Filter",
+    "textWordlist": "Text"
+  },
+  "summaryTableHeaders": {
+    "filteredWords": "Filtered Words"
+  },
+  "wordlists": {
+    "allWords": "$t(common:wordlists.allWords)",
+    "default": "$t(common:wordlists.default)"
+  }
+}

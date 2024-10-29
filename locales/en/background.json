@@ -1,0 +1,16 @@
+{
+  "contextMenu": {
+    "addSelection": "Add selection to filter",
+    "disableOnce": "Disable once",
+    "options": "$t(common:names.options)",
+    "removeSelection": "Remove selection from filter",
+    "toggleAdvancedForDomain": "Toggle advanced for domain",
+    "toggleForDomain": "Toggle for domain",
+    "toggleForTab": "Toggle for tab",
+    "toggleFramesForDomain": "Toggle frames for domain"
+  },
+  "updateNotification": {
+    "message": "Update installed, click for changelog.",
+    "title": "$t(common:app.name)"
+  }
+}

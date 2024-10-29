@@ -23,11 +23,12 @@
     "build:chrome:mv3": "npm run build --target=chrome-mv3",
     "build:chrome": "npm run build:chrome:mv3",
     "build:edgeLegacy": "npm run build --target=edgeLegacy-mv2",
-    "build:firefox": "npm run build:firefox:mv2",
     "build:firefox:mv2": "npm run build --target=firefox-mv2",
     "build:firefox:mv3": "npm run build --target=firefox-mv3",
+    "build:firefox": "npm run build:firefox:mv2",
     "build:libs": "tsc -p ./src/script/lib/tsconfig.json",
     "build:static": "node bin/copyStatic.js",
+    "build:translations": "node bin/buildTranslations.js",
     "build": "webpack --config bin/webpack.dev.js && npm run build:static",
     "clean:all": "node bin/clean.js --all",
     "clean:build": "node bin/clean.js --build",
@@ -38,7 +39,7 @@
     "postrelease:all": "npm run build",
     "postrelease:build": "node bin/postbuild.js && npm run package",
     "postrelease:firefox:mv2": "node bin/packageSource.js",
-    "prebuild": "npm run clean:build && node bin/prebuild.js --$npm_config_environment --$npm_config_target",
+    "prebuild": "npm run clean:build && npm run build:translations && node bin/prebuild.js --$npm_config_environment --$npm_config_target",
     "prerelease:all": "npm run clean && npm run release:bookmarklet",
     "prerelease:build": "npm run clean:build && node bin/prebuild.js --release --$npm_config_target",
     "release:all": "npm run release:chrome:mv2 && npm run release:chrome:mv3 && npm run release:edgeLegacy && npm run release:firefox:mv2 && npm run release:firefox:mv3",
@@ -69,6 +70,9 @@
     "update:deps": "npx npm-check-updates --concurrency 10 --timeout 600000 --upgrade",
     "update:help": "node bin/updateHelp.js",
     "watch": "node bin/watch.js"
+  },
+  "dependencies": {
+    "i18next": "^23.14.0"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.271",

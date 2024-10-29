@@ -1,0 +1,66 @@
+{
+  "app": {
+    "name": "Advanced Profanity Filter",
+    "shortName": "APF"
+  },
+  "buttons": {
+    "backup": "Backup",
+    "cancel": "Cancel",
+    "export": "Export",
+    "import": "Import",
+    "ok": "OK",
+    "remove": "Remove",
+    "removeAll": "Remove All",
+    "rename": "Rename",
+    "reset": "Reset",
+    "restoreDefaults": "Restore Defaults",
+    "save": "Save",
+    "set": "Set",
+    "submit": "Submit"
+  },
+  "domainMatchModes": {
+    "minimal": "Minimal",
+    "normal": "Normal"
+  },
+  "domainModes": {
+    "advanced": "Advanced",
+    "deep": "Deep",
+    "normal": "Normal"
+  },
+  "filterMethods": {
+    "censor": "Censor",
+    "off": "Off",
+    "remove": "Remove",
+    "substitute": "Substitute"
+  },
+  "logLevels": {
+    "debug": "Debug",
+    "error": "Error",
+    "info": "Info",
+    "warn": "Warn"
+  },
+  "names": {
+    "changelog": "Changelog",
+    "help": "Help",
+    "options": "Options",
+    "substitution": "Substitution",
+    "support": "Support",
+    "word": "Word",
+    "words": "Words"
+  },
+  "values": {
+    "defaultWordSubstitution": "censored",
+    "wordlistName": "Wordlist"
+  },
+  "wordlists": {
+    "allWords": "All Words",
+    "default": "Default Wordlist",
+    "plural": "Wordlists"
+  },
+  "wordMatchMethods": {
+    "exact": "Exact",
+    "partial": "Partial",
+    "regex": "Regex",
+    "whole": "Whole"
+  }
+}

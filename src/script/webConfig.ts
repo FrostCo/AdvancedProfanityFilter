@@ -1,6 +1,7 @@
 import Config from '@APF/lib/config';
 import { prettyPrintArray, removeFromArray, sortObjectKeys, stringArray } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
+import Translation from '@APF/translation';
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
 /* eslint-disable-next-line @typescript-eslint/naming-convention */
@@ -9,6 +10,7 @@ const BUILD_DEFAULTS = { config: {}, manifestVersion: 3, release: true, target: 
 const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
+  _defaultsLoaded: string[];
   _lastSplitKeys: { [key: string]: number };
   collectStats: boolean;
   contextMenu: boolean;
@@ -328,8 +330,38 @@ export default class WebConfig extends Config {
     // Apply the Config defaults
     super(config);
 
+    // Overcome Object.assign not overwriting undefined values for underscore keys
+    const underscoreKeys = Object.keys(config).filter((key) => key[0] === '_');
+    for (const underscoreKey of underscoreKeys) {
+      if (config[underscoreKey]) this[underscoreKey] = config[underscoreKey];
+    }
+
     // Apply class defaults
     Object.assign(this, this.Class._webDefaults, config);
+
+    // Compile list of defaults that were applied
+    if (!this._defaultsLoaded) this._defaultsLoaded = [];
+    const defaultKeys = Object.keys(this.Class._defaults);
+    this._defaultsLoaded = defaultKeys.filter((key) => config[key] === undefined);
+
+    this.localizeDefaults();
+  }
+
+  localizeDefaults() {
+    if (!this._defaultsLoaded || !this._defaultsLoaded.length) return;
+
+    const translation = new Translation('common');
+
+    if (this._defaultsLoaded.includes('defaultSubstitution')) {
+      const options = { defaultValue: this.Class._defaults.defaultSubstitution };
+      this.defaultSubstitution = translation.t('common:values.defaultWordSubstitution', options);
+    }
+
+    if (this._defaultsLoaded.includes('wordlists')) {
+      this.wordlists = Config._configDefaults.wordlists.map((wordlist, index) => {
+        return translation.t(`common:values.wordlist${index + 1}`, { defaultValue: wordlist });
+      });
+    }
   }
 
   // Order and remove `_` prefixed values

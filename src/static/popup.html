@@ -21,15 +21,36 @@
   </div>
 
   <div id="domainModeContainer" class="container">
-    <label class="selectLabel">Mode<select id="domainModeSelect" class="w3-select w3-border smallSelect"></select></label>
+    <label id="domainModeLabel" for="domainModeSelect" class="selectLabel">Mode</label>
+    <select id="domainModeSelect" class="w3-select w3-border smallSelect">
+      <option id="domainModeNormal" value="0">Normal</option>
+      <option id="domainModeAdvanced" value="1">Advanced</option>
+      <option id="domainModeDeep" value="2">Deep</option>
+    </select>
   </div>
 
   <div id="filterMethodContainer" class="container">
-    <label class="selectLabel">Filter<select id="filterMethodSelect" class="w3-select w3-border smallSelect"></select></label>
+    <label id="filterMethodLabel" for="filterMethodSelect" class="selectLabel">Filter</label>
+    <select id="filterMethodSelect" class="w3-select w3-border smallSelect">
+      <option id="filterMethodCensor" value="0">Censor</option>
+      <option id="filterMethodSubstitute" value="1">Substitute</option>
+      <option id="filterMethodRemove" value="2">Remove</option>
+      <option id="filterMethodOff" value="3">Off</option>
+    </select>
   </div>
 
   <div id="wordListContainer" class="container w3-hide">
-    <label class="selectLabel">Text</label><select id="wordlistSelect" class="w3-select w3-border smallSelect"></select>
+    <label id="textWordlistLabel" for="wordlistSelect" class="selectLabel">Text</label>
+    <select id="wordlistSelect" class="w3-select w3-border smallSelect">
+      <option id="wordlistDefault" value="default">Default Wordlist</option>
+      <option id="wordlistAllWords"value="0">All words</option>
+      <option id="wordlist1" value="1">Wordlist 1</option>
+      <option id="wordlist2" value="2">Wordlist 2</option>
+      <option id="wordlist3" value="3">Wordlist 3</option>
+      <option id="wordlist4" value="4">Wordlist 4</option>
+      <option id="wordlist5" value="5">Wordlist 5</option>
+      <option id="wordlist6" value="6">Wordlist 6</option>
+    </select>
   </div>
 
   <div class="divider"></div>
@@ -38,7 +59,7 @@
     <table class="w3-table w3-striped w3-border w3-bordered w3-card w3-small">
       <thead>
         <tr>
-          <th colspan="2" class="w3-center">Filtered Words</th>
+          <th id="summaryTableHeader" colspan="2" class="w3-center">Filtered Words</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -51,8 +72,8 @@
 
   <div id="footer">
     <a id="gettingStarted" href="https://github.com/FrostCo/AdvancedProfanityFilter/wiki" target="_blank">Help</a>
-    - <a href="https://github.com/FrostCo/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
-    - <a href="https://github.com/FrostCo/AdvancedProfanityFilter/issues" target="_blank">Support</a>
+    - <a id="changelogLink" href="https://github.com/FrostCo/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
+    - <a id="supportLink" href="https://github.com/FrostCo/AdvancedProfanityFilter/issues" target="_blank">Support</a>
     <div id="disabledMessage"></div>
   </div>
 

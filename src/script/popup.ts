@@ -1,9 +1,9 @@
 import Constants from '@APF/lib/constants';
-import { dynamicList } from '@APF/lib/helper';
 import WebConfig from '@APF/webConfig';
 import Domain from '@APF/domain';
 import Page from '@APF/page';
 import Logger from '@APF/lib/logger';
+import Translation from '@APF/translation';
 const logger = new Logger('Popup');
 
 export default class Popup {
@@ -17,6 +17,7 @@ export default class Popup {
   summaries: { number?: Summary };
   tab: chrome.tabs.Tab;
   themeElements: Element[];
+  translation: Translation;
   url: URL;
   webFilterActive: boolean;
 
@@ -26,6 +27,7 @@ export default class Popup {
   static get Constants() { return Constants; }
   static get Domain() { return Domain; }
   static get Page() { return Page; }
+  static get Translation() { return Translation; }
   get Class() { return (this.constructor as typeof Popup); }
   //#endregion
 
@@ -126,6 +128,24 @@ export default class Popup {
     }
   }
 
+  applyTranslation() {
+    document.getElementById('domainModeLabel').textContent = this.translation.t('popup:labels.domainMode');
+    document.getElementById('filterMethodLabel').textContent = this.translation.t('popup:labels.filterMethod');
+    document.getElementById('textWordlistLabel').textContent = this.translation.t('popup:labels.textWordlist');
+    document.getElementById('summaryTableHeader').textContent = this.translation.t('popup:summaryTableHeaders.filteredWords');
+    document.getElementById('options').textContent = this.translation.t('popup:buttons.options');
+    document.getElementById('gettingStarted').textContent = this.translation.t('popup:footer.help');
+    document.getElementById('changelogLink').textContent = this.translation.t('popup:footer.changelog');
+    document.getElementById('supportLink').textContent = this.translation.t('popup:footer.support');
+    document.getElementById('domainModeNormal').textContent = this.translation.t('popup:domainModes.normal');
+    document.getElementById('domainModeAdvanced').textContent = this.translation.t('popup:domainModes.advanced');
+    document.getElementById('domainModeDeep').textContent = this.translation.t('popup:domainModes.deep');
+    document.getElementById('filterMethodCensor').textContent = this.translation.t('popup:filterMethods.censor');
+    document.getElementById('filterMethodSubstitute').textContent = this.translation.t('popup:filterMethods.substitute');
+    document.getElementById('filterMethodRemove').textContent = this.translation.t('popup:filterMethods.off');
+    document.getElementById('filterMethodOff').textContent = this.translation.t('popup:filterMethods.remove');
+  }
+
   disableDomainSwitch() {
     const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
     const domainToggle = document.getElementById('domainToggle') as HTMLInputElement;
@@ -134,12 +154,12 @@ export default class Popup {
   }
 
   get disabledReason(): string {
-    if (this.isRestrictedPage) return 'Popup disabled by browser';
-    if (this.isPasswordProtected) return 'Popup disabled by password';
-    if (this.disabledTab) return 'Popup disabled for tab';
-    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return 'Popup disabled by domain mode';
-    if (this.domain.disabled) return 'Popup disabled for domain';
-    if (this.isDisconnected) return 'Disconnected, please refresh page';
+    if (this.isRestrictedPage) return this.translation.t('popup:disabledMessages.restrictedPage');
+    if (this.isPasswordProtected) return this.translation.t('popup:disabledMessages.passwordProtected');
+    if (this.disabledTab) return this.translation.t('popup:disabledMessages.tab');
+    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return this.translation.t('popup:disabledMessages.domainMode');
+    if (this.domain.disabled) return this.translation.t('popup:disabledMessages.domain');
+    if (this.isDisconnected) return this.translation.t('popup:disabledMessages.disconnected');
     return '';
   }
 
@@ -226,10 +246,11 @@ export default class Popup {
   handleWordlistsEnabled() {
     const wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
-    const wordlists = ['Default Wordlist'].concat(this.Class.Config._allWordlists, this.cfg.wordlists);
     const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
-    dynamicList(wordlists, wordlistSelect);
     wordlistSelect.selectedIndex = wordlistIndex;
+    document.getElementById('wordlistDefault').textContent = this.translation.t('popup:wordlists.default');
+    document.getElementById('wordlistAllWords').textContent = this.translation.t('popup:wordlists.allWords');
+    this.cfg.wordlists.forEach((wordlist, index) => { document.getElementById(`wordlist${index + 1}`).textContent = wordlist; });
     this.Class.show(wordListContainer);
   }
 
@@ -260,6 +281,8 @@ export default class Popup {
   }
 
   async initializePopup() {
+    this.translation = new this.Class.Translation(['common', 'popup']);
+    this.applyTranslation();
     await this.Class.load(this);
     this.applyTheme();
     this.populateOptions(true);
@@ -310,9 +333,7 @@ export default class Popup {
   async populateOptions(init = false) {
     const domainModeSelect = document.getElementById('domainModeSelect') as HTMLSelectElement;
     const filterMethodSelect = document.getElementById('filterMethodSelect') as HTMLSelectElement;
-    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.DOMAIN_MODES), domainModeSelect, true);
     domainModeSelect.selectedIndex = this.domain.getModeIndex();
-    dynamicList(this.Class.Constants.orderedArray(this.Class.Constants.FILTER_METHODS), filterMethodSelect, true);
     filterMethodSelect.selectedIndex = this.cfg.filterMethod;
 
     if (init) {

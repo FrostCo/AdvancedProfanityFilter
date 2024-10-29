@@ -28,8 +28,6 @@ export default class Config {
     return Object.assign({}, this._configDefaults, ...defaults);
   }
 
-  static readonly _allWordlists = ['All words'];
-
   static readonly _configDefaults = {
     censorCharacter: '*',
     censorFixedLength: 0,

@@ -15,11 +15,11 @@ export default class OptionAuth {
     const passwordInput = document.getElementById('passwordInput') as HTMLInputElement;
     if (passwordInput.value == this.password) {
       this.authenticated = true;
-      this.Class.OptionPage.closeModal('passwordModal');
-      this.Class.OptionPage.show(document.getElementById('main'));
-      this.Class.OptionPage.hideInputError(passwordInput);
+      this.optionPage.closeModal('passwordModal');
+      this.optionPage.show(document.getElementById('main'));
+      this.optionPage.hideInputError(passwordInput);
     } else {
-      this.Class.OptionPage.showInputError(passwordInput);
+      this.optionPage.showInputError(passwordInput);
     }
   }
 
@@ -38,7 +38,7 @@ export default class OptionAuth {
       this.setPasswordButton();
       if (this.optionPage.cfg.contextMenu) this.optionPage.sendUpdateContextMenuMessage();
     } catch (err) {
-      this.Class.OptionPage.handleError('Failed to update password.', err);
+      this.optionPage.handleError(this.optionPage.translation.t('options:configsPage.messages.updatePasswordFailed'), err);
     }
   }
 
@@ -47,18 +47,18 @@ export default class OptionAuth {
     const passwordBtn = document.getElementById('setPasswordBtn') as HTMLButtonElement;
 
     if (this.optionPage.cfg.password) { // Password already set
-      this.Class.OptionPage.enableBtn(passwordBtn);
+      this.optionPage.enableBtn(passwordBtn);
       if (passwordText.value) { // Password field filled
-        passwordBtn.innerText = 'SET';
+        passwordBtn.innerText = this.optionPage.translation.t('options:configsPage.buttons.setPassword').toUpperCase();
       } else { // Empty password field
-        passwordBtn.innerText = 'REMOVE';
+        passwordBtn.innerText = this.optionPage.translation.t('options:configsPage.buttons.removePassword').toUpperCase();
       }
     } else { // Password not already set
-      passwordBtn.innerText = 'SET';
+      passwordBtn.innerText = this.optionPage.translation.t('options:configsPage.buttons.setPassword').toUpperCase();
       if (passwordText.value) { // Password field filled
-        this.Class.OptionPage.enableBtn(passwordBtn);
+        this.optionPage.enableBtn(passwordBtn);
       } else { // Empty password field
-        this.Class.OptionPage.disableBtn(passwordBtn);
+        this.optionPage.disableBtn(passwordBtn);
       }
     }
   }
