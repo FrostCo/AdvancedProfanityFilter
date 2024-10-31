@@ -69,9 +69,6 @@ export default class OptionPage {
     this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
     this.setHelpVersion();
     this.filter = new this.Class.Filter;
-    this.translation = new this.Class.Translation(['common', 'options']);
-    this.t = this.translation.t;
-    this.applyTranslation();
   }
 
   applyDarkTheme(allElements = true) {
@@ -952,6 +949,8 @@ export default class OptionPage {
 
   async init(refreshTheme = false) {
     await this.initializeCfg();
+    this.initializeTranslations();
+    this.applyTranslation();
     logger.setLevel(this.cfg.loggingLevel);
     this.applyTheme(refreshTheme);
     if (!this.auth) this.auth = new this.Class.OptionAuth(this, this.cfg.password);
@@ -979,6 +978,11 @@ export default class OptionPage {
 
   async initializeCfg() {
     this.cfg = await this.Class.Config.load();
+  }
+
+  initializeTranslations() {
+    this.translation = new this.Class.Translation(['common', 'options'], this.cfg.language);
+    this.t = this.translation.t;
   }
 
   isStorageError(error: Error): boolean {

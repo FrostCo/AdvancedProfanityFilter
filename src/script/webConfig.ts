@@ -352,7 +352,7 @@ export default class WebConfig extends Config {
   localizeDefaults() {
     if (!this._defaultsLoaded || !this._defaultsLoaded.length) return;
 
-    const translation = new Translation('common');
+    const translation = new Translation('common', this.language);
 
     if (this._defaultsLoaded.includes('defaultSubstitution')) {
       const options = { defaultValue: this.Class._defaults.defaultSubstitution };

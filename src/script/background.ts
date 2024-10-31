@@ -45,13 +45,14 @@ export default class Background {
 
   static async contextMenuSetup() {
     await this.contextMenuRemoveAll();
-    const translation = new this.Translation(['common', 'background']);
 
     const requiredConfig = {
       contextMenu: this.Config._defaults.contextMenu,
+      language: this.Config._defaults.language,
       password: this.Config._defaults.password,
     };
     const config = await this.Config.getSyncStorage(requiredConfig) as Partial<WebConfig>;
+    const translation = new this.Translation(['common', 'background'], config.language);
 
     if (config.contextMenu) {
       if (!config.password) {

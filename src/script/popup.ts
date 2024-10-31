@@ -36,6 +36,7 @@ export default class Popup {
     'domains',
     'enabledDomainsOnly',
     'filterMethod',
+    'language',
     'loggingLevel',
     'password',
     'wordlistId',
@@ -281,10 +282,10 @@ export default class Popup {
   }
 
   async initializePopup() {
-    this.translation = new this.Class.Translation(['common', 'popup']);
-    this.applyTranslation();
     await this.Class.load(this);
     this.applyTheme();
+    this.translation = new this.Class.Translation(['common', 'popup'], this.cfg.language);
+    this.applyTranslation();
     this.populateOptions(true);
   }
 
