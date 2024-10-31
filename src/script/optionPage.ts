@@ -69,7 +69,7 @@ export default class OptionPage {
     this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
     this.setHelpVersion();
     this.filter = new this.Class.Filter;
-    this.translation = new this.Class.Translation;
+    this.translation = new this.Class.Translation(['common', 'options']);
     this.t = this.translation.t;
     this.applyTranslation();
   }
