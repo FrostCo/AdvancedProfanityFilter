@@ -74,6 +74,8 @@ For all scripts, please see `package.json`.
   - npm run prebuild
     - npm run clean:build
       - node bin/clean.js --build
+    - npm run build:translations
+      - node bin/buildTranslations.js
     - node bin/prebuild.js --$npm_config_target
       - NOTE: $npm_config_target will be blank (`--`)
   - webpack --config bin/webpack.dev.js
@@ -89,6 +91,8 @@ For all scripts, please see `package.json`.
     - npm run prebuild
       - npm run clean:build
         - node bin/clean.js --build
+      - npm run build:translations
+        - node bin/buildTranslations.js
       - node bin/prebuild.js --$npm_config_target
     - npm run build
       - webpack --config bin/webpack.dev.js
@@ -104,6 +108,8 @@ For all scripts, please see `package.json`.
     - npm run prerelease:build
       - npm run clean:build
         - node bin/clean.js --build
+      - npm run build:translations
+        - node bin/buildTranslations.js
       - node bin/prebuild.js --release --$npm_config_target
     - webpack --config bin/webpack.prod.js
     - npm run build:static
@@ -120,6 +126,8 @@ For all scripts, please see `package.json`.
     - npm run prerelease:build
       - npm run clean:build
         - node bin/clean.js --build
+      - npm run build:translations
+        - node bin/buildTranslations.js
       - node bin/prebuild.js --release --$npm_config_target
     - webpack --config bin/webpack.prod.js
     - npm run build:static
@@ -128,3 +136,18 @@ For all scripts, please see `package.json`.
       - node bin/postbuild.js
       - npm run package
   - npx addons-linter ./dist
+
+## Localization
+
+Adding support for a new language can be done by creating a new locale folder (`locales/{lang}`) with a file for each namespace. To update an existing translation, modify the existing file in the same location.
+
+Translations will automatically be compiled at build time (part of the `prebuild` script), but can be run manually as well with `npm run build:translations`. The compiled translations are stored in `src/script/translations.js`.
+
+To use the translations, use the `Translation` class (`src/script/translation.ts`). When creating a new instance, pass in the desired namespace(s) (you should almost always include the `'common'` namespace). Once you have the translation instance you can simply call `translation.t()` with the desired key, such as `common:app.name`.
+
+### Namespaces
+
+- **Background**: Tranlations for context menu entries and the update notification
+- **Common**: Common translations shared across the app
+- **Options**: Translations for the extension's Option page
+- **Popup**: Translations for the extension's Popup page
