@@ -18,6 +18,7 @@ export default class WebConfig extends Config {
   domains: { [site: string]: DomainCfg };
   enabledDomainsOnly: boolean;
   enabledFramesOnly: boolean;
+  language: string;
   password: string;
   showUpdateNotification: boolean;
   syncLargeKeys: boolean;
@@ -35,6 +36,7 @@ export default class WebConfig extends Config {
     domains: {},
     enabledDomainsOnly: false,
     enabledFramesOnly: false,
+    language: 'en',
     password: null,
     showUpdateNotification: false,
     syncLargeKeys: true,
@@ -350,7 +352,7 @@ export default class WebConfig extends Config {
   localizeDefaults() {
     if (!this._defaultsLoaded || !this._defaultsLoaded.length) return;
 
-    const translation = new Translation('common');
+    const translation = new Translation('common', this.language);
 
     if (this._defaultsLoaded.includes('defaultSubstitution')) {
       const options = { defaultValue: this.Class._defaults.defaultSubstitution };

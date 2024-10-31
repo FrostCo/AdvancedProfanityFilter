@@ -241,7 +241,7 @@
       "censorPreserveLast": "Preserve the last letter",
       "defaultSubstitution": "Default Substitution",
       "defaultWordMatchMethod": "$t(options:headers.matchMethod)",
-      "defaultWordMatchRepeated": "$t(common:labels.matchRepeatedCharacters)",
+      "defaultWordMatchRepeated": "$t(options:labels.matchRepeatedCharacters)",
       "defaultWordMatchSeparators": "Match separator characters",
       "showContextMenu": "Show context menu",
       "showCounter": "Show number of filtered words",
@@ -318,7 +318,7 @@
     },
     "tableHeaders": {
       "summaryTotal": "Total",
-      "summaryWords": "$t(common:names.word)"
+      "summaryWord": "$t(common:names.word)"
     },
     "validations": {
       "lessUsedWordsInvalid": "Enter a positive whole number."
