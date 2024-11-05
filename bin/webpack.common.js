@@ -1,7 +1,6 @@
 import fs from 'fs-extra';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
-import translations from '../src/script/translations.js';
 
 const BUILD = fs.readJsonSync('.build.json');
 
@@ -36,7 +35,6 @@ export default {
   },
   plugins: [
     new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) }),
-    new webpack.DefinePlugin({ __TRANSLATIONS__: JSON.stringify(translations) }),
   ],
   resolve: {
     extensions: ['.js', '.ts'],

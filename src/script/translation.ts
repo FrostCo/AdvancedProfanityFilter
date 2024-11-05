@@ -1,14 +1,9 @@
 import i18next, { i18n } from 'i18next';
+import translations from '@APF/translations.js';
 import { stringArray } from '@APF/lib/helper';
-
-// __TRANSLATIONS__ is injected by webpack from ROOT/src/script/
-/* eslint-disable-next-line @typescript-eslint/naming-convention */
-declare const __TRANSLATIONS__: any;
 
 export default class Translation {
   i18next: i18n;
-
-  static readonly translations = typeof __TRANSLATIONS__ == 'undefined' ? { common: {} }  : __TRANSLATIONS__;
 
   //#region Class reference helpers
   // Can be overridden in children classes
@@ -22,7 +17,7 @@ export default class Translation {
       lng: language,
       fallbackLng: 'en',
       ns: namespaces,
-      resources: this.Class.translations,
+      resources: translations
     });
   }
 
