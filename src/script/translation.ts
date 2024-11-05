@@ -5,6 +5,11 @@ import { stringArray } from '@APF/lib/helper';
 export default class Translation {
   i18next: i18n;
 
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  get Class() { return (this.constructor as typeof Translation); }
+  //#endregion
+
   constructor(namespaces: string|string[] = [], language: string = 'en') {
     namespaces = stringArray(namespaces);
     this.i18next = i18next;
