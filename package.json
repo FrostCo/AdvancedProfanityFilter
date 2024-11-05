@@ -28,7 +28,7 @@
     "build:firefox": "npm run build:firefox:mv2",
     "build:libs": "tsc -p ./src/script/lib/tsconfig.json",
     "build:static": "node bin/copyStatic.js",
-    "build:translations": "node bin/buildTranslations.js",
+    "build:translations": "node bin/buildTranslation.js",
     "build": "webpack --config bin/webpack.dev.js && npm run build:static",
     "clean:all": "node bin/clean.js --all",
     "clean:build": "node bin/clean.js --build",
