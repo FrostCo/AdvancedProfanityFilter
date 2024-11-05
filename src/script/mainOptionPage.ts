@@ -5,7 +5,7 @@ const option = new OptionPage;
 ////
 // Events
 // Add event listeners to DOM
-window.addEventListener('load', (evt) => { option.init(); });
+window.addEventListener('DOMContentLoaded', (evt) => { option.init(); });
 document.querySelectorAll('#menu a').forEach((el) => { el.addEventListener('click', (evt) => { option.switchPage(evt.target as HTMLAnchorElement); }); });
 // Modals
 document.getElementById('submitPassword').addEventListener('click', (evt) => { option.auth.authenticate(evt.target as HTMLButtonElement); });
