@@ -75,7 +75,7 @@ For all scripts, please see `package.json`.
     - npm run clean:build
       - node bin/clean.js --build
     - npm run build:translations
-      - node bin/buildTranslations.js
+      - node bin/buildTranslation.js
     - node bin/prebuild.js --$npm_config_target
       - NOTE: $npm_config_target will be blank (`--`)
   - webpack --config bin/webpack.dev.js
@@ -92,7 +92,7 @@ For all scripts, please see `package.json`.
       - npm run clean:build
         - node bin/clean.js --build
       - npm run build:translations
-        - node bin/buildTranslations.js
+        - node bin/buildTranslation.js
       - node bin/prebuild.js --$npm_config_target
     - npm run build
       - webpack --config bin/webpack.dev.js
@@ -109,7 +109,7 @@ For all scripts, please see `package.json`.
       - npm run clean:build
         - node bin/clean.js --build
       - npm run build:translations
-        - node bin/buildTranslations.js
+        - node bin/buildTranslation.js
       - node bin/prebuild.js --release --$npm_config_target
     - webpack --config bin/webpack.prod.js
     - npm run build:static
@@ -127,7 +127,7 @@ For all scripts, please see `package.json`.
       - npm run clean:build
         - node bin/clean.js --build
       - npm run build:translations
-        - node bin/buildTranslations.js
+        - node bin/buildTranslation.js
       - node bin/prebuild.js --release --$npm_config_target
     - webpack --config bin/webpack.prod.js
     - npm run build:static
