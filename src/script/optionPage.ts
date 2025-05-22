@@ -528,7 +528,9 @@ export default class OptionPage {
   }
 
   closeModal(id: string) {
-    this.hide(document.getElementById(id));
+    const modal = document.getElementById(id);
+    modal.classList.remove('w3-show');
+    this.hide(modal);
   }
 
   configInlineToggle() {
@@ -999,7 +1001,9 @@ export default class OptionPage {
   }
 
   openModal(id: string) {
-    this.show(document.getElementById(id));
+    const modal = document.getElementById(id);
+    modal.classList.add('w3-show');
+    this.show(modal);
   }
 
   populateBookmarkletPage() {
