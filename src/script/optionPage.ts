@@ -842,7 +842,6 @@ export default class OptionPage {
   }
 
   hide(element: HTMLElement) {
-    element.classList.remove('w3-show');
     element.classList.add('w3-hide');
   }
 
@@ -1837,7 +1836,6 @@ export default class OptionPage {
 
   show(element: HTMLElement) {
     element.classList.remove('w3-hide');
-    element.classList.add('w3-show');
   }
 
   showBulkWordEditor() {
