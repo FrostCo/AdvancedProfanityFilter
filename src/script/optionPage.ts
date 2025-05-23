@@ -1276,7 +1276,7 @@ export default class OptionPage {
     const wordCell = row.insertCell(0);
     wordCell.classList.add('w3-tooltip');
     const tooltipSpan = document.createElement('span');
-    tooltipSpan.classList.add('statsTooltip', 'w3-tag', 'w3-text');
+    tooltipSpan.classList.add('stats-tooltip', 'w3-tag', 'w3-text');
     tooltipSpan.textContent = word;
     const wordSpan = document.createElement('span');
     wordSpan.textContent = this.filter.replaceText(word, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
