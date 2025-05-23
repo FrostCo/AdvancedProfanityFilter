@@ -198,7 +198,7 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   width: 98%;
 }
 
-#bulkWordEditorModal div.tableContainer {
+#bulkWordEditorModal div.table-container {
   overflow: auto;
   height: 600px;
 }
