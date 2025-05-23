@@ -252,7 +252,7 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   text-align: right;
 }
 
-.inline {
+.inline-block {
   display: inline-block;
 }
 
