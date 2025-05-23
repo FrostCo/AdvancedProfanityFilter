@@ -4,6 +4,7 @@
     "shortName": "APF"
   },
   "buttons": {
+    "add": "Add",
     "backup": "Backup",
     "cancel": "Cancel",
     "export": "Export",

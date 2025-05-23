@@ -178,6 +178,7 @@
   },
   "listsPage": {
     "buttons": {
+      "addWordlist": "$t(common:buttons.add)",
       "removeWordFromList": "$t(common:buttons.remove)",
       "renameWordlist": "$t(common:buttons.rename)",
       "saveWordToList": "$t(common:buttons.save)"

@@ -71,6 +71,30 @@ export default class OptionPage {
     this.filter = new this.Class.Filter;
   }
 
+  async addWordlist() {
+    const wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
+    const name = wordlistText.value.trim();
+
+    if (wordlistText.checkValidity()) {
+      // Make sure there are no duplicates
+      if (this.cfg.wordlists.includes(name)) {
+        this.showInputError(wordlistText, this.t('options:listsPage.validations.wordlistNameNotUnique'));
+        return false;
+      }
+
+      this.cfg.wordlists.push(name);
+      try {
+        await this.cfg.save('wordlists');
+        this.populateWordlists();
+        this.populateWordPage();
+      } catch (err) {
+        this.handleError(this.t('options:listsPage.messages.addWordlistFailed'), err);
+      }
+    } else {
+      this.showInputError(wordlistText, this.t('options:listsPage.validations.wordlistNameInvalid'));
+    }
+  }
+
   applyDarkTheme(allElements = true) {
     document.documentElement.style.setProperty('color-scheme', 'dark');
     const statsWordTable = document.getElementById('statsWordTable') as HTMLTableElement;
@@ -212,6 +236,7 @@ export default class OptionPage {
     document.getElementById('allowlistSensitiveNote').textContent = this.t('options:listsPage.notes.caseSensitive');
     document.getElementById('defaultTextWordlistHeader').textContent = this.t('options:listsPage.headers.defaultTextWordlist');
     document.getElementById('listWordPhraseHeader').textContent = this.t('options:listsPage.headers.wordPhrase');
+    document.getElementById('wordlistAdd').textContent = this.t('options:listsPage.buttons.addWordlist').toUpperCase();
     document.getElementById('wordlistNameHeader').textContent = this.t('options:listsPage.headers.wordlistName');
     document.getElementById('wordlistRename').textContent = this.t('options:listsPage.buttons.renameWordlist').toUpperCase();
     document.getElementById('wordlistsHeader').textContent = this.t('options:listsPage.headers.wordlists');

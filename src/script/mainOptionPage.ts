@@ -49,6 +49,7 @@ document.getElementById('allowlistSelect').addEventListener('change', (evt) => {
 document.getElementById('allowlistText').addEventListener('input', (evt) => { option.hideInputError(evt.target as HTMLInputElement); });
 document.getElementById('allowlistSave').addEventListener('click', (evt) => { option.saveAllowlist(); });
 document.getElementById('allowlistRemove').addEventListener('click', (evt) => { option.removeAllowlist(); });
+document.getElementById('wordlistAdd').addEventListener('click', (evt) => { option.addWordlist(); });
 document.getElementById('wordlistsEnabled').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('wordlistRename').addEventListener('click', (evt) => { option.renameWordlist(); });
 document.getElementById('wordlistSelect').addEventListener('change', (evt) => { option.populateWordlist(); });
