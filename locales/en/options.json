@@ -180,6 +180,7 @@
     "buttons": {
       "addWordlist": "$t(common:buttons.add)",
       "removeWordFromList": "$t(common:buttons.remove)",
+      "removeWordlist": "$t(common:buttons.remove)",
       "renameWordlist": "$t(common:buttons.rename)",
       "saveWordToList": "$t(common:buttons.save)"
     },
@@ -195,6 +196,7 @@
       "caseSensitive": "$t(options:labels.caseSensitive)"
     },
     "messages": {
+      "confirmRemoveWordlist": "Are you sure you want to remove this wordlist?",
       "removeWordFromAllowlistFailed": "Failed to remove '{{word}}' from allowlist.",
       "renameWordlistFailed": "Failed to save wordlist name.",
       "saveAllowlistFailed": "Failed to update allowlist.",
@@ -203,7 +205,8 @@
     "notes": {
       "allowlistCaseSensitive": "(* $t(options:labels.caseSensitive))",
       "caseInsensitive": "(doghouse: Don't filter 'DogHouse')",
-      "caseSensitive": "(Doghouse: Don't filter 'Doghouse')"
+      "caseSensitive": "(Doghouse: Don't filter 'Doghouse')",
+      "confirmRemoveWordlist": "Removes the wordlist from all assigned words too."
     },
     "options": {
       "addOrUpdateExistingWord": "$t(options:options.addOrUpdateExisting)",

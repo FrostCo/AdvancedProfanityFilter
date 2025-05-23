@@ -238,6 +238,7 @@ export default class OptionPage {
     document.getElementById('listWordPhraseHeader').textContent = this.t('options:listsPage.headers.wordPhrase');
     document.getElementById('wordlistAdd').textContent = this.t('options:listsPage.buttons.addWordlist').toUpperCase();
     document.getElementById('wordlistNameHeader').textContent = this.t('options:listsPage.headers.wordlistName');
+    document.getElementById('wordlistRemove').textContent = this.t('options:listsPage.buttons.removeWordlist').toUpperCase();
     document.getElementById('wordlistRename').textContent = this.t('options:listsPage.buttons.renameWordlist').toUpperCase();
     document.getElementById('wordlistsHeader').textContent = this.t('options:listsPage.headers.wordlists');
     // Domains page
@@ -713,6 +714,15 @@ export default class OptionPage {
             `);
           }
         }
+        break;
+      case 'removeWordlist':
+        paragraph.textContent = this.t('options:listsPage.messages.confirmRemoveWordlist');
+        italics.textContent = this.t('options:listsPage.notes.confirmRemoveWordlist');
+        content.appendChild(paragraph);
+        content.appendChild(italics);
+        this.configureConfirmModal({ backup: true }, content);
+        this._confirmEventListeners.push(this.removeWordlist.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
         break;
       case 'statsImport':
         this.configureConfirmModal({ content: this.t('options:statsPage.messages.confirmImportStats') });
@@ -1550,6 +1560,40 @@ export default class OptionPage {
         this.showErrorModal([this.t('options:wordsPage.messages.removeFailed', { word: word }), `Error: ${err.message}`]);
       }
     }
+  }
+
+  async removeWordlist() {
+    const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    const wordIndex = wordlistSelect.selectedIndex; // Placeholder adds 1, which helps preserve index 0 for "All Words"
+    const cfgIndex = wordIndex - 1;
+    const wordlist = this.cfg.wordlists[cfgIndex];
+    if (wordlist) {
+      // Remove wordlist name
+      this.cfg.wordlists.splice(cfgIndex, 1);
+      try {
+        // Remove wordlist from all words
+        const wordKeys = Object.keys(this.cfg.words);
+        for (const wordKey of wordKeys) {
+          const lists = this.cfg.words[wordKey].lists;
+          for (let i = lists.length - 1; i >= 0; i--) {
+            if (lists[i] === wordIndex) {
+              lists.splice(i, 1); // Remove removed wordlist
+            } else if (lists[i] > wordIndex) {
+              lists[i] -= 1; // Decrement wordlists after removed wordlist
+            }
+          }
+        }
+        await this.cfg.save(['words', 'wordlists']);
+        this.populateWordlists();
+        this.populateWordPage();
+      } catch (err) {
+        logger.warn(this.t('options:listsPage.messages.removeWordlistFailed', { wordlist: wordlist }), err);
+        this.showErrorModal([this.t('options:listsPage.messages.removeWordlistFailed', { wordlist: wordlist }), `Error: ${err.message}`]);
+      }
+    }
+    const wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
+    wordlistText.value = '';
+    this.hideInputError(wordlistText);
   }
 
   async renameWordlist() {
