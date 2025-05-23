@@ -252,6 +252,14 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   text-align: right;
 }
 
+.margin-top-large {
+  margin-top: 16px;
+}
+
+.margin-top-small {
+  margin-top: 8px;
+}
+
 .notes {
   margin-left: 16px;
   padding-top: 5px;
