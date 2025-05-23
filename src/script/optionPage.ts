@@ -1368,7 +1368,7 @@ export default class OptionPage {
     if (this.cfg.wordlistsEnabled) {
       const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
       const textWordlistSelect = document.getElementById('textWordlistSelect') as HTMLSelectElement;
-      dynamicList(this.cfg.wordlists, wordlistSelect);
+      dynamicList(this.cfg.wordlists, wordlistSelect, false, this.t('options:listsPage.options.addOrUpdateExistingWordlist'));
       dynamicList([this.t('options:listsPage.options.allWordsWordlist')].concat(this.cfg.wordlists), textWordlistSelect);
       wordlistSelect.selectedIndex = selectedIndex;
       textWordlistSelect.selectedIndex = this.cfg.wordlistId;

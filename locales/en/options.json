@@ -206,6 +206,7 @@
     },
     "options": {
       "addOrUpdateExistingWord": "$t(options:options.addOrUpdateExisting)",
+      "addOrUpdateExistingWordlist": "$t(options:options.addOrUpdateExisting)",
       "allWordsWordlist": "$t(common:wordlists.allWords)"
     },
     "validations": {
