@@ -1846,12 +1846,28 @@ export default class OptionPage {
     const modalId = 'bulkWordEditorModal';
     const tableContainer = document.querySelector(`#${modalId} div.tableContainer`) as HTMLDivElement;
     const table = tableContainer.querySelector('table') as HTMLTableElement;
+    const tHead = table.querySelector('thead') as HTMLTableSectionElement;
+    const tHeadRow = tHead.querySelector('tr') as HTMLTableRowElement;
     const tBody = table.querySelector('tbody') as HTMLTableSectionElement;
     removeChildren(tBody);
+    tHeadRow.querySelectorAll('.dynamicHeader').forEach((th) => th.remove());
 
-    // Add wordlist names to header
+    // Add wordlists to header
     this.cfg.wordlists.forEach((wordlist, i) => {
-      document.getElementById(`bulkWordEditorWordlist${i + 1}`).textContent = wordlist;
+      const th = document.createElement('th');
+      th.classList.add('dynamicHeader');
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      input.classList.add('wordlistHeader');
+      input.dataset.col = (i + 1).toString();
+      input.type = 'checkbox';
+      const span = document.createElement('span');
+      span.id = `bulkWordEditorWordlist${i + 1}`;
+      span.textContent = wordlist;
+      label.appendChild(input);
+      label.appendChild(span);
+      th.appendChild(label);
+      tHeadRow.appendChild(th);
     });
 
     // Add current words to the table
