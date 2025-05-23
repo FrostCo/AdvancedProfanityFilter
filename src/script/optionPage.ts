@@ -422,16 +422,18 @@ export default class OptionPage {
     cellSeparators.appendChild(separatorsInput);
 
     const existingCellCount = row.cells.length;
-    this.cfg.wordlists.forEach((wordlist, index) => {
-      const cell = row.insertCell(index + existingCellCount);
-      const wordlistInput = document.createElement('input');
-      wordlistInput.type = 'checkbox';
-      wordlistInput.name = 'wordlists';
-      wordlistInput.classList.add('wordlistData');
-      wordlistInput.dataset.col = (index + 1).toString();
-      wordlistInput.checked = data.lists.includes(index + 1);
-      cell.appendChild(wordlistInput);
-    });
+    if (this.cfg.wordlistsEnabled) {
+      this.cfg.wordlists.forEach((wordlist, index) => {
+        const cell = row.insertCell(index + existingCellCount);
+        const wordlistInput = document.createElement('input');
+        wordlistInput.type = 'checkbox';
+        wordlistInput.name = 'wordlists';
+        wordlistInput.classList.add('wordlistData');
+        wordlistInput.dataset.col = (index + 1).toString();
+        wordlistInput.checked = data.lists.includes(index + 1);
+        cell.appendChild(wordlistInput);
+      });
+    }
 
     // Scroll to the bottom if this is a new word row
     if (word === '') {
@@ -1948,22 +1950,24 @@ export default class OptionPage {
     tHeadRow.querySelectorAll('.dynamicHeader').forEach((th) => th.remove());
 
     // Add wordlists to header
-    this.cfg.wordlists.forEach((wordlist, i) => {
-      const th = document.createElement('th');
-      th.classList.add('dynamicHeader');
-      const label = document.createElement('label');
-      const input = document.createElement('input');
-      input.classList.add('wordlistHeader');
-      input.dataset.col = (i + 1).toString();
-      input.type = 'checkbox';
-      const span = document.createElement('span');
-      span.id = `bulkWordEditorWordlist${i + 1}`;
-      span.textContent = wordlist;
-      label.appendChild(input);
-      label.appendChild(span);
-      th.appendChild(label);
-      tHeadRow.appendChild(th);
-    });
+    if (this.cfg.wordlistsEnabled) {
+      this.cfg.wordlists.forEach((wordlist, i) => {
+        const th = document.createElement('th');
+        th.classList.add('dynamicHeader');
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+        input.classList.add('wordlistHeader');
+        input.dataset.col = (i + 1).toString();
+        input.type = 'checkbox';
+        const span = document.createElement('span');
+        span.id = `bulkWordEditorWordlist${i + 1}`;
+        span.textContent = wordlist;
+        label.appendChild(input);
+        label.appendChild(span);
+        th.appendChild(label);
+        tHeadRow.appendChild(th);
+      });
+    }
 
     // Add current words to the table
     const wordKeys = Object.keys(this.cfg.words);
