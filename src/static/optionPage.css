@@ -245,7 +245,7 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   cursor: not-allowed !important;
 }
 
-.extraSmallInput {
+.extra-small-input {
   margin: 2px;
   padding: 2px;
   width: 70px;
