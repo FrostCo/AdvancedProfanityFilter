@@ -47,7 +47,7 @@ export default class Config {
     substitutionMark: false,
     wordAllowlist: [],
     wordlistId: 0,
-    wordlists: ['Wordlist 1', 'Wordlist 2', 'Wordlist 3', 'Wordlist 4', 'Wordlist 5', 'Wordlist 6'],
+    wordlists: [],
     wordlistsEnabled: true,
     words: undefined,
     wordSubSeparator: ';;',
