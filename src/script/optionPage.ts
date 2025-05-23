@@ -1941,7 +1941,7 @@ export default class OptionPage {
 
   showBulkWordEditor() {
     const modalId = 'bulkWordEditorModal';
-    const tableContainer = document.querySelector(`#${modalId} div.tableContainer`) as HTMLDivElement;
+    const tableContainer = document.querySelector(`#${modalId} div.table-container`) as HTMLDivElement;
     const table = tableContainer.querySelector('table') as HTMLTableElement;
     const tHead = table.querySelector('thead') as HTMLTableSectionElement;
     const tHeadRow = tHead.querySelector('tr') as HTMLTableRowElement;
