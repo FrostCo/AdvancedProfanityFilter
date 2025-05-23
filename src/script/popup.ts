@@ -98,7 +98,7 @@ export default class Popup {
     this.prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
     this.protected = false;
     this.summaries = {};
-    this.themeElements = [document.body, document.querySelector('#footer')];
+    this.themeElements = [document.body, document.getElementById('footer')];
   }
 
   applyDarkTheme() {
@@ -215,7 +215,7 @@ export default class Popup {
   }
 
   handleDisabledMessage() {
-    const element = document.querySelector('#disabledMessage') as HTMLElement;
+    const element = document.getElementById('disabledMessage') as HTMLElement;
     element.textContent = this.disabledReason;
     this.isDisabled ? this.Class.show(element) : this.Class.hide(element);
   }
