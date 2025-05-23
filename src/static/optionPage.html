@@ -151,7 +151,7 @@
     <div class="margin-top-small">
       <label>
         <span id="defaultSubstitutionName">Default Substitution</span>
-        <input id="defaultWordSubstitutionText" class="w3-input w3-border small" style="display:inline;">
+        <input id="defaultWordSubstitutionText" class="w3-input w3-border small inline">
       </label>
     </div>
   </div>
@@ -326,8 +326,8 @@
   </div>
 
   <div class="w3-half w3-right">
-    <label style="display: block;">
-      <h4 id="wordlistsHeader" class="section-header" style="display: inline-block; height: 30px;">Wordlists</h4>
+    <label>
+      <h4 id="wordlistsHeader" class="section-header" style="height: 30px;">Wordlists</h4>
       <input id="wordlistsEnabled" type="checkbox" class="w3-check">
     </label>
 
@@ -335,7 +335,7 @@
       <select id="wordlistSelect" class="w3-select w3-border small text-input"></select>
 
       <h4 id="wordlistNameHeader" class="section-header">Name</h4>
-      <input id="wordlistText" class="w3-input w3-border small" type="text" pattern="^\S.*" required style="display: inline; margin-right: 8px;">
+      <input id="wordlistText" class="w3-input w3-border small" type="text" pattern="^\S.*" required>
       <br />
       <button id="wordlistAdd" class="w3-btn w3-round-large w3-flat-peter-river">ADD</button>
       <button id="wordlistRename" class="w3-btn w3-round-large w3-flat-peter-river">RENAME</button>
@@ -377,7 +377,7 @@
 
   <div id="domainRightContainer" class="w3-half w3-right">
     <h4 id="domainsHeader" class="section-header">Domains</h4>
-    <select id="domainSelect" class="w3-select w3-border small text-input" style="display:block"></select>
+    <select id="domainSelect" class="w3-select w3-border small text-input"></select>
     <h4 id="domainHeader" class="section-header">Domain</h4>
     <input id="domainText" class="w3-input w3-border small" type="text" pattern="^([a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+|localhost)$"/>
     <span id="domainTextNote" class="notes">Example: 'google.com' or 'mail.google.com'</span>
@@ -478,7 +478,7 @@
 
   <div id="setPasswordContainer" style="width:500px;">
     <h4 id="configPasswordHeader" class="section-header">Password</h4>
-    <input id="setPassword" class="w3-input w3-border small" style="display:inline">
+    <input id="setPassword" class="w3-input w3-border small inline">
     <button id="setPasswordBtn" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">REMOVE</button>
   </div>
 </div>
@@ -529,7 +529,7 @@
 
   <label>
     <span id="statsRemoveLessUsedWordsExplanation">Remove words filtered fewer times than</span>
-    <input id="lessUsedWordsNumber" class="w3-input w3-border extra-small-input" style="display:inline;">
+    <input id="lessUsedWordsNumber" class="w3-input w3-border extra-small-input inline">
   </label>
   <button id="removeLessUsedWords" class="w3-btn w3-round-large w3-flat-pomegranate" pattern="">REMOVE WORDS</button>
 </div>
@@ -844,7 +844,7 @@
   <div class="w3-modal-content w3-card-4 w3-animate-opacity">
     <header class="w3-container w3-flat-peter-river"><h5 id="passwordModalHeader">Enter Password</h5></header>
     <div class="w3-container w3-padding w3-margin">
-      <input id="passwordInput" class="w3-input w3-border" style="display:inline" type="password">
+      <input id="passwordInput" class="w3-input w3-border" type="password">
       <button id="submitPassword" class="w3-btn w3-round-large w3-flat-peter-river w3-right margin-top-large">SUBMIT</button>
     </div>
   </div>

@@ -252,6 +252,10 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   text-align: right;
 }
 
+.inline {
+  display: inline-block;
+}
+
 .margin-top-large {
   margin-top: 16px;
 }
