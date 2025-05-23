@@ -161,6 +161,12 @@ div#wordsPage input#substitutionText {
   display: inline;
 }
 
+div#wordsPage div#wordlistSelections {
+  min-height: 120px;
+  max-height: 210px;
+  overflow-y: auto;
+}
+
 /* Bookmarklet */
 a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited {
   color: #fff;
