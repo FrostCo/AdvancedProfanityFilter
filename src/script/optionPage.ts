@@ -1390,9 +1390,23 @@ export default class OptionPage {
   }
 
   populateWordlist() {
+    const wordlistAdd = document.getElementById('wordlistAdd') as HTMLElement;
+    const wordlistRemove = document.getElementById('wordlistRemove') as HTMLElement;
+    const wordlistRename = document.getElementById('wordlistRename') as HTMLElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
-    wordlistText.value = wordlistSelect.value;
+    const wordlist = wordlistSelect.value;
+    wordlistText.value = wordlist;
+
+    if (wordlist === '') { // New wordlist
+      this.hide(wordlistRemove);
+      this.hide(wordlistRename);
+      this.show(wordlistAdd);
+    } else { // Existing wordlist
+      this.show(wordlistRemove);
+      this.show(wordlistRename);
+      this.hide(wordlistAdd);
+    }
   }
 
   populateWordlists(selectedIndex: number = 0) {

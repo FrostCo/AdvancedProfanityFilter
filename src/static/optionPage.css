@@ -167,6 +167,11 @@ div#wordsPage div#wordlistSelections {
   overflow-y: auto;
 }
 
+/* Lists */
+button#wordlistAdd, button#wordlistRename, button#wordlistRemove {
+  margin-top: 10px;
+}
+
 /* Bookmarklet */
 a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited {
   color: #fff;
