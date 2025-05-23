@@ -1614,7 +1614,7 @@ export default class OptionPage {
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
     const name = wordlistText.value.trim();
-    const index = wordlistSelect.selectedIndex;
+    const index = wordlistSelect.selectedIndex - 1; // -1 to ignore placeholder, since we don't store "All words" in config
 
     if (wordlistText.checkValidity()) {
       // Make sure there are no duplicates
