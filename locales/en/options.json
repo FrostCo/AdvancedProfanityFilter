@@ -400,7 +400,8 @@
       "matchRegex": "(Regular expression)",
       "matchRepeated": "(dog: dddoooggg)",
       "matchSeparators": "([-_ ] dog matches: D-o _g)",
-      "matchWhole": "(dog: *** in the ********)"
+      "matchWhole": "(dog: *** in the ********)",
+      "wordlistsGettingStarted": "Add a wordlist (Lists tab) to start using this feature"
     },
     "options": {
       "addOrUpdateExistingWord": "$t(options:options.addOrUpdateExisting)",

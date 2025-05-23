@@ -1479,6 +1479,18 @@ export default class OptionPage {
       selections.appendChild(div);
     });
 
+    // Add explanation for when there are no wordlists
+    if (!this.cfg.wordlists.length) {
+      const anchor = document.createElement('a');
+      anchor.href = '#/lists';
+      anchor.textContent = this.t('options:wordsPage.notes.wordlistsGettingStarted');
+      anchor.addEventListener('click', function(event) {
+        event.preventDefault();
+        document.getElementById('listsTab').click();
+      });
+      selections.appendChild(anchor);
+    }
+
     this.populateWord();
   }
 
