@@ -1626,7 +1626,7 @@ export default class OptionPage {
       this.cfg.wordlists[index] = name;
       try {
         await this.cfg.save('wordlists');
-        this.populateWordlists(index);
+        this.populateWordlists();
         this.populateWordPage();
       } catch (err) {
         this.handleError(this.t('options:listsPage.messages.renameWordlistFailed'), err);
