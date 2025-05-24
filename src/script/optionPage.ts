@@ -809,8 +809,7 @@ export default class OptionPage {
   }
 
   disableBtn(element: HTMLElement) {
-    element.classList.add('disabled');
-    element.classList.add('w3-flat-silver');
+    element.classList.add('disabled', 'w3-flat-silver');
   }
 
   domainCfgFromPage(): DomainCfg {
@@ -831,8 +830,7 @@ export default class OptionPage {
   }
 
   enableBtn(element: HTMLElement) {
-    element.classList.remove('disabled');
-    element.classList.remove('w3-flat-silver');
+    element.classList.remove('disabled', 'w3-flat-silver');
   }
 
   exportConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
