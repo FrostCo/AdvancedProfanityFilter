@@ -10,15 +10,16 @@ export function deepCloneJson(object) {
 
 /* istanbul ignore next */
 export function dynamicList(list: string[], select: HTMLSelectElement, upperCaseFirstChar: boolean = false, title?: string) {
-  removeChildren(select);
-  const array = title !== undefined ? [title].concat(list) : list;
+  const array = title !== undefined ? [title, ...list] : list;
 
-  array.forEach((item) => {
+  const options = array.map((item) => {
     const option = document.createElement('option');
     option.value = (title && item === title) ? '' : item;
     option.textContent = upperCaseFirstChar ? upperCaseFirst(item) : item;
-    select.appendChild(option);
+    return option;
   });
+
+  select.replaceChildren(...options);
 }
 
 export function exportToFile(dataStr, fileName = 'data.txt') {
