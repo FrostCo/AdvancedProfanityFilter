@@ -470,7 +470,7 @@ export default class OptionPage {
 
   bulkEditorRemoveAll() {
     const tBody = document.querySelector('#bulkWordEditorModal table tbody') as HTMLTableSectionElement;
-    removeChildren(tBody);
+    tBody.replaceChildren();
     this.bulkEditorAddRow();
   }
 
