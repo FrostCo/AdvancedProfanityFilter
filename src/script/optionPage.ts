@@ -1307,15 +1307,17 @@ export default class OptionPage {
     const sensitiveList = this.filter.cfg.wordAllowlist.map((item) => { return item + ' *'; });
     const list = [].concat(sensitiveList, this.filter.cfg.iWordAllowlist).sort();
     const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
-    removeChildren(allowlist);
+
     list.unshift(this.t('options:listsPage.options.addOrUpdateExistingWord'));
-    list.forEach((item) => {
+    const options = list.map((item, index) => {
       const optionElement = document.createElement('option');
-      optionElement.value = item === list[0] ? '' : item.replace(regExp, '');
+      optionElement.value = index === 0 ? '' : item.replace(regExp, '');
       optionElement.dataset.sensitive = regExp.test(item).toString();
       optionElement.textContent = item;
-      allowlist.appendChild(optionElement);
+      return optionElement;
     });
+
+    allowlist.replaceChildren(...options);
     this.populateAllowlistWord();
   }
 
