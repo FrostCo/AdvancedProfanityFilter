@@ -577,7 +577,7 @@ export default class OptionPage {
     const modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
     const modalContent = document.getElementById('confirmModalContent') as HTMLElement;
     const modalHeader = document.querySelector('#confirmModal header') as HTMLElement;
-    const backupButtonContainer = document.querySelector('#confirmModal span.confirmBackupButton') as HTMLElement;
+    const backupButtonContainer = document.getElementById('confirmBackupButton') as HTMLElement;
     const backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
     removeChildren(modalContent);
 
