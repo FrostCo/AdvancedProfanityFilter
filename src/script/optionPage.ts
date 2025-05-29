@@ -1946,7 +1946,7 @@ export default class OptionPage {
     const tHead = table.querySelector('thead') as HTMLTableSectionElement;
     const tHeadRow = tHead.querySelector('tr') as HTMLTableRowElement;
     const tBody = table.querySelector('tbody') as HTMLTableSectionElement;
-    removeChildren(tBody);
+    tBody.replaceChildren();
     tHeadRow.querySelectorAll('.dynamicHeader').forEach((th) => th.remove());
 
     // Add wordlists to header
