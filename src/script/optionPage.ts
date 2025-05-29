@@ -16,7 +16,6 @@ import {
   numberToBoolean,
   numberWithCommas,
   readFile,
-  removeChildren,
   removeFromArray,
   stringArray,
   timeForFileName,
