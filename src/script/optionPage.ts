@@ -1115,16 +1115,16 @@ export default class OptionPage {
     const domainFramesOnLabel = document.getElementById('domainFramesOnLabel') as HTMLLabelElement;
 
     this.hideInputError(domainText);
-    removeChildren(domainsSelect);
 
     const domains = this.Class.Domain.sortedKeys(this.cfg.domains);
     domains.unshift(this.t('options:domainsPage.options.addOrUpdateExistingDomain'));
-    domains.forEach((domain) => {
+    const options = domains.map((domain, index) => {
       const optionElement = document.createElement('option');
       optionElement.textContent = domain;
-      optionElement.value = domain === domains[0] ? '' : domain;
-      domainsSelect.appendChild(optionElement);
+      optionElement.value = index === 0 ? '' : domain;
+      return optionElement;
     });
+    domainsSelect.replaceChildren(...options);
     domainFilterAllFrames.checked = !this.cfg.enabledFramesOnly;
 
     if (mode === 'minimal') {
