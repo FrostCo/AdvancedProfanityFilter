@@ -579,7 +579,6 @@ export default class OptionPage {
     const modalHeader = document.querySelector('#confirmModal header') as HTMLElement;
     const backupButtonContainer = document.getElementById('confirmBackupButton') as HTMLElement;
     const backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
-    removeChildren(modalContent);
 
     const defaults = {
       backup: false,
@@ -595,7 +594,7 @@ export default class OptionPage {
     }
 
     modalTitle.textContent = settings.title;
-    modalContent.appendChild(contentElement);
+    modalContent.replaceChildren(contentElement);
     modalHeader.className = `w3-container ${settings.titleClass}`;
     if (settings.backup) {
       this.show(backupButtonContainer);
