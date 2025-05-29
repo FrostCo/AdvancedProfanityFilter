@@ -609,17 +609,18 @@ export default class OptionPage {
     const modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
     const modalContent = document.getElementById('statusModalContent') as HTMLElement;
     const modalHeader = document.querySelector('#statusModal header') as HTMLElement;
-    removeChildren(modalContent);
 
     modalHeader.className = `w3-container ${titleColor}`;
     modalTitle.textContent = title;
 
-    content = stringArray(content);
-    content.forEach((textPart) => {
-      const contentElement = document.createElement('p') as HTMLParagraphElement;
-      contentElement.textContent = textPart;
-      modalContent.appendChild(contentElement);
+    const contentArray = stringArray(content);
+    const contentElements = contentArray.map((textPart) => {
+      const p = document.createElement('p');
+      p.textContent = textPart;
+      return p;
     });
+
+    modalContent.replaceChildren(...contentElements);
   }
 
   async confirm(action: string) {
