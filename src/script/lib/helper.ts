@@ -185,14 +185,6 @@ export function readFile(file) {
   });
 }
 
-export function removeChildren(element) {
-  if (element.hasChildNodes) {
-    while (element.firstChild) {
-      element.firstChild.remove();
-    }
-  }
-}
-
 export function removeFromArray(array: string[], toRemove: string | string[]) {
   if (typeof toRemove === 'string') return array.filter((e) => e !== toRemove);
 
