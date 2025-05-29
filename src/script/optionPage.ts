@@ -1435,7 +1435,6 @@ export default class OptionPage {
     let wordlistFilter = this.filter;
     const selections = document.getElementById('wordlistSelections') as HTMLInputElement;
     const wordsSelect = document.getElementById('wordList') as HTMLSelectElement;
-    removeChildren(wordsSelect);
 
     // Workaround for remove filter method
     if (this.filter.cfg.filterWordList && this.filter.cfg.filterMethod === 2) {
@@ -1447,7 +1446,7 @@ export default class OptionPage {
 
     const words = Object.keys(this.cfg.words).sort();
     words.unshift(this.t('options:wordsPage.options.addOrUpdateExistingWord'));
-    words.forEach((word) => {
+    const options = words.map((word) => {
       let filteredWord = word;
       if (word != words[0] && wordlistFilter.cfg.filterWordList) {
         if (wordlistFilter.cfg.words[word].matchMethod === this.Class.Constants.MATCH_METHODS.REGEX) { // Regexp
@@ -1461,12 +1460,12 @@ export default class OptionPage {
       optionElement.value = word === words[0] ? '' : word;
       optionElement.dataset.filtered = filteredWord;
       optionElement.textContent = filteredWord;
-      wordsSelect.appendChild(optionElement);
+      return optionElement;
     });
+    wordsSelect.replaceChildren(...options);
 
     // Dynamically create the wordlist selection checkboxes
-    if (selections.hasChildNodes()) { removeChildren(selections); }
-    this.cfg.wordlists.forEach((list, index) => {
+    const wordlistOptions = this.cfg.wordlists.map((list, index) => {
       const div = document.createElement('div');
       const label = document.createElement('label');
       const input = document.createElement('input');
@@ -1478,8 +1477,9 @@ export default class OptionPage {
       label.appendChild(input);
       label.appendChild(name);
       div.appendChild(label);
-      selections.appendChild(div);
+      return div;
     });
+    selections.replaceChildren(...wordlistOptions);
 
     // Add explanation for when there are no wordlists
     if (!this.cfg.wordlists.length) {
