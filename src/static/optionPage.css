@@ -252,6 +252,10 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   text-align: right;
 }
 
+.hidden {
+  display: none;
+}
+
 .inline-block {
   display: inline-block;
 }
