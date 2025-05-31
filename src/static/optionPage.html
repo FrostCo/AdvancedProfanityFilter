@@ -452,13 +452,13 @@
     <input id="configInlineInput" type="checkbox" class="w3-check">
     <span id="configInlineEditorName">Inline editor</span>
   </label>
-  <div style="padding-top:16px;padding-bottom:16px;width:500px;">
+  <div id="configButtonContainer">
     <input type="file" id="importFileInput" class="hidden" accept=".json">
     <button id="configExport" class="w3-btn w3-round-large w3-flat-peter-river">EXPORT</button>
     <button id="configImport" class="w3-btn w3-round-large w3-flat-peter-river">IMPORT</button>
     <button id="configReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESTORE DEFAULTS</button>
   </div>
-  <textarea id="configText" class="w3-input w3-border w3-card w3-hide" style="width:500px;height:550px;font-size:11px;" spellcheck="false"></textarea>
+  <textarea id="configText" class="w3-input w3-border w3-card w3-hide" spellcheck="false"></textarea>
 
   <h4 id="configStorageHeader" class="section-header">Storage</h4>
   <label>
@@ -811,7 +811,7 @@
         </table>
       </div>
       <div class="w3-margin-top">
-        <textarea id="bulkAddWordsText" class="w3-left w3-margin-right" style="width:300px;height:50px;font-size:11px;" spellcheck="false" placeholder="Bulk add words (one word/phrase per line)"></textarea>
+        <textarea id="bulkAddWordsText" class="w3-left w3-margin-right" spellcheck="false" placeholder="Bulk add words (one word/phrase per line)"></textarea>
         <button id="bulkEditorAddWords" class="w3-btn w3-round-large w3-flat-peter-river">BULK ADD WORDS</button>
         <div class="w3-right">
           <button id="bulkEditorAddWord" class="w3-btn w3-round-large w3-flat-peter-river">ADD WORD</button>
