@@ -1302,7 +1302,7 @@ export default class OptionPage {
   }
 
   populateAllowlist() {
-    const regExp = RegExp(' [*]$');
+    const pattern = / \*$/;
     const sensitiveList = this.filter.cfg.wordAllowlist.map((item) => { return item + ' *'; });
     const list = [].concat(sensitiveList, this.filter.cfg.iWordAllowlist).sort();
     const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
@@ -1310,8 +1310,8 @@ export default class OptionPage {
     list.unshift(this.t('options:listsPage.options.addOrUpdateExistingWord'));
     const options = list.map((item, index) => {
       const optionElement = document.createElement('option');
-      optionElement.value = index === 0 ? '' : item.replace(regExp, '');
-      optionElement.dataset.sensitive = regExp.test(item).toString();
+      optionElement.value = index === 0 ? '' : item.replace(pattern, '');
+      optionElement.dataset.sensitive = pattern.test(item).toString();
       optionElement.textContent = item;
       return optionElement;
     });
