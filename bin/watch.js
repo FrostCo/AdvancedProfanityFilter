@@ -4,8 +4,8 @@ import path from 'path';
 import chokidar from 'chokidar';
 import { execSync } from 'child_process';
 
-const scriptRegExp = new RegExp('/script/');
-const staticRegExp = new RegExp('/static/');
+const scriptRegExp = /\/script\//;
+const staticRegExp = /\/static\//;
 
 function copyStatic(file) {
   const basename = path.basename(file);
