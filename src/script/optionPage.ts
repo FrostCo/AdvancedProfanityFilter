@@ -1733,7 +1733,7 @@ export default class OptionPage {
       return false;
     }
 
-    if (this.cfg[newListName].indexOf(newWord) > -1) {
+    if (this.cfg.wordAllowlist.includes(newWord) || this.cfg.iWordAllowlist.includes(newWord)) {
       this.showInputError(allowlistText, this.t('options:listsPage.validations.wordAlreadyAllowed'));
       return false;
     }
