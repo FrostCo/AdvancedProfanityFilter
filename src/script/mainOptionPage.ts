@@ -47,6 +47,9 @@ document.getElementById('bulkWordEditorButton').addEventListener('click', (evt) 
 // Lists
 document.getElementById('allowlistSelect').addEventListener('change', (evt) => { option.populateAllowlistWord(); });
 document.getElementById('allowlistText').addEventListener('input', (evt) => { option.hideInputError(evt.target as HTMLInputElement); });
+document.querySelectorAll('input[name="allowlistCase"]').forEach((el) => {
+  el.addEventListener('change', (evt) => { option.hideInputError(document.getElementById('allowlistText') as HTMLInputElement); });
+});
 document.getElementById('allowlistSave').addEventListener('click', (evt) => { option.saveAllowlist(); });
 document.getElementById('allowlistRemove').addEventListener('click', (evt) => { option.removeAllowlist(); });
 document.getElementById('wordlistAdd').addEventListener('click', (evt) => { option.addWordlist(); });
