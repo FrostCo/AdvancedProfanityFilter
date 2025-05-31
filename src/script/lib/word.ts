@@ -91,29 +91,29 @@ export default class Word {
             if (this.unicode) {
               // Work around for lack of word boundary support for unicode characters
               // /(^|[\s.,'"+!?|-]?)[\w-]*(word)[\w-]*([\s.,'"+!?|-]?|$)/giu
-              return new RegExp('(^|' + Word._unicodeWordBoundary + '?)([\\w-]*' +  this.processedPhrase() + '[\\w-]*)(' + Word._unicodeWordBoundary + '?|$)', this.regexOptions());
+              return new RegExp('(^|' + Word._unicodeWordBoundary + '?)([\\w-]*' +  this.processedPhrase() + '[\\w-]*)(' + Word._unicodeWordBoundary + '?|$)', this.regexOptions);
             } else if (this.hasEdgePunctuation()) { // Begin or end with punctuation (not \w))
-              return new RegExp('(^|\\s)([\\w-]*' +  this.processedPhrase() + '[\\w-]*)(\\s|$)', this.regexOptions());
+              return new RegExp('(^|\\s)([\\w-]*' +  this.processedPhrase() + '[\\w-]*)(\\s|$)', this.regexOptions);
             } else {
-              return new RegExp('\\s?\\b[\\w-]*' +  this.processedPhrase() + '[\\w-]*\\b\\s?', this.regexOptions());
+              return new RegExp('\\s?\\b[\\w-]*' +  this.processedPhrase() + '[\\w-]*\\b\\s?', this.regexOptions);
             }
           } else {
             // /word/gi
-            return new RegExp(this.processedPhrase(), this.regexOptions());
+            return new RegExp(this.processedPhrase(), this.regexOptions);
           }
         case Constants.MATCH_METHODS.WHOLE:
           // /\b[\w-]*word[\w-]*\b/gi
           if (this.unicode) {
             // Work around for lack of word boundary support for unicode characters
             // (^|[\s.,'"+!?|-]*)([\S]*куче[\S]*)([\s.,'"+!?|-]*|$)/giu
-            return new RegExp('(^|' + Word._unicodeWordBoundary + '*)([\\S]*' + this.processedPhrase() + '[\\S]*)(' + Word._unicodeWordBoundary + '*|$)', this.regexOptions());
+            return new RegExp('(^|' + Word._unicodeWordBoundary + '*)([\\S]*' + this.processedPhrase() + '[\\S]*)(' + Word._unicodeWordBoundary + '*|$)', this.regexOptions);
           } else if (this.hasEdgePunctuation()) { // Begin or end with punctuation (not \w))
-            return new RegExp('(^|\\s)([\\S]*' + this.processedPhrase() + '[\\S]*)(\\s|$)', this.regexOptions());
+            return new RegExp('(^|\\s)([\\S]*' + this.processedPhrase() + '[\\S]*)(\\s|$)', this.regexOptions);
           } else {
-            return new RegExp('\\b[\\w-]*' + this.processedPhrase() + '[\\w-]*\\b', this.regexOptions());
+            return new RegExp('\\b[\\w-]*' + this.processedPhrase() + '[\\w-]*\\b', this.regexOptions);
           }
         case Constants.MATCH_METHODS.REGEX:
-          return new RegExp(this.value, this.regexOptions());
+          return new RegExp(this.value, this.regexOptions);
         case Constants.MATCH_METHODS.EXACT:
         default:
           // If begins or ends with '-', mark unicode to work around word boundaries
@@ -129,23 +129,23 @@ export default class Word {
             if (this.unicode) {
               // Work around for lack of word boundary support for unicode characters
               // /(^|[\s.,'"+!?|-])(word)([\s.,'"+!?|-]+|$)/giu
-              return new RegExp('(^|' + Word._unicodeWordBoundary + ')(' + this.processedPhrase() + ')(' + Word._unicodeWordBoundary + '|$)', this.regexOptions());
+              return new RegExp('(^|' + Word._unicodeWordBoundary + ')(' + this.processedPhrase() + ')(' + Word._unicodeWordBoundary + '|$)', this.regexOptions);
             } else if (this.hasEdgePunctuation()) { // Begin or end with punctuation (not \w))
-              return new RegExp('(^|\\s)(' + this.processedPhrase() + ')(\\s|$)', this.regexOptions());
+              return new RegExp('(^|\\s)(' + this.processedPhrase() + ')(\\s|$)', this.regexOptions);
             } else {
-              return new RegExp('\\s?\\b' + this.processedPhrase() + '\\b\\s?', this.regexOptions());
+              return new RegExp('\\s?\\b' + this.processedPhrase() + '\\b\\s?', this.regexOptions);
             }
           } else {
             if (this.unicode) {
               // Work around for lack of word boundary support for unicode characters
               // /(^|[\s.,'"+!?|-]+)(word)([\s.,'"+!?|-]+|$)/giu
-              return new RegExp('(^|' + Word._unicodeWordBoundary + '+)(' + this.processedPhrase() + ')(' + Word._unicodeWordBoundary + '+|$)', this.regexOptions());
+              return new RegExp('(^|' + Word._unicodeWordBoundary + '+)(' + this.processedPhrase() + ')(' + Word._unicodeWordBoundary + '+|$)', this.regexOptions);
             } else if (this.hasEdgePunctuation()) {
               // Begin or end with punctuation (not \w))
-              return new RegExp('(^|\\s)(' + this.processedPhrase() + ')(\\s|$)', this.regexOptions());
+              return new RegExp('(^|\\s)(' + this.processedPhrase() + ')(\\s|$)', this.regexOptions);
             } else {
               // /\bword\b/gi
-              return new RegExp('\\b' + this.processedPhrase() + '\\b', this.regexOptions());
+              return new RegExp('\\b' + this.processedPhrase() + '\\b', this.regexOptions);
             }
           }
       }
@@ -189,7 +189,7 @@ export default class Word {
     return val;
   }
 
-  regexOptions() {
+  get regexOptions(): string {
     let options = 'gi';
     if (this.unicode) { options += 'u'; }
     return options;
