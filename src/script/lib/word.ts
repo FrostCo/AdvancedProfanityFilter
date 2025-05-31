@@ -21,7 +21,7 @@ export default class Word {
   private static readonly _unicodeWordBoundary = '[\\s.,\'"+!?|-]';
   static readonly emojiRegExp = /(?![*#0-9]+)[\p{Emoji}\p{Emoji_Modifier}\p{Emoji_Component}\p{Emoji_Modifier_Base}\p{Emoji_Presentation}]/gu;
   static readonly nonWordRegExp = /^\s*[^\w]+\s*$/g;
-  static readonly separatorsRegExp = '[-_ ]*';
+  static readonly separatorsPattern = '[-_ ]*';
   static readonly whitespaceRegExp = /^\s+$/;
 
   static allLowerCase(string: string): boolean {
@@ -183,7 +183,7 @@ export default class Word {
       // Word: /w[-_]*o[-_]*r[-_]*d*/g
       if (this.matchSeparators) {
         if (i != lastCharIndex) {
-          val += Word.separatorsRegExp;
+          val += Word.separatorsPattern;
         }
       }
     }
