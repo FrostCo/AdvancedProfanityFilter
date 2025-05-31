@@ -112,7 +112,7 @@ export default class WebConfig extends Config {
     if (Array.isArray(splitKeys)) {
       const maxKey = splitKeys.sort()[splitKeys.length - 1];
       if (maxKey) {
-        const pattern = new RegExp('\\d+$');
+        const pattern = /\d+$/;
         const result = maxKey.match(pattern);
         if (result) {
           return parseInt(result[0]);

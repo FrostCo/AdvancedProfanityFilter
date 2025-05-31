@@ -20,7 +20,7 @@ export default class Word {
   private static readonly _unicodeRegExp = /[^\u0000-\u00ff]/;
   private static readonly _unicodeWordBoundary = '[\\s.,\'"+!?|-]';
   static readonly emojiRegExp = /(?![*#0-9]+)[\p{Emoji}\p{Emoji_Modifier}\p{Emoji_Component}\p{Emoji_Modifier_Base}\p{Emoji_Presentation}]/gu;
-  static readonly nonWordRegExp = new RegExp('^\\s*[^\\w]+\\s*$', 'g');
+  static readonly nonWordRegExp = /^\s*[^\w]+\s*$/g;
   static readonly separatorsRegExp = '[-_ ]*';
   static readonly whitespaceRegExp = /^\s+$/;
 
