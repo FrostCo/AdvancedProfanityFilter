@@ -50,7 +50,7 @@
 
 <div id="main" class="w3-hide">
 <div id="settingsPage" class="w3-container">
-  <h4 id="filterMethodHeader" class="sectionHeader">Filter Method</h4>
+  <h4 id="filterMethodHeader" class="section-header">Filter Method</h4>
 
   <div id="filterMethod">
     <label>
@@ -82,7 +82,7 @@
   </div>
 
   <div id="censorSettings" class="w3-hide">
-    <h4 id="censorSettingsHeader" class="sectionHeader">Censor Settings</h4>
+    <h4 id="censorSettingsHeader" class="section-header">Censor Settings</h4>
     <label>
       <input id="preserveFirst" type="checkbox" class="w3-check">
       <span id="preserveFirstName">Preserve the first letter</span>
@@ -97,7 +97,7 @@
     <br />
     <label>
       <span id="censorCharacterName">Censor character:</span>
-      <select id="censorCharacterSelect" class="w3-select w3-border small textInput" style="margin-top:8px;">
+      <select id="censorCharacterSelect" class="w3-select w3-border small text-input margin-top-small">
         <option value="*">*</option>
         <option value="&">&amp;</option>
         <option value="$">$</option>
@@ -120,7 +120,7 @@
     <br />
     <label>
       <span id="censorFixedLengthName">Fixed length:</span>
-      <select id="censorFixedLengthSelect" class="w3-select w3-border small textInput" style="margin-top:8px;">
+      <select id="censorFixedLengthSelect" class="w3-select w3-border small text-input margin-top-small">
         <option id="censorFixedLengthOriginal" value="0">Original</option>
         <option value="1">1</option>
         <option value="2">2</option>
@@ -136,7 +136,7 @@
   </div>
 
   <div id="substitutionSettings" class="w3-hide">
-    <h4 id="substitutionSettingsHeader" class="sectionHeader">Substitution Settings</h4>
+    <h4 id="substitutionSettingsHeader" class="section-header">Substitution Settings</h4>
     <label>
       <input id="preserveCase" type="checkbox" class="w3-check">
       <span id="substitutionPreserveCaseName">Preserve case of filtered words</span>
@@ -148,16 +148,16 @@
       <span id="substitutionMarkName">Mark substituted words with [ ]</span>
       <span id="substitutionMarkNote" class="notes">(dog: dog = [cat])</span>
     </label>
-    <div style="padding-top:8px;">
+    <div class="margin-top-small">
       <label>
         <span id="defaultSubstitutionName">Default Substitution</span>
-        <input id="defaultWordSubstitutionText" class="w3-input w3-border small" style="display:inline;">
+        <input id="defaultWordSubstitutionText" class="w3-input w3-border small inline-block">
       </label>
     </div>
   </div>
 
   <div id="generalOptions">
-    <h4 id="generalSettingsHeader" class="sectionHeader">General Settings</h4>
+    <h4 id="generalSettingsHeader" class="section-header">General Settings</h4>
     <label>
       <input id="useDeviceTheme" type="checkbox" class="w3-check">
       <span id="useDeviceThemeName">Use device theme</span>
@@ -189,7 +189,7 @@
   </div>
 
   <div id="defaultOptions">
-    <h4 id="defaultSettingsHeader" class="sectionHeader">Default Settings (for new words/phrases)</h4>
+    <h4 id="defaultSettingsHeader" class="section-header">Default Settings (for new words/phrases)</h4>
     <label>
       <input id="defaultWordRepeat" type="checkbox" class="w3-check">
       <span id="defaultWordMatchRepeatedName">Match repeated characters</span>
@@ -201,10 +201,10 @@
       <span id="defaultWordMatchSeparatorsName">Match separator characters</span>
       <span id="defaultWordMatchSeparatorsNote" class="notes">([-_ ] dog matches: D-o _g)</span>
     </label>
-    <div id="defaultMatchMethod" style="padding-top:8px;">
+    <div id="defaultMatchMethod" class="margin-top-small">
       <label>
         <span id="defaultWordMatchMethodName">Match Method</span>
-        <select id="defaultWordMatchMethodSelect" class="w3-select w3-border small textInput">
+        <select id="defaultWordMatchMethodSelect" class="w3-select w3-border small text-input">
           <option id="defaultWordMatchMethodExact">Exact</option>
           <option id="defaultWordMatchMethodPartial">Partial</option>
           <option id="defaultWordMatchMethodWhole">Whole</option>
@@ -216,18 +216,18 @@
 
 <div id="wordsPage" class="w3-container w3-hide">
   <div class="w3-half">
-    <h4 id="wordsHeader" class="sectionHeader">Words & Phrases</h4>
-    <select id="wordList" class="w3-select w3-border small textInput"></select>
+    <h4 id="wordsHeader" class="section-header">Words & Phrases</h4>
+    <select id="wordList" class="w3-select w3-border small text-input"></select>
     <label>
       <input id="filterWordList" type="checkbox" class="w3-check">
       <span id="filterWordListName">Filter list</span>
     </label>
 
-    <h4 id="wordPhraseHeader" class="sectionHeader">Word/Phrase</h4>
+    <h4 id="wordPhraseHeader" class="section-header">Word/Phrase</h4>
     <input id="wordText" class="w3-input w3-border small" type="text" pattern=".+">
 
     <div id="wordSubstitution" class="w3-hide">
-      <h4 id="wordSubstitutionHeader" class="sectionHeader">Substitution</h4>
+      <h4 id="wordSubstitutionHeader" class="section-header">Substitution</h4>
       <input id="substitutionText" class="w3-input w3-border small"/>
       <label>
         <input id="substitutionCase" type="checkbox" class="w3-check">
@@ -236,7 +236,7 @@
     </div>
 
     <div id="wordMatchMethod">
-      <h4 id="wordMatchMethodHeader" class="sectionHeader">Match Method</h4>
+      <h4 id="wordMatchMethodHeader" class="section-header">Match Method</h4>
       <label>
         <input id="wordMatchExact" type="radio" class="w3-radio" name="wordMatchMethod" value="EXACT">
         <span id="wordMatchExactName">Exact</span>
@@ -268,11 +268,11 @@
 
   <div class="w3-half w3-right">
     <div id="wordWordlistDiv" class="w3-hide">
-      <h4 id="includeInWordlistsHeader" class="sectionHeader">Include in Wordlists</h4>
+      <h4 id="includeInWordlistsHeader" class="section-header">Include in Wordlists</h4>
       <div id="wordlistSelections"></div>
     </div>
 
-    <h4 id="wordOtherHeader" class="sectionHeader">Other</h4>
+    <h4 id="wordOtherHeader" class="section-header">Other</h4>
     <label>
       <input id="wordMatchRepeated" type="checkbox" class="w3-check" name="matchRepeat"/>
       <span id="wordMatchRepeatedName">Match repeated characters</span>
@@ -287,7 +287,7 @@
     </label>
   </div>
 
-  <div class="w3-container w3-center" style="width: 100%;">
+  <div class="w3-container w3-center">
     <button id="wordSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
     <button id="wordRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
     <button id="wordRemoveAll" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE ALL</button>
@@ -297,11 +297,11 @@
 
 <div id="listsPage" class="w3-container w3-hide">
   <div class="w3-half w3">
-    <h4 id="allowlistHeader" class="sectionHeader">Allowlist</h4>
-    <select id="allowlistSelect" class="w3-select w3-border small textInput"></select>
+    <h4 id="allowlistHeader" class="section-header">Allowlist</h4>
+    <select id="allowlistSelect" class="w3-select w3-border small text-input"></select>
     <span id="allowlistNote" class="notes">(* Case-sensitive)</span>
 
-    <h4 id="listWordPhraseHeader" class="sectionHeader">Word/Phrase</h4>
+    <h4 id="listWordPhraseHeader" class="section-header">Word/Phrase</h4>
     <input id="allowlistText" class="w3-input w3-border small" type="text" pattern=".+">
 
     <br>
@@ -319,34 +319,36 @@
     </label>
 
     <br>
-    <div class="w3-left" style="padding-top: 20px;">
+    <div class="w3-left margin-top-large">
       <button id="allowlistSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
       <button id="allowlistRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
     </div>
   </div>
 
   <div class="w3-half w3-right">
-    <label style="display: block;">
-      <h4 id="wordlistsHeader" class="sectionHeader" style="display: inline-block; height: 30px;">Wordlists</h4>
+    <label>
+      <h4 id="wordlistsHeader" class="section-header inline-block">Wordlists</h4>
       <input id="wordlistsEnabled" type="checkbox" class="w3-check">
     </label>
 
     <div id="wordlistContainer" class="w3-hide">
-      <select id="wordlistSelect" class="w3-select w3-border small textInput"></select>
+      <select id="wordlistSelect" class="w3-select w3-border small text-input"></select>
 
-      <h4 id="wordlistNameHeader" class="sectionHeader">Name</h4>
-      <input id="wordlistText" class="w3-input w3-border small" type="text" pattern="^\S.*" required style="display: inline; margin-right: 8px;">
+      <h4 id="wordlistNameHeader" class="section-header">Name</h4>
+      <input id="wordlistText" class="w3-input w3-border small" type="text" pattern="^\S.*" required>
+      <button id="wordlistAdd" class="w3-btn w3-round-large w3-flat-peter-river">ADD</button>
       <button id="wordlistRename" class="w3-btn w3-round-large w3-flat-peter-river">RENAME</button>
+      <button id="wordlistRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
 
-      <h4 id="defaultTextWordlistHeader" class="sectionHeader">Default Text Wordlist</h4>
-      <select id="textWordlistSelect" class="w3-select w3-border small textInput"></select><span class="notes"></span>
+      <h4 id="defaultTextWordlistHeader" class="section-header">Default Text Wordlist</h4>
+      <select id="textWordlistSelect" class="w3-select w3-border small text-input"></select><span class="notes"></span>
     </div>
   </div>
 </div>
 
 <div id="domainsPage" class="w3-container w3-hide">
   <div id="disabledDomainContainer" class="w3-half">
-    <h4 id="domainMatchModeHeader" class="sectionHeader">Domain Match Mode</h4>
+    <h4 id="domainMatchModeHeader" class="section-header">Domain Match Mode</h4>
 
     <div id="domainMatchMode">
       <label>
@@ -364,7 +366,7 @@
     </div>
 
     <br>
-    <h4 id="domainFrameModeHeader" class="sectionHeader">Frame Mode</h4>
+    <h4 id="domainFrameModeHeader" class="section-header">Frame Mode</h4>
     <label>
       <input id="domainFilterAllFrames" type="checkbox" class="w3-check">
       <span id="domainFilterAllFramesName">Filter all frames</span>
@@ -373,35 +375,35 @@
   </div>
 
   <div id="domainRightContainer" class="w3-half w3-right">
-    <h4 id="domainsHeader" class="sectionHeader">Domains</h4>
-    <select id="domainSelect" class="w3-select w3-border small textInput" style="display:block"></select>
-    <h4 id="domainHeader" class="sectionHeader">Domain</h4>
+    <h4 id="domainsHeader" class="section-header">Domains</h4>
+    <select id="domainSelect" class="w3-select w3-border small text-input"></select>
+    <h4 id="domainHeader" class="section-header">Domain</h4>
     <input id="domainText" class="w3-input w3-border small" type="text" pattern="^([a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+|localhost)$"/>
     <span id="domainTextNote" class="notes">Example: 'google.com' or 'mail.google.com'</span>
 
-    <div style="padding-top: 8px;">
-      <label id="domainDisabledLabel" class="w3-hide">
+    <div class="margin-top-small">
+      <label id="domainDisabledLabel" class="w3-hide inline-block">
         <input id="domainDisabledCheck" type="checkbox" class="w3-check">
         <span id="domainDisabledName">Filter disabled</span>
         <span id="domainDisabledNote" class="notes">Don't filter pages on this domain</span>
       </label>
-      <label id="domainEnabledLabel" class="w3-hide">
+      <label id="domainEnabledLabel" class="w3-hide inline-block">
         <input id="domainEnabledCheck" type="checkbox" class="w3-check">
         <span id="domainEnabledName">Filter enabled</span>
         <span id="domainEnabledNote" class="notes">Filter pages on this domain</span>
       </label>
-      <label id="domainFramesOffLabel" class="w3-hide">
+      <label id="domainFramesOffLabel" class="w3-hide inline-block">
         <input id="domainFramesOffCheck" type="checkbox" class="w3-check">
         <span id="domainFramesDisabledName">Frames disabled</span>
         <span id="domainFramesDisabledNote" class="notes">Disable filtering frames on this domain</span>
       </label>
-      <label id="domainFramesOnLabel" class="w3-hide">
+      <label id="domainFramesOnLabel" class="w3-hide inline-block">
         <input id="domainFramesOnCheck" type="checkbox" class="w3-check">
         <span id="domainFramesEnabledName">Frames enabled</span>
         <span id="domainFramesEnabledNote" class="notes">Filter frames on this domain</span>
       </label>
-      <h4 id="domainModeHeader" class="sectionHeader">Mode</h4>
-      <select id="domainModeSelect" class="w3-select w3-border small textInput">
+      <h4 id="domainModeHeader" class="section-header">Mode</h4>
+      <select id="domainModeSelect" class="w3-select w3-border small text-input">
         <option id="domainModeNormal">Normal</option>
         <option id="domainModeAdvanced">Advanced</option>
         <option id="domainModeDeep">Deep</option>
@@ -409,11 +411,11 @@
     </div>
 
     <div id="domainWordlistContainer" class="w3-hide">
-      <h4 id="domainTextWordlistHeader" class="sectionHeader">Text Wordlist</h4>
-      <select id="domainWordlistSelect" class="w3-select w3-border small textInput"></select><span class="notes"></span>
+      <h4 id="domainTextWordlistHeader" class="section-header">Text Wordlist</h4>
+      <select id="domainWordlistSelect" class="w3-select w3-border small text-input"></select><span class="notes"></span>
     </div>
 
-    <div style="padding-top: 16px;">
+    <div class="margin-top-large">
       <button id="domainSave" class="w3-btn w3-round-large w3-flat-peter-river">SAVE</button>
       <button id="domainRemove" class="w3-btn w3-round-large w3-flat-pomegranate">REMOVE</button>
     </div>
@@ -421,7 +423,7 @@
 </div>
 
 <div id="bookmarkletPage" class="w3-container w3-hide">
-  <h4 id="bookmarkletHeader" class="sectionHeader">Bookmarklet</h4>
+  <h4 id="bookmarkletHeader" class="section-header">Bookmarklet</h4>
   <p>
     <span id="bookmarkletExplanation">Create a 'bookmarklet' of Advanced Profanity Filter that can be used when you can't install the extension</span>
     (<a id="bookmarkletLearnMore" href="https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Bookmarklet" target="_blank">learn more</a>).
@@ -445,43 +447,43 @@
 </div>
 
 <div id="configPage" class="w3-container w3-hide">
-  <h4 id="configHeader" class="sectionHeader">Configuration</h4>
+  <h4 id="configHeader" class="section-header">Configuration</h4>
   <label>
     <input id="configInlineInput" type="checkbox" class="w3-check">
     <span id="configInlineEditorName">Inline editor</span>
   </label>
-  <div style="padding-top:16px;padding-bottom:16px;width:500px;">
-    <input type="file" id="importFileInput" accept=".json" style="display:none"/>
+  <div id="configButtonContainer">
+    <input type="file" id="importFileInput" class="hidden" accept=".json">
     <button id="configExport" class="w3-btn w3-round-large w3-flat-peter-river">EXPORT</button>
     <button id="configImport" class="w3-btn w3-round-large w3-flat-peter-river">IMPORT</button>
     <button id="configReset" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">RESTORE DEFAULTS</button>
   </div>
-  <textarea id="configText" class="w3-input w3-border w3-card w3-hide" style="width:500px;height:550px;font-size:11px;" spellcheck="false"></textarea>
+  <textarea id="configText" class="w3-input w3-border w3-card w3-hide" spellcheck="false"></textarea>
 
-  <h4 id="configStorageHeader" class="sectionHeader">Storage</h4>
+  <h4 id="configStorageHeader" class="section-header">Storage</h4>
   <label>
     <input id="configSyncLargeKeys" type="checkbox" class="w3-check">
     <span id="configSyncLargeSettingsName">Sync large settings</span>
   </label>
   <span id="configSyncLargeSettingsNote" class="notes">Words, domains, etc. Disable if you run out of space</span>
 
-  <h4 id="configLoggingLevelHeader" class="sectionHeader">Logging Level</h4>
-  <select id="configLoggingLevelSelect" class="w3-select w3-border small textInput">
+  <h4 id="configLoggingLevelHeader" class="section-header">Logging Level</h4>
+  <select id="configLoggingLevelSelect" class="w3-select w3-border small text-input">
     <option id="configLoggingLevelDebug">Debug</option>
     <option id="configLoggingLevelInfo">Info</option>
     <option id="configLoggingLevelWarn">Warn</option>
     <option id="configLoggingLevelError">Error</option>
   </select>
 
-  <div id="setPasswordContainer" style="width:500px;">
-    <h4 id="configPasswordHeader" class="sectionHeader">Password</h4>
-    <input id="setPassword" class="w3-input w3-border small" style="display:inline">
-    <button id="setPasswordBtn" class="w3-btn w3-round-large w3-flat-pomegranate w3-right">REMOVE</button>
+  <div id="setPasswordContainer">
+    <h4 id="configPasswordHeader" class="section-header">Password</h4>
+    <input id="setPassword" class="w3-input w3-border small w3-left inline-block">
+    <button id="setPasswordBtn" class="w3-btn w3-round-large w3-flat-pomegranate w3-left margin-left-small">REMOVE</button>
   </div>
 </div>
 
 <div id="statsPage" class="w3-container w3-hide">
-  <h4 id="statsHeader" class="sectionHeader">Stats</h4>
+  <h4 id="statsHeader" class="section-header">Stats</h4>
   <label>
     <input id="collectStats" type="checkbox" class="w3-check">
     <span id="collectStatsName">Collect stats</span>
@@ -489,13 +491,13 @@
   </label>
 
   <div class="w3-right">
-    <input type="file" id="statsImportInput" accept=".json" style="display:none"/>
+    <input type="file" id="statsImportInput" class="hidden" accept=".json">
     <button id="statsExport" class="w3-btn w3-round-large w3-flat-peter-river">EXPORT</button>
     <button id="statsImport" class="w3-btn w3-round-large w3-flat-peter-river">IMPORT</button>
     <button id="statsReset" class="w3-btn w3-round-large w3-flat-pomegranate">RESET</button>
   </div>
 
-  <h4 id="statsSummaryHeader" class="sectionHeader">Summary</h4>
+  <h4 id="statsSummaryHeader" class="section-header">Summary</h4>
   <div id="statsSummaryContainer">
     <table id="statsSummaryTable" class="w3-table w3-border w3-bordered w3-card w3-small">
       <tbody>
@@ -511,7 +513,7 @@
     </table>
   </div>
 
-  <h4 id="statsWordsFilteredHeader" class="sectionHeader">Words Filtered</h4>
+  <h4 id="statsWordsFilteredHeader" class="section-header">Words Filtered</h4>
   <div id="statsWordContainer">
     <table id="statsWordTable" class="w3-table w3-striped w3-border w3-bordered w3-card w3-small">
       <thead class="w3-flat-peter-river">
@@ -526,15 +528,15 @@
 
   <label>
     <span id="statsRemoveLessUsedWordsExplanation">Remove words filtered fewer times than</span>
-    <input id="lessUsedWordsNumber" class="w3-input w3-border extraSmallInput" style="display:inline;">
+    <input id="lessUsedWordsNumber" class="w3-input w3-border extra-small-input inline-block">
   </label>
   <button id="removeLessUsedWords" class="w3-btn w3-round-large w3-flat-pomegranate" pattern="">REMOVE WORDS</button>
 </div>
 
 <div id="testPage" class="w3-container w3-hide">
-  <h4 id="testHeader" class="sectionHeader">Test</h4>
+  <h4 id="testHeader" class="section-header">Test</h4>
   <textarea id="testText" class="w3-input w3-border w3-card"></textarea>
-  <h4 id="testFilteredHeader"class="sectionHeader">Filtered</h4>
+  <h4 id="testFilteredHeader"class="section-header">Filtered</h4>
   <div id="filteredTestText" class="w3-panel w3-leftbar w3-border-grey w3-flat-silver"></div>
 </div>
 
@@ -790,9 +792,9 @@
 
 <div id="bulkWordEditorModal" class="w3-modal">
   <div class="w3-modal-content w3-card-4 w3-animate-opacity">
-    <header class="w3-container w3-flat-peter-river"><h5 id="bulkWordEditorTitle" class="modalTitle">Bulk Word Editor</h5></header>
+    <header class="w3-container w3-flat-peter-river"><h5 id="bulkWordEditorTitle">Bulk Word Editor</h5></header>
     <div class="w3-container w3-margin w3-padding">
-      <div class="tableContainer w3-card">
+      <div class="table-container w3-card">
         <table id="bulkWordEditorTable" class="w3-table w3-striped w3-centered w3-tiny w3-hoverable">
           <thead>
             <tr>
@@ -803,19 +805,13 @@
               <th><span id="bulkWordEditorMatchMethodHeader">Match Method</span></th>
               <th><span id="bulkWordEditorRepeatedHeader">Repeated</span></th>
               <th><span id="bulkWordEditorSeparatorsHeader">Separators</span></th>
-              <th><label><input type="checkbox" class="wordlistHeader" data-col="1"><span id="bulkWordEditorWordlist1"></span></label></th>
-              <th><label><input type="checkbox" class="wordlistHeader" data-col="2"><span id="bulkWordEditorWordlist2"></span></label></th>
-              <th><label><input type="checkbox" class="wordlistHeader" data-col="3"><span id="bulkWordEditorWordlist3"></span></label></th>
-              <th><label><input type="checkbox" class="wordlistHeader" data-col="4"><span id="bulkWordEditorWordlist4"></span></label></th>
-              <th><label><input type="checkbox" class="wordlistHeader" data-col="5"><span id="bulkWordEditorWordlist5"></span></label></th>
-              <th><label><input type="checkbox" class="wordlistHeader" data-col="6"><span id="bulkWordEditorWordlist6"></span></label></th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
       <div class="w3-margin-top">
-        <textarea id="bulkAddWordsText" class="batchAddWord w3-left w3-margin-right" style="width:300px;height:50px;font-size:11px;" spellcheck="false" placeholder="Bulk add words (one word/phrase per line)"></textarea>
+        <textarea id="bulkAddWordsText" class="w3-left w3-margin-right" spellcheck="false" placeholder="Bulk add words (one word/phrase per line)"></textarea>
         <button id="bulkEditorAddWords" class="w3-btn w3-round-large w3-flat-peter-river">BULK ADD WORDS</button>
         <div class="w3-right">
           <button id="bulkEditorAddWord" class="w3-btn w3-round-large w3-flat-peter-river">ADD WORD</button>
@@ -832,12 +828,12 @@
     <header class="w3-container w3-flat-peter-river"><h5 id="confirmModalTitle"></h5></header>
     <div class="w3-container w3-padding w3-margin">
       <div id="confirmModalContent"></div>
-      <span class="confirmBackupButton w3-left w3-hide">
-        <button id="confirmModalBackup" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">BACKUP</button>
+      <span id="confirmBackupButton" class="w3-left w3-hide">
+        <button id="confirmModalBackup" class="w3-btn w3-round-large w3-flat-peter-river margin-top-large">BACKUP</button>
       </span>
       <span class="w3-right">
-        <button id="confirmModalCancel" class="w3-btn w3-round-large w3-flat-silver" style="margin-top:16px">CANCEL</button>
-        <button id="confirmModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
+        <button id="confirmModalCancel" class="w3-btn w3-round-large w3-flat-silver margin-top-large">CANCEL</button>
+        <button id="confirmModalOK" class="w3-btn w3-round-large w3-flat-peter-river margin-top-large">OK</button>
       </span>
     </div>
   </div>
@@ -847,8 +843,8 @@
   <div class="w3-modal-content w3-card-4 w3-animate-opacity">
     <header class="w3-container w3-flat-peter-river"><h5 id="passwordModalHeader">Enter Password</h5></header>
     <div class="w3-container w3-padding w3-margin">
-      <input id="passwordInput" class="w3-input w3-border" style="display:inline" type="password">
-      <button id="submitPassword" class="w3-btn w3-round-large w3-flat-peter-river w3-right" style="margin-top:16px">SUBMIT</button>
+      <input id="passwordInput" class="w3-input w3-border" type="password">
+      <button id="submitPassword" class="w3-btn w3-round-large w3-flat-peter-river w3-right margin-top-large">SUBMIT</button>
     </div>
   </div>
 </div>
@@ -859,7 +855,7 @@
     <div class="w3-container w3-padding w3-margin">
       <div id="statusModalContent"></div>
       <div class="w3-right">
-        <button id="statusModalOK" class="w3-btn w3-round-large w3-flat-peter-river" style="margin-top:16px">OK</button>
+        <button id="statusModalOK" class="w3-btn w3-round-large w3-flat-peter-river margin-top-large">OK</button>
       </div>
     </div>
   </div>

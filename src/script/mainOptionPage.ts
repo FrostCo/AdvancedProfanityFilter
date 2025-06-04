@@ -47,10 +47,15 @@ document.getElementById('bulkWordEditorButton').addEventListener('click', (evt) 
 // Lists
 document.getElementById('allowlistSelect').addEventListener('change', (evt) => { option.populateAllowlistWord(); });
 document.getElementById('allowlistText').addEventListener('input', (evt) => { option.hideInputError(evt.target as HTMLInputElement); });
+document.querySelectorAll('input[name="allowlistCase"]').forEach((el) => {
+  el.addEventListener('change', (evt) => { option.hideInputError(document.getElementById('allowlistText') as HTMLInputElement); });
+});
 document.getElementById('allowlistSave').addEventListener('click', (evt) => { option.saveAllowlist(); });
 document.getElementById('allowlistRemove').addEventListener('click', (evt) => { option.removeAllowlist(); });
+document.getElementById('wordlistAdd').addEventListener('click', (evt) => { option.addWordlist(); });
 document.getElementById('wordlistsEnabled').addEventListener('click', (evt) => { option.saveOptions(); });
 document.getElementById('wordlistRename').addEventListener('click', (evt) => { option.renameWordlist(); });
+document.getElementById('wordlistRemove').addEventListener('click', (evt) => { option.confirm('removeWordlist'); });
 document.getElementById('wordlistSelect').addEventListener('change', (evt) => { option.populateWordlist(); });
 document.getElementById('wordlistText').addEventListener('input', (evt) => { option.hideInputError(evt.target as HTMLInputElement); });
 document.getElementById('textWordlistSelect').addEventListener('change', (evt) => { option.setDefaultWordlist(evt.target as HTMLSelectElement); });

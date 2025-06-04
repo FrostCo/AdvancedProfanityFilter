@@ -4,8 +4,8 @@ export default class Page {
 
   static readonly disabledChromePages = ['chrome.google.com', 'chromewebstore.google.com'];
   static readonly disabledFirefoxPages = ['addons.mozilla.org'];
-  static readonly disabledProtocols = new RegExp('(^chrome:|^about:|^[a-zA-Z]+-extension:)', 'i');
-  static readonly forbiddenNodeRegExp = new RegExp('^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)');
+  static readonly disabledProtocols = /(^chrome:|^about:|^[a-zA-Z]+-extension:)/i;
+  static readonly forbiddenNodeRegExp = /^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/;
   static readonly forbiddenTags = ['SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA', 'IFRAME', 'LINK'];
 
   // Returns true if a node should *not* be altered in any way

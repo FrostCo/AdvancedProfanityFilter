@@ -98,7 +98,7 @@ export default class Popup {
     this.prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
     this.protected = false;
     this.summaries = {};
-    this.themeElements = [document.body, document.querySelector('#footer')];
+    this.themeElements = [document.body, document.getElementById('footer')];
   }
 
   applyDarkTheme() {
@@ -215,7 +215,7 @@ export default class Popup {
   }
 
   handleDisabledMessage() {
-    const element = document.querySelector('#disabledMessage') as HTMLElement;
+    const element = document.getElementById('disabledMessage') as HTMLElement;
     element.textContent = this.disabledReason;
     this.isDisabled ? this.Class.show(element) : this.Class.hide(element);
   }
@@ -248,10 +248,15 @@ export default class Popup {
     const wordListContainer = document.getElementById('wordListContainer') as HTMLInputElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const wordlistIndex = this.domain.wordlistId >= 0 ? this.domain.wordlistId + 1 : 0;
-    wordlistSelect.selectedIndex = wordlistIndex;
     document.getElementById('wordlistDefault').textContent = this.translation.t('popup:wordlists.default');
     document.getElementById('wordlistAllWords').textContent = this.translation.t('popup:wordlists.allWords');
-    this.cfg.wordlists.forEach((wordlist, index) => { document.getElementById(`wordlist${index + 1}`).textContent = wordlist; });
+    this.cfg.wordlists.forEach((wordlist, index) => {
+      const wordlistOption = document.createElement('option');
+      wordlistOption.textContent = wordlist;
+      wordlistOption.value = `wordlist${index + 1}`;
+      wordlistSelect.appendChild(wordlistOption);
+    });
+    wordlistSelect.selectedIndex = wordlistIndex;
     this.Class.show(wordListContainer);
   }
 
@@ -378,7 +383,7 @@ export default class Popup {
         const wordCell = row.insertCell(0);
         wordCell.classList.add('w3-tooltip');
         const tooltipSpan = document.createElement('span');
-        tooltipSpan.classList.add('summaryTooltip', 'w3-tag', 'w3-text');
+        tooltipSpan.classList.add('summary-tooltip', 'w3-tag', 'w3-text');
         tooltipSpan.textContent = key;
         const wordSpan = document.createElement('span');
         wordSpan.textContent = summary[key].filtered;

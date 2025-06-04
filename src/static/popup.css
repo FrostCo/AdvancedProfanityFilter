@@ -105,18 +105,14 @@ h4 {
   margin-left: 8px;
 }
 
-.checkboxLabel {
-  line-height: 34px;
-}
-
 /* Filter and Wordlist select dropboowns */
-.selectLabel {
+.select-label {
   line-height: 39px;
   padding-left: 25px;
   text-align: left;
 }
 
-.smallSelect {
+.select-small {
   height: 40px;
   width: 150px;
   float: right;
@@ -153,7 +149,7 @@ h4 {
   color: var(--dark-text);
 }
 
-#summary table tbody .summaryTooltip {
+#summary table tbody .summary-tooltip {
   position: absolute;
   left: 0;
   bottom: 18px

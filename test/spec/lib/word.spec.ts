@@ -32,7 +32,7 @@ describe('Word', function() {
         const word = new Word('word-', { matchMethod: Constants.MATCH_METHODS.EXACT }, Config._defaults);
         expect(word.unicode).to.eql(true);
         expect(word.regExp).to.eql(
-          new RegExp('(^|[\\s.,\'"+!?|-]+)(word-)([\\s.,\'"+!?|-]+|$)', 'giu')
+          /(^|[\s.,'"+!?|-]+)(word-)([\s.,'"+!?|-]+|$)/giu
         );
       });
 
@@ -47,7 +47,7 @@ describe('Word', function() {
           const word = new Word('врата', { matchMethod: Constants.MATCH_METHODS.EXACT }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-]+)(врата)([\\s.,\'"+!?|-]+|$)', 'giu')
+            /(^|[\s.,'"+!?|-]+)(врата)([\s.,'"+!?|-]+|$)/giu
           );
         });
 
@@ -55,7 +55,7 @@ describe('Word', function() {
           const word = new Word('врата', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-]+)(в+р+а+т+а+)([\\s.,\'"+!?|-]+|$)', 'giu')
+            /(^|[\s.,'"+!?|-]+)(в+р+а+т+а+)([\s.,'"+!?|-]+|$)/giu
           );
         });
       });
@@ -113,7 +113,7 @@ describe('Word', function() {
           const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.EXACT, _filterMethod: Constants.FILTER_METHODS.REMOVE }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-])(куче)([\\s.,\'"+!?|-]|$)', 'giu')
+            /(^|[\s.,'"+!?|-])(куче)([\s.,'"+!?|-]|$)/giu
           );
         });
 
@@ -121,7 +121,7 @@ describe('Word', function() {
           const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, _filterMethod: Constants.FILTER_METHODS.REMOVE }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-])(к+у+ч+е+)([\\s.,\'"+!?|-]|$)', 'giu')
+            /(^|[\s.,'"+!?|-])(к+у+ч+е+)([\s.,'"+!?|-]|$)/giu
           );
         });
       });
@@ -154,7 +154,7 @@ describe('Word', function() {
           const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.PARTIAL }, Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }));
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-]?)([\\w-]*куче[\\w-]*)([\\s.,\'"+!?|-]?|$)', 'giu')
+            /(^|[\s.,'"+!?|-]?)([\w-]*куче[\w-]*)([\s.,'"+!?|-]?|$)/giu
           );
         });
 
@@ -162,7 +162,7 @@ describe('Word', function() {
           const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE }, Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }));
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-]?)([\\w-]*к+у+ч+е+[\\w-]*)([\\s.,\'"+!?|-]?|$)', 'giu')
+            /(^|[\s.,'"+!?|-]?)([\w-]*к+у+ч+е+[\w-]*)([\s.,'"+!?|-]?|$)/giu
           );
         });
       });
@@ -190,7 +190,7 @@ describe('Word', function() {
           const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.WHOLE }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*куче[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
+            /(^|[\s.,'"+!?|-]*)([\S]*куче[\S]*)([\s.,'"+!?|-]*|$)/giu
           );
         });
 
@@ -198,7 +198,7 @@ describe('Word', function() {
           const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*к+у+ч+е+[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
+            /(^|[\s.,'"+!?|-]*)([\S]*к+у+ч+е+[\S]*)([\s.,'"+!?|-]*|$)/giu
           );
         });
 
@@ -206,7 +206,7 @@ describe('Word', function() {
           const word = new Word('куче', { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE, separators: Constants.TRUE }, Config._defaults);
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(
-            new RegExp('(^|[\\s.,\'"+!?|-]*)([\\S]*к+[-_ ]*у+[-_ ]*ч+[-_ ]*е+[\\S]*)([\\s.,\'"+!?|-]*|$)', 'giu')
+            /(^|[\s.,'"+!?|-]*)([\S]*к+[-_ ]*у+[-_ ]*ч+[-_ ]*е+[\S]*)([\s.,'"+!?|-]*|$)/giu
           );
         });
       });

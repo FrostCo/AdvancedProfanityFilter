@@ -95,12 +95,12 @@ a:hover {
   color: var(--blue);
 }
 
-h4.sectionHeader {
+h4.section-header {
   color: var(--blue);
 }
 
 /* General */
-.textInput {
+.text-input {
   height: 40px;
 }
 /* #endregion */
@@ -161,9 +161,33 @@ div#wordsPage input#substitutionText {
   display: inline;
 }
 
+div#wordsPage div#wordlistSelections {
+  min-height: 120px;
+  max-height: 210px;
+  overflow-y: auto;
+}
+
+/* Lists */
+button#wordlistAdd, button#wordlistRename, button#wordlistRemove {
+  margin-top: 10px;
+}
+
 /* Bookmarklet */
 a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited {
   color: #fff;
+}
+
+/* Config */
+#configButtonContainer {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  width: 500px;
+}
+
+#configText {
+  width: 500px;
+  height: 550px;
+  font-size: 11px;
 }
 
 /* Help */
@@ -183,11 +207,17 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 }
 
 /* Bulk Word Editor */
+#bulkAddWordsText {
+  width: 300px;
+  height: 50px;
+  font-size: 11px;
+}
+
 #bulkWordEditorModal div.w3-modal-content {
   width: 98%;
 }
 
-#bulkWordEditorModal div.tableContainer {
+#bulkWordEditorModal div.table-container {
   overflow: auto;
   height: 600px;
 }
@@ -234,11 +264,31 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   cursor: not-allowed !important;
 }
 
-.extraSmallInput {
+.extra-small-input {
   margin: 2px;
   padding: 2px;
   width: 70px;
   text-align: right;
+}
+
+.hidden {
+  display: none;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.margin-left-small {
+  margin-left: 8px;
+}
+
+.margin-top-large {
+  margin-top: 16px;
+}
+
+.margin-top-small {
+  margin-top: 8px;
 }
 
 .notes {
@@ -270,7 +320,7 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   z-index: 10;
 }
 
-#statsWordTable tbody .statsTooltip {
+#statsWordTable tbody .stats-tooltip {
   position: absolute;
   left: 0;
   bottom: 18px

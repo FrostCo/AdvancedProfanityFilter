@@ -16,7 +16,6 @@ import {
   numberToBoolean,
   numberWithCommas,
   readFile,
-  removeChildren,
   removeFromArray,
   stringArray,
   timeForFileName,
@@ -69,6 +68,30 @@ export default class OptionPage {
     this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
     this.setHelpVersion();
     this.filter = new this.Class.Filter;
+  }
+
+  async addWordlist() {
+    const wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
+    const name = wordlistText.value.trim();
+
+    if (wordlistText.checkValidity()) {
+      // Make sure there are no duplicates
+      if (this.cfg.wordlists.includes(name)) {
+        this.showInputError(wordlistText, this.t('options:listsPage.validations.wordlistNameNotUnique'));
+        return false;
+      }
+
+      this.cfg.wordlists.push(name);
+      try {
+        await this.cfg.save('wordlists');
+        this.populateWordlists();
+        this.populateWordPage();
+      } catch (err) {
+        this.handleError(this.t('options:listsPage.messages.addWordlistFailed'), err);
+      }
+    } else {
+      this.showInputError(wordlistText, this.t('options:listsPage.validations.wordlistNameInvalid'));
+    }
   }
 
   applyDarkTheme(allElements = true) {
@@ -212,7 +235,9 @@ export default class OptionPage {
     document.getElementById('allowlistSensitiveNote').textContent = this.t('options:listsPage.notes.caseSensitive');
     document.getElementById('defaultTextWordlistHeader').textContent = this.t('options:listsPage.headers.defaultTextWordlist');
     document.getElementById('listWordPhraseHeader').textContent = this.t('options:listsPage.headers.wordPhrase');
+    document.getElementById('wordlistAdd').textContent = this.t('options:listsPage.buttons.addWordlist').toUpperCase();
     document.getElementById('wordlistNameHeader').textContent = this.t('options:listsPage.headers.wordlistName');
+    document.getElementById('wordlistRemove').textContent = this.t('options:listsPage.buttons.removeWordlist').toUpperCase();
     document.getElementById('wordlistRename').textContent = this.t('options:listsPage.buttons.renameWordlist').toUpperCase();
     document.getElementById('wordlistsHeader').textContent = this.t('options:listsPage.headers.wordlists');
     // Domains page
@@ -396,16 +421,18 @@ export default class OptionPage {
     cellSeparators.appendChild(separatorsInput);
 
     const existingCellCount = row.cells.length;
-    this.cfg.wordlists.forEach((wordlist, index) => {
-      const cell = row.insertCell(index + existingCellCount);
-      const wordlistInput = document.createElement('input');
-      wordlistInput.type = 'checkbox';
-      wordlistInput.name = 'wordlists';
-      wordlistInput.classList.add('wordlistData');
-      wordlistInput.dataset.col = (index + 1).toString();
-      wordlistInput.checked = data.lists.includes(index + 1);
-      cell.appendChild(wordlistInput);
-    });
+    if (this.cfg.wordlistsEnabled) {
+      this.cfg.wordlists.forEach((wordlist, index) => {
+        const cell = row.insertCell(index + existingCellCount);
+        const wordlistInput = document.createElement('input');
+        wordlistInput.type = 'checkbox';
+        wordlistInput.name = 'wordlists';
+        wordlistInput.classList.add('wordlistData');
+        wordlistInput.dataset.col = (index + 1).toString();
+        wordlistInput.checked = data.lists.includes(index + 1);
+        cell.appendChild(wordlistInput);
+      });
+    }
 
     // Scroll to the bottom if this is a new word row
     if (word === '') {
@@ -442,7 +469,7 @@ export default class OptionPage {
 
   bulkEditorRemoveAll() {
     const tBody = document.querySelector('#bulkWordEditorModal table tbody') as HTMLTableSectionElement;
-    removeChildren(tBody);
+    tBody.replaceChildren();
     this.bulkEditorAddRow();
   }
 
@@ -528,7 +555,9 @@ export default class OptionPage {
   }
 
   closeModal(id: string) {
-    this.hide(document.getElementById(id));
+    const modal = document.getElementById(id);
+    modal.classList.remove('w3-show');
+    this.hide(modal);
   }
 
   configInlineToggle() {
@@ -547,9 +576,8 @@ export default class OptionPage {
     const modalTitle = document.getElementById('confirmModalTitle') as HTMLElement;
     const modalContent = document.getElementById('confirmModalContent') as HTMLElement;
     const modalHeader = document.querySelector('#confirmModal header') as HTMLElement;
-    const backupButtonContainer = document.querySelector('#confirmModal span.confirmBackupButton') as HTMLElement;
+    const backupButtonContainer = document.getElementById('confirmBackupButton') as HTMLElement;
     const backupButton = document.querySelector('#confirmModal button#confirmModalBackup') as HTMLButtonElement;
-    removeChildren(modalContent);
 
     const defaults = {
       backup: false,
@@ -565,7 +593,7 @@ export default class OptionPage {
     }
 
     modalTitle.textContent = settings.title;
-    modalContent.appendChild(contentElement);
+    modalContent.replaceChildren(contentElement);
     modalHeader.className = `w3-container ${settings.titleClass}`;
     if (settings.backup) {
       this.show(backupButtonContainer);
@@ -580,17 +608,18 @@ export default class OptionPage {
     const modalTitle = document.getElementById('statusModalTitle') as HTMLElement;
     const modalContent = document.getElementById('statusModalContent') as HTMLElement;
     const modalHeader = document.querySelector('#statusModal header') as HTMLElement;
-    removeChildren(modalContent);
 
     modalHeader.className = `w3-container ${titleColor}`;
     modalTitle.textContent = title;
 
-    content = stringArray(content);
-    content.forEach((textPart) => {
-      const contentElement = document.createElement('p') as HTMLParagraphElement;
-      contentElement.textContent = textPart;
-      modalContent.appendChild(contentElement);
+    const contentArray = stringArray(content);
+    const contentElements = contentArray.map((textPart) => {
+      const p = document.createElement('p');
+      p.textContent = textPart;
+      return p;
     });
+
+    modalContent.replaceChildren(...contentElements);
   }
 
   async confirm(action: string) {
@@ -687,6 +716,15 @@ export default class OptionPage {
           }
         }
         break;
+      case 'removeWordlist':
+        paragraph.textContent = this.t('options:listsPage.messages.confirmRemoveWordlist');
+        italics.textContent = this.t('options:listsPage.notes.confirmRemoveWordlist');
+        content.appendChild(paragraph);
+        content.appendChild(italics);
+        this.configureConfirmModal({ backup: true }, content);
+        this._confirmEventListeners.push(this.removeWordlist.bind(this));
+        ok.addEventListener('click', lastElement(this._confirmEventListeners));
+        break;
       case 'statsImport':
         this.configureConfirmModal({ content: this.t('options:statsPage.messages.confirmImportStats') });
         this._confirmEventListeners.push(this.importStats.bind(this));
@@ -770,8 +808,7 @@ export default class OptionPage {
   }
 
   disableBtn(element: HTMLElement) {
-    element.classList.add('disabled');
-    element.classList.add('w3-flat-silver');
+    element.classList.add('disabled', 'w3-flat-silver');
   }
 
   domainCfgFromPage(): DomainCfg {
@@ -792,8 +829,7 @@ export default class OptionPage {
   }
 
   enableBtn(element: HTMLElement) {
-    element.classList.remove('disabled');
-    element.classList.remove('w3-flat-silver');
+    element.classList.remove('disabled', 'w3-flat-silver');
   }
 
   exportConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
@@ -842,7 +878,6 @@ export default class OptionPage {
   }
 
   hide(element: HTMLElement) {
-    element.classList.remove('w3-show');
     element.classList.add('w3-hide');
   }
 
@@ -1000,7 +1035,9 @@ export default class OptionPage {
   }
 
   openModal(id: string) {
-    this.show(document.getElementById(id));
+    const modal = document.getElementById(id);
+    modal.classList.add('w3-show');
+    this.show(modal);
   }
 
   populateBookmarkletPage() {
@@ -1077,16 +1114,16 @@ export default class OptionPage {
     const domainFramesOnLabel = document.getElementById('domainFramesOnLabel') as HTMLLabelElement;
 
     this.hideInputError(domainText);
-    removeChildren(domainsSelect);
 
     const domains = this.Class.Domain.sortedKeys(this.cfg.domains);
     domains.unshift(this.t('options:domainsPage.options.addOrUpdateExistingDomain'));
-    domains.forEach((domain) => {
+    const options = domains.map((domain, index) => {
       const optionElement = document.createElement('option');
       optionElement.textContent = domain;
-      optionElement.value = domain === domains[0] ? '' : domain;
-      domainsSelect.appendChild(optionElement);
+      optionElement.value = index === 0 ? '' : domain;
+      return optionElement;
     });
+    domainsSelect.replaceChildren(...options);
     domainFilterAllFrames.checked = !this.cfg.enabledFramesOnly;
 
     if (mode === 'minimal') {
@@ -1236,7 +1273,7 @@ export default class OptionPage {
     const wordCell = row.insertCell(0);
     wordCell.classList.add('w3-tooltip');
     const tooltipSpan = document.createElement('span');
-    tooltipSpan.classList.add('statsTooltip', 'w3-tag', 'w3-text');
+    tooltipSpan.classList.add('stats-tooltip', 'w3-tag', 'w3-text');
     tooltipSpan.textContent = word;
     const wordSpan = document.createElement('span');
     wordSpan.textContent = this.filter.replaceText(word, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
@@ -1265,19 +1302,21 @@ export default class OptionPage {
   }
 
   populateAllowlist() {
-    const regExp = RegExp(' [*]$');
+    const pattern = / \*$/;
     const sensitiveList = this.filter.cfg.wordAllowlist.map((item) => { return item + ' *'; });
     const list = [].concat(sensitiveList, this.filter.cfg.iWordAllowlist).sort();
     const allowlist = document.getElementById('allowlistSelect') as HTMLSelectElement;
-    removeChildren(allowlist);
+
     list.unshift(this.t('options:listsPage.options.addOrUpdateExistingWord'));
-    list.forEach((item) => {
+    const options = list.map((item, index) => {
       const optionElement = document.createElement('option');
-      optionElement.value = item === list[0] ? '' : item.replace(regExp, '');
-      optionElement.dataset.sensitive = regExp.test(item).toString();
+      optionElement.value = index === 0 ? '' : item.replace(pattern, '');
+      optionElement.dataset.sensitive = pattern.test(item).toString();
       optionElement.textContent = item;
-      allowlist.appendChild(optionElement);
+      return optionElement;
     });
+
+    allowlist.replaceChildren(...options);
     this.populateAllowlistWord();
   }
 
@@ -1352,9 +1391,23 @@ export default class OptionPage {
   }
 
   populateWordlist() {
+    const wordlistAdd = document.getElementById('wordlistAdd') as HTMLElement;
+    const wordlistRemove = document.getElementById('wordlistRemove') as HTMLElement;
+    const wordlistRename = document.getElementById('wordlistRename') as HTMLElement;
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
-    wordlistText.value = wordlistSelect.value;
+    const wordlist = wordlistSelect.value;
+    wordlistText.value = wordlist;
+
+    if (wordlist === '') { // New wordlist
+      this.hide(wordlistRemove);
+      this.hide(wordlistRename);
+      this.show(wordlistAdd);
+    } else { // Existing wordlist
+      this.show(wordlistRemove);
+      this.show(wordlistRename);
+      this.hide(wordlistAdd);
+    }
   }
 
   populateWordlists(selectedIndex: number = 0) {
@@ -1365,7 +1418,7 @@ export default class OptionPage {
     if (this.cfg.wordlistsEnabled) {
       const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
       const textWordlistSelect = document.getElementById('textWordlistSelect') as HTMLSelectElement;
-      dynamicList(this.cfg.wordlists, wordlistSelect);
+      dynamicList(this.cfg.wordlists, wordlistSelect, false, this.t('options:listsPage.options.addOrUpdateExistingWordlist'));
       dynamicList([this.t('options:listsPage.options.allWordsWordlist')].concat(this.cfg.wordlists), textWordlistSelect);
       wordlistSelect.selectedIndex = selectedIndex;
       textWordlistSelect.selectedIndex = this.cfg.wordlistId;
@@ -1381,7 +1434,6 @@ export default class OptionPage {
     let wordlistFilter = this.filter;
     const selections = document.getElementById('wordlistSelections') as HTMLInputElement;
     const wordsSelect = document.getElementById('wordList') as HTMLSelectElement;
-    removeChildren(wordsSelect);
 
     // Workaround for remove filter method
     if (this.filter.cfg.filterWordList && this.filter.cfg.filterMethod === 2) {
@@ -1393,7 +1445,7 @@ export default class OptionPage {
 
     const words = Object.keys(this.cfg.words).sort();
     words.unshift(this.t('options:wordsPage.options.addOrUpdateExistingWord'));
-    words.forEach((word) => {
+    const options = words.map((word) => {
       let filteredWord = word;
       if (word != words[0] && wordlistFilter.cfg.filterWordList) {
         if (wordlistFilter.cfg.words[word].matchMethod === this.Class.Constants.MATCH_METHODS.REGEX) { // Regexp
@@ -1407,12 +1459,12 @@ export default class OptionPage {
       optionElement.value = word === words[0] ? '' : word;
       optionElement.dataset.filtered = filteredWord;
       optionElement.textContent = filteredWord;
-      wordsSelect.appendChild(optionElement);
+      return optionElement;
     });
+    wordsSelect.replaceChildren(...options);
 
     // Dynamically create the wordlist selection checkboxes
-    if (selections.hasChildNodes()) { removeChildren(selections); }
-    this.cfg.wordlists.forEach((list, index) => {
+    const wordlistOptions = this.cfg.wordlists.map((list, index) => {
       const div = document.createElement('div');
       const label = document.createElement('label');
       const input = document.createElement('input');
@@ -1424,8 +1476,21 @@ export default class OptionPage {
       label.appendChild(input);
       label.appendChild(name);
       div.appendChild(label);
-      selections.appendChild(div);
+      return div;
     });
+    selections.replaceChildren(...wordlistOptions);
+
+    // Add explanation for when there are no wordlists
+    if (!this.cfg.wordlists.length) {
+      const anchor = document.createElement('a');
+      anchor.href = '#/lists';
+      anchor.textContent = this.t('options:wordsPage.notes.wordlistsGettingStarted');
+      anchor.addEventListener('click', function(event) {
+        event.preventDefault();
+        document.getElementById('listsTab').click();
+      });
+      selections.appendChild(anchor);
+    }
 
     this.populateWord();
   }
@@ -1524,11 +1589,45 @@ export default class OptionPage {
     }
   }
 
+  async removeWordlist() {
+    const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
+    const wordIndex = wordlistSelect.selectedIndex; // Placeholder adds 1, which helps preserve index 0 for "All Words"
+    const cfgIndex = wordIndex - 1;
+    const wordlist = this.cfg.wordlists[cfgIndex];
+    if (wordlist) {
+      // Remove wordlist name
+      this.cfg.wordlists.splice(cfgIndex, 1);
+      try {
+        // Remove wordlist from all words
+        const wordKeys = Object.keys(this.cfg.words);
+        for (const wordKey of wordKeys) {
+          const lists = this.cfg.words[wordKey].lists;
+          for (let i = lists.length - 1; i >= 0; i--) {
+            if (lists[i] === wordIndex) {
+              lists.splice(i, 1); // Remove removed wordlist
+            } else if (lists[i] > wordIndex) {
+              lists[i] -= 1; // Decrement wordlists after removed wordlist
+            }
+          }
+        }
+        await this.cfg.save(['words', 'wordlists']);
+        this.populateWordlists();
+        this.populateWordPage();
+      } catch (err) {
+        logger.warn(this.t('options:listsPage.messages.removeWordlistFailed', { wordlist: wordlist }), err);
+        this.showErrorModal([this.t('options:listsPage.messages.removeWordlistFailed', { wordlist: wordlist }), `Error: ${err.message}`]);
+      }
+    }
+    const wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
+    wordlistText.value = '';
+    this.hideInputError(wordlistText);
+  }
+
   async renameWordlist() {
     const wordlistSelect = document.getElementById('wordlistSelect') as HTMLSelectElement;
     const wordlistText = document.getElementById('wordlistText') as HTMLInputElement;
     const name = wordlistText.value.trim();
-    const index = wordlistSelect.selectedIndex;
+    const index = wordlistSelect.selectedIndex - 1; // -1 to ignore placeholder, since we don't store "All words" in config
 
     if (wordlistText.checkValidity()) {
       // Make sure there are no duplicates
@@ -1540,7 +1639,7 @@ export default class OptionPage {
       this.cfg.wordlists[index] = name;
       try {
         await this.cfg.save('wordlists');
-        this.populateWordlists(index);
+        this.populateWordlists();
         this.populateWordPage();
       } catch (err) {
         this.handleError(this.t('options:listsPage.messages.renameWordlistFailed'), err);
@@ -1634,7 +1733,7 @@ export default class OptionPage {
       return false;
     }
 
-    if (this.cfg[newListName].indexOf(newWord) > -1) {
+    if (this.cfg.wordAllowlist.includes(newWord) || this.cfg.iWordAllowlist.includes(newWord)) {
       this.showInputError(allowlistText, this.t('options:listsPage.validations.wordAlreadyAllowed'));
       return false;
     }
@@ -1837,20 +1936,37 @@ export default class OptionPage {
 
   show(element: HTMLElement) {
     element.classList.remove('w3-hide');
-    element.classList.add('w3-show');
   }
 
   showBulkWordEditor() {
     const modalId = 'bulkWordEditorModal';
-    const tableContainer = document.querySelector(`#${modalId} div.tableContainer`) as HTMLDivElement;
+    const tableContainer = document.querySelector(`#${modalId} div.table-container`) as HTMLDivElement;
     const table = tableContainer.querySelector('table') as HTMLTableElement;
+    const tHead = table.querySelector('thead') as HTMLTableSectionElement;
+    const tHeadRow = tHead.querySelector('tr') as HTMLTableRowElement;
     const tBody = table.querySelector('tbody') as HTMLTableSectionElement;
-    removeChildren(tBody);
+    tBody.replaceChildren();
+    tHeadRow.querySelectorAll('.dynamicHeader').forEach((th) => th.remove());
 
-    // Add wordlist names to header
-    this.cfg.wordlists.forEach((wordlist, i) => {
-      document.getElementById(`bulkWordEditorWordlist${i + 1}`).textContent = wordlist;
-    });
+    // Add wordlists to header
+    if (this.cfg.wordlistsEnabled) {
+      this.cfg.wordlists.forEach((wordlist, i) => {
+        const th = document.createElement('th');
+        th.classList.add('dynamicHeader');
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+        input.classList.add('wordlistHeader');
+        input.dataset.col = (i + 1).toString();
+        input.type = 'checkbox';
+        const span = document.createElement('span');
+        span.id = `bulkWordEditorWordlist${i + 1}`;
+        span.textContent = wordlist;
+        label.appendChild(input);
+        label.appendChild(span);
+        th.appendChild(label);
+        tHeadRow.appendChild(th);
+      });
+    }
 
     // Add current words to the table
     const wordKeys = Object.keys(this.cfg.words);
