@@ -13,6 +13,7 @@ export default class Constants {
   static readonly LOGGING_LEVELS = { DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3 };
   static readonly MATCH_METHODS = { EXACT: 0, PARTIAL: 1, WHOLE: 2, REGEX: 3 };
   static readonly MESSAGING = { BACKGROUND: 'background', CONTEXT: 'context', OPTION: 'option', POPUP: 'popup' };
+  static readonly SELECTOR_SHADOWROOT_DELIMITER = '>>>';
   static readonly STATS_TYPE_TEXT = 'text';
   static readonly STATUS = { DISABLED: 0, NORMAL: 1, ADVANCED: 2, DEEP: 3 };
   static readonly TAB_DISABLE_ONCE = { NOT_SET: 0, DISABLED: 1, WILL_DISABLE: 2 };
