@@ -4,7 +4,7 @@ export default class Page {
 
   static readonly disabledChromePages = ['chrome.google.com', 'chromewebstore.google.com'];
   static readonly disabledFirefoxPages = ['addons.mozilla.org'];
-  static readonly disabledProtocols = /^(chrome:|about:|[a-z]+-extension:)/;
+  static readonly disabledProtocols = /^(chrome:|about:|[a-z][a-z0-9\-]*-extension:)/;
   static readonly forbiddenNodeRegExp = /^\s*(<[a-z].+?\/?>|{.+?:.+?;.*}|https?:\/\/[^\s]+$)/;
   static readonly forbiddenTags = ['SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA', 'IFRAME', 'LINK'];
 
