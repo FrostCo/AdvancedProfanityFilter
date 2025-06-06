@@ -6,7 +6,7 @@ Contributions to this project are released to the public under the [project's op
 
 All contributors and community members should always be polite, courteous, and helpful. Please help to keep our community to be a welcoming one!
 
-## Ways to contribute
+## Ways to Contribute
 
 We want to make contributing to this project as easy and transparent as possible, whether it's:
 
@@ -32,12 +32,59 @@ If you have any substantial changes that you would like to make, please [open an
 8. Push to your fork and [submit a pull request](https://github.com/FrostCo/AdvancedProfanityFilter/compare)
 9. Wait for your pull request to be reviewed, and be willing to answer questions or make adjustments as needed so that it can get merged
 
-Tips for a good review process:
+### Tips for a Good Review Process
 
-- Keep your change as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, consider submitting them as separate pull requests.
-- Write tests if possible
-- Write a good commit message. This project is aiming to use [gitmoji](https://gitmoji.dev/). For examples, look through the commit history.
-- If you are adding a new feature, please include a section in the pull request with proposed text to be included in the [main wiki page](https://github.com/FrostCo/AdvancedProfanityFilter/wiki).
+- **Keep your changes focused.**  
+  If you're making multiple unrelated changes, consider submitting them as separate pull requests. This makes reviews easier and helps isolate future regressions.
+
+- **Adding a new feature?**  
+  Please include a section in your pull request describing what should be added to the [main wiki page](https://github.com/FrostCo/AdvancedProfanityFilter/wiki).
+
+- **Write tests when possible.**  
+  This helps maintain confidence and stability in the project over time.
+
+- **Write a clear and consistent commit message.**  
+  We follow the [gitmoji](https://gitmoji.dev/) convention for commit messages. This keeps the commit history readable and easy to scan.
+
+### Commit Message Format
+
+You can use the [gitmoji-cli](https://www.npmjs.com/package/gitmoji-cli) to help write commits:
+
+```bash
+gitmoji -c
+```
+
+If you prefer not to install the CLI, follow this format (ignore the curly braces):
+
+```txt
+{emoji} ({scope}): {message}
+```
+
+**Example:**
+
+```txt
+✨ (filter): Add exact match method for words
+```
+
+### Commit Scopes
+
+Use one of the following scopes when writing your commit message:
+
+| Scope          | Description                                       |
+| -------------- | --------------------------------------------------|
+| **audio**      | Audio muting feature                              |
+| **background** | Background script behavior (lifecycle, messaging) |
+| **build**      | Tooling for bundling, CI, or build output         |
+| **config**     | Configuration changes and data migrations         |
+| **dev**        | Development scripts, tooling, environment setup   |
+| **docs**       | Documentation updates                             |
+| **filter**     | Core filtering logic                              |
+| **i18n**       | Translation/localization efforts                  |
+| **misc**       | Catch-all for edge-cases, try to avoid overuse    |
+| **options**    | Options/settings page logic/UI                    |
+| **popup**      | Popup UI or behavior                              |
+| **release**    | Changelog updates, version bumps, packaging       |
+| **ui**         | Shared components, design changes, layout/styling |
 
 ## Releases
 
