@@ -53,6 +53,13 @@ export default [
       // Base ESLint rules
       'array-bracket-spacing': ['warn', 'never'],
       'arrow-parens': ['warn', 'always'],
+      'comma-dangle': ['error', {
+        arrays: 'always-multiline',
+        objects: 'always-multiline',
+        imports: 'always-multiline',
+        exports: 'always-multiline',
+        functions: 'never'
+      }],
       'comma-spacing': 'warn',
       'eol-last': 'error',
       'indent': ['warn', 2, { SwitchCase: 1 }],
