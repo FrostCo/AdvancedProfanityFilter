@@ -104,7 +104,7 @@ export default class DataMigration {
     const originalWordConf = { matchMethod: this.Class.Constants.MATCH_METHODS.PARTIAL, repeat: true, sub: 'dumbo' };
     const update = {
       twat: { matchMethod: this.Class.Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'dumbo' },
-      twats: { matchMethod: this.Class.Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'dumbos' }
+      twats: { matchMethod: this.Class.Constants.MATCH_METHODS.EXACT, repeat: true, sub: 'dumbos' },
     };
 
     if (

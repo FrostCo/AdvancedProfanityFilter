@@ -106,7 +106,7 @@ export function getVersion(version: string): Version {
   return {
     major: parseInt(versionValues[0]),
     minor: parseInt(versionValues[1]),
-    patch: parseInt(versionValues[2])
+    patch: parseInt(versionValues[2]),
   };
 }
 

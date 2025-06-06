@@ -502,7 +502,7 @@ export default class OptionPage {
           matchMethod: (cells[4].querySelector('select') as HTMLSelectElement).selectedIndex,
           repeat: booleanToNumber((cells[5].querySelector('input') as HTMLInputElement).checked),
           separators: booleanToNumber((cells[6].querySelector('input') as HTMLInputElement).checked),
-          sub: (cells[2].querySelector('input') as HTMLInputElement).value
+          sub: (cells[2].querySelector('input') as HTMLInputElement).value,
         };
         const success = this.cfg.addWord(name, wordOptions);
         if (!success) {

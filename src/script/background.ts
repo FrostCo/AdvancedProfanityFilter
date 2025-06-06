@@ -60,56 +60,56 @@ export default class Background {
           id: 'addSelection',
           title: translation.t('background:contextMenu.addSelection'),
           contexts: ['selection'],
-          documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+          documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*'],
         });
 
         chrome.contextMenus.create({
           id: 'removeSelection',
           title: translation.t('background:contextMenu.removeSelection'),
           contexts: ['selection'],
-          documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*']
+          documentUrlPatterns: ['file://*/*', 'http://*/*', 'https://*/*'],
         });
 
         chrome.contextMenus.create({
           id: 'disableTabOnce',
           title: translation.t('background:contextMenu.disableOnce'),
           contexts: ['all'],
-          documentUrlPatterns: ['http://*/*', 'https://*/*']
+          documentUrlPatterns: ['http://*/*', 'https://*/*'],
         });
 
         chrome.contextMenus.create({
           id: 'toggleTabDisable',
           title: translation.t('background:contextMenu.toggleForTab'),
           contexts: ['all'],
-          documentUrlPatterns: ['http://*/*', 'https://*/*']
+          documentUrlPatterns: ['http://*/*', 'https://*/*'],
         });
 
         chrome.contextMenus.create({
           id: 'toggleForDomain',
           title: translation.t('background:contextMenu.toggleForDomain'),
           contexts: ['all'],
-          documentUrlPatterns: ['http://*/*', 'https://*/*']
+          documentUrlPatterns: ['http://*/*', 'https://*/*'],
         });
 
         chrome.contextMenus.create({
           id: 'toggleAdvancedForDomain',
           title: translation.t('background:contextMenu.toggleAdvancedForDomain'),
           contexts: ['all'],
-          documentUrlPatterns: ['http://*/*', 'https://*/*']
+          documentUrlPatterns: ['http://*/*', 'https://*/*'],
         });
 
         chrome.contextMenus.create({
           id: 'toggleFramesForDomain',
           title: translation.t('background:contextMenu.toggleFramesForDomain'),
           contexts: ['all'],
-          documentUrlPatterns: ['http://*/*', 'https://*/*']
+          documentUrlPatterns: ['http://*/*', 'https://*/*'],
         });
       }
 
       chrome.contextMenus.create({
         id: 'options',
         title: translation.t('background:contextMenu.options'),
-        contexts: ['all']
+        contexts: ['all'],
       });
     }
   }

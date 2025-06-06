@@ -17,7 +17,7 @@ export default class Translation {
       lng: language,
       fallbackLng: 'en',
       ns: namespaces,
-      resources: translations
+      resources: translations,
     });
   }
 

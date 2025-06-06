@@ -47,7 +47,7 @@ export default class Filter {
           matchMethod: Constants.MATCH_METHODS.WHOLE,
           repeat: Constants.FALSE,
           separators: Constants.FALSE,
-          sub: ''
+          sub: '',
         };
         const wholeWordRegExp = new Word(match, wordOptions, this.cfg).regExp;
 
@@ -215,7 +215,7 @@ export default class Filter {
     const result: ReplaceTextResult = {
       original: str,
       filtered: this.replaceText(str, wordlistId, statsType),
-      modified: false
+      modified: false,
     };
     result.modified = (result.filtered != str);
     return result;
