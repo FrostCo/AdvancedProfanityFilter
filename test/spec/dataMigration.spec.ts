@@ -33,7 +33,7 @@ describe('DataMigration', function() {
           'test': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
           'another': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
           'testWithList': { lists: [1, 3, 5], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
-        }
+        },
       };
       const dataMigration = new DataMigration(cfg);
       dataMigration.addWordlistsToWords();
@@ -99,7 +99,7 @@ describe('DataMigration', function() {
           'another': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: true, sub: 'tset' },
           'testWithList': { lists: [1, 3, 5], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
           'withoutRepeat': { lists: [1, 3, 5], matchMethod: Constants.MATCH_METHODS.EXACT, separators: true, sub: 'tset' },
-        }
+        },
       };
       const cfg = new WebConfig(data);
       const dataMigration = new DataMigration(cfg);

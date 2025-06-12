@@ -12,7 +12,7 @@ describe('WebFilter', function() {
         'example.com': { disabled: true },
         'sub.sample.com': { adv: true },
         /* eslint-enable @typescript-eslint/naming-convention */
-      }
+      },
     });
 
     // Setup mock window/document
