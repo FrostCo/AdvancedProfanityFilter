@@ -67,7 +67,7 @@
     "test:nocov": "mocha --paths",
     "test:types:tests": "tsc --noEmit -p test/tsconfig.json",
     "test:types": "tsc --noEmit",
-    "test": "npm run test:lint && npm run test:types && npm run test:addon && npm run test:cov",
+    "test": "npm run test:lint && npm run test:format && npm run test:types && npm run test:addon && npm run test:cov",
     "type-check:watch": "npm run type-check -- --watch",
     "update:deps": "npx npm-check-updates --concurrency 10 --timeout 600000 --upgrade",
     "update:help": "node bin/updateHelp.js",
