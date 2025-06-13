@@ -85,6 +85,7 @@
     "chokidar": "^4.0.3",
     "download": "^8.0.0",
     "eslint": "^9.28.0",
+    "eslint-config-prettier": "^10.1.5",
     "fs-extra": "^11.3.0",
     "globby": "^14.1.0",
     "marked": "^15.0.12",
