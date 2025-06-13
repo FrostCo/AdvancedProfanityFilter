@@ -28,7 +28,10 @@ export default class Bookmarklet {
   customizedCode(cfg: WebConfig): string {
     const prefix = '/* @preserve - Start User Config */';
     const suffix = '/* @preserve - End User Config */';
-    const configRegExp = new RegExp(`${prefix.replace(/[\/\*]/g, '\\$&')}[\\S\\s]\*${suffix.replace(/[\/\*]/g, '\\$&')}`, 'm');
+    const configRegExp = new RegExp(
+      `${prefix.replace(/[\/\*]/g, '\\$&')}[\\S\\s]\*${suffix.replace(/[\/\*]/g, '\\$&')}`,
+      'm'
+    );
 
     try {
       const cfgCode = this.code.match(configRegExp).toString();

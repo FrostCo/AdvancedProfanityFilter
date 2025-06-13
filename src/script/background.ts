@@ -9,11 +9,21 @@ import Logger from '@APF/lib/logger';
 export default class Background {
   //#region Class reference helpers
   // Can be overridden in children classes
-  static get Config() { return WebConfig; }
-  static get Constants() { return Constants; }
-  static get DataMigration() { return DataMigration; }
-  static get Domain() { return Domain; }
-  static get Translation() { return Translation; }
+  static get Config() {
+    return WebConfig;
+  }
+  static get Constants() {
+    return Constants;
+  }
+  static get DataMigration() {
+    return DataMigration;
+  }
+  static get Domain() {
+    return Domain;
+  }
+  static get Translation() {
+    return Translation;
+  }
   //#endregion
 
   // #region Constants
@@ -51,7 +61,7 @@ export default class Background {
       language: this.Config._defaults.language,
       password: this.Config._defaults.password,
     };
-    const config = await this.Config.getSyncStorage(requiredConfig) as Partial<WebConfig>;
+    const config = (await this.Config.getSyncStorage(requiredConfig)) as Partial<WebConfig>;
     const translation = new this.Translation(['common', 'background'], config.language);
 
     if (config.contextMenu) {
@@ -117,21 +127,29 @@ export default class Background {
   static contextMenusOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
     switch (info.menuItemId) {
       case 'addSelection':
-        this.processSelection('addWord', info.selectionText); break;
+        this.processSelection('addWord', info.selectionText);
+        break;
       case 'disableTabOnce':
-        this.disableTabOnce(tab.id); break;
+        this.disableTabOnce(tab.id);
+        break;
       case 'options':
-        chrome.runtime.openOptionsPage(); break;
+        chrome.runtime.openOptionsPage();
+        break;
       case 'removeSelection':
-        this.processSelection('removeWord', info.selectionText); break;
+        this.processSelection('removeWord', info.selectionText);
+        break;
       case 'toggleAdvancedForDomain':
-        this.toggleDomain((new URL(tab.url)).hostname, 'advanced'); break;
+        this.toggleDomain(new URL(tab.url).hostname, 'advanced');
+        break;
       case 'toggleForDomain':
-        this.toggleDomain((new URL(tab.url)).hostname, 'disable'); break;
+        this.toggleDomain(new URL(tab.url).hostname, 'disable');
+        break;
       case 'toggleFramesForDomain':
-        this.toggleDomain((new URL(tab.url)).hostname, 'frames'); break;
+        this.toggleDomain(new URL(tab.url).hostname, 'frames');
+        break;
       case 'toggleTabDisable':
-        this.toggleTabDisable(tab.id); break;
+        this.toggleTabDisable(tab.id);
+        break;
     }
   }
 
@@ -150,7 +168,10 @@ export default class Background {
 
   static async handleBackgroundDataRequest(request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
     const storage = await this.loadBackgroundStorage();
-    const tabId = request.source == this.Constants.MESSAGING.CONTEXT && sender && sender.tab && sender.tab.id ? sender.tab.id : request.tabId;
+    const tabId =
+      request.source == this.Constants.MESSAGING.CONTEXT && sender && sender.tab && sender.tab.id
+        ? sender.tab.id
+        : request.tabId;
     if (!tabId) {
       // Firefox: sender.tab is not always defined
       const response: BackgroundData = { disabledTab: false };
@@ -163,21 +184,20 @@ export default class Background {
 
     // Reset tab's counters
     if (
-      request.source == this.Constants.MESSAGING.CONTEXT
-      && sender.frameId == this.Constants.TOP_WINDOW_FRAME_ID
-      && (
-        !tabOptions.counters
-        || Object.keys(tabOptions.counters).length
-      )
+      request.source == this.Constants.MESSAGING.CONTEXT &&
+      sender.frameId == this.Constants.TOP_WINDOW_FRAME_ID &&
+      (!tabOptions.counters || Object.keys(tabOptions.counters).length)
     ) {
       tabOptions.counters = {};
       updated = true;
     }
 
     if (
-      tabOptions.disabled
-      || (request.source == this.Constants.MESSAGING.CONTEXT && tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE)
-      || (request.source == this.Constants.MESSAGING.POPUP && tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.DISABLED)
+      tabOptions.disabled ||
+      (request.source == this.Constants.MESSAGING.CONTEXT &&
+        tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.WILL_DISABLE) ||
+      (request.source == this.Constants.MESSAGING.POPUP &&
+        tabOptions.disabledOnce == this.Constants.TAB_DISABLE_ONCE.DISABLED)
     ) {
       response.disabledTab = true;
     }
@@ -221,11 +241,11 @@ export default class Background {
         if (showNotification) {
           const translation = new this.Translation(['common', 'background']);
           chrome.notifications.create('extensionUpdate', {
-            'type': 'basic',
-            'title': translation.t('background:updateNotification.title'),
-            'message': translation.t('background:updateNotification.message'),
-            'iconUrl': 'img/icon64.png',
-            'isClickable': true,
+            type: 'basic',
+            title: translation.t('background:updateNotification.title'),
+            message: translation.t('background:updateNotification.message'),
+            iconUrl: 'img/icon64.png',
+            isClickable: true,
           });
         }
       }
@@ -240,7 +260,12 @@ export default class Background {
   }
 
   static newTabOptions(storage: BackgroundStorage, tabId: number, options: TabStorageOptions = {}): TabStorageOptions {
-    const _defaults: TabStorageOptions = { counters: {}, status: 0, disabled: false, disabledOnce: this.Constants.TAB_DISABLE_ONCE.NOT_SET };
+    const _defaults: TabStorageOptions = {
+      counters: {},
+      status: 0,
+      disabled: false,
+      disabledOnce: this.Constants.TAB_DISABLE_ONCE.NOT_SET,
+    };
     const tabOptions = Object.assign({}, _defaults, options) as TabStorageOptions;
     tabOptions.id = tabId;
     tabOptions.registeredAt = new Date().getTime();
@@ -315,7 +340,12 @@ export default class Background {
     sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
   }
 
-  static async onContextMessageElse(chromeAction: typeof chrome.browserAction, request: Message, sender: chrome.runtime.MessageSender, sendResponse) {
+  static async onContextMessageElse(
+    chromeAction: typeof chrome.browserAction,
+    request: Message,
+    sender: chrome.runtime.MessageSender,
+    sendResponse
+  ) {
     // Update tab's status and set badge color
     if (request.status && sender && sender.tab && sender.tab.id) {
       // Firefox: sender.tab is not always defined
@@ -389,7 +419,11 @@ export default class Background {
 
   static async tabsOnUpdated(tabId, changeInfo, tab) {
     if (changeInfo.url) {
-      const message: Message = { source: this.Constants.MESSAGING.BACKGROUND, destination: this.Constants.MESSAGING.CONTEXT, urlUpdate: changeInfo.url };
+      const message: Message = {
+        source: this.Constants.MESSAGING.BACKGROUND,
+        destination: this.Constants.MESSAGING.CONTEXT,
+        urlUpdate: changeInfo.url,
+      };
       chrome.tabs.sendMessage(tabId, message, () => chrome.runtime.lastError); // Suppress error if no listener
     }
   }
@@ -400,11 +434,14 @@ export default class Background {
 
     switch (action) {
       case 'advanced':
-        domain.advanced = !domain.advanced; break;
+        domain.advanced = !domain.advanced;
+        break;
       case 'disable':
-        cfg.enabledDomainsOnly ? domain.enabled = !domain.enabled : domain.disabled = !domain.disabled; break;
+        cfg.enabledDomainsOnly ? (domain.enabled = !domain.enabled) : (domain.disabled = !domain.disabled);
+        break;
       case 'frames':
-        cfg.enabledFramesOnly ? domain.framesOn = !domain.framesOn : domain.framesOff = !domain.framesOff; break;
+        cfg.enabledFramesOnly ? (domain.framesOn = !domain.framesOn) : (domain.framesOff = !domain.framesOff);
+        break;
     }
 
     try {
@@ -431,7 +468,12 @@ export default class Background {
       status = tabOptions.status;
     }
     if (!sendResponse) sendResponse = chrome.runtime.sendMessage;
-    const message: Message = { destination: this.Constants.MESSAGING.POPUP, source: this.Constants.MESSAGING.BACKGROUND, status: status, tabId: tabId };
+    const message: Message = {
+      destination: this.Constants.MESSAGING.POPUP,
+      source: this.Constants.MESSAGING.BACKGROUND,
+      status: status,
+      tabId: tabId,
+    };
     sendResponse(message, () => chrome.runtime.lastError); // Suppress error if Popup isn't active
   }
 

@@ -19,18 +19,32 @@ export default class WebFilter extends Filter {
   location: Location | URL;
   observer: MutationObserver;
   processMutationTarget: boolean;
-  processNode: (node: Document | HTMLElement | Node | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
+  processNode: (
+    node: Document | HTMLElement | Node | ShadowRoot,
+    wordlistId: number,
+    statsType?: string | null
+  ) => void;
   shadowObserver: MutationObserver;
   stats: Statistics;
   summary: Summary;
 
   //#region Class reference helpers
   // Can be overridden in children classes
-  static get Config() { return WebConfig; }
-  static get Constants() { return Constants; }
-  static get Domain() { return Domain; }
-  static get Page() { return Page; }
-  get Class() { return (this.constructor as typeof WebFilter); }
+  static get Config() {
+    return WebConfig;
+  }
+  static get Constants() {
+    return Constants;
+  }
+  static get Domain() {
+    return Domain;
+  }
+  static get Page() {
+    return Page;
+  }
+  get Class() {
+    return this.constructor as typeof WebFilter;
+  }
   //#endregion
 
   static readonly observerConfig: MutationObserverInit = {
@@ -55,28 +69,34 @@ export default class WebFilter extends Filter {
   }
 
   get _defaultWordStat(): WordStatistic {
-    return { [ this.Class.Constants.STATS_TYPE_TEXT ]: 0 };
+    return { [this.Class.Constants.STATS_TYPE_TEXT]: 0 };
   }
 
   _processStatsBeforeSaving(stats) {}
 
   _processWordStat(stats, word: string) {
     if (!stats.words[word]) stats.words[word] = this._defaultWordStat;
-    stats.words[word][this.Class.Constants.STATS_TYPE_TEXT] += this.stats.words[word][this.Class.Constants.STATS_TYPE_TEXT];
+    stats.words[word][this.Class.Constants.STATS_TYPE_TEXT] +=
+      this.stats.words[word][this.Class.Constants.STATS_TYPE_TEXT];
   }
 
   advancedReplaceText(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
     if (node.parentNode || node === document) {
       for (const regExp of this.wordlists[wordlistId].regExps) {
         // @ts-ignore: External library function
-        findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: (portion, match) => {
-          // logger.debug('[APF] Advanced match found', node.textContent);
-          if (portion.index === 0) { // Replace the whole match on the first portion and skip the rest
-            return this.replaceText(match[0], wordlistId, statsType);
-          } else {
-            return '';
-          }
-        } });
+        findAndReplaceDOMText(node, {
+          preset: 'prose',
+          find: regExp,
+          replace: (portion, match) => {
+            // logger.debug('[APF] Advanced match found', node.textContent);
+            if (portion.index === 0) {
+              // Replace the whole match on the first portion and skip the rest
+              return this.replaceText(match[0], wordlistId, statsType);
+            } else {
+              return '';
+            }
+          },
+        });
       }
     } else {
       // ?: Might want to add support for processNode()
@@ -90,7 +110,7 @@ export default class WebFilter extends Filter {
 
   buildInitStateMessage(message: Message) {
     // Get status
-    message.iframe = !!(this.iframe);
+    message.iframe = !!this.iframe;
     message.advanced = this.domain.advanced;
     message.deep = this.domain.deep;
     message.status = this.Class.Constants.STATUS.NORMAL;
@@ -98,7 +118,9 @@ export default class WebFilter extends Filter {
     if (message.deep) message.status = this.Class.Constants.STATUS.DEEP;
 
     // Always show counter if not in normal mode
-    if (this.cfg.showCounter && message.status != this.Class.Constants.STATUS.NORMAL) { message.counter = this.counter; }
+    if (this.cfg.showCounter && message.status != this.Class.Constants.STATUS.NORMAL) {
+      message.counter = this.counter;
+    }
   }
 
   buildMessage(destination: string, data = {}): Message {
@@ -124,10 +146,14 @@ export default class WebFilter extends Filter {
   }
 
   cleanNode(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
-    if (this.Class.Page.isForbiddenNode(node)) { return false; }
-    if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
+    if (this.Class.Page.isForbiddenNode(node)) {
+      return false;
+    }
+    if (node.shadowRoot) {
+      this.filterShadowRoot(node.shadowRoot, wordlistId, statsType);
+    }
     if (node.childNodes.length > 0) {
-      for (let i = 0; i < node.childNodes.length ; i++) {
+      for (let i = 0; i < node.childNodes.length; i++) {
         this.cleanNode(node.childNodes[i], wordlistId, statsType);
       }
     } else {
@@ -135,7 +161,12 @@ export default class WebFilter extends Filter {
     }
   }
 
-  cleanNodeAttribute(node, attribute: string, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
+  cleanNodeAttribute(
+    node,
+    attribute: string,
+    wordlistId: number,
+    statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT
+  ) {
     if (node[attribute] != '') {
       const result = this.replaceTextResult(node[attribute], wordlistId, statsType);
       if (result.modified && this.filterText) {
@@ -194,8 +225,12 @@ export default class WebFilter extends Filter {
   }
 
   cleanText(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
-    if (this.Class.Page.isForbiddenNode(node)) { return false; }
-    if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
+    if (this.Class.Page.isForbiddenNode(node)) {
+      return false;
+    }
+    if (node.shadowRoot) {
+      this.filterShadowRoot(node.shadowRoot, wordlistId, statsType);
+    }
     if (node.childElementCount > 0) {
       const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
       // Note: This while loop skips processing on first node
@@ -215,7 +250,11 @@ export default class WebFilter extends Filter {
     }
   }
 
-  filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
+  filterShadowRoot(
+    shadowRoot: ShadowRoot,
+    wordlistId: number,
+    statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT
+  ) {
     this.shadowObserver.observe(shadowRoot, this.Class.observerConfig);
     this.processNode(shadowRoot, wordlistId, statsType);
   }
@@ -245,25 +284,33 @@ export default class WebFilter extends Filter {
     if (this.cfg.collectStats) {
       const wordStats = this.stats.words;
       if (!wordStats[word.value]) {
-        wordStats[word.value] = { [ this.Class.Constants.STATS_TYPE_TEXT ]: 0 };
+        wordStats[word.value] = { [this.Class.Constants.STATS_TYPE_TEXT]: 0 };
       }
 
-      if (this.filterText && statsType == this.Class.Constants.STATS_TYPE_TEXT) wordStats[word.value][this.Class.Constants.STATS_TYPE_TEXT]++;
+      if (this.filterText && statsType == this.Class.Constants.STATS_TYPE_TEXT)
+        wordStats[word.value][this.Class.Constants.STATS_TYPE_TEXT]++;
     }
   }
 
   getBackgroundData() {
     return new Promise((resolve, reject) => {
-      const message = this.buildMessage(this.Class.Constants.MESSAGING.BACKGROUND, { backgroundData: true, iframe: !!this.iframe });
+      const message = this.buildMessage(this.Class.Constants.MESSAGING.BACKGROUND, {
+        backgroundData: true,
+        iframe: !!this.iframe,
+      });
       chrome.runtime.sendMessage(message, (response) => {
-        if (!response) { response = { disabledTab: false }; }
+        if (!response) {
+          response = { disabledTab: false };
+        }
         resolve(response);
       });
     });
   }
 
   async getStatsFromStorage() {
-    const { stats }: { stats: Statistics } = await this.Class.Config.getLocalStorage({ stats: this._defaultStats }) as any;
+    const { stats }: { stats: Statistics } = (await this.Class.Config.getLocalStorage({
+      stats: this._defaultStats,
+    })) as any;
     return stats;
   }
 
@@ -289,9 +336,11 @@ export default class WebFilter extends Filter {
     // The hostname should resolve to the browser window's URI (or the parent of an IFRAME) for disabled/advanced page checks
     if (window != window.top) {
       this.iframe = document.location;
-      try { // same domain
+      try {
+        // same domain
         this.hostname = window.parent.location.hostname;
-      } catch (err) { // different domain
+      } catch (err) {
+        // different domain
         if (document.referrer) {
           this.hostname = new URL(document.referrer).hostname;
         } else {
@@ -334,7 +383,9 @@ export default class WebFilter extends Filter {
   }
 
   async persistStats() {
-    if (!this.Class.Config.chromeStorageAvailable()) { return false; }
+    if (!this.Class.Config.chromeStorageAvailable()) {
+      return false;
+    }
     try {
       const words = Object.keys(this.stats.words);
       if (words.length) {
@@ -344,7 +395,9 @@ export default class WebFilter extends Filter {
           this._processWordStat(stats, word);
         }
 
-        if (stats.startedAt == null) { stats.startedAt = Date.now(); }
+        if (stats.startedAt == null) {
+          stats.startedAt = Date.now();
+        }
 
         this._processStatsBeforeSaving(stats);
         await this.Class.Config.saveLocalStorage({ stats: stats });
@@ -430,14 +483,7 @@ export default class WebFilter extends Filter {
   }
 
   shouldBeDisabled(backgroundData: BackgroundData) {
-    return (
-      backgroundData.disabledTab
-      || (
-        this.cfg.enabledDomainsOnly
-        && !this.domain.enabled
-      )
-      || this.domain.disabled
-    );
+    return backgroundData.disabledTab || (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled;
   }
 
   shouldProcessAddedNode(node) {
@@ -450,11 +496,9 @@ export default class WebFilter extends Filter {
 
   get shouldProcessFrame() {
     return (
-      !this.iframe
-      || (
-        (this.cfg.enabledFramesOnly && this.domain.framesOn)
-        || (!this.cfg.enabledFramesOnly && !this.domain.framesOff)
-      )
+      !this.iframe ||
+      (this.cfg.enabledFramesOnly && this.domain.framesOn) ||
+      (!this.cfg.enabledFramesOnly && !this.domain.framesOff)
     );
   }
 
@@ -484,7 +528,9 @@ export default class WebFilter extends Filter {
     const shadowMutations = this.shadowObserver.takeRecords();
     observer.disconnect();
     this.shadowObserver.disconnect();
-    if (mutations) { this.processMutations(mutations); }
+    if (mutations) {
+      this.processMutations(mutations);
+    }
     if (shadowMutations) this.processMutations(shadowMutations);
   }
 

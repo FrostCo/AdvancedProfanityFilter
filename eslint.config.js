@@ -53,16 +53,19 @@ export default [
       // Base ESLint rules
       'array-bracket-spacing': ['warn', 'never'],
       'arrow-parens': ['warn', 'always'],
-      'comma-dangle': ['error', {
-        arrays: 'always-multiline',
-        objects: 'always-multiline',
-        imports: 'always-multiline',
-        exports: 'always-multiline',
-        functions: 'never'
-      }],
+      'comma-dangle': [
+        'error',
+        {
+          arrays: 'always-multiline',
+          objects: 'always-multiline',
+          imports: 'always-multiline',
+          exports: 'always-multiline',
+          functions: 'never',
+        },
+      ],
       'comma-spacing': 'warn',
       'eol-last': 'error',
-      'indent': ['warn', 2, { SwitchCase: 1 }],
+      indent: ['warn', 2, { SwitchCase: 1 }],
       'keyword-spacing': ['error', { before: true, after: true }],
       'no-console': 'warn',
       'no-control-regex': 'off',
@@ -80,19 +83,19 @@ export default [
       'no-useless-escape': 'off',
       'object-curly-spacing': ['warn', 'always'],
       'prefer-const': ['error', { destructuring: 'all' }],
-      'quotes': ['error', 'single', { avoidEscape: true }],
-      'semi': ['error', 'always'],
-      'space-before-function-paren': ['error', {
-        anonymous: 'never',
-        named: 'never',
-        asyncArrow: 'always',
-      }],
+      quotes: ['error', 'single', { avoidEscape: true }],
+      semi: ['error', 'always'],
+      'space-before-function-paren': [
+        'error',
+        {
+          anonymous: 'never',
+          named: 'never',
+          asyncArrow: 'always',
+        },
+      ],
 
       // TypeScript-specific rules from @typescript-eslint
-      '@typescript-eslint/ban-ts-comment': [
-        'warn',
-        { 'ts-ignore': 'allow-with-description' },
-      ],
+      '@typescript-eslint/ban-ts-comment': ['warn', { 'ts-ignore': 'allow-with-description' }],
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-member-accessibility': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',

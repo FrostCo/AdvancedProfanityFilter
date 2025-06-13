@@ -15,45 +15,45 @@ For an overview of features and options, please head to the [wiki](https://githu
 
 ## Installation
 
-| Browser | Download |
-|---------|----------|
-| Chrome  | [Chrome Web Store](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh) |
-| Firefox | [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/advanced_profanity_filter) |
-| Edge    | [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/lhnbdlbhcokmgpjenkjolnhdnkphnkam) |
-| Safari  | [App Store](https://apps.apple.com/app/advanced-profanity-filter/id1593810102) |
-| Opera   | [Opera addons](https://addons.opera.com/en/extensions/details/advanced-profanity-filter/) |
-| Android | [Kiwi](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser) or [Firefox](https://play.google.com/store/apps/details?id=org.mozilla.firefox) |
-| Other   | [Bookmarklet Info](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Bookmarklet) |
+| Browser | Download                                                                                                                                                                |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chrome  | [Chrome Web Store](https://chrome.google.com/webstore/detail/advanced-profanity-filter/piajkpdbaniagacofgklljacgjhefjeh)                                                |
+| Firefox | [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/advanced_profanity_filter)                                                                                   |
+| Edge    | [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/lhnbdlbhcokmgpjenkjolnhdnkphnkam)                                                             |
+| Safari  | [App Store](https://apps.apple.com/app/advanced-profanity-filter/id1593810102)                                                                                          |
+| Opera   | [Opera addons](https://addons.opera.com/en/extensions/details/advanced-profanity-filter/)                                                                               |
+| Android | [Kiwi](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser) or [Firefox](https://play.google.com/store/apps/details?id=org.mozilla.firefox)           |
+| Other   | [Bookmarklet Info](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Bookmarklet)                                                                                 |
 | TV Cast | [Instructions](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Audio#watch-on-tv) - [Discussion](https://github.com/FrostCo/AdvancedProfanityFilter/issues/206) |
 
 ## Features
 
-* Filter modes
-  * Censor - Hide offending words
-  * Substitute - Replace offensive words
-  * Remove - Remove offensive words
-* Customizable word and substitution lists
-* Works everywhere, including popular pages such as:
-  * Facebook
-  * Pinterest
-  * Reddit
-* Twitter
-* [Audio muting](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Audio) for videos on supported sites:
-  * Amazon Video
-  * Hulu
-  * Netflix
-  * Plex
-  * Vudu
-  * YouTube
-  * And more! see [all supported sites here](https://apf.frostco.dev/status)
-  * You can even add your own! ([advanced](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site))
+- Filter modes
+  - Censor - Hide offending words
+  - Substitute - Replace offensive words
+  - Remove - Remove offensive words
+- Customizable word and substitution lists
+- Works everywhere, including popular pages such as:
+  - Facebook
+  - Pinterest
+  - Reddit
+- Twitter
+- [Audio muting](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Audio) for videos on supported sites:
+  - Amazon Video
+  - Hulu
+  - Netflix
+  - Plex
+  - Vudu
+  - YouTube
+  - And more! see [all supported sites here](https://apf.frostco.dev/status)
+  - You can even add your own! ([advanced](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Custom-Audio-Muting-Site))
 
 For a detailed overview of the features and settings, please see the [Getting Started page](https://github.com/FrostCo/AdvancedProfanityFilter/wiki).
 
 ## Issues, Suggestions or Feedback?
 
-* Found a bug? Please open an [issue](https://github.com/FrostCo/AdvancedProfanityFilter/issues/new).
-* Have a great idea to improve the project? Want to share some feedback? Head over [here](https://goo.gl/forms/LTqFpJ0mCTsrgGgf2).
+- Found a bug? Please open an [issue](https://github.com/FrostCo/AdvancedProfanityFilter/issues/new).
+- Have a great idea to improve the project? Want to share some feedback? Head over [here](https://goo.gl/forms/LTqFpJ0mCTsrgGgf2).
 
 ## Beta Testing
 

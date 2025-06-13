@@ -43,7 +43,7 @@ export default class Common {
       const regex = new RegExp(`^${prefix}`);
       parsed.arguments = parsed.arguments.map((arg) => arg.replace(regex, ''));
     };
-    parsed.removeEmptyArguments = (blank = '') => parsed.arguments = parsed.arguments.filter((arg) => arg !== blank);
+    parsed.removeEmptyArguments = (blank = '') => (parsed.arguments = parsed.arguments.filter((arg) => arg !== blank));
     return parsed;
   }
 

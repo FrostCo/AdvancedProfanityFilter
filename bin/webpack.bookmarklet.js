@@ -52,14 +52,10 @@ export default {
       }),
     ],
   },
-  plugins: [
-    new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) }),
-  ],
+  plugins: [new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) })],
   resolve: {
     extensions: ['.js', '.ts'],
-    plugins: [
-      new TsconfigPathsPlugin({ configFile: './tsconfig.json' }),
-    ],
+    plugins: [new TsconfigPathsPlugin({ configFile: './tsconfig.json' })],
   },
   target: 'web',
 };

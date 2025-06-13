@@ -3,8 +3,12 @@ import Common from './common.js';
 
 export default class Postbuild {
   //#region Class reference helpers
-  static get Common() { return Common; }
-  get Class() { return (this.constructor); }
+  static get Common() {
+    return Common;
+  }
+  get Class() {
+    return this.constructor;
+  }
   //#endregion
 
   constructor() {
@@ -19,7 +23,7 @@ export default class Postbuild {
   edgeLegacyBuild() {
     const msPreload = {
       backgroundScript: 'backgroundScriptsAPIBridge.js',
-      contentScript: 'contentScriptsAPIBridge.js'
+      contentScript: 'contentScriptsAPIBridge.js',
     };
 
     // Fix options_page
@@ -39,13 +43,17 @@ export default class Postbuild {
   firefoxBuild() {
     this.manifest.browser_specific_settings = {
       gecko: {
-        id: '{853d1586-e2ab-4387-a7fd-1f7f894d2651}'
-      }
+        id: '{853d1586-e2ab-4387-a7fd-1f7f894d2651}',
+      },
     };
 
     switch (this.buildData.manifestVersion) {
-      case 2: this.firefoxMv2Build(); break;
-      case 3: this.firefoxMv3Build(); break;
+      case 2:
+        this.firefoxMv2Build();
+        break;
+      case 3:
+        this.firefoxMv3Build();
+        break;
     }
   }
 
@@ -78,8 +86,8 @@ export default class Postbuild {
     };
     this.manifest.browser_action = {
       default_icon: {
-        '19': 'img/icon19.png',
-        '38': 'img/icon38.png',
+        19: 'img/icon19.png',
+        38: 'img/icon38.png',
       },
       default_popup: 'popup.html',
       default_title: 'Advanced Profanity Filter',
@@ -92,8 +100,12 @@ export default class Postbuild {
 
   handleManifestVersions() {
     switch (this.buildData.manifestVersion) {
-      case 2: this.handleManifestV2(); break;
-      case 3: this.handleManifestV3(); break;
+      case 2:
+        this.handleManifestV2();
+        break;
+      case 3:
+        this.handleManifestV3();
+        break;
     }
   }
 
@@ -105,8 +117,12 @@ export default class Postbuild {
 
   targetCustomizations() {
     switch (this.buildData.target) {
-      case 'edgeLegacy': this.edgeLegacyBuild(); break;
-      case 'firefox': this.firefoxBuild(); break;
+      case 'edgeLegacy':
+        this.edgeLegacyBuild();
+        break;
+      case 'firefox':
+        this.firefoxBuild();
+        break;
     }
   }
 

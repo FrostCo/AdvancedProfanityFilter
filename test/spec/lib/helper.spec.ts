@@ -24,9 +24,9 @@ import {
 
 const array = ['a', 'needle', 'in', 'a', 'large', 'haystack'];
 
-describe('Helper', function() {
-  describe('booleanToNumber()', function() {
-    it('Return a number from a boolean', function() {
+describe('Helper', function () {
+  describe('booleanToNumber()', function () {
+    it('Return a number from a boolean', function () {
       expect(booleanToNumber(true)).to.eql(Constants.TRUE);
       expect(booleanToNumber(false)).to.eql(Constants.FALSE);
       expect(booleanToNumber(undefined)).to.eql(Constants.FALSE);
@@ -34,7 +34,7 @@ describe('Helper', function() {
     });
   });
 
-  describe('deepJsonClone()', function() {
+  describe('deepJsonClone()', function () {
     const deepObject = {
       children: {
         deep: false,
@@ -54,22 +54,22 @@ describe('Helper', function() {
       shallow: true,
     };
 
-    it('Shallow clones object', function() {
+    it('Shallow clones object', function () {
       expect(JSON.stringify(deepCloneJson(shallowObject))).to.eql(JSON.stringify(shallowObject));
     });
 
-    it('Deep clones object', function() {
+    it('Deep clones object', function () {
       expect(JSON.stringify(deepCloneJson(deepObject))).to.eql(JSON.stringify(deepObject));
     });
 
-    it('Is a clone (delete)', function() {
+    it('Is a clone (delete)', function () {
       const clone = deepCloneJson(deepObject);
       delete clone.name;
       expect(clone.name).to.be.undefined;
       expect(deepObject.name).to.not.be.undefined;
     });
 
-    it('Is a clone (update)', function() {
+    it('Is a clone (update)', function () {
       const clone = deepCloneJson(deepObject);
       const key = 'name2';
       clone[key] = 'deep2';
@@ -78,8 +78,8 @@ describe('Helper', function() {
     });
   });
 
-  describe('formatNumber()', function() {
-    it('Format numbers for counter display', function() {
+  describe('formatNumber()', function () {
+    it('Format numbers for counter display', function () {
       expect(formatNumber(999)).to.eql('999');
       expect(formatNumber(1000)).to.eql('1k');
       expect(formatNumber(1499)).to.eql('1.4k');
@@ -98,7 +98,7 @@ describe('Helper', function() {
     });
   });
 
-  describe('getParent()', function() {
+  describe('getParent()', function () {
     const elements = {
       textContent: 'child',
       parentElement: {
@@ -116,32 +116,32 @@ describe('Helper', function() {
     };
     const child = elements;
 
-    it('Get parent', function() {
+    it('Get parent', function () {
       expect(child.textContent == 'child');
       expect(getParent(child).textContent).to.eql('parent');
       expect(getParent(child, 1).textContent).to.eql('parent');
     });
 
-    it('Get grandparent', function() {
+    it('Get grandparent', function () {
       expect(getParent(child, 2).textContent).to.eql('grandparent');
     });
 
-    it('Get great-grandparent', function() {
+    it('Get great-grandparent', function () {
       expect(getParent(child, 3).textContent).to.eql('great-grandparent');
     });
 
-    it('Get great-great-grandparent', function() {
+    it('Get great-great-grandparent', function () {
       expect(getParent(child, 4).textContent).to.eql('great-great-grandparent');
     });
 
-    it('no parent', function() {
+    it('no parent', function () {
       expect(getParent(child, 5)).to.be.null;
       expect(getParent(child, 6)).to.be.null;
     });
   });
 
-  describe('hmsToSeconds()', function() {
-    it('Convert HH:MM:SS.mmm to seconds', function() {
+  describe('hmsToSeconds()', function () {
+    it('Convert HH:MM:SS.mmm to seconds', function () {
       expect(hmsToSeconds('0:00:11.97')).to.eql(11.97);
       expect(hmsToSeconds('0:00:17')).to.eql(17);
       expect(hmsToSeconds('0:02:33.09')).to.eql(153.09);
@@ -154,13 +154,13 @@ describe('Helper', function() {
       expect(hmsToSeconds('3:00:18.500')).to.eql(10818.5);
     });
 
-    it('should handle empty input string', function() {
+    it('should handle empty input string', function () {
       expect(hmsToSeconds('')).to.eql(0);
     });
   });
 
-  describe('isVersionOlder()', function() {
-    it('should return true when provided version is older than minimum', function() {
+  describe('isVersionOlder()', function () {
+    it('should return true when provided version is older than minimum', function () {
       let version = getVersion('1.1.10');
       let minimum = getVersion('1.2.15');
       expect(isVersionOlder(version, minimum)).to.equal(true);
@@ -182,7 +182,7 @@ describe('Helper', function() {
       expect(isVersionOlder(version, minimum)).to.equal(true);
     });
 
-    it('should return false when provided version is not older than minimum', function() {
+    it('should return false when provided version is not older than minimum', function () {
       let version = getVersion('1.5.10');
       let minimum = getVersion('1.2.1');
       expect(isVersionOlder(version, minimum)).to.equal(false);
@@ -213,16 +213,16 @@ describe('Helper', function() {
     });
   });
 
-  describe('lastElement()', function() {
-    it('Returns last element in array', function() {
+  describe('lastElement()', function () {
+    it('Returns last element in array', function () {
       expect(lastElement([1])).to.eql(1);
       expect(lastElement([1, 2, 3])).to.eql(3);
       expect(lastElement([])).to.eql(undefined);
     });
   });
 
-  describe('numberToBoolean()', function() {
-    it('Return a boolean from a number', function() {
+  describe('numberToBoolean()', function () {
+    it('Return a boolean from a number', function () {
       expect(numberToBoolean(Constants.FALSE)).to.eql(false);
       expect(numberToBoolean(Constants.TRUE)).to.eql(true);
       expect(numberToBoolean(5)).to.eql(true);
@@ -231,53 +231,53 @@ describe('Helper', function() {
     });
   });
 
-  describe('numberWithCommas()', function() {
-    it('Works with numbers', function() {
+  describe('numberWithCommas()', function () {
+    it('Works with numbers', function () {
       expect(numberWithCommas(123)).to.eql('123');
       expect(numberWithCommas(1234)).to.eql('1,234');
       expect(numberWithCommas(1234567890)).to.eql('1,234,567,890');
     });
 
-    it('Works with number string', function() {
+    it('Works with number string', function () {
       expect(numberWithCommas('123')).to.eql('123');
       expect(numberWithCommas('1234')).to.eql('1,234');
       expect(numberWithCommas('1234567890')).to.eql('1,234,567,890');
     });
   });
 
-  describe('prettyPrintArray()', function() {
-    it('Single element', function() {
+  describe('prettyPrintArray()', function () {
+    it('Single element', function () {
       expect(prettyPrintArray(['abc'])).to.eql('[abc]');
     });
 
-    it('Multiple element', function() {
+    it('Multiple element', function () {
       expect(prettyPrintArray(['abc', '123', 'zyx'])).to.eql('[abc, 123, zyx]');
     });
   });
 
-  describe('randomArrayElement()', function() {
-    it('Returns random item from array', function() {
+  describe('randomArrayElement()', function () {
+    it('Returns random item from array', function () {
       const values = ['abc', 123];
       expect(randomArrayElement(values)).to.be.oneOf(values);
     });
   });
 
-  describe('removeFromArray()', function() {
-    it('should return an array with the matching element removed', function() {
+  describe('removeFromArray()', function () {
+    it('should return an array with the matching element removed', function () {
       expect(removeFromArray(array, 'needle')).to.eql(['a', 'in', 'a', 'large', 'haystack']);
     });
 
-    it('should return an array with multiple removed values', function() {
+    it('should return an array with multiple removed values', function () {
       expect(removeFromArray(array, ['a', 'needle', 'in'])).to.eql(['large', 'haystack']);
     });
 
-    it('should return an array with the same values if no match is found', function() {
+    it('should return an array with the same values if no match is found', function () {
       expect(removeFromArray(array, 'pin')).to.eql(array);
     });
   });
 
-  describe('secondsToHMS()', function() {
-    it('Convert seconds to HH:MM:SS.mmm', function() {
+  describe('secondsToHMS()', function () {
+    it('Convert seconds to HH:MM:SS.mmm', function () {
       expect(secondsToHMS(11.97)).to.eql('00:00:11.970');
       expect(secondsToHMS(17)).to.eql('00:00:17.000');
       expect(secondsToHMS(153.09)).to.eql('00:02:33.090');
@@ -291,74 +291,74 @@ describe('Helper', function() {
     });
   });
 
-  describe('sortObjectKeys()', function() {
+  describe('sortObjectKeys()', function () {
     const object = { c: 3, b: 2, a: 1, _z: 0 };
-    it('Sorts object keys ignoring underscore-prefixed keys', function() {
+    it('Sorts object keys ignoring underscore-prefixed keys', function () {
       expect(Object.keys(object)).to.eql(['c', 'b', 'a', '_z']);
       expect(Object.keys(sortObjectKeys(object, true))).to.eql(['a', 'b', 'c']);
     });
 
-    it('Sorts object keys including underscore-prefixed keys', function() {
+    it('Sorts object keys including underscore-prefixed keys', function () {
       expect(Object.keys(sortObjectKeys(object, false))).to.eql(['_z', 'a', 'b', 'c']);
     });
   });
 
-  describe('stringArray()', function() {
-    it('Ensures array when passed a string', function() {
+  describe('stringArray()', function () {
+    it('Ensures array when passed a string', function () {
       expect(stringArray('abc')).to.eql(['abc']);
     });
 
-    it('Returns provided array', function() {
+    it('Returns provided array', function () {
       expect(stringArray(['abc', 'def'])).to.eql(['abc', 'def']);
     });
   });
 
-  describe('timeForFileName()', function() {
-    it('Returns time string', function() {
+  describe('timeForFileName()', function () {
+    it('Returns time string', function () {
       expect(timeForFileName()).to.match(/\d{4}-\d{2}-\d{2}_\d{6}/);
     });
   });
 
-  describe('truncateString()', function() {
-    it('Does not truncate short string', function() {
+  describe('truncateString()', function () {
+    it('Does not truncate short string', function () {
       expect(truncateString('short', 10)).to.eql('short');
     });
 
-    it('truncates long string', function() {
+    it('truncates long string', function () {
       expect(truncateString('this is a long string', 14)).to.eql('this is a l...');
     });
 
-    it('truncates long string with elipses', function() {
+    it('truncates long string with elipses', function () {
       expect(truncateString('this is a long string', 10, true)).to.eql('this is...');
     });
 
-    it('truncates long string with elipses and count elipses', function() {
+    it('truncates long string with elipses and count elipses', function () {
       expect(truncateString('this is a long string', 20, true)).to.eql('this is a long st...');
     });
 
-    it('truncates long string with elipses and not count elipses', function() {
+    it('truncates long string with elipses and not count elipses', function () {
       expect(truncateString('this is a long string', 20, true, false)).to.eql('this is a long strin...');
     });
 
-    it('truncates long string without elipses', function() {
+    it('truncates long string without elipses', function () {
       expect(truncateString('this is a long string', 10, false)).to.eql('this is a');
     });
   });
 
-  describe('upperCaseFirst()', function() {
-    it('Returns string with first character uppercased', function() {
+  describe('upperCaseFirst()', function () {
+    it('Returns string with first character uppercased', function () {
       expect(upperCaseFirst('abc', false)).to.eql('Abc');
     });
 
-    it('Returns string with first character uppercased and the rest lowercased', function() {
+    it('Returns string with first character uppercased and the rest lowercased', function () {
       expect(upperCaseFirst('aBC', true)).to.eql('Abc');
     });
 
-    it('Returns string with first character uppercased and the rest lowercased', function() {
+    it('Returns string with first character uppercased and the rest lowercased', function () {
       expect(upperCaseFirst('hello WORLD', true)).to.eql('Hello world');
     });
 
-    it('Returns string with first character uppercased leaving the rest alone', function() {
+    it('Returns string with first character uppercased leaving the rest alone', function () {
       expect(upperCaseFirst('hello WORLD', false)).to.eql('Hello WORLD');
     });
   });

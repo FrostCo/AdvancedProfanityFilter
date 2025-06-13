@@ -130,11 +130,11 @@ h4 {
 }
 
 #statusText.active {
-  color: #228B22
+  color: #228b22;
 }
 
 #statusText.available {
-  color: #8A2BE2
+  color: #8a2be2;
 }
 
 /* Summary table */
@@ -152,7 +152,7 @@ h4 {
 #summary table tbody .summary-tooltip {
   position: absolute;
   left: 0;
-  bottom: 18px
+  bottom: 18px;
 }
 
 .options {
@@ -235,7 +235,7 @@ input:checked + .slider:before {
 
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 26px;
   width: 26px;
   left: 4px;

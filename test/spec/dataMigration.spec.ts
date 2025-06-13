@@ -3,9 +3,9 @@ import Constants from '@APF/lib/constants';
 import DataMigration from '@APF/dataMigration';
 import WebConfig from '@APF/webConfig';
 
-describe('DataMigration', function() {
-  describe('_renameConfigKeys()', function() {
-    it('should migrate to allowlists', function() {
+describe('DataMigration', function () {
+  describe('_renameConfigKeys()', function () {
+    it('should migrate to allowlists', function () {
       const cfg = {
         iWordAllowlist: WebConfig._defaults.iWordAllowlist,
         wordAllowlist: WebConfig._defaults.wordAllowlist,
@@ -26,13 +26,19 @@ describe('DataMigration', function() {
   });
 
   // 2.7.0
-  describe('addWordlistsToWords()', function() {
-    it('should add wordlist to all words', function() {
+  describe('addWordlistsToWords()', function () {
+    it('should add wordlist to all words', function () {
       const cfg = {
         words: {
-          'test': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
-          'another': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
-          'testWithList': { lists: [1, 3, 5], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
+          test: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
+          another: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
+          testWithList: {
+            lists: [1, 3, 5],
+            matchMethod: Constants.MATCH_METHODS.EXACT,
+            repeat: true,
+            separators: false,
+            sub: 'tset',
+          },
         },
       };
       const dataMigration = new DataMigration(cfg);
@@ -44,20 +50,29 @@ describe('DataMigration', function() {
   });
 
   // 2.7.0
-  describe('removeGlobalMatchMethod()', function() {
-    it('should remove global match method and adjust RegExp method', function() {
+  describe('removeGlobalMatchMethod()', function () {
+    it('should remove global match method and adjust RegExp method', function () {
       const data = {
         words: {
-          'test': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
-          'another': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'tset' },
-          'testWithList': { lists: [1, 3, 5], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
+          test: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
+          another: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: true, separators: false, sub: 'tset' },
+          testWithList: {
+            lists: [1, 3, 5],
+            matchMethod: Constants.MATCH_METHODS.EXACT,
+            repeat: true,
+            separators: false,
+            sub: 'tset',
+          },
           /* eslint-disable-next-line @typescript-eslint/naming-convention */
           '^myRegexp$': { lists: [1, 3, 5], matchMethod: 4, repeat: true, separators: false, sub: 'tset' },
         },
         globalMatchMethod: 3,
       };
       const cfg = new WebConfig(data);
-      cfg.remove = (prop) => { delete cfg[prop]; return true; }; // TODO: Find a good way to mock chrome.*
+      cfg.remove = (prop) => {
+        delete cfg[prop];
+        return true;
+      }; // TODO: Find a good way to mock chrome.*
       const dataMigration = new DataMigration(cfg);
       dataMigration.removeGlobalMatchMethod();
       expect(cfg.words['test'].matchMethod).to.eql(Constants.MATCH_METHODS.EXACT);
@@ -69,8 +84,8 @@ describe('DataMigration', function() {
   });
 
   // 2.7.0
-  describe('removeOldDomainArrays()', function() {
-    it('should migrate all old domain arrays', function() {
+  describe('removeOldDomainArrays()', function () {
+    it('should migrate all old domain arrays', function () {
       const cfg = {
         advancedDomains: ['example.com', 'www.example.com'],
         disabledDomains: ['test.com', 'test.org'],
@@ -91,36 +106,47 @@ describe('DataMigration', function() {
   });
 
   // 2.20.0
-  describe('updateWordRepeatAndSeparatorDataTypes()', function() {
-    describe('convert repeat and separators to numbers', function() {
+  describe('updateWordRepeatAndSeparatorDataTypes()', function () {
+    describe('convert repeat and separators to numbers', function () {
       const data = {
         words: {
-          'test': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: false, separators: false, sub: 'tset' },
-          'another': { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: true, sub: 'tset' },
-          'testWithList': { lists: [1, 3, 5], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: false, sub: 'tset' },
-          'withoutRepeat': { lists: [1, 3, 5], matchMethod: Constants.MATCH_METHODS.EXACT, separators: true, sub: 'tset' },
+          test: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: false, separators: false, sub: 'tset' },
+          another: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: true, separators: true, sub: 'tset' },
+          testWithList: {
+            lists: [1, 3, 5],
+            matchMethod: Constants.MATCH_METHODS.EXACT,
+            repeat: true,
+            separators: false,
+            sub: 'tset',
+          },
+          withoutRepeat: {
+            lists: [1, 3, 5],
+            matchMethod: Constants.MATCH_METHODS.EXACT,
+            separators: true,
+            sub: 'tset',
+          },
         },
       };
       const cfg = new WebConfig(data);
       const dataMigration = new DataMigration(cfg);
       dataMigration.updateWordRepeatAndSeparatorDataTypes();
 
-      it('when both are false', function() {
+      it('when both are false', function () {
         expect(cfg.words['test'].repeat).to.equal(Constants.FALSE);
         expect(cfg.words['test'].separators).to.equal(Constants.FALSE);
       });
 
-      it('when both are false', function() {
+      it('when both are false', function () {
         expect(cfg.words['another'].repeat).to.equal(Constants.TRUE);
         expect(cfg.words['another'].separators).to.equal(Constants.TRUE);
       });
 
-      it('when repeat is true and separators is false', function() {
+      it('when repeat is true and separators is false', function () {
         expect(cfg.words['testWithList'].repeat).to.equal(Constants.TRUE);
         expect(cfg.words['testWithList'].separators).to.equal(Constants.FALSE);
       });
 
-      it('when repeat is not present and separators is true', function() {
+      it('when repeat is not present and separators is true', function () {
         expect(cfg.words['withoutRepeat'].repeat).to.equal(Constants.FALSE);
         expect(cfg.words['withoutRepeat'].separators).to.equal(Constants.TRUE);
       });
@@ -128,8 +154,8 @@ describe('DataMigration', function() {
   });
 
   // 2.40.0
-  describe('renameToWordAllowlist()', function() {
-    it('should migrate to allowlists when populated', async function() {
+  describe('renameToWordAllowlist()', function () {
+    it('should migrate to allowlists when populated', async function () {
       const cfg = {
         iWordAllowlist: WebConfig._defaults.iWordAllowlist,
         iWordWhitelist: ['ALLCAPS', 'LOUD NOISES'],
@@ -144,7 +170,7 @@ describe('DataMigration', function() {
       expect(cfg.wordAllowlist[0]).to.equal('allowed');
     });
 
-    it('should migrate to allowlists when empty', async function() {
+    it('should migrate to allowlists when empty', async function () {
       const cfg = {
         iWordAllowlist: WebConfig._defaults.iWordAllowlist,
         iWordWhitelist: [],

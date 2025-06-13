@@ -23,12 +23,24 @@ export default class Popup {
 
   //#region Class reference helpers
   // Can be overridden in children classes
-  static get Config() { return WebConfig; }
-  static get Constants() { return Constants; }
-  static get Domain() { return Domain; }
-  static get Page() { return Page; }
-  static get Translation() { return Translation; }
-  get Class() { return (this.constructor as typeof Popup); }
+  static get Config() {
+    return WebConfig;
+  }
+  static get Constants() {
+    return Constants;
+  }
+  static get Domain() {
+    return Domain;
+  }
+  static get Page() {
+    return Page;
+  }
+  static get Translation() {
+    return Translation;
+  }
+  get Class() {
+    return this.constructor as typeof Popup;
+  }
   //#endregion
 
   static readonly _requiredConfig = [
@@ -62,11 +74,12 @@ export default class Popup {
   static async load(instance: Popup) {
     instance.cfg = await this.Config.load(this._requiredConfig);
     logger.setLevel(instance.cfg.loggingLevel);
-    instance.tab = await this.Domain.getCurrentTab() as chrome.tabs.Tab;
+    instance.tab = (await this.Domain.getCurrentTab()) as chrome.tabs.Tab;
     if (instance.tab.url) {
       instance.url = new URL(instance.tab.url);
       instance.domain = this.Domain.byHostname(instance.url.hostname, instance.cfg.domains);
-    } else { // No URL
+    } else {
+      // No URL
       instance.url = null;
       instance.domain = new this.Domain('');
     }
@@ -125,7 +138,7 @@ export default class Popup {
     if (this.cfg.darkMode == null) {
       this.prefersDarkScheme ? this.applyDarkTheme() : this.applyLightTheme();
     } else {
-      this.cfg.darkMode ?  this.applyDarkTheme() : this.applyLightTheme();
+      this.cfg.darkMode ? this.applyDarkTheme() : this.applyLightTheme();
     }
   }
 
@@ -133,7 +146,9 @@ export default class Popup {
     document.getElementById('domainModeLabel').textContent = this.translation.t('popup:labels.domainMode');
     document.getElementById('filterMethodLabel').textContent = this.translation.t('popup:labels.filterMethod');
     document.getElementById('textWordlistLabel').textContent = this.translation.t('popup:labels.textWordlist');
-    document.getElementById('summaryTableHeader').textContent = this.translation.t('popup:summaryTableHeaders.filteredWords');
+    document.getElementById('summaryTableHeader').textContent = this.translation.t(
+      'popup:summaryTableHeaders.filteredWords'
+    );
     document.getElementById('options').textContent = this.translation.t('popup:buttons.options');
     document.getElementById('gettingStarted').textContent = this.translation.t('popup:footer.help');
     document.getElementById('changelogLink').textContent = this.translation.t('popup:footer.changelog');
@@ -142,7 +157,9 @@ export default class Popup {
     document.getElementById('domainModeAdvanced').textContent = this.translation.t('popup:domainModes.advanced');
     document.getElementById('domainModeDeep').textContent = this.translation.t('popup:domainModes.deep');
     document.getElementById('filterMethodCensor').textContent = this.translation.t('popup:filterMethods.censor');
-    document.getElementById('filterMethodSubstitute').textContent = this.translation.t('popup:filterMethods.substitute');
+    document.getElementById('filterMethodSubstitute').textContent = this.translation.t(
+      'popup:filterMethods.substitute'
+    );
     document.getElementById('filterMethodRemove').textContent = this.translation.t('popup:filterMethods.remove');
     document.getElementById('filterMethodOff').textContent = this.translation.t('popup:filterMethods.off');
   }
@@ -158,7 +175,8 @@ export default class Popup {
     if (this.isRestrictedPage) return this.translation.t('popup:disabledMessages.restrictedPage');
     if (this.isPasswordProtected) return this.translation.t('popup:disabledMessages.passwordProtected');
     if (this.disabledTab) return this.translation.t('popup:disabledMessages.tab');
-    if (this.cfg.enabledDomainsOnly && !this.domain.enabled) return this.translation.t('popup:disabledMessages.domainMode');
+    if (this.cfg.enabledDomainsOnly && !this.domain.enabled)
+      return this.translation.t('popup:disabledMessages.domainMode');
     if (this.domain.disabled) return this.translation.t('popup:disabledMessages.domain');
     if (this.isDisconnected) return this.translation.t('popup:disabledMessages.disconnected');
     return '';
@@ -203,7 +221,9 @@ export default class Popup {
         tabId: this.tab.id,
       };
       chrome.runtime.sendMessage(message, (response) => {
-        if (!response) { response = { disabledTab: false }; }
+        if (!response) {
+          response = { disabledTab: false };
+        }
         resolve(response);
       });
     });
@@ -278,7 +298,11 @@ export default class Popup {
     });
 
     // Initial data request
-    const message = { destination: this.Class.Constants.MESSAGING.CONTEXT, source: this.Class.Constants.MESSAGING.POPUP, summary: true };
+    const message = {
+      destination: this.Class.Constants.MESSAGING.CONTEXT,
+      source: this.Class.Constants.MESSAGING.POPUP,
+      summary: true,
+    };
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       chrome.tabs.sendMessage(tabs[0].id, message, () => {
         if (chrome.runtime.lastError) this.webFilterActive = false;
@@ -298,22 +322,22 @@ export default class Popup {
     return false; // Disable for now because its not stable and can break when toggling
 
     return (
-      !this.webFilterActive
-      && !this.disabledTab
-      && !this.isRestrictedPage
-      && !this.domain.disabled
-      && !(this.cfg.enabledDomainsOnly && !this.domain.enabled)
+      !this.webFilterActive &&
+      !this.disabledTab &&
+      !this.isRestrictedPage &&
+      !this.domain.disabled &&
+      !(this.cfg.enabledDomainsOnly && !this.domain.enabled)
     );
   }
 
   get isDisabled() {
     return (
-      this.domain.disabled
-      || this.disabledTab
-      || (this.cfg.enabledDomainsOnly && !this.domain.enabled)
-      || this.isRestrictedPage
-      || this.isPasswordProtected
-      || this.isDisconnected
+      this.domain.disabled ||
+      this.disabledTab ||
+      (this.cfg.enabledDomainsOnly && !this.domain.enabled) ||
+      this.isRestrictedPage ||
+      this.isPasswordProtected ||
+      this.isDisconnected
     );
   }
 
@@ -323,16 +347,12 @@ export default class Popup {
 
   get isRestrictedPage() {
     return (
-      !this.domain.hostname
-      || this.Class.Page.disabledProtocols.test(this.url.protocol)
-      || (
-        this.Class.Config.BUILD.target == this.Class.Constants.BUILD_TARGET_CHROME
-        && this.Class.Page.disabledChromePages.includes(this.domain.hostname)
-      )
-      || (
-        this.Class.Config.BUILD.target == this.Class.Constants.BUILD_TARGET_FIREFOX
-        && this.Class.Page.disabledFirefoxPages.includes(this.domain.hostname)
-      )
+      !this.domain.hostname ||
+      this.Class.Page.disabledProtocols.test(this.url.protocol) ||
+      (this.Class.Config.BUILD.target == this.Class.Constants.BUILD_TARGET_CHROME &&
+        this.Class.Page.disabledChromePages.includes(this.domain.hostname)) ||
+      (this.Class.Config.BUILD.target == this.Class.Constants.BUILD_TARGET_FIREFOX &&
+        this.Class.Page.disabledFirefoxPages.includes(this.domain.hostname))
     );
   }
 

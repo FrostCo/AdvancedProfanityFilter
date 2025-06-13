@@ -17,10 +17,12 @@ download(readmeURI).then((data) => {
   const md = data.toString();
   const html = marked(md);
 
-  const newOptionPageHTML = optionPageHTML.replace(/<div id="helpContainer">.*?<\/div>/s, function(match) {
+  const newOptionPageHTML = optionPageHTML.replace(/<div id="helpContainer">.*?<\/div>/s, function (match) {
     foundMatch = true;
     let output = prefix;
-    html.split('\n').forEach((line) => { if (line.trim() != '') output += `\n    ${line}`; });
+    html.split('\n').forEach((line) => {
+      if (line.trim() != '') output += `\n    ${line}`;
+    });
     return output + postfix;
   });
   if (foundMatch) {

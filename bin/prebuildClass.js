@@ -5,8 +5,12 @@ import Common from './common.js';
 
 export default class Prebuild {
   //#region Class reference helpers
-  static get Common() { return Common; }
-  get Class() { return (this.constructor); }
+  static get Common() {
+    return Common;
+  }
+  get Class() {
+    return this.constructor;
+  }
   //#endregion
 
   constructor(args) {
@@ -30,8 +34,12 @@ export default class Prebuild {
 
   chromeBuild() {
     switch (this.data.manifestVersion) {
-      case 2: this.chromeMv2Build(); break;
-      case 3: this.chromeMv3Build(); break;
+      case 2:
+        this.chromeMv2Build();
+        break;
+      case 3:
+        this.chromeMv3Build();
+        break;
     }
   }
 
@@ -77,7 +85,7 @@ export default class Prebuild {
   handleEnvArg(arg) {
     if (this.Class.Common.environments.includes(arg)) {
       this.environmentProvided = true;
-      return this.environment = arg;
+      return (this.environment = arg);
     }
   }
 
@@ -88,7 +96,7 @@ export default class Prebuild {
     if (this.Class.Common.targets.includes(targetName)) {
       this.data.target = targetName;
       if (manifestVersion) this.data.manifestVersion = parseInt(manifestVersion.match(/\d$/)?.toString());
-      return this.targetProvided = true;
+      return (this.targetProvided = true);
     }
   }
 

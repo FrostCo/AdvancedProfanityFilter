@@ -7,9 +7,15 @@ export default class DataMigration {
 
   //#region Class reference helpers
   // Can be overridden in children classes
-  static get Config() { return WebConfig; }
-  static get Constants() { return Constants; }
-  get Class() { return (this.constructor as typeof DataMigration); }
+  static get Config() {
+    return WebConfig;
+  }
+  static get Constants() {
+    return Constants;
+  }
+  get Class() {
+    return this.constructor as typeof DataMigration;
+  }
   //#endregion
 
   static readonly _migrations: Migration[] = [
@@ -60,12 +66,13 @@ export default class DataMigration {
   }
 
   // TODO: Only tested with arrays
-  _renameConfigKeys(oldCfg: WebConfig, oldKeys: string[], mapping: {[key: string]: string}) {
+  _renameConfigKeys(oldCfg: WebConfig, oldKeys: string[], mapping: { [key: string]: string }) {
     for (const oldKey of oldKeys) {
       const newKey = mapping[oldKey];
       if (!oldCfg[oldKey]) oldCfg[oldKey] = this.Class.Config._defaults[newKey];
       if (oldCfg[oldKey].length) {
-        if (this.cfg[newKey].length) throw new Error(`'${oldKey}' and '${newKey}' both exist. Please combine them manually into '${newKey}'.`);
+        if (this.cfg[newKey].length)
+          throw new Error(`'${oldKey}' and '${newKey}' both exist. Please combine them manually into '${newKey}'.`);
         this.cfg[newKey] = oldCfg[oldKey];
       }
     }
@@ -108,9 +115,9 @@ export default class DataMigration {
     };
 
     if (
-      cfg.words[originalWord]
-      && cfg.words[originalWord].matchMethod == originalWordConf.matchMethod
-      && cfg.words[originalWord].sub == originalWordConf.sub
+      cfg.words[originalWord] &&
+      cfg.words[originalWord].matchMethod == originalWordConf.matchMethod &&
+      cfg.words[originalWord].sub == originalWordConf.sub
     ) {
       Object.keys(update).forEach((word) => {
         cfg.words[word] = update[word];
@@ -121,7 +128,7 @@ export default class DataMigration {
   // [1.0.13] - updateRemoveWordsFromStorage - transition from previous words structure under the hood
   async moveToNewWordsStorage() {
     const oldWordsKey = 'words';
-    const oldCfg = await this.Class.Config.getSyncStorage(oldWordsKey) as any;
+    const oldCfg = (await this.Class.Config.getSyncStorage(oldWordsKey)) as any;
     if (oldCfg.words) {
       await this.Class.Config.saveSyncStorage({ _words0: oldCfg.words });
       await this.Class.Config.removeSyncStorage(oldWordsKey);
@@ -144,14 +151,18 @@ export default class DataMigration {
 
   removeOldDomainArrays() {
     const cfg = this.cfg as any;
-    if (!cfg.domains) { cfg.domains = {}; }
+    if (!cfg.domains) {
+      cfg.domains = {};
+    }
     const propsToDelete = { advancedDomains: 'adv', disabledDomains: 'disabled', enabledDomains: 'enabled' };
     Object.keys(propsToDelete).forEach((propToDelete) => {
       if (cfg[propToDelete] && Array.isArray(cfg[propToDelete])) {
         if (cfg[propToDelete].length > 0) {
           cfg[propToDelete].forEach((domain) => {
             if (domain) {
-              if (cfg.domains[domain] == null) { cfg.domains[domain] = {}; }
+              if (cfg.domains[domain] == null) {
+                cfg.domains[domain] = {};
+              }
               cfg.domains[domain][propsToDelete[propToDelete]] = true;
             }
           });
@@ -168,7 +179,7 @@ export default class DataMigration {
 
     // Handle chrome storage config
     if (this.Class.Config.chromeStorageAvailable()) {
-      const oldCfg = await this.Class.Config.getSyncStorage(oldKeys) as any;
+      const oldCfg = (await this.Class.Config.getSyncStorage(oldKeys)) as any;
       if (Object.keys(oldCfg).some((k) => oldKeys.includes(k))) {
         this._renameConfigKeys(oldCfg, oldKeys, mapping);
         await this.Class.Config.removeSyncStorage(oldKeys);

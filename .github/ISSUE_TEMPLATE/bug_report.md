@@ -4,7 +4,6 @@ about: Create a report to help us improve
 title: ''
 labels: 'Bug'
 assignees: ''
-
 ---
 
 _Instructions: This template is written in Markdown. Click the "Preview" tab to see what it will look like when submitted. Fill in the applicable sections (you can erase the examples if you'd like)._

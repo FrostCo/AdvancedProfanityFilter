@@ -118,7 +118,7 @@ h4.section-header {
 #header span.title {
   font-size: 28px;
   vertical-align: middle;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 #header img.discord {
@@ -132,7 +132,8 @@ h4.section-header {
   line-height: 24px;
 }
 
-#menu > a:hover, #menu > div:hover {
+#menu > a:hover,
+#menu > div:hover {
   color: #fff !important;
   background-color: var(--blue) !important;
 }
@@ -168,12 +169,17 @@ div#wordsPage div#wordlistSelections {
 }
 
 /* Lists */
-button#wordlistAdd, button#wordlistRename, button#wordlistRemove {
+button#wordlistAdd,
+button#wordlistRename,
+button#wordlistRemove {
   margin-top: 10px;
 }
 
 /* Bookmarklet */
-a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#bookmarkletLink:visited {
+a#bookmarkletLink:active,
+a#bookmarkletLink:hover,
+a#bookmarkletLink:link,
+a#bookmarkletLink:visited {
   color: #fff;
 }
 
@@ -198,7 +204,9 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 /* #endregion */
 
 /* #region Modals */
-#confirmModal, #passwordModal, #statusModal {
+#confirmModal,
+#passwordModal,
+#statusModal {
   z-index: 900;
 }
 
@@ -257,7 +265,6 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
   border-bottom: 1px solid;
 }
 /* #endregion */
-
 
 /* #region Utility */
 .disabled {
@@ -323,7 +330,7 @@ a#bookmarkletLink:active, a#bookmarkletLink:hover, a#bookmarkletLink:link, a#boo
 #statsWordTable tbody .stats-tooltip {
   position: absolute;
   left: 0;
-  bottom: 18px
+  bottom: 18px;
 }
 /* #endregion */
 

@@ -21,9 +21,15 @@ export default class Constants {
   static readonly TRUE = 1;
 
   // Helper Functions
-  static filterMethodName(id: number) { return this.nameById(this.FILTER_METHODS, id); }
-  static loggingLevelName(id: number) { return this.nameByValue(this.LOGGING_LEVELS, id); }
-  static matchMethodName(id: number) { return this.nameById(this.MATCH_METHODS, id); }
+  static filterMethodName(id: number) {
+    return this.nameById(this.FILTER_METHODS, id);
+  }
+  static loggingLevelName(id: number) {
+    return this.nameByValue(this.LOGGING_LEVELS, id);
+  }
+  static matchMethodName(id: number) {
+    return this.nameById(this.MATCH_METHODS, id);
+  }
   static nameById(obj: Record<string, number>, id: number): string {
     return upperCaseFirst(Object.entries(obj).filter((arr) => arr[1] === id)[0][0]);
   }
@@ -33,7 +39,11 @@ export default class Constants {
 
   static orderedArray(obj: Record<string, number>) {
     const result = [];
-    Object.values(obj).sort().forEach((id) => { result.push(Constants.nameById(obj, id)); });
+    Object.values(obj)
+      .sort()
+      .forEach((id) => {
+        result.push(Constants.nameById(obj, id));
+      });
     return result;
   }
 }

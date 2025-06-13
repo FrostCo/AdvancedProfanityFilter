@@ -7,8 +7,12 @@ export default class OptionAuth {
 
   //#region Class reference helpers
   // Can be overridden in children classes
-  static get OptionPage() { return OptionPage; }
-  get Class() { return (this.constructor as typeof OptionAuth); }
+  static get OptionPage() {
+    return OptionPage;
+  }
+  get Class() {
+    return this.constructor as typeof OptionAuth;
+  }
   //#endregion
 
   authenticate(evt) {
@@ -38,7 +42,10 @@ export default class OptionAuth {
       this.setPasswordButton();
       if (this.optionPage.cfg.contextMenu) this.optionPage.sendUpdateContextMenuMessage();
     } catch (err) {
-      this.optionPage.handleError(this.optionPage.translation.t('options:configsPage.messages.updatePasswordFailed'), err);
+      this.optionPage.handleError(
+        this.optionPage.translation.t('options:configsPage.messages.updatePasswordFailed'),
+        err
+      );
     }
   }
 
@@ -46,18 +53,26 @@ export default class OptionAuth {
     const passwordText = document.getElementById('setPassword') as HTMLInputElement;
     const passwordBtn = document.getElementById('setPasswordBtn') as HTMLButtonElement;
 
-    if (this.optionPage.cfg.password) { // Password already set
+    if (this.optionPage.cfg.password) {
+      // Password already set
       this.optionPage.enableBtn(passwordBtn);
-      if (passwordText.value) { // Password field filled
+      if (passwordText.value) {
+        // Password field filled
         passwordBtn.innerText = this.optionPage.translation.t('options:configsPage.buttons.setPassword').toUpperCase();
-      } else { // Empty password field
-        passwordBtn.innerText = this.optionPage.translation.t('options:configsPage.buttons.removePassword').toUpperCase();
+      } else {
+        // Empty password field
+        passwordBtn.innerText = this.optionPage.translation
+          .t('options:configsPage.buttons.removePassword')
+          .toUpperCase();
       }
-    } else { // Password not already set
+    } else {
+      // Password not already set
       passwordBtn.innerText = this.optionPage.translation.t('options:configsPage.buttons.setPassword').toUpperCase();
-      if (passwordText.value) { // Password field filled
+      if (passwordText.value) {
+        // Password field filled
         this.optionPage.enableBtn(passwordBtn);
-      } else { // Empty password field
+      } else {
+        // Empty password field
         this.optionPage.disableBtn(passwordBtn);
       }
     }
