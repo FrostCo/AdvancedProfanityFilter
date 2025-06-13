@@ -1,6 +1,7 @@
 import globals from 'globals';
 import eslintJs from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import prettier from 'eslint-config-prettier/flat';
 
 export default [
   {
@@ -159,4 +160,5 @@ export default [
       '@typescript-eslint/no-use-before-define': 'off',
     },
   },
+  prettier,
 ];
