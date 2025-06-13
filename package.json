@@ -89,6 +89,7 @@
     "mocha": "^11.5.0",
     "npm-check-updates": "^18.0.1",
     "nyc": "^17.1.0",
+    "prettier": "^3.5.3",
     "sinon": "^20.0.0",
     "terser-webpack-plugin": "^5.3.14",
     "ts-loader": "^9.5.2",
