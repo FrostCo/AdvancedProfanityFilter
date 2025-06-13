@@ -2,18 +2,18 @@ import { expect } from 'chai';
 import Constants from '@APF/lib/constants';
 import WebConfig from '@APF/webConfig';
 
-describe('WebConfig', function() {
-  it('should throw when no async_params provided', function() {
-    expect(() => (new WebConfig)).to.throw();
+describe('WebConfig', function () {
+  it('should throw when no async_params provided', function () {
+    expect(() => new WebConfig()).to.throw();
   });
 
-  describe('.combineData()', function() {
-    it('should combine _domain# data', function() {
+  describe('.combineData()', function () {
+    it('should combine _domain# data', function () {
       const config = new WebConfig(WebConfig._defaults);
       delete config.domains;
       /* eslint-disable @typescript-eslint/naming-convention */
-      config._domains0 = { 'www.example0.com': { 'adv': true } };
-      config._domains1 = { 'www.example1.com': { 'adv': true } };
+      config._domains0 = { 'www.example0.com': { adv: true } };
+      config._domains1 = { 'www.example1.com': { adv: true } };
       /* eslint-enable @typescript-eslint/naming-convention */
       config._lastSplitKeys = { domains: 1 };
       expect(config.domain).to.not.exist;
@@ -25,10 +25,18 @@ describe('WebConfig', function() {
       expect(config._domains1).to.not.exist;
     });
 
-    it('should combine _words# data', function() {
+    it('should combine _words# data', function () {
       const config = new WebConfig(WebConfig._defaults);
       config._words0 = WebConfig._defaultWords;
-      config._words1 = { 'test': { lists: [], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.FALSE, sub: 'tset' } };
+      config._words1 = {
+        test: {
+          lists: [],
+          matchMethod: Constants.MATCH_METHODS.EXACT,
+          repeat: Constants.TRUE,
+          separators: Constants.FALSE,
+          sub: 'tset',
+        },
+      };
       config._lastSplitKeys = { words: 1 };
       expect(config.words).to.not.exist;
       const combinedKeys = WebConfig.combineData(config, 'words');
@@ -41,25 +49,25 @@ describe('WebConfig', function() {
     });
   });
 
-  describe('.getDataContainerKeys()', function() {
-    it('should return all matches', function() {
+  describe('.getDataContainerKeys()', function () {
+    it('should return all matches', function () {
       const config = new WebConfig(WebConfig._defaults);
       delete config.domains;
       /* eslint-disable @typescript-eslint/naming-convention */
-      config._domains0 = { 'www.example0.com': { 'adv': true } };
-      config._domains1 = { 'www.example1.com': { 'adv': true } };
+      config._domains0 = { 'www.example0.com': { adv: true } };
+      config._domains1 = { 'www.example1.com': { adv: true } };
       /* eslint-enable @typescript-eslint/naming-convention */
       expect(WebConfig.getDataContainerKeys(config, 'domains')).to.eql(['_domains0', '_domains1']);
     });
 
-    it('should return no matches if none', function() {
+    it('should return no matches if none', function () {
       const config = new WebConfig(WebConfig._defaults);
       expect(WebConfig.getDataContainerKeys(config, 'domains')).to.eql([]);
     });
   });
 
-  describe('ordered()', function() {
-    it('remove "_" prefix values', function() {
+  describe('ordered()', function () {
+    it('remove "_" prefix values', function () {
       const config = new WebConfig(WebConfig._defaults);
       config._lastSplitKeys = {};
       expect(config._lastSplitKeys).to.exist;
@@ -67,10 +75,10 @@ describe('WebConfig', function() {
     });
   });
 
-  describe('splitData()', function() {
+  describe('splitData()', function () {
     const encoder = new TextEncoder();
 
-    it('should split data on _splittingKeys', function() {
+    it('should split data on _splittingKeys', function () {
       const config = new WebConfig(WebConfig._defaults);
       const domains = {};
       let domainsLength = 0;
@@ -90,7 +98,7 @@ describe('WebConfig', function() {
       expect(Object.keys(data._domains0).length + Object.keys(data._domains1).length).to.eq(count);
     });
 
-    it('should not split when under max', function() {
+    it('should not split when under max', function () {
       const config = new WebConfig(WebConfig._defaults);
       const domains = {};
       let domainsLength = 0;

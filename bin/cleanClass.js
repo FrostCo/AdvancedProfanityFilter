@@ -4,8 +4,12 @@ import Common from './common.js';
 
 export default class Clean {
   //#region Class reference helpers
-  static get Common() { return Common; }
-  get Class() { return (this.constructor); }
+  static get Common() {
+    return Common;
+  }
+  get Class() {
+    return this.constructor;
+  }
   //#endregion
 
   constructor(args) {

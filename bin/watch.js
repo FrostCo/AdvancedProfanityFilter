@@ -33,12 +33,10 @@ function compileScript(file) {
 }
 
 const watcher = chokidar.watch(
-  [
-    path.join(process.cwd() + '/src/**/*.ts'),
-    path.join(process.cwd() + '/src/static/**/*.(css|html|json|)')
-  ], {
+  [path.join(process.cwd() + '/src/**/*.ts'), path.join(process.cwd() + '/src/static/**/*.(css|html|json|)')],
+  {
     awaitWriteFinish: true,
-    persistent: true
+    persistent: true,
   }
 );
 
@@ -49,6 +47,10 @@ watcher.on('ready', () => log('Initial scan complete. Watching for changes...\n\
 
 watcher.on('change', (filePath, stats) => {
   // console.log(filePath, stats);
-  if (scriptRegExp.test(filePath)) { compileScript(filePath); }
-  if (staticRegExp.test(filePath)) { copyStatic(filePath); }
+  if (scriptRegExp.test(filePath)) {
+    compileScript(filePath);
+  }
+  if (staticRegExp.test(filePath)) {
+    copyStatic(filePath);
+  }
 });

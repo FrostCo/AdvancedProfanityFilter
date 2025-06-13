@@ -7,10 +7,12 @@ export default class Translation {
 
   //#region Class reference helpers
   // Can be overridden in children classes
-  get Class() { return (this.constructor as typeof Translation); }
+  get Class() {
+    return this.constructor as typeof Translation;
+  }
   //#endregion
 
-  constructor(namespaces: string|string[] = [], language: string = 'en') {
+  constructor(namespaces: string | string[] = [], language: string = 'en') {
     namespaces = stringArray(namespaces);
     this.i18next = i18next;
     i18next.init({

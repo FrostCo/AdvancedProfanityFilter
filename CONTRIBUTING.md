@@ -71,7 +71,7 @@ If you prefer not to install the CLI, follow this format (ignore the curly brace
 Use one of the following scopes when writing your commit message:
 
 | Scope          | Description                                       |
-| -------------- | --------------------------------------------------|
+| -------------- | ------------------------------------------------- |
 | **audio**      | Audio muting feature                              |
 | **background** | Background script behavior (lifecycle, messaging) |
 | **build**      | Tooling for bundling, CI, or build output         |

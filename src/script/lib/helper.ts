@@ -9,12 +9,17 @@ export function deepCloneJson(object) {
 }
 
 /* istanbul ignore next */
-export function dynamicList(list: string[], select: HTMLSelectElement, upperCaseFirstChar: boolean = false, title?: string) {
+export function dynamicList(
+  list: string[],
+  select: HTMLSelectElement,
+  upperCaseFirstChar: boolean = false,
+  title?: string
+) {
   const array = title !== undefined ? [title, ...list] : list;
 
   const options = array.map((item) => {
     const option = document.createElement('option');
-    option.value = (title && item === title) ? '' : item;
+    option.value = title && item === title ? '' : item;
     option.textContent = upperCaseFirstChar ? upperCaseFirst(item) : item;
     return option;
   });
@@ -34,17 +39,21 @@ export function exportToFile(dataStr, fileName = 'data.txt') {
 // Format numbers up to 1B to be 4 characters or less
 export function formatNumber(number: number): string {
   const length = number.toString().length;
-  if (length <= 3) { // 0 - 999
+  if (length <= 3) {
+    // 0 - 999
     return number.toString();
-  } else if (length <= 6) { // 1,000 - 999,999
-    const n = (number/1000).toPrecision();
+  } else if (length <= 6) {
+    // 1,000 - 999,999
+    const n = (number / 1000).toPrecision();
     const index = n.indexOf('.');
-    return ((index >= -1 && index <= 1) ? n.slice(0, 3) : n.slice(0, index)) + 'k';
-  } else if (length <= 9) { // 1,000,000 - 999,999,999
-    const n = (number/1000000).toPrecision();
+    return (index >= -1 && index <= 1 ? n.slice(0, 3) : n.slice(0, index)) + 'k';
+  } else if (length <= 9) {
+    // 1,000,000 - 999,999,999
+    const n = (number / 1000000).toPrecision();
     const index = n.indexOf('.');
-    return ((index >= -1 && index <= 1) ? n.slice(0, 3) : n.slice(0, index)) + 'M';
-  } else { // >= 1,000,000,000
+    return (index >= -1 && index <= 1 ? n.slice(0, 3) : n.slice(0, index)) + 'M';
+  } else {
+    // >= 1,000,000,000
     return '1G+';
   }
 }
@@ -57,7 +66,11 @@ export function getElement(selector: string, root: Document | ShadowRoot | HTMLE
 
 // Returns the elements found by selector string
 //   Supports querying through a shadow DOM using '>>>'
-function getElementCore(selector: string, root: Document | HTMLElement | ShadowRoot = document, queryMethod = 'querySelector'): HTMLElement | NodeListOf<HTMLElement> {
+function getElementCore(
+  selector: string,
+  root: Document | HTMLElement | ShadowRoot = document,
+  queryMethod = 'querySelector'
+): HTMLElement | NodeListOf<HTMLElement> {
   let element;
   const domLayers = selector.split(Constants.SELECTOR_SHADOWROOT_DELIMITER);
 
@@ -86,7 +99,10 @@ function getElementCore(selector: string, root: Document | HTMLElement | ShadowR
 
 // Returns the elements found by selector string
 //   Supports querying through a shadow DOM using '>>>'
-export function getElements(selector: string, root: Document | HTMLElement | ShadowRoot = document): NodeListOf<HTMLElement> {
+export function getElements(
+  selector: string,
+  root: Document | HTMLElement | ShadowRoot = document
+): NodeListOf<HTMLElement> {
   return getElementCore(selector, root, 'querySelectorAll') as NodeListOf<HTMLElement>;
 }
 
@@ -116,7 +132,7 @@ export function hmsToSeconds(timeStr: string, precision: number = 3): number {
   const hour = parseInt(hh, 10) || 0;
   const minute = parseInt(mm, 10) || 0;
   const second = parseFloat(ss) || 0;
-  return parseFloat(((hour * 3600) + (minute * 60) + second).toFixed(precision));
+  return parseFloat((hour * 3600 + minute * 60 + second).toFixed(precision));
 }
 
 // Is the provided version lower than the minimum version?
@@ -180,7 +196,9 @@ export function randomArrayElement(array: any[]): string {
 export function readFile(file) {
   return new Promise((resolve, reject) => {
     const fr = new FileReader();
-    fr.onload = () => { resolve(fr.result); };
+    fr.onload = () => {
+      resolve(fr.result);
+    };
     fr.readAsText(file);
   });
 }
@@ -192,14 +210,16 @@ export function removeFromArray(array: string[], toRemove: string | string[]) {
 }
 
 export function secondsToHMS(seconds: number): string {
-  return new Date(seconds * 1000).toISOString().slice(11, (11 + 12));
+  return new Date(seconds * 1000).toISOString().slice(11, 11 + 12);
 }
 
 export function sortObjectKeys(object: any, ignoreUnderscores = true) {
-  return Object.keys(object).sort().reduce((obj, key) => {
-    if (!ignoreUnderscores || key[0] != '_') obj[key] = object[key];
-    return obj;
-  }, {});
+  return Object.keys(object)
+    .sort()
+    .reduce((obj, key) => {
+      if (!ignoreUnderscores || key[0] != '_') obj[key] = object[key];
+      return obj;
+    }, {});
 }
 
 export function stringArray(data: string | string[]): string[] {
@@ -209,9 +229,11 @@ export function stringArray(data: string | string[]): string[] {
 }
 
 export function timeForFileName() {
-  const padded = (num: number) => { return ('0' + num).slice(-2); };
-  const date = new Date;
-  const today = `${date.getFullYear()}-${padded(date.getMonth()+1)}-${padded(date.getDate())}`;
+  const padded = (num: number) => {
+    return ('0' + num).slice(-2);
+  };
+  const date = new Date();
+  const today = `${date.getFullYear()}-${padded(date.getMonth() + 1)}-${padded(date.getDate())}`;
   const time = `${padded(date.getHours())}${padded(date.getMinutes())}${padded(date.getSeconds())}`;
   return `${today}_${time}`;
 }

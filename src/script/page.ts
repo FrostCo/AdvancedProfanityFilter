@@ -10,16 +10,17 @@ export default class Page {
 
   // Returns true if a node should *not* be altered in any way
   static isForbiddenNode(node: any): boolean {
-    if (node.isContentEditable) { return true; }
+    if (node.isContentEditable) {
+      return true;
+    }
 
     // Check if parentNode is a forbidden tag
     if (
-      node.parentNode
-      && (
-        node.parentNode.isContentEditable
-        || Page.forbiddenTags.includes(node.parentNode.nodeName)
-      )
-    ) { return true; }
+      node.parentNode &&
+      (node.parentNode.isContentEditable || Page.forbiddenTags.includes(node.parentNode.nodeName))
+    ) {
+      return true;
+    }
 
     // Check if node is a forbidden tag
     return Page.forbiddenTags.includes(node.nodeName);

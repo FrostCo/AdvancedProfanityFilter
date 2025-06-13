@@ -5,8 +5,12 @@ import Common from './common.js';
 // Required for Firefox due to bundled code
 export default class PackageSource {
   //#region Class reference helpers
-  static get Common() { return Common; }
-  get Class() { return (this.constructor); }
+  static get Common() {
+    return Common;
+  }
+  get Class() {
+    return this.constructor;
+  }
   //#endregion
 
   constructor() {
@@ -14,7 +18,9 @@ export default class PackageSource {
   }
 
   addBinFiles() {
-    for (const file of this.binFiles) { this.zip.addLocalFile(file, 'bin/'); }
+    for (const file of this.binFiles) {
+      this.zip.addLocalFile(file, 'bin/');
+    }
   }
 
   addFiles() {
@@ -24,7 +30,9 @@ export default class PackageSource {
   }
 
   addRootFiles() {
-    for (const file of this.rootFiles) { this.zip.addLocalFile(file); }
+    for (const file of this.rootFiles) {
+      this.zip.addLocalFile(file);
+    }
   }
 
   addSourceFiles() {
@@ -58,14 +66,7 @@ export default class PackageSource {
   }
 
   get rootFiles() {
-    return [
-      '.build.json',
-      'LICENSE',
-      'package-lock.json',
-      'package.json',
-      'README.md',
-      'tsconfig.json',
-    ];
+    return ['.build.json', 'LICENSE', 'package-lock.json', 'package.json', 'README.md', 'tsconfig.json'];
   }
 
   run() {

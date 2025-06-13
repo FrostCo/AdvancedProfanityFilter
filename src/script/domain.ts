@@ -16,8 +16,12 @@ export default class Domain {
 
   //#region Class reference helpers
   // Can be overridden in children classes
-  static get Constants() { return Constants; }
-  get Class() { return (this.constructor as typeof Domain); }
+  static get Constants() {
+    return Constants;
+  }
+  get Class() {
+    return this.constructor as typeof Domain;
+  }
   //#endregion
 
   static readonly _domainCfgDefaults: DomainCfg = {
@@ -42,7 +46,9 @@ export default class Domain {
   }
 
   static findDomainKey(hostname: string, domains: { [domain: string]: DomainCfg }): string {
-    const sorted = Object.keys(domains).sort((a, b) => { return b.length - a.length; });
+    const sorted = Object.keys(domains).sort((a, b) => {
+      return b.length - a.length;
+    });
     return sorted.find((key) => new RegExp(`(^|.)${key}$`).test(hostname));
   }
 
@@ -120,7 +126,8 @@ export default class Domain {
     if (cfg.domains) {
       this.updateCfg();
 
-      if (JSON.stringify(this.cfg) === '{}') { // Nothing to save, so remove it
+      if (JSON.stringify(this.cfg) === '{}') {
+        // Nothing to save, so remove it
         delete cfg.domains[this.cfgKey];
       } else {
         cfg.domains[this.cfgKey] = this.cfg;
@@ -152,9 +159,18 @@ export default class Domain {
 
   updateFromModeIndex(index: number) {
     switch (index) {
-      case this.Class.Constants.DOMAIN_MODES.NORMAL: this.advanced = false; this.deep = false; break;
-      case this.Class.Constants.DOMAIN_MODES.ADVANCED: this.advanced = true; this.deep = false; break;
-      case this.Class.Constants.DOMAIN_MODES.DEEP: this.advanced = false; this.deep = true; break;
+      case this.Class.Constants.DOMAIN_MODES.NORMAL:
+        this.advanced = false;
+        this.deep = false;
+        break;
+      case this.Class.Constants.DOMAIN_MODES.ADVANCED:
+        this.advanced = true;
+        this.deep = false;
+        break;
+      case this.Class.Constants.DOMAIN_MODES.DEEP:
+        this.advanced = false;
+        this.deep = true;
+        break;
     }
   }
 }

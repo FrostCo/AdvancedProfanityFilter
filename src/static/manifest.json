@@ -10,20 +10,11 @@
     "48": "img/icon48.png",
     "128": "img/icon128.png"
   },
-  "permissions": [
-    "contextMenus",
-    "notifications",
-    "storage",
-    "tabs"
-  ],
+  "permissions": ["contextMenus", "notifications", "storage", "tabs"],
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "webFilter.js"
-      ],
+      "matches": ["<all_urls>"],
+      "js": ["webFilter.js"],
       "run_at": "document_start",
       "all_frames": true,
       "match_about_blank": true

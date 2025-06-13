@@ -2,10 +2,10 @@ name: Mirroring
 
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
   workflow_dispatch: # Manual dispatch
   schedule:
-    - cron: "0 */6 * * *" # Every 6 hours
+    - cron: '0 */6 * * *' # Every 6 hours
 
 jobs:
   codeberg:

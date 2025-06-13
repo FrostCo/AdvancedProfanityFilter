@@ -1,13 +1,13 @@
 {
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
   "files.associations": {
     "**/*.js.example": "javascript"
   },
   "vsicons.associations.files": [
     {
       "icon": "webpack",
-      "extensions": [
-        "webpack.bookmarklet.js"
-      ],
+      "extensions": ["webpack.bookmarklet.js"],
       "filename": true,
       "format": "svg"
     }

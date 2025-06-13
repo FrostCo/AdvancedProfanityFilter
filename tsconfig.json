@@ -7,12 +7,10 @@
     "outDir": "./built",
     "paths": {
       "@APF/*": ["src/script/*"],
-      "@VENDOR/*": ["src/script/vendor/*"],
+      "@VENDOR/*": ["src/script/vendor/*"]
     },
     "skipLibCheck": true,
     "target": "esnext"
   },
-  "include": [
-    "./src/script/**/*.ts"
-  ]
+  "include": ["./src/script/**/*.ts"]
 }

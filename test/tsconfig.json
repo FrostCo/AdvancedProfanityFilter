@@ -8,13 +8,11 @@
     "noEmit": true,
     "paths": {
       "@APF/*": ["src/script/*"],
-      "@VENDOR/*": ["src/script/vendor/*"],
+      "@VENDOR/*": ["src/script/vendor/*"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "target": "esnext"
   },
-  "include": [
-    "./spec/**/*.spec.ts"
-  ]
+  "include": ["./spec/**/*.spec.ts"]
 }

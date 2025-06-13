@@ -13,12 +13,17 @@ npm install
 npm run build
 ```
 
+```sh
+# Configure git blame ignore revs file to ignore recommended commits
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
 Once the extension has been built, you can load the unpacked extension (found in `dist/`) in your browser.
 
 ### Commonly Used Scripts
 
 | Target  | Manifest | Stage   | Script                      | Description                       |
-|---------|---------:|---------|-----------------------------|-----------------------------------|
+| ------- | -------: | ------- | --------------------------- | --------------------------------- |
 | chrome  |        3 | build   | `npm run build:chrome:mv3`  | Dev build for Chrome Manifest V3  |
 | chrome  |        2 | build   | `npm run build:chrome:mv2`  | Dev build for Chrome Manifest V2  |
 | firefox |        2 | build   | `npm run build:firefox:mv2` | Dev build for Firefox Manifest V2 |
@@ -27,17 +32,17 @@ Once the extension has been built, you can load the unpacked extension (found in
 ## Build Targets
 
 | Target     | Manifest | Browsers           |
-|------------|---------:|--------------------|
-| chrome     |    2, 3* | Chrome, Edge, etc. |
+| ---------- | -------: | ------------------ |
+| chrome     |   2, 3\* | Chrome, Edge, etc. |
 | edgeLegacy |        2 | Legacy Edge        |
-| firefox    |    2*, 3 | Firefox            |
+| firefox    |   2\*, 3 | Firefox            |
 
 \* = _default target_
 
 ## Build Stages
 
 | Stage   | Output                                | Description                                       |
-|---------|---------------------------------------|---------------------------------------------------|
+| ------- | ------------------------------------- | ------------------------------------------------- |
 | build   | `dist/`                               | Build/compile the extension for local development |
 | release | `release/target-manifest-version.zip` | Create an official release for a target browser   |
 

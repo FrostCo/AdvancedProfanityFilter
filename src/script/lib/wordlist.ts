@@ -10,7 +10,9 @@ export default class Wordlist {
 
   //#region Class reference helpers
   // Can be overridden in children classes
-  get Class() { return (this.constructor as typeof Wordlist); }
+  get Class() {
+    return this.constructor as typeof Wordlist;
+  }
   //#endregion
 
   static readonly logger = new Logger('Wordlist');
@@ -28,7 +30,11 @@ export default class Wordlist {
 
     // Process list of words
     sorted.forEach((wordStr) => {
-      if (wordlistId === Constants.ALL_WORDS_WORDLIST_ID || !Array.isArray(cfg.words[wordStr].lists) || cfg.words[wordStr].lists.includes(wordlistId)) {
+      if (
+        wordlistId === Constants.ALL_WORDS_WORDLIST_ID ||
+        !Array.isArray(cfg.words[wordStr].lists) ||
+        cfg.words[wordStr].lists.includes(wordlistId)
+      ) {
         try {
           const word = new Word(wordStr, cfg.words[wordStr], cfg);
           this.list.push(wordStr);
@@ -41,7 +47,7 @@ export default class Wordlist {
     });
   }
 
-  find(value: string|number): Word {
+  find(value: string | number): Word {
     if (typeof value === 'string') {
       return this.all[this.list.indexOf(value)];
     } else if (typeof value === 'number') {

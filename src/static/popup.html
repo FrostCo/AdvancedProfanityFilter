@@ -1,79 +1,82 @@
 <!doctype html>
 <html>
-<head>
-  <meta charset="utf-8"/>
-  <link rel="stylesheet" type="text/css" href="w3.css" />
-  <link rel="stylesheet" type="text/css" href="w3-color-flat.css"/>
-  <link rel="stylesheet" type="text/css" href="popup.css" />
-</head>
-<body tabindex="1" class="w3-card">
-  <img id="logo" src="img/icon64.png"/>
-  <label class="switch">
-    <input class="unselectable" id="domainFilter" type="checkbox" checked>
-    <span id="domainToggle" class="slider round"></span>
-  </label>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="w3.css" />
+    <link rel="stylesheet" type="text/css" href="w3-color-flat.css" />
+    <link rel="stylesheet" type="text/css" href="popup.css" />
+  </head>
+  <body tabindex="1" class="w3-card">
+    <img id="logo" src="img/icon64.png" />
+    <label class="switch">
+      <input class="unselectable" id="domainFilter" type="checkbox" checked />
+      <span id="domainToggle" class="slider round"></span>
+    </label>
 
-  <div class="divider"></div>
-
-  <div id="statusContainer" class="container w3-hide">
-    <label class="select-label"></label><span id="statusText"></span>
     <div class="divider"></div>
-  </div>
 
-  <div id="domainModeContainer" class="container">
-    <label id="domainModeLabel" for="domainModeSelect" class="select-label">Mode</label>
-    <select id="domainModeSelect" class="w3-select w3-border select-small">
-      <option id="domainModeNormal" value="0">Normal</option>
-      <option id="domainModeAdvanced" value="1">Advanced</option>
-      <option id="domainModeDeep" value="2">Deep</option>
-    </select>
-  </div>
+    <div id="statusContainer" class="container w3-hide">
+      <label class="select-label"></label><span id="statusText"></span>
+      <div class="divider"></div>
+    </div>
 
-  <div id="filterMethodContainer" class="container">
-    <label id="filterMethodLabel" for="filterMethodSelect" class="select-label">Filter</label>
-    <select id="filterMethodSelect" class="w3-select w3-border select-small">
-      <option id="filterMethodCensor" value="0">Censor</option>
-      <option id="filterMethodSubstitute" value="1">Substitute</option>
-      <option id="filterMethodRemove" value="2">Remove</option>
-      <option id="filterMethodOff" value="3">Off</option>
-    </select>
-  </div>
+    <div id="domainModeContainer" class="container">
+      <label id="domainModeLabel" for="domainModeSelect" class="select-label">Mode</label>
+      <select id="domainModeSelect" class="w3-select w3-border select-small">
+        <option id="domainModeNormal" value="0">Normal</option>
+        <option id="domainModeAdvanced" value="1">Advanced</option>
+        <option id="domainModeDeep" value="2">Deep</option>
+      </select>
+    </div>
 
-  <div id="wordListContainer" class="container w3-hide">
-    <label id="textWordlistLabel" for="wordlistSelect" class="select-label">Text</label>
-    <select id="wordlistSelect" class="w3-select w3-border select-small">
-      <option id="wordlistDefault" value="default">Default Wordlist</option>
-      <option id="wordlistAllWords"value="0">All words</option>
-    </select>
-  </div>
+    <div id="filterMethodContainer" class="container">
+      <label id="filterMethodLabel" for="filterMethodSelect" class="select-label">Filter</label>
+      <select id="filterMethodSelect" class="w3-select w3-border select-small">
+        <option id="filterMethodCensor" value="0">Censor</option>
+        <option id="filterMethodSubstitute" value="1">Substitute</option>
+        <option id="filterMethodRemove" value="2">Remove</option>
+        <option id="filterMethodOff" value="3">Off</option>
+      </select>
+    </div>
 
-  <div class="divider"></div>
+    <div id="wordListContainer" class="container w3-hide">
+      <label id="textWordlistLabel" for="wordlistSelect" class="select-label">Text</label>
+      <select id="wordlistSelect" class="w3-select w3-border select-small">
+        <option id="wordlistDefault" value="default">Default Wordlist</option>
+        <option id="wordlistAllWords" value="0">All words</option>
+      </select>
+    </div>
 
-  <div id="summary" class="w3-hide w3-margin-left w3-margin-right container w3-border">
-    <table class="w3-table w3-striped w3-border w3-bordered w3-card w3-small">
-      <thead>
-        <tr>
-          <th id="summaryTableHeader" colspan="2" class="w3-center">Filtered Words</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+    <div class="divider"></div>
 
-  <div class="options unselectable w3-center container">
-    <button id="options" class="w3-button w3-border w3-border-blue">Options</button>
-  </div>
+    <div id="summary" class="w3-hide w3-margin-left w3-margin-right container w3-border">
+      <table class="w3-table w3-striped w3-border w3-bordered w3-card w3-small">
+        <thead>
+          <tr>
+            <th id="summaryTableHeader" colspan="2" class="w3-center">Filtered Words</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
-  <div id="footer">
-    <a id="gettingStarted" href="https://github.com/FrostCo/AdvancedProfanityFilter/wiki" target="_blank">Help</a>
-    - <a id="changelogLink" href="https://github.com/FrostCo/AdvancedProfanityFilter/releases" target="_blank">Changelog</a>
-    - <a id="supportLink" href="https://github.com/FrostCo/AdvancedProfanityFilter/issues" target="_blank">Support</a>
-    <div id="disabledMessage"></div>
-  </div>
+    <div class="options unselectable w3-center container">
+      <button id="options" class="w3-button w3-border w3-border-blue">Options</button>
+    </div>
 
-  <div id="uncaughtErrors"></div>
-  <script src="showErrors.js"></script>
+    <div id="footer">
+      <a id="gettingStarted" href="https://github.com/FrostCo/AdvancedProfanityFilter/wiki" target="_blank">Help</a>
+      -
+      <a id="changelogLink" href="https://github.com/FrostCo/AdvancedProfanityFilter/releases" target="_blank"
+        >Changelog</a
+      >
+      - <a id="supportLink" href="https://github.com/FrostCo/AdvancedProfanityFilter/issues" target="_blank">Support</a>
+      <div id="disabledMessage"></div>
+    </div>
 
-  <script src="popup.js"></script>
-</body>
+    <div id="uncaughtErrors"></div>
+    <script src="showErrors.js"></script>
+
+    <script src="popup.js"></script>
+  </body>
 </html>

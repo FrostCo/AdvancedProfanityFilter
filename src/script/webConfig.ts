@@ -5,7 +5,7 @@ import Translation from '@APF/translation';
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
 /* eslint-disable-next-line @typescript-eslint/naming-convention */
-declare const __BUILD__: { config: any, manifestVersion: number, release: boolean, target: string, version: string };
+declare const __BUILD__: { config: any; manifestVersion: number; release: boolean; target: string; version: string };
 const BUILD_DEFAULTS = { config: {}, manifestVersion: 3, release: true, target: 'chrome', version: '1.0.0' };
 const logger = new Logger('WebConfig');
 
@@ -25,10 +25,12 @@ export default class WebConfig extends Config {
 
   //#region Class reference helpers
   // Can be overridden in children classes
-  get Class() { return (this.constructor as typeof WebConfig); }
+  get Class() {
+    return this.constructor as typeof WebConfig;
+  }
   //#endregion
 
-  static readonly BUILD = typeof __BUILD__ == 'undefined' ? BUILD_DEFAULTS  : __BUILD__;
+  static readonly BUILD = typeof __BUILD__ == 'undefined' ? BUILD_DEFAULTS : __BUILD__;
   static readonly _webDefaults = {
     collectStats: true,
     contextMenu: true,
@@ -51,7 +53,7 @@ export default class WebConfig extends Config {
   static get _maxBytes() {
     try {
       if (chrome.storage.sync.QUOTA_BYTES_PER_ITEM) {
-        return Math.round(chrome.storage.sync.QUOTA_BYTES_PER_ITEM * .98);
+        return Math.round(chrome.storage.sync.QUOTA_BYTES_PER_ITEM * 0.98);
       } else {
         throw 'QUOTA_BYTES_PER_ITEM not defined, using default';
       }
@@ -97,13 +99,13 @@ export default class WebConfig extends Config {
   }
 
   static getLocalStorage(keys: string | string[] | Record<string, unknown>) {
-    if (typeof keys === 'string') { keys = [keys]; }
+    if (typeof keys === 'string') {
+      keys = [keys];
+    }
 
     return new Promise((resolve, reject) => {
       chrome.storage.local.get(keys, (data) => {
-        chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError)
-          : resolve(data);
+        chrome.runtime.lastError ? reject(chrome.runtime.lastError) : resolve(data);
       });
     });
   }
@@ -127,13 +129,13 @@ export default class WebConfig extends Config {
   }
 
   static getSyncStorage(keys: string | string[] | Record<string, unknown>) {
-    if (typeof keys === 'string') { keys = [keys]; }
+    if (typeof keys === 'string') {
+      keys = [keys];
+    }
 
     return new Promise((resolve, reject) => {
       chrome.storage.sync.get(keys, (data) => {
-        chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError)
-          : resolve(data);
+        chrome.runtime.lastError ? reject(chrome.runtime.lastError) : resolve(data);
       });
     });
   }
@@ -164,7 +166,7 @@ export default class WebConfig extends Config {
     try {
       // Local storage
       const localKeys = this.requestedkeysForLocalStorage(keys, data);
-      const appliedLocalKeys =  await this.loadKeysFromLocalStorage(localKeys, data);
+      const appliedLocalKeys = await this.loadKeysFromLocalStorage(localKeys, data);
 
       // Sync storage
       const syncKeys = this.requestedkeysForSyncStorage(keys, appliedLocalKeys, data);
@@ -178,12 +180,13 @@ export default class WebConfig extends Config {
   }
 
   // Returns list of keys applied to data
-  static async loadKeysFromLocalStorage(keys: string[], data: Partial<WebConfig>): Promise<string[]> { // Rename
+  static async loadKeysFromLocalStorage(keys: string[], data: Partial<WebConfig>): Promise<string[]> {
+    // Rename
     if (!keys.length) return [];
 
     // Load large keys from LocalStorage if necessary
     const retrievedKeys = [];
-    const localData = await this.getLocalStorage(keys) as Partial<WebConfig>;
+    const localData = (await this.getLocalStorage(keys)) as Partial<WebConfig>;
     data.syncLargeKeys = localData.syncLargeKeys === false ? localData.syncLargeKeys : this._defaults.syncLargeKeys;
 
     for (const key of keys) {
@@ -225,7 +228,8 @@ export default class WebConfig extends Config {
         if (splitKeys) {
           data._lastSplitKeys[key] = this.getMaxSplitKeyFromArray(splitKeys);
           data[key] = syncData[key];
-        } else { // Add defaults if nothing was returned
+        } else {
+          // Add defaults if nothing was returned
           this.assignDefaultValue(key, data);
         }
       } else {
@@ -246,9 +250,7 @@ export default class WebConfig extends Config {
       chrome.storage.local.remove(keys, () => {
         if (!keys.length) resolve(0);
 
-        chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError)
-          : resolve(0);
+        chrome.runtime.lastError ? reject(chrome.runtime.lastError) : resolve(0);
       });
     });
   }
@@ -260,9 +262,7 @@ export default class WebConfig extends Config {
       if (!keys.length) resolve(0);
 
       chrome.storage.sync.remove(keys, () => {
-        chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError)
-          : resolve(0);
+        chrome.runtime.lastError ? reject(chrome.runtime.lastError) : resolve(0);
       });
     });
   }
@@ -282,9 +282,7 @@ export default class WebConfig extends Config {
   static resetLocalStorage() {
     return new Promise((resolve, reject) => {
       chrome.storage.local.clear(() => {
-        chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError)
-          : resolve(0);
+        chrome.runtime.lastError ? reject(chrome.runtime.lastError) : resolve(0);
       });
     });
   }
@@ -292,9 +290,7 @@ export default class WebConfig extends Config {
   static resetSyncStorage() {
     return new Promise((resolve, reject) => {
       chrome.storage.sync.clear(() => {
-        chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError)
-          : resolve(0);
+        chrome.runtime.lastError ? reject(chrome.runtime.lastError) : resolve(0);
       });
     });
   }
@@ -302,9 +298,7 @@ export default class WebConfig extends Config {
   static saveLocalStorage(data) {
     return new Promise((resolve, reject) => {
       chrome.storage.local.set(data, () => {
-        chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError)
-          : resolve(0);
+        chrome.runtime.lastError ? reject(chrome.runtime.lastError) : resolve(0);
       });
     });
   }
@@ -312,15 +306,15 @@ export default class WebConfig extends Config {
   static saveSyncStorage(data) {
     return new Promise((resolve, reject) => {
       chrome.storage.sync.set(data, () => {
-        chrome.runtime.lastError
-          ? reject(chrome.runtime.lastError)
-          : resolve(0);
+        chrome.runtime.lastError ? reject(chrome.runtime.lastError) : resolve(0);
       });
     });
   }
 
   static splitKeyNames(key: string, start: number = 0): string[] {
-    return Array(this._maxSplitKeys - start).fill(1).map((item, index) => '_' + key + (index + start));
+    return Array(this._maxSplitKeys - start)
+      .fill(1)
+      .map((item, index) => '_' + key + (index + start));
   }
 
   // Call load() to create a new instance
@@ -452,9 +446,11 @@ export default class WebConfig extends Config {
           // Check for any unused splitContainers
           if (this._lastSplitKeys) {
             const newMaxSplitKey = this.Class.getMaxSplitKeyFromData(syncData, key);
-            if (this._lastSplitKeys[key] > newMaxSplitKey) { // Split data was reduced
+            if (this._lastSplitKeys[key] > newMaxSplitKey) {
+              // Split data was reduced
               unusedSplitKeys = unusedSplitKeys.concat(this.Class.splitKeyNames(key, newMaxSplitKey + 1));
-            } else if (this._lastSplitKeys[key] < newMaxSplitKey) { // Split data was increased
+            } else if (this._lastSplitKeys[key] < newMaxSplitKey) {
+              // Split data was increased
               this._lastSplitKeys[key] = newMaxSplitKey;
             }
           }
@@ -490,22 +486,24 @@ export default class WebConfig extends Config {
     data[currentContainer] = {};
     currentBytes += encoder.encode(`{"${currentContainer}":{}}`).length;
 
-    Object.keys(this[key]).sort().forEach((item) => {
-      let newBytes = encoder.encode(`",${item}":`).length; // This leads to an extra ',' for the last entry
-      newBytes += encoder.encode(JSON.stringify(this[key][item])).length;
+    Object.keys(this[key])
+      .sort()
+      .forEach((item) => {
+        let newBytes = encoder.encode(`",${item}":`).length; // This leads to an extra ',' for the last entry
+        newBytes += encoder.encode(JSON.stringify(this[key][item])).length;
 
-      // Next word would be too big, setup next container
-      if ((currentBytes + newBytes) >= this.Class._maxBytes) {
-        currentContainerNum++;
-        currentContainer = `_${key}${currentContainerNum}`;
-        data[currentContainer] = {};
-        currentBytes = encoder.encode(`"${currentContainer}":{}`).length;
-      }
+        // Next word would be too big, setup next container
+        if (currentBytes + newBytes >= this.Class._maxBytes) {
+          currentContainerNum++;
+          currentContainer = `_${key}${currentContainerNum}`;
+          data[currentContainer] = {};
+          currentBytes = encoder.encode(`"${currentContainer}":{}`).length;
+        }
 
-      // Adding a word
-      currentBytes += newBytes;
-      data[currentContainer][item] = this[key][item];
-    });
+        // Adding a word
+        currentBytes += newBytes;
+        data[currentContainer][item] = this[key][item];
+      });
 
     return data;
   }

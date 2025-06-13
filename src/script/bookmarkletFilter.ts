@@ -16,17 +16,31 @@ export default class BookmarkletFilter extends Filter {
   location: Location | URL;
   observer: MutationObserver;
   processMutationTarget: boolean;
-  processNode: (node: Document | HTMLElement | Node | ShadowRoot, wordlistId: number, statsType?: string | null) => void;
+  processNode: (
+    node: Document | HTMLElement | Node | ShadowRoot,
+    wordlistId: number,
+    statsType?: string | null
+  ) => void;
   shadowObserver: MutationObserver;
   stats?: Statistics; // Bookmarklet: Not used
 
   //#region Class reference helpers
   // Can be overridden in children classes
-  static get Config() { return WebConfig; }
-  static get Constants() { return Constants; }
-  static get Domain() { return Domain; }
-  static get Page() { return Page; }
-  get Class() { return (this.constructor as typeof BookmarkletFilter); }
+  static get Config() {
+    return WebConfig;
+  }
+  static get Constants() {
+    return Constants;
+  }
+  static get Domain() {
+    return Domain;
+  }
+  static get Page() {
+    return Page;
+  }
+  get Class() {
+    return this.constructor as typeof BookmarkletFilter;
+  }
   //#endregion
 
   static readonly observerConfig: MutationObserverInit = {
@@ -47,13 +61,17 @@ export default class BookmarkletFilter extends Filter {
     if (node.parentNode || node === document) {
       for (const regExp of this.wordlists[wordlistId].regExps) {
         // @ts-ignore: External library function
-        findAndReplaceDOMText(node, { preset: 'prose', find: regExp, replace: (portion, match) => {
-          if (portion.index === 0) {
-            return this.replaceText(match[0], wordlistId, statsType);
-          } else {
-            return '';
-          }
-        } });
+        findAndReplaceDOMText(node, {
+          preset: 'prose',
+          find: regExp,
+          replace: (portion, match) => {
+            if (portion.index === 0) {
+              return this.replaceText(match[0], wordlistId, statsType);
+            } else {
+              return '';
+            }
+          },
+        });
       }
     } else {
       this.cleanText(node, wordlistId, statsType);
@@ -81,10 +99,14 @@ export default class BookmarkletFilter extends Filter {
   }
 
   cleanNode(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
-    if (this.Class.Page.isForbiddenNode(node)) { return false; }
-    if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
+    if (this.Class.Page.isForbiddenNode(node)) {
+      return false;
+    }
+    if (node.shadowRoot) {
+      this.filterShadowRoot(node.shadowRoot, wordlistId, statsType);
+    }
     if (node.childNodes.length > 0) {
-      for (let i = 0; i < node.childNodes.length ; i++) {
+      for (let i = 0; i < node.childNodes.length; i++) {
         this.cleanNode(node.childNodes[i], wordlistId, statsType);
       }
     } else {
@@ -92,7 +114,12 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  cleanNodeAttribute(node, attribute: string, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
+  cleanNodeAttribute(
+    node,
+    attribute: string,
+    wordlistId: number,
+    statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT
+  ) {
     if (node[attribute] != '') {
       const result = this.replaceTextResult(node[attribute], wordlistId, statsType);
       if (result.modified && this.filterText) {
@@ -129,8 +156,12 @@ export default class BookmarkletFilter extends Filter {
   }
 
   cleanText(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
-    if (this.Class.Page.isForbiddenNode(node)) { return false; }
-    if (node.shadowRoot) { this.filterShadowRoot(node.shadowRoot, wordlistId, statsType); }
+    if (this.Class.Page.isForbiddenNode(node)) {
+      return false;
+    }
+    if (node.shadowRoot) {
+      this.filterShadowRoot(node.shadowRoot, wordlistId, statsType);
+    }
     if (node.childElementCount > 0) {
       const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
       while (treeWalker.nextNode()) {
@@ -149,7 +180,11 @@ export default class BookmarkletFilter extends Filter {
     }
   }
 
-  filterShadowRoot(shadowRoot: ShadowRoot, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
+  filterShadowRoot(
+    shadowRoot: ShadowRoot,
+    wordlistId: number,
+    statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT
+  ) {
     this.shadowObserver.observe(shadowRoot, this.Class.observerConfig);
     this.processNode(shadowRoot, wordlistId, statsType);
   }
@@ -173,9 +208,11 @@ export default class BookmarkletFilter extends Filter {
   initPageDetails() {
     if (window != window.top) {
       this.iframe = document.location;
-      try { // same domain
+      try {
+        // same domain
         this.hostname = window.parent.location.hostname;
-      } catch (err) { // different domain
+      } catch (err) {
+        // different domain
         if (document.referrer) {
           this.hostname = new URL(document.referrer).hostname;
         } else {
@@ -242,13 +279,7 @@ export default class BookmarkletFilter extends Filter {
   }
 
   shouldBeDisabled(backgroundData: BackgroundData) {
-    return (
-      (
-        this.cfg.enabledDomainsOnly
-        && !this.domain.enabled
-      )
-      || this.domain.disabled
-    );
+    return (this.cfg.enabledDomainsOnly && !this.domain.enabled) || this.domain.disabled;
   }
 
   shouldProcessAddedNode(node) {
@@ -261,11 +292,9 @@ export default class BookmarkletFilter extends Filter {
 
   get shouldProcessFrame() {
     return (
-      !this.iframe
-      || (
-        (this.cfg.enabledFramesOnly && this.domain.framesOn)
-        || (!this.cfg.enabledFramesOnly && !this.domain.framesOff)
-      )
+      !this.iframe ||
+      (this.cfg.enabledFramesOnly && this.domain.framesOn) ||
+      (!this.cfg.enabledFramesOnly && !this.domain.framesOff)
     );
   }
 
@@ -284,7 +313,9 @@ export default class BookmarkletFilter extends Filter {
   stopObserving(observer: MutationObserver = this.observer) {
     const mutations = observer.takeRecords();
     observer.disconnect();
-    if (mutations) { this.processMutations(mutations); }
+    if (mutations) {
+      this.processMutations(mutations);
+    }
   }
 
   updateCounterBadge() {

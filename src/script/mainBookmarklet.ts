@@ -12,7 +12,7 @@ if (typeof window !== 'undefined' && !(<any>window).apfBookmarklet) {
   (<any>window).apfBookmarklet = true;
   console.log('[APF Bookmarklet] Running');
   if (!config.words) config.words = WebConfig._defaultWords;
-  const filter = new BookmarkletFilter;
+  const filter = new BookmarkletFilter();
   filter.initPageDetails();
   filter.cleanPage(config);
 }

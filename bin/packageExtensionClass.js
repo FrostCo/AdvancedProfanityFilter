@@ -6,8 +6,12 @@ import fse from 'fs-extra';
 
 export default class PackageExtension {
   //#region Class reference helpers
-  static get Common() { return Common; }
-  get Class() { return (this.constructor); }
+  static get Common() {
+    return Common;
+  }
+  get Class() {
+    return this.constructor;
+  }
   //#endregion
 
   constructor() {
@@ -19,7 +23,7 @@ export default class PackageExtension {
       this.data = this.Class.Common.loadJSONFile(this.Class.Common.buildFilePath);
     } catch (err) {
       console.error(err.message);
-      throw (err);
+      throw err;
     }
   }
 
@@ -55,7 +59,7 @@ export default class PackageExtension {
       this.zip.writeZip(this.packagePath);
     } catch (err) {
       console.error(err.message);
-      throw (err);
+      throw err;
     }
   }
 
