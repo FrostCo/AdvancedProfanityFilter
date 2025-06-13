@@ -13,6 +13,11 @@ npm install
 npm run build
 ```
 
+```sh
+# Configure git blame ignore revs file to ignore recommended commits
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
 Once the extension has been built, you can load the unpacked extension (found in `dist/`) in your browser.
 
 ### Commonly Used Scripts
