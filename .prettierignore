@@ -1,0 +1,13 @@
+# Ignore built files for distribution
+dist/
+
+# Ignore third-party vendor scripts and styles
+src/script/vendor/
+src/static/w3*.css
+
+# Ignore store related files
+store/
+
+# Ignore test output and coverage reports
+test/.nyc_output/
+test/coverage/
