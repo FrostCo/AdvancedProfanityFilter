@@ -34,17 +34,20 @@ export default class Common {
   }
 
   static parseArgv(argv) {
-    const parsed = {};
-    parsed.count = argv.length;
-    parsed.process = argv[0]; // process (node)
-    parsed.script = argv[1]; // script
-    parsed.arguments = argv.slice(2);
-    parsed.removeArgumentPrefixes = (prefix = '--') => {
-      const regex = new RegExp(`^${prefix}`);
-      parsed.arguments = parsed.arguments.map((arg) => arg.replace(regex, ''));
+    return {
+      process: argv[0],
+      script: argv[1],
+      arguments: Object.fromEntries(
+        argv.slice(2).map((arg) => {
+          const [key, val] = arg.replace(/^--/, '').split('=');
+          let value = val ?? true;
+          if (value === 'true') value = true;
+          else if (value === 'false') value = false;
+          else if (!isNaN(value)) value = Number(value);
+          return [key, value];
+        })
+      ),
     };
-    parsed.removeEmptyArguments = (blank = '') => (parsed.arguments = parsed.arguments.filter((arg) => arg !== blank));
-    return parsed;
   }
 
   static get releaseBuildFilePath() {
