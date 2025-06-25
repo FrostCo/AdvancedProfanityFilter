@@ -115,20 +115,11 @@ export default class Prebuild {
 
   processArguments(args) {
     const argv = this.Class.Common.parseArgv(args);
-    argv.removeArgumentPrefixes('--');
-    argv.removeEmptyArguments();
-    if (argv.arguments.length > 2) this.error('Too many arguments provided.');
+    // console.log(`Processing arguments: ${JSON.stringify(argv)}`);
 
-    if (argv.arguments.length >= 1) {
-      for (const arg of argv.arguments) {
-        if (this.handleEnvArg(arg)) continue;
-        if (this.handleTargetArg(arg)) continue;
-        this.error(`Unsupported argument: ${arg}`);
-      }
-    }
-
-    if (argv.arguments.length == 0 || !this.targetProvided) this.loadDataFromFile();
-
+    if (argv.arguments.target) this.handleTargetArg(argv.arguments.target);
+    if (argv.arguments.release) this.handleEnvArg(argv.arguments.release);
+    if (!this.targetProvided) this.loadDataFromFile();
     if (this.environment === 'release') this.data.release = true;
   }
 
