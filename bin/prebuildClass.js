@@ -139,8 +139,8 @@ export default class Prebuild {
   }
 
   get showBuildDetails() {
-    // Only show build details if no target was passed or if this is a release
-    return this.loadedFromFile || this.data.release;
+    // Only show build details when loaded from a file
+    return this.loadedFromFile;
   }
 
   targetCustomizations() {
