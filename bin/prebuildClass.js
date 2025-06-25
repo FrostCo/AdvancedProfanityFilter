@@ -97,6 +97,8 @@ export default class Prebuild {
       this.data.target = targetName;
       if (manifestVersion) this.data.manifestVersion = parseInt(manifestVersion.match(/\d$/)?.toString());
       return (this.targetProvided = true);
+    } else {
+      this.error(`Unsupported target: ${arg}\n`);
     }
   }
 
@@ -108,7 +110,7 @@ export default class Prebuild {
       // Use existing buildFile as starting point if no target was passed
       this.data = this.Class.Common.loadJSONFile(envBuildFilePath);
     } catch (err) {
-      console.warn(`${envBuildFilePath} doesn't exist, creating with defaults...`);
+      console.warn(`${envBuildFilePath} doesn't exist, creating with defaults...\n`);
       this.Class.Common.writeJSONFile(envBuildFilePath, this.data);
     }
   }
