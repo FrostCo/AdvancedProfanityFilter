@@ -117,6 +117,13 @@ export default class Prebuild {
     const argv = this.Class.Common.parseArgv(args);
     // console.log(`Processing arguments: ${JSON.stringify(argv)}`);
 
+    const invalidArgs = Object.keys(argv.arguments).filter((arg) => !this.validArgs.includes(arg));
+    if (invalidArgs.length) {
+      console.error(`Unsupported arg: ${invalidArgs}\n`);
+      this.usage();
+      process.exit(1);
+    }
+
     if (argv.arguments.target) this.handleTargetArg(argv.arguments.target);
     if (argv.arguments.release) this.handleEnvArg(argv.arguments.release);
     if (!this.targetProvided) this.loadDataFromFile();
@@ -153,6 +160,18 @@ export default class Prebuild {
         console.warn('\n!!!!! NOTICE: using default build !!!!!\n');
         this.defaultBuild();
     }
+  }
+
+  usage() {
+    console.log(`usage:
+        npm run build
+        npm run build:chrome
+        npm run build:chrome:mv2
+    `);
+  }
+
+  get validArgs() {
+    return ['release', 'target'];
   }
 
   writeBuildData() {
