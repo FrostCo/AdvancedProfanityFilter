@@ -1,10 +1,10 @@
+/* eslint-disable no-console */
 import fs from 'fs-extra';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
 import { execSync } from 'child_process';
 
 if (!fs.existsSync('.build.json')) {
-  // eslint-disable-next-line no-console
   console.warn('.build.json file not found. Running prebuild script...\n');
   execSync('node bin/prebuild.js', { stdio: 'inherit' });
 }
