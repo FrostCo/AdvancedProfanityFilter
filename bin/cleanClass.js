@@ -14,8 +14,6 @@ export default class Clean {
 
   constructor(args) {
     this.argv = this.Class.Common.parseArgv(args);
-    this.argv.removeArgumentPrefixes('--');
-    this.argv.removeEmptyArguments();
     this.arguments = this.argv.arguments;
     this.processArgs();
     this.toRemove = [];
@@ -42,11 +40,11 @@ export default class Clean {
   }
 
   get allArgs() {
-    return ['build', 'built', 'dist', 'test'];
+    return { build: true, built: true, dist: true, test: true };
   }
 
   get defaultArgs() {
-    return ['built', 'dist', 'test'];
+    return { built: true, dist: true, test: true };
   }
 
   get validArgs() {
@@ -54,25 +52,25 @@ export default class Clean {
   }
 
   processArgs() {
-    const invalidArgs = this.arguments.filter((arg) => !this.validArgs.includes(arg));
+    const invalidArgs = Object.keys(this.arguments).filter((arg) => !this.validArgs.includes(arg));
     if (invalidArgs.length) {
       console.error(`Unsupported arg: ${invalidArgs}`);
       this.usage();
       process.exit(1);
     }
 
-    if (this.arguments.length === 0) {
+    if (Object.keys(this.arguments).length === 0) {
       this.arguments = this.defaultArgs;
-    } else if (this.arguments.includes('all')) {
+    } else if (this.arguments.all) {
       this.arguments = this.allArgs;
     }
   }
 
   run() {
-    if (this.arguments.includes('build')) this.addBuildPaths();
-    if (this.arguments.includes('built')) this.addBuiltPaths();
-    if (this.arguments.includes('dist')) this.addDistPaths();
-    if (this.arguments.includes('test')) this.addTestPaths();
+    if (this.arguments.build) this.addBuildPaths();
+    if (this.arguments.built) this.addBuiltPaths();
+    if (this.arguments.dist) this.addDistPaths();
+    if (this.arguments.test) this.addTestPaths();
 
     this.Class.Common.removeFiles(this.toRemove);
   }
