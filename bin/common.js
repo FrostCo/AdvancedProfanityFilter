@@ -43,7 +43,7 @@ export default class Common {
           let value = val ?? true;
           if (value === 'true') value = true;
           else if (value === 'false') value = false;
-          else if (!isNaN(value)) value = Number(value);
+          else if (typeof value === 'string' && !isNaN(value)) value = Number(value);
           return [key, value];
         })
       ),
