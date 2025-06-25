@@ -10,6 +10,7 @@ if (!fs.existsSync('.build.json')) {
 }
 
 const BUILD = fs.readJsonSync('.build.json');
+console.log(`Build details:\n${JSON.stringify(BUILD, null, 2)}`);
 
 export default {
   entry: {

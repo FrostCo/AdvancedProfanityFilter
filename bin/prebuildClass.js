@@ -138,11 +138,6 @@ export default class Prebuild {
     this.writeBuildData();
   }
 
-  get showBuildDetails() {
-    // Only show build details when loaded from a file
-    return this.loadedFromFile;
-  }
-
   targetCustomizations() {
     switch (this.data.target) {
       case 'bookmarklet':
@@ -180,8 +175,5 @@ export default class Prebuild {
     const filePath = this.Class.Common.buildFilePathByEnv(this.environment);
     this.Class.Common.writeJSONFile(filePath, this.data);
     this.activateBuildFile(filePath);
-    if (this.showBuildDetails) {
-      console.log(`Build details:\n${JSON.stringify(this.data, null, 2)}`);
-    }
   }
 }
