@@ -127,7 +127,7 @@ export default class Prebuild {
     }
 
     if (argv.arguments.target) this.handleTargetArg(argv.arguments.target);
-    if (argv.arguments.release) this.handleEnvArg(argv.arguments.release);
+    if (argv.arguments.environment) this.handleEnvArg(argv.arguments.environment);
     if (!this.targetProvided) this.loadDataFromFile();
     if (this.environment === 'release') this.data.release = true;
   }
@@ -173,7 +173,7 @@ export default class Prebuild {
   }
 
   get validArgs() {
-    return ['release', 'target'];
+    return ['environment', 'target'];
   }
 
   writeBuildData() {
