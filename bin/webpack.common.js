@@ -33,10 +33,14 @@ export default {
   optimization: {
     minimize: true,
   },
+  performance: {
+    hints: false,
+  },
   plugins: [new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) })],
   resolve: {
     extensions: ['.js', '.ts'],
     plugins: [new TsconfigPathsPlugin({ configFile: './tsconfig.json' })],
   },
+  stats: 'minimal',
   target: 'web',
 };
