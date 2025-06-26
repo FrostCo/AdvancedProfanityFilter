@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
 import { execSync } from 'child_process';
+import TerserPlugin from 'terser-webpack-plugin';
 
 if (!fs.existsSync('.build.json')) {
   console.warn('.build.json file not found. Running prebuild script...\n');
@@ -40,6 +41,19 @@ export default {
   },
   optimization: {
     minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: true,
+          mangle: true,
+          output: {
+            comments: false,
+          },
+        },
+        extractComments: false,
+      }),
+    ],
+    moduleIds: 'deterministic',
   },
   performance: {
     hints: false,
