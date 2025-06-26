@@ -1,9 +1,13 @@
 /* eslint-disable no-console */
 import fs from 'fs-extra';
+import path from 'path';
+import CopyPlugin from 'copy-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
 import { execSync } from 'child_process';
 import TerserPlugin from 'terser-webpack-plugin';
+
+const projectRoot = process.cwd();
 
 if (!fs.existsSync('.build.json')) {
   console.warn('.build.json file not found. Running prebuild script...\n');
@@ -20,6 +24,9 @@ export default {
     popup: './src/script/mainPopup.ts',
     showErrors: '/src/script/showErrors.ts',
     webFilter: './src/script/mainContent.ts',
+  },
+  output: {
+    path: path.resolve(projectRoot, 'dist'),
   },
   mode: 'production',
   module: {
@@ -58,7 +65,15 @@ export default {
   performance: {
     hints: false,
   },
-  plugins: [new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) })],
+  plugins: [
+    new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) }),
+    new CopyPlugin({
+      patterns: [
+        { from: path.resolve(projectRoot, 'src/img'), to: './img' },
+        { from: path.resolve(projectRoot, 'src/static'), to: './' },
+      ],
+    }),
+  ],
   resolve: {
     extensions: ['.js', '.ts'],
     plugins: [new TsconfigPathsPlugin({ configFile: './tsconfig.json' })],
