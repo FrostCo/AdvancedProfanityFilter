@@ -1,13 +1,20 @@
 import fs from 'fs-extra';
+import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
+
+const projectRoot = process.cwd();
 
 const BUILD = fs.readJsonSync('.build.json');
 
 export default {
   entry: {
     bookmarkletFilter: './src/script/mainBookmarklet.ts',
+  },
+  output: {
+    path: path.resolve(projectRoot, 'dist-bookmarklet'),
+    clean: true,
   },
   mode: 'production',
   module: {

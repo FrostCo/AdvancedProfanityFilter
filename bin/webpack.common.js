@@ -72,6 +72,11 @@ export default {
       patterns: [
         { from: path.resolve(projectRoot, 'src/img'), to: './img' },
         { from: path.resolve(projectRoot, 'src/static'), to: './' },
+        {
+          from: path.resolve(projectRoot, 'dist-bookmarklet/bookmarkletFilter.js'),
+          to: './bookmarkletFilter.js',
+          noErrorOnMissing: true,
+        },
       ],
     }),
   ],

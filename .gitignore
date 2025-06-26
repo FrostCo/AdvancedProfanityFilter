@@ -23,6 +23,9 @@ bin/git-filters/*.js
 /test/.nyc_output/*
 /test/coverage/*
 
+# Built bookmarklet
+/dist-bookmarklet
+
 # Built shared libs
 /dist-lib
 
