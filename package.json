@@ -83,6 +83,7 @@
     "adm-zip": "^0.5.16",
     "chai": "^5.2.0",
     "chokidar": "^4.0.3",
+    "copy-webpack-plugin": "^13.0.0",
     "download": "^8.0.0",
     "eslint": "^9.28.0",
     "eslint-config-prettier": "^10.1.5",
