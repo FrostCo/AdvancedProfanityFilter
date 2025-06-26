@@ -27,6 +27,7 @@ export default {
   },
   output: {
     path: path.resolve(projectRoot, 'dist'),
+    clean: true,
   },
   mode: 'production',
   module: {
