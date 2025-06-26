@@ -58,6 +58,7 @@ export default {
         },
       }),
     ],
+    moduleIds: 'deterministic',
   },
   performance: {
     hints: false,
