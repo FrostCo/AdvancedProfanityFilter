@@ -1,4 +1,4 @@
-import TranslationBuilder from './TranslationBuilder.js';
+import TranslationBuilder from '../lib/TranslationBuilder.js';
 
 export class TranslationBuilderPlugin {
   apply(compiler) {
