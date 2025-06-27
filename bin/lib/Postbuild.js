@@ -1,5 +1,5 @@
 import fse from 'fs-extra';
-import Common from './common.js';
+import Common from '../common.js';
 
 export default class Postbuild {
   //#region Class reference helpers
