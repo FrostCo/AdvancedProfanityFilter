@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import AdmZip from 'adm-zip';
-import Common from './common.js';
+import Common from '../common.js';
 
 // Required for Firefox due to bundled code
-export default class PackageSource {
+export default class SourcePackager {
   //#region Class reference helpers
   static get Common() {
     return Common;

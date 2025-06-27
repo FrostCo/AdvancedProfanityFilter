@@ -32,7 +32,7 @@
     "postbuild": "node bin/postbuild.js",
     "postrelease:all": "npm run build",
     "postrelease:build": "node bin/postbuild.js && npm run package",
-    "postrelease:firefox:mv2": "node bin/packageSource.js",
+    "postrelease:firefox:mv2": "node bin/cli/package-source.js",
     "prerelease:all": "npm run release:bookmarklet",
     "release:all": "npm run release:chrome:mv2 && npm run release:chrome:mv3 && npm run release:edgeLegacy && npm run release:firefox:mv2 && npm run release:firefox:mv3",
     "release:bookmarklet": "node bin/prebuild.js --environment=release --target=bookmarklet && webpack --config bin/webpack.bookmarklet.js",
