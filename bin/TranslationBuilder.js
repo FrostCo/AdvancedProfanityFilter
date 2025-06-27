@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export default class BuildTranslation {
+export default class TranslationBuilder {
   constructor() {
     this.localesDir = path.join('locales');
     this.translations = {};
