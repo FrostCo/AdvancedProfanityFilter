@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 import AdmZip from 'adm-zip';
-import Common from '../common.js';
+import BuildUtils from './BuildUtils.js';
 
 // Required for Firefox due to bundled code
 export default class SourcePackager {
   //#region Class reference helpers
-  static get Common() {
-    return Common;
+  static get BuildUtils() {
+    return BuildUtils;
   }
   get Class() {
     return this.constructor;
@@ -70,7 +70,7 @@ export default class SourcePackager {
   }
 
   run() {
-    this.Class.Common.removeFiles(this.filePath, true);
+    this.Class.BuildUtils.removeFiles(this.filePath, true);
     this.showInstructions();
     this.addFiles();
     this.zip.writeZip(this.filePath);

@@ -1,10 +1,10 @@
 import fse from 'fs-extra';
-import Common from '../common.js';
+import BuildUtils from './BuildUtils.js';
 
 export default class Postbuild {
   //#region Class reference helpers
-  static get Common() {
-    return Common;
+  static get BuildUtils() {
+    return BuildUtils;
   }
   get Class() {
     return this.constructor;
@@ -12,8 +12,8 @@ export default class Postbuild {
   //#endregion
 
   constructor() {
-    this.buildData = this.Class.Common.loadJSONFile(this.Class.Common.buildFilePath);
-    this.manifest = this.Class.Common.loadJSONFile(this.Class.Common.distManifestPath);
+    this.buildData = this.Class.BuildUtils.loadJSONFile(this.Class.BuildUtils.buildFilePath);
+    this.manifest = this.Class.BuildUtils.loadJSONFile(this.Class.BuildUtils.distManifestPath);
   }
 
   commonBuild() {
@@ -127,6 +127,6 @@ export default class Postbuild {
   }
 
   writeManifestFile() {
-    Common.writeJSONFile(Common.distManifestPath, this.manifest);
+    this.Class.BuildUtils.writeJSONFile(this.Class.BuildUtils.distManifestPath, this.manifest);
   }
 }

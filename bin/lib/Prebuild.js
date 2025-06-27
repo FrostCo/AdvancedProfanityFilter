@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 import fse from 'fs-extra';
 // import Constants from '../../src/script/lib/constants'; // Temp?
-import Common from '../common.js';
+import BuildUtils from './BuildUtils.js';
 
 export default class Prebuild {
   //#region Class reference helpers
-  static get Common() {
-    return Common;
+  static get BuildUtils() {
+    return BuildUtils;
   }
   get Class() {
     return this.constructor;
@@ -24,7 +24,7 @@ export default class Prebuild {
   }
 
   activateBuildFile(sourceFile) {
-    fse.copyFileSync(sourceFile, this.Class.Common.buildFilePath);
+    fse.copyFileSync(sourceFile, this.Class.BuildUtils.buildFilePath);
   }
 
   bookmarkletBuild() {
@@ -83,7 +83,7 @@ export default class Prebuild {
   }
 
   handleEnvArg(arg) {
-    if (this.Class.Common.environments.includes(arg)) {
+    if (this.Class.BuildUtils.environments.includes(arg)) {
       this.environmentProvided = true;
       return (this.environment = arg);
     }
@@ -93,7 +93,7 @@ export default class Prebuild {
     const [targetName, manifestVersion] = arg.split('-');
     if (!targetName) return;
 
-    if (this.Class.Common.targets.includes(targetName)) {
+    if (this.Class.BuildUtils.targets.includes(targetName)) {
       this.data.target = targetName;
       if (manifestVersion) this.data.manifestVersion = parseInt(manifestVersion.match(/\d$/)?.toString());
       return (this.targetProvided = true);
@@ -104,19 +104,19 @@ export default class Prebuild {
 
   loadDataFromFile() {
     this.loadedFromFile = true;
-    const envBuildFilePath = this.Class.Common.buildFilePathByEnv(this.environment);
+    const envBuildFilePath = this.Class.BuildUtils.buildFilePathByEnv(this.environment);
 
     try {
       // Use existing buildFile as starting point if no target was passed
-      this.data = this.Class.Common.loadJSONFile(envBuildFilePath);
+      this.data = this.Class.BuildUtils.loadJSONFile(envBuildFilePath);
     } catch (err) {
       console.warn(`${envBuildFilePath} doesn't exist, creating with defaults...\n`);
-      this.Class.Common.writeJSONFile(envBuildFilePath, this.data);
+      this.Class.BuildUtils.writeJSONFile(envBuildFilePath, this.data);
     }
   }
 
   processArguments(args) {
-    const argv = this.Class.Common.parseArgv(args);
+    const argv = this.Class.BuildUtils.parseArgv(args);
     // console.log(`Processing arguments: ${JSON.stringify(argv)}`);
 
     const invalidArgs = Object.keys(argv.arguments).filter((arg) => !this.validArgs.includes(arg));
@@ -172,8 +172,8 @@ export default class Prebuild {
   }
 
   writeBuildData() {
-    const filePath = this.Class.Common.buildFilePathByEnv(this.environment);
-    this.Class.Common.writeJSONFile(filePath, this.data);
+    const filePath = this.Class.BuildUtils.buildFilePathByEnv(this.environment);
+    this.Class.BuildUtils.writeJSONFile(filePath, this.data);
     this.activateBuildFile(filePath);
   }
 }

@@ -2,7 +2,7 @@
 import fse from 'fs-extra';
 import path from 'path';
 
-export default class Common {
+export default class BuildUtils {
   // Paths are relative from the project root
   // Should be correct when running with `npm run ...`
   static get buildFilePath() {

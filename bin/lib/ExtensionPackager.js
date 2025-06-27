@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
 import AdmZip from 'adm-zip';
 import { globbySync } from 'globby';
-import Common from '../common.js';
+import BuildUtils from './BuildUtils.js';
 import fse from 'fs-extra';
 
 export default class ExtensionPackager {
   //#region Class reference helpers
-  static get Common() {
-    return Common;
+  static get BuildUtils() {
+    return BuildUtils;
   }
   get Class() {
     return this.constructor;
@@ -20,7 +20,7 @@ export default class ExtensionPackager {
 
     try {
       fse.ensureDirSync(this.releaseDir);
-      this.data = this.Class.Common.loadJSONFile(this.Class.Common.buildFilePath);
+      this.data = this.Class.BuildUtils.loadJSONFile(this.Class.BuildUtils.buildFilePath);
     } catch (err) {
       console.error(err.message);
       throw err;
@@ -54,7 +54,7 @@ export default class ExtensionPackager {
   run() {
     try {
       this.buildArchive();
-      this.Class.Common.removeFiles(this.packagePath, true);
+      this.Class.BuildUtils.removeFiles(this.packagePath, true);
       console.log(`Building ${this.packagePath}`);
       this.zip.writeZip(this.packagePath);
     } catch (err) {
