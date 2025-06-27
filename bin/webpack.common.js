@@ -6,6 +6,7 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
 import { execSync } from 'child_process';
 import TerserPlugin from 'terser-webpack-plugin';
+import { TranslationBuilderPlugin } from './TranslationBuilderPlugin.js';
 
 const projectRoot = process.cwd();
 
@@ -67,6 +68,7 @@ export default {
     hints: false,
   },
   plugins: [
+    new TranslationBuilderPlugin(),
     new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) }),
     new CopyPlugin({
       patterns: [
