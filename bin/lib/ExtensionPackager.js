@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 import AdmZip from 'adm-zip';
 import { globbySync } from 'globby';
-import Common from './common.js';
+import Common from '../common.js';
 import fse from 'fs-extra';
 
-export default class PackageExtension {
+export default class ExtensionPackager {
   //#region Class reference helpers
   static get Common() {
     return Common;

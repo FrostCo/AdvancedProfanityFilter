@@ -28,7 +28,7 @@
     "build:firefox": "npm run build:firefox:mv2",
     "build:libs": "tsc -p ./src/script/lib/tsconfig.json",
     "build": "node bin/prebuild.js && webpack --config bin/webpack.dev.js",
-    "package": "node bin/packageExtension.js",
+    "package": "node bin/cli/package-extension.js",
     "postbuild": "node bin/postbuild.js",
     "postrelease:all": "npm run build",
     "postrelease:build": "node bin/postbuild.js && npm run package",
