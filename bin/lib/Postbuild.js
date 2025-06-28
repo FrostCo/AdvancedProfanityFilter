@@ -18,6 +18,17 @@ export default class Postbuild {
 
   commonBuild() {
     this.handleManifest();
+    this.copyBookmarklet();
+  }
+
+  copyBookmarklet() {
+    try {
+      fse.copyFileSync('./dist-bookmarklet/bookmarkletFilter.js', './dist/bookmarkletFilter.js');
+    } catch (error) {
+      if (this.buildData.release) {
+        throw error;
+      }
+    }
   }
 
   edgeLegacyBuild() {
