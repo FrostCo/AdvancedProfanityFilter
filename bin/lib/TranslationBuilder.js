@@ -7,6 +7,11 @@ export default class TranslationBuilder {
     this.translations = {};
   }
 
+  bookmarklet() {
+    // Bookmarklet build does not require translations
+    this.translations = { en: {} };
+  }
+
   build() {
     this.translations = this.combineLocaleFiles(this.localesDir);
   }
