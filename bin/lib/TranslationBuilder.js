@@ -43,10 +43,10 @@ export default class TranslationBuilder {
 
   run() {
     this.build();
-    this.writeCombinedTranslations();
+    this.writeTranslations();
   }
 
-  writeCombinedTranslations() {
+  writeTranslations() {
     fs.writeFileSync(this.combinedTranslationsPath, this.output, 'utf8');
   }
 }
