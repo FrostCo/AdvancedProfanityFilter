@@ -3,6 +3,7 @@ import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
+import { BookmarkletTranslationBuilderPlugin } from './plugins/BookmarkletTranslationBuilderPlugin.js';
 
 const projectRoot = process.cwd();
 
@@ -63,7 +64,7 @@ export default {
   performance: {
     hints: false,
   },
-  plugins: [new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) })],
+  plugins: [new BookmarkletTranslationBuilderPlugin(), new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) })],
   resolve: {
     extensions: ['.js', '.ts'],
     plugins: [new TsconfigPathsPlugin({ configFile: './tsconfig.json' })],
