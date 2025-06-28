@@ -17,6 +17,9 @@ export default {
     path: path.resolve(projectRoot, 'dist-bookmarklet'),
     clean: true,
   },
+  externals: {
+    i18next: 'undefined',
+  },
   mode: 'production',
   module: {
     rules: [

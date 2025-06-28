@@ -2,6 +2,7 @@ import Config from '@APF/lib/config';
 import { prettyPrintArray, removeFromArray, sortObjectKeys, stringArray } from '@APF/lib/helper';
 import Logger from '@APF/lib/logger';
 import Translation from '@APF/translation';
+import Constants from '@APF/lib/constants';
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
 /* eslint-disable-next-line @typescript-eslint/naming-convention */
@@ -25,6 +26,9 @@ export default class WebConfig extends Config {
 
   //#region Class reference helpers
   // Can be overridden in children classes
+  static get Constants() {
+    return Constants;
+  }
   get Class() {
     return this.constructor as typeof WebConfig;
   }
@@ -344,7 +348,12 @@ export default class WebConfig extends Config {
   }
 
   localizeDefaults() {
-    if (!this._defaultsLoaded || !this._defaultsLoaded.length) return;
+    if (
+      this.Class.BUILD.target === this.Class.Constants.BUILD_TARGET_BOOKMARKLET ||
+      !this._defaultsLoaded ||
+      !this._defaultsLoaded.length
+    )
+      return;
 
     const translation = new Translation('common', this.language);
 
