@@ -6,6 +6,7 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
 import { execSync } from 'child_process';
 import TerserPlugin from 'terser-webpack-plugin';
+import { PostbuildPlugin } from './plugins/PostbuildPlugin.js';
 import { TranslationBuilderPlugin } from './plugins/TranslationBuilderPlugin.js';
 
 const projectRoot = process.cwd();
@@ -76,6 +77,7 @@ export default {
         { from: path.resolve(projectRoot, 'src/static'), to: './' },
       ],
     }),
+    new PostbuildPlugin(),
   ],
   resolve: {
     extensions: ['.js', '.ts'],
