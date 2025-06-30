@@ -13,12 +13,12 @@ import { PackExtensionPlugin } from './plugins/PackExtensionPlugin.js';
 
 const projectRoot = process.cwd();
 
-if (!fs.existsSync('.build.json')) {
-  console.warn('.build.json file not found. Running prebuild script...\n');
+if (!fs.existsSync(BuildUtils.buildFilePath)) {
+  console.warn(`⚠️ ${BuildUtils.buildFilePath} file not found. Running prebuild script...\n`);
   execSync('node bin/prebuild.js', { stdio: 'inherit' });
 }
 
-const BUILD = fs.readJsonSync('.build.json');
+const BUILD = fs.readJsonSync(BuildUtils.buildFilePath);
 console.log(`${BuildUtils.buildDetailsMessage(BUILD)}\n🛠️ Starting build...\n`);
 
 export default {

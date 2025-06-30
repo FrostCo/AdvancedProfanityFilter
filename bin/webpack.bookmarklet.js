@@ -9,7 +9,7 @@ import { BookmarkletTranslationBuilderPlugin } from './plugins/BookmarkletTransl
 
 const projectRoot = process.cwd();
 
-const BUILD = fs.readJsonSync('.build.json');
+const BUILD = fs.readJsonSync(BuildUtils.buildFilePath);
 
 console.log(`${BuildUtils.buildDetailsMessage(BUILD)}\n🛠️ Starting build...\n`);
 
