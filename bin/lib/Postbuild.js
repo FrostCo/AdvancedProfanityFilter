@@ -51,6 +51,10 @@ export default class Postbuild {
     if (this.manifest.version != this.buildData.version) this.manifest.version = this.buildData.version;
   }
 
+  errorMessage(label = 'Postbuild') {
+    return `❌ [${label}] Postbuild tasks failed`;
+  }
+
   firefoxBuild() {
     this.manifest.browser_specific_settings = {
       gecko: {
@@ -124,6 +128,10 @@ export default class Postbuild {
     this.commonBuild();
     this.targetCustomizations();
     this.writeManifestFile();
+  }
+
+  successMessage(label = 'Postbuild') {
+    return `🏁 [${label}] Postbuild tasks completed`;
   }
 
   targetCustomizations() {
