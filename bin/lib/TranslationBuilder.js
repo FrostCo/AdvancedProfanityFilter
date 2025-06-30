@@ -42,6 +42,10 @@ export default class TranslationBuilder {
     return combined;
   }
 
+  errorMessage(label = 'TranslationBuilder') {
+    return `❌ [${label}] Failed to build translations`;
+  }
+
   get output() {
     return `export const translations = ${JSON.stringify(this.translations, null, 2)};\n\nexport default translations;\n`;
   }
@@ -49,6 +53,10 @@ export default class TranslationBuilder {
   run() {
     this.build();
     this.writeTranslations();
+  }
+
+  successMessage(label = 'TranslationBuilder') {
+    return `🌐 [${label}] Translations built`;
   }
 
   writeTranslations() {
