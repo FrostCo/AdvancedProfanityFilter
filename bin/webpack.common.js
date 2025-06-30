@@ -8,6 +8,7 @@ import { execSync } from 'child_process';
 import TerserPlugin from 'terser-webpack-plugin';
 import { PostbuildPlugin } from './plugins/PostbuildPlugin.js';
 import { TranslationBuilderPlugin } from './plugins/TranslationBuilderPlugin.js';
+import { PackExtensionPlugin } from './plugins/PackExtensionPlugin.js';
 
 const projectRoot = process.cwd();
 
@@ -78,6 +79,7 @@ export default {
       ],
     }),
     new PostbuildPlugin(),
+    new PackExtensionPlugin(),
   ],
   resolve: {
     extensions: ['.js', '.ts'],

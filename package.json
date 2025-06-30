@@ -30,7 +30,6 @@
     "build": "node bin/cli/prebuild.js && webpack --config bin/webpack.dev.js",
     "package": "node bin/cli/package-extension.js",
     "postrelease:all": "npm run build",
-    "postrelease:build": "npm run package",
     "postrelease:firefox:mv2": "node bin/cli/package-source.js",
     "prerelease:all": "npm run release:bookmarklet",
     "release:all": "npm run release:chrome:mv2 && npm run release:chrome:mv3 && npm run release:edgeLegacy && npm run release:firefox:mv2 && npm run release:firefox:mv3",

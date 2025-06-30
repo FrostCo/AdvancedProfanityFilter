@@ -1,8 +1,5 @@
-/* eslint-disable no-console */
-import AdmZip from 'adm-zip';
-import { globbySync } from 'globby';
+import ArchiveBuilder from './ArchiveBuilder.js';
 import BuildUtils from './BuildUtils.js';
-import fse from 'fs-extra';
 
 export default class ExtensionPackager {
   //#region Class reference helpers
@@ -17,53 +14,48 @@ export default class ExtensionPackager {
   constructor() {
     this.distDir = this.distDirectory;
     this.releaseDir = this.releaseDirectory;
-
-    try {
-      fse.ensureDirSync(this.releaseDir);
-      this.data = this.Class.BuildUtils.loadJSONFile(this.Class.BuildUtils.buildFilePath);
-    } catch (err) {
-      console.error(err.message);
-      throw err;
-    }
+    this.data = this.Class.BuildUtils.loadJSONFile(this.Class.BuildUtils.buildFilePath);
   }
 
-  buildArchive() {
-    this.zip = new AdmZip();
-    this.zip.addLocalFolder(this.distDir, null);
-
-    // Remove unwanted files
-    const filesToRemove = globbySync(['dist/**/*.LICENSE.txt']);
-    for (const file of filesToRemove) {
-      const entry = file.replace(/^dist\//, '');
-      this.zip.deleteFile(entry);
-    }
+  async buildArchive() {
+    const builder = new ArchiveBuilder({
+      sources: [this.distDir],
+      outputDir: this.releaseDir,
+      archiveName: `${this.packageName}.zip`,
+      root: false,
+    });
+    return await builder.build();
   }
 
   get distDirectory() {
     return './dist';
   }
 
+  errorMessage(label = 'ExtensionPackager') {
+    return `❌ [${label}] Failed to create archive: ${this.packagePath}`;
+  }
+
+  get packageName() {
+    return `${this.data.target}-mv${this.data.manifestVersion}-v${this.data.version}`;
+  }
+
   get packagePath() {
-    return `${this.releaseDir}/${this.zipName}.zip`;
+    return `${this.releaseDir}/${this.packageName}.zip`;
   }
 
   get releaseDirectory() {
     return './release';
   }
 
-  run() {
-    try {
-      this.buildArchive();
-      this.Class.BuildUtils.removeFiles(this.packagePath, true);
-      console.log(`Building ${this.packagePath}`);
-      this.zip.writeZip(this.packagePath);
-    } catch (err) {
-      console.error(err.message);
-      throw err;
-    }
+  async run() {
+    await this.buildArchive();
   }
 
-  get zipName() {
-    return `${this.data.target}-mv${this.data.manifestVersion}-v${this.data.version}`;
+  shouldPackage() {
+    return this.data.release;
+  }
+
+  successMessage(label = 'ExtensionPackager') {
+    return `📦 [${label}] Packed extension: ${this.packagePath}`;
   }
 }
