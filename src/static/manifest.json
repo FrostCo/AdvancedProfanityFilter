@@ -22,7 +22,7 @@
   ],
   "options_ui": {
     "open_in_tab": true,
-    "page": "optionPage.html"
+    "page": "option-page.html"
   },
   "background": {
     "service_worker": "background.js"
