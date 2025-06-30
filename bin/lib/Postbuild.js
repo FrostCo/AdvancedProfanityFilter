@@ -47,10 +47,6 @@ export default class Postbuild {
     fse.copyFileSync('./store/edge/src/contentScriptsAPIBridge.js', './dist/contentScriptsAPIBridge.js');
   }
 
-  updateManifestVersion() {
-    if (this.manifest.version != this.buildData.version) this.manifest.version = this.buildData.version;
-  }
-
   errorMessage(label = 'Postbuild') {
     return `❌ [${label}] Postbuild tasks failed`;
   }
@@ -143,6 +139,10 @@ export default class Postbuild {
         this.firefoxBuild();
         break;
     }
+  }
+
+  updateManifestVersion() {
+    if (this.manifest.version != this.buildData.version) this.manifest.version = this.buildData.version;
   }
 
   writeManifestFile() {
