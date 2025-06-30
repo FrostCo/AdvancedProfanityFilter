@@ -1,5 +1,5 @@
-import Constants from './constants';
-import Config from './config';
+import Constants from './Constants';
+import Config from './Config';
 
 export default class Word {
   _filterMethod: number;

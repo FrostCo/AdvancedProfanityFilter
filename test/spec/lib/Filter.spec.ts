@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { expect } from 'chai';
-import Constants from '@APF/lib/constants';
-import Config from '@APF/lib/config';
-import Filter from '@APF/lib/filter';
+import Constants from '@APF/lib/Constants';
+import Config from '@APF/lib/Config';
+import Filter from '@APF/lib/Filter';
 
 const testWords = {
   example: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'demo', lists: [] },

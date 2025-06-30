@@ -1,4 +1,4 @@
-import Constants from './constants';
+import Constants from './Constants';
 
 export function booleanToNumber(value: boolean): number {
   return value ? Constants.TRUE : Constants.FALSE;

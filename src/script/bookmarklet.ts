@@ -1,5 +1,5 @@
-import type WebConfig from '@APF/webConfig';
-import Logger from '@APF/lib/logger';
+import type WebConfig from '@APF/WebConfig';
+import Logger from '@APF/lib/Logger';
 
 const logger = new Logger('OptionPage:Bookmarklet');
 

@@ -1,8 +1,8 @@
-import Config from '@APF/lib/config';
+import Config from '@APF/lib/Config';
 import { prettyPrintArray, removeFromArray, sortObjectKeys, stringArray } from '@APF/lib/helper';
-import Logger from '@APF/lib/logger';
-import Translation from '@APF/translation';
-import Constants from '@APF/lib/constants';
+import Logger from '@APF/lib/Logger';
+import Translation from '@APF/Tanslation';
+import Constants from '@APF/lib/Constants';
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
 /* eslint-disable-next-line @typescript-eslint/naming-convention */

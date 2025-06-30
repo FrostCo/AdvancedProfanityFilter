@@ -1,9 +1,9 @@
 import '@VENDOR/findAndReplaceDOMText.js';
-import Constants from '@APF/lib/constants';
-import Domain from '@APF/domain';
-import Filter from '@APF/lib/filter';
-import Page from '@APF/page';
-import WebConfig from '@APF/webConfig';
+import Constants from '@APF/lib/Constants';
+import Domain from '@APF/Domain';
+import Filter from '@APF/lib/Filter';
+import Page from '@APF/Page';
+import WebConfig from '@APF/WebConfig';
 
 export default class BookmarkletFilter extends Filter {
   buildMessage: (destination: string, data?: object) => Message; // Bookmarklet: Not used - Needed to match signature of WebFilter

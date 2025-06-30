@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import WebConfig from '@APF/webConfig';
-import BookmarkletFilter from '@APF/bookmarkletFilter';
+import WebConfig from '@APF/WebConfig';
+import BookmarkletFilter from '@APF/BookmarkletFilter';
 
 /* @preserve - Advanced Profanity Filter by Richard Frost (FrostCo) */
 /* @preserve - Start User Config */

@@ -1,11 +1,11 @@
 import '@VENDOR/findAndReplaceDOMText.js';
-import Constants from '@APF/lib/constants';
-import Domain from '@APF/domain';
-import Filter from '@APF/lib/filter';
-import Page from '@APF/page';
-import WebConfig from '@APF/webConfig';
-import Logger from '@APF/lib/logger';
-import type Word from '@APF/lib/word';
+import Constants from '@APF/lib/Constants';
+import Domain from '@APF/Domain';
+import Filter from '@APF/lib/Filter';
+import Page from '@APF/Page';
+import WebConfig from '@APF/WebConfig';
+import Logger from '@APF/lib/Logger';
+import type Word from '@APF/lib/Word';
 const logger = new Logger('WebFilter');
 
 export default class WebFilter extends Filter {

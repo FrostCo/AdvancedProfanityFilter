@@ -1,6 +1,6 @@
-import Constants from '@APF/lib/constants';
+import Constants from '@APF/lib/Constants';
 import { booleanToNumber, getVersion, isVersionOlder } from '@APF/lib/helper';
-import WebConfig from '@APF/webConfig';
+import WebConfig from '@APF/WebConfig';
 
 export default class DataMigration {
   cfg: WebConfig;

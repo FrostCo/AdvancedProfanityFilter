@@ -1,7 +1,7 @@
-import Constants from './constants';
-import Word from './word';
-import Config from './config';
-import Logger from './logger';
+import Constants from './Constants';
+import Word from './Word';
+import Config from './Config';
+import Logger from './Logger';
 
 export default class Wordlist {
   all: Word[];

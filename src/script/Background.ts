@@ -1,10 +1,10 @@
-import Constants from '@APF/lib/constants';
-import DataMigration from '@APF/dataMigration';
-import Domain from '@APF/domain';
-import Translation from '@APF/translation';
-import WebConfig from '@APF/webConfig';
+import Constants from '@APF/lib/Constants';
+import DataMigration from '@APF/DataMigration';
+import Domain from '@APF/Domain';
+import Translation from '@APF/Tanslation';
+import WebConfig from '@APF/WebConfig';
 import { formatNumber } from '@APF/lib/helper';
-import Logger from '@APF/lib/logger';
+import Logger from '@APF/lib/Logger';
 
 export default class Background {
   //#region Class reference helpers

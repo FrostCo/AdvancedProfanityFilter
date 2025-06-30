@@ -1,4 +1,4 @@
-import OptionPage from '@APF/optionPage';
+import OptionPage from '@APF/OptionPage';
 
 export default class OptionAuth {
   authenticated: boolean;

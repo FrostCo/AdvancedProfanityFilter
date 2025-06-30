@@ -1,7 +1,7 @@
-import Constants from './constants';
-import Word from './word';
-import Wordlist from './wordlist';
-import Config from './config';
+import Constants from './Constants';
+import Word from './Word';
+import Wordlist from './Wordlist';
+import Config from './Config';
 import { randomArrayElement } from './helper';
 
 export default class Filter {

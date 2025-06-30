@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import Page from '@APF/page';
+import Page from '@APF/Page';
 
 describe('Page', function () {
   describe('isForbiddenNode()', function () {

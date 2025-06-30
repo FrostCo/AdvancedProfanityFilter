@@ -1,4 +1,4 @@
-import Popup from '@APF/popup';
+import Popup from '@APF/Popup';
 
 const popup = new Popup();
 

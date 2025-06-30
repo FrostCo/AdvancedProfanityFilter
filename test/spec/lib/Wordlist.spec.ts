@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
-import Constants from '@APF/lib/constants';
-import Wordlist from '@APF/lib/wordlist';
+import Constants from '@APF/lib/Constants';
+import Wordlist from '@APF/lib/Wordlist';
 
 const testWords = {
   example: { lists: [1], matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'demo' },

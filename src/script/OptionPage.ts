@@ -1,12 +1,12 @@
-import Constants from '@APF/lib/constants';
-import WebConfig from '@APF/webConfig';
-import Filter from '@APF/lib/filter';
-import Domain from '@APF/domain';
-import OptionAuth from '@APF/optionAuth';
-import DataMigration from '@APF/dataMigration';
+import Constants from '@APF/lib/Constants';
+import WebConfig from '@APF/WebConfig';
+import Filter from '@APF/lib/Filter';
+import Domain from '@APF/Domain';
+import OptionAuth from '@APF/OptionAuth';
+import DataMigration from '@APF/DataMigration';
 import Bookmarklet from '@APF/bookmarklet';
-import Logger from '@APF/lib/logger';
-import Translation from '@APF/translation';
+import Logger from '@APF/lib/Logger';
+import Translation from '@APF/Tanslation';
 import {
   booleanToNumber,
   deepCloneJson,

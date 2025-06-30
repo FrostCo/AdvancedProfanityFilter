@@ -1,9 +1,9 @@
-import Constants from '@APF/lib/constants';
-import WebConfig from '@APF/webConfig';
-import Domain from '@APF/domain';
-import Page from '@APF/page';
-import Logger from '@APF/lib/logger';
-import Translation from '@APF/translation';
+import Constants from '@APF/lib/Constants';
+import WebConfig from '@APF/WebConfig';
+import Domain from '@APF/Domain';
+import Page from '@APF/Page';
+import Logger from '@APF/lib/Logger';
+import Translation from '@APF/Tanslation';
 const logger = new Logger('Popup');
 
 export default class Popup {

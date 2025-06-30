@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import Constants from '@APF/lib/constants';
+import Constants from '@APF/lib/Constants';
 
 describe('Constants', function () {
   describe('filterMethodName()', function () {

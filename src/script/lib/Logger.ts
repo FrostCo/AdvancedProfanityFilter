@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import Constants from './constants';
+import Constants from './Constants';
 
 // Class logging methods will be logged unconditionally
 // Instance logging methods will be conditionally logged based on this.level, and may optionally include a prefix tag

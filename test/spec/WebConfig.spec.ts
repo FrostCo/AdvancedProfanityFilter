@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import Constants from '@APF/lib/constants';
-import WebConfig from '@APF/webConfig';
+import Constants from '@APF/lib/Constants';
+import WebConfig from '@APF/WebConfig';
 
 describe('WebConfig', function () {
   it('should throw when no async_params provided', function () {

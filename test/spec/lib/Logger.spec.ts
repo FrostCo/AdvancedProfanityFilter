@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
-import Logger from '@APF/lib/logger';
-import Constants from '@APF/lib/constants';
+import Logger from '@APF/lib/Logger';
+import Constants from '@APF/lib/Constants';
 
 describe('Logger', function () {
   describe('class', function () {
