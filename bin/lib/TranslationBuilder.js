@@ -12,6 +12,10 @@ export default class TranslationBuilder {
     this.translations = { en: {} };
   }
 
+  bookmarkletSuccessMessage(label = 'TranslationBuilder') {
+    return `🌐 [${label}] Bookmarklet translations built`;
+  }
+
   build() {
     this.translations = this.combineLocaleFiles(this.localesDir);
   }
