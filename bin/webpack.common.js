@@ -6,6 +6,7 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
 import { execSync } from 'child_process';
 import TerserPlugin from 'terser-webpack-plugin';
+import BuildUtils from './lib/BuildUtils.js';
 import { PostbuildPlugin } from './plugins/PostbuildPlugin.js';
 import { TranslationBuilderPlugin } from './plugins/TranslationBuilderPlugin.js';
 import { PackExtensionPlugin } from './plugins/PackExtensionPlugin.js';
@@ -18,7 +19,7 @@ if (!fs.existsSync('.build.json')) {
 }
 
 const BUILD = fs.readJsonSync('.build.json');
-console.log(`Build details:\n${JSON.stringify(BUILD, null, 2)}`);
+console.log(`${BuildUtils.buildDetailsMessage(BUILD)}\n🛠️ Starting build...\n`);
 
 export default {
   entry: {

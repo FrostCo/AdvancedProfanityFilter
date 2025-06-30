@@ -3,6 +3,17 @@ import fse from 'fs-extra';
 import path from 'path';
 
 export default class BuildUtils {
+  static buildDetailsMessage({ version, release, target, manifestVersion, config }) {
+    return `👷 Build Details 🏗️
+
+🔖 version: ${version}
+🚀 release: ${release ? '✔️' : '✖️'}
+🎯 target: ${target}
+📝 manifestVersion: ${manifestVersion}
+⚙️ config: ${JSON.stringify(config, null, 2)}
+`;
+  }
+
   // Paths are relative from the project root
   // Should be correct when running with `npm run ...`
   static get buildFilePath() {
