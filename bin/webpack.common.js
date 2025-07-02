@@ -23,11 +23,11 @@ console.log(`${BuildUtils.buildDetailsMessage(BUILD)}\n🛠️ Starting build...
 
 export default {
   entry: {
-    background: './src/script/mainBackground.ts',
-    optionPage: './src/script/mainOptionPage.ts',
-    popup: './src/script/mainPopup.ts',
-    showErrors: '/src/script/showErrors.ts',
-    webFilter: './src/script/mainContent.ts',
+    background: './src/script/entry/background.ts',
+    'option-page': './src/script/entry/option-page.ts',
+    popup: './src/script/entry/popup.ts',
+    'show-errors': '/src/script/entry/show-errors.ts',
+    'web-filter': './src/script/entry/web-filter.ts',
   },
   output: {
     path: path.resolve(projectRoot, 'dist'),

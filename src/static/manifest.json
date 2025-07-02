@@ -14,7 +14,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["webFilter.js"],
+      "js": ["web-filter.js"],
       "run_at": "document_start",
       "all_frames": true,
       "match_about_blank": true

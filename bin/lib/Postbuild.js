@@ -23,7 +23,7 @@ export default class Postbuild {
 
   copyBookmarklet() {
     try {
-      fse.copyFileSync('./dist-bookmarklet/bookmarkletFilter.js', './dist/bookmarkletFilter.js');
+      fse.copyFileSync('./dist-bookmarklet/bookmarklet.js', './dist/bookmarklet.js');
     } catch (error) {
       if (this.buildData.release) {
         throw error;
@@ -89,7 +89,7 @@ export default class Postbuild {
     this.manifest.options_ui = {
       chrome_style: false,
       open_in_tab: true,
-      page: 'optionPage.html',
+      page: 'option-page.html',
     };
     this.manifest.background = {
       persistent: false,

@@ -13,7 +13,7 @@ export default class Bookmarklet {
 
   static async loadCode() {
     try {
-      const origURL = './bookmarkletFilter.js';
+      const origURL = './bookmarklet.js';
       const response = await fetch(origURL);
       return await response.text();
     } catch (err) {

@@ -5,7 +5,7 @@ import { marked } from 'marked';
 import download from 'download';
 
 const readmeURI = 'https://raw.githubusercontent.com/wiki/FrostCo/AdvancedProfanityFilter/Home.md';
-const optionPage = path.join('src/static', 'optionPage.html');
+const optionPage = path.join('src/static', 'option-page.html');
 const optionPageHTML = fse.readFileSync(optionPage).toString();
 const prefix = '<div id="helpContainer">';
 const postfix = '\n  </div>';

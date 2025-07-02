@@ -15,7 +15,7 @@ console.log(`${BuildUtils.buildDetailsMessage(BUILD)}\n🛠️ Starting build...
 
 export default {
   entry: {
-    bookmarkletFilter: './src/script/mainBookmarklet.ts',
+    bookmarklet: './src/script/entry/bookmarklet.ts',
   },
   output: {
     path: path.resolve(projectRoot, 'dist-bookmarklet'),

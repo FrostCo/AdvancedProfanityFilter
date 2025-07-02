@@ -3,7 +3,7 @@ import Popup from '@APF/Popup';
 const popup = new Popup();
 
 // Use internal help page
-(document.getElementById('gettingStarted') as HTMLAnchorElement).href = chrome.runtime.getURL('optionPage.html#/help');
+(document.getElementById('gettingStarted') as HTMLAnchorElement).href = chrome.runtime.getURL('option-page.html#/help');
 
 // Listeners
 document.addEventListener('DOMContentLoaded', (evt) => {
