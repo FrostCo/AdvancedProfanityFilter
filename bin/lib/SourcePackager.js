@@ -1,5 +1,5 @@
-/* eslint-disable no-console */
-import AdmZip from 'adm-zip';
+import fs from 'fs-extra';
+import archiver from 'archiver';
 import BuildUtils from './BuildUtils.js';
 
 // Required for Firefox due to bundled code
@@ -14,76 +14,78 @@ export default class SourcePackager {
   //#endregion
 
   constructor() {
-    this.zip = new AdmZip();
+    this.build = fs.readJsonSync(BuildUtils.buildFilePath);
+    this.output = fs.createWriteStream(this.filePath);
+    this.archive = archiver('zip', { zlib: { level: 9 } });
+    this.archive.pipe(this.output);
   }
 
   addBinFiles() {
-    for (const file of this.binFiles) {
-      this.zip.addLocalFile(file, 'bin/');
-    }
+    this.archive.glob('bin/**/*', { ignore: this.binFilesToIgnore });
   }
 
   addFiles() {
     this.addBinFiles();
+    this.addLocaleFiles();
     this.addRootFiles();
     this.addSourceFiles();
   }
 
+  addLocaleFiles() {
+    this.archive.directory('locales');
+  }
+
   addRootFiles() {
     for (const file of this.rootFiles) {
-      this.zip.addLocalFile(file);
+      this.archive.file(file);
     }
   }
 
   addSourceFiles() {
-    this.zip.addLocalFolder('./src', 'src');
+    this.archive.directory('src');
   }
 
-  get binFiles() {
-    return [
-      'bin/clean.js',
-      'bin/cleanClass.js',
-      'bin/common.js',
-      'bin/copyStatic.js',
-      'bin/copyStaticClass.js',
-      'bin/packageExtension.js',
-      'bin/packageExtensionClass.js',
-      'bin/packageSource.js',
-      'bin/packageSourceClass.js',
-      'bin/postbuild.js',
-      'bin/postbuildClass.js',
-      'bin/prebuild.js',
-      'bin/prebuildClass.js',
-      'bin/webpack.bookmarklet.js',
-      'bin/webpack.common.js',
-      'bin/webpack.dev.js',
-      'bin/webpack.prod.js',
-    ];
+  get binFilesToIgnore() {
+    return ['bin/cli/update-help.js', 'bin/cli/watch.js'];
+  }
+
+  errorMessage(label = 'SourcePackager') {
+    return `❌ [${label}] Failed to package source`;
   }
 
   get filePath() {
-    return `./release/source-${this.version}.zip`;
+    return `${this.outputDir}/${this.packageName}.zip`;
+  }
+
+  get outputDir() {
+    return `./release`;
+  }
+
+  get packageName() {
+    return `source-${this.version}`;
   }
 
   get rootFiles() {
-    return ['.build.json', 'LICENSE', 'package-lock.json', 'package.json', 'README.md', 'tsconfig.json'];
+    return ['.build.json', '.nvmrc', 'LICENSE', 'package-lock.json', 'package.json', 'README.md', 'tsconfig.json'];
   }
 
-  run() {
-    this.Class.BuildUtils.removeFiles(this.filePath, true);
-    this.showInstructions();
+  async run() {
     this.addFiles();
-    this.zip.writeZip(this.filePath);
+
+    return new Promise((resolve, reject) => {
+      this.output.on('close', () => resolve());
+      this.archive.on('error', reject);
+      this.archive.finalize();
+    });
   }
 
-  showInstructions() {
-    console.log(`Building ${this.filePath}`);
-    console.log('Build from source: npm install && npm run release:bookmarklet && npm run release:firefox');
-    console.log('  Unpacked: ./dist');
-    console.log(`  Packed: ${this.filePath}`);
+  successMessage(label = 'SourcePackager') {
+    return `📦 [${label}] Source packaged
+To build from source: npm install && npm run release:bookmarklet && npm run release:firefox
+Unpacked: ./dist`;
   }
 
   get version() {
-    return process.env.npm_package_version;
+    return this.build.version;
   }
 }
