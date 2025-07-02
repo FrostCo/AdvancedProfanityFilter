@@ -7,6 +7,7 @@
     "type": "git",
     "url": "git+https://github.com/FrostCo/AdvancedProfanityFilter.git"
   },
+  "engine": ">=22.14.0 <23",
   "type": "module",
   "keywords": [
     "Profanity",
