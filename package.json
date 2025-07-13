@@ -29,7 +29,7 @@
     "build:firefox": "npm run build:firefox:mv2",
     "build:libs": "tsc -p ./src/script/lib/tsconfig.json",
     "build:translations": "node bin/cli/build-translations.js",
-    "build": "node bin/cli/prebuild.js && webpack --config bin/webpack.dev.js",
+    "build": "webpack --config bin/webpack.dev.js",
     "package": "node bin/cli/package-extension.js",
     "postrelease:all": "npm run build",
     "postrelease:firefox:mv2": "node bin/cli/package-source.js",
