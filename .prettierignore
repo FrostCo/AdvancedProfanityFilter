@@ -1,5 +1,7 @@
 # Ignore built files for distribution
 dist/
+dist-bookmarklet/
+dist-lib/
 
 # Ignore third-party vendor scripts and styles
 src/script/vendor/
