@@ -57,6 +57,9 @@
     "type-check": "tsc --noEmit",
     "type-check:tests": "tsc --noEmit -p test/tsconfig.json",
     "type-check:watch": "npm run type-check -- --watch",
+    "ci": "npm run lint && npm run format && npm run type-check && npm run test:addon && npm run test:coverage",
+    "dev": "npm run build",
+    "dev:check": "npm run lint && npm run format && npm run type-check",
     "update:deps": "npx npm-check-updates --concurrency 10 --timeout 600000 --upgrade",
     "update:help": "node bin/cli/update-help.js && prettier --write ./src/static/option-page.html",
     "watch": "node bin/cli/watch.js"
