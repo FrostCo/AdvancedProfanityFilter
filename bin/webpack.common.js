@@ -15,7 +15,7 @@ const projectRoot = process.cwd();
 
 if (!fs.existsSync(BuildUtils.buildFilePath)) {
   console.warn(`⚠️ ${BuildUtils.buildFilePath} file not found. Running prebuild script...\n`);
-  execSync('node bin/prebuild.js', { stdio: 'inherit' });
+  execSync('node bin/cli/prebuild.js', { stdio: 'inherit' });
 }
 
 const BUILD = fs.readJsonSync(BuildUtils.buildFilePath);
