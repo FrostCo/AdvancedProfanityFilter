@@ -14,6 +14,7 @@ export default class Postbuild {
   constructor() {
     this.buildData = this.Class.BuildUtils.loadJSONFile(this.Class.BuildUtils.buildFilePath);
     this.manifest = this.Class.BuildUtils.loadJSONFile(this.Class.BuildUtils.distManifestPath);
+    this.actionsTaken = [];
   }
 
   commonBuild() {
@@ -45,6 +46,7 @@ export default class Postbuild {
     this.manifest['-ms-preload'] = msPreload;
     fse.copyFileSync('./store/edge/src/backgroundScriptsAPIBridge.js', './dist/backgroundScriptsAPIBridge.js');
     fse.copyFileSync('./store/edge/src/contentScriptsAPIBridge.js', './dist/contentScriptsAPIBridge.js');
+    this.actionsTaken.push('edgeLegacyBuild');
   }
 
   errorMessage(label = 'Postbuild') {
