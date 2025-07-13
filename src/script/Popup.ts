@@ -3,7 +3,7 @@ import WebConfig from '@APF/WebConfig';
 import Domain from '@APF/Domain';
 import Page from '@APF/Page';
 import Logger from '@APF/lib/Logger';
-import Translation from '@APF/Tanslation';
+import Translation from '@APF/Translation';
 const logger = new Logger('Popup');
 
 export default class Popup {

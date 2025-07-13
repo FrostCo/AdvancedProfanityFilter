@@ -1,7 +1,7 @@
 import Constants from '@APF/lib/Constants';
 import DataMigration from '@APF/DataMigration';
 import Domain from '@APF/Domain';
-import Translation from '@APF/Tanslation';
+import Translation from '@APF/Translation';
 import WebConfig from '@APF/WebConfig';
 import { formatNumber } from '@APF/lib/helper';
 import Logger from '@APF/lib/Logger';

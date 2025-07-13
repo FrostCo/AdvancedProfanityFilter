@@ -6,7 +6,7 @@ import OptionAuth from '@APF/OptionAuth';
 import DataMigration from '@APF/DataMigration';
 import Bookmarklet from '@APF/bookmarklet';
 import Logger from '@APF/lib/Logger';
-import Translation from '@APF/Tanslation';
+import Translation from '@APF/Translation';
 import {
   booleanToNumber,
   deepCloneJson,
