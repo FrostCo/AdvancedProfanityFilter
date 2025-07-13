@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import fse from 'fs-extra';
 // import Constants from '../../src/script/lib/constants'; // Temp?
 import BuildUtils from './BuildUtils.js';
@@ -19,6 +18,7 @@ export default class Prebuild {
     this.environment = 'dev';
     this.environmentProvided = false;
     this.targetProvided = false;
+    this.warnings = [];
 
     this.processArguments(args);
   }
@@ -73,9 +73,8 @@ export default class Prebuild {
     // Target customizations
   }
 
-  error(msg) {
-    console.error(msg);
-    process.exit(1);
+  errorMessage(label = 'Prebuild') {
+    return `❌ [${label}] Prebuild tasks failed`;
   }
 
   firefoxBuild() {
@@ -98,8 +97,16 @@ export default class Prebuild {
       if (manifestVersion) this.data.manifestVersion = parseInt(manifestVersion.match(/\d$/)?.toString());
       return (this.targetProvided = true);
     } else {
-      this.error(`Unsupported target: ${arg}\n`);
+      throw new Error(`Unsupported target: ${arg}`);
     }
+  }
+
+  addWarning(message) {
+    this.warnings.push(message);
+  }
+
+  get hasWarnings() {
+    return this.warnings.length > 0;
   }
 
   loadDataFromFile() {
@@ -110,7 +117,8 @@ export default class Prebuild {
       // Use existing buildFile as starting point if no target was passed
       this.data = this.Class.BuildUtils.loadJSONFile(envBuildFilePath);
     } catch (err) {
-      console.warn(`${envBuildFilePath} doesn't exist, creating with defaults...\n`);
+      // Create with defaults if file doesn't exist
+      this.addWarning(`${envBuildFilePath} doesn't exist, creating with defaults...`);
       this.Class.BuildUtils.writeJSONFile(envBuildFilePath, this.data);
     }
   }
@@ -121,9 +129,7 @@ export default class Prebuild {
 
     const invalidArgs = Object.keys(argv.arguments).filter((arg) => !this.validArgs.includes(arg));
     if (invalidArgs.length) {
-      console.error(`Unsupported arg: ${invalidArgs}\n`);
-      this.usage();
-      process.exit(1);
+      throw new Error(`Unsupported arg: ${invalidArgs}`);
     }
 
     if (argv.arguments.target) this.handleTargetArg(argv.arguments.target);
@@ -136,6 +142,10 @@ export default class Prebuild {
     this.commonBuild();
     this.targetCustomizations();
     this.writeBuildData();
+  }
+
+  successMessage(label = 'Prebuild') {
+    return `🔨 [${label}] Prebuild tasks completed`;
   }
 
   targetCustomizations() {
@@ -154,17 +164,17 @@ export default class Prebuild {
         break;
       default:
         // throw new Error(`Invalid target: ${this.data.target}`);
-        console.warn('\n!!!!! NOTICE: using default build !!!!!\n');
+        this.addWarning('Using default build target: chrome');
         this.defaultBuild();
     }
   }
 
   usage() {
-    console.log(`usage:
+    return `usage:
         npm run build
         npm run build:chrome
         npm run build:chrome:mv2
-    `);
+    `;
   }
 
   get validArgs() {
