@@ -8,8 +8,9 @@ export class PostbuildPlugin {
       try {
         postbuild.run();
         console.log(postbuild.successMessage('postbuild'));
-        if (postbuild.actionsTaken.length > 0) {
-          console.log(` 🪛 Actions taken: ${postbuild.actionsTaken.join(', ')}\n`);
+        const actionsTakenMessage = postbuild.actionsTakenMessage();
+        if (actionsTakenMessage) {
+          console.log(actionsTakenMessage);
         }
       } catch (error) {
         console.error(postbuild.errorMessage('postbuild'), error);

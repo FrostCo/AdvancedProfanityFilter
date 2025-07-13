@@ -17,6 +17,13 @@ export default class Postbuild {
     this.actionsTaken = [];
   }
 
+  actionsTakenMessage() {
+    if (this.actionsTaken.length > 0) {
+      return ` 🪛 Actions taken: ${this.actionsTaken.join(', ')}\n`;
+    }
+    return '';
+  }
+
   commonBuild() {
     this.handleManifest();
     this.copyBookmarklet();
