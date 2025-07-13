@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import fse from 'fs-extra';
 import path from 'path';
 
@@ -63,19 +62,6 @@ export default class BuildUtils {
 
   static get releaseBuildFilePath() {
     return path.join('.build.release.json');
-  }
-
-  static removeFiles(files, silent = false) {
-    if (typeof files === 'string') {
-      files = [files];
-    }
-
-    files.forEach((file) => {
-      if (!silent) {
-        console.log(`Removing ${file}`);
-      }
-      fse.removeSync(file);
-    });
   }
 
   static get srcManifestPath() {
