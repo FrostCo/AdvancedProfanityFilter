@@ -125,8 +125,6 @@ export default class Prebuild {
 
   processArguments(args) {
     const argv = this.Class.BuildUtils.parseArgv(args);
-    // console.log(`Processing arguments: ${JSON.stringify(argv)}`);
-
     const invalidArgs = Object.keys(argv.arguments).filter((arg) => !this.validArgs.includes(arg));
     if (invalidArgs.length) {
       throw new Error(`Unsupported arg: ${invalidArgs}`);
