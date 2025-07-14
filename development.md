@@ -76,77 +76,46 @@ For all scripts, please see `package.json`.
 ### Build (Load Last Target From File)
 
 - `npm run build`
-  - npm run prebuild
-    - npm run clean:build
-      - node bin/clean.js --build
-    - npm run build:translations
-      - node bin/buildTranslation.js
-    - node bin/prebuild.js --$npm_config_target
-      - NOTE: $npm_config_target will be blank (`--`)
+  - node bin/cli/prebuild.js
   - webpack --config bin/webpack.dev.js
-  - npm run build:static
-    - node bin/copyStatic.js
-  - npm run postbuild
-    - node bin/postbuild.js
+    - TranslationBuilderPlugin (builds translations)
+    - CopyPlugin (copies static files and images)
+    - PostbuildPlugin (runs postbuild tasks)
 
 ### Build Chrome Manifest V2
 
 - `npm run build:chrome:mv2`
-  - npm run build --target=chrome-mv2
-    - npm run prebuild
-      - npm run clean:build
-        - node bin/clean.js --build
-      - npm run build:translations
-        - node bin/buildTranslation.js
-      - node bin/prebuild.js --$npm_config_target
-    - npm run build
-      - webpack --config bin/webpack.dev.js
-      - npm run build:static
-        - node bin/copyStatic.js
-      - npm run postbuild
-        - node bin/postbuild.js
+  - node bin/cli/prebuild.js --target=chrome-mv2
+  - webpack --config bin/webpack.dev.js
+    - TranslationBuilderPlugin (builds translations)
+    - CopyPlugin (copies static files and images)
+    - PostbuildPlugin (runs postbuild tasks)
 
 ### Release Chrome Manifest V3
 
 - `npm run release:chrome:mv3`
-  - npm run release:build --target=chrome-mv3
-    - npm run prerelease:build
-      - npm run clean:build
-        - node bin/clean.js --build
-      - npm run build:translations
-        - node bin/buildTranslation.js
-      - node bin/prebuild.js --release --$npm_config_target
-    - webpack --config bin/webpack.prod.js
-    - npm run build:static
-      - node bin/copyStatic.js
-    - postrelease:build
-      - node bin/postbuild.js
-      - npm run package
-    - node bin/packageExtension.js
+  - node bin/cli/prebuild.js --environment=release --target=chrome-mv3
+  - webpack --config bin/webpack.prod.js
+    - TranslationBuilderPlugin (builds translations)
+    - CopyPlugin (copies static files and images)
+    - PostbuildPlugin (runs postbuild tasks)
+    - PackExtensionPlugin (creates release zip)
 
 ### Test Addon (Firefox Manifest V2)
 
 - `npm run test:addon`
-  - npm run release:build --target=firefox-mv2
-    - npm run prerelease:build
-      - npm run clean:build
-        - node bin/clean.js --build
-      - npm run build:translations
-        - node bin/buildTranslation.js
-      - node bin/prebuild.js --release --$npm_config_target
-    - webpack --config bin/webpack.prod.js
-    - npm run build:static
-      - node bin/copyStatic.js
-    - postrelease:build
-      - node bin/postbuild.js
-      - npm run package
+  - node bin/cli/prebuild.js --environment=test --target=firefox-mv2
+  - webpack --config bin/webpack.prod.js
+    - TranslationBuilderPlugin (builds translations)
+    - CopyPlugin (copies static files and images)
+    - PostbuildPlugin (runs postbuild tasks)
   - npx addons-linter ./dist
 
 ## Localization
 
 Adding support for a new language can be done by creating a new locale folder (`locales/{lang}`) with a file for each namespace. To update an existing translation, modify the existing file in the same location.
 
-Translations will automatically be compiled at build time (part of the `prebuild` script), but can be run manually as well with `npm run build:translations`. The compiled translations are stored in `src/script/translations.js`.
+Translations will automatically be compiled at build time by the `TranslationBuilderPlugin` webpack plugin, but can be run manually as well with `node bin/cli/build-translations.js`. The compiled translations are stored in `src/script/translations.js`.
 
 To use the translations, use the `Translation` class (`src/script/translation.ts`). When creating a new instance, pass in the desired namespace(s) (you should almost always include the `'common'` namespace). Once you have the translation instance you can simply call `translation.t()` with the desired key, such as `common:app.name`.
 

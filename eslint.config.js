@@ -7,7 +7,7 @@ export default [
   {
     // JavaScript files
     files: ['**/*.js'],
-    ignores: ['node_modules/**'],
+    ignores: ['node_modules/**', 'dist/**', 'dist-bookmarklet/**', 'dist-lib/**'],
     languageOptions: {
       globals: {
         ...globals.browser,

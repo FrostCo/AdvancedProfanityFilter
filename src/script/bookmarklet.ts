@@ -1,5 +1,5 @@
-import type WebConfig from '@APF/webConfig';
-import Logger from '@APF/lib/logger';
+import type WebConfig from '@APF/WebConfig';
+import Logger from '@APF/lib/Logger';
 
 const logger = new Logger('OptionPage:Bookmarklet');
 
@@ -13,7 +13,7 @@ export default class Bookmarklet {
 
   static async loadCode() {
     try {
-      const origURL = './bookmarkletFilter.js';
+      const origURL = './bookmarklet.js';
       const response = await fetch(origURL);
       return await response.text();
     } catch (err) {

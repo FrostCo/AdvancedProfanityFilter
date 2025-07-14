@@ -1,13 +1,28 @@
+/* eslint-disable no-console */
 import fs from 'fs-extra';
+import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import webpack from 'webpack';
+import BuildUtils from './lib/BuildUtils.js';
+import { BookmarkletTranslationBuilderPlugin } from './plugins/BookmarkletTranslationBuilderPlugin.js';
 
-const BUILD = fs.readJsonSync('.build.json');
+const projectRoot = process.cwd();
+
+const BUILD = fs.readJsonSync(BuildUtils.buildFilePath);
+
+console.log(`${BuildUtils.buildDetailsMessage(BUILD)}\n🛠️ Starting build...\n`);
 
 export default {
   entry: {
-    bookmarkletFilter: './src/script/mainBookmarklet.ts',
+    bookmarklet: './src/script/entry/bookmarklet.ts',
+  },
+  output: {
+    path: path.resolve(projectRoot, 'dist-bookmarklet'),
+    clean: true,
+  },
+  externals: {
+    i18next: 'undefined',
   },
   mode: 'production',
   module: {
@@ -51,11 +66,16 @@ export default {
         },
       }),
     ],
+    moduleIds: 'deterministic',
   },
-  plugins: [new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) })],
+  performance: {
+    hints: false,
+  },
+  plugins: [new BookmarkletTranslationBuilderPlugin(), new webpack.DefinePlugin({ __BUILD__: JSON.stringify(BUILD) })],
   resolve: {
     extensions: ['.js', '.ts'],
     plugins: [new TsconfigPathsPlugin({ configFile: './tsconfig.json' })],
   },
+  stats: 'minimal',
   target: 'web',
 };

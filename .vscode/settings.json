@@ -11,5 +11,8 @@
       "filename": true,
       "format": "svg"
     }
-  ]
+  ],
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
