@@ -147,7 +147,7 @@ export default class Popup {
     document.getElementById('filterMethodLabel').textContent = this.translation.t('popup:labels.filterMethod');
     document.getElementById('textWordlistLabel').textContent = this.translation.t('popup:labels.textWordlist');
     document.getElementById('summaryTableHeader').textContent = this.translation.t(
-      'popup:summaryTableHeaders.filteredWords'
+      'popup:summaryTableHeaders.filteredWords',
     );
     document.getElementById('options').textContent = this.translation.t('popup:buttons.options');
     document.getElementById('gettingStarted').textContent = this.translation.t('popup:footer.help');
@@ -158,7 +158,7 @@ export default class Popup {
     document.getElementById('domainModeDeep').textContent = this.translation.t('popup:domainModes.deep');
     document.getElementById('filterMethodCensor').textContent = this.translation.t('popup:filterMethods.censor');
     document.getElementById('filterMethodSubstitute').textContent = this.translation.t(
-      'popup:filterMethods.substitute'
+      'popup:filterMethods.substitute',
     );
     document.getElementById('filterMethodRemove').textContent = this.translation.t('popup:filterMethods.remove');
     document.getElementById('filterMethodOff').textContent = this.translation.t('popup:filterMethods.off');

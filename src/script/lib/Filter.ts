@@ -124,7 +124,7 @@ export default class Filter {
   replaceText(
     str: string,
     wordlistId: number | false = false,
-    statsType: string | null = Constants.STATS_TYPE_TEXT
+    statsType: string | null = Constants.STATS_TYPE_TEXT,
   ): string {
     wordlistId = this.buildWordlist(wordlistId);
     const wordlist = this.wordlists[wordlistId];
@@ -138,7 +138,7 @@ export default class Filter {
               wordlist,
               index,
               originalMatch,
-              args
+              args,
             );
             if (this.checkAllowlist(match, string, matchStartIndex, word)) {
               return match;
@@ -181,7 +181,7 @@ export default class Filter {
               wordlist,
               index,
               originalMatch,
-              args
+              args,
             );
             if (this.checkAllowlist(match, string, matchStartIndex, word)) {
               return match;
@@ -231,7 +231,7 @@ export default class Filter {
               wordlist,
               index,
               originalMatch,
-              args
+              args,
             );
             if (this.checkAllowlist(match.trim(), string, matchStartIndex, word)) {
               return match;
@@ -270,7 +270,7 @@ export default class Filter {
   replaceTextResult(
     str: string,
     wordlistId: number | false = false,
-    statsType: string | null = Constants.STATS_TYPE_TEXT
+    statsType: string | null = Constants.STATS_TYPE_TEXT,
   ): ReplaceTextResult {
     const result: ReplaceTextResult = {
       original: str,

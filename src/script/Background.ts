@@ -344,7 +344,7 @@ export default class Background {
     chromeAction: typeof chrome.browserAction,
     request: Message,
     sender: chrome.runtime.MessageSender,
-    sendResponse
+    sendResponse,
   ) {
     // Update tab's status and set badge color
     if (request.status && sender && sender.tab && sender.tab.id) {

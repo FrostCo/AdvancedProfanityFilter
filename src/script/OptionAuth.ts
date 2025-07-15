@@ -44,7 +44,7 @@ export default class OptionAuth {
     } catch (err) {
       this.optionPage.handleError(
         this.optionPage.translation.t('options:configsPage.messages.updatePasswordFailed'),
-        err
+        err,
       );
     }
   }

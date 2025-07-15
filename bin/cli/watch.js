@@ -37,7 +37,7 @@ const watcher = chokidar.watch(
   {
     awaitWriteFinish: true,
     persistent: true,
-  }
+  },
 );
 
 const log = console.log.bind(console);

@@ -55,7 +55,7 @@ export default class BuildUtils {
           else if (value === 'false') value = false;
           else if (typeof value === 'string' && !isNaN(value)) value = Number(value);
           return [key, value];
-        })
+        }),
       ),
     };
   }

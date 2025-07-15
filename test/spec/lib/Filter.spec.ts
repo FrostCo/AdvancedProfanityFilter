@@ -34,7 +34,7 @@ describe('Filter', () => {
           {
             '^regexp.*?$': { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: Constants.FALSE, sub: 'substitute' },
           },
-          testWords
+          testWords,
         ),
       });
       filter.init();
@@ -78,7 +78,7 @@ describe('Filter', () => {
           {
             book: { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE, sub: 'journal', lists: [1] },
           },
-          testWords
+          testWords,
         ),
       });
       filter.init();
@@ -116,7 +116,7 @@ describe('Filter', () => {
           });
           filter.init();
           expect(filter.replaceText('this is a placeholder placeholder.')).to.equal(
-            'this is a p********** p**********.'
+            'this is a p********** p**********.',
           );
         });
       });
@@ -136,7 +136,7 @@ describe('Filter', () => {
           });
           filter.init();
           expect(filter.replaceText('this is a placeholder placeholder.')).to.equal(
-            'this is a p********** p**********.'
+            'this is a p********** p**********.',
           );
         });
 
@@ -197,7 +197,7 @@ describe('Filter', () => {
           filter.init();
           expect(filter.counter).to.equal(0);
           expect(filter.replaceText('this sample is a pretty good sampler to sample.')).to.equal(
-            'this s****e is a pretty good s****er to s****e.'
+            'this s****e is a pretty good s****er to s****e.',
           );
           expect(filter.counter).to.be.above(0);
         });
@@ -271,7 +271,7 @@ describe('Filter', () => {
           filter.init();
           expect(filter.counter).to.equal(0);
           expect(
-            filter.replaceText('Words used to be okay, but now even a word is bad.', filter.wordlistId, null)
+            filter.replaceText('Words used to be okay, but now even a word is bad.', filter.wordlistId, null),
           ).to.equal('___ used to be okay, but now even a ___ is bad.');
           expect(filter.counter).to.equal(0);
         });
@@ -307,12 +307,12 @@ describe('Filter', () => {
               {
                 '^The': { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: Constants.FALSE, sub: 'substitute' },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
           expect(filter.replaceText('The best things are always the best.')).to.equal(
-            '____e best things are always the best.'
+            '____e best things are always the best.',
           );
         });
       });
@@ -329,7 +329,7 @@ describe('Filter', () => {
           });
           filter.init();
           expect(filter.replaceText('Can the master outsmart the Master?')).to.equal(
-            'Can the m***** outsmart the Master?'
+            'Can the m***** outsmart the Master?',
           );
           expect(filter.counter).to.equal(1);
         });
@@ -360,7 +360,7 @@ describe('Filter', () => {
           });
           filter.init();
           expect(filter.replaceText('Can the master outsmart the Master?')).to.equal(
-            'Can t** master outsmart t** Master?'
+            'Can t** master outsmart t** Master?',
           );
           expect(filter.counter).to.equal(2);
         });
@@ -393,12 +393,12 @@ describe('Filter', () => {
               {
                 врата: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'door' },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
           expect(filter.replaceText('this even works on unicode words like врата, cool huh?')).to.equal(
-            'this even works on unicode w**** like в****, cool huh?'
+            'this even works on unicode w**** like в****, cool huh?',
           );
         });
 
@@ -414,7 +414,7 @@ describe('Filter', () => {
               {
                 котка: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'cat' },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
@@ -433,7 +433,7 @@ describe('Filter', () => {
               {
                 куче: { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE, sub: 'dog' },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
@@ -452,12 +452,12 @@ describe('Filter', () => {
               {
                 словен: { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.FALSE },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
           expect(filter.replaceText('За пределами Словении этнические словенцы компактно')).to.equal(
-            'За пределами ******** этнические ******** компактно'
+            'За пределами ******** этнические ******** компактно',
           );
         });
 
@@ -472,13 +472,13 @@ describe('Filter', () => {
               {
                 ловен: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
               },
-              testWords
+              testWords,
             ),
             wordAllowlist: ['словенцы'],
           });
           filter.init();
           expect(filter.replaceText('За пределами Словении этнические словенцы компактно')).to.equal(
-            'За пределами С*****ии этнические словенцы компактно'
+            'За пределами С*****ии этнические словенцы компактно',
           );
           expect(filter.counter).to.equal(1);
         });
@@ -494,7 +494,7 @@ describe('Filter', () => {
               {
                 ぅ: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
@@ -513,7 +513,7 @@ describe('Filter', () => {
               {
                 '🍕': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
@@ -532,7 +532,7 @@ describe('Filter', () => {
               {
                 '🔧': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
@@ -552,7 +552,7 @@ describe('Filter', () => {
               {
                 '🔧': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
@@ -572,7 +572,7 @@ describe('Filter', () => {
               {
                 '❤️': { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.FALSE },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
@@ -594,7 +594,7 @@ describe('Filter', () => {
           });
           filter.init();
           expect(filter.replaceText('I love having good examples as an Example.')).to.equal(
-            'I love having good examples as an [Demo].'
+            'I love having good examples as an [Demo].',
           );
         });
 
@@ -608,7 +608,7 @@ describe('Filter', () => {
           });
           filter.init();
           expect(filter.replaceText('I love having good examples as an Exxaammppllee.')).to.equal(
-            'I love having good examples as an [Demo].'
+            'I love having good examples as an [Demo].',
           );
         });
 
@@ -700,25 +700,25 @@ describe('Filter', () => {
 
           it('Phrase with case sensitivity on', () => {
             expect(filter.replaceText('I can filter and capitalize A Phrase Too!')).to.equal(
-              'I can filter and capitalize mULTIPLE wORDS tOO!'
+              'I can filter and capitalize mULTIPLE wORDS tOO!',
             );
             expect(filter.replaceText('I can filter and capitalize A Phraseeeee Too!')).to.equal(
-              'I can filter and capitalize mULTIPLE wORDS tOO!'
+              'I can filter and capitalize mULTIPLE wORDS tOO!',
             );
           });
 
           it('Phrase with case sensitivity off (preserveCase on)', () => {
             expect(
-              filter.replaceText("Here's A Little Song I Wrote, you might want to sing it note for note")
+              filter.replaceText("Here's A Little Song I Wrote, you might want to sing it note for note"),
             ).to.equal('My Gift Is My Song, you might want to sing it note for note');
             expect(
-              filter.replaceText("Here's a Little Song I Wrote, you might want to sing it note for note")
+              filter.replaceText("Here's a Little Song I Wrote, you might want to sing it note for note"),
             ).to.equal('My gift is my song, you might want to sing it note for note');
             expect(
-              filter.replaceText("here's a little song i wrote, you might want to sing it note for note")
+              filter.replaceText("here's a little song i wrote, you might want to sing it note for note"),
             ).to.equal('my gift is my song, you might want to sing it note for note');
             expect(
-              filter.replaceText("HERE'S A LITTLE SONG I WROTE, you might want to sing it note for note")
+              filter.replaceText("HERE'S A LITTLE SONG I WROTE, you might want to sing it note for note"),
             ).to.equal('MY GIFT IS MY SONG, you might want to sing it note for note');
           });
 
@@ -749,7 +749,7 @@ describe('Filter', () => {
           });
           filter.init();
           expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal(
-            'This Piece is a pretty good piecer to piece.'
+            'This Piece is a pretty good piecer to piece.',
           );
         });
 
@@ -765,7 +765,7 @@ describe('Filter', () => {
           filter.cfg.words['this'] = { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: '' };
           filter.init();
           expect(filter.replaceText('This Sample is a pretty good sampler to sample.')).to.equal(
-            'Censored Piece is a pretty good piecer to piece.'
+            'Censored Piece is a pretty good piecer to piece.',
           );
         });
 
@@ -780,7 +780,7 @@ describe('Filter', () => {
           filter.init();
           expect(filter.counter).to.equal(0);
           expect(filter.replaceText('This Sample is a pretty good sampler to saammppllee.')).to.equal(
-            'This Piece is a pretty good piecer to saammppllee.'
+            'This Piece is a pretty good piecer to saammppllee.',
           );
           expect(filter.counter).to.be.above(0);
         });
@@ -796,7 +796,7 @@ describe('Filter', () => {
           filter.init();
           expect(filter.counter).to.equal(0);
           expect(
-            filter.replaceText('This Sample is a pretty good sampler to sample.', filter.wordlistId, null)
+            filter.replaceText('This Sample is a pretty good sampler to sample.', filter.wordlistId, null),
           ).to.equal('This [piece] is a pretty good [piece]r to [piece].');
           expect(filter.counter).to.equal(0);
         });
@@ -857,7 +857,7 @@ describe('Filter', () => {
               {
                 'c(a|u)t': { matchMethod: Constants.MATCH_METHODS.REGEX, repeat: Constants.FALSE, sub: 'bit' },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
@@ -881,7 +881,7 @@ describe('Filter', () => {
                   sub: 'spook\\1 off',
                 },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
@@ -934,7 +934,7 @@ describe('Filter', () => {
           });
           filter.init();
           expect(filter.replaceText('Can the master outsmart the Master?')).to.equal(
-            'Can the padawan outsmart the Master?'
+            'Can the padawan outsmart the Master?',
           );
           expect(filter.counter).to.equal(1);
         });
@@ -951,7 +951,7 @@ describe('Filter', () => {
           });
           filter.init();
           expect(filter.replaceText('Can the master outsmart the Master?')).to.equal(
-            'Can teh master outsmart teh Master?'
+            'Can teh master outsmart teh Master?',
           );
           expect(filter.counter).to.equal(2);
         });
@@ -982,12 +982,12 @@ describe('Filter', () => {
               {
                 врата: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'door' },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
           expect(filter.replaceText('this even works on unicode WORDS like Врата, cool huh?')).to.equal(
-            'this even works on unicode [IDEA] like [Door], cool huh?'
+            'this even works on unicode [IDEA] like [Door], cool huh?',
           );
         });
       });
@@ -1060,7 +1060,7 @@ describe('Filter', () => {
           filter.init();
           expect(filter.counter).to.equal(0);
           expect(
-            filter.replaceText('This Sample is a pretty good sampler to sample.', filter.wordlistId, null)
+            filter.replaceText('This Sample is a pretty good sampler to sample.', filter.wordlistId, null),
           ).to.equal('This is a pretty good to.');
           expect(filter.counter).to.equal(0);
         });
@@ -1120,7 +1120,7 @@ describe('Filter', () => {
                 sub: 'substitute',
               },
             },
-            testWords
+            testWords,
           ),
         });
         filter.init();
@@ -1180,7 +1180,7 @@ describe('Filter', () => {
               {
                 врата: { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, sub: 'door' },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
@@ -1197,12 +1197,12 @@ describe('Filter', () => {
               {
                 врата: { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, sub: 'door' },
               },
-              testWords
+              testWords,
             ),
           });
           filter.init();
           expect(filter.replaceText('This even works on with-врата. Cool huh?')).to.equal(
-            'This even works on. Cool huh?'
+            'This even works on. Cool huh?',
           );
           expect(filter.replaceText('The вратаs in the hat')).to.equal('The in the hat');
           expect(filter.replaceText('вратаs. in the hat')).to.equal('. in the hat');

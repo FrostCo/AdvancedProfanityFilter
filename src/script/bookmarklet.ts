@@ -30,7 +30,7 @@ export default class Bookmarklet {
     const suffix = '/* @preserve - End User Config */';
     const configRegExp = new RegExp(
       `${prefix.replace(/[\/\*]/g, '\\$&')}[\\S\\s]\*${suffix.replace(/[\/\*]/g, '\\$&')}`,
-      'm'
+      'm',
     );
 
     try {

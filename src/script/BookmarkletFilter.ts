@@ -19,7 +19,7 @@ export default class BookmarkletFilter extends Filter {
   processNode: (
     node: Document | HTMLElement | Node | ShadowRoot,
     wordlistId: number,
-    statsType?: string | null
+    statsType?: string | null,
   ) => void;
   shadowObserver: MutationObserver;
   stats?: Statistics; // Bookmarklet: Not used
@@ -118,7 +118,7 @@ export default class BookmarkletFilter extends Filter {
     node,
     attribute: string,
     wordlistId: number,
-    statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT
+    statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT,
   ) {
     if (node[attribute] != '') {
       const result = this.replaceTextResult(node[attribute], wordlistId, statsType);
@@ -183,7 +183,7 @@ export default class BookmarkletFilter extends Filter {
   filterShadowRoot(
     shadowRoot: ShadowRoot,
     wordlistId: number,
-    statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT
+    statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT,
   ) {
     this.shadowObserver.observe(shadowRoot, this.Class.observerConfig);
     this.processNode(shadowRoot, wordlistId, statsType);

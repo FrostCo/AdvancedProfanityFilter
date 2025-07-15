@@ -15,7 +15,7 @@ describe('Word', function () {
         const word = new Word(
           'word',
           { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE },
-          Config._defaults
+          Config._defaults,
         );
         expect(word.regExp).to.eql(/\bw+o+r+d+\b/gi);
       });
@@ -42,7 +42,7 @@ describe('Word', function () {
         const word = new Word(
           'word',
           { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE, separators: Constants.TRUE },
-          Config._defaults
+          Config._defaults,
         );
         expect(word.regExp).to.eql(/\bw+[-_ ]*o+[-_ ]*r+[-_ ]*d+\b/gi);
       });
@@ -59,7 +59,7 @@ describe('Word', function () {
           const word = new Word(
             'врата',
             { matchMethod: Constants.MATCH_METHODS.EXACT, repeat: Constants.TRUE },
-            Config._defaults
+            Config._defaults,
           );
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(/(^|[\s.,'"+!?|-]+)(в+р+а+т+а+)([\s.,'"+!?|-]+|$)/giu);
@@ -85,7 +85,7 @@ describe('Word', function () {
         const word = new Word(
           'word',
           { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE },
-          Config._defaults
+          Config._defaults,
         );
         expect(word.regExp).to.eql(/w+o+r+d+/gi);
       });
@@ -94,7 +94,7 @@ describe('Word', function () {
         const word = new Word(
           'word',
           { matchMethod: Constants.MATCH_METHODS.PARTIAL, separators: Constants.TRUE },
-          Config._defaults
+          Config._defaults,
         );
         expect(word.regExp).to.eql(/w[-_ ]*o[-_ ]*r[-_ ]*d/gi);
       });
@@ -103,7 +103,7 @@ describe('Word', function () {
         const word = new Word(
           'word',
           { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE, separators: Constants.TRUE },
-          Config._defaults
+          Config._defaults,
         );
         expect(word.regExp).to.eql(/w+[-_ ]*o+[-_ ]*r+[-_ ]*d+/gi);
       });
@@ -114,7 +114,7 @@ describe('Word', function () {
         const word = new Word(
           'word',
           { matchMethod: Constants.MATCH_METHODS.EXACT, _filterMethod: Constants.FILTER_METHODS.REMOVE },
-          Config._defaults
+          Config._defaults,
         );
         expect(word.regExp).to.eql(/\s?\bword\b\s?/gi);
       });
@@ -127,7 +127,7 @@ describe('Word', function () {
             repeat: Constants.TRUE,
             _filterMethod: Constants.FILTER_METHODS.REMOVE,
           },
-          Config._defaults
+          Config._defaults,
         );
         expect(word.regExp).to.eql(/\s?\bw+o+r+d+\b\s?/gi);
       });
@@ -136,7 +136,7 @@ describe('Word', function () {
         const word = new Word(
           'word!',
           { matchMethod: Constants.MATCH_METHODS.EXACT, _filterMethod: Constants.FILTER_METHODS.REMOVE },
-          Config._defaults
+          Config._defaults,
         );
         expect(word.regExp).to.eql(/(^|\s)(word!)(\s|$)/gi);
       });
@@ -147,7 +147,7 @@ describe('Word', function () {
           const word = new Word(
             'куче',
             { matchMethod: Constants.MATCH_METHODS.EXACT, _filterMethod: Constants.FILTER_METHODS.REMOVE },
-            Config._defaults
+            Config._defaults,
           );
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(/(^|[\s.,'"+!?|-])(куче)([\s.,'"+!?|-]|$)/giu);
@@ -161,7 +161,7 @@ describe('Word', function () {
               repeat: Constants.TRUE,
               _filterMethod: Constants.FILTER_METHODS.REMOVE,
             },
-            Config._defaults
+            Config._defaults,
           );
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(/(^|[\s.,'"+!?|-])(к+у+ч+е+)([\s.,'"+!?|-]|$)/giu);
@@ -174,7 +174,7 @@ describe('Word', function () {
         const word = new Word(
           'word',
           { matchMethod: Constants.MATCH_METHODS.PARTIAL },
-          Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE })
+          Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }),
         );
         expect(word.regExp).to.eql(/\s?\b[\w-]*word[\w-]*\b\s?/gi);
       });
@@ -183,7 +183,7 @@ describe('Word', function () {
         const word = new Word(
           'word',
           { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE },
-          Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE })
+          Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }),
         );
         expect(word.regExp).to.eql(/\s?\b[\w-]*w+o+r+d+[\w-]*\b\s?/gi);
       });
@@ -192,7 +192,7 @@ describe('Word', function () {
         const word = new Word(
           'word!',
           { matchMethod: Constants.MATCH_METHODS.PARTIAL },
-          Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE })
+          Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }),
         );
         expect(word.regExp).to.eql(/(^|\s)([\w-]*word![\w-]*)(\s|$)/gi);
       });
@@ -201,7 +201,7 @@ describe('Word', function () {
         const word = new Word(
           'app. rate:',
           { matchMethod: Constants.MATCH_METHODS.PARTIAL },
-          Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE })
+          Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }),
         );
         expect(word.regExp).to.eql(/(^|\s)([\w-]*app\. rate:[\w-]*)(\s|$)/gi);
       });
@@ -212,7 +212,7 @@ describe('Word', function () {
           const word = new Word(
             'куче',
             { matchMethod: Constants.MATCH_METHODS.PARTIAL },
-            Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE })
+            Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }),
           );
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(/(^|[\s.,'"+!?|-]?)([\w-]*куче[\w-]*)([\s.,'"+!?|-]?|$)/giu);
@@ -222,7 +222,7 @@ describe('Word', function () {
           const word = new Word(
             'куче',
             { matchMethod: Constants.MATCH_METHODS.PARTIAL, repeat: Constants.TRUE },
-            Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE })
+            Object.assign(Config._defaults, { filterMethod: Constants.FILTER_METHODS.REMOVE }),
           );
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(/(^|[\s.,'"+!?|-]?)([\w-]*к+у+ч+е+[\w-]*)([\s.,'"+!?|-]?|$)/giu);
@@ -240,7 +240,7 @@ describe('Word', function () {
         const word = new Word(
           'word',
           { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE },
-          Config._defaults
+          Config._defaults,
         );
         expect(word.regExp).to.eql(/\b[\w-]*w+o+r+d+[\w-]*\b/gi);
       });
@@ -262,7 +262,7 @@ describe('Word', function () {
           const word = new Word(
             'куче',
             { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE },
-            Config._defaults
+            Config._defaults,
           );
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(/(^|[\s.,'"+!?|-]*)([\S]*к+у+ч+е+[\S]*)([\s.,'"+!?|-]*|$)/giu);
@@ -272,7 +272,7 @@ describe('Word', function () {
           const word = new Word(
             'куче',
             { matchMethod: Constants.MATCH_METHODS.WHOLE, repeat: Constants.TRUE, separators: Constants.TRUE },
-            Config._defaults
+            Config._defaults,
           );
           expect(word.unicode).to.eql(true);
           expect(word.regExp).to.eql(/(^|[\s.,'"+!?|-]*)([\S]*к+[-_ ]*у+[-_ ]*ч+[-_ ]*е+[\S]*)([\s.,'"+!?|-]*|$)/giu);

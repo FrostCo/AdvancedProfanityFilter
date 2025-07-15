@@ -97,7 +97,7 @@ export default class Word {
               // /(^|[\s.,'"+!?|-]?)[\w-]*(word)[\w-]*([\s.,'"+!?|-]?|$)/giu
               return new RegExp(
                 `(^|${Word._unicodeWordBoundary}?)([\\w-]*${this.processedPhrase}[\\w-]*)(${Word._unicodeWordBoundary}?|$)`,
-                this.regexOptions
+                this.regexOptions,
               );
             } else if (this.hasEdgePunctuation) {
               // Begin or end with punctuation (not \w))
@@ -116,7 +116,7 @@ export default class Word {
             // (^|[\s.,'"+!?|-]*)([\S]*куче[\S]*)([\s.,'"+!?|-]*|$)/giu
             return new RegExp(
               `(^|${Word._unicodeWordBoundary}*)([\\S]*${this.processedPhrase}[\\S]*)(${Word._unicodeWordBoundary}*|$)`,
-              this.regexOptions
+              this.regexOptions,
             );
           } else if (this.hasEdgePunctuation) {
             // Begin or end with punctuation (not \w))
@@ -143,7 +143,7 @@ export default class Word {
               // /(^|[\s.,'"+!?|-])(word)([\s.,'"+!?|-]+|$)/giu
               return new RegExp(
                 `(^|${Word._unicodeWordBoundary})(${this.processedPhrase})(${Word._unicodeWordBoundary}|$)`,
-                this.regexOptions
+                this.regexOptions,
               );
             } else if (this.hasEdgePunctuation) {
               // Begin or end with punctuation (not \w))
@@ -157,7 +157,7 @@ export default class Word {
               // /(^|[\s.,'"+!?|-]+)(word)([\s.,'"+!?|-]+|$)/giu
               return new RegExp(
                 `(^|${Word._unicodeWordBoundary}+)(${this.processedPhrase})(${Word._unicodeWordBoundary}+|$)`,
-                this.regexOptions
+                this.regexOptions,
               );
             } else if (this.hasEdgePunctuation) {
               // Begin or end with punctuation (not \w))

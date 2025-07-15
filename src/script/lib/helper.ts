@@ -13,7 +13,7 @@ export function dynamicList(
   list: string[],
   select: HTMLSelectElement,
   upperCaseFirstChar: boolean = false,
-  title?: string
+  title?: string,
 ) {
   const array = title !== undefined ? [title, ...list] : list;
 
@@ -69,7 +69,7 @@ export function getElement(selector: string, root: Document | ShadowRoot | HTMLE
 function getElementCore(
   selector: string,
   root: Document | HTMLElement | ShadowRoot = document,
-  queryMethod = 'querySelector'
+  queryMethod = 'querySelector',
 ): HTMLElement | NodeListOf<HTMLElement> {
   let element;
   const domLayers = selector.split(Constants.SELECTOR_SHADOWROOT_DELIMITER);
@@ -101,7 +101,7 @@ function getElementCore(
 //   Supports querying through a shadow DOM using '>>>'
 export function getElements(
   selector: string,
-  root: Document | HTMLElement | ShadowRoot = document
+  root: Document | HTMLElement | ShadowRoot = document,
 ): NodeListOf<HTMLElement> {
   return getElementCore(selector, root, 'querySelectorAll') as NodeListOf<HTMLElement>;
 }
