@@ -34,7 +34,6 @@ export default class OptionPage {
   lessUsedWords: { [word: string]: number };
   lightModeButton: Element;
   prefersDarkScheme: boolean;
-  t: typeof Translation.prototype.t;
   themeElements: Element[];
   translation: Translation;
 
@@ -504,6 +503,10 @@ export default class OptionPage {
     ).toUpperCase();
     // Status
     document.getElementById('statusModalOK').textContent = this.t('options:statusModal.buttons.ok').toUpperCase();
+  }
+
+  t(key: string, options = {}): string {
+    return this.translation.t(key, options);
   }
 
   backupConfig(config = this.cfg.ordered(), filePrefix = 'apf-backup') {
@@ -1167,7 +1170,7 @@ export default class OptionPage {
 
   async init(refreshTheme = false) {
     await this.initializeCfg();
-    this.initializeTranslations();
+    this.translation = new this.Class.Translation(['common', 'options'], this.cfg.language);
     this.applyTranslation();
     logger.setLevel(this.cfg.loggingLevel);
     this.applyTheme(refreshTheme);
@@ -1196,11 +1199,6 @@ export default class OptionPage {
 
   async initializeCfg() {
     this.cfg = await this.Class.Config.load();
-  }
-
-  initializeTranslations() {
-    this.translation = new this.Class.Translation(['common', 'options'], this.cfg.language);
-    this.t = this.translation.t;
   }
 
   isStorageError(error: Error): boolean {
