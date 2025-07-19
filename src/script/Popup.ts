@@ -105,6 +105,7 @@ export default class Popup {
   }
 
   constructor() {
+    this.translation = new this.Class.Translation(['common', 'popup']);
     this.webFilterActive = true;
     this.initializeMessaging();
     this.disabledTab = false;
@@ -313,7 +314,7 @@ export default class Popup {
   async initializePopup() {
     await this.Class.load(this);
     this.applyTheme();
-    this.translation = new this.Class.Translation(['common', 'popup'], this.cfg.language);
+    await this.translation.changeLanguage(this.cfg.language);
     this.applyTranslation();
     this.populateOptions(true);
   }

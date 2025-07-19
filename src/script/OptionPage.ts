@@ -72,6 +72,7 @@ export default class OptionPage {
   static readonly themeElementSelectors = ['body', 'div#page', 'div.w3-modal'];
 
   constructor() {
+    this.translation = new this.Class.Translation(['common', 'options']);
     this._confirmEventListeners = [];
     this.darkModeButton = document.querySelector('div.themes > div.moon');
     this.lightModeButton = document.querySelector('div.themes > div.sun');
@@ -1170,7 +1171,7 @@ export default class OptionPage {
 
   async init(refreshTheme = false) {
     await this.initializeCfg();
-    this.translation = new this.Class.Translation(['common', 'options'], this.cfg.language);
+    await this.translation.changeLanguage(this.cfg.language);
     this.applyTranslation();
     logger.setLevel(this.cfg.loggingLevel);
     this.applyTheme(refreshTheme);
