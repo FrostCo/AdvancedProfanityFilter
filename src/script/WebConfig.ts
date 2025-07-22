@@ -6,8 +6,8 @@ import Constants from '@APF/lib/Constants';
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
 /* eslint-disable-next-line @typescript-eslint/naming-convention */
-declare const __BUILD__: { config: any; manifestVersion: number; release: boolean; target: string; version: string };
-const BUILD_DEFAULTS = { config: {}, manifestVersion: 3, release: true, target: 'chrome', version: '1.0.0' };
+declare const __BUILD__: BuildInfo;
+const BUILD_DEFAULTS: BuildInfo = { config: {}, manifestVersion: 3, release: true, target: 'chrome', version: '1.0.0' };
 const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
