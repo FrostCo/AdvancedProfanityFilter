@@ -11,6 +11,7 @@ const BUILD_DEFAULTS: BuildInfo = { config: {}, manifestVersion: 3, release: tru
 const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
+  _buildInfo: BuildInfo;
   _defaultsLoaded: string[];
   _lastSplitKeys: { [key: string]: number };
   collectStats: boolean;
@@ -329,6 +330,8 @@ export default class WebConfig extends Config {
 
     // Apply the Config defaults
     super(config);
+
+    this._buildInfo = this.Class.BUILD;
 
     // Overcome Object.assign not overwriting undefined values for underscore keys
     const underscoreKeys = Object.keys(config).filter((key) => key[0] === '_');
