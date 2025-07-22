@@ -350,9 +350,9 @@ export default class Popup {
     return (
       !this.domain.hostname ||
       this.Class.Page.disabledProtocols.test(this.url.protocol) ||
-      (this.Class.Config.BUILD.target == this.Class.Constants.BUILD_TARGET_CHROME &&
+      (this.cfg._buildInfo.target == this.Class.Constants.BUILD_TARGET_CHROME &&
         this.Class.Page.disabledChromePages.includes(this.domain.hostname)) ||
-      (this.Class.Config.BUILD.target == this.Class.Constants.BUILD_TARGET_FIREFOX &&
+      (this.cfg._buildInfo.target == this.Class.Constants.BUILD_TARGET_FIREFOX &&
         this.Class.Page.disabledFirefoxPages.includes(this.domain.hostname))
     );
   }

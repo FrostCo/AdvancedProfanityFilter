@@ -82,7 +82,6 @@ export default class OptionPage {
       })
       .flat();
     this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
-    this.setHelpVersion();
     this.filter = new this.Class.Filter();
   }
 
@@ -1175,6 +1174,7 @@ export default class OptionPage {
     this.applyTranslation();
     logger.setLevel(this.cfg.loggingLevel);
     this.applyTheme(refreshTheme);
+    this.setHelpVersion();
     if (!this.auth) this.auth = new this.Class.OptionAuth(this, this.cfg.password);
     this.filter.cfg = this.cfg;
     this.filter.init();
@@ -2168,7 +2168,7 @@ export default class OptionPage {
 
   setHelpVersion() {
     const helpVersion = document.getElementById('helpVersion') as HTMLAnchorElement;
-    helpVersion.textContent = this.Class.Config.BUILD.version;
+    helpVersion.textContent = this.cfg._buildInfo.version;
   }
 
   setThemeButton(darkTheme: boolean) {

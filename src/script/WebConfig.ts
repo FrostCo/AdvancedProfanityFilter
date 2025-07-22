@@ -352,7 +352,7 @@ export default class WebConfig extends Config {
 
   localizeDefaults() {
     if (
-      this.Class.BUILD.target === this.Class.Constants.BUILD_TARGET_BOOKMARKLET ||
+      this._buildInfo.target === this.Class.Constants.BUILD_TARGET_BOOKMARKLET ||
       !this._defaultsLoaded ||
       !this._defaultsLoaded.length
     )
