@@ -31,8 +31,6 @@
     "build:translations": "node bin/cli/build-translations.js",
     "build": "webpack --config bin/webpack.dev.js",
     "package": "node bin/cli/package-extension.js",
-    "postrelease:all": "npm run build",
-    "postrelease:firefox:mv3": "node bin/cli/package-source.js",
     "prerelease:all": "npm run release:bookmarklet",
     "release:all": "npm run release:chrome:mv2 && npm run release:chrome:mv3 && npm run release:edgeLegacy && npm run release:firefox:mv2 && npm run release:firefox:mv3",
     "release:bookmarklet": "node bin/cli/prebuild.js --environment=release --target=bookmarklet && webpack --config bin/webpack.bookmarklet.js",
