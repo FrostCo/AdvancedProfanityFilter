@@ -81,7 +81,7 @@ export default class SourcePackager {
 
   successMessage(label = 'SourcePackager') {
     return `📦 [${label}] Source packaged
-To build from source: npm install && npm run release:bookmarklet && npm run release:firefox
+To build from source: npm install && npm run ci:release:firefox
 Unpacked: ./dist`;
   }
 

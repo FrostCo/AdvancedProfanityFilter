@@ -55,6 +55,7 @@
     "type-check": "tsc --noEmit",
     "type-check:tests": "tsc --noEmit -p test/tsconfig.json",
     "type-check:watch": "npm run type-check -- --watch",
+    "ci:release:firefox": "npm run release:bookmarklet && npm run release:firefox",
     "ci:release": "npm run release:bookmarklet && npm run release:chrome:mv2 && npm run release:chrome:mv3 && npm run release:edgeLegacy && npm run release:firefox:mv2 && npm run release:firefox:mv3 && npm run package:source",
     "ci": "npm run lint && npm run format && npm run type-check && npm run test:addon && npm run test:coverage",
     "dev": "npm run build",
