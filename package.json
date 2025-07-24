@@ -30,6 +30,7 @@
     "build:libs": "tsc -p ./src/script/lib/tsconfig.json",
     "build:translations": "node bin/cli/build-translations.js",
     "build": "webpack --config bin/webpack.dev.js",
+    "package:source": "node bin/cli/package-source.js",
     "package": "node bin/cli/package-extension.js",
     "prerelease:all": "npm run release:bookmarklet",
     "release:all": "npm run release:chrome:mv2 && npm run release:chrome:mv3 && npm run release:edgeLegacy && npm run release:firefox:mv2 && npm run release:firefox:mv3",
