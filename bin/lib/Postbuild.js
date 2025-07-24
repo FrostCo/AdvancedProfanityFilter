@@ -34,7 +34,9 @@ export default class Postbuild {
       fse.copyFileSync('./dist-bookmarklet/bookmarklet.js', './dist/bookmarklet.js');
     } catch (error) {
       if (this.buildData.release) {
-        throw error;
+        throw new Error('Bookmarklet file not found. Please run "npm run release:bookmarklet" first.');
+      } else {
+        this.actionsTaken.push('skipped-copyBookmarklet');
       }
     }
   }

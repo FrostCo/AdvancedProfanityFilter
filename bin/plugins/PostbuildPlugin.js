@@ -3,7 +3,7 @@ import Postbuild from '../lib/Postbuild.js';
 
 export class PostbuildPlugin {
   apply(compiler) {
-    compiler.hooks.done.tap('PostbuildPlugin', () => {
+    compiler.hooks.done.tap('PostbuildPlugin', (stats) => {
       const postbuild = new Postbuild();
       try {
         postbuild.run();
@@ -14,6 +14,8 @@ export class PostbuildPlugin {
         }
       } catch (error) {
         console.error(postbuild.errorMessage('postbuild'), error);
+        // Add the error to webpack's compilation errors
+        stats.compilation.errors.push(error);
       }
     });
   }
