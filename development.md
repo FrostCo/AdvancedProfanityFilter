@@ -27,7 +27,7 @@ Once the extension has been built, you can load the unpacked extension (found in
 | chrome  |        3 | build   | `npm run build:chrome:mv3`  | Dev build for Chrome Manifest V3  |
 | chrome  |        2 | build   | `npm run build:chrome:mv2`  | Dev build for Chrome Manifest V2  |
 | firefox |        2 | build   | `npm run build:firefox:mv2` | Dev build for Firefox Manifest V2 |
-|         |          | release | `npm run release:all`       | Official relase for all targets   |
+|         |          | release | `npm run ci:release`        | Official relase for all targets   |
 
 ## Build Targets
 
