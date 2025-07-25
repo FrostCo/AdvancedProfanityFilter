@@ -107,6 +107,7 @@ export default class Popup {
   constructor() {
     this.translation = new this.Class.Translation(['common', 'popup']);
     this.webFilterActive = true;
+    this.setupEventListeners();
     this.initializeMessaging();
     this.disabledTab = false;
     this.prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -426,6 +427,32 @@ export default class Popup {
   setDomainSwitch(checked: boolean = true) {
     const domainFilter = document.getElementById('domainFilter') as HTMLInputElement;
     domainFilter.checked = checked;
+  }
+
+  setupEventListeners() {
+    // Use internal help page
+    (document.getElementById('gettingStarted') as HTMLAnchorElement).href =
+      chrome.runtime.getURL('option-page.html#/help');
+
+    // Listeners
+    document.addEventListener('DOMContentLoaded', (evt) => {
+      this.initializePopup();
+    });
+    document.getElementById('domainFilter').addEventListener('change', (evt) => {
+      this.toggle(this.filterToggleProp);
+    });
+    document.getElementById('domainModeSelect').addEventListener('change', (evt) => {
+      this.updateDomainMode();
+    });
+    document.getElementById('filterMethodSelect').addEventListener('change', (evt) => {
+      this.filterMethodSelect();
+    });
+    document.getElementById('wordlistSelect').addEventListener('change', (evt) => {
+      this.wordlistSelect(evt.target as HTMLSelectElement);
+    });
+    document.getElementById('options').addEventListener('click', (evt) => {
+      chrome.runtime.openOptionsPage();
+    });
   }
 
   get summary(): Summary {
