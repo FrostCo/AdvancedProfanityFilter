@@ -73,6 +73,7 @@ export default class OptionPage {
 
   constructor() {
     this.translation = new this.Class.Translation(['common', 'options']);
+    this.setupEventListeners();
     this._confirmEventListeners = [];
     this.darkModeButton = document.querySelector('div.themes > div.moon');
     this.lightModeButton = document.querySelector('div.themes > div.sun');
@@ -2169,6 +2170,289 @@ export default class OptionPage {
   setHelpVersion() {
     const helpVersion = document.getElementById('helpVersion') as HTMLAnchorElement;
     helpVersion.textContent = this.cfg._buildInfo.version;
+  }
+
+  setupEventListeners() {
+    this.setupCoreEventListeners();
+    this.setupModalEventListeners();
+    this.setupSettingsEventListeners();
+    this.setupWordsEventListeners();
+    this.setupListsEventListeners();
+    this.setupDomainsEventListeners();
+    this.setupBookmarkletEventListeners();
+    this.setupConfigEventListeners();
+    this.setupTestEventListeners();
+    this.setupStatsEventListeners();
+    this.setupHelpEventListeners();
+    this.setupThemeEventListeners();
+  }
+
+  setupCoreEventListeners() {
+    window.addEventListener('DOMContentLoaded', (evt) => {
+      this.init();
+    });
+    document.querySelectorAll('#menu a').forEach((el) => {
+      el.addEventListener('click', (evt) => {
+        this.switchPage(evt.target as HTMLAnchorElement);
+      });
+    });
+  }
+
+  setupModalEventListeners() {
+    document.getElementById('submitPassword').addEventListener('click', (evt) => {
+      this.auth.authenticate(evt.target as HTMLButtonElement);
+    });
+    document.getElementById('confirmModalBackup').addEventListener('click', (evt) => {
+      this.confirmModalBackup();
+    });
+    document.getElementById('confirmModalOK').addEventListener('click', (evt) => {
+      this.closeModal('confirmModal');
+    });
+    document.getElementById('confirmModalCancel').addEventListener('click', (evt) => {
+      this.closeModal('confirmModal');
+    });
+    document.getElementById('statusModalOK').addEventListener('click', (evt) => {
+      this.closeModal('statusModal');
+    });
+    document.getElementById('bulkEditorAddWord').addEventListener('click', (evt) => {
+      this.bulkEditorAddRow();
+    });
+    document.getElementById('bulkEditorAddWords').addEventListener('click', (evt) => {
+      this.bulkEditorAddWords();
+    });
+    document.getElementById('bulkEditorCancel').addEventListener('click', (evt) => {
+      this.closeModal('bulkWordEditorModal');
+    });
+    document.getElementById('bulkEditorSave').addEventListener('click', (evt) => {
+      this.confirm('bulkEditorSave');
+    });
+    document.getElementById('bulkEditorRemoveAll').addEventListener('click', (evt) => {
+      this.bulkEditorRemoveAll();
+    });
+  }
+
+  setupSettingsEventListeners() {
+    document.querySelectorAll('#filterMethod input').forEach((el) => {
+      el.addEventListener('click', (evt) => {
+        this.selectFilterMethod(evt.target as HTMLInputElement);
+      });
+    });
+    document.getElementById('censorCharacterSelect').addEventListener('change', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('censorFixedLengthSelect').addEventListener('change', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('defaultWordMatchMethodSelect').addEventListener('change', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('defaultWordRepeat').addEventListener('click', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('defaultWordSeparators').addEventListener('click', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('preserveCase').addEventListener('click', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('preserveFirst').addEventListener('click', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('preserveLast').addEventListener('click', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('useDeviceTheme').addEventListener('click', (evt) => {
+      this.updateUseSystemTheme(evt.target as HTMLInputElement);
+    });
+    document.getElementById('showContextMenu').addEventListener('click', (evt) => {
+      this.updateContextMenu(evt.target as HTMLInputElement);
+    });
+    document.getElementById('showCounter').addEventListener('click', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('showSummary').addEventListener('click', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('showUpdateNotification').addEventListener('click', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('filterWordList').addEventListener('click', (evt) => {
+      this.filterWordListUpdate();
+    });
+    document.getElementById('substitutionMark').addEventListener('click', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('defaultWordSubstitutionText').addEventListener('change', (evt) => {
+      this.saveOptions();
+    });
+  }
+
+  setupWordsEventListeners() {
+    document.getElementById('wordList').addEventListener('change', (evt) => {
+      this.populateWord();
+    });
+    document.getElementById('wordText').addEventListener('input', (evt) => {
+      this.hideInputError(evt.target as HTMLInputElement);
+    });
+    document.getElementById('substitutionText').addEventListener('input', (evt) => {
+      this.hideInputError(evt.target as HTMLInputElement);
+    });
+    document.getElementById('wordSave').addEventListener('click', (evt) => {
+      this.saveWord();
+    });
+    document.getElementById('wordRemove').addEventListener('click', (evt) => {
+      this.removeWord(evt.target as HTMLButtonElement);
+    });
+    document.getElementById('wordRemoveAll').addEventListener('click', (evt) => {
+      this.confirm('removeAllWords');
+    });
+    document.getElementById('bulkWordEditorButton').addEventListener('click', (evt) => {
+      this.showBulkWordEditor();
+    });
+  }
+
+  setupListsEventListeners() {
+    document.getElementById('allowlistSelect').addEventListener('change', (evt) => {
+      this.populateAllowlistWord();
+    });
+    document.getElementById('allowlistText').addEventListener('input', (evt) => {
+      this.hideInputError(evt.target as HTMLInputElement);
+    });
+    document.querySelectorAll('input[name="allowlistCase"]').forEach((el) => {
+      el.addEventListener('change', (evt) => {
+        this.hideInputError(document.getElementById('allowlistText') as HTMLInputElement);
+      });
+    });
+    document.getElementById('allowlistSave').addEventListener('click', (evt) => {
+      this.saveAllowlist();
+    });
+    document.getElementById('allowlistRemove').addEventListener('click', (evt) => {
+      this.removeAllowlist();
+    });
+    document.getElementById('wordlistAdd').addEventListener('click', (evt) => {
+      this.addWordlist();
+    });
+    document.getElementById('wordlistsEnabled').addEventListener('click', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('wordlistRemove').addEventListener('click', (evt) => {
+      this.confirm('removeWordlist');
+    });
+    document.getElementById('wordlistRename').addEventListener('click', (evt) => {
+      this.renameWordlist();
+    });
+    document.getElementById('wordlistSelect').addEventListener('change', (evt) => {
+      this.populateWordlist();
+    });
+    document.getElementById('wordlistText').addEventListener('input', (evt) => {
+      this.hideInputError(evt.target as HTMLInputElement);
+    });
+    document.getElementById('textWordlistSelect').addEventListener('change', (evt) => {
+      this.setDefaultWordlist(evt.target as HTMLSelectElement);
+    });
+  }
+
+  setupDomainsEventListeners() {
+    document.querySelectorAll('#domainMatchMode input').forEach((el) => {
+      el.addEventListener('click', (evt) => {
+        this.saveOptions();
+      });
+    });
+    document.getElementById('domainFilterAllFrames').addEventListener('change', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('domainSelect').addEventListener('change', (evt) => {
+      this.populateDomain();
+    });
+    document.getElementById('domainText').addEventListener('input', (evt) => {
+      this.hideInputError(evt.target as HTMLInputElement);
+    });
+    document.getElementById('domainSave').addEventListener('click', (evt) => {
+      this.saveDomain();
+    });
+    document.getElementById('domainRemove').addEventListener('click', (evt) => {
+      this.removeDomain();
+    });
+  }
+
+  setupBookmarkletEventListeners() {
+    document.querySelectorAll('#bookmarkletConfigInputs input').forEach((el) => {
+      el.addEventListener('click', (evt) => {
+        this.populateBookmarkletPage();
+      });
+    });
+  }
+
+  setupConfigEventListeners() {
+    document.getElementById('configSyncLargeKeys').addEventListener('click', (evt) => {
+      this.confirm('convertStorageLocation');
+    });
+    document.getElementById('configInlineInput').addEventListener('click', (evt) => {
+      this.configInlineToggle();
+    });
+    document.getElementById('importFileInput').addEventListener('change', (evt) => {
+      this.importConfigFile(evt.target as HTMLInputElement, (evt.target as HTMLInputElement).files);
+    });
+    document.getElementById('configReset').addEventListener('click', (evt) => {
+      this.confirm('restoreDefaults');
+    });
+    document.getElementById('configExport').addEventListener('click', (evt) => {
+      this.exportConfig();
+    });
+    document.getElementById('configImport').addEventListener('click', (evt) => {
+      this.confirm('importConfig');
+    });
+    document.getElementById('configLoggingLevelSelect').addEventListener('change', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('setPassword').addEventListener('input', (evt) => {
+      this.auth.setPasswordButton();
+    });
+    document.getElementById('setPasswordBtn').addEventListener('click', (evt) => {
+      this.confirm('setPassword');
+    });
+  }
+
+  setupTestEventListeners() {
+    document.getElementById('testText').addEventListener('input', (evt) => {
+      this.populateTest();
+    });
+  }
+
+  setupStatsEventListeners() {
+    document.getElementById('collectStats').addEventListener('click', (evt) => {
+      this.saveOptions();
+    });
+    document.getElementById('statsExport').addEventListener('click', (evt) => {
+      this.exportStats();
+    });
+    document.getElementById('statsImport').addEventListener('click', (evt) => {
+      this.confirm('statsImport');
+    });
+    document.getElementById('statsImportInput').addEventListener('change', (evt) => {
+      this.importStatsFile(evt.target as HTMLInputElement, (evt.target as HTMLInputElement).files);
+    });
+    document.getElementById('statsReset').addEventListener('click', (evt) => {
+      this.confirm('statsReset');
+    });
+    document.getElementById('lessUsedWordsNumber').addEventListener('input', (evt) => {
+      this.hideInputError(evt.target as HTMLInputElement);
+    });
+    document.getElementById('removeLessUsedWords').addEventListener('click', (evt) => {
+      this.confirm('removeLessUsedWords');
+    });
+  }
+
+  setupHelpEventListeners() {
+    document.querySelectorAll('div#helpContainer a').forEach((anchor) => {
+      anchor.setAttribute('target', '_blank');
+    });
+  }
+
+  setupThemeEventListeners() {
+    document.getElementsByClassName('themes')[0].addEventListener('click', (evt) => {
+      this.toggleTheme();
+    });
   }
 
   setThemeButton(darkTheme: boolean) {
