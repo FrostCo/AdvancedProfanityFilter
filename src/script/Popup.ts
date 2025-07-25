@@ -92,9 +92,7 @@ export default class Popup {
       getStatus: true,
       tabId: instance.tab.id,
     };
-    chrome.runtime.sendMessage(statusMessage, (response) => {
-      instance.updateStatus(response.status);
-    });
+    chrome.runtime.sendMessage(statusMessage);
 
     return instance;
   }
@@ -284,7 +282,7 @@ export default class Popup {
 
   initializeMessaging() {
     chrome.runtime.onMessage.addListener((request: Message, sender, sendResponse) => {
-      if (request.destination !== this.Class.Constants.MESSAGING.POPUP) return true;
+      if (!request || request.destination !== this.Class.Constants.MESSAGING.POPUP) return true;
 
       if (request.summary) {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
