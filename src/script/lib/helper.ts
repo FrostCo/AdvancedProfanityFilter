@@ -251,3 +251,41 @@ export function upperCaseFirst(str: string, lowerCaseRest: boolean = true): stri
   value += lowerCaseRest ? str.toLowerCase().slice(1) : str.slice(1);
   return value;
 }
+
+/**
+ * Send message with retry logic for MV3 service worker availability
+ * @param message - The message to send
+ * @param maxRetries - Maximum number of retry attempts (default: 3)
+ * @param fallbackResponse - Default response if all retries fail
+ * @returns Promise that resolves with the response
+ */
+export function sendMessageWithRetry<tResponse = any>(
+  message: any,
+  maxRetries: number = 3,
+  fallbackResponse?: tResponse,
+): Promise<tResponse> {
+  return new Promise((resolve) => {
+    let attempts = 0;
+
+    const attemptSend = () => {
+      attempts++;
+
+      chrome.runtime.sendMessage(message, (response) => {
+        if (chrome.runtime.lastError) {
+          if (attempts < maxRetries) {
+            // Exponential backoff: 100ms, 200ms, 400ms
+            const delay = Math.pow(2, attempts - 1) * 100;
+            setTimeout(attemptSend, delay);
+          } else {
+            // All retries failed, use fallback
+            resolve(fallbackResponse);
+          }
+        } else {
+          resolve(response || fallbackResponse);
+        }
+      });
+    };
+
+    attemptSend();
+  });
+}
