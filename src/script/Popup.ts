@@ -4,6 +4,7 @@ import Domain from '@APF/Domain';
 import Page from '@APF/Page';
 import Logger from '@APF/lib/Logger';
 import Translation from '@APF/Translation';
+import { sendMessageWithRetry } from '@APF/lib/helper';
 const logger = new Logger('Popup');
 
 export default class Popup {
@@ -220,16 +221,8 @@ export default class Popup {
       tabId: this.tab.id,
     };
 
-    const response: BackgroundData = await new Promise((resolve) => {
-      chrome.runtime.sendMessage(message, (res) => {
-        if (!res) {
-          res = { disabledTab: false };
-        }
-        resolve(res);
-      });
-    });
-
-    return response;
+    // Using retry logic to handle service worker availability for MV3
+    return sendMessageWithRetry(message, 3, { disabledTab: false });
   }
 
   handleDisabled() {
