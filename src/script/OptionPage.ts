@@ -1081,7 +1081,7 @@ export default class OptionPage {
     this.hide(notificationPanel);
   }
 
-  async getStatsFromStorage() {
+  async getStatsFromStorage(): Promise<Statistics> {
     const { stats }: { stats: Statistics } = (await this.Class.Config.getLocalStorage({ stats: { words: {} } })) as any;
     return stats;
   }
