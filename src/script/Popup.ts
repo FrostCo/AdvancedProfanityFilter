@@ -212,21 +212,24 @@ export default class Popup {
     }
   }
 
-  getBackgroundData(): Promise<BackgroundData> {
-    return new Promise((resolve, reject) => {
-      const message = {
-        destination: this.Class.Constants.MESSAGING.BACKGROUND,
-        source: this.Class.Constants.MESSAGING.POPUP,
-        backgroundData: true,
-        tabId: this.tab.id,
-      };
-      chrome.runtime.sendMessage(message, (response) => {
-        if (!response) {
-          response = { disabledTab: false };
+  async getBackgroundData(): Promise<BackgroundData> {
+    const message = {
+      destination: this.Class.Constants.MESSAGING.BACKGROUND,
+      source: this.Class.Constants.MESSAGING.POPUP,
+      backgroundData: true,
+      tabId: this.tab.id,
+    };
+
+    const response: BackgroundData = await new Promise((resolve) => {
+      chrome.runtime.sendMessage(message, (res) => {
+        if (!res) {
+          res = { disabledTab: false };
         }
-        resolve(response);
+        resolve(res);
       });
     });
+
+    return response;
   }
 
   handleDisabled() {
