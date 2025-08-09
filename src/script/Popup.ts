@@ -93,7 +93,13 @@ export default class Popup {
       getStatus: true,
       tabId: instance.tab.id,
     };
-    chrome.runtime.sendMessage(statusMessage);
+
+    // Handle service worker availability for Firefox for Android
+    chrome.runtime.sendMessage(statusMessage, () => {
+      if (chrome.runtime.lastError) {
+        logger.debug('Service worker not ready for status request');
+      }
+    });
 
     return instance;
   }
