@@ -41,7 +41,7 @@ export default class Background {
     this.COLOR_BLUE_VIOLET,
     this.COLOR_FOREST_GREEN,
   ] as chrome.action.ColorArray[];
-  static readonly LOGGER = new Logger('Background');
+  static readonly LOGGER = new Logger('Background', this.Constants.LOGGING_LEVELS.INFO);
   // #endregion
 
   // #region Static Methods
