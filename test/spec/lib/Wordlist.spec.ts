@@ -27,7 +27,7 @@ describe('Wordlist', function () {
     });
 
     it('should report warning on error adding word', function () {
-      const logSpy = sinon.spy(Wordlist.logger, 'warn');
+      const logSpy = sinon.spy(Wordlist.log, 'warn');
       const word = '$\\z+(^';
       const words = { [word]: { lists: [1], matchMethod: Constants.MATCH_METHODS.REGEX } };
       const wordlist = new Wordlist({ words: words }, 1);

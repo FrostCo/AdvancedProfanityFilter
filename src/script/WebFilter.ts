@@ -47,6 +47,10 @@ export default class WebFilter extends Filter {
   }
   //#endregion
 
+  static get log() {
+    return logger;
+  }
+
   static readonly observerConfig: MutationObserverInit = {
     characterData: true,
     characterDataOldValue: true,
@@ -72,6 +76,10 @@ export default class WebFilter extends Filter {
     return { [this.Class.Constants.STATS_TYPE_TEXT]: 0 };
   }
 
+  get log() {
+    return this.Class.log;
+  }
+
   _processStatsBeforeSaving(stats) {}
 
   _processWordStat(stats, word: string) {
@@ -88,7 +96,7 @@ export default class WebFilter extends Filter {
           preset: 'prose',
           find: regExp,
           replace: (portion, match) => {
-            // logger.debug('[APF] Advanced match found', node.textContent);
+            // this.log.debug('[APF] Advanced match found', node.textContent);
             if (portion.index === 0) {
               // Replace the whole match on the first portion and skip the rest
               return this.replaceText(match[0], wordlistId, statsType);
@@ -132,7 +140,7 @@ export default class WebFilter extends Filter {
       if (node.textContent && node.textContent.trim() != '') {
         const result = this.replaceTextResult(node.textContent, wordlistId, statsType);
         if (result.modified && this.filterText) {
-          // logger.debug(`Normal node text changed: '${result.original}' to '${result.filtered}'.`);
+          // this.log.debug(`Normal node text changed: '${result.original}' to '${result.filtered}'.`);
           node.textContent = result.filtered;
         }
       } else if (node.nodeName == 'IMG') {
@@ -142,7 +150,7 @@ export default class WebFilter extends Filter {
         this.filterShadowRoot(node.shadowRoot, wordlistId, statsType);
       }
     }
-    // else { logger.debug('Node without nodeName', node); }
+    // else { this.log.debug('Node without nodeName', node); }
   }
 
   cleanNode(node, wordlistId: number, statsType: string | null = this.Class.Constants.STATS_TYPE_TEXT) {
@@ -177,19 +185,19 @@ export default class WebFilter extends Filter {
 
   async cleanPage() {
     this.cfg = await this.Class.Config.load();
-    logger.setLevel(this.cfg.loggingLevel);
+    this.log.setLevel(this.cfg.loggingLevel);
 
     if (Object.keys(this.cfg.words).length === 0) {
-      logger.warn('No words to filter. Exiting.');
+      this.log.warn('No words to filter. Exiting.');
       return false;
     }
 
     this.filterText = this.cfg.filterMethod !== this.Class.Constants.FILTER_METHODS.OFF;
     this.domain = this.Class.Domain.byHostname(this.hostname, this.cfg.domains);
-    logger.info('Config loaded.', this.cfg);
+    this.log.info('Config loaded.', this.cfg);
 
     if (!this.shouldProcessFrame) {
-      logger.info(`Filter disabled on frames for current domain (${this.iframe.href})`);
+      this.log.info(`Filter disabled on frames for current domain (${this.iframe.href})`);
       return false;
     }
 
@@ -198,7 +206,7 @@ export default class WebFilter extends Filter {
 
     if (this.shouldBeDisabled(backgroundData)) {
       message.disabled = true;
-      logger.info(`Disabled for page '${this.hostname}'.`);
+      this.log.info(`Disabled for page '${this.hostname}'.`);
       chrome.runtime.sendMessage(message);
       return false;
     }
@@ -210,9 +218,9 @@ export default class WebFilter extends Filter {
 
     // Filter text from the main document and watch for new nodes
     this.init();
-    logger.infoTime('Filter initialized.', this);
+    this.log.infoTime('Filter initialized.', this);
     this.processInitialPage();
-    logger.infoTime('Initial page filtered.');
+    this.log.infoTime('Initial page filtered.');
     this.startObserving(document);
 
     // Track stats (if enabled)
@@ -362,7 +370,7 @@ export default class WebFilter extends Filter {
           if (request.urlUpdate) {
             this.handleUrlUpdateMessage();
           } else {
-            logger.error('Received unhandled message.', JSON.stringify(request));
+            this.log.error('Received unhandled message.', JSON.stringify(request));
           }
           break;
 
@@ -370,12 +378,12 @@ export default class WebFilter extends Filter {
           if (request.summary) {
             if (this.shouldSendPopupSummary) chrome.runtime.sendMessage(this.popupSummaryMessage);
           } else {
-            logger.error('Received unhandled message.', JSON.stringify(request));
+            this.log.error('Received unhandled message.', JSON.stringify(request));
           }
           break;
 
         default:
-          logger.error('Received message without a supported source:', JSON.stringify(request));
+          this.log.error('Received message without a supported source:', JSON.stringify(request));
       }
 
       sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
@@ -405,7 +413,7 @@ export default class WebFilter extends Filter {
       }
     } catch (err) {
       if (err.message !== 'Extension context invalidated.') {
-        logger.warn('Failed to save stats.', err);
+        this.log.warn('Failed to save stats.', err);
       }
     }
   }
@@ -433,7 +441,7 @@ export default class WebFilter extends Filter {
 
   processMutation(mutation: MutationRecord) {
     // console.count('[APF] this.processMutation() count'); // Benchmark: Filter
-    // logger.debug('Mutation observed', mutation);
+    // this.log.debug('Mutation observed', mutation);
 
     if (this.shouldProcessAddedNodes(mutation)) this.processAddedNodes(mutation.addedNodes);
 
@@ -452,7 +460,7 @@ export default class WebFilter extends Filter {
 
   processMutationTargetText(mutation: MutationRecord) {
     // console.count('processMutationTargetText'); // Benchmark: Filter
-    // logger.debug('processMutationTargetText', target, target.data);
+    // this.log.debug('processMutationTargetText', target, target.data);
     const target = mutation.target as CharacterData;
     const result = this.replaceTextResult(target.data, this.wordlistId);
     if (result.modified) target.data = result.filtered;
@@ -551,7 +559,7 @@ export default class WebFilter extends Filter {
         }
       } catch (err) {
         if (err.message !== 'Extension context invalidated.') {
-          logger.warn('Failed to sendMessage to update counter.', err);
+          this.log.warn('Failed to sendMessage to update counter.', err);
         }
       }
     }
