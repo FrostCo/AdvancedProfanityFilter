@@ -44,6 +44,10 @@ export default class Popup {
   }
   //#endregion
 
+  static get log() {
+    return logger;
+  }
+
   static readonly _requiredConfig = [
     'darkMode',
     'domains',
@@ -74,7 +78,7 @@ export default class Popup {
 
   static async load(instance: Popup) {
     instance.cfg = await this.Config.load(this._requiredConfig);
-    logger.setLevel(instance.cfg.loggingLevel);
+    this.log.setLevel(instance.cfg.loggingLevel);
     instance.tab = (await this.Domain.getCurrentTab()) as chrome.tabs.Tab;
     if (instance.tab.url) {
       instance.url = new URL(instance.tab.url);
@@ -97,7 +101,7 @@ export default class Popup {
     // Handle service worker availability for Firefox for Android
     chrome.runtime.sendMessage(statusMessage, () => {
       if (chrome.runtime.lastError) {
-        logger.debug('Service worker not ready for status request');
+        this.log.debug('Service worker not ready for status request');
       }
     });
 
@@ -119,6 +123,10 @@ export default class Popup {
     this.protected = false;
     this.summaries = {};
     this.themeElements = [document.body, document.getElementById('footer')];
+  }
+
+  get log() {
+    return this.Class.log;
   }
 
   applyDarkTheme() {
@@ -215,7 +223,7 @@ export default class Popup {
       chrome.tabs.reload();
       this.populateOptions();
     } catch (err) {
-      logger.error('Failed to update selected filter method.', err);
+      this.log.error('Failed to update selected filter method.', err);
     }
   }
 
@@ -293,7 +301,7 @@ export default class Popup {
       } else if (request.status) {
         this.updateStatus(request.status);
       } else {
-        logger.error('Received unhandled message.', JSON.stringify(request));
+        this.log.error('Received unhandled message.', JSON.stringify(request));
       }
 
       sendResponse(); // Issue 393 - Chrome 99+ promisified sendMessage expects callback to be called
@@ -487,7 +495,7 @@ export default class Popup {
         chrome.tabs.reload();
         this.populateOptions();
       } catch (err) {
-        logger.error(`Failed to toggle domain '${this.domain.hostname}'.`, err);
+        this.log.error(`Failed to toggle domain '${this.domain.hostname}'.`, err);
       }
     }
   }
@@ -501,7 +509,7 @@ export default class Popup {
         chrome.tabs.reload();
         this.populateOptions();
       } catch (err) {
-        logger.error(`Failed to update mode for domain '${this.domain.hostname}'.`, err);
+        this.log.error(`Failed to update mode for domain '${this.domain.hostname}'.`, err);
       }
     }
   }
@@ -527,7 +535,7 @@ export default class Popup {
       chrome.tabs.reload();
       this.populateOptions();
     } catch (err) {
-      logger.error(`Failed to select wordlist for domain ${this.domain.hostname}.`, err);
+      this.log.error(`Failed to select wordlist for domain ${this.domain.hostname}.`, err);
     }
   }
 

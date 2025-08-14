@@ -68,6 +68,10 @@ export default class OptionPage {
   }
   //#endregion
 
+  static get log() {
+    return logger;
+  }
+
   static readonly activeClass = 'w3-flat-belize-hole';
   static readonly themeElementSelectors = ['body', 'div#page', 'div.w3-modal'];
 
@@ -84,6 +88,10 @@ export default class OptionPage {
       .flat();
     this.prefersDarkScheme = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
     this.filter = new this.Class.Filter();
+  }
+
+  get log() {
+    return this.Class.log;
   }
 
   async addWordlist() {
@@ -705,7 +713,7 @@ export default class OptionPage {
       if (this.isStorageError(err) && this.cfg.syncLargeKeys) {
         this.confirm('bulkEditorSaveRetry');
       } else {
-        logger.warn(this.t('options:bulkWordEditorModal.messages.saveFailed'), err);
+        this.log.warn(this.t('options:bulkWordEditorModal.messages.saveFailed'), err);
         this.showErrorModal([this.t('options:.bulkWordEditor.messages.saveFailed'), `Error: ${err.message}`]);
       }
     }
@@ -1055,10 +1063,10 @@ export default class OptionPage {
 
   handleError(message: string, error?: Error) {
     if (error) {
-      logger.error(message, error);
+      this.log.error(message, error);
       this.showErrorModal([message, `Error: ${error.message}`]);
     } else {
-      logger.error(message);
+      this.log.error(message);
       this.showErrorModal([message]);
     }
   }
@@ -1173,14 +1181,14 @@ export default class OptionPage {
     await this.initializeCfg();
     await this.translation.changeLanguage(this.cfg.language);
     this.applyTranslation();
-    logger.setLevel(this.cfg.loggingLevel);
+    this.log.setLevel(this.cfg.loggingLevel);
     this.applyTheme(refreshTheme);
     this.setHelpVersion();
     if (!this.auth) this.auth = new this.Class.OptionAuth(this, this.cfg.password);
     this.filter.cfg = this.cfg;
     this.filter.init();
 
-    // logger.debug(`Password: '${this.cfg.password}', Authenticated: ${this.auth.authenticated}`);
+    // this.log.debug(`Password: '${this.cfg.password}', Authenticated: ${this.auth.authenticated}`);
     if (this.cfg.password && !this.auth.authenticated) {
       this.openModal('passwordModal');
       document.getElementById('passwordInput').focus();
@@ -1434,7 +1442,7 @@ export default class OptionPage {
 
       this.populateStatsSummary(stats, totalFiltered);
     } catch (err) {
-      logger.warn(this.t('options:statsPage.messages.loadFailed'), err);
+      this.log.warn(this.t('options:statsPage.messages.loadFailed'), err);
       this.showErrorModal([this.t('options:statsPage.messages.loadFailed'), `Error: ${err.message}`]);
     }
   }
@@ -1726,7 +1734,7 @@ export default class OptionPage {
         }
       }
     } catch (err) {
-      logger.warn(this.t('options:statsPage.lessUsedWords.messages.prepareLessUsedWordsError'), err);
+      this.log.warn(this.t('options:statsPage.lessUsedWords.messages.prepareLessUsedWordsError'), err);
       return {};
     }
   }
@@ -1749,7 +1757,7 @@ export default class OptionPage {
         await this.cfg.save('domains');
         this.populateDomainPage();
       } catch (err) {
-        logger.warn(this.t('options:domainsPage.removeFailed', { domain: domainsSelect.value }), err);
+        this.log.warn(this.t('options:domainsPage.removeFailed', { domain: domainsSelect.value }), err);
         this.showErrorModal([
           this.t('options:domainsPage.removeFailed', { domain: domainsSelect.value }),
           `Error: ${err.message}`,
@@ -1780,7 +1788,7 @@ export default class OptionPage {
       this.filter.init();
       this.populateOptions();
     } catch (err) {
-      logger.warn(this.t('options:listPage.messages.removeWordFromAllowlistFailed', { word: originalWord }), err);
+      this.log.warn(this.t('options:listPage.messages.removeWordFromAllowlistFailed', { word: originalWord }), err);
       this.showErrorModal([
         this.t('options:listPage.messages.removeWordFromAllowlistFailed', { word: originalWord }),
         `Error: ${err.message}`,
@@ -1804,7 +1812,7 @@ export default class OptionPage {
         this.filter.rebuildWordlists();
         this.populateOptions();
       } catch (err) {
-        logger.warn(this.t('options:wordsPage.messages.removeFailed', { word: word }), err);
+        this.log.warn(this.t('options:wordsPage.messages.removeFailed', { word: word }), err);
         this.showErrorModal([
           this.t('options:wordsPage.messages.removeFailed', { word: word }),
           `Error: ${err.message}`,
@@ -1838,7 +1846,7 @@ export default class OptionPage {
         this.populateWordlists();
         this.populateWordPage();
       } catch (err) {
-        logger.warn(this.t('options:listsPage.messages.removeWordlistFailed', { wordlist: wordlist }), err);
+        this.log.warn(this.t('options:listsPage.messages.removeWordlistFailed', { wordlist: wordlist }), err);
         this.showErrorModal([
           this.t('options:listsPage.messages.removeWordlistFailed', { wordlist: wordlist }),
           `Error: ${err.message}`,
@@ -1883,7 +1891,7 @@ export default class OptionPage {
       await this.init(true);
       return true;
     } catch (err) {
-      logger.warn(this.t('options:configsPage.messages.restoreDefaultsFailed'), err);
+      this.log.warn(this.t('options:configsPage.messages.restoreDefaultsFailed'), err);
       this.showErrorModal([this.t('options:configsPage.messages.restoreDefaultsFailed'), `Error: ${err.message}`]);
       return false;
     }
@@ -1939,7 +1947,7 @@ export default class OptionPage {
       await this.init();
       return true;
     } catch (err) {
-      logger.warn(this.t('options:statusModal.messages.saveOptionsFailed'), err);
+      this.log.warn(this.t('options:statusModal.messages.saveOptionsFailed'), err);
       this.showErrorModal([this.t('options:statusModal.messages.saveOptionsFailed'), `Error: ${err.message}`]);
       return false;
     }
@@ -1995,7 +2003,7 @@ export default class OptionPage {
           this.filter.init();
           this.populateOptions();
         } catch (err) {
-          logger.warn(this.t('options:listsPage.messages.saveAllowlistFailed'), err);
+          this.log.warn(this.t('options:listsPage.messages.saveAllowlistFailed'), err);
           this.showErrorModal([this.t('options:listsPage.messages.saveAllowlistFailed'), `Error: ${err.message}`]);
           return false;
         }
@@ -2091,18 +2099,18 @@ export default class OptionPage {
 
       if (wordList.value === '') {
         // New record
-        logger.info(`Adding new word: '${word}'.`, wordOptions);
+        this.log.info(`Adding new word: '${word}'.`, wordOptions);
         added = this.cfg.addWord(word, wordOptions);
       } else {
         // Updating existing record
         const originalWord = wordList.value;
         if (originalWord == word) {
           // Word options changed
-          logger.info(`Modifying existing word options for '${word}'.`, wordOptions);
+          this.log.info(`Modifying existing word options for '${word}'.`, wordOptions);
           this.cfg.words[word] = wordOptions;
         } else {
           // Existing word modified
-          logger.info(`Rename existing word '${originalWord}' to '${word}'.`, wordOptions);
+          this.log.info(`Rename existing word '${originalWord}' to '${word}'.`, wordOptions);
           added = this.cfg.addWord(word, wordOptions);
           if (added) {
             delete this.cfg.words[originalWord];
@@ -2119,7 +2127,7 @@ export default class OptionPage {
           this.filter.rebuildWordlists();
           this.populateOptions();
         } catch (err) {
-          logger.warn(this.t('options:wordsPage.messages.updateFailed', { word: word }), err);
+          this.log.warn(this.t('options:wordsPage.messages.updateFailed', { word: word }), err);
           this.showErrorModal([
             this.t('options:wordsPage.messages.updateFailed', { word: word }),
             `Error: ${err.message}`,
@@ -2526,7 +2534,7 @@ export default class OptionPage {
       await this.Class.Config.removeLocalStorage('stats');
       this.populateStats();
     } catch (err) {
-      logger.warn(this.t('options:statsPage.messages.resetFailed'), err);
+      this.log.warn(this.t('options:statsPage.messages.resetFailed'), err);
       this.showErrorModal([this.t('options:statsPage.messages.resetFailed'), `Error: ${err.message}`]);
     }
   }

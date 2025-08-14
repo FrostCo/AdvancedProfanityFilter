@@ -6,6 +6,17 @@ const logger = new Logger('OptionPage:Bookmarklet');
 export default class Bookmarklet {
   code: string;
 
+  //#region Class reference helpers
+  // Can be overridden in children classes
+  get Class() {
+    return this.constructor as typeof WebConfig;
+  }
+  //#endregion
+
+  static get log() {
+    return logger;
+  }
+
   static async create() {
     const code = await this.loadCode();
     if (code) return new this(code);
@@ -17,12 +28,16 @@ export default class Bookmarklet {
       const response = await fetch(origURL);
       return await response.text();
     } catch (err) {
-      logger.warn('Failed to load bookmarklet script.', err);
+      this.log.warn('Failed to load bookmarklet script.', err);
     }
   }
 
   constructor(code: string) {
     this.code = code;
+  }
+
+  get log() {
+    return this.Class.log;
   }
 
   customizedCode(cfg: WebConfig): string {

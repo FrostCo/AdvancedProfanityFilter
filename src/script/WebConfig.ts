@@ -35,6 +35,10 @@ export default class WebConfig extends Config {
   }
   //#endregion
 
+  static get log() {
+    return logger;
+  }
+
   static readonly BUILD = typeof __BUILD__ == 'undefined' ? BUILD_DEFAULTS : __BUILD__;
   static readonly _webDefaults = {
     collectStats: true,
@@ -179,7 +183,7 @@ export default class WebConfig extends Config {
 
       return new this(data);
     } catch (err) {
-      logger.error('Failed to load items.', keys, err);
+      this.log.error('Failed to load items.', keys, err);
       throw new Error(`Failed to load items: ${prettyPrintArray(keys)}. [${err.message}]`);
     }
   }
@@ -333,6 +337,8 @@ export default class WebConfig extends Config {
 
     this._buildInfo = this.Class.BUILD;
 
+    this.log.setLevel(this.loggingLevel);
+
     // Overcome Object.assign not overwriting undefined values for underscore keys
     const underscoreKeys = Object.keys(config).filter((key) => key[0] === '_');
     for (const underscoreKey of underscoreKeys) {
@@ -348,6 +354,10 @@ export default class WebConfig extends Config {
     this._defaultsLoaded = defaultKeys.filter((key) => config[key] === undefined);
 
     this.localizeDefaults();
+  }
+
+  get log() {
+    return this.Class.log;
   }
 
   localizeDefaults() {
@@ -416,7 +426,7 @@ export default class WebConfig extends Config {
           delete this[key];
         });
       } catch (err) {
-        logger.error('Failed to remove items.', keys, err);
+        this.log.error('Failed to remove items.', keys, err);
         throw new Error(`Failed to remove items: ${prettyPrintArray(keys)}. ${err.message}`);
       }
     }
@@ -427,7 +437,7 @@ export default class WebConfig extends Config {
       await this.Class.resetSyncStorage();
       await this.Class.resetLocalStorage();
     } catch (err) {
-      logger.error('Failed to clear storage.', err);
+      this.log.error('Failed to clear storage.', err);
       throw new Error(`Failed to clear storage. ${err.message}`);
     }
   }
@@ -437,7 +447,7 @@ export default class WebConfig extends Config {
       await this.Class.resetSyncStorage();
       await this.Class.removeLocalStorage(removeFromArray(this.Class._localOnlyKeys, 'stats'));
     } catch (err) {
-      logger.error('Failed to clear storage.', err);
+      this.log.error('Failed to clear storage.', err);
       throw new Error(`Failed to clear storage. ${err.message}`);
     }
   }
@@ -483,7 +493,7 @@ export default class WebConfig extends Config {
       if (Object.keys(localData).length) await this.Class.saveLocalStorage(localData);
       if (unusedSplitKeys.length) await this.remove(unusedSplitKeys);
     } catch (err) {
-      logger.error('Failed to save items.', keys, err);
+      this.log.error('Failed to save items.', keys, err);
       throw new Error(`Failed to save items: ${prettyPrintArray(keys)}. [${err.message}]`);
     }
   }
