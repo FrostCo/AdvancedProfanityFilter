@@ -65,8 +65,8 @@ export default class Logger {
     this.logTime(this.warnName, message, data);
   }
 
-  constructor(tag?: string) {
-    this.level = Logger.defaultLevel;
+  constructor(tag?: string, level: number = Logger.defaultLevel) {
+    this.level = level;
     this.prefix = '';
     if (tag) {
       this.prefix = `[${tag}] `;
