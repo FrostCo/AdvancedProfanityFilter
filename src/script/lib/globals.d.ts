@@ -8,14 +8,6 @@ interface BackgroundStorage {
   };
 }
 
-interface BuildInfo {
-  config: any;
-  manifestVersion: number;
-  release: boolean;
-  target: string;
-  version: string;
-}
-
 interface ConfirmModalSettings {
   backup?: boolean;
   content?: string;
