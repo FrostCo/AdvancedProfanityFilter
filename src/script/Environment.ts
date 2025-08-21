@@ -40,7 +40,7 @@ type UAData =
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
 /* eslint-disable-next-line @typescript-eslint/naming-convention */
-declare const __BUILD__: BuildInfo;
+declare const __BUILD__: BuildInfo | undefined;
 const BUILD_DEFAULTS: BuildInfo = { config: {}, manifestVersion: 3, release: true, target: 'chrome', version: '1.0.0' };
 
 export default class Environment {
@@ -66,7 +66,9 @@ export default class Environment {
   static readonly OS_WINDOWS = 'windows';
 
   // Static environment values - computed once and cached
-  private static readonly _BUILD_INFO = typeof __BUILD__ == 'undefined' ? BUILD_DEFAULTS : __BUILD__;
+  private static readonly _BUILD_INFO: Readonly<BuildInfo> = Object.freeze(
+    typeof __BUILD__ === 'undefined' ? BUILD_DEFAULTS : __BUILD__,
+  );
   private static readonly _BROWSER_INFO = Environment._computeBrowserInfoSafe();
 
   // Static getters for browser info
