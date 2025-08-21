@@ -1668,7 +1668,7 @@ export default class OptionPage {
     const wordsSelect = document.getElementById('wordList') as HTMLSelectElement;
 
     // Workaround for remove filter method
-    if (this.filter.cfg.filterWordList && this.filter.cfg.filterMethod === 2) {
+    if (this.filter.cfg.filterWordList && this.filter.cfg.filterMethod === this.Class.Constants.FILTER_METHODS.REMOVE) {
       wordlistFilter = new this.Class.Filter();
       // Works because we are only changing a native value (filterMethod: number)
       wordlistFilter.cfg = new this.Class.Config(Object.assign({}, this.cfg, { filterMethod: 0 }));
