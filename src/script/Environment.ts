@@ -19,14 +19,19 @@ interface BrowserInfo {
     | typeof Environment.OS_WINDOWS;
 }
 
+type BaseTarget =
+  | typeof Environment.BUILD_TARGET_BOOKMARKLET
+  | typeof Environment.BUILD_TARGET_CHROME
+  | typeof Environment.BUILD_TARGET_FIREFOX;
+
+// open union: allows extra literal strings later (subclasses)
+type AnyTarget = BaseTarget | (string & {});
+
 interface BuildInfo {
   config: Partial<WebConfig>;
   manifestVersion: number;
   release: boolean;
-  target:
-    | typeof Environment.BUILD_TARGET_BOOKMARKLET
-    | typeof Environment.BUILD_TARGET_CHROME
-    | typeof Environment.BUILD_TARGET_FIREFOX;
+  target: AnyTarget;
   version: string;
 }
 
