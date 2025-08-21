@@ -1,6 +1,16 @@
 import Constants from './Constants';
 import Config from './Config';
 
+export interface WordOptions {
+  _filterMethod?: number; // This should not be stored in the config. Only there for new Word
+  case?: number;
+  lists?: number[];
+  matchMethod: number;
+  repeat: number;
+  separators?: number;
+  sub: string;
+}
+
 export default class Word {
   _filterMethod: number;
   case?: number;

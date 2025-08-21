@@ -4,6 +4,7 @@ import Logger from '@APF/lib/Logger';
 import Translation from '@APF/Translation';
 import Constants from '@APF/lib/Constants';
 import Environment from '@APF/Environment';
+import type { DomainCfg } from '@APF/Domain';
 
 const logger = new Logger('WebConfig');
 

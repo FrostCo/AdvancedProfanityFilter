@@ -1,6 +1,14 @@
 import Constants from '@APF/lib/Constants';
 import { booleanToNumber, getVersion, isVersionOlder } from '@APF/lib/helper';
 import WebConfig from '@APF/WebConfig';
+import type { WordOptions } from '@APF/lib/Word';
+
+interface Migration {
+  async?: boolean;
+  name: string;
+  runOnImport: boolean;
+  version: string;
+}
 
 export default class DataMigration {
   cfg: WebConfig;
@@ -91,7 +99,7 @@ export default class DataMigration {
 
   // This will look at the version (from before the update) and perform data migrations if necessary
   async byVersion(oldVersion: string) {
-    const version = getVersion(oldVersion) as Version;
+    const version = getVersion(oldVersion);
     let migrated = false;
     for (const migration of (this.constructor as typeof DataMigration).migrations) {
       if (isVersionOlder(version, getVersion(migration.version))) {

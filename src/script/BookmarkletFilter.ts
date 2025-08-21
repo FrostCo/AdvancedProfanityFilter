@@ -4,6 +4,8 @@ import Domain from '@APF/Domain';
 import Filter from '@APF/lib/Filter';
 import Page from '@APF/Page';
 import WebConfig from '@APF/WebConfig';
+import type { BackgroundData, Message } from '@APF/Background';
+import type { Statistics } from '@APF/WebFilter';
 
 export default class BookmarkletFilter extends Filter {
   buildMessage: (destination: string, data?: object) => Message; // Bookmarklet: Not used - Needed to match signature of WebFilter

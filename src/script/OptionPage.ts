@@ -1,7 +1,7 @@
 import Constants from '@APF/lib/Constants';
 import WebConfig from '@APF/WebConfig';
 import Filter from '@APF/lib/Filter';
-import Domain from '@APF/Domain';
+import Domain, { type DomainCfg } from '@APF/Domain';
 import OptionAuth from '@APF/OptionAuth';
 import DataMigration from '@APF/DataMigration';
 import Bookmarklet from '@APF/bookmarklet';
@@ -21,6 +21,16 @@ import {
   timeForFileName,
   upperCaseFirst,
 } from '@APF/lib/helper';
+import type { Message } from '@APF/Background';
+import type { Statistics } from '@APF/WebFilter';
+import type { WordOptions } from '@APF/lib/Word';
+
+interface ConfirmModalSettings {
+  backup?: boolean;
+  content?: string;
+  title?: string;
+  titleClass?: string;
+}
 
 const logger = new Logger('OptionPage');
 

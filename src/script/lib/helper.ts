@@ -1,5 +1,11 @@
 import Constants from './Constants';
 
+export interface Version {
+  major: number;
+  minor: number;
+  patch: number;
+}
+
 export function booleanToNumber(value: boolean): number {
   return value ? Constants.TRUE : Constants.FALSE;
 }

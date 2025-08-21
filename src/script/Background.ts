@@ -5,6 +5,47 @@ import Translation from '@APF/Translation';
 import WebConfig from '@APF/WebConfig';
 import { formatNumber } from '@APF/lib/helper';
 import Logger from '@APF/lib/Logger';
+import type { Summary } from '@APF/WebFilter';
+
+export interface BackgroundData {
+  disabledTab?: boolean;
+}
+
+interface BackgroundStorage {
+  tabs?: {
+    [tabId: number]: TabStorageOptions;
+  };
+}
+
+export interface Message {
+  advanced?: boolean;
+  backgroundData?: boolean;
+  counter?: number;
+  deep?: boolean;
+  destination: string;
+  disabled?: boolean;
+  enableTab?: boolean;
+  forceUpdate?: boolean;
+  getStatus?: boolean;
+  globalVariable?: string;
+  iframe?: boolean;
+  popup?: boolean;
+  source: string;
+  status?: number;
+  summary?: Summary;
+  tabId?: number;
+  updateContextMenus?: boolean;
+  urlUpdate?: string;
+}
+
+interface TabStorageOptions {
+  counters?: { number?: number };
+  disabled?: boolean;
+  disabledOnce?: number; // NOT_SET: 0, DISABLED: 1, WILL_DISABLE: 2
+  id?: number;
+  registeredAt?: number;
+  status?: number;
+}
 
 export default class Background {
   //#region Class reference helpers

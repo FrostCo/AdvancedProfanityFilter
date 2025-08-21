@@ -1,8 +1,14 @@
 import Constants from './Constants';
-import Word from './Word';
+import Word, { type WordOptions } from './Word';
 import Wordlist from './Wordlist';
 import Config from './Config';
 import { randomArrayElement } from './helper';
+
+interface ReplaceTextResult {
+  filtered: string;
+  modified: boolean;
+  original: string;
+}
 
 export default class Filter {
   allowlist: string[];

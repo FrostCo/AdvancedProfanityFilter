@@ -5,6 +5,9 @@ import Page from '@APF/Page';
 import Logger from '@APF/lib/Logger';
 import Translation from '@APF/Translation';
 import { sendMessageWithRetry } from '@APF/lib/helper';
+import type { Summary } from '@APF/WebFilter';
+import type { BackgroundData, Message } from '@APF/Background';
+
 const logger = new Logger('Popup');
 
 export default class Popup {

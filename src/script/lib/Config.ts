@@ -1,4 +1,5 @@
 import Constants from './Constants';
+import type { WordOptions } from './Word';
 
 export default class Config {
   censorCharacter: string;
