@@ -2187,7 +2187,7 @@ export default class OptionPage {
 
   setHelpVersion() {
     const helpVersion = document.getElementById('helpVersion') as HTMLAnchorElement;
-    helpVersion.textContent = this.cfg._environment.version;
+    helpVersion.textContent = this.cfg._env.version;
   }
 
   setupEventListeners() {

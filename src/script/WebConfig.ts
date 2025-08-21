@@ -10,7 +10,7 @@ const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
   _defaultsLoaded: string[];
-  _environment: typeof Environment;
+  _env: typeof Environment;
   _lastSplitKeys: { [key: string]: number };
   collectStats: boolean;
   contextMenu: boolean;
@@ -335,7 +335,7 @@ export default class WebConfig extends Config {
     // Apply the Config defaults
     super(config);
 
-    this._environment = this.Class.Environment;
+    this._env = this.Class.Environment;
 
     this.log.setLevel(this.loggingLevel);
 
@@ -361,7 +361,7 @@ export default class WebConfig extends Config {
   }
 
   localizeDefaults() {
-    if (this._environment.isBookmarkletTarget || !this._defaultsLoaded || !this._defaultsLoaded.length) return;
+    if (this._env.isBookmarkletTarget || !this._defaultsLoaded || !this._defaultsLoaded.length) return;
 
     const translation = new Translation('common', this.language);
 

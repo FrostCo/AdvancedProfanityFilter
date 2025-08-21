@@ -362,8 +362,8 @@ export default class Popup {
     return (
       !this.domain.hostname ||
       this.Class.Page.disabledProtocols.test(this.url.protocol) ||
-      (this.cfg._environment.isChromeTarget && this.Class.Page.disabledChromePages.includes(this.domain.hostname)) ||
-      (this.cfg._environment.isFirefoxTarget && this.Class.Page.disabledFirefoxPages.includes(this.domain.hostname))
+      (this.cfg._env.isChromeTarget && this.Class.Page.disabledChromePages.includes(this.domain.hostname)) ||
+      (this.cfg._env.isFirefoxTarget && this.Class.Page.disabledFirefoxPages.includes(this.domain.hostname))
     );
   }
 
