@@ -45,25 +45,25 @@ const BUILD_DEFAULTS: BuildInfo = { config: {}, manifestVersion: 3, release: tru
 
 export default class Environment {
   // Static constants
-  static readonly BROWSER_CHROME = 'chrome';
-  static readonly BROWSER_EDGE = 'edge';
-  static readonly BROWSER_FIREFOX = 'firefox';
-  static readonly BROWSER_OPERA = 'opera';
-  static readonly BROWSER_SAFARI = 'safari';
-  static readonly BROWSER_UNKNOWN = 'unknown';
-  static readonly BUILD_TARGET_BOOKMARKLET = 'bookmarklet';
-  static readonly BUILD_TARGET_CHROME = 'chrome';
-  static readonly BUILD_TARGET_FIREFOX = 'firefox';
-  static readonly DEVICE_DESKTOP = 'desktop';
-  static readonly DEVICE_PHONE = 'phone';
-  static readonly DEVICE_TABLET = 'tablet';
-  static readonly OS_ANDROID = 'android';
-  static readonly OS_CHROMEOS = 'chromeos';
-  static readonly OS_IOS = 'ios';
-  static readonly OS_LINUX = 'linux';
-  static readonly OS_MACOS = 'macos';
-  static readonly OS_UNKNOWN = 'unknown';
-  static readonly OS_WINDOWS = 'windows';
+  static readonly BROWSER_CHROME = 'chrome' as const;
+  static readonly BROWSER_EDGE = 'edge' as const;
+  static readonly BROWSER_FIREFOX = 'firefox' as const;
+  static readonly BROWSER_OPERA = 'opera' as const;
+  static readonly BROWSER_SAFARI = 'safari' as const;
+  static readonly BROWSER_UNKNOWN = 'unknown' as const;
+  static readonly BUILD_TARGET_BOOKMARKLET = 'bookmarklet' as const;
+  static readonly BUILD_TARGET_CHROME = 'chrome' as const;
+  static readonly BUILD_TARGET_FIREFOX = 'firefox' as const;
+  static readonly DEVICE_DESKTOP = 'desktop' as const;
+  static readonly DEVICE_PHONE = 'phone' as const;
+  static readonly DEVICE_TABLET = 'tablet' as const;
+  static readonly OS_ANDROID = 'android' as const;
+  static readonly OS_CHROMEOS = 'chromeos' as const;
+  static readonly OS_IOS = 'ios' as const;
+  static readonly OS_LINUX = 'linux' as const;
+  static readonly OS_MACOS = 'macos' as const;
+  static readonly OS_UNKNOWN = 'unknown' as const;
+  static readonly OS_WINDOWS = 'windows' as const;
 
   // Static environment values - computed once and cached
   private static readonly _BUILD_INFO: Readonly<BuildInfo> = Object.freeze(
