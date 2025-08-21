@@ -30,15 +30,13 @@ interface BuildInfo {
   version: string;
 }
 
-interface Navigator {
-  userAgentData?: UserAgentData;
-}
-
-interface UserAgentData {
-  brands?: Array<{ brand: string; version: string }>;
-  mobile?: boolean;
-  platform?: string;
-}
+type UAData =
+  | {
+      brands?: Array<{ brand: string; version: string }>;
+      mobile?: boolean;
+      platform?: string;
+    }
+  | undefined;
 
 // __BUILD__ is injected by webpack from ROOT/.build.json
 /* eslint-disable-next-line @typescript-eslint/naming-convention */
@@ -202,7 +200,7 @@ export default class Environment {
 
   private static _computeBrowserInfo(): BrowserInfo {
     const ua = navigator.userAgent || '';
-    const uaData = (navigator as Navigator).userAgentData;
+    const uaData = (navigator as any).userAgentData as UAData;
 
     // iPadOS heuristic (handles Safari reporting MacIntel)
     const isiPadByPlatform = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
