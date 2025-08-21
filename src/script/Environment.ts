@@ -193,6 +193,15 @@ export default class Environment {
     return this.os === this.OS_CHROMEOS;
   }
 
+  // Manifest version static helpers
+  static get isManifestV2() {
+    return this.manifestVersion === 2;
+  }
+
+  static get isManifestV3() {
+    return this.manifestVersion === 3;
+  }
+
   private static _computeBrowserInfoSafe(): BrowserInfo {
     const unknown: BrowserInfo = { browser: this.BROWSER_UNKNOWN, os: this.OS_UNKNOWN, device: this.DEVICE_DESKTOP };
     try {
