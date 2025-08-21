@@ -3,7 +3,7 @@ import { booleanToNumber, getVersion, isVersionOlder } from '@APF/lib/helper';
 import WebConfig from '@APF/WebConfig';
 import type { WordOptions } from '@APF/lib/Word';
 
-interface Migration {
+export interface Migration {
   async?: boolean;
   name: string;
   runOnImport: boolean;

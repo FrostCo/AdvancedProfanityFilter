@@ -20,12 +20,12 @@ export interface Summary {
   };
 }
 
-interface WordStatistic {
+export interface WordStatistic {
   text: number;
   total?: number;
 }
 
-interface WordStatistics {
+export interface WordStatistics {
   [word: string]: WordStatistic;
 }
 

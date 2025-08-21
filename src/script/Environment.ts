@@ -1,6 +1,6 @@
 import type WebConfig from '@APF/WebConfig';
 
-interface BrowserInfo {
+export interface BrowserInfo {
   browser:
     | typeof Environment.BROWSER_CHROME
     | typeof Environment.BROWSER_SAFARI
@@ -27,7 +27,7 @@ type BaseTarget =
 // open union: allows extra literal strings later (subclasses)
 type AnyTarget = BaseTarget | (string & {});
 
-interface BuildInfo {
+export interface BuildInfo {
   config: Partial<WebConfig>;
   manifestVersion: number;
   release: boolean;

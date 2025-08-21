@@ -11,7 +11,7 @@ export interface BackgroundData {
   disabledTab?: boolean;
 }
 
-interface BackgroundStorage {
+export interface BackgroundStorage {
   tabs?: {
     [tabId: number]: TabStorageOptions;
   };
@@ -38,7 +38,7 @@ export interface Message {
   urlUpdate?: string;
 }
 
-interface TabStorageOptions {
+export interface TabStorageOptions {
   counters?: { number?: number };
   disabled?: boolean;
   disabledOnce?: number; // NOT_SET: 0, DISABLED: 1, WILL_DISABLE: 2

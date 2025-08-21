@@ -25,7 +25,7 @@ import type { Message } from '@APF/Background';
 import type { Statistics } from '@APF/WebFilter';
 import type { WordOptions } from '@APF/lib/Word';
 
-interface ConfirmModalSettings {
+export interface ConfirmModalSettings {
   backup?: boolean;
   content?: string;
   title?: string;

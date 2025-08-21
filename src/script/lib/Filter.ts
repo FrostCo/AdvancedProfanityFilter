@@ -4,7 +4,7 @@ import Wordlist from './Wordlist';
 import Config from './Config';
 import { randomArrayElement } from './helper';
 
-interface ReplaceTextResult {
+export interface ReplaceTextResult {
   filtered: string;
   modified: boolean;
   original: string;
