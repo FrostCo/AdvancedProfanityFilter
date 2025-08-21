@@ -1,3 +1,5 @@
+import type WebConfig from '@APF/WebConfig';
+
 interface BrowserInfo {
   browser:
     | typeof Environment.BROWSER_CHROME
@@ -18,7 +20,7 @@ interface BrowserInfo {
 }
 
 interface BuildInfo {
-  config: any;
+  config: Partial<WebConfig>;
   manifestVersion: number;
   release: boolean;
   target:
@@ -44,19 +46,7 @@ declare const __BUILD__: BuildInfo;
 const BUILD_DEFAULTS: BuildInfo = { config: {}, manifestVersion: 3, release: true, target: 'chrome', version: '1.0.0' };
 
 export default class Environment {
-  buildTarget: string;
-  manifestVersion: number;
-  release: boolean;
-  version: string;
-  _buildInfo: BuildInfo;
-
-  // Class reference helpers - can be overridden in children classes
-  get Class() {
-    return this.constructor as typeof Environment;
-  }
-
   // Static constants
-  static readonly BUILD_INFO = typeof __BUILD__ == 'undefined' ? BUILD_DEFAULTS : __BUILD__;
   static readonly BROWSER_CHROME = 'chrome';
   static readonly BROWSER_EDGE = 'edge';
   static readonly BROWSER_FIREFOX = 'firefox';
@@ -77,14 +67,125 @@ export default class Environment {
   static readonly OS_UNKNOWN = 'unknown';
   static readonly OS_WINDOWS = 'windows';
 
-  // Environment values
+  // Static environment values - computed once and cached
+  private static readonly _BUILD_INFO = typeof __BUILD__ == 'undefined' ? BUILD_DEFAULTS : __BUILD__;
   private static readonly _BROWSER_INFO = Environment._computeBrowserInfoSafe();
-  static readonly browser = Environment._BROWSER_INFO.browser;
-  static readonly os = Environment._BROWSER_INFO.os;
-  static readonly device = Environment._BROWSER_INFO.device;
+
+  // Static getters for browser info
+  static get browser() {
+    return this._BROWSER_INFO.browser;
+  }
+  static get os() {
+    return this._BROWSER_INFO.os;
+  }
+  static get device() {
+    return this._BROWSER_INFO.device;
+  }
+
+  // Static getters for build info
+  static get buildTarget() {
+    return this._BUILD_INFO.target;
+  }
+
+  static get manifestVersion() {
+    return this._BUILD_INFO.manifestVersion;
+  }
+
+  static get release() {
+    return this._BUILD_INFO.release;
+  }
 
   static get version() {
-    return this.BUILD_INFO.version;
+    return this._BUILD_INFO.version;
+  }
+
+  static get config() {
+    return this._BUILD_INFO.config;
+  }
+
+  // Browser target static helpers
+  static get isChromeTarget() {
+    return this.buildTarget === this.BUILD_TARGET_CHROME;
+  }
+
+  static get isFirefoxTarget() {
+    return this.buildTarget === this.BUILD_TARGET_FIREFOX;
+  }
+
+  static get isBookmarkletTarget() {
+    return this.buildTarget === this.BUILD_TARGET_BOOKMARKLET;
+  }
+
+  // Build environment static helpers
+  static get isProduction() {
+    return this.release;
+  }
+
+  static get isDevelopment() {
+    return !this.isProduction;
+  }
+
+  // Device type static helpers
+  static get isDesktop() {
+    return this.device === this.DEVICE_DESKTOP;
+  }
+
+  static get isTablet() {
+    return this.device === this.DEVICE_TABLET;
+  }
+
+  static get isPhone() {
+    return this.device === this.DEVICE_PHONE;
+  }
+
+  static get isMobile() {
+    return this.isTablet || this.isPhone;
+  }
+
+  // Browser static helpers
+  static get isChrome() {
+    return this.browser === this.BROWSER_CHROME;
+  }
+
+  static get isFirefox() {
+    return this.browser === this.BROWSER_FIREFOX;
+  }
+
+  static get isSafari() {
+    return this.browser === this.BROWSER_SAFARI;
+  }
+
+  static get isEdge() {
+    return this.browser === this.BROWSER_EDGE;
+  }
+
+  static get isOpera() {
+    return this.browser === this.BROWSER_OPERA;
+  }
+
+  // OS static helpers
+  static get isWindows() {
+    return this.os === this.OS_WINDOWS;
+  }
+
+  static get isMacOS() {
+    return this.os === this.OS_MACOS;
+  }
+
+  static get isLinux() {
+    return this.os === this.OS_LINUX;
+  }
+
+  static get isAndroid() {
+    return this.os === this.OS_ANDROID;
+  }
+
+  static get isIOS() {
+    return this.os === this.OS_IOS;
+  }
+
+  static get isChromeOS() {
+    return this.os === this.OS_CHROMEOS;
   }
 
   private static _computeBrowserInfoSafe(): BrowserInfo {
@@ -185,32 +286,6 @@ export default class Environment {
   }
 
   constructor() {
-    this._buildInfo = this.Class.BUILD_INFO;
-    this.buildTarget = this.Class.BUILD_INFO.target;
-    this.manifestVersion = this.Class.BUILD_INFO.manifestVersion;
-    this.release = this.Class.BUILD_INFO.release;
-    this.version = this.Class.BUILD_INFO.version;
-  }
-
-  // Browser targets
-  get isChromeTarget(): boolean {
-    return this.buildTarget === this.Class.BUILD_TARGET_CHROME;
-  }
-
-  get isFirefoxTarget(): boolean {
-    return this.buildTarget === this.Class.BUILD_TARGET_FIREFOX;
-  }
-
-  get isBookmarkletTarget(): boolean {
-    return this.buildTarget === this.Class.BUILD_TARGET_BOOKMARKLET;
-  }
-
-  // Builds
-  get isProduction(): boolean {
-    return this.release;
-  }
-
-  get isDevelopment(): boolean {
-    return !this.isProduction;
+    throw new Error('Environment is a static class and cannot be instantiated');
   }
 }

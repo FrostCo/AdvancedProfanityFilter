@@ -10,7 +10,7 @@ const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
   _defaultsLoaded: string[];
-  _environment: Environment;
+  _environment: typeof Environment;
   _lastSplitKeys: { [key: string]: number };
   collectStats: boolean;
   contextMenu: boolean;
@@ -335,7 +335,7 @@ export default class WebConfig extends Config {
     // Apply the Config defaults
     super(config);
 
-    this._environment = new this.Class.Environment();
+    this._environment = this.Class.Environment;
 
     this.log.setLevel(this.loggingLevel);
 
