@@ -5,6 +5,9 @@ import Page from '@APF/Page';
 import Logger from '@APF/lib/Logger';
 import Translation from '@APF/Translation';
 import { sendMessageWithRetry } from '@APF/lib/helper';
+import type { Summary } from '@APF/WebFilter';
+import type { BackgroundData, Message } from '@APF/Background';
+
 const logger = new Logger('Popup');
 
 export default class Popup {
@@ -359,10 +362,8 @@ export default class Popup {
     return (
       !this.domain.hostname ||
       this.Class.Page.disabledProtocols.test(this.url.protocol) ||
-      (this.cfg._buildInfo.target == this.Class.Constants.BUILD_TARGET_CHROME &&
-        this.Class.Page.disabledChromePages.includes(this.domain.hostname)) ||
-      (this.cfg._buildInfo.target == this.Class.Constants.BUILD_TARGET_FIREFOX &&
-        this.Class.Page.disabledFirefoxPages.includes(this.domain.hostname))
+      (this.cfg._env.isChromeTarget && this.Class.Page.disabledChromePages.includes(this.domain.hostname)) ||
+      (this.cfg._env.isFirefoxTarget && this.Class.Page.disabledFirefoxPages.includes(this.domain.hostname))
     );
   }
 

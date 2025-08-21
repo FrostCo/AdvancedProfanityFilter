@@ -1,5 +1,11 @@
 import Constants from './Constants';
 
+export interface Version {
+  major: number;
+  minor: number;
+  patch: number;
+}
+
 export function booleanToNumber(value: boolean): number {
   return value ? Constants.TRUE : Constants.FALSE;
 }
@@ -259,11 +265,11 @@ export function upperCaseFirst(str: string, lowerCaseRest: boolean = true): stri
  * @param fallbackResponse - Default response if all retries fail
  * @returns Promise that resolves with the response
  */
-export function sendMessageWithRetry<tResponse = any>(
+export function sendMessageWithRetry<TResponse = any>(
   message: any,
   maxRetries: number = 3,
-  fallbackResponse?: tResponse,
-): Promise<tResponse> {
+  fallbackResponse?: TResponse,
+): Promise<TResponse> {
   return new Promise((resolve) => {
     let attempts = 0;
 

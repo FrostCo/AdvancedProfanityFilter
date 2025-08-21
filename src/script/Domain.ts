@@ -1,6 +1,16 @@
 import Constants from '@APF/lib/Constants';
 import type WebConfig from '@APF/WebConfig';
 
+export interface DomainCfg {
+  adv?: boolean;
+  deep?: boolean;
+  disabled?: boolean;
+  enabled?: boolean;
+  framesOff?: boolean;
+  framesOn?: boolean;
+  wordlist?: number;
+}
+
 export default class Domain {
   advanced: boolean;
   cfg: DomainCfg;

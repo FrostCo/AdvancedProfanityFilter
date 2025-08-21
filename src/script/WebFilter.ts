@@ -6,6 +6,29 @@ import Page from '@APF/Page';
 import WebConfig from '@APF/WebConfig';
 import Logger from '@APF/lib/Logger';
 import type Word from '@APF/lib/Word';
+import type { BackgroundData, Message } from '@APF/Background';
+
+export interface Statistics {
+  startedAt?: number;
+  words: WordStatistics;
+}
+
+export interface Summary {
+  [word: string]: {
+    filtered: string;
+    count: number;
+  };
+}
+
+export interface WordStatistic {
+  text: number;
+  total?: number;
+}
+
+export interface WordStatistics {
+  [word: string]: WordStatistic;
+}
+
 const logger = new Logger('WebFilter');
 
 export default class WebFilter extends Filter {

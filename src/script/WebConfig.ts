@@ -3,16 +3,14 @@ import { prettyPrintArray, removeFromArray, sortObjectKeys, stringArray } from '
 import Logger from '@APF/lib/Logger';
 import Translation from '@APF/Translation';
 import Constants from '@APF/lib/Constants';
+import Environment from '@APF/Environment';
+import type { DomainCfg } from '@APF/Domain';
 
-// __BUILD__ is injected by webpack from ROOT/.build.json
-/* eslint-disable-next-line @typescript-eslint/naming-convention */
-declare const __BUILD__: BuildInfo;
-const BUILD_DEFAULTS: BuildInfo = { config: {}, manifestVersion: 3, release: true, target: 'chrome', version: '1.0.0' };
 const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
-  _buildInfo: BuildInfo;
   _defaultsLoaded: string[];
+  _env: typeof Environment;
   _lastSplitKeys: { [key: string]: number };
   collectStats: boolean;
   contextMenu: boolean;
@@ -30,6 +28,9 @@ export default class WebConfig extends Config {
   static get Constants() {
     return Constants;
   }
+  static get Environment() {
+    return Environment;
+  }
   get Class() {
     return this.constructor as typeof WebConfig;
   }
@@ -39,7 +40,6 @@ export default class WebConfig extends Config {
     return logger;
   }
 
-  static readonly BUILD = typeof __BUILD__ == 'undefined' ? BUILD_DEFAULTS : __BUILD__;
   static readonly _webDefaults = {
     collectStats: true,
     contextMenu: true,
@@ -335,7 +335,7 @@ export default class WebConfig extends Config {
     // Apply the Config defaults
     super(config);
 
-    this._buildInfo = this.Class.BUILD;
+    this._env = this.Class.Environment;
 
     this.log.setLevel(this.loggingLevel);
 
@@ -361,12 +361,7 @@ export default class WebConfig extends Config {
   }
 
   localizeDefaults() {
-    if (
-      this._buildInfo.target === this.Class.Constants.BUILD_TARGET_BOOKMARKLET ||
-      !this._defaultsLoaded ||
-      !this._defaultsLoaded.length
-    )
-      return;
+    if (this._env.isBookmarkletTarget || !this._defaultsLoaded || !this._defaultsLoaded.length) return;
 
     const translation = new Translation('common', this.language);
 
