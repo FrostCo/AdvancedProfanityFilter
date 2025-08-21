@@ -103,6 +103,12 @@ export default [
       '@typescript-eslint/naming-convention': [
         'error',
         {
+          selector: 'typeLike',
+          format: ['PascalCase'],
+          leadingUnderscore: 'forbid',
+          trailingUnderscore: 'forbid',
+        },
+        {
           selector: 'accessor',
           format: ['camelCase', 'PascalCase'],
           leadingUnderscore: 'allow',
@@ -124,12 +130,6 @@ export default [
         {
           selector: 'import',
           format: ['camelCase', 'PascalCase'],
-          leadingUnderscore: 'forbid',
-          trailingUnderscore: 'forbid',
-        },
-        {
-          selector: 'interface',
-          format: ['PascalCase'],
           leadingUnderscore: 'forbid',
           trailingUnderscore: 'forbid',
         },
