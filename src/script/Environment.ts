@@ -72,34 +72,34 @@ export default class Environment {
   private static readonly _BROWSER_INFO = Environment._computeBrowserInfoSafe();
 
   // Static getters for browser info
-  static get browser() {
+  static get browser(): BrowserInfo['browser'] {
     return this._BROWSER_INFO.browser;
   }
-  static get os() {
+  static get os(): BrowserInfo['os'] {
     return this._BROWSER_INFO.os;
   }
-  static get device() {
+  static get device(): BrowserInfo['device'] {
     return this._BROWSER_INFO.device;
   }
 
   // Static getters for build info
-  static get buildTarget() {
+  static get buildTarget(): BuildInfo['target'] {
     return this._BUILD_INFO.target;
   }
 
-  static get manifestVersion() {
+  static get manifestVersion(): BuildInfo['manifestVersion'] {
     return this._BUILD_INFO.manifestVersion;
   }
 
-  static get release() {
+  static get release(): BuildInfo['release'] {
     return this._BUILD_INFO.release;
   }
 
-  static get version() {
+  static get version(): BuildInfo['version'] {
     return this._BUILD_INFO.version;
   }
 
-  static get config() {
+  static get config(): BuildInfo['config'] {
     return this._BUILD_INFO.config;
   }
 
