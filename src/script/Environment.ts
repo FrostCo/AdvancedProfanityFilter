@@ -70,12 +70,6 @@ export default class Environment {
   static readonly OS_UNKNOWN = 'unknown' as const;
   static readonly OS_WINDOWS = 'windows' as const;
 
-  // Static environment values - computed once and cached
-  private static readonly _BUILD_INFO: Readonly<BuildInfo> = Object.freeze(
-    typeof __BUILD__ === 'undefined' ? BUILD_DEFAULTS : __BUILD__,
-  );
-  private static readonly _BROWSER_INFO = Environment._computeBrowserInfoSafe();
-
   // Static getters for browser info
   static get browser(): BrowserInfo['browser'] {
     return this._BROWSER_INFO.browser;
@@ -298,6 +292,12 @@ export default class Environment {
 
     return { browser, os, device };
   }
+
+  // Static environment values - computed once and cached
+  private static readonly _BUILD_INFO: Readonly<BuildInfo> = Object.freeze(
+    typeof __BUILD__ === 'undefined' ? BUILD_DEFAULTS : __BUILD__,
+  );
+  private static readonly _BROWSER_INFO = Environment._computeBrowserInfoSafe();
 
   constructor() {
     throw new Error('Environment is a static class and cannot be instantiated');
