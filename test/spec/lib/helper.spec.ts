@@ -6,6 +6,7 @@ import {
   formatNumber,
   getParent,
   getVersion,
+  hasOwn,
   hmsToSeconds,
   isVersionOlder,
   lastElement,
@@ -137,6 +138,91 @@ describe('Helper', function () {
     it('no parent', function () {
       expect(getParent(child, 5)).to.be.null;
       expect(getParent(child, 6)).to.be.null;
+    });
+  });
+
+  describe('hasOwn()', function () {
+    it('should return false for null object', function () {
+      expect(hasOwn(null, 'key')).to.be.false;
+    });
+
+    it('should return false for undefined object', function () {
+      expect(hasOwn(undefined, 'key')).to.be.false;
+    });
+
+    it('should return true for own properties', function () {
+      const obj = { a: 1, b: 2 };
+      expect(hasOwn(obj, 'a')).to.be.true;
+      expect(hasOwn(obj, 'b')).to.be.true;
+    });
+
+    it('should return false for inherited properties', function () {
+      const obj = { a: 1 };
+      expect(hasOwn(obj, 'toString')).to.be.false;
+      expect(hasOwn(obj, 'constructor')).to.be.false;
+      expect(hasOwn(obj, 'valueOf')).to.be.false;
+    });
+
+    it('should return false for non-existent properties', function () {
+      const obj = { a: 1 };
+      expect(hasOwn(obj, 'nonexistent')).to.be.false;
+      expect(hasOwn(obj, 'b')).to.be.false;
+    });
+
+    it('should work with string keys', function () {
+      const obj = { stringKey: 'value' };
+      expect(hasOwn(obj, 'stringKey')).to.be.true;
+    });
+
+    it('should work with numeric keys', function () {
+      const obj = {};
+      obj['0'] = 'zero';
+      obj['1'] = 'one';
+      expect(hasOwn(obj, '0')).to.be.true;
+      expect(hasOwn(obj, '1')).to.be.true;
+      expect(hasOwn(obj, '2')).to.be.false;
+    });
+
+    it('should work with symbol keys', function () {
+      const sym = Symbol('test');
+      const obj = { [sym]: 'value' };
+      expect(hasOwn(obj, sym)).to.be.true;
+      expect(hasOwn(obj, Symbol('other'))).to.be.false;
+    });
+
+    it('should handle properties with undefined values', function () {
+      const obj = { a: undefined };
+      expect(hasOwn(obj, 'a')).to.be.true;
+    });
+
+    it('should handle properties with null values', function () {
+      const obj = { a: null };
+      expect(hasOwn(obj, 'a')).to.be.true;
+    });
+
+    it('should handle empty object', function () {
+      const obj = {};
+      expect(hasOwn(obj, 'anyKey')).to.be.false;
+    });
+
+    it('should handle objects with prototype properties', function () {
+      function testConstructor() {
+        this.ownProp = 'value';
+      }
+      testConstructor.prototype.inheritedProp = 'inherited';
+
+      const obj = new testConstructor();
+      expect(hasOwn(obj, 'ownProp')).to.be.true;
+      expect(hasOwn(obj, 'inheritedProp')).to.be.false;
+    });
+
+    it('should handle objects created with Object.create', function () {
+      const proto = { inherited: 'value' };
+      const obj = Object.create(proto);
+      obj.own = 'ownValue';
+
+      expect(hasOwn(obj, 'own')).to.be.true;
+      expect(hasOwn(obj, 'inherited')).to.be.false;
     });
   });
 
