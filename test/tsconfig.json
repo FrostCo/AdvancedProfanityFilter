@@ -3,7 +3,7 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "../",
-    "lib": ["es2017", "dom", "dom.iterable"],
+    "lib": ["es2022", "dom", "dom.iterable"],
     "moduleResolution": "node",
     "noEmit": true,
     "paths": {

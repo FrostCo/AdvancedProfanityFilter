@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "baseUrl": "./",
-    "lib": ["es2017", "dom", "dom.iterable"],
+    "lib": ["es2022", "dom", "dom.iterable"],
     "moduleResolution": "node",
     "outDir": "./built",
     "paths": {
