@@ -224,6 +224,69 @@ describe('Helper', function () {
       expect(hasOwn(obj, 'own')).to.be.true;
       expect(hasOwn(obj, 'inherited')).to.be.false;
     });
+
+    it('should use fallback when Object.hasOwn is not available', function () {
+      // Save original Object.hasOwn
+      const originalHasOwn = Object.hasOwn;
+
+      try {
+        // Temporarily remove Object.hasOwn
+        delete (Object as any).hasOwn;
+
+        const obj = { test: 'value' };
+        expect(hasOwn(obj, 'test')).to.be.true;
+        expect(hasOwn(obj, 'nonexistent')).to.be.false;
+        expect(hasOwn(null, 'key')).to.be.false;
+        expect(hasOwn(undefined, 'key')).to.be.false;
+      } finally {
+        // Restore original Object.hasOwn
+        if (originalHasOwn) {
+          (Object as any).hasOwn = originalHasOwn;
+        }
+      }
+    });
+
+    it('should use fallback when Object.hasOwn is undefined', function () {
+      // Save original Object.hasOwn
+      const originalHasOwn = Object.hasOwn;
+
+      try {
+        // Set Object.hasOwn to undefined
+        (Object as any).hasOwn = undefined;
+
+        const obj = { test: 'value' };
+        expect(hasOwn(obj, 'test')).to.be.true;
+        expect(hasOwn(obj, 'nonexistent')).to.be.false;
+        expect(hasOwn(null, 'key')).to.be.false;
+        expect(hasOwn(undefined, 'key')).to.be.false;
+      } finally {
+        // Restore original Object.hasOwn
+        if (originalHasOwn) {
+          (Object as any).hasOwn = originalHasOwn;
+        }
+      }
+    });
+
+    it('should use fallback when Object.hasOwn is null', function () {
+      // Save original Object.hasOwn
+      const originalHasOwn = Object.hasOwn;
+
+      try {
+        // Set Object.hasOwn to null
+        (Object as any).hasOwn = null;
+
+        const obj = { test: 'value' };
+        expect(hasOwn(obj, 'test')).to.be.true;
+        expect(hasOwn(obj, 'nonexistent')).to.be.false;
+        expect(hasOwn(null, 'key')).to.be.false;
+        expect(hasOwn(undefined, 'key')).to.be.false;
+      } finally {
+        // Restore original Object.hasOwn
+        if (originalHasOwn) {
+          (Object as any).hasOwn = originalHasOwn;
+        }
+      }
+    });
   });
 
   describe('hmsToSeconds()', function () {
