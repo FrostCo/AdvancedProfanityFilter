@@ -132,6 +132,12 @@ export function getVersion(version: string): Version {
   };
 }
 
+// Object.hasOwn access with a built-in fallback for older environments
+export function hasOwn(obj: object | null | undefined, key: PropertyKey): boolean {
+  if (obj == null) return false;
+  return Object.hasOwn ? Object.hasOwn(obj, key) : Object.prototype.hasOwnProperty.call(obj, key);
+}
+
 // NOTE: This function requires the hh:mm:ss.ff format
 export function hmsToSeconds(timeStr: string, precision: number = 3): number {
   const [hh = '0', mm = '0', ss = '0'] = (timeStr || '0:0:0').split(':');
