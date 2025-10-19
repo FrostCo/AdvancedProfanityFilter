@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "lib": ["es2017", "dom", "dom.iterable"],
+    "lib": ["es2022", "dom", "dom.iterable"],
     "noEmit": false,
     "outDir": "../../../dist-lib",
     "skipLibCheck": true,
