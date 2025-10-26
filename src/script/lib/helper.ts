@@ -76,7 +76,7 @@ function getElementCore(
   selector: string,
   root: Document | HTMLElement | ShadowRoot = document,
   queryMethod = 'querySelector',
-): HTMLElement | NodeListOf<HTMLElement> {
+): HTMLElement | NodeListOf<HTMLElement> | ShadowRoot {
   let element;
   const domLayers = selector.split(Constants.SELECTOR_SHADOWROOT_DELIMITER);
   const shadowRootCount = domLayers.length - 1;
@@ -88,7 +88,9 @@ function getElementCore(
   while (domLayers.length) {
     if (root) {
       const currentSelector = domLayers.shift().trim();
-      if (domLayers.length == 0) {
+      if (currentSelector === '' && root && root instanceof ShadowRoot) {
+        return root;
+      } else if (domLayers.length === 0) {
         return root[queryMethod](currentSelector);
       } else {
         element = root.querySelector(currentSelector);
