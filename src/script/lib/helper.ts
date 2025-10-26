@@ -176,23 +176,21 @@ export function numberWithCommas(number: number | string): string {
     if (typeof number === 'string') number = parseInt(number);
     return number.toLocaleString();
   } else {
-    number = number.toString();
+    const numberStr = number.toString();
 
-    // Get numbers before `.` (if present)
-    const decimalIndex = number.indexOf('.');
-    let output = decimalIndex === -1 ? number : number.slice(0, decimalIndex);
-
-    // Insert commas every 3 digits from the right
-    for (let i = output.length - 3; i > 0; i -= 3) {
-      output = output.slice(0, i) + ',' + output.slice(i);
+    // Use regex to match the sign, integer part, and decimal part
+    const match = numberStr.match(/^(-?)(\d+)\.?(\d*)$/);
+    if (!match) {
+      return numberStr; // Return as-is if it doesn't match expected format
     }
 
-    // Append fractional part
-    if (decimalIndex !== -1) {
-      output += number.slice(decimalIndex);
-    }
+    const [, sign, integerPart, decimalPart] = match;
 
-    return output;
+    // Add commas to integer part
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+    // Combine sign, formatted integer, and decimal part
+    return sign + formattedInteger + (decimalPart ? '.' + decimalPart : '');
   }
 }
 
