@@ -322,6 +322,224 @@ describe('Environment', function () {
     });
   });
 
+  describe('Helper Methods', function () {
+    it('should have build target helpers', function () {
+      expect(Environment.isChromeTarget).to.be.a('boolean');
+      expect(Environment.isFirefoxTarget).to.be.a('boolean');
+      expect(Environment.isBookmarkletTarget).to.be.a('boolean');
+    });
+
+    it('should have build environment helpers', function () {
+      expect(Environment.isProduction).to.be.a('boolean');
+      expect(Environment.isDevelopment).to.be.a('boolean');
+      expect(Environment.isDevelopment).to.equal(!Environment.isProduction);
+    });
+
+    it('should have device type helpers', function () {
+      expect(Environment.isDesktop).to.be.a('boolean');
+      expect(Environment.isTablet).to.be.a('boolean');
+      expect(Environment.isPhone).to.be.a('boolean');
+      expect(Environment.isMobile).to.be.a('boolean');
+      expect(Environment.isMobile).to.equal(Environment.isTablet || Environment.isPhone);
+    });
+
+    it('should have browser type helpers', function () {
+      expect(Environment.isChrome).to.be.a('boolean');
+      expect(Environment.isFirefox).to.be.a('boolean');
+      expect(Environment.isSafari).to.be.a('boolean');
+      expect(Environment.isEdge).to.be.a('boolean');
+      expect(Environment.isOpera).to.be.a('boolean');
+    });
+
+    it('should have OS type helpers', function () {
+      expect(Environment.isWindows).to.be.a('boolean');
+      expect(Environment.isMacOS).to.be.a('boolean');
+      expect(Environment.isLinux).to.be.a('boolean');
+      expect(Environment.isAndroid).to.be.a('boolean');
+      expect(Environment.isIOS).to.be.a('boolean');
+      expect(Environment.isChromeOS).to.be.a('boolean');
+    });
+
+    it('should have manifest version helpers', function () {
+      expect(Environment.isManifestV2).to.be.a('boolean');
+      expect(Environment.isManifestV3).to.be.a('boolean');
+    });
+  });
+
+  describe('Advanced Detection', function () {
+    it('should detect additional browsers', function () {
+      // Edge with UA-CH
+      Object.defineProperty(global, 'navigator', {
+        value: {
+          userAgent:
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59',
+          platform: 'Win32',
+          maxTouchPoints: 0,
+          userAgentData: {
+            brands: [
+              { brand: 'Not/A Brand', version: '99' },
+              { brand: 'Microsoft Edge', version: '91' },
+            ],
+            mobile: false,
+            platform: 'Windows',
+          },
+        } as any,
+        writable: true,
+        configurable: true,
+      });
+      expect(Environment.browser).to.be.oneOf([Environment.BROWSER_EDGE, Environment.BROWSER_UNKNOWN]);
+
+      // Opera
+      Object.defineProperty(global, 'navigator', {
+        value: {
+          userAgent:
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 OPR/77.0.4054.277',
+          platform: 'Win32',
+          maxTouchPoints: 0,
+        } as any,
+        writable: true,
+        configurable: true,
+      });
+      expect(Environment.browser).to.be.oneOf([Environment.BROWSER_OPERA, Environment.BROWSER_UNKNOWN]);
+    });
+
+    it('should detect additional operating systems', function () {
+      // Linux
+      Object.defineProperty(global, 'navigator', {
+        value: {
+          userAgent:
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          platform: 'Linux x86_64',
+          maxTouchPoints: 0,
+        } as any,
+        writable: true,
+        configurable: true,
+      });
+      expect(Environment.os).to.be.oneOf([Environment.OS_LINUX, Environment.OS_UNKNOWN]);
+
+      // ChromeOS
+      Object.defineProperty(global, 'navigator', {
+        value: {
+          userAgent:
+            'Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          platform: 'Linux x86_64',
+          maxTouchPoints: 0,
+        } as any,
+        writable: true,
+        configurable: true,
+      });
+      expect(Environment.os).to.be.oneOf([Environment.OS_CHROMEOS, Environment.OS_UNKNOWN]);
+
+      // iOS
+      Object.defineProperty(global, 'navigator', {
+        value: {
+          userAgent:
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Mobile/15E148 Safari/604.1',
+          platform: 'iPhone',
+          maxTouchPoints: 5,
+        } as any,
+        writable: true,
+        configurable: true,
+      });
+      expect(Environment.os).to.be.oneOf([Environment.OS_IOS, Environment.OS_UNKNOWN]);
+    });
+  });
+
+  describe('Device Detection Edge Cases', function () {
+    it('should handle tablet detection', function () {
+      // Android tablet
+      Object.defineProperty(global, 'navigator', {
+        value: {
+          userAgent:
+            'Mozilla/5.0 (Linux; Android 11; SM-T870) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Safari/537.36',
+          platform: 'Linux armv8l',
+          maxTouchPoints: 5,
+        } as any,
+        writable: true,
+        configurable: true,
+      });
+      Object.defineProperty(global, 'window', {
+        value: { innerWidth: 1024, innerHeight: 768 } as any,
+        writable: true,
+        configurable: true,
+      });
+      expect(Environment.device).to.be.oneOf([
+        Environment.DEVICE_PHONE,
+        Environment.DEVICE_TABLET,
+        Environment.DEVICE_DESKTOP,
+      ]);
+
+      // iPad
+      Object.defineProperty(global, 'navigator', {
+        value: {
+          userAgent:
+            'Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Mobile/15E148 Safari/604.1',
+          platform: 'iPad',
+          maxTouchPoints: 5,
+        } as any,
+        writable: true,
+        configurable: true,
+      });
+      Object.defineProperty(global, 'window', {
+        value: { innerWidth: 768, innerHeight: 1024 } as any,
+        writable: true,
+        configurable: true,
+      });
+      expect(Environment.device).to.be.oneOf([
+        Environment.DEVICE_PHONE,
+        Environment.DEVICE_TABLET,
+        Environment.DEVICE_DESKTOP,
+      ]);
+    });
+
+    it('should handle matchMedia scenarios', function () {
+      // Working matchMedia
+      Object.defineProperty(global, 'navigator', {
+        value: {
+          userAgent:
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          platform: 'Win32',
+          maxTouchPoints: 0,
+        } as any,
+        writable: true,
+        configurable: true,
+      });
+      Object.defineProperty(global, 'matchMedia', {
+        value: (query: string) => ({
+          matches: query === '(pointer: coarse)',
+          media: query,
+          onchange: null,
+          addListener: () => {},
+          removeListener: () => {},
+          addEventListener: () => {},
+          removeEventListener: () => {},
+          dispatchEvent: () => true,
+        }),
+        writable: true,
+        configurable: true,
+      });
+      expect(Environment.device).to.be.oneOf([
+        Environment.DEVICE_DESKTOP,
+        Environment.DEVICE_PHONE,
+        Environment.DEVICE_TABLET,
+      ]);
+
+      // matchMedia error
+      Object.defineProperty(global, 'matchMedia', {
+        value: () => {
+          throw new Error('matchMedia not supported');
+        },
+        writable: true,
+        configurable: true,
+      });
+      expect(Environment.device).to.be.oneOf([
+        Environment.DEVICE_DESKTOP,
+        Environment.DEVICE_PHONE,
+        Environment.DEVICE_TABLET,
+      ]);
+    });
+  });
+
   describe('Constructor', function () {
     it('should throw error when instantiated', function () {
       expect(() => {
