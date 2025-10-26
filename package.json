@@ -49,7 +49,7 @@
     "format:fix": "prettier --write .",
     "test": "mocha --paths",
     "test:addon": "node bin/cli/prebuild.js --environment=test --target=firefox-mv3 && webpack --config bin/webpack.prod.js && npx addons-linter ./dist",
-    "test:coverage": "nyc --reporter=lcov --reporter=html --reporter=text npm run test",
+    "test:coverage": "c8 --reporter=lcov --reporter=html --reporter=text --reports-dir=test/coverage --exclude='src/script/vendor/**' --exclude='test/**' npm run test",
     "test:debug": "node --inspect-brk node_modules/mocha/bin/_mocha --paths --reporter tap",
     "test:full": "npm run lint && npm run format && npm run type-check && npm run test:addon && npm run test:coverage",
     "type-check": "tsc --noEmit",
