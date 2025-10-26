@@ -79,9 +79,10 @@ function getElementCore(
 ): HTMLElement | NodeListOf<HTMLElement> {
   let element;
   const domLayers = selector.split(Constants.SELECTOR_SHADOWROOT_DELIMITER);
+  const shadowRootCount = domLayers.length - 1;
 
   // No shadowRoot in selector: return native querySelector[All]
-  if (domLayers.length == 1) return root[queryMethod](selector);
+  if (shadowRootCount === 0) return root[queryMethod](selector);
 
   // shadowRoot in selector: return querySelector[All] through shadowRoot(s)
   while (domLayers.length) {
