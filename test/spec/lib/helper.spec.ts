@@ -385,12 +385,43 @@ describe('Helper', function () {
       expect(numberWithCommas(123)).to.eql('123');
       expect(numberWithCommas(1234)).to.eql('1,234');
       expect(numberWithCommas(1234567890)).to.eql('1,234,567,890');
+      expect(numberWithCommas(0)).to.eql('0');
+      expect(numberWithCommas(-1234)).to.eql('-1,234');
     });
 
     it('Works with number string', function () {
       expect(numberWithCommas('123')).to.eql('123');
       expect(numberWithCommas('1234')).to.eql('1,234');
       expect(numberWithCommas('1234567890')).to.eql('1,234,567,890');
+      expect(numberWithCommas('0')).to.eql('0');
+      expect(numberWithCommas('-1234')).to.eql('-1,234');
+    });
+
+    describe('Fallback logic when Intl is not available', function () {
+      let originalIntl: any;
+
+      beforeEach(function () {
+        // Save original Intl
+        originalIntl = (global as any).Intl;
+      });
+
+      afterEach(function () {
+        // Restore original Intl
+        (global as any).Intl = originalIntl;
+      });
+
+      it('should use fallback logic when Intl is not available', function () {
+        // Remove Intl
+        delete (global as any).Intl;
+
+        expect(numberWithCommas(123)).to.eql('123');
+        expect(numberWithCommas(1234)).to.eql('1,234');
+        expect(numberWithCommas(1234567890)).to.eql('1,234,567,890');
+        expect(numberWithCommas(0)).to.eql('0');
+        expect(numberWithCommas(-1234)).to.eql('-1,234');
+        expect(numberWithCommas(1234.56)).to.eql('1,234.56');
+        expect(numberWithCommas(-1234.56)).to.eql('-1,234.56');
+      });
     });
   });
 
