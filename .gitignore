@@ -20,7 +20,6 @@ bin/git-filters/*.js
 
 # Testing
 /test/built/*
-/test/.nyc_output/*
 /test/coverage/*
 
 # Built bookmarklet
