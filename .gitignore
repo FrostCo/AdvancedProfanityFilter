@@ -19,7 +19,6 @@ bin/git-filters/*.js
 /extension*/*
 
 # Testing
-/test/built/*
 /test/coverage/*
 
 # Built bookmarklet
