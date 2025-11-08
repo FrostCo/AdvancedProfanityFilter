@@ -2,12 +2,13 @@
   "name": "advancedprofanityfilter",
   "version": "4.3.5",
   "description": "A browser extension to filter profanity from webpages.",
-  "node": "^12.20.0 || ^14.13.1 || >=16.0.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/FrostCo/AdvancedProfanityFilter.git"
   },
-  "engine": ">=22.14.0 <23",
+  "engines": {
+    "node": ">=24 <25"
+  },
   "type": "module",
   "keywords": [
     "Profanity",
