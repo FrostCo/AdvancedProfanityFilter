@@ -1,5 +1,5 @@
 import Config from '@APF/lib/Config';
-import { prettyPrintArray, removeFromArray, sortObjectKeys, stringArray } from '@APF/lib/helper';
+import { deepCloneJson, prettyPrintArray, removeFromArray, sortObjectKeys, stringArray } from '@APF/lib/helper';
 import Logger from '@APF/lib/Logger';
 import Translation from '@APF/Translation';
 import Constants from '@APF/lib/Constants';
@@ -332,6 +332,9 @@ export default class WebConfig extends Config {
       throw new Error('Cannot be called directly, call load() instead.');
     }
 
+    // Remove _env from loaded/imported config
+    delete config._env;
+
     // Apply the Config defaults
     super(config);
 
@@ -378,8 +381,15 @@ export default class WebConfig extends Config {
   }
 
   // Order and remove `_` prefixed values
-  ordered() {
-    return sortObjectKeys(this);
+  ordered(includeEnv: boolean = true) {
+    const sorted = sortObjectKeys(this);
+    if (includeEnv) {
+      sorted['_env'] = deepCloneJson(this._env.info);
+      delete sorted['_env'].config;
+      sorted['_env']['exportedAt'] = new Date().toISOString();
+      sorted['_env'] = sortObjectKeys(sorted['_env']);
+    }
+    return sorted;
   }
 
   async prepareLocalDataForSave(localData: Partial<WebConfig>) {}
