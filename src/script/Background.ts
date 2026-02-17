@@ -68,12 +68,12 @@ export default class Background {
   //#endregion
 
   // #region Constants
-  static readonly COLOR_BLUE = [66, 133, 244, 255] as chrome.action.ColorArray;
-  static readonly COLOR_BLUE_VIOLET = [138, 43, 226, 255] as chrome.action.ColorArray;
-  static readonly COLOR_FOREST_GREEN = [34, 139, 34, 255] as chrome.action.ColorArray;
-  static readonly COLOR_GREY = [85, 85, 85, 255] as chrome.action.ColorArray;
-  static readonly COLOR_ORANGE = [236, 147, 41, 255] as chrome.action.ColorArray;
-  static readonly COLOR_RED = [211, 45, 39, 255] as chrome.action.ColorArray;
+  static readonly COLOR_BLUE = [66, 133, 244, 255] as chrome.extensionTypes.ColorArray;
+  static readonly COLOR_BLUE_VIOLET = [138, 43, 226, 255] as chrome.extensionTypes.ColorArray;
+  static readonly COLOR_FOREST_GREEN = [34, 139, 34, 255] as chrome.extensionTypes.ColorArray;
+  static readonly COLOR_GREY = [85, 85, 85, 255] as chrome.extensionTypes.ColorArray;
+  static readonly COLOR_ORANGE = [236, 147, 41, 255] as chrome.extensionTypes.ColorArray;
+  static readonly COLOR_RED = [211, 45, 39, 255] as chrome.extensionTypes.ColorArray;
   static readonly BADGE_COLORS = [
     this.COLOR_GREY,
     this.COLOR_BLUE,
@@ -81,7 +81,7 @@ export default class Background {
     this.COLOR_RED,
     this.COLOR_BLUE_VIOLET,
     this.COLOR_FOREST_GREEN,
-  ] as chrome.action.ColorArray[];
+  ] as chrome.extensionTypes.ColorArray[];
   static readonly log = new Logger('Background', this.Constants.LOGGING_LEVELS.INFO);
   // #endregion
 
