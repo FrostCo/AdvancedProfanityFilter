@@ -94,6 +94,7 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.0",
+    "web-ext": "^10.0.0",
     "webpack": "^5.105.2",
     "webpack-cli": "^6.0.1",
     "webpack-merge": "^6.0.1"
