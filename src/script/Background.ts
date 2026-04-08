@@ -278,8 +278,8 @@ export default class Background {
     // Display update notification
     try {
       if (chrome.notifications != null) {
-        const showNotification = await this.Config.getSyncStorage({ showUpdateNotification: true });
-        if (showNotification) {
+        const { showUpdateNotification } = await this.Config.load('showUpdateNotification');
+        if (showUpdateNotification) {
           const translation = new this.Translation(['common', 'background']);
           chrome.notifications.create('extensionUpdate', {
             type: 'basic',
