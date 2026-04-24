@@ -13,6 +13,17 @@ export interface Migration {
 export default class DataMigration {
   cfg: WebConfig;
 
+  /**
+   * Which high-level runner is executing migration methods: `'import'` for {@link DataMigration.runImportMigrations}
+   * or `'versionUpgrade'` for {@link DataMigration.byVersion}. Otherwise `null`.
+   */
+  private _migrationRunner: 'import' | 'versionUpgrade' | null = null;
+
+  /** `true` only while `runImportMigrations` is running (parsed JSON / in-memory config), not during extension upgrade. */
+  get isConfigImportMigration(): boolean {
+    return this._migrationRunner === 'import';
+  }
+
   //#region Class reference helpers
   // Can be overridden in children classes
   static get Config() {
@@ -101,12 +112,18 @@ export default class DataMigration {
   async byVersion(oldVersion: string) {
     const version = getVersion(oldVersion);
     let migrated = false;
-    for (const migration of (this.constructor as typeof DataMigration).migrations) {
-      if (isVersionOlder(version, getVersion(migration.version))) {
-        migrated = true;
-        if (migration.async) await this[migration.name]();
-        else this[migration.name]();
+    const prevRunner = this._migrationRunner;
+    this._migrationRunner = 'versionUpgrade';
+    try {
+      for (const migration of (this.constructor as typeof DataMigration).migrations) {
+        if (isVersionOlder(version, getVersion(migration.version))) {
+          migrated = true;
+          if (migration.async) await this[migration.name]();
+          else this[migration.name]();
+        }
       }
+    } finally {
+      this._migrationRunner = prevRunner;
     }
 
     return migrated;
@@ -200,13 +217,18 @@ export default class DataMigration {
 
   async runImportMigrations() {
     let migrated = false;
-
-    for (const migration of (this.constructor as typeof DataMigration).migrations) {
-      if (migration.runOnImport) {
-        migrated = true;
-        if (migration.async) await this[migration.name]();
-        else this[migration.name]();
+    const prevRunner = this._migrationRunner;
+    this._migrationRunner = 'import';
+    try {
+      for (const migration of (this.constructor as typeof DataMigration).migrations) {
+        if (migration.runOnImport) {
+          migrated = true;
+          if (migration.async) await this[migration.name]();
+          else this[migration.name]();
+        }
       }
+    } finally {
+      this._migrationRunner = prevRunner;
     }
 
     return migrated;
