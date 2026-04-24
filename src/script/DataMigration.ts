@@ -1,5 +1,5 @@
 import Constants from '@APF/lib/Constants';
-import { booleanToNumber, getVersion, isVersionOlder } from '@APF/lib/helper';
+import { booleanToNumber, deepCloneJson, getVersion, isVersionOlder } from '@APF/lib/helper';
 import WebConfig from '@APF/WebConfig';
 import type { WordOptions } from '@APF/lib/Word';
 
@@ -82,6 +82,116 @@ export default class DataMigration {
 
   constructor(config) {
     this.cfg = config;
+  }
+
+  /**
+   * Merges host maps for {@link DataMigration.loadFormerLargeKeyStorage}: later `part` wins per host and per
+   * field within a host.
+   */
+  static mergeFormerLargeKeyParts(
+    acc: Record<string, unknown> | null,
+    part: Record<string, unknown> | null,
+  ): Record<string, unknown> | null {
+    if (part == null || !Object.keys(part).length) return acc;
+    if (acc == null || !Object.keys(acc).length) return deepCloneJson(part) as Record<string, unknown>;
+    const out = deepCloneJson(acc) as Record<string, unknown>;
+    for (const h of Object.keys(part)) {
+      const O = part[h];
+      const A = out[h];
+      if (A && typeof A === 'object' && !Array.isArray(A) && O && typeof O === 'object' && !Array.isArray(O)) {
+        out[h] = { ...(A as object), ...(O as object) };
+      } else {
+        out[h] = deepCloneJson(O);
+      }
+    }
+    return out;
+  }
+
+  /**
+   * Loads a retired large-key blob when it is no longer in {@link WebConfig._largeKeys}. Merges **non-split**
+   * (`formerLogicalKey` as a single object in sync or local) and **split** (`_${key}N` containers) reads;
+   * later sources overlay earlier (bare local → bare sync → local splits → sync splits). Returns `null` if
+   * nothing was stored. Pair with {@link DataMigration.removeFormerLargeKeyStorage}.
+   */
+  static async loadFormerLargeKeyStorage(
+    cfg: WebConfig,
+    formerLogicalKey: string,
+  ): Promise<Record<string, unknown> | null> {
+    const C = this.Config;
+    if (!C.chromeStorageAvailable() || !formerLogicalKey) return null;
+
+    const parseSplitContainers = (raw: Record<string, unknown>): Record<string, unknown> | null => {
+      const temp = { ...raw };
+      const combinedKeys = C.combineData(temp, formerLogicalKey);
+      if (!combinedKeys?.length) return null;
+      const obj = temp[formerLogicalKey];
+      if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return null;
+      if (!Object.keys(obj).length) return null;
+      return deepCloneJson(obj) as Record<string, unknown>;
+    };
+
+    const readBareLocal = async (): Promise<Record<string, unknown> | null> => {
+      const localData = (await C.getLocalStorage([formerLogicalKey])) as Record<string, unknown>;
+      const obj = localData[formerLogicalKey];
+      if (obj == null || typeof obj !== 'object' || Array.isArray(obj)) return null;
+      if (!Object.keys(obj).length) return null;
+      return deepCloneJson(obj) as Record<string, unknown>;
+    };
+
+    const readBareSync = async (): Promise<Record<string, unknown> | null> => {
+      const syncData = (await C.getSyncStorage([formerLogicalKey])) as Record<string, unknown>;
+      const obj = syncData[formerLogicalKey];
+      if (obj == null || typeof obj !== 'object' || Array.isArray(obj)) return null;
+      if (!Object.keys(obj).length) return null;
+      return deepCloneJson(obj) as Record<string, unknown>;
+    };
+
+    const readSyncSplits = async (): Promise<Record<string, unknown> | null> => {
+      const raw = (await C.getSyncStorage(C.splitKeyNames(formerLogicalKey))) as Record<string, unknown>;
+      return parseSplitContainers(raw);
+    };
+
+    const readLocalSplits = async (): Promise<Record<string, unknown> | null> => {
+      const raw = (await C.getLocalStorage(C.splitKeyNames(formerLogicalKey))) as Record<string, unknown>;
+      return parseSplitContainers(raw);
+    };
+
+    const [bareLocal, bareSync, localSplits, syncSplits] = await Promise.all([
+      readBareLocal(),
+      readBareSync(),
+      readLocalSplits(),
+      readSyncSplits(),
+    ]);
+
+    let merged: Record<string, unknown> | null = null;
+    merged = this.mergeFormerLargeKeyParts(merged, bareLocal);
+    merged = this.mergeFormerLargeKeyParts(merged, bareSync);
+    merged = this.mergeFormerLargeKeyParts(merged, localSplits);
+    merged = this.mergeFormerLargeKeyParts(merged, syncSplits);
+
+    return merged;
+  }
+
+  /** @see DataMigration.loadFormerLargeKeyStorage */
+  loadFormerLargeKeyStorage(formerLogicalKey: string): Promise<Record<string, unknown> | null> {
+    return (this.constructor as typeof DataMigration).loadFormerLargeKeyStorage(this.cfg, formerLogicalKey);
+  }
+
+  /**
+   * Removes the bare logical key (non-split) and all split containers (`_${key}N`) from sync **and** local
+   * storage. Use when the key was removed from {@link WebConfig._largeKeys} so {@link WebConfig.remove} would
+   * not expand split names.
+   */
+  static async removeFormerLargeKeyStorage(formerLogicalKey: string): Promise<void> {
+    const C = this.Config;
+    if (!C.chromeStorageAvailable() || !formerLogicalKey) return;
+    const keysToRemove = [formerLogicalKey, ...C.splitKeyNames(formerLogicalKey)];
+    await Promise.all([C.removeSyncStorage(keysToRemove), C.removeLocalStorage(keysToRemove)]);
+  }
+
+  /** @see DataMigration.removeFormerLargeKeyStorage */
+  removeFormerLargeKeyStorage(formerLogicalKey: string): Promise<void> {
+    return (this.constructor as typeof DataMigration).removeFormerLargeKeyStorage(formerLogicalKey);
   }
 
   // TODO: Only tested with arrays
