@@ -6,12 +6,24 @@ import Constants from '@APF/lib/Constants';
 import Environment from '@APF/Environment';
 import type { DomainCfg } from '@APF/Domain';
 
+export type StorageGetKeys = string | string[] | Record<string, unknown> | null;
+
+export interface StorageRecoveryResult {
+  recoveredAt: string;
+  localError: string | null;
+  syncError: string | null;
+  local: Record<string, unknown>;
+  sync: Record<string, unknown>;
+  config: Record<string, unknown>;
+}
+
 const logger = new Logger('WebConfig');
 
 export default class WebConfig extends Config {
   _defaultsLoaded: string[];
   _env: typeof Environment;
   _lastSplitKeys: { [key: string]: number };
+  _saveDisabled: boolean;
   collectStats: boolean;
   contextMenu: boolean;
   darkMode: boolean;
@@ -107,7 +119,7 @@ export default class WebConfig extends Config {
     return containerKeys.sort();
   }
 
-  static getLocalStorage(keys: string | string[] | Record<string, unknown>) {
+  static getLocalStorage(keys: StorageGetKeys) {
     if (typeof keys === 'string') {
       keys = [keys];
     }
@@ -137,7 +149,7 @@ export default class WebConfig extends Config {
     return this.getMaxSplitKeyFromArray(keys);
   }
 
-  static getSyncStorage(keys: string | string[] | Record<string, unknown>) {
+  static getSyncStorage(keys: StorageGetKeys) {
     if (typeof keys === 'string') {
       keys = [keys];
     }
@@ -250,6 +262,101 @@ export default class WebConfig extends Config {
         }
       }
     });
+  }
+
+  // Unlike combineData(), gaps in the split containers are tolerated (_words0 missing, _words1 present),
+  // because salvaged storage isn't guaranteed to be complete
+  static mergeDataContainers(data: Record<string, unknown>, key: string) {
+    const containerKeys = this.getDataContainerKeys(data, key);
+    if (!containerKeys.length) return;
+
+    const combined = (data[key] as Record<string, unknown>) || {};
+    containerKeys.forEach((containerKey) => {
+      Object.assign(combined, data[containerKey]);
+      delete data[containerKey];
+    });
+    data[key] = combined;
+  }
+
+  static assembleRecoveredConfig(
+    localData: Record<string, unknown> = {},
+    syncData: Record<string, unknown> = {},
+  ): Record<string, unknown> {
+    const local = deepCloneJson(localData || {});
+    const sync = deepCloneJson(syncData || {});
+
+    this._largeKeys.forEach((key) => {
+      this.mergeDataContainers(sync, key);
+      this.mergeDataContainers(local, key);
+    });
+
+    const syncLargeKeys = local.syncLargeKeys === false ? false : this._defaults.syncLargeKeys;
+    const merged: Record<string, unknown> = { ...sync };
+
+    if (!syncLargeKeys) {
+      this._largeKeys.forEach((key) => {
+        if (local[key] !== undefined) merged[key] = local[key];
+      });
+    }
+
+    this._localOnlyKeys.forEach((key) => {
+      if (local[key] !== undefined) merged[key] = local[key];
+    });
+
+    // Runtime-only keys (background, stats) aren't persistable, so they're dropped here
+    const config: Record<string, unknown> = {};
+    this._persistableKeys.forEach((key) => {
+      if (merged[key] !== undefined) config[key] = merged[key];
+    });
+    return config;
+  }
+
+  static async recoverStorage(): Promise<StorageRecoveryResult> {
+    const localResult = await this.getStorageAreaSafely('local');
+    const syncResult = await this.getStorageAreaSafely('sync');
+
+    return {
+      recoveredAt: new Date().toISOString(),
+      localError: localResult.error,
+      syncError: syncResult.error,
+      local: localResult.data,
+      sync: syncResult.data,
+      config: this.assembleRecoveredConfig(localResult.data, syncResult.data),
+    };
+  }
+
+  static async getStorageAreaSafely(
+    area: 'local' | 'sync',
+  ): Promise<{ data: Record<string, unknown>; error: string | null }> {
+    const getter = area === 'local' ? this.getLocalStorage.bind(this) : this.getSyncStorage.bind(this);
+
+    try {
+      // Full-area read is only used for salvage after a keyed load has already failed.
+      return { data: (await getter(null)) as Record<string, unknown>, error: null };
+    } catch (err) {
+      const error = err?.message || String(err);
+      const data: Record<string, unknown> = {};
+      const keyGroups: string[][] = [];
+
+      if (area === 'local') {
+        keyGroups.push([...this._localOnlyKeys, ...this._largeKeys]);
+      } else {
+        keyGroups.push(
+          this._persistableKeys.filter((key) => !this._localOnlyKeys.includes(key) && !this._largeKeys.includes(key)),
+        );
+        this._largeKeys.forEach((largeKey) => keyGroups.push(this.splitKeyNames(largeKey)));
+      }
+
+      for (const keys of keyGroups) {
+        try {
+          Object.assign(data, await getter(keys));
+        } catch {
+          // Skip groups that still fail
+        }
+      }
+
+      return { data, error };
+    }
   }
 
   static removeLocalStorage(keys: string | string[]) {
@@ -458,6 +565,9 @@ export default class WebConfig extends Config {
   }
 
   async save(keys: string | string[] = []) {
+    // Values may be stale or incomplete after a failed load, so persisting them would lose readable settings
+    if (this._saveDisabled) throw new Error('Saving is disabled because settings failed to load.');
+
     keys = this.keysToSave(keys);
     const syncData = {};
     const localData = {};
