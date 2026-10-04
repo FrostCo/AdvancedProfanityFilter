@@ -35,7 +35,9 @@ export interface ConfirmModalSettings {
 const logger = new Logger('OptionPage');
 
 export default class OptionPage {
+  _cfgLoadError: Error | undefined;
   _confirmEventListeners: { (): void }[];
+  _loadErrorBusy: boolean;
   auth: OptionAuth;
   bookmarklet: Bookmarklet;
   cfg: WebConfig;
@@ -89,6 +91,7 @@ export default class OptionPage {
     this.translation = new this.Class.Translation(['common', 'options']);
     this.setupEventListeners();
     this._confirmEventListeners = [];
+    this._loadErrorBusy = false;
     this.darkModeButton = document.querySelector('div.themes > div.moon');
     this.lightModeButton = document.querySelector('div.themes > div.sun');
     this.themeElements = this.Class.themeElementSelectors
@@ -522,6 +525,8 @@ export default class OptionPage {
     ).toUpperCase();
     // Status
     document.getElementById('statusModalOK').textContent = this.t('options:statusModal.buttons.ok').toUpperCase();
+    // Load error
+    this.applyLoadErrorModalTranslation();
   }
 
   t(key: string, options = {}): string {
@@ -1142,7 +1147,7 @@ export default class OptionPage {
 
   async importConfigText(cfg: string) {
     try {
-      const importedCfg = new this.Class.Config(JSON.parse(cfg));
+      const importedCfg = new this.Class.Config(this.importedConfigData(JSON.parse(cfg)));
       const migration = new this.Class.DataMigration(importedCfg);
       await migration.runImportMigrations();
       const resetSuccess = await this.restoreDefaults(null, true);
@@ -1163,6 +1168,20 @@ export default class OptionPage {
     } catch (err) {
       this.showErrorModal([this.t('options:configsPage.messages.importProcessingFailed'), `Error: ${err.message}`]);
     }
+  }
+
+  // Storage recovery backups wrap the settings in { _storageRecovery, config, local, sync }
+  importedConfigData(data: Record<string, unknown>): Record<string, unknown> {
+    if (!data || !data._storageRecovery) return data;
+
+    const recovered = data.config as Record<string, unknown>;
+    // Importing restores defaults first, so an empty recovery would clear settings instead of restoring them
+    if (!recovered || !Object.keys(recovered).length) {
+      throw new Error(this.t('options:configsPage.messages.importRecoveryEmpty'));
+    }
+
+    this.log.info('Importing the config from a storage recovery backup.', data._storageRecovery);
+    return recovered;
   }
 
   importStats() {
@@ -1188,7 +1207,17 @@ export default class OptionPage {
   }
 
   async init(refreshTheme = false) {
-    await this.initializeCfg();
+    try {
+      await this.initializeCfg();
+    } catch (err) {
+      this.handleLoadError(err);
+      return;
+    }
+
+    if (this._cfgLoadError) {
+      this.closeModal('loadErrorModal');
+      this._cfgLoadError = undefined;
+    }
     await this.translation.changeLanguage(this.cfg.language);
     this.applyTranslation();
     this.log.setLevel(this.cfg.loggingLevel);
@@ -1219,6 +1248,96 @@ export default class OptionPage {
 
   async initializeCfg() {
     this.cfg = await this.Class.Config.load();
+  }
+
+  applyLoadErrorModalTranslation() {
+    document.getElementById('loadErrorModalTitle').textContent = this.t('options:loadErrorModal.headers.title');
+    document.getElementById('loadErrorModalMessage').textContent = this.t('options:loadErrorModal.messages.body');
+    document.getElementById('loadErrorModalRestart').textContent = this.t('options:loadErrorModal.messages.restart');
+    document.getElementById('loadErrorModalBackup').textContent = this.t(
+      'options:loadErrorModal.buttons.backup',
+    ).toUpperCase();
+    document.getElementById('loadErrorModalRetry').textContent = this.t(
+      'options:loadErrorModal.buttons.retry',
+    ).toUpperCase();
+  }
+
+  get configLoadFailed(): boolean {
+    return this._cfgLoadError != null || this.cfg == null;
+  }
+
+  // A failed load leaves cfg missing or stale and the page's inputs unpopulated, so block every
+  // write path until a load succeeds instead of letting a partial save overwrite readable settings
+  disableSaving() {
+    if (this.cfg) this.cfg._saveDisabled = true;
+    this.hide(document.getElementById('main'));
+  }
+
+  handleLoadError(error: Error) {
+    this._cfgLoadError = error;
+    this.log.error(this.t('options:loadErrorModal.headers.title'), error);
+    this.disableSaving();
+    this.applyLoadErrorModalTranslation();
+
+    if (this.prefersDarkScheme) {
+      this.applyDarkTheme();
+    } else {
+      this.applyLightTheme();
+    }
+
+    const errorEl = document.getElementById('loadErrorModalError');
+    errorEl.textContent = error?.message ? `Error: ${error.message}` : '';
+    document.getElementById('loadErrorModalStatus').textContent = '';
+    this.openModal('loadErrorModal');
+  }
+
+  async retryLoad() {
+    if (this._loadErrorBusy) return;
+
+    this._loadErrorBusy = true;
+    try {
+      await this.init();
+    } finally {
+      this._loadErrorBusy = false;
+    }
+  }
+
+  async backupFromLoadError() {
+    if (this._loadErrorBusy) return;
+
+    this._loadErrorBusy = true;
+    const statusEl = document.getElementById('loadErrorModalStatus');
+    statusEl.textContent = '';
+
+    try {
+      const recovery = await this.Class.Config.recoverStorage();
+      const payload = {
+        _storageRecovery: {
+          recoveredAt: recovery.recoveredAt,
+          loadError: this._cfgLoadError?.message ?? null,
+          localError: recovery.localError,
+          syncError: recovery.syncError,
+        },
+        config: recovery.config,
+        local: recovery.local,
+        sync: recovery.sync,
+      };
+      this.backupConfig(payload, 'apf-storage-recovery');
+
+      const recoveredKeys = Object.keys(recovery.config).length;
+      if (!recovery.localError && !recovery.syncError) {
+        statusEl.textContent = this.t('options:loadErrorModal.messages.backupSuccess');
+      } else if (recoveredKeys) {
+        statusEl.textContent = this.t('options:loadErrorModal.messages.backupPartial');
+      } else {
+        statusEl.textContent = this.t('options:loadErrorModal.messages.backupFailed');
+      }
+    } catch (err) {
+      this.log.error(this.t('options:loadErrorModal.messages.backupFailed'), err);
+      statusEl.textContent = `${this.t('options:loadErrorModal.messages.backupFailed')} Error: ${err.message}`;
+    } finally {
+      this._loadErrorBusy = false;
+    }
   }
 
   isStorageError(error: Error): boolean {
@@ -1950,6 +2069,12 @@ export default class OptionPage {
   }
 
   async saveOptions() {
+    // The load error modal is already explaining why the page is unusable
+    if (this.configLoadFailed) {
+      this.log.warn(this.t('options:statusModal.messages.saveOptionsFailed'), this._cfgLoadError);
+      return false;
+    }
+
     this.updateOptionsFromPage();
 
     try {
@@ -2231,6 +2356,12 @@ export default class OptionPage {
     });
     document.getElementById('statusModalOK').addEventListener('click', (evt) => {
       this.closeModal('statusModal');
+    });
+    document.getElementById('loadErrorModalRetry').addEventListener('click', (evt) => {
+      this.retryLoad();
+    });
+    document.getElementById('loadErrorModalBackup').addEventListener('click', (evt) => {
+      this.backupFromLoadError();
     });
     document.getElementById('bulkEditorAddWord').addEventListener('click', (evt) => {
       this.bulkEditorAddRow();

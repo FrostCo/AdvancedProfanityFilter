@@ -75,6 +75,79 @@ describe('WebConfig', function () {
     });
   });
 
+  describe('.assembleRecoveredConfig()', function () {
+    it('should combine split sync keys when syncLargeKeys is enabled', function () {
+      const local = { syncLargeKeys: true };
+      const sync = {
+        filterMethod: Constants.FILTER_METHODS.CENSOR,
+        _words0: { ass: WebConfig._defaultWords.ass },
+        _words1: {
+          test: {
+            lists: [],
+            matchMethod: Constants.MATCH_METHODS.EXACT,
+            repeat: Constants.TRUE,
+            separators: Constants.FALSE,
+            sub: 'tset',
+          },
+        },
+      };
+
+      const config = WebConfig.assembleRecoveredConfig(local, sync);
+      expect(config.syncLargeKeys).to.equal(true);
+      expect(config.filterMethod).to.equal(Constants.FILTER_METHODS.CENSOR);
+      expect(config.words).to.have.keys('ass', 'test');
+      expect(config._words0).to.not.exist;
+      expect(config.background).to.not.exist;
+    });
+
+    it('should prefer local large keys when syncLargeKeys is disabled', function () {
+      const local = {
+        syncLargeKeys: false,
+        words: { localword: WebConfig._defaultWords.ass },
+        background: { tabs: {} },
+        stats: { words: {} },
+      };
+      const sync = {
+        _words0: { syncword: WebConfig._defaultWords.ass },
+        collectStats: false,
+      };
+
+      const config = WebConfig.assembleRecoveredConfig(local, sync);
+      expect(config.syncLargeKeys).to.equal(false);
+      expect(config.words).to.have.keys('localword');
+      expect(config.collectStats).to.equal(false);
+      expect(config.background).to.not.exist;
+      expect(config.stats).to.not.exist;
+    });
+
+    it('should keep split sync data when lower containers are missing', function () {
+      const sync = { _words1: { gapword: WebConfig._defaultWords.ass } };
+
+      const config = WebConfig.assembleRecoveredConfig({ syncLargeKeys: true }, sync);
+      expect(config.words).to.have.keys('gapword');
+    });
+
+    it('should omit missing persistable keys instead of filling defaults', function () {
+      const config = WebConfig.assembleRecoveredConfig({}, { collectStats: true });
+      expect(config.collectStats).to.equal(true);
+      expect(config.words).to.be.undefined;
+      expect(config.filterMethod).to.be.undefined;
+    });
+  });
+
+  describe('save()', function () {
+    it('should refuse to save when _saveDisabled is set', async function () {
+      const config = new WebConfig(WebConfig._defaults);
+      config._saveDisabled = true;
+      try {
+        await config.save();
+        expect.fail('save() should have thrown');
+      } catch (err) {
+        expect(err.message).to.include('Saving is disabled');
+      }
+    });
+  });
+
   describe('splitData()', function () {
     const encoder = new TextEncoder();
 

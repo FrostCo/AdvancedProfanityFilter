@@ -76,6 +76,7 @@
       "convertStorageSuccess": "Storage converted successfully.",
       "importFailed": "Failed to import config.",
       "importProcessingFailed": "Failed to process new settings.",
+      "importRecoveryEmpty": "This is a storage recovery backup, but it doesn't contain any readable settings to import.",
       "importSuccess": "Settings imported successfully.",
       "restoreDefaultsFailed": "Failed to restore defaults.",
       "restoreDefaultsSuccess": "Default settings restored.",
@@ -344,6 +345,22 @@
       "saveOptionsFailed": "Settings not saved! Please try again.",
       "status": "Status updated.",
       "warning": "Invalid input."
+    }
+  },
+  "loadErrorModal": {
+    "buttons": {
+      "backup": "$t(common:buttons.backup)",
+      "retry": "$t(common:buttons.retry)"
+    },
+    "headers": {
+      "title": "Failed to Load Settings"
+    },
+    "messages": {
+      "body": "Settings could not be loaded from browser storage. You can retry or back up whatever data can still be read. Saving is disabled until settings load successfully.",
+      "restart": "If retrying doesn't help, restart your browser, and then your computer if the problem persists. The browser is sometimes temporarily unable to reach its storage, and a restart usually clears it up.",
+      "backupFailed": "Backup failed. A diagnostic file was still saved if possible.",
+      "backupPartial": "Backup downloaded, but some storage could not be read. Check the file for details.",
+      "backupSuccess": "Backup downloaded. Keep this file in case you need to restore settings later."
     }
   },
   "tabs": {
