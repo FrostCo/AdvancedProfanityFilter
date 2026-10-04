@@ -251,13 +251,27 @@ a#bookmarkletLink:visited {
 
 #bulkWordEditorModal table th button,
 #bulkWordEditorModal table th input,
+#bulkWordEditorModal table th select,
 #bulkWordEditorModal table th span {
   vertical-align: middle;
 }
 
 #bulkWordEditorModal table th button,
-#bulkWordEditorModal table th input {
+#bulkWordEditorModal table th input[type='checkbox'] {
   margin-right: 5px;
+}
+
+#bulkWordEditorModal table th input[type='text'],
+#bulkWordEditorModal table th select {
+  margin-left: 5px;
+}
+
+#bulkWordEditorModal table th input[type='text'] {
+  width: 80px;
+}
+
+#bulkWordEditorModal table th select {
+  max-width: 90px;
 }
 
 #bulkWordEditorModal table td {

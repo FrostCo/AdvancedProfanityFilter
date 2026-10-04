@@ -489,6 +489,10 @@ export default class OptionPage {
     document.getElementById('bulkWordEditorMatchMethodHeader').textContent = this.t(
       'options:bulkWordEditorModal.tableHeaders.matchMethod',
     );
+    this.populateBulkEditorMatchMethodSelect(
+      document.getElementById('bulkEditorMatchMethod') as HTMLSelectElement,
+      true,
+    );
     document.getElementById('bulkWordEditorRemoveAllHeader').textContent = this.t(
       'options:bulkWordEditorModal.tableHeaders.remove',
     );
@@ -591,6 +595,7 @@ export default class OptionPage {
 
     const subInput = document.createElement('input');
     subInput.type = 'text';
+    subInput.classList.add('bulkWordSub');
     cellSub.appendChild(subInput);
     subInput.value = data.sub;
 
@@ -601,11 +606,8 @@ export default class OptionPage {
     cellSubCase.appendChild(subCaseInput);
 
     const matchMethodSelect = document.createElement('select');
-    this.Class.Constants.orderedArray(this.Class.Constants.MATCH_METHODS).forEach((matchMethod, index) => {
-      const optionElement = document.createElement('option');
-      optionElement.textContent = this.t(`options:bulkWordEditorModal.options.${matchMethod.toLowerCase()}MatchMethod`);
-      matchMethodSelect.appendChild(optionElement);
-    });
+    matchMethodSelect.classList.add('bulkWordMatchMethod');
+    this.populateBulkEditorMatchMethodSelect(matchMethodSelect);
     matchMethodSelect.selectedIndex = data.matchMethod;
     cellMatchMethod.appendChild(matchMethodSelect);
 
@@ -761,6 +763,59 @@ export default class OptionPage {
       .forEach((box: HTMLInputElement) => {
         box.checked = checked;
       });
+  }
+
+  bulkEditorHeaderCheckbox(checkbox: HTMLInputElement) {
+    const checked = checkbox.checked;
+    const name = checkbox.dataset.name;
+    document
+      .querySelectorAll(`#bulkWordEditorModal table td input[name="${name}"]`)
+      .forEach((box: HTMLInputElement) => {
+        box.checked = checked;
+      });
+  }
+
+  bulkEditorHeaderMatchMethod(select: HTMLSelectElement) {
+    if (select.value === '') return;
+
+    const selectedIndex = parseInt(select.value, 10);
+    document
+      .querySelectorAll('#bulkWordEditorModal table td select.bulkWordMatchMethod')
+      .forEach((rowSelect: HTMLSelectElement) => {
+        rowSelect.selectedIndex = selectedIndex;
+      });
+  }
+
+  bulkEditorHeaderSubstitution(input: HTMLInputElement) {
+    const value = input.value;
+    document
+      .querySelectorAll('#bulkWordEditorModal table td input.bulkWordSub')
+      .forEach((rowInput: HTMLInputElement) => {
+        rowInput.value = value;
+      });
+  }
+
+  populateBulkEditorMatchMethodSelect(select: HTMLSelectElement, includeBlank = false) {
+    select.replaceChildren();
+    if (includeBlank) {
+      const blank = document.createElement('option');
+      blank.value = '';
+      select.appendChild(blank);
+    }
+    this.Class.Constants.orderedArray(this.Class.Constants.MATCH_METHODS).forEach((matchMethod, index) => {
+      const optionElement = document.createElement('option');
+      optionElement.value = index.toString();
+      optionElement.textContent = this.t(`options:bulkWordEditorModal.options.${matchMethod.toLowerCase()}MatchMethod`);
+      select.appendChild(optionElement);
+    });
+  }
+
+  resetBulkEditorHeaderControls() {
+    (document.getElementById('bulkEditorSubstitution') as HTMLInputElement).value = '';
+    (document.getElementById('bulkEditorSubstitutionCase') as HTMLInputElement).checked = false;
+    (document.getElementById('bulkEditorMatchMethod') as HTMLSelectElement).selectedIndex = 0;
+    (document.getElementById('bulkEditorRepeated') as HTMLInputElement).checked = false;
+    (document.getElementById('bulkEditorSeparators') as HTMLInputElement).checked = false;
   }
 
   closeModal(id: string) {
@@ -2391,6 +2446,21 @@ export default class OptionPage {
     document.getElementById('bulkEditorRemoveAll').addEventListener('click', (evt) => {
       this.bulkEditorRemoveAll();
     });
+    document.getElementById('bulkEditorSubstitution').addEventListener('change', (evt) => {
+      this.bulkEditorHeaderSubstitution(evt.target as HTMLInputElement);
+    });
+    document.getElementById('bulkEditorSubstitutionCase').addEventListener('click', (evt) => {
+      this.bulkEditorHeaderCheckbox(evt.target as HTMLInputElement);
+    });
+    document.getElementById('bulkEditorMatchMethod').addEventListener('change', (evt) => {
+      this.bulkEditorHeaderMatchMethod(evt.target as HTMLSelectElement);
+    });
+    document.getElementById('bulkEditorRepeated').addEventListener('click', (evt) => {
+      this.bulkEditorHeaderCheckbox(evt.target as HTMLInputElement);
+    });
+    document.getElementById('bulkEditorSeparators').addEventListener('click', (evt) => {
+      this.bulkEditorHeaderCheckbox(evt.target as HTMLInputElement);
+    });
   }
 
   setupSettingsEventListeners() {
@@ -2644,6 +2714,7 @@ export default class OptionPage {
     const tBody = table.querySelector('tbody') as HTMLTableSectionElement;
     tBody.replaceChildren();
     tHeadRow.querySelectorAll('.dynamicHeader').forEach((th) => th.remove());
+    this.resetBulkEditorHeaderControls();
 
     // Add wordlists to header
     if (this.cfg.wordlistsEnabled) {

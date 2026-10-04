@@ -1253,11 +1253,32 @@
                     <button id="bulkEditorRemoveAll">X</button><span id="bulkWordEditorRemoveAllHeader">Remove</span>
                   </th>
                   <th><span id="bulkWordEditorWordHeader">Word</span></th>
-                  <th><span id="bulkWordEditorSubstitutionHeader">Substitution</span></th>
-                  <th><span id="bulkWordEditorSubstitutionCaseHeader">Substitution Case</span></th>
-                  <th><span id="bulkWordEditorMatchMethodHeader">Match Method</span></th>
-                  <th><span id="bulkWordEditorRepeatedHeader">Repeated</span></th>
-                  <th><span id="bulkWordEditorSeparatorsHeader">Separators</span></th>
+                  <th>
+                    <span id="bulkWordEditorSubstitutionHeader">Substitution</span>
+                    <input id="bulkEditorSubstitution" type="text" />
+                  </th>
+                  <th>
+                    <label>
+                      <input id="bulkEditorSubstitutionCase" type="checkbox" data-name="subCase" />
+                      <span id="bulkWordEditorSubstitutionCaseHeader">Substitution Case</span>
+                    </label>
+                  </th>
+                  <th>
+                    <span id="bulkWordEditorMatchMethodHeader">Match Method</span>
+                    <select id="bulkEditorMatchMethod"></select>
+                  </th>
+                  <th>
+                    <label>
+                      <input id="bulkEditorRepeated" type="checkbox" data-name="repeat" />
+                      <span id="bulkWordEditorRepeatedHeader">Repeated</span>
+                    </label>
+                  </th>
+                  <th>
+                    <label>
+                      <input id="bulkEditorSeparators" type="checkbox" data-name="separators" />
+                      <span id="bulkWordEditorSeparatorsHeader">Separators</span>
+                    </label>
+                  </th>
                 </tr>
               </thead>
               <tbody></tbody>
