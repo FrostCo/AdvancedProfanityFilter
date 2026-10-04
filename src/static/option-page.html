@@ -1325,6 +1325,34 @@
       </div>
     </div>
 
+    <div id="loadErrorModal" class="w3-modal">
+      <div class="w3-modal-content w3-card-4 w3-animate-zoom">
+        <header class="w3-container w3-red"><h5 id="loadErrorModalTitle">Failed to Load Settings</h5></header>
+        <div class="w3-container w3-padding w3-margin">
+          <div id="loadErrorModalContent">
+            <p id="loadErrorModalMessage">
+              Settings could not be loaded from browser storage. You can retry or back up whatever data can still be
+              read. Saving is disabled until settings load successfully.
+            </p>
+            <p id="loadErrorModalRestart" class="notes">
+              If retrying doesn't help, restart your browser, and then your computer if the problem persists. The
+              browser is sometimes temporarily unable to reach its storage, and a restart usually clears it up.
+            </p>
+            <p id="loadErrorModalError" class="notes"></p>
+            <p id="loadErrorModalStatus" class="notes"></p>
+          </div>
+          <div class="w3-right">
+            <button id="loadErrorModalBackup" class="w3-btn w3-round-large w3-flat-peter-river margin-top-large">
+              BACKUP
+            </button>
+            <button id="loadErrorModalRetry" class="w3-btn w3-round-large w3-flat-peter-river margin-top-large">
+              RETRY
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="uncaughtErrors"></div>
     <script src="show-errors.js"></script>
 
