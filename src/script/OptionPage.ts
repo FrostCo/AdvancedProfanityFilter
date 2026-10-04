@@ -1794,11 +1794,9 @@ export default class OptionPage {
       wordlistFilter.init();
     }
 
-    const words = Object.keys(this.cfg.words).sort();
-    words.unshift(this.t('options:wordsPage.options.addOrUpdateExistingWord'));
-    const options = words.map((word) => {
+    const wordEntries = Object.keys(this.cfg.words).map((word) => {
       let filteredWord = word;
-      if (word != words[0] && wordlistFilter.cfg.filterWordList) {
+      if (wordlistFilter.cfg.filterWordList) {
         if (wordlistFilter.cfg.words[word].matchMethod === this.Class.Constants.MATCH_METHODS.REGEX) {
           // Regexp
           filteredWord = wordlistFilter.cfg.words[word].sub || wordlistFilter.cfg.defaultSubstitution;
@@ -1806,14 +1804,29 @@ export default class OptionPage {
           filteredWord = wordlistFilter.replaceText(word, this.Class.Constants.ALL_WORDS_WORDLIST_ID, null);
         }
       }
+      return { word, filteredWord };
+    });
 
+    // Sort by filtered display name when filtering the word list, otherwise by original word
+    if (this.cfg.filterWordList) {
+      wordEntries.sort((a, b) => (a.filteredWord > b.filteredWord ? 1 : a.filteredWord < b.filteredWord ? -1 : 0));
+    } else {
+      wordEntries.sort((a, b) => (a.word > b.word ? 1 : a.word < b.word ? -1 : 0));
+    }
+
+    const placeholder = this.t('options:wordsPage.options.addOrUpdateExistingWord');
+    const options = wordEntries.map(({ word, filteredWord }) => {
       const optionElement = document.createElement('option');
-      optionElement.value = word === words[0] ? '' : word;
+      optionElement.value = word;
       optionElement.dataset.filtered = filteredWord;
       optionElement.textContent = filteredWord;
       return optionElement;
     });
-    wordsSelect.replaceChildren(...options);
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.dataset.filtered = placeholder;
+    placeholderOption.textContent = placeholder;
+    wordsSelect.replaceChildren(placeholderOption, ...options);
 
     // Dynamically create the wordlist selection checkboxes
     const wordlistOptions = this.cfg.wordlists.map((list, index) => {
