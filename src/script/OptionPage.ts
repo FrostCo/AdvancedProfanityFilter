@@ -1147,7 +1147,7 @@ export default class OptionPage {
 
   async importConfigText(cfg: string) {
     try {
-      const importedCfg = new this.Class.Config(JSON.parse(cfg));
+      const importedCfg = new this.Class.Config(this.importedConfigData(JSON.parse(cfg)));
       const migration = new this.Class.DataMigration(importedCfg);
       await migration.runImportMigrations();
       const resetSuccess = await this.restoreDefaults(null, true);
@@ -1168,6 +1168,20 @@ export default class OptionPage {
     } catch (err) {
       this.showErrorModal([this.t('options:configsPage.messages.importProcessingFailed'), `Error: ${err.message}`]);
     }
+  }
+
+  // Storage recovery backups wrap the settings in { _storageRecovery, config, local, sync }
+  importedConfigData(data: Record<string, unknown>): Record<string, unknown> {
+    if (!data || !data._storageRecovery) return data;
+
+    const recovered = data.config as Record<string, unknown>;
+    // Importing restores defaults first, so an empty recovery would clear settings instead of restoring them
+    if (!recovered || !Object.keys(recovered).length) {
+      throw new Error(this.t('options:configsPage.messages.importRecoveryEmpty'));
+    }
+
+    this.log.info('Importing the config from a storage recovery backup.', data._storageRecovery);
+    return recovered;
   }
 
   importStats() {

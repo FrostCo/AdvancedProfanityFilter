@@ -76,6 +76,7 @@
       "convertStorageSuccess": "Storage converted successfully.",
       "importFailed": "Failed to import config.",
       "importProcessingFailed": "Failed to process new settings.",
+      "importRecoveryEmpty": "This is a storage recovery backup, but it doesn't contain any readable settings to import.",
       "importSuccess": "Settings imported successfully.",
       "restoreDefaultsFailed": "Failed to restore defaults.",
       "restoreDefaultsSuccess": "Default settings restored.",
