@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import sinon from 'sinon';
 import Constants from '@APF/lib/Constants';
 import {
   booleanToNumber,
@@ -16,6 +17,7 @@ import {
   randomArrayElement,
   removeFromArray,
   secondsToHMS,
+  sendMessageWithRetry,
   sortObjectKeys,
   stringArray,
   timeForFileName,
@@ -540,6 +542,93 @@ describe('Helper', function () {
 
     it('Returns string with first character uppercased leaving the rest alone', function () {
       expect(upperCaseFirst('hello WORLD', false)).to.eql('Hello WORLD');
+    });
+  });
+
+  describe('sendMessageWithRetry()', function () {
+    let clock;
+    let originalChromeDescriptor: PropertyDescriptor | undefined;
+
+    beforeEach(function () {
+      originalChromeDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'chrome');
+    });
+
+    afterEach(function () {
+      clock?.restore();
+      clock = undefined;
+      if (originalChromeDescriptor) {
+        Object.defineProperty(globalThis, 'chrome', originalChromeDescriptor);
+      } else {
+        delete (globalThis as any).chrome;
+      }
+    });
+
+    function installRuntime(sendMessage) {
+      const runtime = {
+        lastError: undefined,
+        sendMessage,
+      };
+      (globalThis as any).chrome = { runtime };
+      return runtime;
+    }
+
+    it('returns the extension response', async function () {
+      const sendMessage = sinon.stub().callsFake((_message, callback) => {
+        callback({ disabledTab: true });
+      });
+      installRuntime(sendMessage);
+
+      const result = await sendMessageWithRetry({ ping: true }, 3, { disabledTab: false });
+
+      expect(sendMessage.calledOnce).to.equal(true);
+      expect(sendMessage.firstCall.args[0]).to.eql({ ping: true });
+      expect(result).to.eql({ disabledTab: true });
+    });
+
+    it('uses the fallback when the extension API is missing', async function () {
+      const result = await sendMessageWithRetry({ ping: true }, 3, { disabledTab: false });
+
+      expect(result).to.eql({ disabledTab: false });
+    });
+
+    it('uses the fallback when chrome.runtime cannot send messages', async function () {
+      (globalThis as any).chrome = { runtime: {} };
+
+      const result = await sendMessageWithRetry({ ping: true }, 1, { ok: false });
+
+      expect(result).to.eql({ ok: false });
+    });
+
+    it('retries while the extension reports lastError', async function () {
+      clock = sinon.useFakeTimers();
+      let attempts = 0;
+      const runtime = installRuntime((_message, callback) => {
+        attempts += 1;
+        runtime.lastError = attempts === 1 ? { message: 'Receiving end does not exist' } : undefined;
+        callback(attempts === 1 ? undefined : { disabledTab: false });
+      });
+
+      const pending = sendMessageWithRetry({ ping: true }, 3, { disabledTab: true });
+      await clock.tickAsync(100);
+
+      expect(await pending).to.eql({ disabledTab: false });
+      expect(attempts).to.equal(2);
+    });
+
+    it('uses the fallback after the retries are exhausted', async function () {
+      clock = sinon.useFakeTimers();
+      let attempts = 0;
+      installRuntime((_message, callback) => {
+        attempts += 1;
+        (globalThis as any).chrome.runtime.lastError = { message: 'Receiving end does not exist' };
+        callback(undefined);
+      });
+
+      const pending = sendMessageWithRetry({ ping: true }, 3, { disabledTab: false });
+      await clock.tickAsync(300);
+
+      expect(await pending).to.eql({ disabledTab: false });
+      expect(attempts).to.equal(3);
     });
   });
 });
