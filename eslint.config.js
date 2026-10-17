@@ -7,7 +7,7 @@ export default [
   {
     // JavaScript files
     files: ['**/*.js'],
-    ignores: ['node_modules/**', 'dist/**', 'dist-bookmarklet/**', 'dist-lib/**'],
+    ignores: ['node_modules/**', 'dist/**', 'dist-bookmarklet/**', 'dist-lib/**', 'packages/apf-core/dist/**'],
     languageOptions: {
       globals: {
         ...globals.browser,

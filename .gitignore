@@ -27,6 +27,11 @@ bin/git-filters/*.js
 # Built shared libs
 /dist-lib
 
+# Built @frostco/apf-core package. Source stays in src/script/lib.
+/packages/apf-core/dist
+/packages/apf-core/LICENSE
+/packages/apf-core/*.tgz
+
 # General
 # MacOS
 .DS_Store

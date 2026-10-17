@@ -278,13 +278,20 @@ export function sendMessageWithRetry<TResponse = any>(
   fallbackResponse?: TResponse,
 ): Promise<TResponse> {
   return new Promise((resolve) => {
+    // Extension pages provide chrome.runtime. Ordinary browser and Node callers do not.
+    const runtime = typeof chrome !== 'undefined' ? chrome.runtime : undefined;
+    if (!runtime?.sendMessage) {
+      resolve(fallbackResponse);
+      return;
+    }
+
     let attempts = 0;
 
     const attemptSend = () => {
       attempts++;
 
-      chrome.runtime.sendMessage(message, (response) => {
-        if (chrome.runtime.lastError) {
+      runtime.sendMessage(message, (response) => {
+        if (runtime.lastError) {
           if (attempts < maxRetries) {
             // Exponential backoff: 100ms, 200ms, 400ms
             const delay = Math.pow(2, attempts - 1) * 100;

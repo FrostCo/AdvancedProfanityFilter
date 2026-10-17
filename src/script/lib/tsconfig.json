@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "declaration": true,
     "lib": ["es2022", "dom", "dom.iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "noEmit": false,
-    "outDir": "../../../dist-lib",
+    "outDir": "../../../packages/apf-core/dist",
+    "rootDir": ".",
     "skipLibCheck": true,
     "target": "esnext"
   },

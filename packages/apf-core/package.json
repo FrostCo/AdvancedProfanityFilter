@@ -1,0 +1,48 @@
+{
+  "name": "@frostco/apf-core",
+  "version": "0.1.0",
+  "description": "Reusable profanity filtering engine from Advanced Profanity Filter.",
+  "license": "GPL-3.0-only",
+  "author": "FrostCo",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "LICENSE",
+    "dist/Config.d.ts",
+    "dist/Config.js",
+    "dist/Constants.d.ts",
+    "dist/Constants.js",
+    "dist/Filter.d.ts",
+    "dist/Filter.js",
+    "dist/Logger.d.ts",
+    "dist/Logger.js",
+    "dist/Word.d.ts",
+    "dist/Word.js",
+    "dist/Wordlist.d.ts",
+    "dist/Wordlist.js",
+    "dist/helper.d.ts",
+    "dist/helper.js",
+    "dist/index.d.ts",
+    "dist/index.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FrostCo/AdvancedProfanityFilter.git",
+    "directory": "packages/apf-core"
+  },
+  "bugs": {
+    "url": "https://github.com/FrostCo/AdvancedProfanityFilter/issues"
+  },
+  "homepage": "https://github.com/FrostCo/AdvancedProfanityFilter#readme",
+  "keywords": [
+    "Profanity",
+    "Filter"
+  ]
+}

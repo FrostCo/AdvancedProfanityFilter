@@ -2,6 +2,8 @@
 dist/
 dist-bookmarklet/
 dist-lib/
+packages/apf-core/dist/
+packages/apf-core/LICENSE
 
 # Ignore third-party vendor scripts and styles
 src/script/vendor/
