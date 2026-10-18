@@ -83,8 +83,15 @@ async function finalize() {
 
   await fs.copy(licenseSource, licenseDestination);
 
+  const staticPackageFiles = ['LICENSE', 'README.md'];
+  for (const fileName of staticPackageFiles) {
+    if (!(await fs.pathExists(path.join(packageDir, fileName)))) {
+      throw new Error(`Package is missing ${fileName}`);
+    }
+  }
+
   const allowed = await allowedPackageFiles();
-  const actual = new Set(['LICENSE', ...outputNames.map((fileName) => `dist/${fileName}`)]);
+  const actual = new Set([...staticPackageFiles, ...outputNames.map((fileName) => `dist/${fileName}`)]);
   const missing = [...allowed].filter((fileName) => !actual.has(fileName));
   const extra = [...actual].filter((fileName) => !allowed.has(fileName));
   if (missing.length > 0 || extra.length > 0) {

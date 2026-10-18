@@ -59,6 +59,10 @@ For a detailed overview of the features and settings, please see the [Getting St
 
 If you would like to help with development, but don't have experience coding, its very helpful to have users test a release candidate before actually publishing it to everyone. If you are interested in testing new versions see [this page](https://github.com/FrostCo/AdvancedProfanityFilter/wiki/Beta-Testing) for more information.
 
+## Reusable filtering library
+
+The filtering engine is also available as [`@frostco/apf-core`](packages/apf-core/README.md). Build and pack it locally with `npm run build:libs`; its version is independent of the extension.
+
 ## Development
 
 See [development.md](development.md) for development documentation.

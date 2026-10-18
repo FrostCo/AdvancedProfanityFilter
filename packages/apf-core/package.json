@@ -15,6 +15,7 @@
   },
   "files": [
     "LICENSE",
+    "README.md",
     "dist/Config.d.ts",
     "dist/Config.js",
     "dist/Constants.d.ts",
